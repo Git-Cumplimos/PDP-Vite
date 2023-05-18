@@ -53,7 +53,7 @@ const rutasDaviviendaCB = {
   label: (
     <AppIcons
       Logo={"CorresponsaliaDavivienda"}
-      name='Corresponsalía Davivienda'
+      name="Corresponsalía Davivienda"
     />
   ),
   component: CorresponsaliaDavivienda,
@@ -61,7 +61,7 @@ const rutasDaviviendaCB = {
   subRoutes: [
     {
       link: "/corresponsalia/corresponsaliaDavivienda/Daviplata",
-      label: <AppIcons Logo={"Daviplata"} name='DaviPlata' />,
+      label: <AppIcons Logo={"Daviplata"} name="DaviPlata" />,
       component: DaviplataCB,
       permission: [
         enumPermisosDavivienda.davivienda_cb_cash_in,
@@ -71,14 +71,14 @@ const rutasDaviviendaCB = {
         {
           link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashIn",
           label: (
-            <AppIcons Logo={"DepositoDaviplata"} name='Depósito DaviPlata' />
+            <AppIcons Logo={"DepositoDaviplata"} name="Depósito DaviPlata" />
           ),
           component: CashIn,
           permission: [enumPermisosDavivienda.davivienda_cb_cash_in],
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/DaviplatacashOut",
-          label: <AppIcons Logo={"RetiroDaviplata"} name='Retiro DaviPlata' />,
+          label: <AppIcons Logo={"RetiroDaviplata"} name="Retiro DaviPlata" />,
           component: CashOut,
           permission: [enumPermisosDavivienda.davivienda_cb_cash_out],
         },
@@ -90,7 +90,7 @@ const rutasDaviviendaCB = {
       label: (
         <AppIcons
           Logo={"RetirosYDepositos"}
-          name='Retiros y Depósitos Davivienda'
+          name="Retiros y Depósitos Davivienda"
         />
       ),
       component: AhorrosCorrienteCB,
@@ -101,13 +101,13 @@ const rutasDaviviendaCB = {
       subRoutes: [
         {
           link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/deposito",
-          label: <AppIcons Logo={"Depositos"} name='Depósitos' />,
+          label: <AppIcons Logo={"DepositoDaviplata"} name="Depósitos" />,
           component: DepositoCB,
           permission: [enumPermisosDavivienda.davivienda_cb_depositos],
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/retiro",
-          label: <AppIcons Logo={"Retiro"} name='Retiros' />,
+          label: <AppIcons Logo={"Retiro"} name="Retiros" />,
           component: RetiroCB,
           permission: [enumPermisosDavivienda.davivienda_cb_retiros],
         },
@@ -115,7 +115,7 @@ const rutasDaviviendaCB = {
     },
     {
       link: "/corresponsalia/corresponsaliaDavivienda/Daviplatapagos_giros",
-      label: <AppIcons Logo={"PagoPorGiro"} name='Pago por giro' />,
+      label: <AppIcons Logo={"PagoPorGiro"} name="Pago por giro" />,
       component: PagoGiro,
       permission: [enumPermisosDavivienda.davivienda_cb_pago_por_giro],
     },
@@ -125,29 +125,29 @@ const rutasDaviviendaCB = {
       label: (
         <AppIcons
           Logo={"PagoProductosPropios"}
-          name='Pago de productos propios'
+          name="Pago de productos propios"
         />
       ),
       component: PagoDeProductosPropios,
-      permission: [
-        enumPermisosDavivienda.davivienda_cb_pago_productos_propios,
-        enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,
-      ],
+      permission: [enumPermisosDavivienda.davivienda_cb_pago_productos_propios],
     },
     {
       link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados",
       label: (
         <AppIcons
-          Logo={"Recaudo"}
-          name='Recaudo servicios públicos y privados'
+          Logo={"RecaudoServiciosPublicosDavivienda"}
+          name="Recaudo servicios públicos y privados"
         />
       ),
       component: RecaudoServiciosPublicosPrivadosMenu,
-      permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
+      permission: [
+        enumPermisosDavivienda.davivienda_cb_recaudo,
+        enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,
+      ],
       subRoutes: [
         {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccion",
-          label: <AppIcons Logo={"RecaudoManual"} name='Recaudo manual' />,
+          label: <AppIcons Logo={"RecaudoManual"} name="Recaudo manual" />,
           component: SeleccionServicioPagar,
           permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
         },
@@ -156,7 +156,7 @@ const rutasDaviviendaCB = {
           label: (
             <AppIcons
               Logo={"RecaudoManual"}
-              name='Recaudo manual operaciones'
+              name="Recaudo manual operaciones"
             />
           ),
           component: SeleccionServicioPagar,
@@ -169,7 +169,7 @@ const rutasDaviviendaCB = {
           label: (
             <AppIcons
               Logo={"RecaudoCodigoDeBarras"}
-              name='Recaudo código de barras'
+              name="Recaudo código de barras"
             />
           ),
           component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarras,
@@ -177,14 +177,14 @@ const rutasDaviviendaCB = {
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
-          label: <AppIcons Logo={"RecaudoManual"} name='Recaudo manual' />,
+          label: <AppIcons Logo={"RecaudoManual"} name="Recaudo manual" />,
           component: RecaudoServiciosPublicosPrivados,
           permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
           show: false,
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manualOperaciones",
-          label: <AppIcons Logo={"RecaudoManual"} name='Recaudo manual' />,
+          label: <AppIcons Logo={"RecaudoManual"} name="Recaudo manual" />,
           component: RecaudoServiciosPublicosPrivadosOperaciones,
           permission: [
             enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,

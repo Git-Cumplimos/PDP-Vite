@@ -2,12 +2,24 @@ import Button from "../../../../components/Base/Button";
 import FileInput from "../../../../components/Base/FileInput";
 import classes from "./FileInputX.module.css";
 import { useCallback, useState } from "react";
-import { Presigned } from "../../utils/fetchBucket";
-import { notifyError } from "../../../../utils/notify";
+import { Presigned, Presigned_validar } from "../../utils/fetchBucket";
+import { notify, notifyError, notifyPending } from "../../../../utils/notify";
+import { Validar_archivo } from "../../utils/fetchValidarArchivo";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import Modal from "../../../../components/Base/Modal";
+import Fieldset from "../../../../components/Base/Fieldset";
+import LogoPDP from "../../../../components/Base/LogoPDP";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import { useNavigate, Navigate } from "react-router-dom";
+
 
 const FileInputX = ({ banco }) => {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [errors, setErrors] = useState([]);
+
   const banco_minuscula = banco.charAt(0).toLowerCase() + banco.slice(1);
-  console.log(banco_minuscula);
+  // console.log(banco_minuscula);
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
   const {
     contendorPrincipalFormulario,
@@ -18,27 +30,56 @@ const FileInputX = ({ banco }) => {
     contenedorArchivos,
     contenedorBtns,
     nombreArchivo,
+    contendorLista,
+    nombreArchivoStyle,
     fileInput,
     contenedorLabel,
     btnBasura,
     divsuperior,
     divinferior,
+    nombreLabel,
     contenedorArchivosBasura,
   } = classes;
 
   const [nombreDocumento, setNombreDocumento] = useState("");
   const [archivo, setArchivo] = useState([]);
-  const [disabledBtn, setDisabledBtn] = useState(true);
+  const [disabledBtn, setDisabledBtn] = useState(false);
+  const [procesandoValidacion, setProcesandoValidacion] = useState(false);
+  const [type1, setType1] = useState([]);
 
   //------------------Guardar Archivos PDF---------------------//
-  const onFileChange = useCallback((files) => {
-    if (Array.isArray(Array.from(files))) {
-      files = Array.from(files);
-      setArchivo(files);
-      setNombreDocumento(files[0]?.name);
-      setDisabledBtn(false);
-    }
-  }, []);
+  const onFileChange = useCallback(
+    (files) => {
+      if (Array.isArray(Array.from(files))) {
+        files = Array.from(files);
+        setArchivo(files);
+        setNombreDocumento(files[0]?.name);
+        setDisabledBtn(false);
+        const tipo_archivo = files[0]?.type.toString();
+        console.log(tipo_archivo);
+        // console.log(!/^.*\.fil$/.test(files[0].name));
+        if (tipo_archivo !== "text/csv" && banco_minuscula === "davivienda") {
+          // Muestra una notificación si la extensión del archivo es diferente de ".fil" o ".csv"
+          document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+          setArchivo([]);
+          setNombreDocumento("");
+          notifyError("La extensión del archivo debe ser de tipo csv");
+          return;
+        } else if (
+          tipo_archivo !== "text/plain" &&
+          !/^.*\.fil$/.test(files[0].name) &&
+          banco_minuscula === "bancolombia"
+        ) {
+          document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+          setArchivo([]);
+          setNombreDocumento("");
+          notifyError("La extensión del archivo debe ser de tipo .fil");
+          return;
+        }
+      }
+    },
+    [banco_minuscula]
+  );
   const EliminarDocumento = (e) => {
     e.preventDefault();
     document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
@@ -46,30 +87,178 @@ const FileInputX = ({ banco }) => {
     setNombreDocumento("");
     setDisabledBtn(true);
   };
-
-  const EnviarArchivos = (e) => {
+  const CancelarDocumento = (e) => {
     e.preventDefault();
+    setShowModal(false);
+    notifyError("El usuario canceló el proceso de contingencia");
+    navigate("/recaudoEmpresarial/recaudoEmpresarialBancolombia");
+    document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+    setArchivo([]);
+    setNombreDocumento("");
     setDisabledBtn(true);
-    if (archivo[0]) {
-      console.log("ARCHIVO[0]", archivo[0]);
-      Presigned(archivo[0], banco_minuscula)
-        .then((res) => {
-          setArchivo([]);
-          setNombreDocumento("");
-          setDisabledBtn(false);
-        })
-        .catch((err) => console.error(err));
-    } else {
-      if (!archivo[0]) {
-        notifyError("Por favor adjunte el archivo de contingencia.");
+  };
+
+  const EnviarArchivos = async (e) => {
+    e.preventDefault();
+    setShowModal(false);
+    setDisabledBtn(true);
+
+    if (!archivo[0]) {
+      notifyError("Por favor adjunte el archivo de contingencia.");
+      setDisabledBtn(false);
+      return;
+    }
+
+    try {
+      setProcesandoValidacion(true);
+      const presignedData = await Presigned_validar(
+        archivo[0],
+        banco_minuscula
+      );
+      const nombreArchivoS3 = presignedData.nombre_archivo;
+
+      if (!nombreArchivoS3) {
+        notifyError("Error, no se recibio el archivo.");
+        setProcesandoValidacion(false);
+        document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+        setArchivo([]);
+        setNombreDocumento("");
         setDisabledBtn(false);
+        return;
       }
+
+      Validar_archivo(banco_minuscula, nombreArchivoS3).then((res) => {
+        console.log("RESPUESTA VALIDAR", res);
+        if (res?.codigo == 400) {
+          // setShowModal(true);
+          // setErrors(res?.obj);
+          window.open(res?.url, "_self");
+        }
+        setProcesandoValidacion(false);
+        document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+        setProcesandoValidacion(false);
+        setArchivo([]);
+        setNombreDocumento("");
+        setDisabledBtn(false);
+      });
+    } catch (error) {
+      console.error(error);
+      document.getElementById("contingencia").value = ""; // <- limpia el valor del campo de archivo
+      setDisabledBtn(false);
     }
   };
 
+  const handleClose = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  // const EnviarArchivos = async (e) => {
+  //   e.preventDefault();
+  //   setDisabledBtn(true);
+
+  //   if (!archivo[0]) {
+  //     notifyError("Por favor adjunte el archivo de contingencia.");
+  //     setDisabledBtn(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     setProcesandoValidacion(true);
+  //     const presignedData = await Presigned_validar(
+  //       archivo[0],
+  //       banco_minuscula
+  //     );
+  //     const nombreArchivoS3 = presignedData.nombre_archivo;
+
+  //     if (!nombreArchivoS3) {
+  //       notifyError("Error, no se recibio el archivo.");
+  //       setProcesandoValidacion(false);
+  //       setArchivo([]);
+  //       setNombreDocumento("");
+  //       setDisabledBtn(false);
+  //       return;
+  //     }
+
+  //     const res = await Validar_archivo(banco_minuscula, nombreArchivoS3);
+
+  //     setProcesandoValidacion(false);
+  //     notifyPending(
+  //       Promise.resolve(res),
+  //       {},
+  //       { render: ({ data }) => `Success ${JSON.stringify(data)}` },
+  //       { render: ({ data }) => `Error ${data.message}` }
+  //     );
+
+  //     setArchivo([]);
+  //     setNombreDocumento("");
+  //     setDisabledBtn(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //     setDisabledBtn(false);
+  //   }
+  // };
+
+  // const EnviarArchivos = (e) => {
+  //   e.preventDefault();
+  //   setDisabledBtn(true);
+  //   if (archivo[0]) {
+  //     console.log("ARCHIVO[0]", archivo[0]);
+  //     setProcesandoValidacion(true);
+  //     Presigned_validar(archivo[0], banco_minuscula)
+  //       .then((res) => {
+  //         setNombreArchivoS3(res?.nombre_archivo);
+
+  //         if (res?.nombre_archivo) {
+  //           notifyPending(
+  //             new Promise((resolve, reject) => {
+  //               setTimeout(() => {
+  //                 Validar_archivo(banco_minuscula, res?.nombre_archivo)
+  //                   .then((res) => {
+  //                     setProcesandoValidacion(false);
+  //                     resolve(res);
+  //                   })
+  //                   .catch((err) => {
+  //                     setProcesandoValidacion(false);
+  //                     reject(err);
+  //                   });
+  //               }, 3000);
+  //             }),
+  //             {},
+  //             { render: ({ data }) => `Success ${JSON.stringify(data)}` },
+  //             { render: ({ data }) => `Error ${data.message}` },
+
+  //           );
+  //           // setTimeout(
+  //           //   () =>
+  //           //     Validar_archivo(banco_minuscula, res?.nombre_archivo).then(
+  //           //       (res) => {
+  //           //         setProcesandoValidacion(false);
+  //           //         notify(res);
+  //           //       }
+  //           //     ),
+  //           //   3000
+  //           // );
+  //         } else {
+  //           notifyError("Error, no se recibio el archivo.");
+  //           setProcesandoValidacion(false);
+  //         }
+  //         setArchivo([]);
+  //         setNombreDocumento("");
+  //         setDisabledBtn(false);
+  //       })
+  //       .catch((err) => console.error(err));
+  //   } else {
+  //     if (!archivo[0]) {
+  //       notifyError("Por favor adjunte el archivo de contingencia.");
+  //       setDisabledBtn(false);
+  //     }
+  //   }
+  // };
+
   return (
     <div className={contendorPrincipalFormulario}>
-      <form onSubmit={(e) => EnviarArchivos(e)} className={contenedorForm}>
+      <SimpleLoading show={procesandoValidacion}></SimpleLoading>
+      <form className={contenedorForm}>
         <div className={contenedorInput}>
           <h2 className={titulo}>
             {`Cargar archivo de contingencia ${banco}`}
@@ -83,7 +272,7 @@ const FileInputX = ({ banco }) => {
                   label={" "}
                   className={fileInput}
                   onGetFile={onFileChange}
-                  accept=".xlsx"
+                  accept=".fil, .csv"
                   allowDrop={false}
                 ></FileInput>
                 <div className={divsuperior}></div>
@@ -94,7 +283,9 @@ const FileInputX = ({ banco }) => {
           </div>
           {archivo[0] ? (
             <label className={contenedorArchivosBasura}>
-              <div className={nombreArchivo}> {nombreDocumento} </div>
+              <div className={nombreArchivoStyle}>
+                <h5 className={nombreLabel}>{nombreDocumento}</h5>
+              </div>
 
               <button
                 className={btnBasura}
@@ -108,15 +299,46 @@ const FileInputX = ({ banco }) => {
           )}
         </div>
         <div></div>
-        <div className={contenedorBtns}>
-          <Button
-            disabled={disabledBtn}
-            /*  className={btnEnviar} */ type="submit"
-          >
-            Cargar
-          </Button>
-        </div>
       </form>
+      <div className={contenedorBtns}>
+        <Button
+          disabled={disabledBtn}
+          onClick={(e) => setShowModal(true)} /* type="submit" */
+          /*  className={btnEnviar} */
+        >
+          Cargar archivo
+        </Button>
+      </div>
+
+      {/* {errors?.length > 0 ? ( */}
+      <Modal show={showModal} handleClose={handleClose}>
+        <LogoPDP xsmall></LogoPDP>
+        <br />
+        <br />
+        <h1 className="text-xl font-semibold">
+          ¿Está seguro de cargar el archivo de los registros de pagos?
+        </h1>
+
+        <ButtonBar>
+          <Button type="submit" onClick={(e) => EnviarArchivos(e)}>
+            Aceptar
+          </Button>
+          <Button onClick={(e) => CancelarDocumento(e)}>Cancelar</Button>
+        </ButtonBar>
+        {/* <Fieldset legend="Archivo con errores">
+            <ul className={contendorLista}>
+              {errors.map((error, index) => (
+                <li key={index}>
+                  {index + 1}) <li>Error: {error.error}</li>
+                  <li> Línea: {error.line}</li>
+                </li>
+              ))}
+            </ul>
+          </Fieldset> */}
+      </Modal>
+      {/* ) : (
+        ""
+      )} */}
     </div>
   );
 };

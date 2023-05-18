@@ -253,7 +253,10 @@ const EditComission = () => {
               return {
                 "Rango minimo": Minimo,
                 "Rango maximo": Maximo === -1 ? "" : Maximo,
-                "Comision porcentual": parseFloat(Porcentaje * 100),
+                "Comision porcentual":
+                  Porcentaje === 0
+                    ? 0
+                    : parseFloat(Porcentaje * 100).toPrecision(2),
                 "Comision fija": parseFloat(Fija),
               };
             }
@@ -284,7 +287,7 @@ const EditComission = () => {
             : "",
           type: res?.results[0]?.comisiones_campanas?.type
             ? res?.results[0]?.comisiones_campanas?.type
-            : "",
+            : "trxEsc",
           ranges:
             res?.results?.[0]?.comisiones_campanas?.ranges?.length > 0
               ? res?.results?.[0]?.comisiones_campanas?.ranges?.map(
@@ -292,7 +295,10 @@ const EditComission = () => {
                     return {
                       "Rango minimo": Minimo,
                       "Rango maximo": Maximo === -1 ? "" : Maximo,
-                      "Comision porcentual": parseFloat(Porcentaje * 100),
+                      "Comision porcentual":
+                        Porcentaje === 0
+                          ? 0
+                          : parseFloat(Porcentaje * 100).toPrecision(2),
                       "Comision fija": parseFloat(Fija),
                     };
                   }

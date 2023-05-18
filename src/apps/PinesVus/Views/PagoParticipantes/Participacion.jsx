@@ -29,7 +29,7 @@ const Participacion = () => {
     content: () => printDiv.current,
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
-  const { infoTicket} = useAuth();
+  // const { infoTicket} = useAuth();
   
 
   const { consultaParticipacion, registroPagoParticipacion} = usePinesVus();
@@ -58,6 +58,41 @@ const Participacion = () => {
   const [progress, setProgress] = useState(0);
   const [file, setFile] = useState("");
   const [fileName, setFileName] = useState("");
+  const [ticketPago, setTicketPago] = useState("")
+
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de pago participante pines vus",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      /*id_comercio*/
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+
+      ["Id Trx", ""],
+      ["", ""],
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
+
+  
+    ],
+    commerceName: "",
+    trxInfo: [
+      ["Fecha participación", ""],
+      ["",""],
+      ["Valor Trámite", ""],
+      ["",""],
+      ["Recibido", "______________________"],
+      ["",""]
+    ],
+    disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+  });
 
 
 
@@ -92,74 +127,89 @@ const Participacion = () => {
   const onSubmit = (e) => { 
     e.preventDefault();
     setDisabledBtns(true)
-    // const f = new Date()
+
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+
+    const objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["commerceName"] = "Pago a " + selected.aliado
+    objTicket["trxInfo"][0] = ["Fecha participación", fecha_ini]
+    objTicket["trxInfo"][2] = ["Valor Trámite", formatMoney.format(selected.total_pago)]
+
+
     registroPagoParticipacion(
       selected.aliado,
       selected.id,
-      //banco, 
-      //numCuenta, 
-      //numAprobacion, 
-      //numTransaccion,
       selected.total_pago,
       fecha_ini,
-      // `vouchersPagoParticipacion/voucherPago_${selected.aliado}_${f.getDate()}${
-      //   f.getMonth() + 1
-      // }${f.getFullYear()}/`,
-
+      objTicket
     ).then((res) => {
         setDisabledBtns(false)
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
           setRespPago(res?.obj)
+          objTicket["commerceInfo"][2] = ["Id trx", res?.obj?.id_transaccion_pdp]
+          setTicketPago(objTicket)
         }
     }).catch(() => setDisabledBtns(false));    
   }
+  
+  // const tickets = useMemo(() => {
+  //   return {
+  //     title: "Recibo de pago participante pines vus",
+  //     timeInfo: {
+  //       "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+  //         year: "numeric",
+  //         month: "numeric",
+  //         day: "numeric",
+  //       }).format(new Date()),
+  //       Hora: Intl.DateTimeFormat("es-CO", {
+  //         hour: "numeric",
+  //         minute: "numeric",
+  //         second: "numeric",
+  //         hour12: false,
+  //       }).format(new Date()),
+  //     },
+  //     commerceInfo: Object.entries({
+  //       "Id Comercio": roleInfo?.id_comercio,
+  //       "No. terminal": roleInfo?.id_dispositivo,
+  //       Municipio: roleInfo?.ciudad,
+  //       Dirección: roleInfo?.direccion,
+  //       "Id Trx": respPago?.id_transaccion_pdp,
+  //     }),
+  //     commerceName: "Pago a " + respPago?.participante,
+  //     trxInfo: [
+  //       ["Fecha participación", fecha_ini],
+  //       ["",""],
+  //       ["Valor Trámite", formatMoney.format(respPago?.valor)],
+  //       ["",""],
+  //       ["Recibido", "______________________"],
+  //       ["",""]
+  //     ],
+  //     disclamer:
+  //       "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+  //   };
+  // }, [roleInfo, respPago, formatMoney, fecha_ini]);
 
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago participante pines vus",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": respPago?.id_transaccion_pdp,
-      }),
-      commerceName: "Pago a " + respPago?.participante,
-      trxInfo: [
-        ["Fecha participación", fecha_ini],
-        ["",""],
-        ["Valor Trámite", formatMoney.format(respPago?.valor)],
-        ["",""],
-        ["Recibido", "______________________"],
-        ["",""]
-      ],
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [roleInfo, respPago, formatMoney, fecha_ini]);
-
-  useEffect(() => {
-    infoTicket(
-      respPago?.id_transaccion_pdp,
-      respPago?.tipo_trx,
-      tickets
-    );
-  }, [infoTicket, respPago, tickets]);
+  // useEffect(() => {
+  //   infoTicket(
+  //     respPago?.id_transaccion_pdp,
+  //     respPago?.tipo_trx,
+  //     tickets
+  //   );
+  // }, [infoTicket, respPago, tickets]);
 
   const hora = useMemo(() => {    
     return Intl.DateTimeFormat("es-CO", {
@@ -240,7 +290,7 @@ const Participacion = () => {
       <Modal show={showModal} handleClose={() => closeModal()}>
       {respPago !== ""? 
         <div className="flex flex-col justify-center items-center">
-          <Tickets refPrint={printDiv} ticket={tickets} />
+          <Tickets refPrint={printDiv} ticket={ticketPago} />
           <ButtonBar>
             <Button
               onClick={() => {

@@ -23,8 +23,10 @@ import {
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 
+const valor_maximo_recaudo = 9900000;
+
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
@@ -290,6 +292,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       } else {
         valorTransaccion = datosTransaccion.valor ?? 0;
       }
+      if (valorTransaccion > valor_maximo_recaudo) {
+        return notifyError(
+          `El valor de transacción es superior al valor máximo permitido ${formatMoney.format(
+            valor_maximo_recaudo
+          )}`
+        );
+      }
       const hoy = new Date();
       const fecha = Intl.DateTimeFormat("es-CO", {
         year: "2-digit",
@@ -354,6 +363,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valCodigoDeBarras: valorTransaccion,
         // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
@@ -440,7 +450,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         direccion: roleInfo?.direccion,
                       })
                         .then((res) => {
-                          if (res?.msg !== "No ha terminado el reintento") {
+                          if (
+                            res?.msg !==
+                            "Error respuesta PDP: (No ha terminado la operación)"
+                          ) {
                             if (res?.status) {
                               setIsUploading(false);
                               notify(res?.msg);
@@ -517,7 +530,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     } else {
       setIsUploading(true);
-      let dataCodBarras = datosTrans.codBarras.slice(3).replace(/[\x1D]/g, "");
+      let codBarrasIndex = datosTrans.codBarras.indexOf("415");
+      let codBarras = datosTrans.codBarras
+        .slice(codBarrasIndex)
+        .replace(/[\x1D]/g, "");
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
@@ -530,6 +546,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         numValor: datosTransaccion.valor ?? 0,
         numValorTotalDebito: datosTransaccion.valor ?? 0,
 
+        nombre_usuario: pdpUser?.uname ?? "",
         idComercio: roleInfo?.id_comercio,
         idUsuario: roleInfo?.id_usuario,
         idTerminal: roleInfo?.id_dispositivo,
@@ -572,7 +589,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     }
   };
   const onChangeMoney = useMoney({
-    limits: [0, 9900000],
+    limits: [0, 9900001],
     decimalDigits: 2,
   });
   const printDiv = useRef();

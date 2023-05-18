@@ -19,32 +19,32 @@ import { pinBlock } from "../../utils/pinBlock";
 import {
   fetchCustomPost,
   ErrorCustom,
-  ErrorCustomBackend,
-  msgCustomBackend,
 } from "../../utils/fetchPagoSubsidios_PagoTerceros";
 
+// ************ constantes *******************
 const minValor = 1000;
-const maxValor = 300001;
+const maxValor = 9000000;
 const dataInputInitial = {
   documento: "",
   numeroCelular: "",
   otp: "",
   valor_total_trx: "",
 };
-const tipo_operacion = 96;
-
 const url_pago_terceros = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_terceros/pago-terceros`;
+// ********************************************
 
+// >>>>>>>>>>>>>>>>>>> componente <<<<<<<<<<<<<<<<<<<<<
 const PagoTerceros = () => {
   const [inputData, setInputData] = useState(dataInputInitial);
   const [infTicket, setInfTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
-  const navigateValid = useNavigate();
-  const { roleInfo, infoTicket: guardarTicket } = useAuth();
   const [loadingPeticionPagoTerceros, PeticionPagoTerceros] =
     useFetch(fetchCustomPost);
+  const navigateValid = useNavigate();
+  const { roleInfo, pdpUser } = useAuth();
 
+  // ***************************** on Change **********************************
   function onChangeInput(e) {
     let valueInput = "";
     if (e.target.name === "valor_total_trx" || e.target.name === "otp") {
@@ -87,6 +87,7 @@ const PagoTerceros = () => {
     }));
   }
 
+  // ************************************* onSubmit *****************************************
   function onSubmitCheck(e) {
     e.preventDefault();
 
@@ -104,7 +105,6 @@ const PagoTerceros = () => {
       );
       return;
     }
-
     setShowModal(true);
     setTypeInfo("Inicial");
   }
@@ -124,6 +124,7 @@ const PagoTerceros = () => {
         id_terminal: roleInfo.id_dispositivo,
       },
       nombre_comercio: roleInfo["nombre comercio"],
+      nombre_usuario: pdpUser["uname"],
       oficina_propia: oficinaPropia_,
       valor_total_trx: inputData.valor_total_trx,
       numeroCelular: inputData.numeroCelular,
@@ -137,73 +138,30 @@ const PagoTerceros = () => {
         city: roleInfo.ciudad,
         dane_code: roleInfo.codigo_dane,
       },
+      bool_ticket: true,
     };
 
     // peticion al backend
-    PeticionPagoTerceros(
-      url_pago_terceros,
-      "/grupo-aval/pago-terceros",
-      dataTerceros
-    )
+    PeticionPagoTerceros(url_pago_terceros, "Pago Terceros", dataTerceros)
       .then((response) => {
         if (response?.status === true) {
-          PagoTercerosExitoso(response?.obj?.result);
+          if (response?.obj?.result?.ticket) {
+            const voucher = response.obj.result.ticket;
+            setInfTicket(JSON.parse(voucher));
+          }
+          notify("Pago de terceros exitoso");
+          setTypeInfo("InfRecibo");
         }
       })
       .catch((error) => {
-        if (error instanceof ErrorCustom) {
-        } else if (error instanceof ErrorCustomBackend) {
-          notifyError(`Pago de terceros no exitoso: ${error.message}`);
-        } else if (error instanceof msgCustomBackend) {
-          notify(`${error.message}`);
-        } else {
+        if (!error instanceof ErrorCustom) {
           notifyError("Pago de terceros no exitoso");
         }
         HandleCloseSecond();
       });
   }
 
-  function PagoTercerosExitoso(result_) {
-    const voucher = {
-      title: "Recibo de pago de terceros ",
-      timeInfo: {
-        "Fecha de venta": result_.fecha,
-        Hora: result_.hora,
-      },
-      commerceInfo: [
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Teléfono", 4567890],
-        ["Id Trx", result_.id_trx],
-        ["Teléfono", 987654],
-        ["Comercio", roleInfo["nombre comercio"]],
-        ["", ""],
-        ["Dirección", roleInfo.direccion],
-        ["", ""],
-      ],
-      commerceName: "PAGO DE TERCEROS",
-      trxInfo: [
-        ["Documento", inputData.documento],
-        ["", ""],
-        ["Celular", toPhoneNumber(inputData.numeroCelular)],
-        ["", ""],
-        ["Valor", formatMoney.format(inputData.valor_total_trx)],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (Chatbot)",
-    };
-
-    notify("Pago de terceros exitoso");
-    setInfTicket(voucher);
-    setTypeInfo("InfRecibo");
-    guardarTicket(result_.id_trx, tipo_operacion, voucher)
-      .then((resTicket) => {
-        console.log("Ticket guardado exitosamente");
-      })
-      .catch((err) => {
-        console.error("Error guardando el ticket");
-      });
-  }
+  //********************Funciones para cerrar el Modal**************************
   const HandleCloseInicial = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
@@ -268,7 +226,7 @@ const PagoTerceros = () => {
           label="Número de OTP"
           type="text"
           minLength="4"
-          maxLength="12"
+          maxLength="8"
           autoComplete="off"
           value={inputData.otp}
           onInput={onChangeInputSecond}
@@ -290,7 +248,9 @@ const PagoTerceros = () => {
           <Button type={"submit"}>Continuar</Button>
         </ButtonBar>
       </Form>
+
       <Modal show={showModal} handleClose={handleCloseModal}>
+        {/******************************Resumen de trx*******************************************************/}
         {typeInfo === "Inicial" && (
           <InfInicial
             summaryInitial={{
@@ -303,13 +263,16 @@ const PagoTerceros = () => {
             HandleClose={HandleCloseInicial}
           ></InfInicial>
         )}
+        {/******************************Resumen de trx*******************************************************/}
 
+        {/************************************ Recibo *******************************************************/}
         {typeInfo === "InfRecibo" && (
           <InfRecibo
             infTicket={infTicket}
             HandleClose={HandleCloseResRecibo}
           ></InfRecibo>
         )}
+        {/************************************ Recibo *******************************************************/}
       </Modal>
     </Fragment>
   );

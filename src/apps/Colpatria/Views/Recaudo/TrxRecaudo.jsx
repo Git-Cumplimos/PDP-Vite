@@ -31,12 +31,12 @@ import {
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {
   makeMoneyFormatter,
+  onChangeNumber,
   // onChangeNumber,
 } from "../../../../utils/functions";
 import fetchData from "../../../../utils/fetchData";
 import ScreenBlocker from "../../components/ScreenBlocker";
 import TicketColpatria from "../../components/TicketColpatria";
-import { buildTicket } from "../../utils/functions";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -46,7 +46,7 @@ const TrxRecaudo = () => {
 
   const { id_convenio_pin } = useParams();
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [searchingConvData, setSearchingConvData] = useState(false);
   const [datosConvenio, setDatosConvenio] = useState(null);
@@ -129,12 +129,13 @@ const TrxRecaudo = () => {
         },
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
+        nombre_usuario: pdpUser?.uname ?? "",
 
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
           codigo_convenio: datosConvenio?.pk_codigo_convenio,
           ...userReferences,
           location: {
@@ -166,7 +167,7 @@ const TrxRecaudo = () => {
             setLoadingInquiry(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Consulta fallida";
@@ -180,12 +181,14 @@ const TrxRecaudo = () => {
       userAddress,
       valTrxRecaudo,
       roleInfo,
+      pdpUser?.uname,
       navigate,
     ]
   );
 
   const onMakePayment = useCallback(
     (ev) => {
+      ev.preventDefault();
       if (valTrxRecaudo <= 0) {
         notifyError("El valor debe ser mayor a cero");
         return;
@@ -200,10 +203,25 @@ const TrxRecaudo = () => {
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO",
         valor_total_trx: valTrxRecaudo,
+        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Convenio", datosConvenio?.nombre_convenio],
+          ...Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ]),
+          ["Valor", formatMoney.format(valTrxRecaudo)],
+        ].reduce((list, elem, i) => {
+          list.push(elem);
+          if ((i + 1) % 1 === 0) list.push(["", ""]);
+          return list;
+        }, []),
 
         id_trx: inquiryStatus?.id_trx,
         // Datos trx colpatria
         colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
           codigo_convenio: datosConvenio?.pk_codigo_convenio,
           ...userReferences,
           location: {
@@ -225,36 +243,7 @@ const TrxRecaudo = () => {
         {
           render: ({ data: res }) => {
             setLoadingSell(false);
-            const trx_id = res?.obj?.id_trx ?? 0;
-            const id_type_trx = res?.obj?.id_type_trx ?? 0;
-            const codigo_autorizacion = res?.obj?.codigo_autorizacion ?? 0;
-            const tempTicket = buildTicket(
-              roleInfo,
-              trx_id,
-              codigo_autorizacion,
-              "Recaudo PSP",
-              [
-                ["Convenio", datosConvenio?.nombre_convenio],
-                ...Object.entries(userReferences).map(([, val], index) => [
-                  datosConvenio[`referencia_${index + 1}`],
-                  val,
-                ]),
-                ["Valor", formatMoney.format(valTrxRecaudo)],
-              ].reduce((list, elem, i) => {
-                list.push(elem);
-                if ((i + 1) % 1 === 0) list.push(["", ""]);
-                return list;
-              }, [])
-            );
-            setPaymentStatus(tempTicket);
-            infoTicket(trx_id, id_type_trx, tempTicket)
-              .then((resTicket) => {
-                console.log(resTicket);
-              })
-              .catch((err) => {
-                console.error(err);
-                notifyError("Error guardando el ticket");
-              });
+            setPaymentStatus(res?.obj?.ticket ?? {});
             return "Transacción satisfactoria";
           },
         },
@@ -263,7 +252,7 @@ const TrxRecaudo = () => {
             setLoadingSell(false);
             navigate("/corresponsalia/colpatria", { replace: true });
             if (error?.cause === "custom") {
-              return error?.message;
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
             console.error(error?.message);
             return "Transacción fallida";
@@ -278,7 +267,7 @@ const TrxRecaudo = () => {
       valTrxRecaudo,
       inquiryStatus,
       roleInfo,
-      infoTicket,
+      pdpUser?.uname,
       navigate,
     ]
   );
@@ -455,7 +444,7 @@ const TrxRecaudo = () => {
               onInput={(ev) =>
                 setUserReferences((old) => ({
                   ...old,
-                  [ev.target.name]: ev.target.value,
+                  [ev.target.name]: onChangeNumber(ev),
                 }))
               }
               readOnly={disableRefs?.[index]}
@@ -498,19 +487,18 @@ const TrxRecaudo = () => {
             </ButtonBar>
           </div>
         ) : (
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button
-                type='submit'
-                onClick={onMakePayment}
-                disabled={loadingSell}>
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingSell}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
+          <form onSubmit={onMakePayment}>
+            <PaymentSummary summaryTrx={summary}>
+              <ButtonBar>
+                <Button type='submit' disabled={loadingSell}>
+                  Aceptar
+                </Button>
+                <Button onClick={handleClose} disabled={loadingSell}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </form>
         )}
       </Modal>
     </Fragment>

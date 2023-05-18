@@ -3,14 +3,19 @@ import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
 import Modal from "../../../../../components/Base/Modal";
-import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from "react";
+import {
+  Fragment,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import {
-  depositoBancoAgrario,
-} from "../../utils/fetchDeposito";
+import { depositoBancoAgrario } from "../../utils/fetchDeposito";
 import { notify, notifyError } from "../../../../../utils/notify";
 import MoneyInput, {
   formatMoney,
@@ -21,7 +26,7 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
-import {enumParametrosBancoAgrario} from "../../utils/enumParametrosBancoAgrario";
+import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -32,22 +37,24 @@ const Deposito = () => {
   });
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false
+    equalError: false,
   });
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
-  const [loadingDepositoCorresponsalBancoAgrario, fetchDepositoCorresponsalBancoAgrario] =
-    useFetch(depositoBancoAgrario);
+  const [
+    loadingDepositoCorresponsalBancoAgrario,
+    fetchDepositoCorresponsalBancoAgrario,
+  ] = useFetch(depositoBancoAgrario);
   const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [tipoCuenta, setTipoCuenta] = useState("01");
   const [isUploading, setIsUploading] = useState(false);
-  const [numCuenta, setNumCuenta] = useState("")
-  const [valor, setValor] = useState("")
-  const [summary, setSummary] = useState([])
+  const [numCuenta, setNumCuenta] = useState("");
+  const [valor, setValor] = useState("");
+  const [summary, setSummary] = useState([]);
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago",
     timeInfo: {
@@ -71,34 +78,38 @@ const Deposito = () => {
     commerceName: "Depósito",
     trxInfo: [],
     disclamer: `Corresponsal bancario para Banco Agrario. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
-  })
+  });
 
   const options = [
     { value: "01", label: "Ahorros" },
-    { value: "02", label: "Corriente" },    
+    { value: "02", label: "Corriente" },
   ];
 
-  const onSubmitModal = useCallback((e) => {
-    e.preventDefault();
-    const { min, max } = limitesMontos;
-    if (valor >= min && valor <= max) {
-    const summary = {
-      "Tipo de cuenta" :tipoCuenta === "01" ? "Ahorros" : "Corriente",
-      "Número de cuenta": numCuenta,      
-      "Valor depósito": formatMoney.format(valor),
-    };
-    setSummary(summary)
-    setShowModal(true)
-    } else {
-      setIsUploading(false);
-      notifyError(
-        `El valor del depósito debe estar entre ${(formatMoney.format(
-          min
-        )).replace(/(\$\s)/g, "$")} y ${formatMoney.format(max).replace(/(\$\s)/g, "$")}`
-      );
-    }
-  }, [valor,numCuenta, tipoCuenta, limitesMontos]);
-  
+  const onSubmitModal = useCallback(
+    (e) => {
+      e.preventDefault();
+      const { min, max } = limitesMontos;
+      if (valor >= min && valor <= max) {
+        const summary = {
+          "Tipo de cuenta": tipoCuenta === "01" ? "Ahorros" : "Corriente",
+          "Número de cuenta": numCuenta,
+          "Valor depósito": formatMoney.format(valor),
+        };
+        setSummary(summary);
+        setShowModal(true);
+      } else {
+        setIsUploading(false);
+        notifyError(
+          `El valor del depósito debe estar entre ${formatMoney
+            .format(min)
+            .replace(/(\$\s)/g, "$")} y ${formatMoney
+            .format(max)
+            .replace(/(\$\s)/g, "$")}`
+        );
+      }
+    },
+    [valor, numCuenta, tipoCuenta, limitesMontos]
+  );
 
   const printDiv = useRef();
 
@@ -135,16 +146,16 @@ const Deposito = () => {
   });
 
   const handleClose = useCallback(() => {
-    setShowModal(false)
-    setTipoCuenta("01")
-    setNumCuenta("")
-    setValor("")
-    setSummary([])
+    setShowModal(false);
+    setTipoCuenta("01");
+    setNumCuenta("");
+    setValor("");
+    setSummary([]);
   }, []);
 
   const onMoneyChange = useCallback(
     (e, valor) => {
-      setValor(valor)
+      setValor(valor);
     },
     [valor]
   );
@@ -162,9 +173,10 @@ const Deposito = () => {
     }).format(new Date());
     /*hora actual */
     const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hourCycle: "h23",
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
@@ -185,15 +197,17 @@ const Deposito = () => {
     ]);
     objTicket["trxInfo"].push(["", ""]);
     const body = {
-      comercio : {
+      comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
       },
 
-      oficina_propia: roleInfo?.tipo_comercio === 'OFICINAS PROPIAS' ? true : false,
-      nombre_comercio: roleInfo?.['nombre comercio'],
+      oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      nombre_comercio: roleInfo?.["nombre comercio"],
       valor_total_trx: valor,
+      nombre_usuario: pdpUser?.uname ?? "",
 
       depositoCuentas: {
         numValorTransaccion: valor,
@@ -204,8 +218,7 @@ const Deposito = () => {
           codDane: roleInfo?.codigo_dane,
           ciudad: roleInfo?.ciudad,
           direccion: roleInfo?.direccion,
-
-        }
+        },
       },
       ticket: objTicket,
     };
@@ -215,35 +228,31 @@ const Deposito = () => {
         setIsUploading(false);
         if (!res?.status) {
           notifyError(res?.msg);
-          handleClose()
+          handleClose();
           return;
-        }
-        else{
-        notify("Transaccion satisfactoria");
-        const comercio = objTicket["commerceInfo"]
-        delete objTicket["commerceInfo"]
-        objTicket["commerceInfo"] = []
-        objTicket["commerceInfo"].push(comercio[1]);
-        objTicket["commerceInfo"].push(comercio[3]);
-        objTicket["commerceInfo"].push([
-          "No. Trx",
-          res?.obj?.id_trx,
-        ]);
-        objTicket["commerceInfo"].push([
-          "No. Aprobación",
-          res?.obj?.codigo_autorizacion,
-        ]);
-        objTicket["commerceInfo"].push(comercio[0]);
-        objTicket["commerceInfo"].push(["",""]);
-        objTicket["commerceInfo"].push(comercio[2]);
-        objTicket["commerceInfo"].push(["",""]);
-        objTicket["trxInfo"].push([
-          "Costo transacción",
-          formatMoney.format(res?.obj?.costoTrx,0)
-        ]);
-        objTicket["trxInfo"].push(["", ""]);
-        setObjTicketActual(objTicket);
-        setPaymentStatus(objTicket);
+        } else {
+          notify("Transaccion satisfactoria");
+          const comercio = objTicket["commerceInfo"];
+          delete objTicket["commerceInfo"];
+          objTicket["commerceInfo"] = [];
+          objTicket["commerceInfo"].push(comercio[1]);
+          objTicket["commerceInfo"].push(comercio[3]);
+          objTicket["commerceInfo"].push(["No. Trx", res?.obj?.id_trx]);
+          objTicket["commerceInfo"].push([
+            "No. Aprobación",
+            res?.obj?.codigo_autorizacion,
+          ]);
+          objTicket["commerceInfo"].push(comercio[0]);
+          objTicket["commerceInfo"].push(["", ""]);
+          objTicket["commerceInfo"].push(comercio[2]);
+          objTicket["commerceInfo"].push(["", ""]);
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(res?.obj?.costoTrx, 0),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          setObjTicketActual(objTicket);
+          setPaymentStatus(objTicket);
         }
       })
       .catch((err) => {
@@ -251,16 +260,13 @@ const Deposito = () => {
         console.error(err);
         notifyError("No se ha podido conectar al servidor");
       });
-
   }, [
     numCuenta,
     valor,
     tipoCuenta,
     fetchDepositoCorresponsalBancoAgrario,
     roleInfo,
-    // infoTicket,
   ]);
-  console.log(objTicketActual)
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -289,30 +295,28 @@ const Deposito = () => {
             value={numCuenta}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
-              if (! isNaN(num)){
-              setNumCuenta(num)  
-              }     
+              if (!isNaN(num)) {
+                setNumCuenta(num);
+              }
             }}
             required
           />
           <Input
-          id="valor"
-          name="valor"
-          label="Valor a depositar"
-          autoComplete="off"
-          type="text"
-          minLength={"15"}
-          maxLength={"15"}
-          min={limitesMontos?.min}
-          max={limitesMontos?.max}
-          value={makeMoneyFormatter(0).format(valor)}
-          onInput={(ev) => setValor(onChangeMoney(ev))}
-          required
-           />
+            id='valor'
+            name='valor'
+            label='Valor a depositar'
+            autoComplete='off'
+            type='text'
+            minLength={"15"}
+            maxLength={"15"}
+            min={limitesMontos?.min}
+            max={limitesMontos?.max}
+            value={makeMoneyFormatter(0).format(valor)}
+            onInput={(ev) => setValor(onChangeMoney(ev))}
+            required
+          />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"}>
-              Continuar
-            </Button>
+            <Button type={"submit"}>Continuar</Button>
           </ButtonBar>
         </Form>
         <Modal
@@ -326,7 +330,7 @@ const Deposito = () => {
           }>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv}/>
+              <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
@@ -340,7 +344,7 @@ const Deposito = () => {
                   onClick={onMakePayment}
                   disabled={loadingDepositoCorresponsalBancoAgrario}>
                   Realizar deposito
-                </Button>                
+                </Button>
                 <Button
                   onClick={handleClose}
                   disabled={loadingDepositoCorresponsalBancoAgrario}>

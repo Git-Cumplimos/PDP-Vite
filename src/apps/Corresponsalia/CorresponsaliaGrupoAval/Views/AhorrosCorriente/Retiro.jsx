@@ -37,7 +37,7 @@ import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 const Retiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo} = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.maxRetiroCuentas,
@@ -76,19 +76,19 @@ const Retiro = () => {
       Hora: "",
     },
     commerceInfo: [
+      ["Id comercio", roleInfo?.id_comercio],
       ["No. Terminal", roleInfo?.id_dispositivo],
-      ["Teléfono", roleInfo?.telefono],
-      // ["Id trx", trx_id],
-      // ["Id Aut", id_auth],
+      ["Id trx", ""],
+      ["Id Aut", ""],
       ["Comercio", roleInfo?.["nombre comercio"]],
-      ["",""],
+      ["", ""],
       ["Dirección", roleInfo?.direccion],
-      ["",""],            
+      ["", ""],
     ],
     commerceName: "Retiro",
     trxInfo: [],
     disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
-  })
+  });
 
   const otpEncrip = useMemo(() => {
     let x;
@@ -249,7 +249,7 @@ const Retiro = () => {
   const onSubmitModal = useCallback(
     (e) => {
       e.preventDefault();
-      if (otp.length <= 6 && otp.length>=3) {
+      if (otp.length <= 6 && otp.length >= 3) {
         const { min, max } = limitesMontos;
         if (valor >= min && valor <= max) {
           const summary = {
@@ -282,7 +282,7 @@ const Retiro = () => {
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
@@ -295,25 +295,17 @@ const Retiro = () => {
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Número celular",
-      phone
-    ]);
+    objTicket["trxInfo"] = [];
+    objTicket["trxInfo"].push(["Número celular", phone]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Entidad financiera",
-      DataBanco?.nombre
-    ]);
+    objTicket["trxInfo"].push(["Entidad financiera", DataBanco?.nombre]);
     objTicket["trxInfo"].push(["", ""]);
     objTicket["trxInfo"].push([
       "Tipo de cuenta",
       tipoCuenta === "01" ? "Ahorros" : "Corriente",
     ]);
     objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valor ?? "0"),
-    ]);
+    objTicket["trxInfo"].push(["Valor", formatMoney.format(valor ?? "0")]);
     objTicket["trxInfo"].push(["", ""]);
     const body = {
       comercio: {
@@ -341,6 +333,7 @@ const Retiro = () => {
           direccion: roleInfo?.direccion,
         },
       },
+      nombre_usuario: pdpUser?.uname ?? "",
       ticket: objTicket,
     };
 
@@ -358,52 +351,14 @@ const Retiro = () => {
           // const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
           // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
 
-          const tempTicket = {
-            title: "Recibo de Pago",
-            timeInfo: {
-              "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-                year: "2-digit",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(new Date()),
-              Hora: Intl.DateTimeFormat("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(new Date()),
-            },
-            commerceInfo: [
-              ["No. Terminal", roleInfo?.id_dispositivo],
-              ["Teléfono", roleInfo?.telefono],
-              ["Id trx", trx_id],
-              ["Id Aut", id_auth],
-              ["Comercio", roleInfo?.["nombre comercio"]],
-              ["", ""],
-              ["Dirección", roleInfo?.direccion],
-              ["", ""],
-            ],
-            commerceName: "Retiro",
-            trxInfo: [
-              ["Número celular", phone],
-              ["", ""],
-
-              ["Entidad financiera", DataBanco?.nombre],
-              ["", ""],
-              ["Tipo de cuenta", tipoCuenta === "01" ? "Ahorros" : "Corriente"],
-              ["", ""],
-              // [
-              //   "Nro. Cuenta",
-              //   `****${String(numCuenta)?.slice(-4) ?? ""}`,
-              // ],
-              // ["",""],
-              ["Valor", formatMoney.format(valor)],
-              ["", ""],
-              ["Costo transacción", formatMoney.format(res?.obj?.costoTrx)],
-              ["", ""],
-            ],
-            disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
-          };
-          setPaymentStatus(tempTicket);
+          objTicket["commerceInfo"][2] = ["Id trx", trx_id];
+          objTicket["commerceInfo"][3] = ["Id Aut", id_auth];
+          objTicket["trxInfo"].push([
+            "Costo transacción",
+            formatMoney.format(res?.obj?.costoTrx),
+          ]);
+          objTicket["trxInfo"].push(["", ""]);
+          setPaymentStatus(objTicket);
         }
       })
       .catch((err) => {
@@ -428,11 +383,11 @@ const Retiro = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className="text-3xl mt-6">Retiros</h1>
+        <h1 className='text-3xl mt-6'>Retiros</h1>
         <Form onSubmit={onSubmitModal} grid>
           <Select
-            id="banco"
-            label="Banco a Retirar"
+            id='banco'
+            label='Banco a Retirar'
             options={optionsBanco}
             value={banco}
             onChange={(e) => {
@@ -441,8 +396,8 @@ const Retiro = () => {
             required
           />
           <Select
-            id="tipCuenta"
-            label="Tipo de cuenta"
+            id='tipCuenta'
+            label='Tipo de cuenta'
             options={optionsTipoCuenta}
             value={tipoCuenta}
             onChange={(e) => {
@@ -451,11 +406,11 @@ const Retiro = () => {
             required
           />
           <Input
-            id="docCliente"
-            name="docCliente"
-            label="Documento cliente"
-            type="text"
-            autoComplete="off"
+            id='docCliente'
+            name='docCliente'
+            label='Documento cliente'
+            type='text'
+            autoComplete='off'
             minLength={"5"}
             maxLength={"12"}
             value={userDoc}
@@ -468,11 +423,11 @@ const Retiro = () => {
             required
           />
           <Input
-            id="numCliente"
-            name="numCliente"
-            label="Número celular"
-            type="text"
-            autoComplete="off"
+            id='numCliente'
+            name='numCliente'
+            label='Número celular'
+            type='text'
+            autoComplete='off'
             minLength={"10"}
             maxLength={"10"}
             value={phone}
@@ -491,13 +446,13 @@ const Retiro = () => {
             required
           />
           <HideInput
-            id="otp"
-            label="Número OTP"
-            type="text"
-            name="otp"
+            id='otp'
+            label='Número OTP'
+            type='text'
+            name='otp'
             minLength={"3"}
             maxLength={"6"}
-            autoComplete="off"
+            autoComplete='off'
             value={otp}
             onInput={(e, valor) => {
               let num = valor.replace(/[\s\.]/g, "");
@@ -505,14 +460,13 @@ const Retiro = () => {
                 setOtp(num);
               }
             }}
-            required
-          ></HideInput>
+            required></HideInput>
           <Input
-            id="valor"
-            name="valor"
-            label="Valor a retirar"
-            autoComplete="off"
-            type="text"
+            id='valor'
+            name='valor'
+            label='Valor a retirar'
+            autoComplete='off'
+            type='text'
             minLength={"5"}
             maxLength={"10"}
             min={limitesMontos?.min}
@@ -533,10 +487,9 @@ const Retiro = () => {
               : loadingRetiroCorresponsalGrupoAval
               ? () => {}
               : handleClose
-          }
-        >
+          }>
           {paymentStatus ? (
-            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
               <TicketsAval refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
@@ -547,13 +500,12 @@ const Retiro = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type="submit"
+                  type='submit'
                   onClick={onMakePayment}
-                  disabled={loadingRetiroCorresponsalGrupoAval}
-                >
+                  disabled={loadingRetiroCorresponsalGrupoAval}>
                   Realizar retiro
                 </Button>
-                {showBTNConsulta ? (
+                {/* {showBTNConsulta ? (
                   <Button
                     type="submit"
                     onClick={consultaCosto}
@@ -563,14 +515,13 @@ const Retiro = () => {
                   </Button>
                 ) : (
                   ""
-                )}
+                )} */}
                 <Button
                   onClick={(e) => {
                     handleClose();
                     notifyError("Transacción cancelada por el usuario");
                   }}
-                  disabled={loadingRetiroCorresponsalGrupoAval}
-                >
+                  disabled={loadingRetiroCorresponsalGrupoAval}>
                   Cancelar
                 </Button>
               </ButtonBar>

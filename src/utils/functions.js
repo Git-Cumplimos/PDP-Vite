@@ -1,4 +1,5 @@
 import { Auth } from "aws-amplify";
+import { Buffer } from "buffer";
 
 const CryptoJS = require("crypto-js");
 
@@ -47,7 +48,7 @@ export const onChangeNumber = (ev) => {
 
   ev.target.value = ((ev.target.value ?? "").match(/\d/g) ?? []).join("");
 
-  if (ev.target.value.length < ev.target.minLength) {
+  if (ev.target.value.length < ev.target.minLength && ev.target.required) {
     ev.target.setCustomValidity(
       `Aumenta la longitud del texto a ${ev.target.minLength} caracteres como minimo (actualmente, el texto tiene ${ev.target.value.length} caracteres)`
     );

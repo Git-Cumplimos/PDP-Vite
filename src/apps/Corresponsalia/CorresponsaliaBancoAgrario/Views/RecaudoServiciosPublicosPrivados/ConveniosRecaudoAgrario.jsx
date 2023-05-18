@@ -20,7 +20,7 @@ import {
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
+const url_cargueS3 = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/banco_agrario_cb_recaudo/subir_archivos_convenios`;
 
 const ConveniosRecaudoAgrario = () => {
   const navigate = useNavigate();
@@ -48,9 +48,9 @@ const ConveniosRecaudoAgrario = () => {
     referencias: [
       {
         nombre_ref1: "",
-        longitud_min_ref1: 0,
+        longitud_min_ref1: 1,
         longitud_max_ref1: 0,
-        algoritmo_ref1: "",
+        algoritmo_ref1: "N 010 Numérico",
       },
     ],
   });
@@ -94,14 +94,13 @@ const ConveniosRecaudoAgrario = () => {
           nombre_ref1: "",
           longitud_min_ref1: 0,
           longitud_max_ref1: 0,
-          algoritmo_ref1: "",
+          algoritmo_ref1: "N 010 Numérico",
         },
       ],
     });
   };
   const onSelectConvenio = useCallback(
     (e, i) => {
-      console.log(convenios[i]);
       const refTemp = [];
       if (convenios[i].nombre_ref1 !== "" && convenios[i].nombre_ref1) {
         refTemp.push({
@@ -141,10 +140,27 @@ const ConveniosRecaudoAgrario = () => {
     },
     [convenios]
   );
-  const createUpdateConvenio = useCallback((e) => {
-    e.preventDefault();
-    setShowModal((old) => ({ estado: 2, showModal: true }));
-  }, []);
+  const createUpdateConvenio = useCallback(
+    (e) => {
+      e.preventDefault();
+      for (let i = 0; i < dataConvenios.referencias.length; i++) {
+        const element = dataConvenios.referencias[i];
+        if (
+          element.longitud_max_ref1 === 0 ||
+          element.longitud_min_ref1 === 0
+        ) {
+          return notifyError(
+            `La longitud máxima o mínima debe ser diferente de 0`
+          );
+        }
+        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
+          return notifyError(`La longitud mínima debe ser menor a la máxima`);
+        }
+      }
+      setShowModal((old) => ({ estado: 2, showModal: true }));
+    },
+    [dataConvenios]
+  );
   useEffect(() => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
@@ -168,9 +184,7 @@ const ConveniosRecaudoAgrario = () => {
       files = Array.from(files);
       if (files.length === 1) {
         const m_file = files[0];
-        // console.log(m_file);
         setFile(m_file);
-        // setFileName(m_file.name);
       } else {
         if (files.length > 1) {
           notifyError("Se debe ingresar un solo archivo para subir");
@@ -179,8 +193,14 @@ const ConveniosRecaudoAgrario = () => {
     }
   };
   const onChangeFormat = useCallback((ev) => {
+    let value = ev.target.value;
+    if (ev.target.name === "estado") {
+      if (value && typeof value === "string") {
+        value = value.toLowerCase() === "false" ? false : true;
+      }
+    }
     setDataConvenios((old) => {
-      return { ...old, [ev.target.name]: ev.target.value };
+      return { ...old, [ev.target.name]: value };
     });
   }, []);
   const onChangeFormatNumber = useCallback((ev) => {
@@ -220,9 +240,9 @@ const ConveniosRecaudoAgrario = () => {
       if (lenData < 3) {
         tempData.referencias.push({
           [`nombre_ref${lenData + 1}`]: "",
-          [`longitud_min_ref${lenData + 1}`]: 0,
+          [`longitud_min_ref${lenData + 1}`]: 1,
           [`longitud_max_ref${lenData + 1}`]: 0,
-          [`algoritmo_ref${lenData + 1}`]: "",
+          [`algoritmo_ref${lenData + 1}`]: "N 010 Numérico",
         });
         setDataConvenios(tempData);
       }
@@ -272,7 +292,6 @@ const ConveniosRecaudoAgrario = () => {
               }
 
               formData2.set("file", file);
-              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
@@ -289,7 +308,10 @@ const ConveniosRecaudoAgrario = () => {
                             uuid: uniqueId,
                           })
                             .then((res) => {
-                              if (res?.msg !== "No ha terminado la operación") {
+                              if (
+                                res?.msg !==
+                                "Error respuesta PDP: (No ha terminado la operación)"
+                              ) {
                                 if (res?.status) {
                                   setIsUploading(false);
                                   notify(res?.msg);
@@ -342,20 +364,7 @@ const ConveniosRecaudoAgrario = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      for (let i = 0; i < dataConvenios.referencias.length; i++) {
-        const element = dataConvenios.referencias[i];
-        if (
-          element.longitud_max_ref1 === 0 ||
-          element.longitud_min_ref1 === 0
-        ) {
-          return notifyError(
-            `La longitud maxima o minima debe ser diferente de 0`
-          );
-        }
-        if (element.longitud_min_ref1 > element.longitud_max_ref1) {
-          return notifyError(`La longitud minima debe ser menor a la maxima`);
-        }
-      }
+
       setIsUploading(true);
       let dataTemp = { ...dataConvenios };
       for (let id = 0; id < dataConvenios.referencias.length; id++) {
@@ -413,9 +422,9 @@ const ConveniosRecaudoAgrario = () => {
     <>
       <SimpleLoading show={isUploading} />
       <TableEnterprise
-        title='Tabla convenios Agrario corresponsal bancario'
+        title='Tabla de convenios Banco Agrario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "EAN", "Estado"]}
+        headers={["Código", "Convenio", "EAN", "Estado"]}
         data={tableConvenios}
         onSelectRow={onSelectConvenio}
         onSetPageData={setPageData}>
@@ -435,7 +444,7 @@ const ConveniosRecaudoAgrario = () => {
         />
         <Input
           id='idConvenio'
-          label='Id convenio'
+          label='Código convenio'
           type='text'
           name='idConvenio'
           minLength='1'
@@ -537,10 +546,10 @@ const ConveniosRecaudoAgrario = () => {
                 type='text'
                 name='codigo'
                 minLength='1'
-                maxLength='80'
+                maxLength='6'
                 required
                 value={dataConvenios?.codigo}
-                onInput={onChangeFormat}></Input>
+                onInput={onChangeFormatNumber}></Input>
               <Input
                 id='nombre_convenio'
                 label='Nombre convenio'
@@ -587,7 +596,7 @@ const ConveniosRecaudoAgrario = () => {
             </Fieldset>
             {dataConvenios.referencias.map((item, id) => (
               <Fieldset
-                legend={`Información del referencia ${id + 1}`}
+                legend={`Información referencia ${id + 1}`}
                 className='lg:col-span-2'
                 key={id}>
                 <Input
@@ -619,7 +628,7 @@ const ConveniosRecaudoAgrario = () => {
                 />
                 <Input
                   id={`longitud_min_ref${id + 1}`}
-                  label={`longitud minima referencia ${id + 1}`}
+                  label={`longitud mínima referencia ${id + 1}`}
                   type='text'
                   name={`longitud_min_ref${id + 1}`}
                   minLength='1'
@@ -631,7 +640,7 @@ const ConveniosRecaudoAgrario = () => {
                   onInput={onChangeFormatNumberVect(id)}></Input>
                 <Input
                   id={`longitud_max_ref${id + 1}`}
-                  label={`longitud maxima referencia ${id + 1}`}
+                  label={`longitud máxima referencia ${id + 1}`}
                   type='text'
                   name={`longitud_max_ref${id + 1}`}
                   minLength='1'
@@ -654,7 +663,13 @@ const ConveniosRecaudoAgrario = () => {
               )}
             </ButtonBar>
             <ButtonBar>
-              <Button onClick={hideModal}>Cancelar</Button>
+              <Button
+                onClick={() => {
+                  notify("Operación cancelada");
+                  hideModal();
+                }}>
+                Cancelar
+              </Button>
               <Button type='submit'>
                 {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                   ? "Editar convenio"
@@ -673,11 +688,17 @@ const ConveniosRecaudoAgrario = () => {
             </h1>
             <>
               <ButtonBar>
-                <Button onClick={hideModal}>Cancelar</Button>
+                <Button
+                  onClick={() => {
+                    notify("Operación cancelada");
+                    hideModal();
+                  }}>
+                  Cancelar
+                </Button>
                 <Button type='submit' onClick={onSubmit}>
                   {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
-                    ? "Editar convenio"
-                    : "Crear convenio"}
+                    ? "Aceptar"
+                    : "Aceptar"}
                 </Button>
               </ButtonBar>
             </>

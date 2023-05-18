@@ -81,7 +81,6 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
         setSorteoExtra(null);
         setSorteofisico(null);
         setSorteofisicoextraordinario(null);
-        // console.log(res);
         const sortOrd = res.filter(({ tip_sorteo, fisico }) => {
           return tip_sorteo === 1 && !fisico;
         });
@@ -133,26 +132,26 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
     if (sorteoOrdi !== null) {
       copy.push({
         value: `${sorteoOrdi.num_sorteo}-${sorteoOrdi.fisico}-${sorteoOrdi.num_loteria}`,
-        label: `Sorteo ordinario - ${sorteoOrdi.num_sorteo}`,
+        label: `Sorteo Ordinario Virtual - ${sorteoOrdi.num_sorteo}`,
       });
     }
     if (sorteoExtra !== null) {
       copy.push({
         value: `${sorteoExtra.num_sorteo}-${sorteoExtra.fisico}-${sorteoExtra.num_loteria}`,
-        label: `Sorteo extraordinario - ${sorteoExtra.num_sorteo}`,
+        label: `Sorteo Extraordinario - ${sorteoExtra.num_sorteo}`,
       });
     }
     if (sorteoOrdifisico !== null) {
       copy.push({
         value: `${sorteoOrdifisico.num_sorteo}-${sorteoOrdifisico.fisico}-${sorteoOrdifisico.num_loteria}`,
-        label: `Sorteo ordinario  fisico- ${sorteoOrdifisico.num_sorteo}`,
+        label: `Sorteo Ordinario  Físico- ${sorteoOrdifisico.num_sorteo}`,
       });
     }
 
     if (sorteoExtrafisico !== null) {
       copy.push({
         value: `${sorteoExtrafisico.num_sorteo}-${sorteoExtrafisico.fisico}-${sorteoExtrafisico.num_loteria}`,
-        label: `Sorteo extraordinario fisico - ${sorteoExtrafisico.num_sorteo}`,
+        label: `Sorteo Extraordinario Físico - ${sorteoExtrafisico.num_sorteo}`,
       });
     }
     SetOpcionesDisponibles([...copy]);
@@ -279,7 +278,6 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                     notifyError(res.msg);
                     setDisabledBtns(true);
                   } else {
-                    // console.log(res);
                     setResp_report(res.data);
                     setTotal(res.total);
                     setDisabledBtns(false);
@@ -298,15 +296,17 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
               setFecha_fin(e.target.value);
               if (fecha_ini !== "") {
                 reportVentas(fecha_ini, e.target.value, sorteo).then((res) => {
-                  if ("msg" in res) {
-                    notifyError(res.msg);
-                    setDisabledBtns(true);
-                  } else {
-                    // console.log(res);
-                    setResp_report(res.data);
-                    setTotal(res.total);
-                    setDisabledBtns(false);
+                  if (res != undefined){
+                    if ("msg" in res) {
+                      notifyError(res.msg);
+                      setDisabledBtns(true);
+                    } else {
+                      setResp_report(res.data);
+                      setTotal(res.total);
+                      setDisabledBtns(false);
+                    }
                   }
+                  
                 });
               }
             }}
@@ -326,7 +326,6 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                       notifyError(res.msg);
                       setDisabledBtns(true);
                     } else {
-                      // console.log(res);
                       setResp_report(res.data);
                       setTotal(res.total);
                       setDisabledBtns(false);
@@ -340,14 +339,14 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
             <>
               <Input
                 id="frac_venta"
-                label="Fracciones vendidas"
+                label="Fracciones Vendidas"
                 type="text"
                 required="true"
                 value={total.total_frac}
               />
               <Input
                 id="val_total"
-                label="Total ventas"
+                label="Total Ventas"
                 type="text"
                 required="true"
                 value={formatMoney.format(total.val_total)}
@@ -370,6 +369,7 @@ const ReportVentasForm = ({ closeModal, oficina }) => {
                 setResp_report(null);
                 setTotal(null);
                 setDisabledBtns(true);
+                notifyError("Se canceló la generación de reporte de ventas")
               }}
             >
               Cancelar

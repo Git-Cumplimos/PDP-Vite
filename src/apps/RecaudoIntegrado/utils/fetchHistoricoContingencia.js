@@ -59,7 +59,8 @@ export const DescargarExcel = async (data) => {
 
   try {
     const res = await fetchData(
-      "http://recaudoempresarial-cert.us-east-2.elasticbeanstalk.com/servicio-contingencia-empresarial-pdp/generarexcel",
+      `${urlBackend}/generarexcel`,
+
       "POST",
       {},
       {

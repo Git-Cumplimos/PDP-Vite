@@ -18,7 +18,7 @@ export const fetchCustom = (url_, metodo_, name_) => {
       }
     } catch (error) {
       throw new ErrorCustomFetch(
-        "error con el código del fetch debido a los datos de entrada",
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
       );
     }
@@ -33,11 +33,9 @@ export const fetchCustom = (url_, metodo_, name_) => {
       } else if (metodo_ === "POST") {
         Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
       }
-      console.log("hh", Peticion);
     } catch (error) {
-      console.log(error);
       throw new ErrorCustomFetch(
-        `Falla en el sistema: no conecta con el servicio ${name_}`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
       );
     }
@@ -46,32 +44,26 @@ export const fetchCustom = (url_, metodo_, name_) => {
     try {
       if (typeof Peticion !== "object") {
         throw new ErrorCustomFetch(
-          `Falla en el sistema: servicio no encontrado ${name_}`,
-          "404 not found"
+          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+          Peticion
         );
       }
     } catch (error) {
       throw error;
     }
-
-    console.log(Peticion?.hasOwnProperty("status") === false);
-    console.log(typeof {});
     //evaluar respuesta de api gateway
     try {
-      if (
-        Peticion?.hasOwnProperty("status") === false &&
-        Peticion?.hasOwnProperty("status") === false
-      ) {
+      if (Peticion?.hasOwnProperty("status") === false) {
         //No es una respuesta directamente del servicio sino del api gateway
         if (Peticion?.hasOwnProperty("message") === true) {
           if (Peticion.message === "Endpoint request timed out") {
             throw new ErrorCustomTimeout(
-              `Falla en el sistema: timeout con el servicio ${name_}`,
+              `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
               "timeout"
             );
           } else {
             throw new ErrorCustomFetch(
-              `Falla en el sistema: error no controlado de la respuesta del servicio ${name_}`,
+              `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
               Peticion.message
             );
           }
@@ -84,22 +76,21 @@ export const fetchCustom = (url_, metodo_, name_) => {
         throw error;
       } else {
         throw new ErrorCustomFetch(
-          `Falla en el sistema: no conecta con el servicio ${name_}`,
+          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
           `no conecta con el servicio ${name_}`
         );
       }
     }
-
     //evaluar la respuesta que llega del backend
     try {
-      return EvaluateResponse(Peticion);
+      return EvaluateResponse(Peticion, name_);
     } catch (error) {
       throw error;
     }
   };
 };
 
-export const EvaluateResponse = (res) => {
+export const EvaluateResponse = (res, name_) => {
   // trx exitosa
   try {
     if (res?.status === true) {
@@ -107,7 +98,7 @@ export const EvaluateResponse = (res) => {
     }
   } catch (error) {
     throw new ErrorCustomFetch(
-      `Falla en el sistema: error con el código del fetch al evaluar el status`,
+      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
       error.message
     );
   }
@@ -119,7 +110,7 @@ export const EvaluateResponse = (res) => {
     res?.obj?.error === true &&
     res?.obj?.error_msg
   ) {
-    MetodoError1(res?.obj?.error_msg);
+    MetodoError1(res?.obj?.error_msg, name_);
   }
 
   // cuando status es false pero no hay errores
@@ -132,14 +123,14 @@ export const EvaluateResponse = (res) => {
       throw error;
     } else {
       throw new ErrorCustomFetch(
-        `Falla en el sistema: error con el código del fetch al evaluar los errores`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
       );
     }
   }
 };
 
-const MetodoError1 = (error_msg_) => {
+const MetodoError1 = (error_msg_, name_) => {
   try {
     const error_msg = error_msg_;
     const error_msg_key = Object.keys(error_msg);
@@ -156,7 +147,7 @@ const MetodoError1 = (error_msg_) => {
       throw new ErrorCustomBackend(error.message, error.error_msg);
     } else {
       throw new ErrorCustomFetch(
-        `Falla en el sistema: error con el código del fetch al evaluar los mensajes`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
       );
     }
@@ -173,6 +164,13 @@ export class ErrorCustom extends Error {
       notifyError(message);
     } else if (this.notificacion === "notify") {
       notify(message);
+    }
+
+    if (
+      this.name === "ErrorCustomFetch" ||
+      this.name === "ErrorCustomTimeout"
+    ) {
+      console.error(`${message}\n ${this.error_msg}`);
     }
   }
 }
@@ -203,6 +201,6 @@ export class ErrorCustomBackendUser extends ErrorCustom {
 
 export class msgCustomBackend extends ErrorCustom {
   constructor(message, error_msg) {
-    super(message, "msgCustomBackend", error_msg, "notify");
+    super(message, "msgCustomBackend", error_msg, null);
   }
 }

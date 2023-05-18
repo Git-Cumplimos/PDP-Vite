@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { cifrarAES } from "../../../../../utils/cryptoUtils";
 
 const Retiro = () => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
@@ -160,7 +160,7 @@ const Retiro = () => {
   const peticionCashOut = () => {
     const hoy = new Date();
     const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
@@ -180,6 +180,7 @@ const Retiro = () => {
       idTerminal: roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
       valor: datosTrans?.valorCashOut,
       issuerIdDane: roleInfo?.codigo_dane ? roleInfo?.codigo_dane : 0,
+      nombre_usuario: pdpUser?.uname ?? "",
       nombreComercio: roleInfo?.["nombre comercio"]
         ? roleInfo?.["nombre comercio"]
         : "No hay datos",

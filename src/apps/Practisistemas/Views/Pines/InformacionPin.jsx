@@ -5,10 +5,10 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { postConsultaPin } from "../../utils/fetchBackPines";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
-
+import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 const InformacionPin = () => {
   const navigate = useNavigate();
-  ////////////////////
+  const [showLoading, setShowLoading] = useState(false);
 
   const { state } = useLocation();
 
@@ -33,8 +33,8 @@ const InformacionPin = () => {
       ...pines?.map(({ productDesc, sell, validity }) => {
         return {
           "Nombre del Pin": productDesc,
-          Valor: formatMoney.format(sell) ,
-          "Días de validez": validity * 1,
+          Valor: formatMoney.format(sell),
+          "Vigencia del Plan": validity * 1,
         };
       }),
     ];
@@ -59,12 +59,14 @@ const InformacionPin = () => {
   }, [datosTrans]);
 
   const fecthTablaTiposPines = () => {
+    setShowLoading(true)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: state.op,
       pin: datosTrans.pin,
     })
       .then((autoArr) => {
+        setShowLoading(false)
         setPines(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));
@@ -72,10 +74,11 @@ const InformacionPin = () => {
 
   return (
     <>
+      <SimpleLoading show={showLoading} />
       <h1 className="text-3xl text-center">Información del Pin</h1>
       <TableEnterprise
         title="Tabla pines"
-        headers={["Nombre del tipo de Pin", "Valor", "Días de validez"]}
+        headers={["Nombre del tipo de Pin", "Valor", "Vigencia del Plan"]}
         data={tableTipoPin}
         onSelectRow={onSelectAutorizador}
       >

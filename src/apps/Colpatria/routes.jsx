@@ -10,7 +10,8 @@ const Deposito = lazy(() => import("./Views/Deposito"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
-const PinPago = lazy(() => import("./Views/PinPago"));
+const PagoGiro = lazy(() => import("./Views/PagoGiro"));
+const PinDePago = lazy(() => import("./Views/PinDePago"));
 
 const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
 const ConsultaBarras = lazy(() => import("./Views/Recaudo/ConsultaBarras"));
@@ -23,7 +24,7 @@ const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 export const rutasGestionColpatria = {
   link: "/corresponsalia/colpatria/gestion",
-  label: <AppIcons Logo={"Reporte"} name={"Gestión"} />,
+  label: <AppIcons Logo={"CorresponsaliaColpatria"} name={"Gestión"} />,
   component: AdminColpatria,
   permission: [PermissionsColpatria.gestion],
   subRoutes: [
@@ -52,23 +53,35 @@ export const rutasGestionColpatria = {
 
 const listPermissions = Object.values(PermissionsColpatria);
 
-export const listPermissionsColpatria = listPermissions.splice(listPermissions.length / 2)
+export const listPermissionsColpatria = listPermissions.splice(
+  listPermissions.length / 2
+);
 
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
-  label: <AppIcons Logo={"CorresponsalBancario"} name={"Corresponsalía Colpatria"} />,
+  label: (
+    <AppIcons
+      Logo={"CorresponsaliaColpatria"}
+      name={"Corresponsalía Colpatria"}
+    />
+  ),
   component: ColpatriaTrx,
   permission: listPermissionsColpatria,
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/deposito",
-      label: <AppIcons Logo={"Depositos"} name={"Depósito"} />,
+      label: <AppIcons Logo={"CorresponsaliaColpatria"} name={"Depósito"} />,
       component: Deposito,
       permission: [PermissionsColpatria.deposito],
     },
     {
       link: "/corresponsalia/colpatria/pines",
-      label: <AppIcons Logo={"CrearPines"} name={"Venta de Pines de Recaudo"} />,
+      label: (
+        <AppIcons
+          Logo={"VentaPinRecaudoColpatria"}
+          name={"Venta de Pines de Recaudo"}
+        />
+      ),
       component: PinesConsulta,
       permission: [PermissionsColpatria.venta_pines],
       subRoutes: [
@@ -87,7 +100,7 @@ const rutasColpatria = {
       link: "/corresponsalia/colpatria/recaudo",
       label: (
         <AppIcons
-          Logo={"Recaudo"}
+          Logo={"RecaudoServiciosPubPrivados"}
           name={"Recaudo Servicios Públicos y Privados"}
         />
       ),
@@ -98,7 +111,7 @@ const rutasColpatria = {
           link: "/corresponsalia/colpatria/recaudo/manual",
           label: (
             <AppIcons
-              Logo={"RecaudoManual"}
+              Logo={"RecaudoManualColpatria"}
               name={"Recaudo PSP Manual en Efectivo"}
             />
           ),
@@ -109,7 +122,7 @@ const rutasColpatria = {
           link: "/corresponsalia/colpatria/recaudo/barras",
           label: (
             <AppIcons
-              Logo={"RecaudoCodigoDeBarras"}
+              Logo={"RecaudoCodigoBarrasColpatria"}
               name={"Recaudo PSP Código de Barras en Efectivo"}
             />
           ),
@@ -127,9 +140,15 @@ const rutasColpatria = {
     },
     {
       link: "/corresponsalia/colpatria/pago-de-giro",
-      label: <AppIcons Logo={"PagoPorGiro"} name={"Pin de Giro"} />,
-      component: PinPago,
+      label: <AppIcons Logo={"RetiroPinColpatria"} name={"Retiro con Pin"} />,
+      component: PagoGiro,
       permission: [PermissionsColpatria.pago_giro],
+    },
+    {
+      link: "/corresponsalia/colpatria/pin-de-pago",
+      label: <AppIcons Logo={"PinPagoColpatria"} name={"Pin de Pago"} />,
+      component: PinDePago,
+      permission: [PermissionsColpatria.pin_pago],
     },
     rutasGestionColpatria,
   ],

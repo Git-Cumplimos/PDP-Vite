@@ -11,7 +11,7 @@ import { useMujer } from "../utils/mujerHooks";
 import { toast } from "react-toastify";
 import { useReactToPrint } from "react-to-print";
 import { notifyError } from "../../../utils/notify";
-import Tickets from "../components/Voucher/Tickets";
+import Tickets from "../../../components/Base/Tickets";
 import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -55,6 +55,7 @@ const Recaudo = () => {
   const [permiteCambio, setPermiteCambio] = useState("");
   const [paraMax, setParaMax] = useState(null);
   const [paraMin, setParaMin] = useState(null);
+  const [tickets, setTickets] = useState("")
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -86,53 +87,76 @@ const Recaudo = () => {
   }
 `;
 
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago(Recaudo)",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: Object.entries({
-        "Id Comercio": roleInfo?.id_comercio,
-        "No. terminal": roleInfo?.id_dispositivo,
-        Municipio: roleInfo?.ciudad,
-        Dirección: roleInfo?.direccion,
-        "Id Trx": response.id_trx,
-        "Id Confirmación": response.Confirmacion,
-      }),
-      commerceName: "FUNDACIÓN DE LA MUJER",
-      trxInfo: [
-        ["CRÉDITO", selected?.Credito],
-        ["VALOR", formatMoney.format(formatMon)],
-        ["Cliente", selected?.Cliente],
-        ["", ""],
-        ["Cédula", selected?.Cedula],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [
-    roleInfo?.ciudad,
-    roleInfo?.direccion,
-    roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
-    response,
-    formatMon,
-    table,
-  ]);
+  const [objTicketActual, setObjTicketActual] = useState({
+    title: "Recibo de pago(Recaudo)",
+    timeInfo: {
+      "Fecha de venta": "",
+      Hora: "",
+    },
+    commerceInfo: [
+      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
+      /*id_dispositivo*/
+      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
+      ["Id Trx", ""],
+      ["Id Aut", ""],  
+      /*ciudad*/
+      ["Comercio", roleInfo?.["nombre comercio"]],
+      ["", ""],
+      /*direccion*/
+      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
+      ["", ""],
+    ],
+    commerceName: "FUNDACIÓN DE LA MUJER",
+    trxInfo: [],
+    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+  });
+  // const tickets = useMemo(() => {
+  //   return {
+  //     title: "Recibo de pago(Recaudo)",
+  //     timeInfo: {
+  //       "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+  //         year: "numeric",
+  //         month: "numeric",
+  //         day: "numeric",
+  //       }).format(new Date()),
+  //       Hora: Intl.DateTimeFormat("es-CO", {
+  //         hour: "numeric",
+  //         minute: "numeric",
+  //         second: "numeric",
+  //         hour12: false,
+  //       }).format(new Date()),
+  //     },
+  //     commerceInfo: Object.entries({
+  //       "Id Comercio": roleInfo?.id_comercio,
+  //       "No. terminal": roleInfo?.id_dispositivo,
+  //       Municipio: roleInfo?.ciudad,
+  //       Dirección: roleInfo?.direccion,
+  //       "Id Trx": response.id_trx,
+  //       "Id Confirmación": response.Confirmacion,
+  //     }),
+  //     commerceName: "FUNDACIÓN DE LA MUJER",
+  //     trxInfo: [
+  //       ["CRÉDITO", selected?.Credito],
+  //       ["VALOR", formatMoney.format(formatMon)],
+  //       ["Cliente", selected?.Cliente],
+  //       ["", ""],
+  //       ["Cédula", selected?.Cedula],
+  //       ["", ""],
+  //     ],
+  //     disclamer:
+  //       "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+  //   };
+  // }, [
+  //   roleInfo?.ciudad,
+  //   roleInfo?.direccion,
+  //   roleInfo?.id_comercio,
+  //   roleInfo?.id_dispositivo,
+  //   response,
+  //   formatMon,
+  //   table,
+  // ]);
 
-  const { infoTicket } = useAuth();
+  // const { infoTicket } = useAuth();
 
   const params = useCallback(async () => {
     const queries = { tipo_op: 5 };
@@ -156,9 +180,9 @@ const Recaudo = () => {
     params();
   }, [info]);
 
-  useEffect(() => {
-    infoTicket(response?.id_trx, 5, tickets);
-  }, [infoTicket, response]);
+  // useEffect(() => {
+  //   infoTicket(response?.id_trx, 5, tickets);
+  // }, [infoTicket, response]);
 
   const printDiv = useRef();
 
@@ -179,6 +203,29 @@ const Recaudo = () => {
 
   const bankCollection = (e) => {
     e.preventDefault();
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "2-digit",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    /*hora actual */
+    const hora = Intl.DateTimeFormat("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date());
+    let objTicket = {}
+    objTicket = { ...objTicketActual };
+    objTicket["timeInfo"]["Fecha de venta"] = fecha;
+    objTicket["timeInfo"]["Hora"] = hora;
+    objTicket["trxInfo"] = []
+    objTicket["trxInfo"].push(["CRÉDITO", selected?.Credito]);
+    objTicket["trxInfo"].push(["VALOR", formatMoney.format(formatMon)]);
+    objTicket["trxInfo"].push(["Cliente", selected?.Cliente]);
+    objTicket["trxInfo"].push(["", ""]);
+    objTicket["trxInfo"].push(["Cédula", selected?.Cedula]);
+    objTicket["trxInfo"].push(["", ""]);
+
     setStop(true);
     let tipo_comercio = roleInfo?.tipo_comercio
     if (roleInfo?.tipo_comercio === "KIOSCO"){
@@ -198,16 +245,27 @@ const Recaudo = () => {
       cliente: selected?.Cliente,
       cedula: selected?.Cedula,
       nombre_comercio: roleInfo?.["nombre comercio"],
+      ticket: objTicket
     };
     console.log(body);
     ingresorecibo(body)
       .then((res) => {
-        if (res?.status == true) {
+        if (res?.status === true) {
           console.log(res);
           setResponse(res?.obj);
+          objTicket["commerceInfo"][2]=[
+            "Id Trx",
+            res?.obj?.id_trx,
+          ]
+          objTicket["commerceInfo"][3]=[
+            "Id Aut",
+            res?.obj?.Confirmacion,
+          ]
+          setTickets(objTicket)
           setTicket(true);
           setStop(false);
         } else {
+          closeModal();
           console.log(res);
           notifyError(res?.msg);
           setStop(false);
@@ -258,7 +316,7 @@ const Recaudo = () => {
         console.log(res);
         setInfo(res);
         setDisabledBtn(false);
-        if (res?.status == false) {
+        if (res?.status === false) {
           notifyError(
             "Consulte soporte, servicio de Fundación de la mujer presenta fallas"
           );
@@ -279,39 +337,6 @@ const Recaudo = () => {
       })
       .catch((err) => console.log("error", err));
   };
-
-  const hora = useMemo(() => {    
-    return Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: false,
-    }).format(new Date())
-  }, [tipobusqueda]);
-
-  const dia = useMemo(() => {    
-    return (new Date()).getDay()
-  }, [tipobusqueda]);
-
-  useEffect(() => {
-    console.log(dia)
-    if (dia === 1){
-    const horaCierre = enumParametrosFundacion.horaCierreSabado.split(":")
-    const horaActual = hora.split(":")
-    const deltaHora = parseInt(horaCierre[0])-parseInt(horaActual[0])
-    const deltaMinutos = parseInt(horaCierre[1])-parseInt(horaActual[1])
-    console.log(deltaHora, deltaMinutos)
-    if (deltaHora<0 || (deltaHora===0 & deltaMinutos<1) ){
-      notifyError("Módulo cerrado a partir de las " + enumParametrosFundacion.horaCierre)
-      navigate("/PinesVus");
-    }
-    else if ((deltaHora ===1 & deltaMinutos<-50)){
-      notifyError("El módulo se cerrara en " + String(parseInt(deltaMinutos)+60) + " minutos, por favor evite realizar mas transacciones")  
-    }
-    else if ((deltaHora ===0 & deltaMinutos<10)){
-      notifyError("El módulo se cerrara en " + deltaMinutos + " minutos, por favor evite realizar mas transacciones") 
-    }}
-
-  }, [hora,dia])
 
   return (
     <>

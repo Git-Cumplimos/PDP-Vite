@@ -7,7 +7,9 @@ import Modal from "../../../components/Base/Modal";
 import { usePinesVus } from "../utils/pinesVusHooks";
 import { notifyError, notify } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
+import TableVertical from "../Views/TableVertical";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+
 import UsarPinForm from "../components/UsarPinForm/UsarPinForm";
 import CancelPin from "../components/CancelPinForm/CancelPinForm";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +18,7 @@ import { enumParametrosPines } from "../utils/enumParametrosPines";
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
   month: "numeric",
-  day: "numeric",
+  day: "numeric", 
 });
 
 const TramitePines = () => {
@@ -43,6 +45,7 @@ const TramitePines = () => {
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [valor, setValor] = useState("");
+  const [valores, setValores] = useState("");
   const [id_trx, setId_trx] = useState("");
   const [tipoPin, setTipoPin] = useState("");
   const [valor_tramite, setValor_tramite] = useState("");
@@ -54,6 +57,7 @@ const TramitePines = () => {
   const [infoComercioCreacion, setInfoComercioCreacion] = useState("")
   const [msgRespReenvio, setMsgRespReenvio] = useState("")
   const [urlAutogestion, setUrlAutogestion] = useState("")
+  const [datosOlimpia,   setDatosOlimpia] = useState("")
 
   useEffect(() => {
     ///////////////
@@ -77,7 +81,7 @@ const TramitePines = () => {
     setModalCancel(false);
     setParametroBusqueda("");
     if (activarNavigate) {
-      navigate("/PinesVus");
+      navigate("/Pines/PinesVus");
     }
   }, [activarNavigate, navigate]);
 
@@ -96,8 +100,9 @@ const TramitePines = () => {
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
-          notify(res?.msg)
-          setMsgRespReenvio(res?.msg);
+          //notify(res?.msg)
+          notify("Verificación exitosa")
+         // setMsgRespReenvio(res?.msg);
           setUrlAutogestion(res?.obj?.url_autogestion)
         }
       })
@@ -116,13 +121,63 @@ const TramitePines = () => {
     //   Depto: roleInfo?.codigo_dane?.slice(0, 2),
     //   Municipio: roleInfo?.codigo_dane?.slice(2),
     // };
-    consultaPinesVus(parametroBusqueda, "", "", "", "", "",pageData)
+    consultaPinesVus("", "", "", "", "", parametroBusqueda,pageData,1)
       .then((res) => {
-        setInfo(res);
+        //console.log(res)
         setDisabledBtn(false);
         if (!res?.status) {
           notifyError(res?.msg);
-        } else {
+        } else { 
+
+          if (res.obj.results[0].nombre!==""&&res.obj.results[0].apellidos!==""){
+            setInfo(res);
+     
+      /*      const fecha_vencimiento = new Date(res?.obj?.results[0]["fecha_vencimiento"]);
+            fecha_vencimiento.setHours(fecha_vencimiento.getHours() + 5);
+            const fecha_nacimiento = new Date(res?.obj?.results[0]["fecha_nacimiento"]);
+            fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
+           //setFormatMon(res?.obj?.results[0]["ValorPagar"]);
+
+     let    objetoVertical=[{
+        clave: "Documento",
+        info: res?.obj?.results[0]["doc_cliente"]
+      },
+      {
+        clave: "Tipo Documento",
+        info: res?.obj?.results[0]["tipo_documento_descripcion"]
+      },{
+        clave: "Nombre",
+                info: res?.obj?.results[0]["nombre"]
+      },{
+        clave: "Apellidos",
+                info: res?.obj?.results[0]["apellidos"]
+      },{
+        clave: "Fecha Nacimiento",
+                info: dateFormatter.format(fecha_nacimiento)
+      },{
+        clave: "Celular",
+                info: res?.obj?.results[0]["celular"]
+      },{
+        clave: "Email",
+                info: res?.obj?.results[0]["email"]
+      },{
+        clave: "Dirección",
+                info: res?.obj?.results[0]["direccion"]
+      },{
+        clave: "Estado",
+                info: res?.obj?.results[0]["name_estado_pin"]
+      },{
+        clave: "Vencimiento",
+                info: dateFormatter.format(fecha_vencimiento)
+      },{
+        clave: "Trámite",
+                info: res?.obj?.results[0]["name_tramite"]
+      },{
+        clave: "Valor",
+                info: formatMoney.format(res?.obj?.results[0]["valor"]*1.19 + res?.obj?.results[0]["valor_tramite"])
+      },]*/
+
+
           setTable(
             res?.obj?.results?.map((row) => {
               const fecha_vencimiento = new Date(row?.fecha_vencimiento);
@@ -146,17 +201,31 @@ const TramitePines = () => {
                 Tramite: row?.name_tramite,
                 Valor: formatMoney.format(row?.valor*1.19 + row?.valor_tramite), // Solo pin tiene iva
               };
+
             })
+
+
+       /*     objetoVertical.map((row) => {
+
+              return {
+
+               clave: row?.clave,
+               info: row?.info,
+
+              };
+
+            })*/
+
+
           );
           setMaxPages(res?.obj?.maxPages);
-          setValor(res?.obj?.results?.[0]?.valor);
-          setId_trx(res?.obj?.results?.[0]?.id_trx?.creacion);
-          setTipoPin(res?.obj?.results?.[0]?.tipo_pin);
-          setValor_tramite(res?.obj?.results?.[0]?.valor_tramite);
-          setName_tramite(res?.obj?.results?.[0]?.name_tramite);
-          setId_pin(res?.obj?.results?.[0]?.id_pin)
-          setInfoComercioCreacion(res?.obj?.results?.[0]?.datos_comercio_creacion)
+        }else{
+          notifyError("Es necesario diligenciar el formulario");
         }
+        
+        setDatosOlimpia(res.obj.results)
+      
+      }
       })
       .catch((err) => console.log("error", err));
   };
@@ -206,6 +275,25 @@ const TramitePines = () => {
 
   }, [parametroBusqueda, hora, horaCierre, navigate, cierreManual])
 
+              /*    <ButtonBar className="col-auto md:col-span-1">
+              <Button type=""
+                  onClick = { () => {
+                  
+                      if (!(info?.obj?.results[0]["name_estado_pin"] === "Pin creado" || info?.obj?.results[0]["name_estado_pin"] === "Dispersado no usado")) {
+                        notifyError(info?.obj?.results[0]["name_estado_pin"]);
+                      } else {
+                        
+                        setSelected(info?.obj?.results[0]);
+        
+                        setShowModal(true);
+                        setActivarNavigate(false);
+                      }
+                  }}>
+              Gestionar Pin
+              </Button>
+    
+            </ButtonBar>*/
+
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -218,15 +306,16 @@ const TramitePines = () => {
             <Form onSubmit={onSubmit} grid>
               <Input
                 id="paramBusqueda"
-                label="Código"
+                label="Documento"//"Código"
                 type="text"
-                minLength="4"
-                maxLength="4"
+                minLength="5"
+                maxLength="12"
                 autoComplete="off"
                 value={parametroBusqueda}
                 required
                 onInput={(e) => {
-                  setParametroBusqueda(e.target.value);
+                  const num = parseInt(e.target.value) || "";
+                  setParametroBusqueda(num);
                 }}
               />
               <ButtonBar className="col-auto md:col-span-2">
@@ -239,7 +328,7 @@ const TramitePines = () => {
                     setShowModalReenvio(true)
                   }}
                   >
-                  Reenviar Código
+                  Diligenciar formulario
                 </Button>
               </ButtonBar>
             </Form>
@@ -252,22 +341,24 @@ const TramitePines = () => {
 
       {info?.status && (
         <>
+
           <TableEnterprise
             title="Información Pin"
             maxPage={maxPages}
             headers={[
-              "Documento",
+           //   "",""
+                   "Documento",
               "Tipo Documento",
-              "Nombre",
+               "Nombre",
               "Apellidos",
-              "Fecha Nacimiento",
-              "Celular", 
-              "Email",
-              "Dirección",
-              "Estado",
-              "Vencimiento",
-              "Trámite",
-              "Valor",
+               "Fecha Nacimiento",
+               "Celular", 
+               "Email",
+               "Dirección",
+                  "Estado",
+               "Vencimiento",
+               "Trámite",
+               "Valor",
             ]}
             data={table || []}
             onSelectRow={(e, index) => {
@@ -275,15 +366,27 @@ const TramitePines = () => {
                 notifyError(table[index].Estado);
               } else {
                 setSelected(table[index]);
+                setValor(info?.obj?.results?.[index]?.valor);
+                setValores(info?.obj?.results?.[index]?.valores);
+                setId_trx(info?.obj?.results?.[index]?.id_trx?.creacion);
+                setTipoPin(info?.obj?.results?.[index]?.tipo_pin);
+                setValor_tramite(info?.obj?.results?.[index]?.valor_tramite);
+                setName_tramite(info?.obj?.results?.[index]?.name_tramite);
+                setId_pin(info?.obj?.results?.[index]?.id_pin)
+                setInfoComercioCreacion(info?.obj?.results?.[index]?.datos_comercio_creacion)
 
                 setShowModal(true);
                 setActivarNavigate(false);
               }
             }}
             onSetPageData={setPageData}
+            
           ></TableEnterprise>
-        </>
+
+        </>   
       )}
+
+
       <Modal show={showModal} handleClose={() => closeModal()}>
         {(modalUsar !== true) & (modalCancel !== true) ? (
           <>
@@ -358,6 +461,7 @@ const TramitePines = () => {
             tipoPin={tipoPin}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
+            datosOlimpia={datosOlimpia}
           ></UsarPinForm>
         ) : (
           ""
@@ -374,6 +478,7 @@ const TramitePines = () => {
             infoComercioCreacion={infoComercioCreacion}
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
+            valores={valores}
           ></CancelPin>
         ) : (
           ""
@@ -383,7 +488,7 @@ const TramitePines = () => {
       {urlAutogestion === '' ?
       <>
         <div className="flex flex-col w-1/2 mx-auto ">
-        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <h1 className="text-3xl mt-3 mx-auto">Verificar documento</h1>
         <br></br>
         </div>  
         <div className="flex flex-col justify-center items-center mx-auto container">          
@@ -403,7 +508,7 @@ const TramitePines = () => {
             />
             <ButtonBar className="col-auto md:col-span-2">
               <Button type="submit" disabled={disabledBtn}>
-                Reenviar código
+                Verificar
               </Button>
               <Button 
                 type="button"
@@ -420,8 +525,8 @@ const TramitePines = () => {
         </div>    
         </>         
         :
-        <div className="flex flex-col w-1/2 mx-auto ">
-        <h1 className="text-3xl mt-3 mx-auto">Reenvio Código PIN</h1>
+        <div className="flex flex-col w-2/3 mx-auto ">
+        <h1 className="text-2xl mt-3 mx-auto">Link para diligenciar formulario:</h1>
         <br></br>
         <h1 className="text-1xl mt-3 mx-auto">{msgRespReenvio}</h1>
         <h1 className="text-1xl mt-3 mx-auto font-semibold">Formulario autogestión: 
@@ -430,6 +535,7 @@ const TramitePines = () => {
           target="blank"
           className="text-1xl mt-3 mx-auto text-sky-400"
           > click aquí</a></h1>
+           <br></br>
         <Button 
           type="button"
           onClick = {() => {

@@ -3,20 +3,21 @@ import { toast } from "react-toastify";
 import Form from "../../../components/Base/Form";
 import InputX from "../../../components/Base/InputX/InputX";
 import Select from "../../../components/Base/Select";
-import AWS, { CostExplorer } from "aws-sdk";
+import AWS from "aws-sdk";
 import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Modal from "../../../components/Base/Modal";
 import CargarForm from "../components/CargarForm/CargarForm";
 import { useLoteria } from "../utils/LoteriaHooks";
-import SubPage from "../../../components/Base/SubPage/SubPage";
+import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/cargueS3`;
 
 const CargaArchivos = ({ route }) => {
   const { codigos_lot, setCodigos_lot } = useLoteria();
+  const { pdpUser } = useAuth();
 
   const { label } = route;
   const options = [
@@ -53,23 +54,22 @@ const CargaArchivos = ({ route }) => {
 
   const optionsFisiVir = [
     { value: "", label: "" },
-    { value: "Fisico/", label: `${archivo} físicos` },
-    { value: "Virtual/", label: `${archivo} Virtuales` },
+    { value: "Fisico/", label: `${archivo === "Asignacion" ? ("Asignación") : ("")} Físicos` },
+    { value: "Virtual/", label: `${archivo === "Asignacion" ? ("Asignación") : ("")} Virtuales` },
   ];
 
   const [showModal, setShowModal] = useState(false);
 
   const [progress, setProgress] = useState(0);
 
+  const nombreUsuario = pdpUser.uname.replace(/ /g,"_").replace(/-/g,"");
   const S3_BUCKET = process.env.REACT_APP_BUCKET;
   const REGION = process.env.REACT_APP_REGION;
-  //console.log(S3_BUCKET)
   const bucket = new AWS.S3({
     params: { Bucket: S3_BUCKET },
     region: REGION,
   });
-  // console.log(`${tipoSorteo}${archivo}/${fisiVirtual}`);
-
+  
   //------------------Funcion Para Subir El Formulario---------------------//
   const saveFile = useCallback(
     (e) => {
@@ -77,16 +77,14 @@ const CargaArchivos = ({ route }) => {
       const f = new Date();
       const query = {
         contentType: "application/text",
-        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${f.getDate()}${
-          f.getMonth() + 1
-        }${f.getFullYear()}${fileName}`,
+        filename: `${tipoSorteo}${archivo}/${fisiVirtual}${nombreUsuario}-${f.getDate()}${f.getMonth() + 1
+          }${f.getFullYear()}-${fileName}`,
       };
       fetchData(url_cargueS3, "GET", query)
         .then((respuesta) => {
           if (!respuesta?.status) {
-            notifyError(respuesta?.msg);
+            notifyError(respuesta?.msg == "Motivo: Archivo con errores: UniqueViolation" ? "Error respuesta PDP: (No se pudo cargar el archivo (" +archivo+ ") [0010006]) Este archivo ya fue cargado previamente" : "Error respuesta PDP: (No se pudo cargar el archivo (" +archivo+ ") [0010006])");
           } else {
-            // setEstadoForm(true);
             const formData2 = new FormData();
             if (file) {
               for (const property in respuesta?.obj?.fields) {
@@ -95,9 +93,7 @@ const CargaArchivos = ({ route }) => {
                   `${respuesta?.obj?.fields[property]}`
                 );
               }
-
               formData2.set("file", file);
-              // console.log(formData2, `${respuesta?.obj?.url}`);
               fetch(`${respuesta?.obj?.url}`, {
                 method: "POST",
                 body: formData2,
@@ -109,9 +105,15 @@ const CargaArchivos = ({ route }) => {
                         if ("Motivo" in res?.[0]) {
                           closeModal();
                           if (res[0]["Estado"] === 1) {
+                            setProgress(0);
+                            setFile("");
+                            setFileName("");
+                            setArchivo("");
+                            setTipoSorteo("");
+                            setFisiVirtual("");
                             notify(res[0]["Motivo"]);
                           } else {
-                            notifyError(res[0]["Motivo"]);
+                            notifyError("Error respuesta PDP: (No se pudo cargar el archivo (" +archivo+ ") [0010006])");
                           }
                         } else {
                           notifyError("Consulte con soporte");
@@ -120,15 +122,15 @@ const CargaArchivos = ({ route }) => {
                     });
                   }, 5000);
                 } else {
-                  notifyError("No fue posible conectar con el Bucket");
+                  notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
                 }
               });
             }
           }
         })
         .catch((err) => {
-          notifyError("Error al cargar Datos");
-        }); /* notify("Se ha comenzado la carga"); */
+          notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
+        });
     },
     [file, fileName, archivo, tipoSorteo, fisiVirtual]
   );
@@ -165,7 +167,6 @@ const CargaArchivos = ({ route }) => {
       files = Array.from(files);
       if (files.length === 1) {
         const m_file = files[0];
-        // console.log(m_file);
         setFile(m_file);
         setFileName(m_file.name);
       } else {
@@ -179,9 +180,13 @@ const CargaArchivos = ({ route }) => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    //saveFile();
-    setShowModal(true);
-    setDisabledBtns(false);
+    if (!fileName.includes("-")){
+      setShowModal(true);
+      setDisabledBtns(false);
+    }
+    else {
+      notifyError("El nombre del archivo no es correcto, no incluir el carácter guion medio")
+    }
   };
 
   useEffect(() => {
@@ -195,12 +200,17 @@ const CargaArchivos = ({ route }) => {
     setProgress(0);
     setFile("");
     setFileName("");
+    setArchivo("");
+    setTipoSorteo("");
+    setFisiVirtual("");
   }, []);
 
   return (
     <>
+      <h1 class="text-3xl">Carga de archivos</h1>
       <div>
         <Select
+          class="mb-3"
           id="archivos"
           label="Archivo a subir"
           options={options}
@@ -214,11 +224,14 @@ const CargaArchivos = ({ route }) => {
           }}
         />
         {archivo === "PlanDePremios" ||
-        archivo === "Asignacion" ||
-        archivo === "Resultados" ? (
+          archivo === "Asignacion" ||
+          archivo === "Resultados" ? (
           <Select
+            class="mb-3"
             id="tip_sorteo"
-            label={`Tipo de sorteo para ${archivo}`}
+            label={(archivo === "PlanDePremios") ? (`Tipo de sorteo para plan de premios`) : 
+                  (archivo === "Asignacion") ? (`Tipo de sorteo para asignación`) :
+                  (`Tipo de sorteo para resultados`)}
             options={optionsTipoSorteo}
             disabled={progress !== 0 && progress !== 100}
             value={tipoSorteo}
@@ -229,10 +242,12 @@ const CargaArchivos = ({ route }) => {
         ) : (
           ""
         )}
-        {archivo !== "PlanDePremios" && tipoSorteo !== "" ? (
+        {archivo !== "PlanDePremios" && archivo !== "Resultados" && tipoSorteo !== "" ? (
+
           <Select
+            class="mb-3"
             id="FisiVir"
-            label={`${archivo} físicos/Virtuales`}
+            label={(archivo === "Asignacion") ? (`Asignación Físicos/Virtuales`) : (`${archivo} Físicos/Virtuales`)}
             options={optionsFisiVir}
             disabled={progress !== 0 && progress !== 100}
             value={fisiVirtual}
@@ -244,15 +259,14 @@ const CargaArchivos = ({ route }) => {
           ""
         )}
         {(archivo === "PlanDePremios" && tipoSorteo !== "") ||
-        fisiVirtual !== "" ? (
+          fisiVirtual !== "" || (archivo === "Resultados" && tipoSorteo !== "") ? (
           <Form formDir="col" onSubmit={onSubmit}>
             <InputX
               id={`archivo_${archivo}`}
-              label={`Elegir archivo: ${
-                options.find(({ value }) => {
-                  return value === archivo;
-                }).label
-              }`}
+              label={`Elegir archivo: ${options.find(({ value }) => {
+                return value === archivo;
+              }).label
+                }`}
               type="file"
               disabled={progress !== 0}
               accept=".txt,.csv"
@@ -276,8 +290,8 @@ const CargaArchivos = ({ route }) => {
               {progress === 0
                 ? "Listo para subir"
                 : progress === 100
-                ? "Subido"
-                : "Subiendo"}
+                  ? "Subido"
+                  : "Subiendo"}
             </h1>
             <ProgressBar value={progress} max="100"></ProgressBar>
           </>
@@ -293,6 +307,7 @@ const CargaArchivos = ({ route }) => {
             handleSubmit={() => {
               saveFile();
             }}
+            fisiVirtual={fisiVirtual}
           />
         </Modal>
       </div>

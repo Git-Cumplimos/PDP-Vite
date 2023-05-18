@@ -3,8 +3,12 @@ import { lazy } from "react";
 /**
  * Rutas
  */
+import rutasIAM from "../apps/IAM/routes";
+
 import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
 import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
+
+import rutasRecaudoDirecto from "../apps/RecaudoDirecto/routes";
 
 import rutasColpatria, {
   listPermissionsColpatria,
@@ -18,6 +22,7 @@ import {
   rutasRecargas,
   rutasPines,
   rutasSoat,
+  rutasApuestas
 } from "../apps/Practisistemas/routes";
 
 import { rutasPinesVus } from "../apps/PinesVus/routes";
@@ -36,6 +41,9 @@ import rutasAgrarioCB, {
   listPermissionsAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 import rutasConfiguraciones from "../apps/TrxParams/routes";
+import rutasRecaudoMultiple, {
+  listPermissionsRecaudoMultiple,
+} from "../apps/Corresponsalia/RecaudoMultiple/routes";
 
 /**
 
@@ -61,6 +69,12 @@ const LoteriaBog = lazy(() => import("../apps/LoteriaBog/LoteriaBog"));
 /** Loteria Bogota */
 const venta = lazy(() => import("../apps/LoteriaBog/Views/Loteria"));
 const Sorteos = lazy(() => import("../apps/LoteriaBog/Views/Sorteos"));
+const DownloadArchivos = lazy(() =>
+  import("../apps/LoteriaBog/Views/DownloadArchivos")
+);
+const ArchivosPagoPremios = lazy(() =>
+  import("../apps/LoteriaBog/Views/ArchivosPagoPremios")
+);
 const DescargarArchivosS3 = lazy(() =>
   import("../apps/LoteriaBog/Views/DescargarArchivosS3")
 );
@@ -72,6 +86,9 @@ const CrearSorteos = lazy(() =>
 );
 const CargaArchivos = lazy(() =>
   import("../apps/LoteriaBog/Views/CargaArchivos")
+);
+const HistoricoCargues = lazy(() =>
+  import("../apps/LoteriaBog/Views/HistoricoCargues")
 );
 const ArqueoBilletes = lazy(() =>
   import("../apps/LoteriaBog/Views/InventarioBilletes/ArqueoBilletes")
@@ -317,10 +334,10 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/loteria",
-    label: <AppIcons Logo={"Loteria"} name="Loteria" />,
+    label: <AppIcons Logo={"Loteria"} name="Lotería" />,
     component: LoteriaBog,
     provider: ProvideLoteria,
-    permission: [3, 4, 5, 6, 44, 45, 46, 47],
+    permission: [3, 4, 5, 6, 44, 45, 46, 47, 95],
     subRoutes: [
       {
         link: "loteria-de-bogota",
@@ -338,7 +355,7 @@ const allUrlsPrivateApps = [
         link: "loteria-de-cundinamarca",
         label: "Lotería de Cundinamarca",
         logo: "LoteriaTolima",
-        permission: [44, 45, 46, 47],
+        permission: [95, 45, 46, 47],
       },
     ].map(({ link: name, label, logo, permission }) => ({
       link: `/loteria/${name}`,
@@ -350,13 +367,22 @@ const allUrlsPrivateApps = [
           link: `/loteria/${name}/ventas`,
           label: <AppIcons Logo={"Ventas"} name="Ventas" />,
           component: venta,
-          permission: [3],
+          permission: [3, 44, 95],
         },
         {
           link: `/loteria/${name}/cargar`,
           label: <AppIcons Logo={"CARGAR"} name="Carga de archivos" />,
           component: CargaArchivos,
           permission: [4],
+        },
+        {
+          link: `/loteria/${name}/historico_cargues`,
+          label: (
+            <AppIcons Logo={"REPORTE"} name="Histórico cargues de archivos" />
+          ),
+          component: HistoricoCargues,
+          extern: false,
+          permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/sorteos`,
@@ -379,24 +405,43 @@ const allUrlsPrivateApps = [
           ],
         },
         {
-          link: `/loteria/${name}/descargar/descarga_reportes`,
+          link: `/loteria/${name}/descargarArchivos`,
           label: <AppIcons Logo={"DESCARGAR"} name="Descarga de archivos" />,
-          component: DescargarArchivosS3,
+          component: DownloadArchivos,
           permission: [6],
+          subRoutes: [
+            {
+              link: `/loteria/${name}/descargarArchivos/descarga_reportes`,
+              label: <AppIcons Logo={"DESCARGAR"} name="Archivos de ventas" />,
+              component: DescargarArchivosS3,
+              permission: [6],
+            },
+            {
+              link: `/loteria/${name}/descargarArchivos/descarga_reportes_pagoPremios`,
+              label: (
+                <AppIcons
+                  Logo={"DESCARGAR"}
+                  name="Archivos de pago de premios"
+                />
+              ),
+              component: ArchivosPagoPremios,
+              permission: [6],
+            },
+          ],
         },
         {
           link: `/loteria/${name}/premios`,
           label: <AppIcons Logo={"Premio"} name="Premios" />,
           component: Premios,
           extern: false,
-          permission: [3], ///////////////////////////////////////////////////////////////////
+          permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
         },
         {
           link: `/loteria/${name}/inventario`,
           label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,
           component: Inventario,
           extern: false,
-          permission: [3, 6], ///////////////////////////////////////////////////////////////////
+          permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
           subRoutes: [
             {
               link: `/loteria/${name}/arqueo`,
@@ -405,7 +450,7 @@ const allUrlsPrivateApps = [
               ),
               component: ArqueoBilletes,
               extern: false,
-              permission: [3, 6], ///////////////////////////////////////////////////////////////////
+              permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////
             },
             {
               link: `/loteria/${name}/inventario/crear`,
@@ -414,7 +459,7 @@ const allUrlsPrivateApps = [
               ),
               component: CrearInventario,
               extern: false,
-              permission: [3], ///////////////////////////////////////////////////////////////////
+              permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
             },
             {
               link: `/loteria/${name}/inventario/reportes`,
@@ -426,20 +471,21 @@ const allUrlsPrivateApps = [
               ),
               component: ReportInventario,
               extern: false,
-              permission: [3, 6], ///////////////////////////////////////////////////////////////////
+              permission: [6], ///////////////////////////////////////////////////////////////////
             },
           ],
         },
       ],
     })),
   },
-
   {
     link: "/transacciones",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
+    // label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
+    label: <AppIcons Logo={"TRANSACCIONES"} name="Transacciones" />,
     component: Transacciones,
     permission: [8],
   },
+  rutasIAM,
   {
     link: "/update-commerce",
     label: <AppIcons Logo={"ACTUALIZACION"} name="Actualizacion de datos" />,
@@ -456,7 +502,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "https://www.puntodecompra.com.co/",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
+    label: <AppIcons Logo={"MarketPlace"} name="Marketplace" />,
     component: MarketPlace,
     extern: true,
     permission: [10],
@@ -482,25 +528,27 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/funmujer/recaudo",
-        label: <AppIcons Logo={"Recaudo"} name={"Recaudo"} />,
+        label: <AppIcons Logo={"FundacionRecaudo"} name={"Recaudo"} />,
         component: recMujer,
         permission: [17],
       },
       {
         link: "/funmujer/desembolso",
-        label: <AppIcons Logo={"Desembolso"} name={"Desembolso"} />,
+        label: <AppIcons Logo={"FundacionDesembolso"} name={"Desembolso"} />,
         component: DesembolsoFDLM,
         permission: [28, 17],
       },
       {
         link: "/funmujer/reversorecaudo",
-        label: <AppIcons Logo={"Reverso"} name={"Reverso Manual"} />,
+        label: (
+          <AppIcons Logo={"FundacionReversoManual"} name={"Reverso Manual"} />
+        ),
         component: revMujer,
         permission: [27],
       },
       {
         link: "/funmujer/reporte",
-        label: <AppIcons Logo={"Reporte"} name={"Reporte"} />,
+        label: <AppIcons Logo={"FundacionReporte"} name={"Reporte"} />,
         component: reportFDLM,
         permission: [28, 17],
       },
@@ -508,7 +556,7 @@ const allUrlsPrivateApps = [
   },
 
   {
-    link: "/PinesVus",
+    link: "/Pines",
     label: <AppIcons Logo={"CrearPines"} name="Pines" />,
     component: PinesVus,
     permission: [
@@ -522,7 +570,7 @@ const allUrlsPrivateApps = [
 
   {
     link: "/iam",
-    label: <AppIcons Logo={"MARKETPLACE"} name="IAM" />,
+    label: <AppIcons Logo={"IAM"} name="IAM" />,
     component: IAMIndex,
     permission: [12, 13, 14, 15, 16],
     subRoutes: [
@@ -587,7 +635,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/cupo",
-    label: <AppIcons Logo={"RECAUDO"} name={"Detalles Cupo"} />,
+    label: <AppIcons Logo={"DETALLES_CUPO"} name={"Detalles Cupo"} />,
     component: cupo,
     permission: [59, 60, 61, 62, 64],
     subRoutes: [
@@ -639,19 +687,21 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/daviplata",
-    label: <AppIcons Logo={"MARKETPLACE"} name="DaviPlata" />,
+    label: <AppIcons Logo={"Daviplata"} name="DaviPlata" />,
     component: Daviplata,
     permission: [53],
     subRoutes: [
       {
         link: "/daviplata/depositos",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Depósito DaviPlata" />,
+        label: (
+          <AppIcons Logo={"DepositoDaviplata"} name="Depósito DaviPlata" />
+        ),
         component: Deposito,
         permission: [53],
       },
       {
         link: "/daviplata/retiros",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Retiro DaviPlata" />,
+        label: <AppIcons Logo={"RetiroDaviplata"} name="Retiro DaviPlata" />,
         component: Retiro,
         permission: [53],
       },
@@ -662,17 +712,23 @@ const allUrlsPrivateApps = [
     label: <AppIcons Logo={"Corresponsalia"} name="Corresponsalía" />,
     component: Corresponsalia,
     permission: [
-      54,
       ...listPermissionsColpatria,
       ...listPermissionsDavivienda,
       ...listPermissionsAval,
       ...listPermissionsAgrario,
+      ...listPermissionsRecaudoMultiple,
     ],
-    subRoutes: [rutasDaviviendaCB, rutasAvalCB, rutasAgrarioCB, rutasColpatria],
+    subRoutes: [
+      rutasDaviviendaCB,
+      rutasAvalCB,
+      rutasAgrarioCB,
+      rutasColpatria,
+      rutasRecaudoMultiple,
+    ],
   },
   {
     link: "/recaudoEmpresarial",
-    label: <AppIcons Logo={"Corresponsalia"} name="Recaudo Empresarial" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Recaudo Empresarial" />,
     component: RecaudoEmpresarial,
     permission: [
       54,
@@ -689,7 +745,7 @@ const allUrlsPrivateApps = [
 
   {
     link: "/API_SMS",
-    label: <AppIcons Logo={"MARKETPLACE"} name="SMS" />,
+    label: <AppIcons Logo={"SMS"} name="SMS" />,
     component: API_SMS,
     permission: [25],
     subRoutes: [
@@ -772,29 +828,27 @@ const allUrlsPrivateApps = [
             subRoutes: [
               {
                 link: "/movistar/paquetes-movistar/combo",
-                label: <AppIcons Logo={"PAQUETESMOVISTAR"} name="Combos" />,
+                label: <AppIcons Logo={"COMBOS"} name="Combos" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-voz",
-                label: (
-                  <AppIcons Logo={"PAQUETESMOVISTAR"} name="Paquete de Voz" />
-                ),
+                label: <AppIcons Logo={"PAQUETEVOZ"} name="Paquete de Voz" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/paquete-datos",
                 label: (
-                  <AppIcons Logo={"PAQUETESMOVISTAR"} name="Paquete de Datos" />
+                  <AppIcons Logo={"PAQUETEDATOS"} name="Paquete de Datos" />
                 ),
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
               {
                 link: "/movistar/paquetes-movistar/prepagada",
-                label: <AppIcons Logo={"PAQUETESMOVISTAR"} name="Prepagada" />,
+                label: <AppIcons Logo={"PREPAGADA"} name="Prepagada" />,
                 component: SubPaquetesMovistar,
                 permission: [65],
               },
@@ -802,7 +856,9 @@ const allUrlsPrivateApps = [
           },
           {
             link: "/movistar/operador-pdp",
-            label: <AppIcons Logo={"OperadorPdp"} name="Operador PDP" />,
+            label: (
+              <AppIcons Logo={"OPERADORPDPMOVISTAR"} name="Operador PDP" />
+            ),
             component: OperadorPDPMovistar,
             permission: [66],
             subRoutes: [
@@ -851,19 +907,20 @@ const allUrlsPrivateApps = [
   rutasRecargas,
   {
     link: "/movii-pdp",
-    label: <AppIcons Logo={"MARKETPLACE"} name="MOVII PDP" />,
+    label: <AppIcons Logo={"MOVII"} name="MOVII PDP" />,
+    // label: <AppIcons Logo={"MARKETPLACE"} name="MOVII PDP" />,
     component: MoviiPDP,
     permission: [48],
     subRoutes: [
       {
-        link: "/movii-pdp/cash-out",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Cash out" />,
+        link: "/movii-pdp/retiro",
+        label: <AppIcons Logo={"MoviiRetiro"} name="Retiro" />,
         component: MoviiPDPCashOut,
         permission: [49],
       },
       {
         link: "/movii-pdp/cash-out-reversos",
-        label: <AppIcons Logo={"SORTEOS"} name="Reversos cash out" />,
+        label: <AppIcons Logo={"MoviiReverso"} name="Reversos cash out" />,
         component: MoviiPDPReverseCashOut,
         permission: [52],
       },
@@ -871,7 +928,7 @@ const allUrlsPrivateApps = [
   },
   {
     link: "/colpensiones",
-    label: <AppIcons Logo={"RECAUDO"} name={"Colpensiones"} />,
+    label: <AppIcons Logo={"COLPENSIONES"} name={"Colpensiones"} />,
     component: Domiciliacion,
     permission: [55, 56, 57],
     subRoutes: [
@@ -1024,6 +1081,8 @@ const allUrlsPrivateApps = [
   //   permission: [1],
   // },
   rutasSoat,
+  rutasApuestas,
+  rutasRecaudoDirecto,
 ];
 
 export { allUrlsPrivateApps };

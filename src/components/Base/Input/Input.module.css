@@ -19,6 +19,7 @@
 
 .formItem > div > input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .formItem > div > input[type="checkbox"] {
@@ -62,4 +63,9 @@
 
 .formItem > div > input + p.invalid {
   @apply text-red-600;
+}
+
+.formItem > div > input ~ button.btn {
+  @apply text-sm absolute text-left bg-primary text-white;
+  @apply right-2 top-1.5 rounded-md p-1;
 }

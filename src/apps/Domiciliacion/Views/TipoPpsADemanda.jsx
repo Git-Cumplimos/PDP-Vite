@@ -39,7 +39,7 @@ const TipoPpsADemanda = ({ numCed, fun }) => {
           funBorrar={borrarData}
         ></PpsVoluntarioDemanda>
       ) : tipoPps === "Pps Obligatorio A Demanda" ? (
-        <PpsObligatorioDemanda ced={numCed}></PpsObligatorioDemanda>
+        <PpsObligatorioDemanda ced={numCed} fun={fun}></PpsObligatorioDemanda>
       ) : (
         ""
       )}

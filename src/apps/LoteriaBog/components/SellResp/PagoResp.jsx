@@ -124,32 +124,44 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
 
   /////////////////////////////####//////////////////////
   const ticket = useMemo(() => {
+      
     return {
       title: "Recibo de pago",
       timeInfo: {
-        "Fecha de pago": voucherInfo["Fecha de pago"],
-        Hora: voucherInfo["Hora"],
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "2-digit",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date()),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).format(new Date()),
       },
       commerceInfo: Object.entries({
         "Id Comercio": roleInfo.id_comercio,
         "No. terminal": roleInfo.id_dispositivo,
-        Municipio: roleInfo.ciudad,
-        Dirección: roleInfo.direccion,
-        "Id Trx": pagoresponse["id_trx"],
-        "Id Transacción": pagoresponse.id_Transaccion,
+        "Id Trx": pagoresponse.id_Transaccion,
+        "Id Aut": pagoresponse.id_Transaccion,
+        "Comercio": roleInfo?.["nombre comercio"],
+        "": "",
+        "Dirección": roleInfo.direccion,
+        "": "",
       }),
       commerceName: pagoresponse.nom_loteria,
       trxInfo: Object.entries({
         Sorteo: pagoresponse["Numero sorteo"],
         Billete: pagoresponse.num_billete,
         Serie: pagoresponse.serie,
-        Fracciones: pagoresponse.fracciones,
+        Fracción: pagoresponse.fracciones,
         Premio: formatMoney.format(pagoresponse["valor bruto"]),
         "valor 17%": formatMoney.format(pagoresponse["valor 17percent"]),
         "valor 20%": formatMoney.format(pagoresponse["valor 20percent"]),
         Total: formatMoney.format(pagoresponse["valor ganado"]),
       }),
-      disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
+      disclamer: "Para quejas o reclamos comuníquese al *num PDP*",
     };
   }, [
     roleInfo.ciudad,
@@ -169,8 +181,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
       <Button
         onClick={(e) => {
           setPagoresponse(null);
-        }}
-      >
+        }}>
         Volver
       </Button>
     </div>
@@ -185,8 +196,7 @@ const Pagoresp = ({ pagoresponse, setPagoresponse, closeModal }) => {
             closeModal();
             setPagoresponse(null);
             //setCustomer({ fracciones: "", phone: "", doc_id: "" });
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>
