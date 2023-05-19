@@ -125,15 +125,12 @@ const RecargarApuestas = () => {
       valor_total_trx: parseInt(inputValor),
       ticket: infTicketFinal,
 
-      datosRecargas:{
-          celular: inputCelular,
-          documento: datosCuenta?.documento,
-          operador:state?.producto,
-          valor: parseInt(inputValor),
-          jsonAdicional:{
-            "nombre_usuario": pdpUser?.uname ?? "",
-            "operador": state?.casaApuesta
-          } 
+      datosRecargas: {
+        celular: datosCuenta?.documento,
+        operador: state?.producto,
+        valor: parseInt(inputValor),
+        jsonAdicional: {
+        }
       }
     })
     .then((res) => {
