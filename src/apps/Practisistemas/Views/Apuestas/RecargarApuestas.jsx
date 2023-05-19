@@ -129,6 +129,8 @@ const RecargarApuestas = () => {
         operador: state?.producto,
         valor: parseInt(inputValor),
         jsonAdicional: {
+          "nombre_usuario": pdpUser?.uname ?? "",
+          "operador": state?.casaApuesta
         }
       }
     })
