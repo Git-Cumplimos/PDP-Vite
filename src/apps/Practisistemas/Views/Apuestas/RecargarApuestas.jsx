@@ -120,7 +120,7 @@ const RecargarApuestas = () => {
         id_usuario: roleInfo.id_usuario,
         id_uuid_trx: id_uuid
       },
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(inputValor),
       ticket: infTicketFinal,
