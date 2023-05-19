@@ -54,6 +54,9 @@ const ApuestasDeportivas = ({ subRoutes }) => {
       casaApuesta: datosTrans.casaApuesta,
     })
       .then((autoArr) => {
+        if (autoArr?.error_msg?.error_bd_logs?.description) {
+          notifyError(autoArr?.error_msg.error_bd_logs.description);
+        }
         setRespuesta(false)
         setMaxPages(autoArr?.maxPages);
         setCasas(autoArr?.response ?? []);
