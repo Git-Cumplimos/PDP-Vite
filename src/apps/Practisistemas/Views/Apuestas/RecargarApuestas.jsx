@@ -49,7 +49,7 @@ const RecargarApuestas = () => {
   const optionsDocumento = [
     { value: "1", label: "Cédula Ciudadanía"},
     { value: "2", label: "Cédula de Extranjería"},
-    { value: "3", label: "Tarjeta de Identidad"},
+    // { value: "3", label: "Tarjeta de Identidad"},
     { value: "4", label: "NIT" },
     { value: "5", label: "Pasaporte"},
   ];
@@ -360,9 +360,11 @@ const RecargarApuestas = () => {
             title="¿Está seguro de realizar la recarga a la cuenta?"
             subtitle="Resumen de transacción"
             summaryTrx={{
-              Producto: state?.casaApuesta,
               Documento: datosCuenta?.documento,
-              "Valor Recarga Cuenta": formatMoney.format(inputValor),
+              Producto: state?.casaApuesta,
+              Celular: inputCelular,
+              Valor: formatMoney.format(inputValor),
+              // "Valor Recarga Cuenta": formatMoney.format(inputValor),
             }}
           >  
             <>
