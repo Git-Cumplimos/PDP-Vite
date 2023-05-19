@@ -60,7 +60,7 @@ const RecaudoDirecto = () => {
     { label: "Sin base de datos", value: 3 },
   ]
   const tipoArchivoConciliacion = [
-    { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+    { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
 
@@ -314,6 +314,7 @@ const RecaudoDirecto = () => {
             label={"Nombre convenio"}
             name={"nombre_convenio"}
             type="text"
+            maxLength={"60"}
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
             required
@@ -369,6 +370,7 @@ const RecaudoDirecto = () => {
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
+                  maxLength={"12"}
                   value={valLimit}
                   equalError={false}
                   onInput={(e, valor) => {
@@ -393,12 +395,14 @@ const RecaudoDirecto = () => {
                         id={`${keyRef}_${index}`}
                         name={keyRef}
                         label={keyRef}
-                        type={`${keyRef.includes("Longitud") ? "number" : "text"}`}
+                        type={`${keyRef.includes("Longitud") ? "tel" : "text"}`}
+                        maxLength={`${keyRef.includes("Longitud") ? "2" : "40"}`}
                         autoComplete="off"
                         value={valRef}
-                        onChange={(e) => {
+                        onInput={(ev) => { 
+                          if (keyRef.includes("Longitud")) (ev.target.value = onChangeNumber(ev))
                           const copyRef = [...referencias];
-                          copyRef[index][keyRef] = e.target.value;
+                          copyRef[index][keyRef] = ev.target.value;
                           setReferencias(copyRef);
                         }}
                         required
@@ -453,6 +457,7 @@ const RecaudoDirecto = () => {
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
+            maxLength={"130"}
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
           />
