@@ -203,7 +203,7 @@ const AdminLayout = () => {
         </Modal>
         <Modal show={showModalPublicidad} handleClose={handleClose}>
           <img
-            src={`${urlAssets}/assets/img/PUBLICIDADMODAL.png`}
+            src={`${urlAssets}/assets/img/MODALPUBLICIDAD.png`}
             alt="Proximamente Corresponsal Colpatria"
           ></img>
         </Modal>

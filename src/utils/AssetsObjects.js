@@ -95,11 +95,11 @@ const svgs = {
   MarketPlace: `${urlAssets}/assets/svg/recaudo/MARKETPLACE.svg`,
 
   // FUNDACION DE LA MUJER
-  Fundacion: `${urlAssets}/assets/svg/recaudo/FUNDACIONMUJER.svg`,
+  Fundacion: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJER.svg`,
   FundacionRecaudo: `${urlAssets}/assets/svg/recaudo/RECAUDOFUNDACIONMUJER.svg`,
-  FundacionDesembolso: `${urlAssets}/assets/svg/recaudo/DESEMBOLSOFUNDACION.svg`,
+  FundacionDesembolso: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJERDESEMBOLSO.svg`,
   FundacionReversoManual: `${urlAssets}/assets/svg/recaudo/RESVERSOMANUAL.svg`,
-  FundacionReporte: `${urlAssets}/assets/svg/recaudo/REPORTEFUNDACIONMUJER.svg`,
+  FundacionReporte: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJERREPORTE.svg`,
   //PINES VUS
   // CrearPines: `${urlAssets}/assets/img/CREAR PINES.png`,
   CrearPines: `${urlAssets}/assets/svg/recaudo/PINES.svg`,
@@ -107,12 +107,21 @@ const svgs = {
   ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
   TramitarPines: `${urlAssets}/assets/img/TRAMITAR PINES.png`,
 
+  //COLPATRIA
+  CorresponsaliaColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIACORRESPONSAL.svg`,
+  PinPagoColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIAPINDEPAGO.svg`,
+  VentaPinRecaudoColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIAVENTAPINDERECAUDO.svg`,
+  RetiroPinColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIARETIROCONPIN.svg`,
+  RecaudoServiciosPubPrivados: `${urlAssets}/assets/svg/recaudo/COLPATRIARECAUDOSERVICIOSPUBLICOSYPRIVADOS.svg`,
+  RecaudoManualColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIARECAUDOMANUAL.svg`,
+  RecaudoCodigoBarrasColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIARECAUDOCODIGODEBARRAS.svg`,
+
   CorresponsalBancario: `${urlAssets}/assets/img/CORRESPONSAL BANCARIO.png`,
   // Corresponsalia: `${urlAssets}/assets/img/CORRESPONSALIA.png`,
-  Corresponsalia: `${urlAssets}/assets/svg/recaudo/PROXIMAMENTECOLP.svg`,
+  Corresponsalia: `${urlAssets}/assets/svg/recaudo/PROXIMAMENTECOLPA.svg`,
   // Daviplata: `${urlAssets}/assets/img/DAVIPLATA.png`,
   Daviplata: `${urlAssets}/assets/svg/recaudo/DAVIPLATA.svg`,
-  DepositoDaviplata: `${urlAssets}/assets/svg/recaudo/DEPOSITODAVIPLATA.svg`,
+  DepositoDaviplata: `${urlAssets}/assets/svg/recaudo/DAVIPLATADEPOSITO.svg`,
   Depositos: `${urlAssets}/assets/img/DEPÓSITOS.png`,
   DescargarReporte: `${urlAssets}/assets/img/descargar reporte.png`,
   Desembolso: `${urlAssets}/assets/img/DESEMBOLSO.png`,
@@ -133,7 +142,7 @@ const svgs = {
   Recaudo: `${urlAssets}/assets/img/RECAUDO.png`,
 
   Reporte: `${urlAssets}/assets/img/REPORTE.png`,
-  RetiroDaviplata: `${urlAssets}/assets/svg/recaudo/RETIRODAVIPLATA.svg`,
+  RetiroDaviplata: `${urlAssets}/assets/svg/recaudo/DAVIPLATARETIRO.svg`,
   Retiro: `${urlAssets}/assets/svg/recaudo/RETIRODAVIPLATA.svg`,
   RetirosYDepositos: `${urlAssets}/assets/img/RETIROS Y DEPÓSITOS.png`,
   Reverso: `${urlAssets}/assets/img/REVERSO.png`,
@@ -143,7 +152,7 @@ const svgs = {
 
   VerPagoParticipacion: `${urlAssets}/assets/img/VER PAGO PARTICIPACION-01.png`,
   // CorresponsaliaDavivienda: `${urlAssets}/assets/svg/CORRESPOSALIA DAVIVIENDA-01.svg`,
-  CorresponsaliaDavivienda: `${urlAssets}/assets/svg/recaudo/CORRESPONSALDAVIVIENDA.svg`,
+  CorresponsaliaDavivienda: `${urlAssets}/assets/svg/recaudo/DAVIVIENDACORRESPONSAL.svg`,
   LogoRecargasCelular: `${urlAssets}/assets/img/RecargasCelular.png`,
 };
 
