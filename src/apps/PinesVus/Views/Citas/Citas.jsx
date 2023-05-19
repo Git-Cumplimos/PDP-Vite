@@ -12,6 +12,8 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useNavigate, useSubmit } from "react-router-dom";
 import TableEnterprise from "../../../../components/Base/TableEnterprise/TableEnterprise";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
+import fetchData from "../../../../utils/fetchData";
+
 const dateFormatter = Intl.DateTimeFormat("fr-ca", {
   year: "numeric",
   month: "2-digit",
@@ -19,7 +21,7 @@ const dateFormatter = Intl.DateTimeFormat("fr-ca", {
 });
 
 const ConsultaCitas = () => {
-  const UrlConsultaCitas = `http://127.0.0.1:5000/consulta_citas`
+  const UrlConsultaCitas = `${process.env.REACT_APP_URL_PinesVus}/consulta_citas`
   const navigate = useNavigate();
   const { consultaCupoQX, modificarCupoQX } =
     usePinesVus();
@@ -53,13 +55,16 @@ const ConsultaCitas = () => {
     let fields ={
       fecha : fecha,
       id_comercio : roleInfo.id_comercio}
-    const params = new URLSearchParams();
-    Object.entries(fields).forEach(([key, value]) => {
-    params.append(key, value);
-    });
-    const queries = params.toString();
-    fetch(UrlConsultaCitas + `?${queries}`)
-    .then(response => response.json())
+    // const params = new URLSearchParams();
+    // Object.entries(fields).forEach(([key, value]) => {
+    // params.append(key, value);
+    // });
+    // const queries = params.toString();
+    fetchData(
+      UrlConsultaCitas,
+      "GET",
+      fields
+      )
     .then((resp) => {
     setIsLoading(false)
     if (!resp?.status){
@@ -108,13 +113,14 @@ const ConsultaCitas = () => {
       documento : `${identificacion}`
     }
     
-    const paramsCitas = new URLSearchParams();
-    Object.entries(fieldsCitas).forEach(([key, value]) => {
-    paramsCitas.append(key, value);
-    });
-    const queriesCitas = paramsCitas.toString();
-    fetch(UrlConsultaCitas + `?${queriesCitas}`)
-        .then(response => response.json())
+    // const paramsCitas = new URLSearchParams();
+    // Object.entries(fieldsCitas).forEach(([key, value]) => {
+    // paramsCitas.append(key, value);
+    // });
+    // const queriesCitas = paramsCitas.toString();
+    fetchData(UrlConsultaCitas,
+        "GET",
+        fieldsCitas)
         .then((resp) => {
         setIsLoading(false)
         if (!resp?.status){

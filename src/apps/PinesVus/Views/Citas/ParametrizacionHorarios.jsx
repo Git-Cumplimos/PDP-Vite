@@ -11,6 +11,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useNavigate } from "react-router-dom";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
+import fetchData from "../../../../utils/fetchData";
 
 import TableEnterprise from "../../../../components/Base/TableEnterprise/TableEnterprise";
 
@@ -21,8 +22,8 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 });
 
 const ConsultaCitas = () => {
-  const UrlConsultaOficinas = `http://127.0.0.1:5000/consulta_oficinas`
-  const UrlParametrizacion = `http://127.0.0.1:5000/parametrizar_horarios`
+  const UrlConsultaOficinas = `${process.env.REACT_APP_URL_PinesVus}/consulta_oficinas`
+  const UrlParametrizacion = `${process.env.REACT_APP_URL_PinesVus}/parametrizar_horarios`
 
   const navigate = useNavigate();
   const { consultaCupoQX, modificarCupoQX } =
@@ -34,6 +35,7 @@ const ConsultaCitas = () => {
     maximumFractionDigits: 0,
   });
 
+  const { pdpUser } = useAuth();  
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });  
   const [tableOficinas, setTableOficinas] = useState([])
   const [maxPages, setMaxPages] = useState(1);
@@ -51,6 +53,8 @@ const ConsultaCitas = () => {
     domingo:{Apertura:"", Cierre:""}
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [ventanillas, setVentanillas] = useState("")
 
 
   const closeModal = useCallback(async () => {
@@ -66,13 +70,14 @@ const ConsultaCitas = () => {
     setIsLoading(true)
     const fields ={...pageData}
     fields.nombre = `${nombreOficina}`
-    const params = new URLSearchParams();
-    Object.entries(fields).forEach(([key, value]) => {
-    params.append(key, value);
-    });
-    const queries = params.toString();
-    fetch(UrlConsultaOficinas + `?${queries}`)
-    .then(response => response.json())
+    // const params = new URLSearchParams();
+    // Object.entries(fields).forEach(([key, value]) => {
+    // params.append(key, value);
+    // });
+    // const queries = params.toString();
+    fetchData(UrlConsultaOficinas,
+              "GET",
+              fields)
     .then((resp) => {
     setIsLoading(false)
     if (!resp?.status){
@@ -106,36 +111,51 @@ const ConsultaCitas = () => {
 
   }, [nombreOficina, pageData, UrlConsultaOficinas])
 
- 
+
+  // const onSubmitModal = (e) => {
+  //   setShowModal(true)
+  // }
 
   const onSubmitParametrizacion = (e) => {
     e.preventDefault();
+    setIsLoading(true)
     const body = {
-      fecha_vigencia : fechaVigencia,
+      fecha_vigencia : fechaVigencia + " 00:00:00",
       duracion_tiempo_cita : tiempoDuracion,
       fecha_inoperancia : [],
       horario_atencion : horarios,
       id_comercio : oficina?.Id,
-      nombre_comercio : oficina?.Nombre,
-      direccion : oficina?.Dirección,
+      // nombre_oficina : oficina?.Nombre,
+      // direccion : oficina?.Dirección,
+      numero_ventanillas : ventanillas,
+      nombre_de_quien_cargo : pdpUser?.uname
     }
-    fetch(UrlParametrizacion,
-      {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-
-      },
-      body: JSON.stringify(body)}
+    fetchData(UrlParametrizacion,
+      "POST",
+      {},
+      body
     )
-    .then(response => response.json())
     .then((resp) => {
         setIsLoading(false)
         if (!resp?.status){
             notifyError(resp?.msg)
         }else{
             // setAgendamientoTrue(true)
+            notify(resp?.msg)
             console.log(resp)
+            setOficina({"Id": "", "Nombre": "", "Dirección": ""})
+            setHorarios({
+              lunes:{Apertura:"", Cierre:""},
+              martes:{Apertura:"", Cierre:""},
+              miercoles:{Apertura:"", Cierre:""},
+              jueves:{Apertura:"", Cierre:""},
+              viernes:{Apertura:"", Cierre:""},
+              sabado:{Apertura:"", Cierre:""},
+              domingo:{Apertura:"", Cierre:""}
+            })
+            setFechaVigencia("")
+            setTiempoDuracion("")
+            setVentanillas("")
         }
     }).catch( () => {
         setIsLoading(false)
@@ -178,7 +198,7 @@ const ConsultaCitas = () => {
       </TableEnterprise>
     :
     <Fieldset>
-    <Form>
+    <Form onSubmit={onSubmitParametrizacion}>
       <Input
         id='idOficina'
         name='idOficina'
@@ -211,6 +231,7 @@ const ConsultaCitas = () => {
         id="dateVigencia"
         label="Fecha vigencia"
         type="date"
+        required
         value={fechaVigencia}
         onInput={(e) => setFechaVigencia(e.target.value)}
       />
@@ -226,6 +247,18 @@ const ConsultaCitas = () => {
         // max={limitesMontos?.max}
         value={tiempoDuracion}
         onInput={(e) => setTiempoDuracion(e.target.value)}
+        required
+      />
+      <Input
+        id='#ventanillas'
+        name='#ventanillas'
+        label='No. Ventanillas'
+        autoComplete='off'
+        type='tel'        
+        // min={limitesMontos?.min}
+        // max={limitesMontos?.max}
+        value={ventanillas}
+        onInput={(e) => setVentanillas(e.target.value)}
         required
       />
       <Fieldset legend="Horarios">
@@ -383,6 +416,18 @@ const ConsultaCitas = () => {
           type = 'button'
           onClick={ () => {
             setOficina({"Id": "", "Nombre": "", "Dirección": ""})
+            setHorarios({
+              lunes:{Apertura:"", Cierre:""},
+              martes:{Apertura:"", Cierre:""},
+              miercoles:{Apertura:"", Cierre:""},
+              jueves:{Apertura:"", Cierre:""},
+              viernes:{Apertura:"", Cierre:""},
+              sabado:{Apertura:"", Cierre:""},
+              domingo:{Apertura:"", Cierre:""}
+            })
+            setFechaVigencia("")
+            setTiempoDuracion("")
+            setVentanillas("")
           }
           }
         >
@@ -397,7 +442,6 @@ const ConsultaCitas = () => {
     </Form>
     </Fieldset>
     }
-    
     </>
   );
 };
