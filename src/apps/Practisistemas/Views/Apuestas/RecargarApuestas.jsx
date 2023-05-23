@@ -31,7 +31,6 @@ const maxValor = enumLimiteApuestas.maxApuestas;
 const RecargarApuestas = () => {
 
   //Variables
-  const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -70,7 +69,7 @@ const RecargarApuestas = () => {
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "RECARGA " +state?.casaApuesta,
+    commerceName: "RECARGA APUESTAS DEPORTIVAS",
     trxInfo: [],
     disclamer:
       "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
@@ -107,9 +106,9 @@ const RecargarApuestas = () => {
     const infTicketFinal = { ...infTicket }; 
     infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
     infTicketFinal["timeInfo"]["Hora"] = hora;
-    infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
+    infTicketFinal["trxInfo"].push(["Operador", state?.casaApuesta ?? " "]);
     infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Número Celular", inputCelular ?? " "]);
+    infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
     infTicketFinal["trxInfo"].push(["", ""]);
     infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(inputValor) ?? "0"]);
     infTicketFinal["trxInfo"].push(["", ""]);
@@ -125,15 +124,14 @@ const RecargarApuestas = () => {
       valor_total_trx: parseInt(inputValor),
       ticket: infTicketFinal,
 
-      datosRecargas:{
-          celular: inputCelular,
-          documento: datosCuenta?.documento,
-          operador:state?.producto,
-          valor: parseInt(inputValor),
-          jsonAdicional:{
-            "nombre_usuario": pdpUser?.uname ?? "",
-            "operador": state?.casaApuesta
-          } 
+      datosRecargas: {
+        celular: datosCuenta?.documento,
+        operador: state?.producto,
+        valor: parseInt(inputValor),
+        jsonAdicional: {
+          "nombre_usuario": pdpUser?.uname ?? "",
+          "operador": state?.casaApuesta
+        }
       }
     })
     .then((res) => {
@@ -248,7 +246,7 @@ const RecargarApuestas = () => {
           ["Dirección", roleInfo.direccion],
           ["", ""],
         ],
-        commerceName: "RECARGA " +state?.casaApuesta,
+        commerceName: "RECARGA APUESTAS DEPORTIVAS",
         trxInfo: [],
       };
     });
@@ -279,19 +277,6 @@ const RecargarApuestas = () => {
       validNavigate("../apuestas-deportivas");
     } 
   }, [state?.casaApuesta]);
-
-  const onCelChange = (e) => {
-    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    if (valueInput[0] != 3) {
-      if (valueInput.length == 1 && inputCelular == "") {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3"
-        );
-        return;
-      }
-    }
-    setInputCelular(valueInput);
-  };
 
   return (
     <Fragment>
@@ -324,17 +309,6 @@ const RecargarApuestas = () => {
           }}
           required
         />
-        <Input
-          name="celular"
-          label="Número de celular"
-          type="tel"
-          autoComplete="off"
-          minLength={"10"}
-          maxLength={"10"}
-          value={inputCelular}
-          onChange={onCelChange}
-          required
-        />
         <MoneyInput
           name="valor"
           label="Valor Recarga Cuenta"
@@ -362,7 +336,6 @@ const RecargarApuestas = () => {
             summaryTrx={{
               Documento: datosCuenta?.documento,
               Producto: state?.casaApuesta,
-              Celular: inputCelular,
               Valor: formatMoney.format(inputValor),
               // "Valor Recarga Cuenta": formatMoney.format(inputValor),
             }}
