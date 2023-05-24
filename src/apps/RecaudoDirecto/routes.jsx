@@ -4,8 +4,12 @@ import PermissionsRecaudoDirecto from "./permissions";
 
 const ConvenioRecaudo = lazy(() => import("./Views/Admin/ConvenioRecaudo"));
 const ConvenioRetiro = lazy(() => import("./Views/Admin/ConvenioRetiro"));
-const GestionArchivosRecaudo = lazy(() => import("./Views/Admin/GestionArchivosRecaudo"));
-const GestionArchivosRetiro = lazy(() => import("./Views/Admin/GestionArchivosRetiro"));
+const GestionArchivosRecaudo = lazy(() =>
+  import("./Views/Admin/GestionArchivosRecaudo")
+);
+const GestionArchivosRetiro = lazy(() =>
+  import("./Views/Admin/GestionArchivosRetiro")
+);
 const RecaudoManual = lazy(() => import("./Views/Recaudo/RecaudoManual"));
 const RecaudoBarras = lazy(() => import("./Views/Recaudo/RecaudoBarras"));
 const RecaudoConjunto = lazy(() => import("./Views/Recaudo/RecaudoConjunto"));
@@ -22,7 +26,9 @@ const FormularioRetiro = lazy(() => import("./Views/Retiro/FormularioRetiro"));
 
 const listPermissions = Object.values(PermissionsRecaudoDirecto);
 
-export const listPermissionsRecaudoDirecto = listPermissions.splice(listPermissions.length / 2)
+export const listPermissionsRecaudoDirecto = listPermissions.splice(
+  listPermissions.length / 2
+);
 
 export const rutasRecaudo = {
   link: "/recaudo-directo/recaudo",
@@ -38,7 +44,12 @@ export const rutasRecaudo = {
     },
     {
       link: "/recaudo-directo/recaudo/barras",
-      label: <AppIcons Logo={"RecaudoCodigoDeBarras"} name={"Recaudo con Código de Barras"} />,
+      label: (
+        <AppIcons
+          Logo={"RecaudoCodigoDeBarras"}
+          name={"Recaudo con Código de Barras"}
+        />
+      ),
       component: RecaudoBarras,
       permission: [PermissionsRecaudoDirecto.Trx_recaudo_directo],
     },
@@ -50,11 +61,11 @@ export const rutasRecaudo = {
       show: false,
     },
   ],
-}
+};
 
 export const rutasRetiro = {
   link: "/recaudo-directo/consultar-retiro",
-  label: <AppIcons Logo={"Retiro"} name={"Retiro Directo"} />,
+  label: <AppIcons Logo={"RETIRO"} name={"Retiro Directo"} />,
   component: RetiroDirecto,
   permission: [PermissionsRecaudoDirecto.Trx_retiro_directo],
   subRoutes: [
@@ -63,10 +74,10 @@ export const rutasRetiro = {
       label: <AppIcons Logo={"Retiro"} name={"Realizar retiro"} />,
       component: FormularioRetiro,
       permission: [PermissionsRecaudoDirecto.Trx_retiro_directo],
-      show:false,
+      show: false,
     },
   ],
-}
+};
 
 export const rutasGestionRecaudoDirecto = {
   link: "/recaudo-directo/gestion",
@@ -79,33 +90,31 @@ export const rutasGestionRecaudoDirecto = {
       label: <AppIcons Logo={"Reporte"} name={"Convenios de Recaudos"} />,
       component: ConvenioRecaudo,
       permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
-    }, {
+    },
+    {
       link: "/recaudo-directo/gestion/retiro",
       label: <AppIcons Logo={"Reporte"} name={"Convenios de Retiros"} />,
       component: ConvenioRetiro,
       permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
-    }, {
+    },
+    {
       link: "/recaudo-directo/gestion/archivos-recaudo",
       label: <AppIcons Logo={"Reporte"} name={"Gestión Archivos de Recaudo"} />,
       component: GestionArchivosRecaudo,
       permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
-    }, {
+    },
+    {
       link: "/recaudo-directo/gestion/archivo-retiro",
       label: <AppIcons Logo={"Reporte"} name={"Gestión Archivos de Retiro"} />,
       component: GestionArchivosRetiro,
       permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
     },
-  ]
-}
+  ],
+};
 
 const rutasRecaudoDirecto = {
   link: "/recaudo-directo",
-  label: (
-    <AppIcons
-      Logo={"RECAUDO_RETIRO_DIRECTO"}
-      name={"Recaudo/Retiro Directos"}
-    />
-  ),
+  label: <AppIcons Logo={"RETIRO"} name={"Recaudo/Retiro Directos"} />,
   component: RecaudoEntryPoint,
   permission: listPermissionsRecaudoDirecto,
   subRoutes: [rutasRecaudo, rutasRetiro, rutasGestionRecaudoDirecto],

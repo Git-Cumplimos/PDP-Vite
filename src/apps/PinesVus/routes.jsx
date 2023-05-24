@@ -5,7 +5,6 @@ import { enumPermisosPinesVus } from "./enumPermisosPinesVus";
  */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
-
 /**
  * Pines Vus
  */
@@ -38,9 +37,14 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
 export const rutasPinesVus = {
   link: "/Pines/PinesVus",
-  label: <AppIcons Logo={"MARKETPLACE"} name='Pines para generación de licencias' />,
+  label: (
+    <AppIcons Logo={"MARKETPLACE"} name="Pines para generación de licencias" />
+  ),
   component: PinesVus,
-  permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+  permission: [
+    enumPermisosPinesVus.operarPinesVus,
+    enumPermisosPinesVus.administrarPinesVus,
+  ],
   subRoutes: [
     {
       link: "/Pines/PinesVus/Crear",
@@ -54,11 +58,14 @@ export const rutasPinesVus = {
       component: TramitarPines,
       permission: [enumPermisosPinesVus.operarPinesVus],
     },
-    {      
-      link: "/Pines/PinesVus/Administrar",
-      label: <AppIcons Logo={"ReportePines"} name={"Administrar Pines"} />,
+    {
+      link: "/PinesVus/Administrar",
+      label: <AppIcons Logo={"AdministrarPines"} name={"Administrar Pines"} />,
       component: AdministrarPines,
-      permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+      permission: [
+        enumPermisosPinesVus.operarPinesVus,
+        enumPermisosPinesVus.administrarPinesVus,
+      ],
       subRoutes: [
         {
           link: "/Pines/PinesVus/Administrar/Participacion",
@@ -85,13 +92,19 @@ export const rutasPinesVus = {
           link: "/Pines/PinesVus/Administrar/Reportes",
           label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
           component: ReportePines,
-          permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+          permission: [
+            enumPermisosPinesVus.operarPinesVus,
+            enumPermisosPinesVus.administrarPinesVus,
+          ],
           subRoutes: [
             {
               link: "/Pines/PinesVus/Administrar/Reporte/VerReportes",
               label: <AppIcons Logo={"ReportePines"} name={"Reportes Pines"} />,
               component: ReportePinesVer,
-              permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+              permission: [
+                enumPermisosPinesVus.operarPinesVus,
+                enumPermisosPinesVus.administrarPinesVus,
+              ],
             },
             {
               link: "/Pines/PinesVus/Administrar/Reporte/DescargarReportes",
@@ -107,10 +120,16 @@ export const rutasPinesVus = {
             {
               link: "/Pines/PinesVus/Administrar/Participacion/VerPagoParticipacion",
               label: (
-                <AppIcons Logo={"ReportePines"} name={"Ver pago participación"} />
+                <AppIcons
+                  Logo={"ReportePines"}
+                  name={"Ver pago participación"}
+                />
               ),
               component: VerParticipacionPines,
-              permission: [enumPermisosPinesVus.operarPinesVus, enumPermisosPinesVus.administrarPinesVus],
+              permission: [
+                enumPermisosPinesVus.operarPinesVus,
+                enumPermisosPinesVus.administrarPinesVus,
+              ],
             },
           ],
         },
@@ -131,9 +150,12 @@ export const rutasPinesVus = {
           link: "/Pines/PinesVus/Administrar/QX",
           label: <AppIcons Logo={"RECAUDO"} name={"QX"} />,
           component: QX,
-          permission: [enumPermisosPinesVus.administrarPinesVus, enumPermisosPinesVus.operarPinesVus],
-        },     
-      ]
+          permission: [
+            enumPermisosPinesVus.administrarPinesVus,
+            enumPermisosPinesVus.operarPinesVus,
+          ],
+        },
+      ],
     },
     {
       link: "/Pines/PinesVus/Citas",
@@ -168,4 +190,3 @@ export const rutasPinesVus = {
     },
   ],
 };
-

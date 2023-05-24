@@ -89,7 +89,7 @@ const rutasDaviviendaCB = {
       link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente",
       label: (
         <AppIcons
-          Logo={"RetirosYDepositos"}
+          Logo={"DaviviendaRetiroDeposito"}
           name="Retiros y Depósitos Davivienda"
         />
       ),
@@ -101,13 +101,13 @@ const rutasDaviviendaCB = {
       subRoutes: [
         {
           link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/deposito",
-          label: <AppIcons Logo={"DepositoDaviplata"} name="Depósitos" />,
+          label: <AppIcons Logo={"DaviviendaDepositos"} name="Depósitos" />,
           component: DepositoCB,
           permission: [enumPermisosDavivienda.davivienda_cb_depositos],
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/retiro",
-          label: <AppIcons Logo={"Retiro"} name="Retiros" />,
+          label: <AppIcons Logo={"RETIRO"} name="Retiros" />,
           component: RetiroCB,
           permission: [enumPermisosDavivienda.davivienda_cb_retiros],
         },
@@ -124,7 +124,7 @@ const rutasDaviviendaCB = {
       link: "/corresponsalia/corresponsaliaDavivienda/pagoDeProductosPropios",
       label: (
         <AppIcons
-          Logo={"PagoProductosPropios"}
+          Logo={"DaviviendaPagoProductosPropios"}
           name="Pago de productos propios"
         />
       ),
@@ -135,7 +135,7 @@ const rutasDaviviendaCB = {
       link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados",
       label: (
         <AppIcons
-          Logo={"RecaudoServiciosPublicosDavivienda"}
+          Logo={"DaviviendaRecaudoServiciosPublicos"}
           name="Recaudo servicios públicos y privados"
         />
       ),
