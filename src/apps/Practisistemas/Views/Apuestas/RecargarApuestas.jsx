@@ -292,11 +292,21 @@ const RecargarApuestas = () => {
           autoComplete="off"
           value={datosCuenta?.documento}
           onInput={(e) => {
-            setDatosCuenta((old) => {
-              return { ...old, documento: parseInt(e.target.value) };
-            });
+            const inputValue = e.target.value;
+            const parsedValue = parseInt(inputValue);
+
+            if (!isNaN(parsedValue)) {
+              setDatosCuenta((old) => {
+                return { ...old, documento: parsedValue };
+              });
+            } else if (inputValue === "") {
+              setDatosCuenta((old) => {
+                return { ...old, documento: "" };
+              });
+            }
           }}
         />
+
         <Select
           id="tipoDocumento"
           label="Tipo de Documento"
