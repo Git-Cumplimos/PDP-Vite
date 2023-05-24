@@ -332,7 +332,7 @@ const CompraPin = () => {
           id_uuid_trx: uniqueId,
         },
         oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
         nombre_comercio: roleInfo["nombre comercio"],
         valor_total_trx:
           state?.op == "cb"
