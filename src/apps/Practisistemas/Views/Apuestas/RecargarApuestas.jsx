@@ -31,7 +31,6 @@ const maxValor = enumLimiteApuestas.maxApuestas;
 const RecargarApuestas = () => {
 
   //Variables
-  const [inputCelular, setInputCelular] = useState("");
   const [inputValor, setInputValor] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -49,7 +48,7 @@ const RecargarApuestas = () => {
   const optionsDocumento = [
     { value: "1", label: "Cédula Ciudadanía"},
     { value: "2", label: "Cédula de Extranjería"},
-    { value: "3", label: "Tarjeta de Identidad"},
+    // { value: "3", label: "Tarjeta de Identidad"},
     { value: "4", label: "NIT" },
     { value: "5", label: "Pasaporte"},
   ];
@@ -70,7 +69,7 @@ const RecargarApuestas = () => {
       ["Dirección", roleInfo.direccion],
       ["", ""],
     ],
-    commerceName: "RECARGA " +state?.casaApuesta,
+    commerceName: "RECARGA APUESTAS DEPORTIVAS",
     trxInfo: [],
     disclamer:
       "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
@@ -107,9 +106,9 @@ const RecargarApuestas = () => {
     const infTicketFinal = { ...infTicket }; 
     infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
     infTicketFinal["timeInfo"]["Hora"] = hora;
-    infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
+    infTicketFinal["trxInfo"].push(["Operador", state?.casaApuesta ?? " "]);
     infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Número Celular", inputCelular ?? " "]);
+    infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
     infTicketFinal["trxInfo"].push(["", ""]);
     infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(inputValor) ?? "0"]);
     infTicketFinal["trxInfo"].push(["", ""]);
@@ -120,20 +119,19 @@ const RecargarApuestas = () => {
         id_usuario: roleInfo.id_usuario,
         id_uuid_trx: id_uuid
       },
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(inputValor),
       ticket: infTicketFinal,
 
-      datosRecargas:{
-          celular: inputCelular,
-          documento: datosCuenta?.documento,
-          operador:state?.producto,
-          valor: parseInt(inputValor),
-          jsonAdicional:{
-            "nombre_usuario": pdpUser?.uname ?? "",
-            "operador": state?.casaApuesta
-          } 
+      datosRecargas: {
+        celular: datosCuenta?.documento,
+        operador: state?.producto,
+        valor: parseInt(inputValor),
+        jsonAdicional: {
+          "nombre_usuario": pdpUser?.uname ?? "",
+          "operador": state?.casaApuesta
+        }
       }
     })
     .then((res) => {
@@ -248,7 +246,7 @@ const RecargarApuestas = () => {
           ["Dirección", roleInfo.direccion],
           ["", ""],
         ],
-        commerceName: "RECARGA " +state?.casaApuesta,
+        commerceName: "RECARGA APUESTAS DEPORTIVAS",
         trxInfo: [],
       };
     });
@@ -280,19 +278,6 @@ const RecargarApuestas = () => {
     } 
   }, [state?.casaApuesta]);
 
-  const onCelChange = (e) => {
-    const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    if (valueInput[0] != 3) {
-      if (valueInput.length == 1 && inputCelular == "") {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3"
-        );
-        return;
-      }
-    }
-    setInputCelular(valueInput);
-  };
-
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Recarga Cuenta Apuesta Deportiva {state?.casaApuesta}</h1>
@@ -307,11 +292,21 @@ const RecargarApuestas = () => {
           autoComplete="off"
           value={datosCuenta?.documento}
           onInput={(e) => {
-            setDatosCuenta((old) => {
-              return { ...old, documento: parseInt(e.target.value) };
-            });
+            const inputValue = e.target.value;
+            const parsedValue = parseInt(inputValue);
+
+            if (!isNaN(parsedValue)) {
+              setDatosCuenta((old) => {
+                return { ...old, documento: parsedValue };
+              });
+            } else if (inputValue === "") {
+              setDatosCuenta((old) => {
+                return { ...old, documento: "" };
+              });
+            }
           }}
         />
+
         <Select
           id="tipoDocumento"
           label="Tipo de Documento"
@@ -322,17 +317,6 @@ const RecargarApuestas = () => {
               return { ...old, tipoDocumento: e.target.value };
             });
           }}
-          required
-        />
-        <Input
-          name="celular"
-          label="Número de celular"
-          type="tel"
-          autoComplete="off"
-          minLength={"10"}
-          maxLength={"10"}
-          value={inputCelular}
-          onChange={onCelChange}
           required
         />
         <MoneyInput
@@ -360,9 +344,10 @@ const RecargarApuestas = () => {
             title="¿Está seguro de realizar la recarga a la cuenta?"
             subtitle="Resumen de transacción"
             summaryTrx={{
-              Producto: state?.casaApuesta,
               Documento: datosCuenta?.documento,
-              "Valor Recarga Cuenta": formatMoney.format(inputValor),
+              Producto: state?.casaApuesta,
+              Valor: formatMoney.format(inputValor),
+              // "Valor Recarga Cuenta": formatMoney.format(inputValor),
             }}
           >  
             <>
