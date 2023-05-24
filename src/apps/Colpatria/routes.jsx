@@ -24,27 +24,37 @@ const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 export const rutasGestionColpatria = {
   link: "/corresponsalia/colpatria/gestion",
-  label: <AppIcons Logo={"CorresponsaliaColpatria"} name={"Gestión"} />,
+  label: <AppIcons Logo={"ColpatriaGestion"} name={"Gestión"} />,
   component: AdminColpatria,
   permission: [PermissionsColpatria.gestion],
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/gestion/lista-errores",
-      label: <AppIcons Logo={"Reporte"} name={"Lista de errores"} />,
+      label: (
+        <AppIcons Logo={"ColpatriaListaErrores"} name={"Lista de errores"} />
+      ),
       component: ListaErrores,
       permission: [PermissionsColpatria.gestion],
     },
     {
       link: "/corresponsalia/colpatria/gestion/lista-convenios-pines",
       label: (
-        <AppIcons Logo={"Reporte"} name={"Convenios de pines de recaudo"} />
+        <AppIcons
+          Logo={"ColpatriaConvenioPinesRecaudo"}
+          name={"Convenios de pines de recaudo"}
+        />
       ),
       component: ConveniosPines,
       permission: [PermissionsColpatria.gestion],
     },
     {
       link: "/corresponsalia/colpatria/gestion/lista-convenios-recaudo",
-      label: <AppIcons Logo={"Reporte"} name={"Convenios de recaudo"} />,
+      label: (
+        <AppIcons
+          Logo={"ColpatriaConvenioRecaudo"}
+          name={"Convenios de recaudo"}
+        />
+      ),
       component: ConveniosRecaudo,
       permission: [PermissionsColpatria.gestion],
     },
@@ -70,7 +80,7 @@ const rutasColpatria = {
   subRoutes: [
     {
       link: "/corresponsalia/colpatria/deposito",
-      label: <AppIcons Logo={"CorresponsaliaColpatria"} name={"Depósito"} />,
+      label: <AppIcons Logo={"ColpatriaDeposito"} name={"Depósito"} />,
       component: Deposito,
       permission: [PermissionsColpatria.deposito],
     },
