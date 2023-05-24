@@ -141,7 +141,14 @@ const ConsultaCitas = () => {
             notifyError(resp?.msg)
         }else{
             // setAgendamientoTrue(true)
-            notify(resp?.msg)
+            let mensaje = ''
+            if(resp?.obj?.url_descargaS3 !== ''){
+              mensaje = `Se cancelaron citas revise el archivo descargado`
+              window.open(resp?.obj?.url_descargaS3, "_blank");
+            }else{
+              mensaje = 'No hubo cancelación de citas'
+            }
+            notify(`${resp?.msg}: ${mensaje}`)
             console.log(resp)
             setOficina({"Id": "", "Nombre": "", "Dirección": ""})
             setHorarios({
