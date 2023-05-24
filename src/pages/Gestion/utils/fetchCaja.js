@@ -101,6 +101,9 @@ export const subirComprobante = buildGetFunction(
 export const buscarReporteCierreCaja = buildPostFunction(
   `${urlCierreCaja}/reporte`
 );
+export const buscarListaComerciosCierreCaja = buildGetFunction(
+  `${urlCierreCaja}/comercios`
+);
 export const descargarComprobante = buildGetFunction(
   `${urlComprobantes}/download-file`
 );
