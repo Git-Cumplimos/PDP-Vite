@@ -19,8 +19,7 @@ type Props = {
   ) => void;
 };
 
-// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const urlComercios = `http://localhost:5000`;
+const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
 const CommerceTable = ({ onSelectComerce }: Props) => {
   const [comercios, setComercios] = useState<any[]>([]);
