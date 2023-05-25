@@ -924,7 +924,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/movii-pdp/cash-out-reversos",
-        label: <AppIcons Logo={"MoviiReverso"} name="Reversos cash out" />,
+        label: <AppIcons Logo={"MoviiReverso"} name="Reverso" />,
         component: MoviiPDPReverseCashOut,
         permission: [52],
       },
