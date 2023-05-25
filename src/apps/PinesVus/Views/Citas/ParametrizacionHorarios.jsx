@@ -63,6 +63,11 @@ const ConsultaCitas = () => {
     // setFormatMon("");
   }, []);
 
+  const minDuracionCita=5
+  const maxDuracionCita=690
+  const minVentanillas=1
+  const maxVentanillas=99
+  
   //////////////////////
   
   useEffect(() => {
@@ -186,6 +191,7 @@ const ConsultaCitas = () => {
       label="Nombre"
       type="text"
       value={nombreOficina}
+      maxLength={"30"}
       onInput={(e) => {
           const text = e.target.value.toUpperCase()
           setNombreOficina(text)
@@ -240,13 +246,12 @@ const ConsultaCitas = () => {
         name='tiempoCitas'
         label='Duración citas'
         autoComplete='off'
-        type='text'
-        minLength={"1"}
-        maxLength={"15"}
+        type='number'
         // min={limitesMontos?.min}
         // max={limitesMontos?.max}
         value={tiempoDuracion}
-        onInput={(e) => setTiempoDuracion(e.target.value)}
+        //value = { Math.max(min, Math.min(max, Number( e.target.value)))}
+        onInput={(e) => setTiempoDuracion(Math.max(minDuracionCita, Math.min(maxDuracionCita, Number(e.target.value))))}
         required
       />
       <Input
@@ -254,11 +259,11 @@ const ConsultaCitas = () => {
         name='#ventanillas'
         label='No. Ventanillas'
         autoComplete='off'
-        type='tel'        
+        type='number'       
         // min={limitesMontos?.min}
         // max={limitesMontos?.max}
         value={ventanillas}
-        onInput={(e) => setVentanillas(e.target.value)}
+        onInput={(e) => setVentanillas(Math.max(minVentanillas, Math.min(maxVentanillas, Number(e.target.value))))}
         required
       />
       <Fieldset legend="Horarios">
