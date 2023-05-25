@@ -44,13 +44,13 @@ const ConsultaCitas = () => {
   const [fechaVigencia, setFechaVigencia] = useState("")
   const [tiempoDuracion, setTiempoDuracion] = useState("")
   const [horarios, setHorarios] = useState({
-    lunes:{Apertura:"", Cierre:""},
-    martes:{Apertura:"", Cierre:""},
-    miercoles:{Apertura:"", Cierre:""},
-	  jueves:{Apertura:"", Cierre:""},
-    viernes:{Apertura:"", Cierre:""},
-    sabado:{Apertura:"", Cierre:""},
-    domingo:{Apertura:"", Cierre:""}
+    lunes:{Apertura:"00:00", Cierre:"00:00"},
+    martes:{Apertura:"00:00", Cierre:"00:00"},
+    miercoles:{Apertura:"00:00", Cierre:"00:00"},
+	  jueves:{Apertura:"00:00", Cierre:"00:00"},
+    viernes:{Apertura:"00:00", Cierre:"00:00"},
+    sabado:{Apertura:"00:00", Cierre:"00:00"},
+    domingo:{Apertura:"00:00", Cierre:"00:00"}
   })
   const [isLoading, setIsLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -66,7 +66,7 @@ const ConsultaCitas = () => {
   const minDuracionCita=5
   const maxDuracionCita=690
   const minVentanillas=1
-  const maxVentanillas=99
+  const maxVentanillas=10
   
   //////////////////////
   
@@ -121,8 +121,22 @@ const ConsultaCitas = () => {
   //   setShowModal(true)
   // }
 
+  const hoy = new Date()
+    const limiteInferior = Intl.DateTimeFormat("fr-ca", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).format(hoy)
+
   const onSubmitParametrizacion = (e) => {
     e.preventDefault();
+    if (
+      horarios.lunes.Apertura > horarios.lunes.Cierre ||
+      horarios.sabado.Apertura > horarios.sabado.Cierre ||
+      horarios.domingo.Apertura > horarios.domingo.Cierre){
+      console.log(horarios)
+      notifyError("Verifique que los horarios de cierre sean mayores a los de apertura")      
+    } else {
     setIsLoading(true)
     const body = {
       fecha_vigencia : fechaVigencia + " 00:00:00",
@@ -150,13 +164,13 @@ const ConsultaCitas = () => {
             console.log(resp)
             setOficina({"Id": "", "Nombre": "", "Dirección": ""})
             setHorarios({
-              lunes:{Apertura:"", Cierre:""},
-              martes:{Apertura:"", Cierre:""},
-              miercoles:{Apertura:"", Cierre:""},
-              jueves:{Apertura:"", Cierre:""},
-              viernes:{Apertura:"", Cierre:""},
-              sabado:{Apertura:"", Cierre:""},
-              domingo:{Apertura:"", Cierre:""}
+              lunes:{Apertura:"00:00", Cierre:"00:00"},
+              martes:{Apertura:"00:00", Cierre:"00:00"},
+              miercoles:{Apertura:"00:00", Cierre:"00:00"},
+              jueves:{Apertura:"00:00", Cierre:"00:00"},
+              viernes:{Apertura:"00:00", Cierre:"00:00"},
+              sabado:{Apertura:"00:00", Cierre:"00:00"},
+              domingo:{Apertura:"00:00", Cierre:"00:00"}
             })
             setFechaVigencia("")
             setTiempoDuracion("")
@@ -166,7 +180,8 @@ const ConsultaCitas = () => {
         setIsLoading(false)
         notifyError("Error intente nuevamente")
     }
-    );  
+    );
+  }
   }
 
   
@@ -213,10 +228,7 @@ const ConsultaCitas = () => {
         type='text'
         minLength={"1"}
         maxLength={"15"}
-        // min={limitesMontos?.min}
-        // max={limitesMontos?.max}
         value={oficina.Id}
-        // onInput={(e) => setTiempoDuracion(e.target.value)}
         required
       />
       <Input
@@ -226,17 +238,15 @@ const ConsultaCitas = () => {
         autoComplete='off'
         type='text'
         minLength={"1"}
-        maxLength={"15"}
-        // min={limitesMontos?.min}
-        // max={limitesMontos?.max}
+        maxLength={"100"}
         value={oficina.Nombre}
-        // onInput={(e) => setTiempoDuracion(e.target.value)}
         required
       />
       <Input
         id="dateVigencia"
         label="Fecha vigencia"
         type="date"
+        min= {limiteInferior}
         required
         value={fechaVigencia}
         onInput={(e) => setFechaVigencia(e.target.value)}
@@ -246,12 +256,17 @@ const ConsultaCitas = () => {
         name='tiempoCitas'
         label='Duración citas'
         autoComplete='off'
-        type='number'
-        // min={limitesMontos?.min}
-        // max={limitesMontos?.max}
+        type='text'
+        minLength={"1"}
+        maxLength={"3"}
+        min={minDuracionCita}
+        max={maxDuracionCita}
         value={tiempoDuracion}
-        //value = { Math.max(min, Math.min(max, Number( e.target.value)))}
-        onInput={(e) => setTiempoDuracion(Math.max(minDuracionCita, Math.min(maxDuracionCita, Number(e.target.value))))}
+        onInput={(e) => {
+          const num = parseInt(e.target.value) || "";
+          setTiempoDuracion(num);       
+        }
+        }
         required
       />
       <Input
@@ -259,11 +274,16 @@ const ConsultaCitas = () => {
         name='#ventanillas'
         label='No. Ventanillas'
         autoComplete='off'
-        type='number'       
-        // min={limitesMontos?.min}
-        // max={limitesMontos?.max}
+        type='text'       
+        min={minVentanillas}
+        max={maxVentanillas}
+        minLength={"1"}
+        maxLength={"2"}
         value={ventanillas}
-        onInput={(e) => setVentanillas(Math.max(minVentanillas, Math.min(maxVentanillas, Number(e.target.value))))}
+        onInput={(e) => {
+          const num = parseInt(e.target.value) || "";
+          setVentanillas(num);
+        }}
         required
       />
       <Fieldset legend="Horarios">
@@ -295,86 +315,6 @@ const ConsultaCitas = () => {
           })}
           />
         </Fieldset>
-        {/* <Fieldset legend="Martes">
-          <Input
-          id="horaIni"
-          label="Hora apertura"
-          type="time"
-          value={horarios.martes.Apertura}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, martes : {Apertura: e.target.value, Cierre : old.martes.Cierre}}
-          })}
-          />
-          <Input
-          id="horaFin"
-          label="Hora cierre"
-          type="time"
-          value={horarios.martes.Cierre}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, martes : {Apertura: old.martes.Apertura, Cierre : e.target.value}}
-          })}
-          />
-        </Fieldset>
-        <Fieldset legend="Miercoles">
-          <Input
-          id="horaIni"
-          label="Hora apertura"
-          type="time"
-          value={horarios.miercoles.Apertura}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, miercoles : {Apertura: e.target.value, Cierre : old.miercoles.Cierre}}
-          })}
-          />
-          <Input
-          id="horaFin"
-          label="Hora cierre"
-          type="time"
-          value={horarios.miercoles.Cierre}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, miercoles : {Apertura: old.miercoles.Apertura, Cierre : e.target.value}}
-          })}
-          />
-        </Fieldset>
-        <Fieldset legend="Jueves">
-          <Input
-          id="horaIni"
-          label="Hora apertura"
-          type="time"
-          value={horarios.jueves.Apertura}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, jueves : {Apertura: e.target.value, Cierre : old.jueves.Cierre}}
-          })}
-          />
-          <Input
-          id="horaFin"
-          label="Hora cierre"
-          type="time"
-          value={horarios.jueves.Cierre}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, jueves : {Apertura: old.jueves.Apertura, Cierre : e.target.value}}
-          })}
-          />
-        </Fieldset>
-        <Fieldset legend="Viernes">
-          <Input
-          id="horaIni"
-          label="Hora apertura"
-          type="time"
-          value={horarios.viernes.Apertura}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, viernes : {Apertura: e.target.value, Cierre : old.viernes.Cierre}}
-          })}
-          />
-          <Input
-          id="horaFin"
-          label="Hora cierre"
-          type="time"
-          value={horarios.viernes.Cierre}
-          onInput={(e) => setHorarios((old) => {
-            return{ ...old, viernes : {Apertura: old.viernes.Apertura, Cierre : e.target.value}}
-          })}
-          />
-        </Fieldset> */}
         <Fieldset legend="Sábado">
           <Input
           id="horaIni"
@@ -422,13 +362,13 @@ const ConsultaCitas = () => {
           onClick={ () => {
             setOficina({"Id": "", "Nombre": "", "Dirección": ""})
             setHorarios({
-              lunes:{Apertura:"", Cierre:""},
-              martes:{Apertura:"", Cierre:""},
-              miercoles:{Apertura:"", Cierre:""},
-              jueves:{Apertura:"", Cierre:""},
-              viernes:{Apertura:"", Cierre:""},
-              sabado:{Apertura:"", Cierre:""},
-              domingo:{Apertura:"", Cierre:""}
+              lunes:{Apertura:"00:00", Cierre:"00:00"},
+              martes:{Apertura:"00:00", Cierre:"00:00"},
+              miercoles:{Apertura:"00:00", Cierre:"00:00"},
+              jueves:{Apertura:"00:00", Cierre:"00:00"},
+              viernes:{Apertura:"00:00", Cierre:"00:00"},
+              sabado:{Apertura:"00:00", Cierre:"00:00"},
+              domingo:{Apertura:"00:00", Cierre:"00:00"}
             })
             setFechaVigencia("")
             setTiempoDuracion("")
