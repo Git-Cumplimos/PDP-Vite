@@ -826,6 +826,12 @@ const CrearComercios = () => {
                       const copy = structuredClone(commerceType);
                       delete copy[key];
                       setCommerceType(copy);
+                      setComercio((old) => ({
+                        ...old,
+                        ciiu: Object.keys(copy).sort(
+                          (key1, key2) => parseInt(key1) - parseInt(key2)
+                        ),
+                      }));
                     }}
                     className="bi bi-trash text-xl cursor-pointer"
                   />
