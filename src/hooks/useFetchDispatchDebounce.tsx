@@ -9,17 +9,17 @@ export interface FetchProps {
 }
 
 export interface ResponseCallbacks {
-  onPending?: () => ReactNode;
-  onSuccess: (response: Response | any) => ReactNode;
-  onError: (error: Error | any) => ReactNode;
+  onPending?: () => ReactNode | void;
+  onSuccess: (response: Response | any) => ReactNode | void;
+  onError: (error: Error | any) => ReactNode | void;
   onFinally?: () => void;
 }
 
 export interface HookOptions {
-  delay: number;
-  isSecure: boolean;
-  checkStatus: boolean;
-  notify: boolean;
+  delay?: number;
+  isSecure?: boolean;
+  checkStatus?: boolean;
+  notify?: boolean;
 }
 
 export class ErrorPDPFetch extends Error {
