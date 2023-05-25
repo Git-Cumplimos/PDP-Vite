@@ -26,14 +26,7 @@ const ConsultaCitas = () => {
   const UrlParametrizacion = `${process.env.REACT_APP_URL_PinesVus}/parametrizar_horarios`
 
   const navigate = useNavigate();
-  const { consultaCupoQX, modificarCupoQX } =
-    usePinesVus();
 
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
 
   const { pdpUser } = useAuth();  
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });  
@@ -53,15 +46,7 @@ const ConsultaCitas = () => {
     domingo:{Apertura:"00:00", Cierre:"00:00"}
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [showModal, setShowModal] = useState(false)
   const [ventanillas, setVentanillas] = useState("")
-
-
-  const closeModal = useCallback(async () => {
-    // setShowModal(false);
-    // setDisabledBtn(false);
-    // setFormatMon("");
-  }, []);
 
   const minDuracionCita=5
   const maxDuracionCita=690
@@ -131,11 +116,11 @@ const ConsultaCitas = () => {
   const onSubmitParametrizacion = (e) => {
     e.preventDefault();
     if (
-      horarios.lunes.Apertura > horarios.lunes.Cierre ||
-      horarios.sabado.Apertura > horarios.sabado.Cierre ||
-      horarios.domingo.Apertura > horarios.domingo.Cierre){
+      (horarios.lunes.Apertura !=='00:00' && horarios.lunes.Apertura >= horarios.lunes.Cierre) ||
+      (horarios.sabado.Apertura !=='00:00' && horarios.sabado.Apertura >= horarios.sabado.Cierre) ||
+      (horarios.domingo.Apertura !=='00:00' && horarios.domingo.Apertura >= horarios.domingo.Cierre)){
       console.log(horarios)
-      notifyError("Verifique que los horarios de cierre sean mayores a los de apertura")      
+      notifyError("Verifique que los horarios de cierre sean mayores a los de apertura")     
     } else {
     setIsLoading(true)
     const body = {
