@@ -107,7 +107,7 @@ const rutasDaviviendaCB = {
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/ahorrosCorriente/retiro",
-          label: <AppIcons Logo={"RETIRO"} name="Retiros" />,
+          label: <AppIcons Logo={"DaviviendaRetiros"} name="Retiros" />,
           component: RetiroCB,
           permission: [enumPermisosDavivienda.davivienda_cb_retiros],
         },
@@ -115,7 +115,7 @@ const rutasDaviviendaCB = {
     },
     {
       link: "/corresponsalia/corresponsaliaDavivienda/Daviplatapagos_giros",
-      label: <AppIcons Logo={"PagoPorGiro"} name="Pago por giro" />,
+      label: <AppIcons Logo={"DaviviendaPagoPorGiro"} name="Pago por giro" />,
       component: PagoGiro,
       permission: [enumPermisosDavivienda.davivienda_cb_pago_por_giro],
     },
@@ -155,7 +155,7 @@ const rutasDaviviendaCB = {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/seleccionOperaciones",
           label: (
             <AppIcons
-              Logo={"RecaudoManual"}
+              Logo={"DaviviendaRecaudoManualOperaciones"}
               name="Recaudo manual operaciones"
             />
           ),
@@ -168,7 +168,7 @@ const rutasDaviviendaCB = {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/codbarras",
           label: (
             <AppIcons
-              Logo={"RecaudoCodigoDeBarras"}
+              Logo={"DaviviendaRecaudoCodBarras"}
               name="Recaudo código de barras"
             />
           ),
@@ -177,14 +177,18 @@ const rutasDaviviendaCB = {
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manual",
-          label: <AppIcons Logo={"RecaudoManual"} name="Recaudo manual" />,
+          label: (
+            <AppIcons Logo={"DaviviendaRecaudoManual"} name="Recaudo manual" />
+          ),
           component: RecaudoServiciosPublicosPrivados,
           permission: [enumPermisosDavivienda.davivienda_cb_recaudo],
           show: false,
         },
         {
           link: "/corresponsalia/corresponsaliaDavivienda/recaudoServiciosPublicosPrivados/manualOperaciones",
-          label: <AppIcons Logo={"RecaudoManual"} name="Recaudo manual" />,
+          label: (
+            <AppIcons Logo={"DaviviendaRecaudoManual"} name="Recaudo manual" />
+          ),
           component: RecaudoServiciosPublicosPrivadosOperaciones,
           permission: [
             enumPermisosDavivienda.davivienda_cb_recaudo_operaciones,

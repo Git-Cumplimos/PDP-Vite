@@ -44,7 +44,7 @@ const svgs = {
   //MOVISTAR
   MOVISTAR: `${urlAssets}/assets/svg/recaudo/MOVISTAR.svg`,
   RECARGASMOVISTAR: `${urlAssets}/assets/svg/recaudo/MOVISTARRECARGAS.svg`,
-  PAQUETESMOVISTAR: `${urlAssets}/assets/svg/recaudo/PAQUETESMOVISTAR.svg`,
+  PAQUETESMOVISTAR: `${urlAssets}/assets/svg/recaudo/MOVISTARPAQUETES.svg`,
   OPERADORPDPMOVISTAR: `${urlAssets}/assets/svg/recaudo/MOVISTAROPERADORPDP.svg`,
   COMBOS: `${urlAssets}/assets/svg/recaudo/MOVISTARCOMBOS.svg`,
   PAQUETEDATOS: `${urlAssets}/assets/svg/recaudo/PAQUETEDEDATOS.svg`,
@@ -94,8 +94,8 @@ const svgs = {
 
   //Movii
   MOVII: `${urlAssets}/assets/svg/recaudo/MOVII.svg`,
-  MoviiRetiro: `${urlAssets}/assets/svg/recaudo/RETIROMOVII.svg`,
-  MoviiReverso: `${urlAssets}/assets/svg/recaudo/REVERSOMOVII.svg`,
+  MoviiRetiro: `${urlAssets}/assets/svg/recaudo/MOVIIRETIRO.svg`,
+  MoviiReverso: `${urlAssets}/assets/svg/recaudo/MOVIIREVERSO.svg`,
 
   //MARKETPLACE
   MarketPlace: `${urlAssets}/assets/svg/recaudo/MARKETPLACE.svg`,
@@ -104,7 +104,7 @@ const svgs = {
   Fundacion: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJER.svg`,
   FundacionRecaudo: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJERRECAUDO.svg`,
   FundacionDesembolso: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJERDESEMBOLSO.svg`,
-  FundacionReversoManual: `${urlAssets}/assets/svg/recaudo/RESVERSOMANUAL.svg`,
+  FundacionReversoManual: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJERREVERSOMANUAL.svg`,
   FundacionReporte: `${urlAssets}/assets/svg/recaudo/FUNDACIONDELAMUJERREPORTE.svg`,
 
   //PINES VUS
@@ -113,6 +113,8 @@ const svgs = {
   ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
   TramitarPines: `${urlAssets}/assets/svg/recaudo/PINESTRAMITAR.svg`,
   AdministrarPines: `${urlAssets}/assets/svg/recaudo/PINESADMINISTRAR.svg`,
+  GeneracionLicenciasPines: `${urlAssets}/assets/svg/recaudo/PINESPARAGENERACIODELICENCIAS.svg`,
+  ServicioContenidoPines: `${urlAssets}/assets/svg/recaudo/PINESSERVICIOYCONTENIDO.svg`,
 
   //DAVIPLATA
   Daviplata: `${urlAssets}/assets/svg/recaudo/DAVIPLATA.svg`,
@@ -127,6 +129,11 @@ const svgs = {
   DaviviendaPagoProductosPropios: `${urlAssets}/assets/svg/recaudo/DAVIVIENDAPAGODEPRODUCTOSPROPIOS.svg`,
   DaviviendaRecaudoServiciosPublicos: `${urlAssets}/assets/svg/recaudo/DAVIVIENDARECAUDOSERVICIOSPUBLICOSYPRIVADOS.svg`,
   DaviviendaDepositos: `${urlAssets}/assets/svg/recaudo/DAVIVIENDADEPOSITOS.svg`,
+  DaviviendaPagoPorGiro: `${urlAssets}/assets/svg/recaudo/DAVIDIENDAPAGOPORGIRO.svg`,
+  DaviviendaRecaudoCodBarras: `${urlAssets}/assets/svg/recaudo/DAVIVIENDARECAUDOCODIGOBARRRAS.svg`,
+  DaviviendaRecaudoManual: `${urlAssets}/assets/svg/recaudo/DAVIVIENDARECAUDOMANUAL.svg`,
+  DaviviendaRecaudoManualOperaciones: `${urlAssets}/assets/svg/recaudo/DAVIVIENDARECAUDOMANUALOPERACIONES.svg`,
+  DaviviendaRetiros: `${urlAssets}/assets/svg/recaudo/DAVIVIENDARETIROS.svg`,
 
   //COLPATRIA
   CorresponsaliaColpatria: `${urlAssets}/assets/svg/recaudo/COLPATRIACORRESPONSAL.svg`,
