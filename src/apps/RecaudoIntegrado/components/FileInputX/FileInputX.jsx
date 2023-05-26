@@ -312,8 +312,8 @@ const FileInputX = ({ banco }) => {
 
       {/* {errors?.length > 0 ? ( */}
       <Modal show={showModal} handleClose={handleClose}>
-        <LogoPDP xsmall></LogoPDP>
-        <br />
+        {/* <LogoPDP xsmall></LogoPDP>
+        <br /> */}
         <br />
         <h1 className="text-xl font-semibold">
           ¿Está seguro de cargar el archivo de los registros de pagos?

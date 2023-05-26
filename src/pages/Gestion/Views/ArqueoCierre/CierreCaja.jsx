@@ -3,13 +3,17 @@ import { Fragment, useState } from "react";
 import Accordion from "../../../../components/Base/Accordion";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
+import Error404 from "../../../Error404";
+import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
+import Select from "../../../../components/Base/Select";
 
-import { buscarReporteCierreCaja } from "../../utils/fetchCaja";
+import { buscarListaComerciosCierreCaja, buscarReporteCierreCaja } from "../../utils/fetchCaja";
 import { makeMoneyFormatter } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import Error404 from "../../../Error404";
+
+import "./CierreCaja.css";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -152,28 +156,66 @@ const CierreCaja = () => {
 
   const { roleInfo } = useAuth();
   const [dataCapitalizar, setDataCapitalizar] = useState({});
+  const [dataComercios, setDataComercios] = useState([]);
   const [dataInicioDia, setDataInicioDia] = useState({});
   const [dataTransacciones, setDataTransacciones] = useState([]);
 
-  const [loadScreen, setLoadScreen] = useState(false);
   const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
+  const [comercio, setComercio] = useState("");
+  const [comercioSeleccionado, setComercioSeleccionado] = useState("");
+  const [loadScreen, setLoadScreen] = useState(false);
 
-  try{      
+  try {
+    
+    const getCommerces = async () => {
+      setLoadScreen(true);
+      try {
+        setComercio("")
+        if (comercioSeleccionado !== "" && comercioSeleccionado !== null && comercioSeleccionado !== undefined) {
+          const dataBack = await buscarListaComerciosCierreCaja({ comercio: comercioSeleccionado });
+          if (dataBack != null) { 
+            if (dataBack.codigo === 200 && dataBack.status === true) {
+              if (dataBack.obj.length > 0) {
+                let dataComerciosList = []
+                dataBack.obj.map((dataComercio) => {
+                  dataComerciosList.push({value: dataComercio.idComercio, label: dataComercio.nombreComercio})
+                });
+                setDataComercios(dataComerciosList);
+              } else {
+                setDataComercios([]);
+                notifyError("No existen comercios");
+              }
+            } else {
+              notifyError("No se encontraton comercios");
+            }
+          } else {
+            notifyError("Hubo un error, vuelva a intentar");
+          }
+        } else {
+          notifyError("Debe ingresar un comercio");
+        }
+      } catch (error) {
+        notifyError("Hubo un error, vuelva a intentar");
+      }
+      setLoadScreen(false);
+    }
+
     const getData = async () => {
       setLoadScreen(true);
-      let fechaActual = new Date().toISOString().split('T')[0];
+      let fechaActual = new Date().toISOString().split("T")[0];
+      let comercioId = roleInfo?.id_comercio;
+      if (!roleInfo.id_comercio) comercioId = comercio;
       try {
-        if (fechas.fechaInicial !== "" && fechas.fechaFinal !== "") {
+        if (fechas.fechaInicial !== "" && fechas.fechaFinal !== "" && comercioId !== "") {
           if (new Date(fechas.fechaFinal) < new Date(fechas.fechaInicial) && new Date(fechas.fechaFinal) <= new Date(fechaActual) && new Date(fechas.fechaInicial) <= new Date(fechaActual)) {
             notifyError("La fecha final debe ser mayor a la inicial");
           } else {
             const body = {
-              idComercio: roleInfo.id_comercio,
+              idComercio: Number(comercioId),
               fechaInicio: fechas.fechaInicial,
               fechaFin: fechas.fechaFinal
             }
             const dataBack = await buscarReporteCierreCaja(body);
-            console.log(dataBack)
             if (dataBack != null) { 
               if (dataBack.codigo === 200 && dataBack.status === true) {
                 if (dataBack.obj.grupoTransacciones.length > 0) {
@@ -187,12 +229,14 @@ const CierreCaja = () => {
                   notifyError("No se encontraron registros en el rango de fecha");
                 }
               } else {
-                notifyError("Consulta fallida");
+                notifyError("No se encontraton transacciones");
               }
+            } else {
+              notifyError("Hubo un error, vuelva a intentar");
             }
           }
         } else {
-          notifyError("Debe seleccionar ambas fechas");
+          notifyError("Debe llenar los campos");
         }
       } catch (error) {
         notifyError("Hubo un error, vuelva a intentar");
@@ -208,46 +252,103 @@ const CierreCaja = () => {
             <h2 className="text-center text-white text-xl font-semibold">{"Cargando"}</h2>
           </div>
         }
-        <h1 className="text-3xl mt-6">Cierre de caja</h1>        
-        <div className="w-full px-10 my-10">
+        <h1 className="text-3xl mt-6">Cierre de caja</h1>
+        <div className="containerCommerce">
+          { !roleInfo.id_comercio &&
+            <>
+              <div className="containerCommerceSearch">
+                <div className="commerceSelected">
+                  <Input
+                    autoComplete="off"
+                    id="id_comercio"
+                    label={"Buscar Comercio"}
+                    maxLength="25"
+                    minLength="1"
+                    name="id_comercio"
+                    onInput={(e) => {
+                      setComercioSeleccionado(e.target.value);
+                    }}
+                    required={true}
+                    type="search"
+                    value={comercioSeleccionado}
+                  />
+                </div>
+                <div>
+                  <button
+                    className="searchButton"
+                    onClick={() => getCommerces()}
+                    type="submit"
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      x="0px" 
+                      y="0px" 
+                      width="25" 
+                      height="25" 
+                      viewBox="0 0 50 50"
+                    >
+                      <path 
+                        d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              { dataComercios.length > 0 ? (
+                <div>
+                  <Select
+                    id="typeNumbers"
+                    label={"Comercio"}
+                    onChange={(e) => {
+                      setComercio(e.target.value);
+                    }}
+                    options={[{ label: "", value: "" }, ...dataComercios]}
+                    value={comercio}
+                  />
+                </div>
+              ) : (
+                <div/>
+              )}
+            </>
+          }
+        </div>
+        <Form grid className="my-5">
           <Input
-            id="fechaInicial"
-            name="fechaInicial"
-            label={"Fecha inicio"}
-            type="date"
             autoComplete="off"
-            value={fechas?.["fechaInicial"]}
+            id="fechaInicial"
+            label={"Fecha inicio"}
+            name="fechaInicial"
             onChange={(e) => {
               setFechas((last) => {
                 return { ...last, fechaInicial: e.target.value };
               });
             }}
             required
-          />
-          <br/>
-          <Input
-            id="fechaFinal"
-            name='fechaFinal'
-            label={"Fecha fin"}
             type="date"
+            value={fechas?.["fechaInicial"]}
+          />
+          <Input
             autoComplete="off"
-            value={fechas?.["fechaFinal"]}
+            id="fechaFinal"
+            label={"Fecha fin"}
+            name="fechaFinal"
             onChange={(e) => {
               setFechas((last) => {
                 return { ...last, fechaFinal: e.target.value };
               });
             }}
             required
+            type="date"
+            value={fechas?.["fechaFinal"]}
           />
-          <ButtonBar className='lg:col-span-2'>
-            <Button
-              onClick={() => getData()}
-              type='submit'
-            >
-              Generar reporte
-            </Button>
-          </ButtonBar>
-        </div>
+        </Form>
+        <ButtonBar>
+          <Button
+            onClick={() => getData()}
+            type="submit"
+          >
+            Generar reporte
+          </Button>
+        </ButtonBar>
         { dataTransacciones.length > 0 &&
           <div className="w-full px-10 my-10">          
             <Accordion
