@@ -34,7 +34,7 @@ const RecaudoManual = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  });
+  },{delay:2000});
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);

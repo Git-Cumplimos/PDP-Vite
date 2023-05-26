@@ -1,7 +1,7 @@
 import HNavbar from "../../../../components/Base/HNavbar";
 
-const navComercios = ({ subRoutes }) => {
+const Comercios = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default navComercios;
+export default Comercios;

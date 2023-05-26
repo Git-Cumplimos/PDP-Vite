@@ -12,7 +12,7 @@ import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
 import Fieldset from "../../../../components/Base/Fieldset";
 import MoneyInput from "../../../../components/Base/MoneyInput";
-import { notifyPending } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import { onChangeEan13Number, onChangeNit, descargarCSV, changeDateFormat } from "../../utils/functions";
 import { getUrlRecaudosList, addConveniosRecaudoList, modConveniosRecaudoList } from "../../utils/fetchFunctions"
 import { onChangeNumber } from "../../../../utils/functions";
@@ -60,7 +60,7 @@ const RecaudoDirecto = () => {
     { label: "Sin base de datos", value: 3 },
   ]
   const tipoArchivoConciliacion = [
-    { label: "Reporte Generico csv", value: "Reporte Generico csv" },
+    { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
 
@@ -75,7 +75,7 @@ const RecaudoDirecto = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  });
+  },{delay:2000});
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);
@@ -145,23 +145,31 @@ const RecaudoDirecto = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    let validacion = true
     if (body['Nombre de Referencia']) {
       delete body['Nombre de Referencia']; delete body['Longitud mínima']; delete body['Longitud máxima']
       let allReferencias = []
       for (let i in referencias) {
+        if (parseInt(referencias[i]["Longitud mínima"]) > parseInt(referencias[i]["Longitud máxima"])) validacion = false
         allReferencias.push({
           "nombre_referencia": referencias[i]["Nombre de Referencia"],
           "length": [referencias[i]["Longitud mínima"], referencias[i]["Longitud máxima"],]
         })
       }
+      if (!validacion) notifyError("En la restriccion de referencias, la longitud máxima debe ser mayor a la longitud mínima")
       body['referencias'] = allReferencias
     }
     if (body['Valor mínimo'] || body['Valor máximo']) {
       delete body['Valor mínimo']; delete body['Valor máximo'];
       body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0 }`, `${limites['Valor máximo'] ?? 0}`]
+      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])){
+        notifyError("En la restriccion de valores, el valor máximo debe ser mayor al valor mínima")
+        validacion = false
+      }
     }
-    notifyPending(
-      selected
+    if (validacion){
+      notifyPending(
+        selected
         ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
         : addConveniosRecaudoList(body),
       {
@@ -174,8 +182,8 @@ const RecaudoDirecto = () => {
           searchTrxs();
           handleClose();
           return `Convenio ${selected ? "modificado" : "agregado"
-            } exitosamente`;
-        },
+        } exitosamente`;
+      },
       },
       {
         render({ data: err }) {
@@ -186,7 +194,8 @@ const RecaudoDirecto = () => {
           return `${selected ? "Edicion" : "Creación"} fallida`;
         },
       }
-    )
+      )
+    } 
   }, [handleClose, searchTrxs, selected, referencias, limites])
 
   const descargarPlantilla = useCallback(() => {
@@ -314,6 +323,7 @@ const RecaudoDirecto = () => {
             label={"Nombre convenio"}
             name={"nombre_convenio"}
             type="text"
+            maxLength={"60"}
             defaultValue={selected?.nombre_convenio ?? ""}
             autoComplete="off"
             required
@@ -369,6 +379,7 @@ const RecaudoDirecto = () => {
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
+                  maxLength={"12"}
                   value={valLimit}
                   equalError={false}
                   onInput={(e, valor) => {
@@ -393,12 +404,14 @@ const RecaudoDirecto = () => {
                         id={`${keyRef}_${index}`}
                         name={keyRef}
                         label={keyRef}
-                        type={`${keyRef.includes("Longitud") ? "number" : "text"}`}
+                        type={`${keyRef.includes("Longitud") ? "tel" : "text"}`}
+                        maxLength={`${keyRef.includes("Longitud") ? "2" : "40"}`}
                         autoComplete="off"
                         value={valRef}
-                        onChange={(e) => {
+                        onInput={(ev) => { 
+                          if (keyRef.includes("Longitud")) (ev.target.value = onChangeNumber(ev))
                           const copyRef = [...referencias];
-                          copyRef[index][keyRef] = e.target.value;
+                          copyRef[index][keyRef] = ev.target.value;
                           setReferencias(copyRef);
                         }}
                         required
@@ -453,6 +466,7 @@ const RecaudoDirecto = () => {
             label={"Observaciones"}
             name={"observaciones"}
             type="text"
+            maxLength={"130"}
             autoComplete="off"
             defaultValue={selected?.observaciones ?? ""}
           />

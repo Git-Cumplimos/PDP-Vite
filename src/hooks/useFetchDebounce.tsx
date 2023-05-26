@@ -8,7 +8,7 @@ import useFetchDispatchDebounce, {
 const useFetchDebounce = (
   { url, options }: FetchProps,
   responseCallbacks: ResponseCallbacks,
-  hookOptions: HookOptions
+  hookOptions?: HookOptions
 ) => {
   const [dispatcher, loading, abort] = useFetchDispatchDebounce(
     responseCallbacks,
