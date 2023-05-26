@@ -48,6 +48,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
     let inputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
+      console.log(type);
       if (type === "email") {
         // for email
         // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
@@ -80,13 +81,15 @@ const Input = forwardRef<HTMLInputElement, Props>(
     return self ? (
       <>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <input {...input} />
+        <input id={_id} type={type} {...input} />
       </>
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
         <div>
           <input
+            id={_id}
+            type={type}
             {...input}
             ref={(realInput) => {
               inputRef.current = realInput;
