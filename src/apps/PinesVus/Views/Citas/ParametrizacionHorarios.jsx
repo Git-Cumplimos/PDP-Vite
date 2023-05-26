@@ -57,9 +57,14 @@ const ConsultaCitas = () => {
   
   useEffect(() => {
     // setIsLoading(true)
+    buscarOficina(nombreOficina, pageData,UrlConsultaOficinas)
+
+  }, [pageData, UrlConsultaOficinas])
+
+  const buscarOficina = useCallback ((nombre, pageData, UrlConsultaOficinas) => {
     setIsLoading(true)
     const fields ={...pageData}
-    fields.nombre = `${nombreOficina}`
+    fields.nombre = `${nombre}`
     // const params = new URLSearchParams();
     // Object.entries(fields).forEach(([key, value]) => {
     // params.append(key, value);
@@ -98,10 +103,7 @@ const ConsultaCitas = () => {
       notifyError("Error intente nuevamente")
     }
     );
-
-  }, [nombreOficina, pageData, UrlConsultaOficinas])
-
-
+  })
   // const onSubmitModal = (e) => {
   //   setShowModal(true)
   // }
@@ -203,10 +205,10 @@ const ConsultaCitas = () => {
           const text = e.target.value.toUpperCase()
           setNombreOficina(text)
       }}
-      // onLazyInput={{
-      //     callback: buscarOficina,
-      //     timeOut: 500,
-      // }}
+      onLazyInput={{
+          callback: (e) => buscarOficina(e.target.value.toUpperCase(), pageData, UrlConsultaOficinas),
+          timeOut: 500,
+      }}
       />
       </TableEnterprise>
     :
