@@ -48,7 +48,6 @@ const Input = forwardRef<HTMLInputElement, Props>(
     let inputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-      console.log(type);
       if (type === "email") {
         // for email
         // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i

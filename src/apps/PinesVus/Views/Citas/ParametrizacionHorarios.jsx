@@ -209,10 +209,19 @@ const ConsultaCitas = () => {
         notifyError(resp?.msg)}
          setDisabledBtnSubir(false)
     }else{     
-      setHorarios(resp?.obj?.horario_atencion)
+      const horarios = {
+        lunes:{Apertura:resp?.obj?.horario_atencion?.lunes?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.lunes?.Cierre || '00:00'},
+        martes:{Apertura:resp?.obj?.horario_atencion?.martes?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.martes?.Cierre || '00:00'},
+        miercoles:{Apertura:resp?.obj?.horario_atencion?.miercoles?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.miercoles?.Cierre || '00:00'},
+        jueves:{Apertura:resp?.obj?.horario_atencion?.jueves?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.jueves?.Cierre || '00:00'},
+        viernes:{Apertura:resp?.obj?.horario_atencion?.viernes?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.viernes?.Cierre || '00:00'},
+        sabado:{Apertura:resp?.obj?.horario_atencion?.sabado?.Apertura || '00:00', Cierre:resp?.obj?.horario_atencion?.sabado?.Cierre || '00:00'},
+        domingo:{Apertura:resp?.obj?.horario_atencion?.domingo?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.domingo?.Cierre || '00:00'}
+      }
+      setHorarios(horarios)
       setTiempoDuracion(resp?.obj?.duracion_cita)
       setVentanillas(resp?.obj?.numero_ventanillas)
-      setHorariosActual(resp?.obj?.horario_atencion)
+      setHorariosActual(horarios)
       setTiempoDuracionActual(resp?.obj?.duracion_cita)
       setVentanillasActual(resp?.obj?.numero_ventanillas)
       setDisabledBtnSubir(true)
