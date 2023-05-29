@@ -45,9 +45,7 @@ const RecaudoServiciosPublicosPrivadosMenuAgrario = lazy(() =>
 );
 
 const listPermissions = Object.values(enumPermisosAgrario);
-export const listPermissionsAgrario = listPermissions.splice(
-  listPermissions.length / 2
-);
+export const listPermissionsAgrario = listPermissions;
 
 const rutasAgrarioCB = {
   link: "/corresponsalia/corresponsalia-banco-agrario",

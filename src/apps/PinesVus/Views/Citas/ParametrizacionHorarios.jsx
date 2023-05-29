@@ -26,14 +26,7 @@ const ConsultaCitas = () => {
   const UrlParametrizacion = `${process.env.REACT_APP_URL_PinesVus}/parametrizar_horarios`
 
   const navigate = useNavigate();
-  const { consultaCupoQX, modificarCupoQX } =
-    usePinesVus();
 
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
 
   const { pdpUser } = useAuth();  
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });  
@@ -53,7 +46,6 @@ const ConsultaCitas = () => {
     domingo:{Apertura:"00:00", Cierre:"00:00"}
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [showModal, setShowModal] = useState(false)
   const [ventanillas, setVentanillas] = useState("")
   const [disabledBtnSubir, setDisabledBtnSubir] = useState(false)
   const [horariosActual, setHorariosActual] = useState({
@@ -83,9 +75,14 @@ const ConsultaCitas = () => {
   
   useEffect(() => {
     // setIsLoading(true)
+    buscarOficina(nombreOficina, pageData,UrlConsultaOficinas)
+
+  }, [pageData, UrlConsultaOficinas])
+
+  const buscarOficina = useCallback ((nombre, pageData, UrlConsultaOficinas) => {
     setIsLoading(true)
     const fields ={...pageData}
-    fields.nombre = `${nombreOficina}`
+    fields.nombre = `${nombre}`
     // const params = new URLSearchParams();
     // Object.entries(fields).forEach(([key, value]) => {
     // params.append(key, value);
@@ -124,9 +121,7 @@ const ConsultaCitas = () => {
       notifyError("Error intente nuevamente")
     }
     );
-
-  }, [nombreOficina, pageData, UrlConsultaOficinas])
-
+  })
   // const onSubmitModal = (e) => {
   //   setShowModal(true)
   // }
@@ -141,11 +136,11 @@ const ConsultaCitas = () => {
   const onSubmitParametrizacion = (e) => {
     e.preventDefault();
     if (
-      horarios.lunes.Apertura > horarios.lunes.Cierre ||
-      horarios.sabado.Apertura > horarios.sabado.Cierre ||
-      horarios.domingo.Apertura > horarios.domingo.Cierre){
+      (horarios.lunes.Apertura !=='00:00' && horarios.lunes.Apertura >= horarios.lunes.Cierre) ||
+      (horarios.sabado.Apertura !=='00:00' && horarios.sabado.Apertura >= horarios.sabado.Cierre) ||
+      (horarios.domingo.Apertura !=='00:00' && horarios.domingo.Apertura >= horarios.domingo.Cierre)){
       console.log(horarios)
-      notifyError("Verifique que los horarios de cierre sean mayores a los de apertura")      
+      notifyError("Verifique que los horarios de cierre sean mayores a los de apertura")     
     } else {
     setIsLoading(true)
     const body = {
@@ -170,7 +165,14 @@ const ConsultaCitas = () => {
             notifyError(resp?.msg)
         }else{
             // setAgendamientoTrue(true)
-            notify(resp?.msg)
+            let mensaje = ''
+            if(resp?.obj?.url_descargaS3 !== ''){
+              mensaje = `Se cancelaron citas revise el archivo descargado`
+              window.open(resp?.obj?.url_descargaS3, "_blank");
+            }else{
+              mensaje = 'No hubo cancelación de citas'
+            }
+            notify(`${resp?.msg}: ${mensaje}`)
             console.log(resp)
             setOficina({"Id": "", "Nombre": "", "Dirección": ""})
             setHorarios({
@@ -259,10 +261,10 @@ const ConsultaCitas = () => {
           const text = e.target.value.toUpperCase()
           setNombreOficina(text)
       }}
-      // onLazyInput={{
-      //     callback: buscarOficina,
-      //     timeOut: 500,
-      // }}
+      onLazyInput={{
+          callback: (e) => buscarOficina(e.target.value.toUpperCase(), pageData, UrlConsultaOficinas),
+          timeOut: 500,
+      }}
       />
       </TableEnterprise>
     :

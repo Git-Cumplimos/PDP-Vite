@@ -40,7 +40,9 @@ const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
 const AdminConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin"));
-const ConveniosAutorizadoresRecaudo = lazy(() => import("./Views/ConveniosPDP/AutorizadoresRecaudo"));
+const ConveniosAutorizadoresRecaudo = lazy(() =>
+  import("./Views/ConveniosPDP/AutorizadoresRecaudo")
+);
 const ConvAuto = lazy(() => import("./Views/ConvAuto"));
 const Autorizadores = lazy(() => import("./Views/Autorizadores"));
 const ReporteConfiguracionComisiones = lazy(() =>
@@ -75,7 +77,7 @@ const EditGruposPlanesComisiones = lazy(() =>
   import("./Views/Comisiones/GruposPlanes/EditGruposPlanesComisiones")
 );
 const navConvenios = lazy(() => import("./Views/Convenios/navConvenios"));
-const navComercios = lazy(() => import("./Views/Comercios/navComercios"));
+const Comercios = lazy(() => import("./Views/Comercios"));
 /**
  * Editar parametros tipos de transacciones
  */
@@ -91,7 +93,12 @@ export const listPermissionsTrx = listPermissions.splice(
 
 const rutasConfiguraciones = {
   link: "/params-operations",
-  label: <AppIcons Logo={"RECAUDO"} name={"Parametros transaccionales"} />,
+  label: (
+    <AppIcons
+      Logo={"PARAMETROS_TRANSACCIONALES"}
+      name={"Parametros transaccionales"}
+    />
+  ),
   component: ParamsOperations,
   permission: listPermissionsTrx,
   subRoutes: [
@@ -264,17 +271,13 @@ const rutasConfiguraciones = {
       subRoutes: [
         {
           link: "/params-operations/convenios-recaudo/administrar",
-          label: (
-            <AppIcons Logo={"RETIRO"} name={"Administrar convenios"} />
-          ),
+          label: <AppIcons Logo={"RETIRO"} name={"Administrar convenios"} />,
           component: AdminConveniosPDP,
           permission: [20],
         },
         {
           link: "/params-operations/convenios-recaudo/autorizadores-recaudo",
-          label: (
-            <AppIcons Logo={"RETIRO"} name={"Autorizadores de recaudo"} />
-          ),
+          label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de recaudo"} />,
           component: ConveniosAutorizadoresRecaudo,
           permission: [20],
         },
@@ -342,9 +345,9 @@ const rutasConfiguraciones = {
       ],
     },
     {
-      link: "/params-operations/navcomercios",
+      link: "/params-operations/comercios-params",
       label: <AppIcons Logo={"RETIRO"} name={"Comercios"} />,
-      component: navComercios,
+      component: Comercios,
       permission: [enumPermisosTrx.comercios],
       subRoutes: [
         // {
@@ -354,26 +357,26 @@ const rutasConfiguraciones = {
         //   permission: [enumPermisosTrx.tipo_nivel_comercio],
         // },
         {
-          link: "/params-operations/comercios",
+          link: "/params-operations/comercios-params/comercios",
           label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
           component: ListarComercios,
           permission: [enumPermisosTrx.comercios],
         },
         {
-          link: "/params-operations/comercios/crear",
+          link: "/params-operations/comercios-params/comercios/:pk_comercio",
           label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
           component: CrearComercios,
           permission: [enumPermisosTrx.comercios],
           show: false,
         },
         {
-          link: "/params-operations/grupos-comercio",
+          link: "/params-operations/comercios-params/grupos-comercio",
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
           component: GruposComercios,
           permission: [enumPermisosTrx.grupos_comercios],
         },
         {
-          link: "/params-operations/grupos-comercio/edit/:id",
+          link: "/params-operations/comercios-params/grupos-comercio/edit/:id",
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
           component: EditGruposComercios,
           permission: [enumPermisosTrx.grupos_comercios],

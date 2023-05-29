@@ -89,7 +89,7 @@ const TablaTransacciones = ({ banco }) => {
       title="Transacciones"
       maxPage={cantidadPaginas}
       headers={[
-        "Id transaccion",
+        "Id transacción",
         "Operación",
         "Monto",
         "Fecha y hora",
@@ -108,7 +108,7 @@ const TablaTransacciones = ({ banco }) => {
             monto: money,
             fecha: created,
             status: inf.status_trx ? "Aprobado" : "Declinado",
-            tipo_proceso: inf.is_trx_contingencia ? "Contingencia" : "En linea",
+            tipo_proceso: inf.is_trx_contingencia ? "Contingencia" : "En línea",
           };
         }) ?? []
       }

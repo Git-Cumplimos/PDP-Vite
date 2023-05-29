@@ -18,8 +18,8 @@ interface Props extends ComponentPropsWithRef<"input"> {
     callback: (ev: FormEvent<HTMLInputElement>) => void;
     timeOut: number;
   };
-  info: string;
-  invalid: string;
+  info?: string;
+  invalid?: string;
   actionBtn?: {
     callback: (ev: MouseEvent<HTMLButtonElement>) => void;
     label: string;
@@ -29,22 +29,26 @@ interface Props extends ComponentPropsWithRef<"input"> {
 const { formItem, invalid: invalidCls, btn } = classes;
 const { div_input_form_item } = classes2;
 const Input = forwardRef<HTMLInputElement, Props>(
-  ({
-    label = "",
-    self = false,
-    onLazyInput,
-    info = "",
-    invalid = "",
-    actionBtn,
-    ...input
-  }, ref) => {
-    const { id: _id, type } = input;
-
+  (
+    {
+      label = "",
+      self = false,
+      onLazyInput,
+      info = "",
+      invalid = "",
+      actionBtn,
+      type,
+      id: _id,
+      ...input
+    },
+    ref
+  ) => {
     const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
     let inputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
+      console.log(type);
       if (type === "email") {
         // for email
         // /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
@@ -76,23 +80,21 @@ const Input = forwardRef<HTMLInputElement, Props>(
 
     return self ? (
       <>
-        {label && label !== "" && (
-          <label htmlFor={_id}>
-            {label}
-          </label>
-        )}
-        <input {...input} />
+        {label && label !== "" && <label htmlFor={_id}>{label}</label>}
+        <input id={_id} type={type} {...input} />
       </>
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
         <div>
           <input
+            id={_id}
+            type={type}
             {...input}
             ref={(realInput) => {
               inputRef.current = realInput;
               if (ref) {
-                if (typeof ref === 'function') {
+                if (typeof ref === "function") {
                   ref(realInput);
                 } else {
                   ref.current = realInput;
@@ -100,10 +102,10 @@ const Input = forwardRef<HTMLInputElement, Props>(
               }
             }}
           />
-          {info ? <p>{info}</p> : ""}
-          {inputRef.current?.value !== ""
-            ? invalid && <p className={`${invalidCls}`}>{invalid}</p>
-            : ""}
+          {info && <p>{info}</p>}
+          {inputRef.current?.value !== "" && invalid && (
+            <p className={`${invalidCls}`}>{invalid}</p>
+          )}
           {actionBtn && (
             <button type="button" className={btn} onClick={actionBtn.callback}>
               {actionBtn.label}

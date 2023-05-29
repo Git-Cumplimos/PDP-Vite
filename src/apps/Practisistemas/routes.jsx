@@ -20,7 +20,7 @@ const FormularioVentaSoat = lazy(() =>
 );
 
 /**
- * Recargas 
+ * Recargas
  */
 const RecargasPaquetes = lazy(() =>
   import("./Views/Recargas/Recargas-Paquetes")
@@ -35,10 +35,23 @@ const RecargarPaquetes = lazy(() =>
   import("./Views/Recargas/RecargarPaquetes.jsx")
 );
 
+/**
+ * Apuestas
+ */
+const ApuestasDeportivas = lazy(() =>
+  import("./Views/Apuestas/ApuestasDeportivas.jsx")
+);
+const RecargarCuentaApuestas = lazy(() =>
+  import("./Views/Apuestas/RecargarApuestas.jsx")
+);
+
 export const rutasPines = {
   link: "/Pines/PinesContenido",
   label: (
-    <AppIcons Logo={"MARKETPLACE"} name="Pines Servicio y Contenido" />
+    <AppIcons
+      Logo={"ServicioContenidoPines"}
+      name="Pines Servicio y Contenido"
+    />
   ),
   component: Pines,
   permission: [enumPermisosPractisistemas.practisistemasPines],
@@ -56,11 +69,11 @@ export const rutasPines = {
       permission: [enumPermisosPractisistemas.practisistemasPines],
     },
   ],
-}
+};
 
 export const rutasSoat = {
   link: "/ventaSeguros",
-  label: <AppIcons Logo={"RECAUDO"} name="Venta De Seguros" />,
+  label: <AppIcons Logo={"VENTA_SEGUROS"} name="Venta De Seguros" />,
   component: VentaSoat,
   permission: [enumPermisosPractisistemas.practisistemasSoat],
   subRoutes: [
@@ -71,11 +84,13 @@ export const rutasSoat = {
       permission: [enumPermisosPractisistemas.practisistemasSoat],
     },
   ],
-}
+};
 
 export const rutasRecargas = {
   link: "/recargas-paquetes",
-  label: <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />,
+  label: (
+    <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
+  ),
   component: RecargasPaquetes,
   permission: [enumPermisosPractisistemas.practisistemasRecargas],
   subRoutes: [
@@ -104,4 +119,20 @@ export const rutasRecargas = {
       show: false,
     },
   ],
-}
+};
+
+export const rutasApuestas = {
+  link: "/apuestas-deportivas",
+  label: <AppIcons Logo={"RECAUDO"} name="Apuestas Deportivas" />,
+  component: ApuestasDeportivas,
+  permission: [enumPermisosPractisistemas.practisistemasApuestas],
+  subRoutes: [
+    {
+      link: "/apuestas-deportivas/Recargar",
+      label: <AppIcons Logo={"RECAUDO"} name="Apuestas Deportivas" />,
+      component: RecargarCuentaApuestas,
+      permission: [enumPermisosPractisistemas.practisistemasApuestas],
+      show: false,
+    },
+  ],
+};
