@@ -55,7 +55,18 @@ const ConsultaCitas = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [ventanillas, setVentanillas] = useState("")
-
+  const [disabledBtnSubir, setDisabledBtnSubir] = useState(false)
+  const [horariosActual, setHorariosActual] = useState({
+    lunes:{Apertura:"00:00", Cierre:"00:00"},
+    martes:{Apertura:"00:00", Cierre:"00:00"},
+    miercoles:{Apertura:"00:00", Cierre:"00:00"},
+	  jueves:{Apertura:"00:00", Cierre:"00:00"},
+    viernes:{Apertura:"00:00", Cierre:"00:00"},
+    sabado:{Apertura:"00:00", Cierre:"00:00"},
+    domingo:{Apertura:"00:00", Cierre:"00:00"}
+  })
+  const [tiempoDuracionActual, setTiempoDuracionActual] = useState("")
+  const [ventanillasActual, setVentanillasActual] = useState("")
 
   const closeModal = useCallback(async () => {
     // setShowModal(false);
@@ -115,7 +126,6 @@ const ConsultaCitas = () => {
     );
 
   }, [nombreOficina, pageData, UrlConsultaOficinas])
-
 
   // const onSubmitModal = (e) => {
   //   setShowModal(true)
@@ -184,6 +194,44 @@ const ConsultaCitas = () => {
   }
   }
 
+  useEffect(() => {
+    setIsLoading(true)
+    const fields = { id_comercio: oficina.Id, fecha_consulta: fechaVigencia + " 00:00:00" }
+    fetchData(UrlParametrizacion,
+              "GET",
+              fields)
+    .then((resp) => {
+    setIsLoading(false)
+    if (!resp?.status){
+        if (oficina.Id!=""){
+        notifyError(resp?.msg)}
+         setDisabledBtnSubir(false)
+    }else{     
+      setHorarios(resp?.obj?.horario_atencion)
+      setTiempoDuracion(resp?.obj?.duracion_cita)
+      setVentanillas(resp?.obj?.numero_ventanillas)
+      setHorariosActual(resp?.obj?.horario_atencion)
+      setTiempoDuracionActual(resp?.obj?.duracion_cita)
+      setVentanillasActual(resp?.obj?.numero_ventanillas)
+      setDisabledBtnSubir(true)
+    }
+    }).catch(() => {
+      setIsLoading(false)
+      notifyError("Error intente nuevamente")
+    }
+    );
+  }, [fechaVigencia, pageData, UrlParametrizacion])
+
+  useEffect(() => {
+    ((tiempoDuracion === tiempoDuracionActual) && 
+    (horarios["lunes"]["Apertura"]===horariosActual["lunes"]["Apertura"]) &&
+    (horarios["sabado"]["Apertura"]===horariosActual["sabado"]["Apertura"]) &&
+    (horarios["domingo"]["Apertura"]===horariosActual["domingo"]["Apertura"]) &&
+    (horarios["lunes"]["Cierre"]===horariosActual["lunes"]["Cierre"]) &&
+    (horarios["sabado"]["Cierre"]===horariosActual["sabado"]["Cierre"]) &&
+    (horarios["domingo"]["Cierre"]===horariosActual["domingo"]["Cierre"]) &&
+    (ventanillas === ventanillasActual)) ? setDisabledBtnSubir(true) : setDisabledBtnSubir(false)
+  }, [tiempoDuracion, horarios, ventanillas])
   
   return (
     <>
@@ -264,7 +312,7 @@ const ConsultaCitas = () => {
         value={tiempoDuracion}
         onInput={(e) => {
           const num = parseInt(e.target.value) || "";
-          setTiempoDuracion(num);       
+          setTiempoDuracion(num);   
         }
         }
         required
@@ -380,6 +428,7 @@ const ConsultaCitas = () => {
         </Button>
         <Button
           type = 'submit'
+          disabled={disabledBtnSubir}
         >
           Subir
         </Button>
