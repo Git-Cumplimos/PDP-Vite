@@ -59,6 +59,8 @@ const ConsultaCitas = () => {
   })
   const [tiempoDuracionActual, setTiempoDuracionActual] = useState("")
   const [ventanillasActual, setVentanillasActual] = useState("")
+  const [citasCanceladas, setCitasCanceladas] = useState("")
+  const [ShowModalAvertencia, setShowModalAvertencia] = useState(false)
 
   const closeModal = useCallback(async () => {
     // setShowModal(false);
@@ -225,6 +227,10 @@ const ConsultaCitas = () => {
       setTiempoDuracionActual(resp?.obj?.duracion_cita)
       setVentanillasActual(resp?.obj?.numero_ventanillas)
       setDisabledBtnSubir(true)
+      setCitasCanceladas(resp?.obj?.citas_a_cancelar)
+      if (resp?.obj?.citas_a_cancelar !== 0){
+        setShowModalAvertencia(true)
+      }
     }
     }).catch(() => {
       setIsLoading(false)
@@ -447,6 +453,26 @@ const ConsultaCitas = () => {
     </Form>
     </Fieldset>
     }
+    <Modal show={ShowModalAvertencia}>
+    <div className="flex flex-col justify-center items-center">
+      { citasCanceladas===1 ? 
+      <h1 className="font-semibold">Si se ingresa una nueva parametrización se cancelará una cita!!!</h1>
+      :
+      <h1 className="font-semibold">Si se ingresa una nueva parametrización se cancelarán {citasCanceladas} citas!!!</h1>
+      }      
+      <h1 className="font-semibold">¿Está seguro de cambiar la parametrización de horarios?</h1>
+      <ButtonBar>
+        <Button
+        onClick = {() => {
+        setShowModalAvertencia(false) 
+        } 
+        }
+        >
+          Cerrar
+        </Button>
+      </ButtonBar>
+    </div>
+    </Modal>
     </>
   );
 };
