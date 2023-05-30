@@ -27,7 +27,8 @@ const CancelPin = ({
   infoComercioCreacion,
   closeModal,
   setActivarNavigate,
-  valores
+  valores,
+  pagoTarjeta
 }) => {
   let posicion=name_tramite.search(",")
   let tramite1
@@ -276,7 +277,7 @@ const CancelPin = ({
       objTicket["trxInfo"].splice(8)
     }
 
-    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket) //// Valor = valor + IVA
+    cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket, pagoTarjeta) //// Valor = valor + IVA
       .then((res) => {
         setActivarNavigate(false);
         setDisabledBtn(false);

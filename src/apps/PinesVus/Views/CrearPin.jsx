@@ -499,6 +499,7 @@ const CrearPin = () => {
     }}
     });
   };
+
   const onSubmit = (e) => {
     e.preventDefault();
     if (codigoPago === codigoPagoVerificacion){
@@ -538,9 +539,13 @@ const CrearPin = () => {
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = pinData["descripcion"]
     objTicket["trxInfo"][0] = ["Trámite", "Creación de Pin"]
-    objTicket["trxInfo"][2] = ["Documento", documento]
-    objTicket["trxInfo"][3] = ["Metodo de pago", metodoPago === 1? 'Efectivo' : 'Tarjeta']
-    objTicket["trxInfo"][4] = ["Cod. Datafono", codigoPago]
+    objTicket["trxInfo"][5] = ["Documento", documento]
+    objTicket["trxInfo"][6] = ["Metodo de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+    if (metodoPago === "2") {
+      objTicket["trxInfo"][7] = ["", ""]
+      objTicket["trxInfo"][8] = ["Cod. Datafono", codigoPago]
+      objTicket["trxInfo"][9] = ["", ""]
+      }
     // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
     // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
     // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
@@ -586,7 +591,7 @@ const CrearPin = () => {
 
     }
 
-    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2 )
+    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago )
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -673,7 +678,7 @@ const CrearPin = () => {
     }
 
   }, [venderVehiculo,tipoPin, hora, horaCierre, navigate, cierreManual])
-  console.log(metodoPago, metodoPago === 2)
+
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -1322,6 +1327,7 @@ const CrearPin = () => {
                   setMetodoPago(e.target.value);
                   setDisabledBtnsContinuar(false)
                   setCodigoPago("")
+                  setCodigoPagoVerificacion("")
                 }}
               />
               { metodoPago === '2' ?
