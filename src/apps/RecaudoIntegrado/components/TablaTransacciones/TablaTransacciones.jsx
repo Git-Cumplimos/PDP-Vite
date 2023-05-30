@@ -90,6 +90,7 @@ const TablaTransacciones = ({ banco }) => {
       maxPage={cantidadPaginas}
       headers={[
         "Id transacción",
+        "Id comercio",
         "Operación",
         "Monto",
         "Fecha y hora",
@@ -104,6 +105,7 @@ const TablaTransacciones = ({ banco }) => {
           const money = formatMoney.format(inf.valor_trx);
           return {
             id_transaccion: inf.id_trx,
+            id_comercio: inf?.id_comercio ?? null,
             operacion: inf.name_tipo_transaccion,
             monto: money,
             fecha: created,
@@ -131,6 +133,12 @@ const TablaTransacciones = ({ banco }) => {
         name="fecha_inicio_fin"
         type="date"
       />
+      <Input
+        id="id_comercio"
+        label="Id comercio"
+        name="id_comercio"
+        type="tel"
+      />
       <Select
         className="place-self-stretch"
         label="Tipo operación"
@@ -141,6 +149,16 @@ const TablaTransacciones = ({ banco }) => {
           "Notificación recaudo",
           "Reverso notificación recaudo",
         ].map((val) => ({ value: val, label: val }))}
+      />
+      <Select
+        className="place-self-stretch"
+        label="Tipo de proceso"
+        name="is_trx_contingencia"
+        options={[
+          "",
+          "En línea",
+          "Contingencia",
+        ].map((val) => ({ value: val === "En línea" ? "false" : "true", label: val }))}
       />
     </TableEnterprise>
   );
