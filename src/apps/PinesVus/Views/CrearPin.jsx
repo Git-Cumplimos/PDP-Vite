@@ -1338,10 +1338,14 @@ const CrearPin = () => {
               type="text"
               autoComplete="off"
               value={codigoPago}
+              minLength="1"
+              maxLength="30"
               required
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setCodigoPago(num);
+                if (!isNaN(e.target.value)) {
+                  const num = e.target.value;
+                  setCodigoPago(num);
+                }                
               }}
               />
               <Input
@@ -1350,6 +1354,8 @@ const CrearPin = () => {
               type="text"
               autoComplete="off"
               value={codigoPagoVerificacion}
+              minLength="1"
+              maxLength="30"
               required
               onInput={(e) => {
                 if (
@@ -1357,9 +1363,11 @@ const CrearPin = () => {
                   (String(codigoPagoVerificacion).length < 1)
                 ) {
                   notifyError("Debe digitar el código y no pegarlo");
-                } else {                  
-                  const num = parseInt(e.target.value) || "";
-                  setCodigoPagoVerificacion(num);
+                } else {            
+                  if (!isNaN(e.target.value)) {
+                    const num = e.target.value;
+                    setCodigoPagoVerificacion(num);
+                  }                  
                 }
               }}
               />
