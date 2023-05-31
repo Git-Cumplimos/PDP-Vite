@@ -11,10 +11,6 @@ import { FuctionEvaluateResponsePractisistemas } from "./utilsPractisistemas";
 
 const urlRecargasCelular = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/recarga`;
 
-// const urlRecargasCelular =
-//   "http://corresponsalia-practisistemas-alb.us-east-2.elasticbeanstalk.com/practisistemas" +
-//   "/recargasCelular/recarga";
-
 export const useBackendRecargasPractisistemas = (
   name_operador: string,
   module: string
