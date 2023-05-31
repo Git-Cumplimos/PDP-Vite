@@ -285,13 +285,6 @@ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
 /**
- * Modulo Telefonia Movil
- */
-const TelefoniaMovil = lazy(() =>
-  import("../apps/TelefoniaMovil/TelefoniaMovil")
-);
-
-/**
  * Modulo Recargas
  */
 const RecargasCelular = lazy(() =>

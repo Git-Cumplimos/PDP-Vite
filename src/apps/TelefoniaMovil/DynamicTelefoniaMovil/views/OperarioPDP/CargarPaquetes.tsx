@@ -1,11 +1,14 @@
 import React, { useCallback, useRef, useState } from "react";
-import classes from "./CargarPaquetes.module.css";
-import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
-import FileInput from "../../../../components/Base/FileInput/FileInput";
-import Button from "../../../../components/Base/Button/Button";
-import Input from "../../../../components/Base/Input/Input";
 
+//--components--
+import SimpleLoading from "../../../../../components/Base/FileInput/FileInput";
+import FileInput from "../../../../../components/Base/FileInput/FileInput";
+import Button from "../../../../../components/Base/Button/Button";
+import Input from "../../../../../components/Base/Input/Input";
+
+import classes from "./CargarPaquetes.module.css";
 import { PropsBackendRecargas } from "../../utils/TypesSubModulos";
+import { useImgs } from "../../../../../hooks/ImgsHooks";
 
 type PropsCargaPaquetes = {
   BackendCargaPaquetes: () => Promise<PropsBackendRecargas>;
@@ -31,7 +34,8 @@ const {
 
 const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
-const CargarPaquetes = ({ BackendCargaPaquetes }: PropsCargaPaquetes) => {
+const CargarPaquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
+  const { svgs }: any = useImgs();
   const [nombreDocumento, setNombreDocumento] = useState("");
   const [archivo, setArchivo] = useState<any[]>([]);
   const [disabledBtn, setDisabledBtn] = useState(false);
@@ -109,8 +113,15 @@ const CargarPaquetes = ({ BackendCargaPaquetes }: PropsCargaPaquetes) => {
   };
 
   return (
-    <div>
-      {" "}
+    <div className="py-10 flex items-center flex-col">
+  <img
+      className="w-24  "
+      src={
+        operadorCurrent?.logo?.includes("http")
+          ? operadorCurrent?.logo
+          : svgs?.[operadorCurrent?.logo]
+      }
+    ></img>
       <FileInput
         id="contingencia"
         label={"pppppppppppppppppppppppp"}
