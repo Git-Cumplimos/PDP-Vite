@@ -171,7 +171,7 @@ export const rutasPinesVus = {
           link: "/Pines/PinesVus/Citas/Consultar",
           label: <AppIcons Logo={"PagoParticipacion"} name={"Consultar"} />,
           component: ConsultaCitas,
-          permission: [enumPermisosPinesVus.operarPinesVus],
+          permission: [enumPermisosPinesVus.operarPinesVus,enumPermisosPinesVus.administrarPinesVus],
         },
         {
           link: "/Pines/PinesVus/Citas/Parametrizacion",
