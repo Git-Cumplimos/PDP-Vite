@@ -16,6 +16,7 @@ import rutasColpatria, {
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
+import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
@@ -797,6 +798,9 @@ const allUrlsPrivateApps = [
   //     // },
   //   ],
   // },
+
+  //Modulo Telefonia Movil
+  RoutesTelefoniaMovil,
 
   //Modulo RecargasCelular
   {
