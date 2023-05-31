@@ -13,7 +13,7 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 export default GetRoutesTelefoniaMovil([
   {
     name: "claro",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/9/99/Logo_de_Claro.svg",
+    logo: "TELEFONIAMOVIL_CLARO",
     subModules: {
       recargas: {
         backend: useBackendRecargas,
@@ -34,7 +34,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "movistar",
-    logo: "https://e7.pngegg.com/pngimages/543/906/png-clipart-movistar-yamaha-motogp-mobile-phones-claro-telefonica-others-angle-logo.png",
+    logo: "TELEFONIAMOVIL_MOVISTAR",
     subModules: {
       recargas: {
         backend: useBackendRecargasMovistar,
@@ -55,7 +55,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Tigo",
-    logo: "https://play-lh.googleusercontent.com/BR3FX8EpkDP1FGH_FdE9NpfDZSQcsxEk_khWNn3mvFd7cR9CA0UZVn0L1PUZdYYVPuE=w600-h300-pc0xffffff-pd",
+    logo: "TELEFONIAMOVIL_TIGO",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -76,7 +76,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "WOM",
-    logo: "https://emtecgroup.net/wp-content/uploads/2020/05/Wom-COLOR.png",
+    logo: "TELEFONIAMOVIL_WOM",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -97,7 +97,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Uff",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Uffmovillogo.svg/1200px-Uffmovillogo.svg.png",
+    logo: "TELEFONIAMOVIL_UFF",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -118,7 +118,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Exito",
-    logo: "https://roams.com.co/images/post/es_CO_telco/companias-telefonicas-movil-exito.svg",
+    logo: "TELEFONIAMOVIL_EXITO",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -139,7 +139,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Virgin",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Virgin-logo.svg/2341px-Virgin-logo.svg.png",
+    logo: "TELEFONIAMOVIL_VIRGIN",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -160,7 +160,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Direct TV",
-    logo: "https://w7.pngwing.com/pngs/612/912/png-transparent-directv-1-hd-logo.png",
+    logo: "TELEFONIAMOVIL_DIRECTV",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -181,7 +181,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Une",
-    logo: "https://www.pngfind.com/pngs/m/682-6828862_une-colombia-png-transparent-png.png",
+    logo: "TELEFONIAMOVIL_UNE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -202,7 +202,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Avantel",
-    logo: "https://www.estamosenlinea.com/wp-content/uploads/2018/09/Avantel.jpg",
+    logo: "TELEFONIAMOVIL_AVANTEL",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -223,7 +223,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Etb",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/ETB_Bogot%C3%A1_logo.svg/2560px-ETB_Bogot%C3%A1_logo.svg.png",
+    logo: "TELEFONIAMOVIL_ETB",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -244,7 +244,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Flash Mobile",
-    logo: "https://moyobamba.com/wp-content/uploads/2020/06/flash-mobile.gif",
+    logo: "TELEFONIAMOVIL_FLASHMOBILE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -265,7 +265,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Comunicate",
-    logo: "https://lh5.googleusercontent.com/p/AF1QipN5f7_KlsxXJQJzIxrEf1TkbsvlHGYx1gMyf52X",
+    logo: "TELEFONIAMOVIL_COMUNICATE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -286,7 +286,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Buenofon",
-    logo: "https://supergirosnortedelvalle.com/wp-content/uploads/2021/05/buenofon.png",
+    logo: "TELEFONIAMOVIL_BUENOFON",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
