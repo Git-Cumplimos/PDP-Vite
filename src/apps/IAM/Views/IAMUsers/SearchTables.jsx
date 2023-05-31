@@ -3,6 +3,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import { notifyError } from "../../../../utils/notify";
 import Input from "../../../../components/Base/Input";
+import CommerceTable from "../../../TrxParams/components/Commerce/CommerceTable";
 
 const urlIAM = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -113,6 +114,14 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
         throw new Error("Type not supported");
     }
   }, [searchType, searchData]);
+
+  if (searchType === "commerce") {
+    return (
+      <CommerceTable
+        onSelectComerce={(commerce_info) => onSelectItem(commerce_info)}
+      />
+    );
+  }
 
   return (
     <Fragment>

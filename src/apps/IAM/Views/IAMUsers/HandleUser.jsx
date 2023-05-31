@@ -84,16 +84,12 @@ const HandleUser = () => {
             doc_type_id: selected?.doc_type_id,
             phone: selected?.phone,
             direccion: selected?.direccion,
-            fk_id_comercio: selected?.fk_id_comercio,
-            usuario_ultima_actualizacion:
-              selected?.usuario_ultima_actualizacion,
           }
         : {
             uuid: selected?.uuid,
             uname: selected?.uname,
             phone: selected?.phone,
-            direccion: selected?.direccion,
-            fk_id_comercio: selected?.fk_id_comercio,
+            direccion: selected?.direccion,            
             active: selected?.active,
           };
       if (isCreate) {
@@ -104,6 +100,10 @@ const HandleUser = () => {
           .join(" ");
       }
       bodyData.usuario_ultima_actualizacion = pdpUser?.uuid;
+      
+      if (selected?.fk_id_comercio) {
+        bodyData.fk_id_comercio = selected?.fk_id_comercio;
+      }
 
       notifyPending(
         isCreate ? createUser(bodyData) : updateUser({}, bodyData),
@@ -427,7 +427,6 @@ const HandleUser = () => {
               },
               label: selected?.fk_id_comercio ? "Eliminar" : "Agregar",
             }}
-            required
           />
           {!isCreate && (
             <ToggleInput
