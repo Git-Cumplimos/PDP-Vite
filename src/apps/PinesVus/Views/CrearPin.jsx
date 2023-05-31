@@ -73,7 +73,7 @@ const CrearPin = () => {
   const [firma, setFirma] = useState("")
   const [pedirFirma, setPedirFirma] = useState(true)
   const [descripcionTipDoc, setDescripcionTipDoc] = useState("")
-  const [metodoPago, setMetodoPago] = useState(1)
+  const [metodoPago, setMetodoPago] = useState("1")
   const [codigoPago, setCodigoPago] = useState("")
   const [codigoPagoVerificacion, setCodigoPagoVerificacion] = useState("")
 
