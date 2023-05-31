@@ -1,4 +1,5 @@
 import React, {
+  ChangeEvent,
   FormEvent,
   MouseEvent,
   ReactNode,
@@ -17,7 +18,7 @@ type Props = {
   headers: ReactNode[];
   data: ReactNode[][] | { [key: string]: ReactNode }[];
   onSubmit?: (ev: FormEvent<HTMLFormElement>) => void;
-  onChange?: (ev: FormEvent<HTMLFormElement>) => void;
+  onChange?: (ev: ChangeEvent<HTMLFormElement>) => void;
   actions?: { [key: string]: (ev: MouseEvent<HTMLSpanElement>) => void };
   onClickRow: (ev: MouseEvent<HTMLTableRowElement>, index: number) => void;
   children: ReactNode;

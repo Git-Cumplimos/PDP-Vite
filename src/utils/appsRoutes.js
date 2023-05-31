@@ -362,7 +362,7 @@ const allUrlsPrivateApps = [
       {
         link: "loteria-de-cundinamarca",
         label: "Lotería de Cundinamarca",
-        logo: "LoteriaTolima",
+        logo: "LoteriaCundinamarca",
         permission: [95, 45, 46, 47],
       },
     ].map(({ link: name, label, logo, permission }) => ({
@@ -759,25 +759,27 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/API_SMS/EnviarSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Enviar SMS" />,
+        label: <AppIcons Logo={"SMSENVIODEMENSAJE"} name="Enviar SMS" />,
         component: EnviarSMS,
         permission: [25],
       },
       {
         link: "/API_SMS/crearSMS",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Crear SMS" />,
+        label: <AppIcons Logo={"SMSCREAR"} name="Crear SMS" />,
         component: CrearSMS,
         permission: [26],
       },
       {
         link: "/API_SMS/reporteSMS",
-        label: <AppIcons Logo={"Reporte"} name="Reporte" />,
+        label: <AppIcons Logo={"SMSREPORTE"} name="Reporte" />,
         component: reporteSMS,
         permission: [26],
       },
       {
         link: "/API_SMS/BloquearNum",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Bloqueo de números" />,
+        label: (
+          <AppIcons Logo={"SMSBLOQUEODENUMEROS"} name="Bloqueo de números" />
+        ),
         component: BloquearNum,
         permission: [26],
       },
@@ -877,7 +879,7 @@ const allUrlsPrivateApps = [
                 link: "/movistar/operador-pdp/cargar-paquetes",
                 label: (
                   <AppIcons
-                    Logo={"SORTEO01"}
+                    Logo={"MOVISTARCARGUEPAQUETES"}
                     name="Cargue de paquetes de movistar"
                   />
                 ),
@@ -886,7 +888,9 @@ const allUrlsPrivateApps = [
               },
               {
                 link: "/movistar/operador-pdp/concilacion",
-                label: <AppIcons Logo={"SORTEO01"} name="Conciliación" />,
+                label: (
+                  <AppIcons Logo={"MOVISTARCONCILIACION"} name="Conciliación" />
+                ),
                 component: ConcilacionMovistar,
                 permission: [66],
                 subRoutes: [
@@ -931,7 +935,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/movii-pdp/cash-out-reversos",
-        label: <AppIcons Logo={"MoviiReverso"} name="Reversos cash out" />,
+        label: <AppIcons Logo={"MoviiReverso"} name="Reverso" />,
         component: MoviiPDPReverseCashOut,
         permission: [52],
       },

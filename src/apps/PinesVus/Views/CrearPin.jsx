@@ -73,6 +73,10 @@ const CrearPin = () => {
   const [firma, setFirma] = useState("")
   const [pedirFirma, setPedirFirma] = useState(true)
   const [descripcionTipDoc, setDescripcionTipDoc] = useState("")
+  const [metodoPago, setMetodoPago] = useState(1)
+  const [codigoPago, setCodigoPago] = useState("")
+  const [codigoPagoVerificacion, setCodigoPagoVerificacion] = useState("")
+
 
   const [olimpia, setOlimpia] = useState("")
 
@@ -495,9 +499,10 @@ const CrearPin = () => {
     }}
     });
   };
-  console.log("HOMELOATION",homeLocation)
+
   const onSubmit = (e) => {
     e.preventDefault();
+    if (codigoPago === codigoPagoVerificacion){
     setDisabledBtns(true);
     const hora_actual=Intl.DateTimeFormat("es-CO", {
       hour: "numeric",
@@ -534,6 +539,13 @@ const CrearPin = () => {
     objTicket["timeInfo"]["Hora"] = hora;
     objTicket["commerceName"] = pinData["descripcion"]
     objTicket["trxInfo"][0] = ["Trámite", "Creación de Pin"]
+    objTicket["trxInfo"][5] = ["Documento", documento]
+    objTicket["trxInfo"][6] = ["Metodo de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+    if (metodoPago === "2") {
+      objTicket["trxInfo"][7] = ["", ""]
+      objTicket["trxInfo"][8] = ["Cod. Datafono", codigoPago]
+      objTicket["trxInfo"][9] = ["", ""]
+      }
     // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
     // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
     // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
@@ -579,7 +591,7 @@ const CrearPin = () => {
 
     }
 
-    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2 )
+    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago )
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -600,6 +612,10 @@ const CrearPin = () => {
         }
       })
       .catch(() => setDisabledBtns(false));
+    }
+    }
+    else{
+      notifyError("Verifique que el código suministrado por el datafono sea correcto")
     }
   };
 
@@ -662,7 +678,7 @@ const CrearPin = () => {
     }
 
   }, [venderVehiculo,tipoPin, hora, horaCierre, navigate, cierreManual])
-  
+
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -1281,6 +1297,7 @@ const CrearPin = () => {
                   formatMoney.format(pinData.total + tramiteData.total)}</h1>
                 } 
               </div>
+              <br></br>
             </>
             {/* {Object.entries(tramiteData).map(([key, val]) => {
               return (
@@ -1297,6 +1314,58 @@ const CrearPin = () => {
             })} */}
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmit}>
+              <Select
+                id="metodoPago"
+                label="Metodo de pago"
+                required
+                options={[
+                  { value: 1, label: "Efectivo" },
+                  { value: 2, label: "Tarjeta" },
+                ]}
+                value={metodoPago}
+                onChange={(e) => {
+                  setMetodoPago(e.target.value);
+                  setDisabledBtnsContinuar(false)
+                  setCodigoPago("")
+                  setCodigoPagoVerificacion("")
+                }}
+              />
+              { metodoPago === '2' ?
+              <>
+              <Input
+              id="codPago"
+              label="Código datafono"
+              type="text"
+              autoComplete="off"
+              value={codigoPago}
+              required
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+                setCodigoPago(num);
+              }}
+              />
+              <Input
+              id="codPagoVerificacion"
+              label="Verificación código"
+              type="text"
+              autoComplete="off"
+              value={codigoPagoVerificacion}
+              required
+              onInput={(e) => {
+                if (
+                  (String(e.target.value).length > 2) &
+                  (String(codigoPagoVerificacion).length < 1)
+                ) {
+                  notifyError("Debe digitar el código y no pegarlo");
+                } else {                  
+                  const num = parseInt(e.target.value) || "";
+                  setCodigoPagoVerificacion(num);
+                }
+              }}
+              />
+              </>
+              :
+              ""}
                 <ButtonBar>
                   <Button type="submit" disabled={disabledBtns}>
                     Crear Pin

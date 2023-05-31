@@ -262,6 +262,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       "Referencia 1",
       datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
     ]);
+    objTicket["trxInfo"].push(["", ""]);
     if (
       datosEnvio?.datosConvenio?.nombre_ref2 &&
       datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
@@ -282,7 +283,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       objRecaudo["referencia3"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";
     }
-    objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     postRecaudoConveniosAgrario({
       oficina_propia:
