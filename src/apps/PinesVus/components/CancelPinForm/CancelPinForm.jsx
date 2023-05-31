@@ -172,6 +172,8 @@ const CancelPin = ({
         ["",""],
         ["Total", formatMoney.format(valor*1.19 + valores[0]+ valores[1] )], // Valor + IVA
         ["",""],
+        ["Metodo de pago", !pagoTarjeta ? 'Efectivo' : 'Tarjeta'],
+        ["",""]
       ] :
       [ 
         ["Trámite", "Cancelación de Pin"],
@@ -186,6 +188,8 @@ const CancelPin = ({
         ["",""],
         ["Total", formatMoney.format(valor*1.19 + valor_tramite)], // Valor + IVA
         ["",""],
+        ["Metodo de pago", !pagoTarjeta ? 'Efectivo' : 'Tarjeta'],
+        ["",""]
       ]
       : 
       [
@@ -197,13 +201,15 @@ const CancelPin = ({
         ["",""],
         ["Total", formatMoney.format(valor*1.19)], // Valor + IVA
         ["",""],
+        ["Metodo de pago", !pagoTarjeta ? 'Efectivo' : 'Tarjeta'],
+        ["",""]
       ] 
       
       ,
       disclamer:
         "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
     };
-  }, [respPinCancel, roleInfo, valor]);
+  }, [respPinCancel, roleInfo, valor, pagoTarjeta]);
 
   // useEffect(() => {
   //   infoTicket(respPinCancel?.id_trx, respPinCancel?.tipo_trx, tickets);
@@ -252,6 +258,8 @@ const CancelPin = ({
     objTicket["trxInfo"][17] = ["",""]
     objTicket["trxInfo"][18] = ["Total", formatMoney.format(valor*1.19 + valores[0]+ valores[1])]
     objTicket["trxInfo"][19] = ["",""]
+    objTicket["trxInfo"][20] = ["Metodo de pago", !pagoTarjeta ? 'Efectivo' : 'Tarjeta']
+    objTicket["trxInfo"][21] = ["",""]
   }
     else{    
       objTicket["trxInfo"][2] = ["Detalle trámite", name_tramite]
@@ -264,7 +272,9 @@ const CancelPin = ({
       objTicket["trxInfo"][9] = ["",""]
       objTicket["trxInfo"][10] = ["Total", formatMoney.format(valor*1.19 + valor_tramite)]
       objTicket["trxInfo"][11] = ["",""]
-      objTicket["trxInfo"].splice(12)
+      objTicket["trxInfo"][12] = ["Metodo de pago", pagoTarjeta ? 'Tarjeta' : 'Efectivo']
+      objTicket["trxInfo"][13] = ["",""]
+      objTicket["trxInfo"].splice(14)
   }
 
     if (tipCancelacion === '2') {
@@ -274,7 +284,9 @@ const CancelPin = ({
       objTicket["trxInfo"][5] = ["",""]
       objTicket["trxInfo"][6] = ["Total", formatMoney.format(valor*1.19)] 
       objTicket["trxInfo"][7] = ["",""]
-      objTicket["trxInfo"].splice(8)
+      objTicket["trxInfo"][8] = ["Metodo de pago", pagoTarjeta ? 'Tarjeta' : 'Efectivo']
+      objTicket["trxInfo"][9] = ["",""]
+      objTicket["trxInfo"].splice(10)
     }
 
     cancelPinVus(valor*1.19, motivo, trx, roleInfo, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion, objTicket, pagoTarjeta) //// Valor = valor + IVA

@@ -11,7 +11,6 @@ const TicketsPines = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, lo
 
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
     ticket;
-  console.log(logo)
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
