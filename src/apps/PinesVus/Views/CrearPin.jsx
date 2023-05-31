@@ -1338,6 +1338,7 @@ const CrearPin = () => {
               type="text"
               autoComplete="off"
               value={codigoPago}
+              required
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
                 setCodigoPago(num);
@@ -1349,6 +1350,7 @@ const CrearPin = () => {
               type="text"
               autoComplete="off"
               value={codigoPagoVerificacion}
+              required
               onInput={(e) => {
                 if (
                   (String(e.target.value).length > 2) &

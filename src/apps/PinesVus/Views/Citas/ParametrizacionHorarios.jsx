@@ -460,7 +460,7 @@ const ConsultaCitas = () => {
       :
       <h1 className="font-semibold">Si se ingresa una nueva parametrización se cancelarán {citasCanceladas} citas!!!</h1>
       }      
-      <h1 className="font-semibold">¿Está seguro de cambiar la parametrización de horarios?</h1>
+      <h1 className="font-semibold">Asegúrese que sea necesario realizar el cambio</h1>
       <ButtonBar>
         <Button
         onClick = {() => {
