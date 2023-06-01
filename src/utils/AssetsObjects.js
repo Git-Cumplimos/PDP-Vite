@@ -53,6 +53,22 @@ const svgs = {
   MOVISTARCARGUEPAQUETES: `${urlAssets}/assets/svg/recaudo/MOVISTARCARGUEPAQUETES.svg`,
   MOVISTARCONCILIACION: `${urlAssets}/assets/svg/recaudo/MOVISTARCONCILIACION.svg`,
 
+  //TelefoniaMovil
+  TELEFONIAMOVIL_CLARO: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Claro.svg`,
+  TELEFONIAMOVIL_MOVISTAR: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Movistar.png`,
+  TELEFONIAMOVIL_TIGO: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Tigo.png`,
+  TELEFONIAMOVIL_WOM: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Wom1.png`,
+  TELEFONIAMOVIL_UFF: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Uff.png`,
+  TELEFONIAMOVIL_EXITO: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Exito.png`,
+  TELEFONIAMOVIL_VIRGIN: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Virgin.png`,
+  TELEFONIAMOVIL_DIRECTV: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_DirecTv.png`,
+  TELEFONIAMOVIL_UNE: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Une.png`,
+  TELEFONIAMOVIL_AVANTEL: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Avantel.png`,
+  TELEFONIAMOVIL_ETB: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Etb.png`,
+  TELEFONIAMOVIL_FLASHMOBILE: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_FlashMobile.png`,
+  TELEFONIAMOVIL_COMUNICATE: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Comunicate.png`,
+  TELEFONIAMOVIL_BUENOFON: `${urlAssets}/assets/svg/TelefoniaMovil/TelefoniaMovil_Logo_Buenofon.png`,
+
   // Recaudo
   CATALOGOS_Y_REVISTAS: `${urlAssets}/assets/svg/recaudo/CATALOGOS&REVISTAS.svg`,
   EPS_Y_SALUD: `${urlAssets}/assets/svg/recaudo/EPS&SALUD.svg`,
