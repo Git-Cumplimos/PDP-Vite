@@ -33,6 +33,14 @@ export const FuctionEvaluateResponsePractisistemas = (
         error_.errorFetchCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
       );
+    } else if (peticion_?.status === false) {
+      throw new ErrorCustomBackend(
+        peticion_?.msg,
+        peticion_?.msg,
+        error_.errorFetchCustomBackend?.typeNotify,
+        error_.errorFetchCustomBackend?.ignoring,
+        peticion_?.obj?.error_msg
+      );
     }
   } catch (error: any) {
     if (error instanceof ErrorCustomBackend) {

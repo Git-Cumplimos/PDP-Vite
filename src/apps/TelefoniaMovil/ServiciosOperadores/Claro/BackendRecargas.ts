@@ -6,7 +6,7 @@ import {
 } from "../../DynamicTelefoniaMovil/TypeDinamic";
 
 const url_recargar = "htpp";
-export const useBackendRecargas = (name_operador: string) => {
+export const useBackendRecargasClaro = (name_operador: string) => {
   const [statePeticionRecargar, setStatePeticionRecargar] =
     useState<boolean>(false);
 

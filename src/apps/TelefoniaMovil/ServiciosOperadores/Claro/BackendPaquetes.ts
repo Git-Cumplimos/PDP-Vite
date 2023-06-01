@@ -12,13 +12,9 @@ import {
   TypeOutputTrxPaquetes,
 } from "../../DynamicTelefoniaMovil/TypeDinamic";
 import { notify } from "../../../../utils/notify";
-import {
-  FuctionEvaluateResponseMovistar,
-  trxParamsError,
-} from "./utilsMovistar";
 
-const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/get-paquetes`;
-const url_trx_compra_paquete = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/trx-compra-paquete`;
+const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/get-paque`;
+const url_trx_compra_paquete = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/trx-compra-p`;
 // const trxParamsError: ParamsError = {
 //   errorFetchCustomCode: {
 //     typeNotify: "notifyError",
@@ -46,7 +42,7 @@ const sleep = (millisecons: number) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
 
-export const useBackendPaquetesMovistar = (
+export const useBackendPaquetesClaro = (
   name_operador: string,
   module: string
 ) => {
@@ -163,9 +159,7 @@ export const useBackendPaquetesMovistar = (
         "POST",
         `${name_operador} - registrar`,
         {},
-        bodyPaso1,
-        trxParamsError,
-        FuctionEvaluateResponseMovistar
+        bodyPaso1
       );
     } catch (error: any) {
       banderaFetchPaso2 = true;
@@ -200,9 +194,7 @@ export const useBackendPaquetesMovistar = (
           "PUT",
           `${name_operador} - modificar`,
           {},
-          bodyPaso2,
-          trxParamsError,
-          FuctionEvaluateResponseMovistar
+          bodyPaso2
         );
         response = {
           status: fetchPaso2Result?.status,

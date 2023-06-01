@@ -22,14 +22,30 @@ export type TypeInputPromisesRecargas =
 
 export type TypeBackendRecargas = any;
 //------------paquetes ------------------------
-export type TypeInputDataPaquetes = any;
-export type TypeOutputDataPaquetes = {
+export type TypeInputDataGetPaquetes = any;
+export type TypeInputPromisesGetPaquetes =
+  TypeInputPromises<TypeInputDataGetPaquetes>;
+export type TypeOutputDataGetPaquetes = {
   maxElems: number;
   maxPages: number;
   results: any;
 };
-export type TypeInputPromisesPaquetes =
-  TypeInputPromises<TypeInputDataPaquetes>;
+
+export type TypeInputDataTrxPaquetesInsert = {
+  celular: number;
+  codigo: number;
+  tipo: string;
+  descripcion: string;
+  valor: number;
+  additional: { [key: string]: any };
+};
+
+export type TypeInputTrxPaquetes =
+  TypeInputPromises<TypeInputDataTrxPaquetesInsert>;
+export type TypeOutputTrxPaquetes = {
+  status: boolean;
+  ticket: { [key: string]: any };
+};
 
 export type TypeBackendPaquetes = any;
 

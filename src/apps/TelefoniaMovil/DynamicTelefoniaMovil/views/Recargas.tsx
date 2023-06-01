@@ -12,7 +12,7 @@ import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { TypeOutputDataRecargas } from "../TypeDinamic";
-import Tickets from "../../../FundacionMujer/components/Voucher/Tickets";
+import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { ErrorCustomFetch } from "../utils/utils";
 import { useNavigate } from "react-router-dom";
@@ -225,15 +225,17 @@ const Recargas = ({
         )}
         {/**************** Resumen de la recarga **********************/}
         {/**************** Recarga Exitosa **********************/}
-        {infTicket && typeInfo === "TrxExitosa" && (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={infTicket} />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={handleCloseRecarga}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        )}
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+          {infTicket && typeInfo === "TrxExitosa" && (
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+              <Tickets refPrint={printDiv} ticket={infTicket} />
+              <ButtonBar>
+                <Button onClick={handlePrint}>Imprimir</Button>
+                <Button onClick={handleCloseRecarga}>Cerrar</Button>
+              </ButtonBar>
+            </div>
+          )}
+        </div>
         {/*************** Recarga Exitosa **********************/}
       </Modal>
     </div>

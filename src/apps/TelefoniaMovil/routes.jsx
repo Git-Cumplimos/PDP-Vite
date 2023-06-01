@@ -1,9 +1,11 @@
 import { lazy } from "react";
 import GetRoutesTelefoniaMovil from "./DynamicTelefoniaMovil/GetRoutesTelefoniaMovil";
-import { useBackendRecargas } from "./ServiciosOperadores/Claro/BackendRecargas";
 import { useBackendRecargasMovistar } from "./ServiciosOperadores/Movistar/BackendRecargas";
 import { useBackendRecargasPractisistemas } from "./ServiciosOperadores/Practisistemas/BackendRecargas";
 import { useBackendPaquetesMovistar } from "./ServiciosOperadores/Movistar/BackendPaquetes";
+import { useBackendPaquetesPractisistemas } from "./ServiciosOperadores/Practisistemas/BackendPaquetes";
+import { useBackendPaquetesClaro } from "./ServiciosOperadores/Claro/BackendPaquetes";
+import { useBackendRecargasClaro } from "./ServiciosOperadores/Claro/BackendRecargas";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -11,27 +13,6 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 //Routes --- si desea agregar un operador  MODIFIQUE AQUI-------
 
 export default GetRoutesTelefoniaMovil([
-  {
-    name: "claro",
-    logo: "TELEFONIAMOVIL_CLARO",
-    subModules: {
-      recargas: {
-        backend: useBackendRecargas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
-      },
-      cargarPaquetes: {
-        backend: async () => {},
-      },
-      cargarConciliacion: {
-        backend: async () => {},
-      },
-      descargarConciliacion: {
-        backend: async () => {},
-      },
-    },
-  },
   {
     name: "movistar",
     logo: "TELEFONIAMOVIL_MOVISTAR",
@@ -54,6 +35,27 @@ export default GetRoutesTelefoniaMovil([
     },
   },
   {
+    name: "claro",
+    logo: "TELEFONIAMOVIL_CLARO",
+    subModules: {
+      recargas: {
+        backend: useBackendRecargasClaro,
+      },
+      paquetes: {
+        backend: useBackendPaquetesClaro,
+      },
+      cargarPaquetes: {
+        backend: async () => {},
+      },
+      cargarConciliacion: {
+        backend: async () => {},
+      },
+      descargarConciliacion: {
+        backend: async () => {},
+      },
+    },
+  },
+  {
     name: "Tigo",
     logo: "TELEFONIAMOVIL_TIGO",
     subModules: {
@@ -61,7 +63,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -82,7 +84,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -101,9 +103,6 @@ export default GetRoutesTelefoniaMovil([
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -124,7 +123,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendRecargasPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -145,7 +144,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -165,9 +164,6 @@ export default GetRoutesTelefoniaMovil([
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
-      },
       cargarPaquetes: {
         backend: async () => {},
       },
@@ -185,9 +181,6 @@ export default GetRoutesTelefoniaMovil([
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -208,7 +201,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -229,7 +222,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -249,9 +242,6 @@ export default GetRoutesTelefoniaMovil([
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
-      },
       cargarPaquetes: {
         backend: async () => {},
       },
@@ -269,9 +259,6 @@ export default GetRoutesTelefoniaMovil([
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -292,7 +279,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
