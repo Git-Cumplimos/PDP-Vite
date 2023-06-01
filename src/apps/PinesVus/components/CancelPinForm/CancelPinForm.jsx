@@ -131,10 +131,9 @@ const CancelPin = ({
           day: "numeric",
         }).format(new Date()),
         Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
         }).format(new Date()),
       },
       commerceName: textTipoPin,
