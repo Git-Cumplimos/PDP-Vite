@@ -124,7 +124,7 @@ const CrearComercios = () => {
     ),
     onError: useCallback((error) => console.error(error), []),
   });
-
+  [].splice(0, 0, 2);
   useFetchDebounce(
     {
       url: useMemo(() => `${url_types}/type-doc`, []),
@@ -133,10 +133,17 @@ const CrearComercios = () => {
       onSuccess: useCallback(
         (res) =>
           setDocTypes(
-            res?.obj?.map(({ id_doc, Nombre, nombre_corto }) => ({
-              value: id_doc,
-              label: `${Nombre} (${nombre_corto})`,
-            })) ?? []
+            [
+              {
+                value: "",
+                label: "",
+              },
+            ].concat(
+              res?.obj?.map(({ id_doc, Nombre, nombre_corto }) => ({
+                value: id_doc,
+                label: `${Nombre} (${nombre_corto})`,
+              })) ?? []
+            )
           ),
         []
       ),
@@ -542,7 +549,7 @@ const CrearComercios = () => {
             }
             disabled
           />
-          {pk_comercio_handled && (
+          {Boolean(pk_comercio_handled) && (
             <ToggleInput
               id={`estado_edit`}
               name={`estado`}
