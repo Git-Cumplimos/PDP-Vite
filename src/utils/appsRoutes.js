@@ -16,6 +16,7 @@ import rutasColpatria, {
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
+import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
@@ -567,45 +568,6 @@ const allUrlsPrivateApps = [
     provider: ProvidepinesVus,
     subRoutes: [rutasPines, rutasPinesVus],
   },
-
-  {
-    link: "/iam",
-    label: <AppIcons Logo={"IAM"} name="IAM" />,
-    component: IAMIndex,
-    permission: [12, 13, 14, 15, 16],
-    subRoutes: [
-      {
-        link: "/iam/users",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Usuarios" />,
-        component: IAMUsers,
-        permission: [13],
-      },
-      {
-        link: "/iam/groups",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Grupos" />,
-        component: IAMGroups,
-        permission: [12],
-      },
-      {
-        link: "/iam/policies",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Politicas" />,
-        component: IAMPolicies,
-        permission: [16],
-      },
-      {
-        link: "/iam/roles",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Roles" />,
-        component: IAMRoles,
-        permission: [14],
-      },
-      {
-        link: "/iam/permissions",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Permisos" />,
-        component: IAMPermissions,
-        permission: [15],
-      },
-    ],
-  },
   {
     link: "/recaudo",
     label: <AppIcons Logo={"RECAUDO"} name={"Recaudo"} />,
@@ -798,6 +760,9 @@ const allUrlsPrivateApps = [
   //   ],
   // },
 
+  //Modulo Telefonia Movil
+  RoutesTelefoniaMovil,
+
   //Modulo RecargasCelular
   {
     link: "/recargas-celular",
@@ -924,7 +889,7 @@ const allUrlsPrivateApps = [
       },
       {
         link: "/movii-pdp/cash-out-reversos",
-        label: <AppIcons Logo={"MoviiReverso"} name="Reversos cash out" />,
+        label: <AppIcons Logo={"MoviiReverso"} name="Reverso" />,
         component: MoviiPDPReverseCashOut,
         permission: [52],
       },

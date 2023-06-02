@@ -80,13 +80,15 @@ const Input = forwardRef<HTMLInputElement, Props>(
     return self ? (
       <>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <input {...input} />
+        <input id={_id} type={type} {...input} />
       </>
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
         <div>
           <input
+            id={_id}
+            type={type}
             {...input}
             ref={(realInput) => {
               inputRef.current = realInput;

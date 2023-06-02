@@ -47,6 +47,26 @@ const ConsultaCitas = () => {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [ventanillas, setVentanillas] = useState("")
+  const [disabledBtnSubir, setDisabledBtnSubir] = useState(false)
+  const [horariosActual, setHorariosActual] = useState({
+    lunes:{Apertura:"00:00", Cierre:"00:00"},
+    martes:{Apertura:"00:00", Cierre:"00:00"},
+    miercoles:{Apertura:"00:00", Cierre:"00:00"},
+	  jueves:{Apertura:"00:00", Cierre:"00:00"},
+    viernes:{Apertura:"00:00", Cierre:"00:00"},
+    sabado:{Apertura:"00:00", Cierre:"00:00"},
+    domingo:{Apertura:"00:00", Cierre:"00:00"}
+  })
+  const [tiempoDuracionActual, setTiempoDuracionActual] = useState("")
+  const [ventanillasActual, setVentanillasActual] = useState("")
+  const [citasCanceladas, setCitasCanceladas] = useState("")
+  const [ShowModalAvertencia, setShowModalAvertencia] = useState(false)
+
+  const closeModal = useCallback(async () => {
+    // setShowModal(false);
+    // setDisabledBtn(false);
+    // setFormatMon("");
+  }, []);
 
   const minDuracionCita=5
   const maxDuracionCita=690
@@ -57,9 +77,14 @@ const ConsultaCitas = () => {
   
   useEffect(() => {
     // setIsLoading(true)
+    buscarOficina(nombreOficina, pageData,UrlConsultaOficinas)
+
+  }, [pageData, UrlConsultaOficinas])
+
+  const buscarOficina = useCallback ((nombre, pageData, UrlConsultaOficinas) => {
     setIsLoading(true)
     const fields ={...pageData}
-    fields.nombre = `${nombreOficina}`
+    fields.nombre = `${nombre}`
     // const params = new URLSearchParams();
     // Object.entries(fields).forEach(([key, value]) => {
     // params.append(key, value);
@@ -98,10 +123,7 @@ const ConsultaCitas = () => {
       notifyError("Error intente nuevamente")
     }
     );
-
-  }, [nombreOficina, pageData, UrlConsultaOficinas])
-
-
+  })
   // const onSubmitModal = (e) => {
   //   setShowModal(true)
   // }
@@ -176,6 +198,57 @@ const ConsultaCitas = () => {
   }
   }
 
+  useEffect(() => {
+    setIsLoading(true)
+    const fields = { id_comercio: oficina.Id, fecha_consulta: fechaVigencia + " 00:00:00" }
+    fetchData(UrlParametrizacion,
+              "GET",
+              fields)
+    .then((resp) => {
+    setIsLoading(false)
+    if (!resp?.status){
+        if (oficina.Id!=""){
+        notifyError(resp?.msg)}
+         setDisabledBtnSubir(false)
+    }else{     
+      const horarios = {
+        lunes:{Apertura:resp?.obj?.horario_atencion?.lunes?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.lunes?.Cierre || '00:00'},
+        martes:{Apertura:resp?.obj?.horario_atencion?.martes?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.martes?.Cierre || '00:00'},
+        miercoles:{Apertura:resp?.obj?.horario_atencion?.miercoles?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.miercoles?.Cierre || '00:00'},
+        jueves:{Apertura:resp?.obj?.horario_atencion?.jueves?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.jueves?.Cierre || '00:00'},
+        viernes:{Apertura:resp?.obj?.horario_atencion?.viernes?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.viernes?.Cierre || '00:00'},
+        sabado:{Apertura:resp?.obj?.horario_atencion?.sabado?.Apertura || '00:00', Cierre:resp?.obj?.horario_atencion?.sabado?.Cierre || '00:00'},
+        domingo:{Apertura:resp?.obj?.horario_atencion?.domingo?.Apertura || "00:00", Cierre:resp?.obj?.horario_atencion?.domingo?.Cierre || '00:00'}
+      }
+      setHorarios(horarios)
+      setTiempoDuracion(resp?.obj?.duracion_cita)
+      setVentanillas(resp?.obj?.numero_ventanillas)
+      setHorariosActual(horarios)
+      setTiempoDuracionActual(resp?.obj?.duracion_cita)
+      setVentanillasActual(resp?.obj?.numero_ventanillas)
+      setDisabledBtnSubir(true)
+      setCitasCanceladas(resp?.obj?.citas_a_cancelar)
+      if (resp?.obj?.citas_a_cancelar !== 0){
+        setShowModalAvertencia(true)
+      }
+    }
+    }).catch(() => {
+      setIsLoading(false)
+      notifyError("Error intente nuevamente")
+    }
+    );
+  }, [fechaVigencia, pageData, UrlParametrizacion])
+
+  useEffect(() => {
+    ((tiempoDuracion === tiempoDuracionActual) && 
+    (horarios["lunes"]["Apertura"]===horariosActual["lunes"]["Apertura"]) &&
+    (horarios["sabado"]["Apertura"]===horariosActual["sabado"]["Apertura"]) &&
+    (horarios["domingo"]["Apertura"]===horariosActual["domingo"]["Apertura"]) &&
+    (horarios["lunes"]["Cierre"]===horariosActual["lunes"]["Cierre"]) &&
+    (horarios["sabado"]["Cierre"]===horariosActual["sabado"]["Cierre"]) &&
+    (horarios["domingo"]["Cierre"]===horariosActual["domingo"]["Cierre"]) &&
+    (ventanillas === ventanillasActual)) ? setDisabledBtnSubir(true) : setDisabledBtnSubir(false)
+  }, [tiempoDuracion, horarios, ventanillas])
   
   return (
     <>
@@ -203,10 +276,10 @@ const ConsultaCitas = () => {
           const text = e.target.value.toUpperCase()
           setNombreOficina(text)
       }}
-      // onLazyInput={{
-      //     callback: buscarOficina,
-      //     timeOut: 500,
-      // }}
+      onLazyInput={{
+          callback: (e) => buscarOficina(e.target.value.toUpperCase(), pageData, UrlConsultaOficinas),
+          timeOut: 500,
+      }}
       />
       </TableEnterprise>
     :
@@ -256,7 +329,7 @@ const ConsultaCitas = () => {
         value={tiempoDuracion}
         onInput={(e) => {
           const num = parseInt(e.target.value) || "";
-          setTiempoDuracion(num);       
+          setTiempoDuracion(num);   
         }
         }
         required
@@ -372,6 +445,7 @@ const ConsultaCitas = () => {
         </Button>
         <Button
           type = 'submit'
+          disabled={disabledBtnSubir}
         >
           Subir
         </Button>
@@ -379,6 +453,26 @@ const ConsultaCitas = () => {
     </Form>
     </Fieldset>
     }
+    <Modal show={ShowModalAvertencia}>
+    <div className="flex flex-col justify-center items-center">
+      { citasCanceladas===1 ? 
+      <h1 className="font-semibold">Si se ingresa una nueva parametrización se cancelará una cita!!!</h1>
+      :
+      <h1 className="font-semibold">Si se ingresa una nueva parametrización se cancelarán {citasCanceladas} citas!!!</h1>
+      }      
+      <h1 className="font-semibold">Asegúrese que sea necesario realizar el cambio</h1>
+      <ButtonBar>
+        <Button
+        onClick = {() => {
+        setShowModalAvertencia(false) 
+        } 
+        }
+        >
+          Cerrar
+        </Button>
+      </ButtonBar>
+    </div>
+    </Modal>
     </>
   );
 };

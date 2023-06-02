@@ -84,16 +84,12 @@ const HandleUser = () => {
             doc_type_id: selected?.doc_type_id,
             phone: selected?.phone,
             direccion: selected?.direccion,
-            fk_id_comercio: selected?.fk_id_comercio,
-            usuario_ultima_actualizacion:
-              selected?.usuario_ultima_actualizacion,
           }
         : {
             uuid: selected?.uuid,
             uname: selected?.uname,
             phone: selected?.phone,
             direccion: selected?.direccion,
-            fk_id_comercio: selected?.fk_id_comercio,
             active: selected?.active,
           };
       if (isCreate) {
@@ -104,6 +100,10 @@ const HandleUser = () => {
           .join(" ");
       }
       bodyData.usuario_ultima_actualizacion = pdpUser?.uuid;
+
+      if (selected?.fk_id_comercio) {
+        bodyData.fk_id_comercio = selected?.fk_id_comercio;
+      }
 
       notifyPending(
         isCreate ? createUser(bodyData) : updateUser({}, bodyData),
@@ -231,7 +231,7 @@ const HandleUser = () => {
         {isCreate ? "Crear" : "Actualizar"} usuario
       </h1>
       <Form onSubmit={onSubmit} grid>
-        <Fieldset legend={"Informacion basica"} className={"lg:col-span-2"}>
+        <Fieldset legend={"Información básica"} className={"lg:col-span-2"}>
           {!isCreate ? (
             <Fragment>
               <Input
@@ -257,6 +257,7 @@ const HandleUser = () => {
                 name="uname"
                 label={"Nombre de usuario"}
                 type="text"
+                maxLength={120}
                 autoComplete="off"
                 value={selected?.uname ?? ""}
                 title={selected?.uname || "Vacio"}
@@ -273,7 +274,9 @@ const HandleUser = () => {
                 name="doc_id"
                 label={"No. Documento"}
                 type="text"
-                value={`${selected?.doc_type?.nombre_corto ?? ""} ${selected?.doc_id ?? ""}`}
+                value={`${selected?.doc_type?.nombre_corto ?? ""} ${
+                  selected?.doc_id ?? ""
+                }`}
                 disabled
               />
             </Fragment>
@@ -284,6 +287,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Primer nombre"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
                 required
               />
@@ -292,6 +296,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Segundo nombre"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
               />
               <Input
@@ -299,6 +304,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Primer apellido"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
                 required
               />
@@ -307,6 +313,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Segundo apellido"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
               />
               <Select
@@ -336,14 +343,18 @@ const HandleUser = () => {
               <Input
                 id="check_doc_id"
                 name="doc_id"
-                label={"Numero de documento"}
+                label={"Número de documento"}
                 type="tel"
+                minLength={5}
+                maxLength={15}
                 autoComplete="off"
                 value={selected?.doc_id ?? ""}
                 onChange={(ev) =>
                   setSelected((old) => ({
                     ...old,
-                    doc_id: parseInt(ev.target.value) ?? "",
+                    doc_id: !isNaN(parseInt(ev.target.value))
+                      ? parseInt(ev.target.value)
+                      : "",
                   }))
                 }
                 required
@@ -353,6 +364,7 @@ const HandleUser = () => {
                 name="email"
                 label={"Email"}
                 type="email"
+                maxLength={80}
                 autoComplete="off"
                 value={selected?.email ?? ""}
                 title={selected?.email || "Vacio"}
@@ -369,8 +381,9 @@ const HandleUser = () => {
           <Input
             id="check_phone"
             name="phone"
-            label={"Telefono"}
+            label={"Teléfono"}
             type="tel"
+            maxLength={10}
             autoComplete="off"
             value={selected?.phone ?? ""}
             onChange={(ev) =>
@@ -427,7 +440,6 @@ const HandleUser = () => {
               },
               label: selected?.fk_id_comercio ? "Eliminar" : "Agregar",
             }}
-            required
           />
           {!isCreate && (
             <ToggleInput

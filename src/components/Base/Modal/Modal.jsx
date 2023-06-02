@@ -40,7 +40,7 @@ const Modal = ({
       </section>
     </div>
   ) : (
-    ""
+    <></>
   );
 };
 

@@ -115,11 +115,11 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
             type: "SET_ALL",
             value: (old) => ({
               ...old,
-              [ev.currentTarget.name]: ["pk_comercio"].includes(
-                ev.currentTarget.name
+              [ev.target.name]: ["pk_comercio"].includes(
+                ev.target.name
               )
                 ? onChangeNumber(ev)
-                : ev.currentTarget.value,
+                : ev.target.value,
               page: 1,
             }),
           })
@@ -130,6 +130,7 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
           name="pk_comercio"
           label={"Id comercio"}
           type="tel"
+          maxLength={10}
           autoComplete="off"
           defaultValue={searchFilters.pk_comercio}
         />
@@ -138,6 +139,7 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
           name="nombre_comercio"
           label={"Nombre comercio"}
           type="text"
+          maxLength={60}
           autoComplete="off"
           defaultValue={searchFilters.nombre_comercio}
         />

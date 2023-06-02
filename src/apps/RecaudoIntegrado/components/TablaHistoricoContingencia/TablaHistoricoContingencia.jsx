@@ -61,6 +61,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
     [fetchExcel]
   );
 
+
   useFetchDebounce(
     useMemo(() => {
       const tempMap = new Map(searchFilters);
@@ -134,17 +135,18 @@ const TablaHistoricoContingencia = ({ banco }) => {
       }
       onSelectRow={(_, i) =>
         downloadExcel({
+          pk_contingencia_recaudo_bancos:datosTablaContingencia[i].pk_contingencia_recaudo_bancos,
           nombre_banco: datosTablaContingencia[i].identificador_banco,
-          fecha_carga: datosTablaContingencia[i].fecha_carga_archivo,
-          total_registros: datosTablaContingencia[i].cantidad_registros,
-          registros_procesados: datosTablaContingencia[i].cantidad_trx_exitosas,
-          registros_fallidos: datosTablaContingencia[i].cantidad_trx_fallidas,
-          respuesta_trx_exitosas: JSON.stringify(
-            datosTablaContingencia[i].respuuestas_trx
-          ),
-          respuesta_trx_fallidas: JSON.stringify(
-            datosTablaContingencia[i].respuestas_trx_fallidas
-          ),
+          // fecha_carga: datosTablaContingencia[i].fecha_carga_archivo,
+          // total_registros: datosTablaContingencia[i].cantidad_registros,
+          // registros_procesados: datosTablaContingencia[i].cantidad_trx_exitosas,
+          // registros_fallidos: datosTablaContingencia[i].cantidad_trx_fallidas,
+          // respuesta_trx_exitosas: JSON.stringify(
+          //   datosTablaContingencia[i].respuuestas_trx
+          // ),
+          // respuesta_trx_fallidas: JSON.stringify(
+          //   datosTablaContingencia[i].respuestas_trx_fallidas
+          // ),
         })
       }
       onSetPageData={setPageData}

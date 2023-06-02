@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useMemo, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
@@ -33,7 +33,7 @@ const ConsultaCitas = () => {
   });
 
   
-  const { roleInfo } = useAuth();  
+  const { roleInfo, userPermissions } = useAuth();  
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [fecha, setFecha] = useState(dateFormatter.format(new Date()))
   const [tableCitas, setTableCitas] = useState([])
@@ -46,63 +46,75 @@ const ConsultaCitas = () => {
   const [dataCita, setDataCita] = useState("")
   const [horaCita, setHoraCita] = useState("")
   const [diaCita, setDiaCita] = useState("")
+  const [id_comercio, setId_comercio] = useState("")
 
   //////////////////////
+
+  const consultarCitas = useCallback(
+    (comercio,fecha) => {
+      if (fecha !== '' && (comercio !== undefined && comercio !== "")){
+        setIsLoading(true)
+        let fields ={
+          fecha : fecha,
+          id_comercio : comercio}
+        // const params = new URLSearchParams();
+        // Object.entries(fields).forEach(([key, value]) => {
+        // params.append(key, value);
+        // });
+        // const queries = params.toString();
+        fetchData(
+          UrlConsultaCitas,
+          "GET",
+          fields
+          )
+        .then((resp) => {
+        setIsLoading(false)
+        if (!resp?.status){
+            notifyError(resp?.msg)
+            // setDisabledBtnsContinuar(false)
+        }else{
+        // setShowFormulario(true)    
+        if (resp?.obj?.citas?.length > 0) {
+            setTableCitas(
+                resp?.obj?.citas?.map((row) => {
+                    let Hora = new Date(row?.hora_inicio)
+                    Hora.setHours(Hora.getHours() + 5);
+                    Hora = Intl.DateTimeFormat('es-US', {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }).format(Hora)
+                    return {
+                      Hora : Hora,
+                      Nombres : row?.nombre_cliente,
+                      Aprellidos : row?.apellido_cliente || "Libre",
+                      Documento : row?.documento_cliente
+                    };
+                })
+            );
+            // setMaxPages(resp?.obj?.max_pages);
+            console.log(resp?.obj?.citas)
+        }
+        else{
+            setTableCitas([])
+            // setMaxPages(1);
+            console.log("SIN DATAAAA")
+        }}
+        }).catch(() => {
+            setIsLoading(false)
+            notifyError("Error intente nuevamente")
+        }
+        );
+        }else{
+          setTableCitas([])
+        }
+    })
   
   useEffect(() => {
-    if (fecha !== '' && roleInfo.id_comercio !== undefined){
-    setIsLoading(true)
-    let fields ={
-      fecha : fecha,
-      id_comercio : roleInfo.id_comercio}
-    // const params = new URLSearchParams();
-    // Object.entries(fields).forEach(([key, value]) => {
-    // params.append(key, value);
-    // });
-    // const queries = params.toString();
-    fetchData(
-      UrlConsultaCitas,
-      "GET",
-      fields
-      )
-    .then((resp) => {
-    setIsLoading(false)
-    if (!resp?.status){
-        notifyError(resp?.msg)
-        // setDisabledBtnsContinuar(false)
-    }else{
-    // setShowFormulario(true)    
-    if (resp?.obj?.citas?.length > 0) {
-        setTableCitas(
-            resp?.obj?.citas?.map((row) => {
-                let Hora = new Date(row?.hora_inicio)
-                Hora.setHours(Hora.getHours() + 5);
-                Hora = Intl.DateTimeFormat('es-US', {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }).format(Hora)
-                return {
-                  Hora : Hora,
-                  Nombres : row?.nombre_cliente,
-                  Aprellidos : row?.apellido_cliente || "Libre",
-                  Documento : row?.documento_cliente
-                };
-            })
-        );
-        // setMaxPages(resp?.obj?.max_pages);
-        console.log(resp?.obj?.citas)
-    }
-    else{
-        setTableCitas([])
-        // setMaxPages(1);
-        console.log("SIN DATAAAA")
-    }}
-    }).catch(() => {
-        setIsLoading(false)
-        notifyError("Error intente nuevamente")
-    }
-    );
-    }
+    const comercio = userPermissions
+    .map(({ id_permission }) => id_permission)
+    .includes(63) ? id_comercio : roleInfo.id_comercio
+    consultarCitas(comercio,fecha)
+    
   }, [roleInfo, fecha,pageData, UrlConsultaCitas])
 
   const onSubmitCitas = (e) => {
@@ -206,7 +218,26 @@ const ConsultaCitas = () => {
           value={fecha}
           onInput={(e) => setFecha(e.target.value)}
         />
-            
+        {userPermissions
+          .map(({ id_permission }) => id_permission)
+          .includes(63) && (          
+          <Input
+            id="id_comercio"
+            name="id_comercio"
+            label="Id comercio"
+            type="tel"
+            value={id_comercio}
+            onInput={(e) => {
+              const num = parseInt(e.target.value) || "";
+              setId_comercio(num)
+            }}
+            onLazyInput={{
+              callback: (e) => consultarCitas(e.target.value, fecha),
+              timeOut: 500,
+            }
+            }
+          />
+        )} 
       </TableEnterprise>
       <Modal show={showModal}>
         
