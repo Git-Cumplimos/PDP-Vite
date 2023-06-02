@@ -285,6 +285,13 @@ const BloquearNum = lazy(() => import("../apps/API-SMS/Views/BloquearNum"));
 const iFoodAportes = lazy(() => import("../apps/Aportes-iFood/IFood"));
 
 /**
+ * Modulo Telefonia Movil
+ */
+const TelefoniaMovil = lazy(() =>
+  import("../apps/TelefoniaMovil/TelefoniaMovil")
+);
+
+/**
  * Modulo Recargas
  */
 const RecargasCelular = lazy(() =>
@@ -800,7 +807,17 @@ const allUrlsPrivateApps = [
   // },
 
   //Modulo Telefonia Movil
+<<<<<<< Updated upstream
   RoutesTelefoniaMovil,
+=======
+  {
+    link: "/telefonia-movil",
+    label: <AppIcons Logo={"RecargaCelular"} name="Telefonía móvil" />,
+    component: TelefoniaMovil,
+    permission: [1],
+    subRoutes: [...RoutesTelefoniaMovil],
+  },
+>>>>>>> Stashed changes
 
   //Modulo RecargasCelular
   {
