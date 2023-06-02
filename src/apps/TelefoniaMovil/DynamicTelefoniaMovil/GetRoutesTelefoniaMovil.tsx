@@ -107,14 +107,14 @@ const GetRoutesTelefoniaMovil = (params: paramsGetRoutesTelefoniaMovil[]) => {
         permission: [1], //los permisos son la combinacion de todos los modulos
         subRoutes: [],
       },
-      {
-        link: "/telefonia-movil/operador-pdp",
-        label: <AppIcons Logo={"RecargaCelular"} name="Operador Pdp" />,
-        component: () =>
-          WithTelefoniaMovil(operadoresPaquetes, OperarioPDPCargarPaquetes),
-        permission: [1], //los permisos son la combinacion de todos los modulos
-        subRoutes: [],
-      },
+      // {
+      //   link: "/telefonia-movil/operador-pdp",
+      //   label: <AppIcons Logo={"RecargaCelular"} name="Operador Pdp" />,
+      //   component: () =>
+      //     WithTelefoniaMovil(operadoresPaquetes, OperarioPDPCargarPaquetes),
+      //   permission: [1], //los permisos son la combinacion de todos los modulos
+      //   subRoutes: [],
+      // },
     ],
   };
 };

@@ -56,7 +56,7 @@ export const useBackendPaquetesMovistar = (
   });
 
   const PeticionGetPaquetes = async (
-    dataInputPromises: TypeInputDataGetPaquetes
+    dataInput: TypeInputDataGetPaquetes
   ): Promise<TypeOutputDataGetPaquetes> => {
     let fetchGetPaquetesResult;
     let response = {
@@ -67,13 +67,16 @@ export const useBackendPaquetesMovistar = (
     //SECUENCIA ---------------Paso 1-------------------------------
     try {
       setLoadingPeticion((old) => ({ ...old, getPaquetes: true }));
-      const tipo_comercio = dataInputPromises.roleInfo.tipo_comercio;
-
+      const tipo_comercio = dataInput.roleInfo.tipo_comercio;
+      const params = {
+        page: dataInput.moduleInfo.page,
+        limit: dataInput.moduleInfo.limit,
+      };
       fetchGetPaquetesResult = await fetchCustom(
         url_get_paquetes,
         "GET",
         `${name_operador} - consultar paquetes`,
-        {}
+        params
       );
 
       const data = fetchGetPaquetesResult?.obj?.result?.results;

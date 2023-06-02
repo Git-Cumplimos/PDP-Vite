@@ -28,7 +28,7 @@ type TypeInfTicket = { [key: string]: any } | null;
 
 //------ constantes generales--------
 const minValor = 1000;
-const maxValor = 100000;
+const maxValor = 100001;
 const dataRecargaInitial = {
   celular: "",
   valor_total_trx: 0,
@@ -167,32 +167,41 @@ const Recargas = ({
         }
       ></img>
       <Form onSubmit={onSubmitSummary} grid>
-        <Input
-          name="celular"
-          label="Número de celular"
-          type="tel"
-          autoComplete="off"
-          minLength={10}
-          maxLength={10}
-          value={dataRecarga.celular}
-          onChange={onCelChange}
-          required
-          info={""}
-          invalid={""}
-        />
-        <ButtonBar>{}</ButtonBar>
-        <MoneyInput
-          name="valor"
-          label="Valor a recargar"
-          autoComplete="off"
-          min={minValor}
-          max={maxValor}
-          minLength={"4"}
-          maxLength={"9"}
-          value={dataRecarga.valor_total_trx}
-          onInput={onMoneyChange}
-          required
-        />
+        <div className="col-span-2">
+          <div className=" grid grid-cols-4  grid-rows-4">
+            <div className="row-start-2 col-start-2 col-span-2">
+              <Input
+                className="col-span-2"
+                name="celular"
+                label="Número de celular"
+                type="tel"
+                autoComplete="off"
+                minLength={10}
+                maxLength={10}
+                value={dataRecarga.celular}
+                onChange={onCelChange}
+                required
+                info={""}
+                invalid={""}
+              />
+            </div>
+
+            <div className="row-start-4 col-start-2 col-span-2">
+              <MoneyInput
+                name="valor"
+                label="Valor a recargar"
+                autoComplete="off"
+                min={minValor}
+                max={maxValor}
+                minLength={"4"}
+                maxLength={"9"}
+                value={dataRecarga.valor_total_trx}
+                onInput={onMoneyChange}
+                required
+              />
+            </div>
+          </div>
+        </div>
         <ButtonBar className={"lg:col-span-2"}>
           <Button type={"submit"}>Realizar Recarga</Button>
         </ButtonBar>
