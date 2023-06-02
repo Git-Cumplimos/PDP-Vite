@@ -89,7 +89,7 @@ const HandleUser = () => {
             uuid: selected?.uuid,
             uname: selected?.uname,
             phone: selected?.phone,
-            direccion: selected?.direccion,            
+            direccion: selected?.direccion,
             active: selected?.active,
           };
       if (isCreate) {
@@ -100,7 +100,7 @@ const HandleUser = () => {
           .join(" ");
       }
       bodyData.usuario_ultima_actualizacion = pdpUser?.uuid;
-      
+
       if (selected?.fk_id_comercio) {
         bodyData.fk_id_comercio = selected?.fk_id_comercio;
       }
@@ -231,7 +231,7 @@ const HandleUser = () => {
         {isCreate ? "Crear" : "Actualizar"} usuario
       </h1>
       <Form onSubmit={onSubmit} grid>
-        <Fieldset legend={"Informacion basica"} className={"lg:col-span-2"}>
+        <Fieldset legend={"Información básica"} className={"lg:col-span-2"}>
           {!isCreate ? (
             <Fragment>
               <Input
@@ -274,7 +274,9 @@ const HandleUser = () => {
                 name="doc_id"
                 label={"No. Documento"}
                 type="text"
-                value={`${selected?.doc_type?.nombre_corto ?? ""} ${selected?.doc_id ?? ""}`}
+                value={`${selected?.doc_type?.nombre_corto ?? ""} ${
+                  selected?.doc_id ?? ""
+                }`}
                 disabled
               />
             </Fragment>
@@ -341,7 +343,7 @@ const HandleUser = () => {
               <Input
                 id="check_doc_id"
                 name="doc_id"
-                label={"Numero de documento"}
+                label={"Número de documento"}
                 type="tel"
                 minLength={5}
                 maxLength={15}
@@ -350,7 +352,9 @@ const HandleUser = () => {
                 onChange={(ev) =>
                   setSelected((old) => ({
                     ...old,
-                    doc_id: parseInt(ev.target.value) ?? "",
+                    doc_id: !isNaN(parseInt(ev.target.value))
+                      ? parseInt(ev.target.value)
+                      : "",
                   }))
                 }
                 required
@@ -377,7 +381,7 @@ const HandleUser = () => {
           <Input
             id="check_phone"
             name="phone"
-            label={"Telefono"}
+            label={"Teléfono"}
             type="tel"
             maxLength={10}
             autoComplete="off"
