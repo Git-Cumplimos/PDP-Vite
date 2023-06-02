@@ -257,6 +257,7 @@ const HandleUser = () => {
                 name="uname"
                 label={"Nombre de usuario"}
                 type="text"
+                maxLength={120}
                 autoComplete="off"
                 value={selected?.uname ?? ""}
                 title={selected?.uname || "Vacio"}
@@ -284,6 +285,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Primer nombre"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
                 required
               />
@@ -292,6 +294,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Segundo nombre"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
               />
               <Input
@@ -299,6 +302,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Primer apellido"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
                 required
               />
@@ -307,6 +311,7 @@ const HandleUser = () => {
                 name="u_name"
                 label={"Segundo apellido"}
                 type="text"
+                maxLength={30}
                 autoComplete="off"
               />
               <Select
@@ -338,6 +343,8 @@ const HandleUser = () => {
                 name="doc_id"
                 label={"Numero de documento"}
                 type="tel"
+                minLength={5}
+                maxLength={15}
                 autoComplete="off"
                 value={selected?.doc_id ?? ""}
                 onChange={(ev) =>
@@ -353,6 +360,7 @@ const HandleUser = () => {
                 name="email"
                 label={"Email"}
                 type="email"
+                maxLength={80}
                 autoComplete="off"
                 value={selected?.email ?? ""}
                 title={selected?.email || "Vacio"}
@@ -371,6 +379,7 @@ const HandleUser = () => {
             name="phone"
             label={"Telefono"}
             type="tel"
+            maxLength={10}
             autoComplete="off"
             value={selected?.phone ?? ""}
             onChange={(ev) =>
