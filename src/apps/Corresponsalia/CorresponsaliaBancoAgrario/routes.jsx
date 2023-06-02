@@ -12,6 +12,7 @@ const CorresponsaliaBancoAgrario = lazy(() =>
 );
 
 const PagarRunt = lazy(() => import("./Views/Runt/PagarRunt"));
+const PagoCartera = lazy(() => import("./Views/Runt/PagoCartera"));
 
 const TrxCuentasBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
@@ -128,6 +129,13 @@ const rutasAgrarioCB = {
       link: "/runt/pagar-runt",
       label: <AppIcons Logo={"RETIRO"} name={"Pagar RUNT"} />,
       component: PagarRunt,
+      permission: [...listPermissionsAgrario],
+      subRoutes: [],
+    },
+    {
+      link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera",
+      label: <AppIcons Logo={"MARKETPLACE"} name={"Consulta de cartera"} />,
+      component: PagoCartera,
       permission: [...listPermissionsAgrario],
       subRoutes: [],
     },
