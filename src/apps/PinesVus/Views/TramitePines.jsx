@@ -431,7 +431,7 @@ const TramitePines = () => {
             <div className="flex flex-col justify-center items-center mx-auto container">
               <Form onSubmit={onSubmitUsar}>
                 <ButtonBar>
-                  <Button type="submit">Usar pin</Button>
+                  {/* <Button type="submit">Usar pin</Button> */}
                   {selected.Estado==="Pin creado" ? 
                   <Button
                   onClick={() => {

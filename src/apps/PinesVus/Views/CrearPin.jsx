@@ -52,18 +52,21 @@ const CrearPin = () => {
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [showTramiteAdicional, setShowTramiteAdicional] = useState(false);
-  const [showPinLicencia, setShowPinLicencia,] = useState(false);
+  const [showPinLicencia, setShowPinLicencia,] = useState(true);
   const [txtButtonTramiteAdicional, settxtButtonTramiteAdicional] = useState("+ Agregar Segundo Trámite");
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
-  const [tipoPin, setTipoPin] = useState("");
+  const [tipoPin, setTipoPin] = useState(1);
   const [optionsTramites, setOptionsTramites] = useState([]);
   const [optionsTramites2, setOptionsTramites2] = useState([]);
-  const [tramite, setTramite] = useState("")
+  const [tramite, setTramite] = useState(7)
   const [tramite2, setTramite2] = useState("")
 
   const [nombre, setNombre] = useState("")
   const [apellidos, setApellidos] = useState("")
+  const [direccion, setDireccion] = useState("")
+  const [municipio, setMunicipio] = useState("")
+  const [departamento, setDepartamento] = useState("")
   const [fechaNacimiento, setFechaNacimiento] = useState("")
   const [celular, setCelular] = useState("")
   const [email, setEmail] = useState("")
@@ -96,7 +99,7 @@ const CrearPin = () => {
     { value: "5", label: "Pasaporte" },
     { value: "13", label: "PPT (Permiso por Protección Temporal)" },
   ];
-  const [tipoDocumento, setTipoDocumento] = useState("")
+  const [tipoDocumento, setTipoDocumento] = useState("1")
 
   const optionsGenero = [
     { value: "", label: "" },
@@ -189,7 +192,7 @@ const CrearPin = () => {
     { value: "C3", label: "C3-Vehículos articulados servicio público" },
   ];
 
-  const [categoria, setCategoria] = useState("")
+  const [categoria, setCategoria] = useState("B1")
   const [categoria2, setCategoria2] = useState("")
   const [foundEps, setFoundEps] = useState([])
   const [foundArl, setFoundArl] = useState([])
@@ -608,7 +611,7 @@ const CrearPin = () => {
       navigate(-1);
       setDocumento("");
       setRespPin("");
-      setTipoPin("");
+      setTipoPin(1);
       setIdPin("");
     }
     setShowModal(false);
@@ -679,9 +682,9 @@ const CrearPin = () => {
           setDescripcionTipDoc(optionsDocumento.filter(tip => tip.value === e.target.value)[0]['label'])
           setDisabledBtnsContinuar(false)
           setShowFormulario(false)
-          setTipoPin("")
-          setTramite("")
-          setCategoria("")
+          setTipoPin(1)
+          setTramite(7)
+          setCategoria("B1")
         }}
         required
       />  
@@ -699,12 +702,12 @@ const CrearPin = () => {
           setDocumento(num);
           setDisabledBtnsContinuar(false)
           setShowFormulario(false)
-          setTipoPin("")
-          setTramite("")
-          setCategoria("")
+          setTipoPin(1)
+          setTramite(7)
+          setCategoria("B1")
         }}
       />
-      <Select
+      {/* <Select
         id="olimpia"
         label="¿Ya inicio el proceso en Olimpia?"
         required
@@ -722,7 +725,7 @@ const CrearPin = () => {
           setTramite("")
           setCategoria("")
         }}
-      />
+      /> */}
       {/* {olimpia === "true" ? 
       <>
        <Input
@@ -749,8 +752,9 @@ const CrearPin = () => {
       </Form>
       {showFormulario? 
       <Form onSubmit={onSubmitModal} grid>
-      <Fieldset legend="Datos cliente" className="lg:col-span-2">
-        {/* <Input
+
+<Fieldset legend="Datos cliente" className="lg:col-span-2">
+        <Input
           id="nombre"
           label="Nombre"
           type="text"
@@ -765,8 +769,8 @@ const CrearPin = () => {
           }}
         />
         <Input
-          id="apellidos"
-          label="Apellidos"
+          id="apellido"
+          label="Apellido"
           type="text"
           minLength="1"
           maxLength="30"
@@ -778,7 +782,7 @@ const CrearPin = () => {
             setApellidos(text);
           }}
         />
-        <Input
+        {/* <Input
           id="dateInit"
           label="Fecha Nacimiento"
           type="date"
@@ -829,7 +833,7 @@ const CrearPin = () => {
             setEmail(text);
           }}
         />
-        <TextArea
+        {/* <TextArea
           id="motivo"
           label="Motivo compra"
           type="input"
@@ -841,7 +845,7 @@ const CrearPin = () => {
           onInput={(e) => {
             setMotivoCompra(e.target.value);
           }}
-        />
+        /> */}
         {/* <InputSuggestions
         id={"searchEps"}
         label={"Eps"}
@@ -875,8 +879,8 @@ const CrearPin = () => {
           callback: searchArl,
           timeOut: 500,
         }}
-        />
-        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> */}
+        />*/}
+        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> 
       </Fieldset>
       {/* <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select
@@ -959,15 +963,16 @@ const CrearPin = () => {
             : "" }
         </Fieldset>
       </Fieldset>      */}
+
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
       
         <Select
           className="place-self-stretch"
           id="tipoPin"
           label="Tipo Pin"
-          options={
+          options={                
             Object.fromEntries([    
-              ["",""],        
+               ["",""],        
               ...optionsTipoPines?.map(({ descripcion, id }) => {
                 return [descripcion, id];
               }),
@@ -983,19 +988,19 @@ const CrearPin = () => {
             consultaClientes(documento,olimpia,tipoDocumento,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
-                setShowPinLicencia(false)
-                setTipoPin("")
+                setShowPinLicencia(true)
+                setTipoPin(1)
                 setDisabledBtns(false)
                // console.log(resp)
               }else{               // console.log(resp)
-                if(e.target.value=="1"){
+                if(e.target.value==1){
                   setShowPinLicencia(true)
                   setShowTramiteAdicional(false)
                   setTramite2("")
                   setCategoria2("")
                   settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
-                  setTramite("")
-                  setCategoria("")
+                  setTramite(7)
+                  setCategoria("B1")
                   setDisabledBtns(false)
                 }else{
                 setShowPinLicencia(false)
@@ -1036,7 +1041,6 @@ const CrearPin = () => {
             settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
           }}
         />
-    
     {showPinLicencia ? 
       <>
 
