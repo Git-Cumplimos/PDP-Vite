@@ -52,7 +52,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
 
   const downloadExcel = useCallback(
     (data) => {
-      fetchExcel(`${urlBackend}/descargarexcel`, {
+      fetchExcel(`${urlBackend}/generarexcel`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
