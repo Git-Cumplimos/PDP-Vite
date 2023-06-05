@@ -5,6 +5,29 @@ import {
   ParamsError,
 } from "../../DynamicTelefoniaMovil/utils/utils";
 
+export const trxParamsError: ParamsError = {
+  errorFetchCustomCode: {
+    typeNotify: "notifyError",
+    ignoring: false,
+  },
+  errorFetchCustomApiGateway: {
+    typeNotify: "notifyError",
+    ignoring: false,
+  },
+  errorFetchCustomApiGatewayTimeout: {
+    typeNotify: undefined,
+    ignoring: true,
+  },
+  errorFetchCustomBackend: {
+    typeNotify: "notifyError",
+    ignoring: false,
+  },
+  errorFetchCustomBackendUser: {
+    typeNotify: "notify",
+    ignoring: true,
+  },
+};
+
 export const FuctionEvaluateResponseMovistar = (
   peticion_: any,
   name_: string,

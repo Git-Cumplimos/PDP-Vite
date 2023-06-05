@@ -18,8 +18,7 @@ const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SER
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
-const url_user =
-  "https://7i347am3a5.execute-api.us-east-2.amazonaws.com/v1/cognitovalidator";
+const url_user = process.env.REACT_APP_URL_COGNITO;
 
 const validateUser = async (email) => {
   const get = {

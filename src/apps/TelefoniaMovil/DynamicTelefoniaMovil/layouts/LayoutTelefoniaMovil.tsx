@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 
 import { PropOperadoresComponent } from "../utils/TypesUtils";
 import { useImgs } from "../../../../hooks/ImgsHooks";
@@ -27,10 +27,12 @@ const LayoutTelefoniaMovil = ({
   return (
     <div className={contenedorLayoutTelefoniaMovil}>
       {operadores.map((operadorInd) => (
-        <div className={contenedorImg}
-        onClick={() => {
-          setOperadorCurrent(operadorInd);
-        }}>
+        <div
+          className={contenedorImg}
+          onClick={() => {
+            setOperadorCurrent(operadorInd);
+          }}
+        >
           <nav className="relative">
             <ul>
               <li className={li_css}>
@@ -43,18 +45,8 @@ const LayoutTelefoniaMovil = ({
                       : svgs?.[operadorInd?.logo]
                   }
                   alt={operadorInd?.name}
-                  onClick={() => {
-                    setOperadorCurrent(operadorInd);
-                  }}
                 />
-                <h1
-                  className={operador}
-                  onClick={() => {
-                    setOperadorCurrent(operadorInd);
-                  }}
-                >
-                  {operadorInd.name}
-                </h1>
+                <h1 className={operador}>{operadorInd.name}</h1>
               </li>
             </ul>
           </nav>

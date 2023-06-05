@@ -7,7 +7,10 @@ import {
   defaultParamsError,
   fetchCustom,
 } from "../../DynamicTelefoniaMovil/utils/utils";
-import { FuctionEvaluateResponsePractisistemas } from "./utilsPractisistemas";
+import {
+  FuctionEvaluateResponsePractisistemas,
+  AcrominosPractisistemas,
+} from "./utilsPractisistemas";
 
 const urlRecargasCelular = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/recarga`;
 
@@ -69,7 +72,7 @@ export const useBackendRecargasPractisistemas = (
 
         datosRecargas: {
           celular: dataInputPromises.moduleInfo.celular,
-          operador: "recarga",
+          operador: AcrominosPractisistemas[name_operador]?.recarga,
           valor: dataInputPromises.moduleInfo.valor_total_trx,
           jsonAdicional: {
             nombre_usuario: dataInputPromises.pdpUser?.uname,
