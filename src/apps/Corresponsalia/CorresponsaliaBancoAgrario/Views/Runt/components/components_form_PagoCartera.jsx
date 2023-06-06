@@ -17,19 +17,12 @@ export const LecturaNumeroObligacion = ({
   procedimiento,
   numero_obligacion,
   numero_cedula,
-  numeroRunt,
+  numeroPagoCartera,
 }) => {
-  console.log("LLEGO ACA 1 loadingPeticion", loadingPeticion)
-  console.log("LLEGO ACA 1 onSubmit", onSubmit)
-  console.log("LLEGO ACA 1 handleClose", handleClose)
-  console.log("LLEGO ACA 1 procedimiento", procedimiento)
-  console.log("LLEGO ACA 1 numero_obligacion", numero_obligacion)
-  console.log("LLEGO ACA 1 numero_cedula", numero_cedula)
-  console.log("LLEGO ACA 1 numeroRunt", numeroRunt)
   return (
     <Fragment>
       <ButtonBar></ButtonBar>
-      <h2 className="text-1xl mt-6">Número de RUNT</h2>
+      <h2 className="text-1xl mt-6">{procedimiento}</h2>
       <ButtonBar></ButtonBar>
       {/* <Form > */}
 
@@ -40,7 +33,7 @@ export const LecturaNumeroObligacion = ({
           className={styleComponentsInput}
           type="text"
           autoComplete="off"
-          value={numeroRunt}
+          value={numeroPagoCartera}
           disabled={true}
         />
       )}
@@ -50,14 +43,14 @@ export const LecturaNumeroObligacion = ({
           className={styleComponentsInput}
           type="text"
           autoComplete="off"
-          value={numeroRunt}
+          value={numeroPagoCartera}
           maxLength={"18"}
           onChange={onChange}
         />
       )}
 
       <ButtonBar className="flex justify-center py-6">
-        <Button type={"submit"} onClick={onSubmit} disabled={numeroRunt === "" || numeroRunt === 0 ? !loadingPeticion : loadingPeticion}>
+        <Button type={"submit"} onClick={onSubmit} disabled={numeroPagoCartera === "" || numeroPagoCartera === 0 ? !loadingPeticion : loadingPeticion}>
           Consultar
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
@@ -77,19 +70,12 @@ export const LecturaNumeroCedula = ({
   procedimiento,
   numero_obligacion,
   numero_cedula,
-  numeroRunt,
-}) => {
-  console.log("LLEGO ACA 2 loadingPeticion", loadingPeticion)
-  console.log("LLEGO ACA 2 onSubmit", onSubmit)
-  console.log("LLEGO ACA 2 handleClose", handleClose)
-  console.log("LLEGO ACA 2 procedimiento", procedimiento)
-  console.log("LLEGO ACA 2 numero_obligacion", numero_obligacion)
-  console.log("LLEGO ACA 2 numero_cedula", numero_cedula)
-  console.log("LLEGO ACA 2 numeroRunt", numeroRunt)
+  numeroPagoCartera,
+}) => {  
   return (
     <Fragment>
       <ButtonBar></ButtonBar>
-      <h2 className="text-1xl mt-6">Número de RUNT</h2>
+      <h2 className="text-1xl mt-6">{procedimiento}</h2>
       <ButtonBar></ButtonBar>
       {/* <Form > */}
 
@@ -100,7 +86,7 @@ export const LecturaNumeroCedula = ({
           className={styleComponentsInput}
           type="text"
           autoComplete="off"
-          value={numeroRunt}
+          value={numeroPagoCartera}
           disabled={true}
         />
       )}
@@ -110,14 +96,14 @@ export const LecturaNumeroCedula = ({
           className={styleComponentsInput}
           type="text"
           autoComplete="off"
-          value={numeroRunt}
+          value={numeroPagoCartera}
           maxLength={"18"}
           onChange={onChange}
         />
       )}
 
       <ButtonBar className="flex justify-center py-6">
-        <Button type={"submit"} onClick={onSubmit} disabled={numeroRunt === "" || numeroRunt === 0 ? !loadingPeticion : loadingPeticion }>
+        <Button type={"submit"} onClick={onSubmit} disabled={numeroPagoCartera === "" || numeroPagoCartera === 0 ? !loadingPeticion : loadingPeticion }>
           Consultar
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>

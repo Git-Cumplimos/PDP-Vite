@@ -19,12 +19,13 @@ import classes from "./PagarRunt.module.css";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';
 import { useFetchRunt } from "../../hooks/hookRunt";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
 //Constantes Style
 const { styleComponents } = classes;
 
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
-const url_consult_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/consulta-runt`;
+const url_consult_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/consulta_pago_cartera`;
 const url_pagar_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/pago-runt`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
@@ -34,14 +35,15 @@ const options_select = [
     { value: numero_cedula, label: numero_cedula },
 ];
 
-const PagarRunt = () => {
+const PagoCartera = () => {
     const uniqueId = v4();
     const [paso, setPaso] = useState("LecturaNumeroObligacion");
-    const [numeroRunt, setNumeroRunt] = useState("");
+    const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
     const [procedimiento, setProcedimiento] = useState(numero_obligacion);
     const [showModal, setShowModal] = useState(false);
     const [resConsultRunt, setResConsultRunt] = useState({});
     const [infTicket, setInfTicket] = useState(null);
+    const [datosTrans, setDatosTrans] = useState(0);
     const printDiv = useRef();
     const buttonDelate = useRef(null);
     const validNavigate = useNavigate();
@@ -54,8 +56,8 @@ const PagarRunt = () => {
     const [loadingPeticionBarcode, peticionBarcode] = useFetch(
         fetchCustom(url_get_barcode, "POST", "Leer código de barras")
     );
-    const [loadingPeticionConsultRunt, peticionConsultRunt] = useFetch(
-        fetchCustom(url_consult_runt, "POST", "Consultar runt")
+    const [loadingPeticionConsultPagoCartera, peticionConsultRunt] = useFetch(
+        fetchCustom(url_consult_pago_cartera, "POST", "Consultar Pago Cartera")
     );
 
     const CallErrorPeticion = useCallback((error) => {
@@ -75,21 +77,21 @@ const PagarRunt = () => {
                     break;
             }
         } else {
-            if (error.message === "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagarRunt) [0010002]") {
+            if (error.message === "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagoCartera) [0010002]") {
             } else {
 
                 notifyError(msg);
             }
         }
         setPaso("LecturaNumeroObligacion");
-        setNumeroRunt("");
+        setNumeroPagoCartera("");
         setResConsultRunt(null);
         setShowModal(false);
         setProcedimiento(numero_obligacion);
     }, []);
 
     const onChangeNumeroRunt = useCallback((e) => {
-        setNumeroRunt(e.target.value);
+        setNumeroPagoCartera(e.target.value);
     }, []);
 
     const onChangeSelect = useCallback((e) => {
@@ -100,7 +102,7 @@ const PagarRunt = () => {
             setPaso("LecturaNumeroCedula");
             setProcedimiento(numero_cedula);
         }
-        setNumeroRunt("");
+        setNumeroPagoCartera("");
     }, []);
 
     const onSubmitBarcode = useCallback(
@@ -115,7 +117,7 @@ const PagarRunt = () => {
             peticionBarcode({}, data)
                 .then((response) => {
                     if (response?.status === true) {
-                        setNumeroRunt(response?.obj?.result?.numero_runt);
+                        setNumeroPagoCartera(response?.obj?.result?.numero_runt);
                         notify(response?.msg);
                         setPaso("LecturaNumeroCedula");
                     }
@@ -128,16 +130,30 @@ const PagarRunt = () => {
         [peticionBarcode, CallErrorPeticion]
     );
 
-    const onSubmitConsultRunt = (e) => {
+    const onSubmitConsultPagoCartera = (e) => {
         e.preventDefault();
         const data = {
+            oficina_propia:
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+                    roleInfo?.tipo_comercio === "KIOSCO"
+                    ? true
+                    : false,
+            valor_total_trx: datosTrans !== "" ? datosTrans : 0,
+            nombre_comercio: roleInfo?.["nombre comercio"],
+            nombre_usuario: pdpUser?.uname ?? "",
             comercio: {
                 id_comercio: roleInfo.id_comercio,
                 id_terminal: roleInfo.id_dispositivo,
                 id_usuario: roleInfo.id_usuario,
             },
-            nombre_usuario: pdpUser["uname"],
-            numero_runt: numeroRunt,
+            consultaCartera: {
+                valReferencia1: numeroPagoCartera,
+                location: {
+                    address: roleInfo?.["direccion"],
+                    dane_code: roleInfo?.codigo_dane,
+                    city: roleInfo?.["ciudad"],
+                },
+            },
         };
         peticionConsultRunt({}, data)
             .then((response) => {
@@ -169,7 +185,7 @@ const PagarRunt = () => {
                         : false,
                 nombre_usuario: pdpUser["uname"],
                 nombre_comercio: roleInfo?.["nombre comercio"],
-                numero_runt: numeroRunt,
+                numero_runt: numeroPagoCartera,
                 id_trx_original: resConsultRunt.id_trx,
                 valor_mt: resConsultRunt.valor_mt,
                 valor_runt: resConsultRunt.valor_runt,
@@ -203,7 +219,7 @@ const PagarRunt = () => {
                 });
         },
         [
-            numeroRunt,
+            numeroPagoCartera,
             pdpUser,
             roleInfo,
             peticionPayRunt,
@@ -221,7 +237,7 @@ const PagarRunt = () => {
         setPaso("LecturaNumeroObligacion");
         setShowModal(false);
         notify("Transacción cancelada");
-        setNumeroRunt("");
+        setNumeroPagoCartera("");
         setResConsultRunt(null);
         setProcedimiento(numero_obligacion);
     }, []);
@@ -229,7 +245,7 @@ const PagarRunt = () => {
     const HandleCloseTrxExitosa = useCallback(() => {
         setPaso("LecturaNumeroObligacion");
         setShowModal(false);
-        setNumeroRunt("");
+        setNumeroPagoCartera("");
         setResConsultRunt(null);
         setInfTicket(null);
         setProcedimiento(numero_obligacion);
@@ -239,7 +255,7 @@ const PagarRunt = () => {
     const HandleCloseModal = useCallback(() => {
         if (paso === "LecturaNumeroObligacion" && !loadingPeticionBarcode) {
             HandleCloseTrx();
-        } else if (paso === "LecturaNumeroCedula" && !loadingPeticionConsultRunt) {
+        } else if (paso === "LecturaNumeroCedula" && !loadingPeticionConsultPagoCartera) {
             HandleCloseTrx();
         } else if (paso === "ResumenTrx" && !loadingPeticionPayRunt) {
             HandleCloseTrx();
@@ -252,11 +268,12 @@ const PagarRunt = () => {
         HandleCloseTrxExitosa,
         loadingPeticionBarcode,
         loadingPeticionPayRunt,
-        loadingPeticionConsultRunt,
+        loadingPeticionConsultPagoCartera,
     ]);
 
     return (
         <Fragment>
+            <SimpleLoading show={loadingPeticionConsultPagoCartera}></SimpleLoading>
             <h1 className='text-3xl mt-6'>Pago de cartera en efectivo</h1>
             <Form>
                 <div className={styleComponents}>
@@ -267,7 +284,7 @@ const PagarRunt = () => {
                         onChange={onChangeSelect}
                         value={procedimiento}
                         disabled={
-                            loadingPeticionBarcode || loadingPeticionConsultRunt
+                            loadingPeticionBarcode || loadingPeticionConsultPagoCartera
                                 ? true
                                 : false
                         }
@@ -276,28 +293,28 @@ const PagarRunt = () => {
                 {/******************************Lectura runt*******************************************************/}
                 {paso === "LecturaNumeroObligacion" && (
                     <LecturaNumeroObligacion
-                        loadingPeticion={loadingPeticionConsultRunt}
-                        onSubmit={onSubmitConsultRunt}
+                        loadingPeticion={loadingPeticionConsultPagoCartera}
+                        onSubmit={onSubmitConsultPagoCartera}
                         handleClose={HandleCloseTrx}
                         onChange={onChangeNumeroRunt}
                         procedimiento={procedimiento}
                         numero_obligacion={numero_obligacion}
                         numero_cedula={numero_cedula}
-                        numeroRunt={numeroRunt}></LecturaNumeroObligacion>
+                        numeroPagoCartera={numeroPagoCartera}></LecturaNumeroObligacion>
                 )}
                 {/******************************Lectura runt*******************************************************/}
 
                 {/******************************Respuesta Lectura runt*******************************************************/}
                 {paso === "LecturaNumeroCedula" && (
                     <LecturaNumeroCedula
-                        loadingPeticion={loadingPeticionConsultRunt}
-                        onSubmit={onSubmitConsultRunt}
+                        loadingPeticion={loadingPeticionConsultPagoCartera}
+                        onSubmit={onSubmitConsultPagoCartera}
                         handleClose={HandleCloseTrx}
                         onChange={onChangeNumeroRunt}
                         procedimiento={procedimiento}
                         numero_obligacion={numero_obligacion}
                         numero_cedula={numero_cedula}
-                        numeroRunt={numeroRunt}></LecturaNumeroCedula>
+                        numeroPagoCartera={numeroPagoCartera}></LecturaNumeroCedula>
                 )}
                 {/******************************Respuesta Lectura runt*******************************************************/}
             </Form>
@@ -329,4 +346,4 @@ const PagarRunt = () => {
     );
 };
 
-export default PagarRunt;
+export default PagoCartera;
