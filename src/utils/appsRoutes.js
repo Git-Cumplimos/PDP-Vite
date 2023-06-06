@@ -29,6 +29,11 @@ import {
 import { rutasPinesVus } from "../apps/PinesVus/routes";
 import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
 
+
+import rutasPinesCrc, {
+  listPermissionsPinesCrc,
+} from "../apps/PinesCrc/routes";
+
 /**
  * * Providers
  */
@@ -156,6 +161,7 @@ const DesembolsoFDLM = lazy(() =>
  * Pines Vus
  */
 const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
+const PinesCrc = lazy(() => import("../apps/PinesCrc/Views/Pines/VentaPines"));
 
 /**
  * IAM
@@ -564,9 +570,10 @@ const allUrlsPrivateApps = [
       enumPermisosPinesVus.administrarPinesVus,
       enumPermisosPinesVus.operarPinesVus,
       enumPermisosPractisistemas.practisistemasPines,
+      ...listPermissionsPinesCrc,
     ],
     provider: ProvidepinesVus,
-    subRoutes: [rutasPines, rutasPinesVus],
+    subRoutes: [rutasPines, rutasPinesVus, rutasPinesCrc],
   },
   {
     link: "/recaudo",
