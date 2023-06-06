@@ -49,7 +49,7 @@ export const rutasPines = {
   link: "/Pines/PinesContenido",
   label: (
     <AppIcons
-      Logo={"ServicioContenidoPines"}
+      Logo={"PINES_SERVICIO_CONTENIDO"}
       name="Pines Servicio y Contenido"
     />
   ),
@@ -79,7 +79,7 @@ export const rutasSoat = {
   subRoutes: [
     {
       link: "/ventaSeguros/ventaSoat",
-      label: <AppIcons Logo={"RECAUDO"} name={"Venta Soat"} />,
+      label: <AppIcons Logo={"VENTA_SEGUROS_SOAT"} name={"Venta Soat"} />,
       component: FormularioVentaSoat,
       permission: [enumPermisosPractisistemas.practisistemasSoat],
     },
