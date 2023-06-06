@@ -5,22 +5,12 @@ import { PermissionsColpatria } from "./permissions";
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
 /** Rutas */
-const ColpatriaTrx = lazy(() => import("./ColpatriaTrx"));
-const Deposito = lazy(() => import("./Views/Deposito"));
+const PinesCrcTrx = lazy(() => import("./PinesCrcTrx"));
+
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
-const PagoGiro = lazy(() => import("./Views/PagoGiro"));
-const PinDePago = lazy(() => import("./Views/PinDePago"));
 
-const ConsultaManual = lazy(() => import("./Views/Recaudo/ConsultaManual"));
-const ConsultaBarras = lazy(() => import("./Views/Recaudo/ConsultaBarras"));
-const TrxRecaudo = lazy(() => import("./Views/Recaudo/TrxRecaudo"));
-
-const AdminColpatria = lazy(() => import("./Views/Admin"));
-const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
-const ConveniosPines = lazy(() => import("./Views/Admin/ConveniosPines"));
-const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 
 
@@ -38,26 +28,26 @@ const rutasPinesCrc = {
       name={"Pines CRC"}
     />
   ),
-  component: ColpatriaTrx,
+  component: PinesCrcTrx,
   permission: listPermissionsPinesCrc,
   subRoutes: [
 
 
     {
-      link: "/corresponsalia/colpatria/pines",
+      link: "/Pines/PinesCrc/pines",
       label: (
         <AppIcons
           Logo={"VentaPinRecaudoColpatria"}
-          name={"Venta de Pines de Recaudo"}
+          name={"Venta de Pines CRC"}
         />
       ),
       component: PinesConsulta,
       permission: [PermissionsColpatria.venta_pines],
       subRoutes: [
         {
-          link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
+          link: "/Pines/PinesCrc/pines/:id_convenio_pin",
           label: (
-            <AppIcons Logo={"CrearPines"} name={"Venta de Pines de Recaudo"} />
+            <AppIcons Logo={"CrearPines"} name={"Venta de Pines CRC"} />
           ),
           component: PinesVenta,
           permission: [PermissionsColpatria.venta_pines],
