@@ -8,6 +8,8 @@ import { notify, notifyError } from "../../../../utils/notify";
 import {
   postConsultaEstadoRecaudoMultiple,
   reporteTransaccionesRecaudoMultiple,
+  postConsultaReferencia,
+  postDescargarTickets,
 } from "../utils/fetchRecaudoMultiple";
 
 const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
@@ -18,12 +20,27 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
     finalizo: false,
     exist: false,
   });
+  const [consultaTrxContadas, setConsultaTrxContadas] = useState({
+    conteoTrx: false,
+    flatTrxContadas: [],
+    valor: 0,
+  });
   const [intervalId, setIntervalId] = useState(null);
+  const [consultaReferencia, setConsultaReferencia] = useState([]);
+
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   useEffect(() => {
     if (uuid && uuid !== "") {
       firstFecthEstadoRecaudoMultiple();
+      fetchConsultaReferencia();
       const intervalId = setInterval(() => {
         fecthEstadoRecaudoMultiple();
+        fetchConsultaReferencia();
       }, 15000);
       setIntervalId(intervalId);
       return () => clearInterval(intervalId);
@@ -53,6 +70,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.ciudad,
       },
+      flat_trx: consultaTrxContadas.conteoTrx ?? false,
     };
     postConsultaEstadoRecaudoMultiple(obj)
       .then((res) => {
@@ -65,6 +83,27 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
           finalizo: res.obj?.finalizo ?? false,
           exist: true,
         });
+        consultaTrxContadas.flatTrxContadas[1] = res.obj?.transacciones_contadas;
+        if (consultaTrxContadas.flatTrxContadas[0] === consultaTrxContadas.flatTrxContadas[1]){
+          setConsultaTrxContadas((old)=>({...old,flatTrxContadas:[]}));
+          consultaTrxContadas.flatTrxContadas[0] = res.obj?.transacciones_contadas;
+          consultaTrxContadas.valor++;
+          if (consultaTrxContadas.valor >= 3) {
+            setConsultaTrxContadas((old)=>({...old,conteoTrx:true}));
+            setConsultaRecaudo((old)=>({...old,finalizo:true}));
+          }
+        }
+        else {
+          setConsultaTrxContadas((old)=>({...old,flatTrxContadas:[], valor:0}));
+          consultaTrxContadas.flatTrxContadas[0] = res.obj?.transacciones_contadas;
+        }
+        if (res.obj?.finalizo === true){
+          setConsultaTrxContadas({
+            conteoTrx: false,
+            flatTrxContadas: [],
+            valor: 0,
+          });
+        }
         notify(res?.msg);
       })
       .catch((err) => {
@@ -93,6 +132,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.ciudad,
       },
+      flat_trx: consultaTrxContadas.conteoTrx ?? false,
     };
     postConsultaEstadoRecaudoMultiple(obj)
       .then((res) => {
@@ -106,6 +146,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
           finalizo: res.obj?.finalizo ?? false,
           exist: true,
         });
+        consultaTrxContadas.flatTrxContadas[0]= res.obj?.transacciones_contadas;
         setEstadoTrx(false);
         notify(res?.msg);
       })
@@ -115,6 +156,26 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         console.error(err);
       });
   };
+  
+  const fetchConsultaReferencia = () => {
+    let obj = {
+      uuid
+    };
+    postConsultaReferencia(obj)
+      .then((res) => {
+        console.log(res)
+        if (!res?.status) {
+          return notifyError(res?.msg);
+        }
+        setConsultaReferencia(res?.obj?.data ?? []);
+      })
+      .catch((err) => {
+        notifyError("Error de conexion con el servicio");
+        setEstadoTrx(false);
+        console.error(err);
+      });
+  };
+
   const fecthArchivoEstadoRecaudoMultiple = () => {
     setEstadoTrx(true);
     let obj = {
@@ -154,6 +215,31 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         console.error(err);
       });
   };
+
+  const fecthDescargarTickets = () => {
+    setEstadoTrx(true);
+    let obj = {
+      uuid,
+    };
+    postDescargarTickets(obj)
+      .then((res) => {
+        console.log(res)
+        if (res?.status) {
+          notify(res?.msg);
+          window.open(res?.obj?.data);
+          setEstadoTrx(false);
+        } else {
+          notifyError(res?.msg);
+          setEstadoTrx(false);
+        }
+      })
+      .catch((err) => {
+        notifyError("Error de conexion con el servicio");
+        setEstadoTrx(false);
+        console.error(err);
+      });
+  };
+  
   return (
     <>
       <SimpleLoading show={estadoTrx} />
@@ -179,10 +265,40 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
             <h1 className='text-xl text-center mb-10 mt-5'>
               {`Cantidad de transacciones realizadas: ${consultaRecaudo?.transacciones_contadas}`}
             </h1>
+            {!consultaRecaudo?.finalizo && consultaReferencia.length > 0? 
+              (
+                <Fieldset legend='Transacciones en proceso'>
+                  <table style={{ border: '1px solid black' }} >
+                  <thead>
+                    <tr style={{ border: '1px solid black' }}>
+                      <th>Número Referencia</th>
+                      <th>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consultaReferencia.map((subArray, index) => (
+                      <tr key={index} >
+                        {subArray.map((element, subIndex) => (
+                          <td key={subIndex}>{subIndex === 1 ? formatMoney.format(element) : element}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </Fieldset>
+              ) : 
+              (<></>)}
             {consultaRecaudo?.transacciones_contadas > 0 && (
               <ButtonBar>
                 <Button onClick={fecthArchivoEstadoRecaudoMultiple}>
                   Descargar extracto de transacciones
+                </Button>
+              </ButtonBar>
+            )}
+            {consultaRecaudo?.transacciones_contadas === consultaRecaudo?.total_transacciones && (
+              <ButtonBar>
+                <Button onClick={fecthDescargarTickets}>
+                  Descargar ticket de transacciones
                 </Button>
               </ButtonBar>
             )}
