@@ -7,7 +7,7 @@ const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
  */
 const Panel = lazy(() => import("./Panel"));
 const ReporteTrx = lazy(() => import("./ReporteTrx"));
-const CierreCaja = lazy(() => import("./CierreCaja"));
+const CierreCaja = lazy(() => import("./CierreCaja/CierreCaja"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
 const Notas = lazy(() => import("./Notas/Notas"));
