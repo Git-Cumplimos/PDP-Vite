@@ -139,6 +139,12 @@ const TablaTransacciones = ({ banco }) => {
         name="id_comercio"
         type="tel"
       />
+      <Input
+        id="id_transacción"
+        label="Id transacción"
+        name="id_trx"
+        type="tel"
+      />
       <Select
         className="place-self-stretch"
         label="Tipo operación"
