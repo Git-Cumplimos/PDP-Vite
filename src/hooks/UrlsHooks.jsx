@@ -23,7 +23,10 @@ const getAllRoutes = (urls,link_padre = null) => {
 
   for (const url of urls) {
     const { subRoutes, provider } = url;
-    if (link_padre) url['link_padre']=link_padre
+
+    if (link_padre && url?.show === false) url['link_padre']= -1
+    else if (link_padre) url['link_padre'] = link_padre
+
     allUrls.push({ ...url });
     if (subRoutes) {
       for (const subUrl of getAllRoutes(subRoutes,url.link)) {
@@ -35,7 +38,7 @@ const getAllRoutes = (urls,link_padre = null) => {
       }
     }
   }
-
+  console.log(allUrls)
   return allUrls;
 };
 
