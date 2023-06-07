@@ -1,19 +1,20 @@
 import { Fragment, useState } from "react";
 
-import Accordion from "../../../../components/Base/Accordion";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Error404 from "../../../Error404";
-import Form from "../../../../components/Base/Form";
-import Input from "../../../../components/Base/Input";
-import Select from "../../../../components/Base/Select";
+import Accordion from "../../../../../components/Base/Accordion";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Error404 from "../../../../Error404";
+import Form from "../../../../../components/Base/Form";
+import Input from "../../../../../components/Base/Input";
+import Select from "../../../../../components/Base/Select";
 
-import { buscarListaComerciosCierreCaja, buscarReporteCierreCaja } from "../../utils/fetchCaja";
-import { makeMoneyFormatter } from "../../../../utils/functions";
-import { notifyError } from "../../../../utils/notify";
-import { useAuth } from "../../../../hooks/AuthHooks";
+import { buscarListaComerciosCierreCaja, buscarReporteCierreCaja } from "../../../utils/fetchCaja";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
+import { notifyError } from "../../../../../utils/notify";
+import { useAuth } from "../../../../../hooks/AuthHooks";
 
-import "./CierreCaja.css";
+import "./CierreCaja.style.css";
+import * as CierreCajaCons from "./CierreCaja.cons";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -57,10 +58,10 @@ const TreeView = ({ tree = {}, child }) =>
       cols = [
         "",
         info.nombre,
-        valoresCalculadosGrupos(info.autorizadores,"transaccionesExitosas"),
-        valoresCalculadosGrupos(info.autorizadores,"transaccionesFallidas"), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"monto")), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,"comisiones"))
+        valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_SUCCESS),
+        valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_FAILURE), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_AMOUNT)), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_COMMISSION))
       ];
       if (info?.autorizadores) {
         return (
@@ -87,22 +88,22 @@ const TreeView = ({ tree = {}, child }) =>
       if (gruposTransaccion.length > 0) {
         gruposTransaccion.map((autorizadores) => {
           if (autorizadores.autorizadores.length > 0) {
-            if (valor === "transaccionesExitosas") {
+            if (valor === CierreCajaCons.TAG_TRX_SUCCESS) {
               autorizadores.autorizadores.map((autorizador) => {
                 valorCalculado += Number(autorizador.transaccionesExitosas);
               })
             }
-            if (valor === "transaccionesFallidas") {
+            if (valor === CierreCajaCons.TAG_TRX_FAILURE) {
               autorizadores.autorizadores.map((autorizador) => {
                 valorCalculado += Number(autorizador.transaccionesFallidas);
               })
             }
-            if (valor === "monto") {
+            if (valor === CierreCajaCons.TAG_AMOUNT) {
               autorizadores.autorizadores.map((autorizador) => {
                 valorCalculado += Number(autorizador.monto);
               })
             }
-            if (valor === "comisiones") {
+            if (valor === CierreCajaCons.TAG_COMMISSION) {
               autorizadores.autorizadores.map((autorizador) => {
                 valorCalculado += Number(autorizador.comisiones);
               })
@@ -118,22 +119,22 @@ const TreeView = ({ tree = {}, child }) =>
     var valorCalculado = 0
     if (autorizadores !== null && autorizadores !== undefined) {
       if (autorizadores.length > 0) {
-        if (valor === "transaccionesExitosas") {
+        if (valor === CierreCajaCons.TAG_TRX_SUCCESS) {
           autorizadores.map((autorizador) => {
             valorCalculado += Number(autorizador.transaccionesExitosas);
           })
         }
-        if (valor === "transaccionesFallidas") {
+        if (valor === CierreCajaCons.TAG_TRX_FAILURE) {
           autorizadores.map((autorizador) => {
             valorCalculado += Number(autorizador.transaccionesFallidas);
           })
         }
-        if (valor === "monto") {
+        if (valor === CierreCajaCons.TAG_AMOUNT) {
           autorizadores.map((autorizador) => {
             valorCalculado += Number(autorizador.monto);
           })
         }
-        if (valor === "comisiones") {
+        if (valor === CierreCajaCons.TAG_COMMISSION) {
           autorizadores.map((autorizador) => {
             valorCalculado += Number(autorizador.comisiones);
           })
@@ -146,10 +147,10 @@ const TreeView = ({ tree = {}, child }) =>
 const headers = [
   "",
   "",
-  "Transacciones Exitosas",
-  "Transacciones Fallidas",
-  "Monto",
-  "Comisiones"
+  CierreCajaCons.HEADER_TRX_SUCCESS,
+  CierreCajaCons.HEADER_TRX_FAILURE,
+  CierreCajaCons.HEADER_AMOUNT,
+  CierreCajaCons.HEADER_COMMISSION
 ]
 
 const CierreCaja = () => {
@@ -183,19 +184,19 @@ const CierreCaja = () => {
                 setDataComercios(dataComerciosList);
               } else {
                 setDataComercios([]);
-                notifyError("No existen comercios");
+                notifyError(CierreCajaCons.MESSAGE_EMPTY_COMMERCE);
               }
             } else {
-              notifyError("No se encontraton comercios");
+              notifyError(CierreCajaCons.MESSAGE_EMPTY_COMMERCE);
             }
           } else {
-            notifyError("Hubo un error, vuelva a intentar");
+            notifyError(CierreCajaCons.MESSAGE_ERROR);
           }
         } else {
-          notifyError("Debe ingresar un comercio");
+          notifyError(CierreCajaCons.MESSAGE_NEED_COMMERCE);
         }
       } catch (error) {
-        notifyError("Hubo un error, vuelva a intentar");
+        notifyError(CierreCajaCons.MESSAGE_ERROR);
       }
       setLoadScreen(false);
     }
@@ -208,7 +209,7 @@ const CierreCaja = () => {
       try {
         if (fechas.fechaInicial !== "" && fechas.fechaFinal !== "" && comercioId !== "") {
           if (new Date(fechas.fechaFinal) < new Date(fechas.fechaInicial) && new Date(fechas.fechaFinal) <= new Date(fechaActual) && new Date(fechas.fechaInicial) <= new Date(fechaActual)) {
-            notifyError("La fecha final debe ser mayor a la inicial");
+            notifyError(CierreCajaCons.MESSAGE_INCONSISTENT_DATE);
           } else {
             const body = {
               idComercio: Number(comercioId),
@@ -226,20 +227,20 @@ const CierreCaja = () => {
                   setDataCapitalizar({});
                   setDataInicioDia({});
                   setDataTransacciones([]);
-                  notifyError("No se encontraron registros en el rango de fecha");
+                  notifyError(CierreCajaCons.MESSAGE_EMPY_DATA_PER_DATE);
                 }
               } else {
-                notifyError("No se encontraton transacciones");
+                notifyError(CierreCajaCons.MESSAGE_EMPTY_TRX);
               }
             } else {
-              notifyError("Hubo un error, vuelva a intentar");
+              notifyError(CierreCajaCons.MESSAGE_ERROR);
             }
           }
         } else {
-          notifyError("Debe llenar los campos");
+          notifyError(CierreCajaCons.MESSAGE_EMPY_FIELDS);
         }
       } catch (error) {
-        notifyError("Hubo un error, vuelva a intentar");
+        notifyError(CierreCajaCons.MESSAGE_ERROR);
       }
       setLoadScreen(false);
     }
@@ -249,10 +250,10 @@ const CierreCaja = () => {
         { loadScreen &&
           <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
             <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4" />
-            <h2 className="text-center text-white text-xl font-semibold">{"Cargando"}</h2>
+            <h2 className="text-center text-white text-xl font-semibold">{CierreCajaCons.LABEL_LOADING}</h2>
           </div>
         }
-        <h1 className="text-3xl mt-6">Cierre de caja</h1>
+        <h1 className="text-3xl mt-6">{CierreCajaCons.LABEL_TITLE_MODULE}</h1>
         <div className="containerCommerce">
           { !roleInfo.id_comercio &&
             <>
@@ -260,11 +261,11 @@ const CierreCaja = () => {
                 <div className="commerceSelected">
                   <Input
                     autoComplete="off"
-                    id="id_comercio"
-                    label={"Buscar Comercio"}
+                    id={CierreCajaCons.TAG_FIND_COMMERCE}
+                    label={CierreCajaCons.LABEL_FIND_COMMERCE}
                     maxLength="25"
                     minLength="1"
-                    name="id_comercio"
+                    name={CierreCajaCons.TAG_FIND_COMMERCE}
                     onInput={(e) => {
                       setComercioSeleccionado(e.target.value);
                     }}
@@ -280,7 +281,7 @@ const CierreCaja = () => {
                     type="submit"
                   >
                     <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
+                      xmlns={CierreCajaCons.UTIL_XMLNS}
                       x="0px" 
                       y="0px" 
                       width="25" 
@@ -288,7 +289,7 @@ const CierreCaja = () => {
                       viewBox="0 0 50 50"
                     >
                       <path 
-                        d="M 21 3 C 11.621094 3 4 10.621094 4 20 C 4 29.378906 11.621094 37 21 37 C 24.710938 37 28.140625 35.804688 30.9375 33.78125 L 44.09375 46.90625 L 46.90625 44.09375 L 33.90625 31.0625 C 36.460938 28.085938 38 24.222656 38 20 C 38 10.621094 30.378906 3 21 3 Z M 21 5 C 29.296875 5 36 11.703125 36 20 C 36 28.296875 29.296875 35 21 35 C 12.703125 35 6 28.296875 6 20 C 6 11.703125 12.703125 5 21 5 Z" />
+                        d={CierreCajaCons.UTIL_D_PATH} />
                     </svg>
                   </button>
                 </div>
@@ -297,7 +298,7 @@ const CierreCaja = () => {
                 <div>
                   <Select
                     id="typeNumbers"
-                    label={"Comercio"}
+                    label={CierreCajaCons.LABEL_COMMERCE}
                     onChange={(e) => {
                       setComercio(e.target.value);
                     }}
@@ -314,9 +315,9 @@ const CierreCaja = () => {
         <Form grid className="my-5">
           <Input
             autoComplete="off"
-            id="fechaInicial"
-            label={"Fecha inicio"}
-            name="fechaInicial"
+            id={CierreCajaCons.TAG_INITIAL_DATE}
+            label={CierreCajaCons.LABEL_INITIAL_DATE}
+            name={CierreCajaCons.TAG_INITIAL_DATE}
             onChange={(e) => {
               setFechas((last) => {
                 return { ...last, fechaInicial: e.target.value };
@@ -324,13 +325,13 @@ const CierreCaja = () => {
             }}
             required
             type="date"
-            value={fechas?.["fechaInicial"]}
+            value={fechas?.[CierreCajaCons.TAG_INITIAL_DATE]}
           />
           <Input
             autoComplete="off"
-            id="fechaFinal"
-            label={"Fecha fin"}
-            name="fechaFinal"
+            id={CierreCajaCons.TAG_FINAL_DATE}
+            label={CierreCajaCons.LABEL_FINAL_DATE}
+            name={CierreCajaCons.TAG_FINAL_DATE}
             onChange={(e) => {
               setFechas((last) => {
                 return { ...last, fechaFinal: e.target.value };
@@ -338,7 +339,7 @@ const CierreCaja = () => {
             }}
             required
             type="date"
-            value={fechas?.["fechaFinal"]}
+            value={fechas?.[CierreCajaCons.TAG_FINAL_DATE]}
           />
         </Form>
         <ButtonBar>
@@ -346,7 +347,7 @@ const CierreCaja = () => {
             onClick={() => getData()}
             type="submit"
           >
-            Generar reporte
+            {CierreCajaCons.LABEL_BUTTON_GENERATE_REPORT}
           </Button>
         </ButtonBar>
         { dataTransacciones.length > 0 &&
@@ -366,7 +367,7 @@ const CierreCaja = () => {
                     dataInicioDia.nombre, 
                     "",
                     "",
-                    formatMoney.format(dataInicioDia.monto), 
+                    dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? (formatMoney.format(dataInicioDia.monto)) : (formatMoney.format(dataInicioDia.monto).toString().replace("$","")), 
                     formatMoney.format(dataInicioDia.comisiones)
                   ]}
                 />
@@ -396,10 +397,15 @@ const CierreCaja = () => {
                   cols={[
                     "", 
                     "Calculado", 
-                    valoresCalculadosTotales(dataTransacciones,"transaccionesExitosas")+dataCapitalizar.transaccionesExitosas,
-                    valoresCalculadosTotales(dataTransacciones,"transaccionesFallidas")+dataCapitalizar.transaccionesFallidas,
-                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"monto")+dataInicioDia.monto+dataCapitalizar.monto), 
-                    formatMoney.format(valoresCalculadosTotales(dataTransacciones,"comisiones")+dataInicioDia.comisiones+dataCapitalizar.comisiones)
+                    valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas,
+                    valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas,
+                    dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? 
+                      (
+                        formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto))
+                      ) : (
+                        formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto))
+                      ),
+                    formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_COMMISSION))+Number(dataInicioDia.comisiones)+Number(dataCapitalizar.comisiones))
                   ]}
                 />
               }
