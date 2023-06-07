@@ -38,7 +38,7 @@ export const useBackendPaquetesPractisistemas = (
   });
 
   const PeticionGetPaquetes = async (
-    dataInputPromises: TypeInputDataGetPaquetes
+    dataInput: TypeInputDataGetPaquetes
   ): Promise<TypeOutputDataGetPaquetes> => {
     setLoadingPeticion((old) => ({ ...old, getPaquetes: true }));
     let response: any = {
@@ -53,9 +53,9 @@ export const useBackendPaquetesPractisistemas = (
       let results: any[] = [];
       for (let i = 0; i < nameProductosOperador.length; i++) {
         const body = {
-          idcomercio: dataInputPromises.roleInfo.id_comercio,
-          limit: 20,
-          page: 10,
+          idcomercio: dataInput.roleInfo.id_comercio,
+          limit: dataInput.moduleInfo.limit,
+          page: dataInput.moduleInfo.page,
           producto: nameProductosOperador[i],
         };
         const fetchCustomResult = await fetchCustom(

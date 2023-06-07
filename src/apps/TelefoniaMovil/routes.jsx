@@ -15,7 +15,7 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 export default GetRoutesTelefoniaMovil([
   {
     name: "movistar",
-    logo: "TELEFONIAMOVIL_MOVISTAR",
+    logo: "TELEFONIA_MOVIL_MOVISTAR",
     subModules: {
       recargas: {
         backend: useBackendRecargasMovistar,
@@ -36,7 +36,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "claro",
-    logo: "TELEFONIAMOVIL_CLARO",
+    logo: "TELEFONIA_MOVIL_CLARO",
     subModules: {
       recargas: {
         backend: useBackendRecargasClaro,
@@ -57,7 +57,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Tigo",
-    logo: "TELEFONIAMOVIL_TIGO",
+    logo: "TELEFONIA_MOVIL_TIGO",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -78,7 +78,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "WOM",
-    logo: "TELEFONIAMOVIL_WOM",
+    logo: "TELEFONIA_MOVIL_WOM",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -99,7 +99,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Uff",
-    logo: "TELEFONIAMOVIL_UFF",
+    logo: "TELEFONIA_MOVIL_UFF",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -117,7 +117,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Exito",
-    logo: "TELEFONIAMOVIL_EXITO",
+    logo: "TELEFONIA_MOVIL_EXITO",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -138,7 +138,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Virgin",
-    logo: "TELEFONIAMOVIL_VIRGIN",
+    logo: "TELEFONIA_MOVIL_VIRGIN",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -159,7 +159,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Direct TV",
-    logo: "TELEFONIAMOVIL_DIRECTV",
+    logo: "TELEFONIA_MOVIL_DIRECTV",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -177,7 +177,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Une",
-    logo: "TELEFONIAMOVIL_UNE",
+    logo: "TELEFONIA_MOVIL_UNE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -195,7 +195,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Avantel",
-    logo: "TELEFONIAMOVIL_AVANTEL",
+    logo: "TELEFONIA_MOVIL_AVANTEL",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -216,7 +216,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Etb",
-    logo: "TELEFONIAMOVIL_ETB",
+    logo: "TELEFONIA_MOVIL_ETB",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -237,7 +237,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Flash Mobile",
-    logo: "TELEFONIAMOVIL_FLASHMOBILE",
+    logo: "TELEFONIA_MOVIL_FLASHMOBILE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -255,7 +255,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Comunicate",
-    logo: "TELEFONIAMOVIL_COMUNICATE",
+    logo: "TELEFONIA_MOVIL_COMUNICATE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
@@ -273,7 +273,7 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Buenofon",
-    logo: "TELEFONIAMOVIL_BUENOFON",
+    logo: "TELEFONIA_MOVIL_BUENOFON",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,

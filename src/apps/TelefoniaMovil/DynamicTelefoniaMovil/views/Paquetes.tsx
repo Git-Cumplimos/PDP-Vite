@@ -23,6 +23,11 @@ import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
 import { PropsBackendRecargas } from "../utils/TypesSubModulos";
+import {
+  TypeOutputDataGetPaquetes,
+  TypeOutputTrxPaquetes,
+  TypeTableDataGetPaquetes,
+} from "../TypeDinamic";
 
 type PropsPaquetes = {
   BackendPaquetes: () => Promise<PropsBackendRecargas>;
@@ -34,39 +39,44 @@ type TypeDataInput = {
 type TypeInfTicket = { [key: string]: any } | null;
 
 //------ constantes generales--------
-const datePackageInputInitial = {
+const dataPackageInputInitial = {
   celular: "",
 };
 
 const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
-  const [datePackageInput, setDatePackageInput] = useState<TypeDataInput>(
-    datePackageInputInitial
+  const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
+    dataPackageInputInitial
   );
-  const [dataGetPaquetes, setDataGetPaquetes] = useState<any | null>(null);
-  const [datePackage, setDatePackage] = useState<any | null>(null);
+  const [dataGetPackages, setDataGetPackages] = useState<any>([]);
+  const [dataPackage, setDataPackage] =
+    useState<TypeTableDataGetPaquetes | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [typeInfo, setTypeInfo] = useState<TypeInfo>("Ninguno");
   const [infTicket, setInfTicket] = useState<TypeInfTicket>(null);
+  const [pageTable, setPageTable] = useState({
+    limit: 10,
+    page: 1,
+    maxPages: 1,
+  });
   const printDiv = useRef(null);
-
-  const validNavigate = useNavigate();
-  const id_uuid = v4();
-  const { svgs }: any = useImgs();
-  const { roleInfo, pdpUser }: any = useAuth();
   const useHookDynamic = operadorCurrent?.backend;
   const [loadingPeticion, PeticionGetPaquetes, PeticionTrx] = useHookDynamic(
     operadorCurrent.name,
     "paquetes"
   );
+  const validNavigate = useNavigate();
+  const id_uuid = v4();
+  const { svgs }: any = useImgs();
+  const { roleInfo, pdpUser }: any = useAuth();
 
   useEffect(() => {
     PeticionGetPaquetes({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
-      moduleInfo: {},
+      moduleInfo: { page: pageTable.page, limit: pageTable.limit },
     })
-      .then((response: any) => {
-        setDataGetPaquetes(response?.results);
+      .then((response: TypeOutputDataGetPaquetes) => {
+        setDataGetPackages(response?.results);
         // setMaxPage(response?.obj?.result?.maxPages);
       })
       .catch((error: any) => {
@@ -75,21 +85,21 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
         } else {
           notifyError(msg);
         }
-        setDataGetPaquetes([]);
+        setDataGetPackages([]);
       });
-  }, [operadorCurrent, roleInfo, pdpUser]);
+  }, [operadorCurrent, roleInfo, pdpUser]); //no quitar advertencia
 
   const onChangeInput = useCallback((e) => {
     let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    if (valueInput[0] != 3) {
-      if (valueInput != "") {
+    if (valueInput[0] !== "3") {
+      if (valueInput !== "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
         valueInput = "";
       }
     }
-    setDatePackageInput((anterior) => ({
+    setDataPackageInput((anterior) => ({
       ...anterior,
       [e.target.name]: valueInput,
     }));
@@ -112,10 +122,10 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
     PeticionTrx({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
-      moduleInfo: { ...datePackageInput, ...datePackage },
+      moduleInfo: { ...dataPackageInput, ...dataPackage },
       id_uuid: id_uuid,
     })
-      .then((result: any) => {
+      .then((result: TypeOutputTrxPaquetes) => {
         if (result?.status === true) {
           if (result?.ticket) {
             setInfTicket(result?.ticket);
@@ -137,7 +147,7 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
           notifyError(msg);
         }
       });
-  }, [roleInfo, pdpUser, datePackageInput, datePackage, operadorCurrent]);
+  }, [roleInfo, pdpUser, dataPackageInput, dataPackage, operadorCurrent]); //no quitar advertencia
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -146,23 +156,23 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
   const HandleCloseInformacion = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
-    setDatePackage(null);
-    setDatePackageInput(datePackageInputInitial);
+    setDataPackage(null);
+    setDataPackageInput(dataPackageInputInitial);
   }, []);
 
   const HandleCloseResumen = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
-    setDatePackage(null);
-    setDatePackageInput(datePackageInputInitial);
+    setDataPackage(null);
+    setDataPackageInput(dataPackageInputInitial);
     notify("Compra cancelada");
   }, []);
 
   const HandleCloseTrxExitosa = useCallback(() => {
     setTypeInfo("Ninguno");
     setShowModal(false);
-    setDatePackage(null);
-    setDatePackageInput(datePackageInputInitial);
+    setDataPackage(null);
+    setDataPackageInput(dataPackageInputInitial);
     validNavigate("/telefonia-movil");
   }, [validNavigate]);
 
@@ -198,22 +208,25 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
         title={"Paquetes"}
         maxPage={3}
         headers={["Código", "Tipo", "Descripción", "Valor"]}
-        data={
-          dataGetPaquetes?.map((inf: any) => ({
+        data={dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
+          return {
             Código: inf.codigo,
             Tipo: inf.tipo,
             Descripción: inf.descripcion,
             Valor: inf.valor,
-          })) ?? []
-        }
-        onSelectRow={(e: any, i: any) => {
-          setDatePackage(dataGetPaquetes?.[i]);
+          };
+        })}
+        onSelectRow={(e: any, i: number) => {
+          setDataPackage(dataGetPackages?.[i]);
           setShowModal(true);
           setTypeInfo("Informacion");
         }}
-        // onSetPageData={(pagedata) => {
-        //   setPageData(pagedata.page);
-        //   setLimit(pagedata.limit);
+        // onSetPageData={(pagedata: any) => {
+        //   // setPageTable((old: any) => ({
+        //   //   ...old,
+        //   //   page: pagedata.page,
+        //   //   limit: pagedata.limit,
+        //   // }));
         // }}
       ></TableEnterprise>
       <Modal show={showModal} handleClose={handleCloseModal}>
@@ -221,13 +234,13 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
         {typeInfo === "Informacion" && (
           <PaymentSummary
             title={`Paquete ${operadorCurrent.name}`}
-            subtitle={datePackage?.tipo ?? ""}
+            subtitle={dataPackage?.tipo ?? ""}
           >
             <label className="whitespace-pre-line">
-              {datePackage?.descripcion}
+              {dataPackage?.descripcion}
             </label>
             <label>
-              {`Valor: ${formatMoney.format(datePackage?.valor ?? 0)}`}
+              {`Valor: ${formatMoney.format(dataPackage?.valor ?? 0)}`}
             </label>
             <Form
               onChange={onChangeInput}
@@ -241,7 +254,7 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
                 autoComplete="off"
                 minLength={10}
                 maxLength={10}
-                value={datePackageInput.celular}
+                value={dataPackageInput.celular}
                 required
               />
               <ButtonBar>
@@ -258,11 +271,11 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
             title="¿Está seguro de realizar la transacción?"
             subtitle="Resumen de transacción"
             summaryTrx={{
-              Celular: toPhoneNumber(datePackageInput.celular),
-              Valor: formatMoney.format(datePackage.valor),
-              "Tipo de Oferta": datePackage.tipo,
-              "Descripción Corta": datePackage.descripcion,
-              "Código de la Oferta": datePackage.codigo,
+              Celular: toPhoneNumber(dataPackageInput.celular),
+              Valor: formatMoney.format(dataPackage?.valor ?? 0),
+              "Tipo de Oferta": dataPackage?.tipo,
+              "Descripción Corta": dataPackage?.descripcion,
+              "Código de la Oferta": dataPackage?.codigo,
             }}
           >
             {!loadingPeticion.trx ? (

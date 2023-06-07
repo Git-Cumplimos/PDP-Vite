@@ -33,7 +33,7 @@ const LayoutTelefoniaMovil = ({
             setOperadorCurrent(operadorInd);
           }}
         >
-          <nav className="relative">
+          <nav>
             <ul>
               <li className={li_css}>
                 <img

@@ -31,34 +31,25 @@ export const listPermissionsDavivienda = listPermissions.splice(
 const rutasDaviviendaRecaudoEmpresarial = {
   //RecaudoEmpresarialDavivienda
   link: "/recaudoEmpresarial/recaudoEmpresarialDavivienda",
-  label: (
-    <AppIcons
-      Logo={"CorresponsaliaDavivienda"}
-      name="Recaudo Empresarial Davivienda"
-    />
-  ),
+  label: <AppIcons Logo={"RECAUDO"} name="Recaudo Empresarial Davivienda" />,
   component: RecaudoEmpresarialDavivienda,
   permission: [4001],
   subRoutes: [
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialDavivienda/CargarArchivos",
-      label: <AppIcons Logo={"DepositoDaviplata"} name="Cargar Archivos" />,
+      label: <AppIcons Logo={"RECAUDO"} name="Cargar Archivos" />,
       component: CargarArchivos,
       permission: [4001],
     },
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialDavivienda/HistoricoContingencia",
-      label: (
-        <AppIcons Logo={"DepositoDaviplata"} name="Histórico Contingencia" />
-      ),
+      label: <AppIcons Logo={"RECAUDO"} name="Histórico Contingencia" />,
       component: HistoricoContingencia,
       permission: [4002],
     },
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialDavivienda/TransaccionesRecaudo",
-      label: (
-        <AppIcons Logo={"DepositoDaviplata"} name="Transacciones Recaudo" />
-      ),
+      label: <AppIcons Logo={"RECAUDO"} name="Transacciones Recaudo" />,
       component: TransaccionesRecaudo,
       permission: [4002],
     },

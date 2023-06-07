@@ -4,7 +4,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../utils/notify";
 
 const LoginForm = () => {
   const { contain, card, field } = classes;
@@ -22,6 +22,7 @@ const LoginForm = () => {
   const [forgotPass, setForgotPass] = useState(false);
   const [forgotPassSubmit, setForgotPassSubmit] = useState(false);
   const [code, setCode] = useState("");
+  const [disabled, setDisabled] = useState(false);
 
   const auth = useAuth();
 
@@ -144,7 +145,13 @@ const LoginForm = () => {
     auth
       .validateUser(username)
       .then((res) => {
+        notify("Validando usuario en base de datos");
+        setDisabled(true);
         if (res?.Status === true) {
+          notify(
+            "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
+          );
+          setDisabled(false);
           setPassword("");
           setForgotPass(false);
           setForgotPassSubmit(true);
@@ -154,6 +161,7 @@ const LoginForm = () => {
             .catch(() => {});
         } else {
           notifyError("El usuario no existe");
+          setDisabled(false);
         }
       })
       .catch((err) => {});
@@ -525,7 +533,9 @@ const LoginForm = () => {
               />
             </div>
             <div className={field}>
-              <button type="submit">Solicitar código</button>
+              <button type="submit" disabled={disabled}>
+                Solicitar código
+              </button>
             </div>
           </form>
         </div>

@@ -145,6 +145,7 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
               name="id_group"
               label={"Id de grupo"}
               type="tel"
+              maxLength={10}
               autoComplete="off"
             />
             <Input
@@ -152,6 +153,7 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
               name="name_group"
               label={"Nombre de grupo"}
               type="text"
+              maxLength={60}
               autoComplete="off"
             />
           </Fragment>
