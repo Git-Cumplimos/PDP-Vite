@@ -10,7 +10,7 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { useFetch } from "../../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
-import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal";
+import { ComponentsModalSummaryTrx } from "../Runt/components/components_modal_PagoCartera";
 import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
@@ -18,7 +18,8 @@ import {
 import classes from "./PagarRunt.module.css";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';
-import { useFetchRunt } from "../../hooks/hookRunt";
+// import { useFetchPagoCartera } from "../../hooks/hookRunt";
+import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
 //Constantes Style
 const { styleComponents } = classes;
@@ -26,6 +27,7 @@ const { styleComponents } = classes;
 //Constantes
 const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
 const url_consult_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/consulta_pago_cartera`;
+const url_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/pago_cartera`;
 const url_pagar_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/pago-runt`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
@@ -38,6 +40,7 @@ const options_select = [
 const PagoCartera = () => {
     const uniqueId = v4();
     const [paso, setPaso] = useState("LecturaNumeroObligacion");
+    const [documento, setDocumento] = useState("LecturaNumeroObligacion");
     const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
     const [procedimiento, setProcedimiento] = useState(numero_obligacion);
     const [showModal, setShowModal] = useState(false);
@@ -48,15 +51,17 @@ const PagoCartera = () => {
     const buttonDelate = useRef(null);
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
-    const [loadingPeticionPayRunt, peticionPayRunt] = useFetchRunt(
-        url_pagar_runt,
+    const [loadingPeticionPayRunt, peticionPayRunt] = useFetchPagoCartera(
+        url_pago_cartera,
         urlreintentos,
-        "PagarRunt"
+        "PagoCartera"
     );
+
     const [loadingPeticionBarcode, peticionBarcode] = useFetch(
         fetchCustom(url_get_barcode, "POST", "Leer código de barras")
     );
-    const [loadingPeticionConsultPagoCartera, peticionConsultRunt] = useFetch(
+
+    const [loadingPeticionConsultPagoCartera, peticionConsultCartera] = useFetch(
         fetchCustom(url_consult_pago_cartera, "POST", "Consultar Pago Cartera")
     );
 
@@ -84,6 +89,7 @@ const PagoCartera = () => {
             }
         }
         setPaso("LecturaNumeroObligacion");
+        setDocumento("LecturaNumeroObligacion");
         setNumeroPagoCartera("");
         setResConsultRunt(null);
         setShowModal(false);
@@ -96,10 +102,12 @@ const PagoCartera = () => {
 
     const onChangeSelect = useCallback((e) => {
         if (e.target.value === numero_obligacion) {
+            setDocumento("LecturaNumeroObligacion");
             setPaso("LecturaNumeroObligacion");
             setProcedimiento(numero_obligacion);
         } else if (e.target.value === numero_cedula) {
             setPaso("LecturaNumeroCedula");
+            setDocumento("LecturaNumeroCedula");
             setProcedimiento(numero_cedula);
         }
         setNumeroPagoCartera("");
@@ -120,6 +128,7 @@ const PagoCartera = () => {
                         setNumeroPagoCartera(response?.obj?.result?.numero_runt);
                         notify(response?.msg);
                         setPaso("LecturaNumeroCedula");
+                        setDocumento("LecturaNumeroCedula");
                     }
                 })
                 .catch((error) => {
@@ -155,10 +164,10 @@ const PagoCartera = () => {
                 },
             },
         };
-        peticionConsultRunt({}, data)
+        peticionConsultCartera({}, data)
             .then((response) => {
                 if (response?.status === true) {
-                    setResConsultRunt(response?.obj?.result);
+                    setResConsultRunt(response?.obj?.response_agrario);
                     setPaso("ResumenTrx");
                     setShowModal(true);
                 }
@@ -172,32 +181,27 @@ const PagoCartera = () => {
         (e) => {
             const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
             const data = {
+                oficina_propia:
+                    roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+                        roleInfo?.tipo_comercio === "KIOSCO"
+                        ? true
+                        : false,
+                valor_total_trx: datosTrans !== "" ? datosTrans : 0,
+                nombre_comercio: roleInfo?.["nombre comercio"],
+                nombre_usuario: pdpUser?.uname ?? "",
                 comercio: {
                     id_comercio: roleInfo.id_comercio,
                     id_terminal: roleInfo.id_dispositivo,
                     id_usuario: roleInfo.id_usuario,
                 },
-                id_uuid_trx: uniqueId,
-                oficina_propia:
-                    tipo__comercio.search("kiosco") >= 0 ||
-                        tipo__comercio.search("oficinas propias") >= 0
-                        ? true
-                        : false,
-                nombre_usuario: pdpUser["uname"],
-                nombre_comercio: roleInfo?.["nombre comercio"],
-                numero_runt: numeroPagoCartera,
-                id_trx_original: resConsultRunt.id_trx,
-                valor_mt: resConsultRunt.valor_mt,
-                valor_runt: resConsultRunt.valor_runt,
-                valor_total_trx: resConsultRunt.valor_total_trx,
-                ciudad: roleInfo.ciudad,
-                direccion: roleInfo.direccion,
-                idterminal_punto: roleInfo.idterminal_punto,
-                idtipo_dispositivo: roleInfo.idtipo_dispositivo,
-                serial_dispositivo: roleInfo.serial_dispositivo,
-                telefono: roleInfo?.telefono,
-                dane_code: roleInfo?.codigo_dane,
-                city: roleInfo?.["ciudad"],
+                PagoCartera: {
+                    valReferencia1: numeroPagoCartera,
+                    location: {
+                        address: roleInfo?.["direccion"],
+                        dane_code: roleInfo?.codigo_dane,
+                        city: roleInfo?.["ciudad"],
+                    },
+                },
             };
             const dataAditional = {
                 id_uuid_trx: uniqueId,
@@ -235,6 +239,7 @@ const PagoCartera = () => {
     //********************Funciones para cerrar el Modal**************************
     const HandleCloseTrx = useCallback(() => {
         setPaso("LecturaNumeroObligacion");
+        setDocumento("LecturaNumeroObligacion");
         setShowModal(false);
         notify("Transacción cancelada");
         setNumeroPagoCartera("");
@@ -244,6 +249,7 @@ const PagoCartera = () => {
 
     const HandleCloseTrxExitosa = useCallback(() => {
         setPaso("LecturaNumeroObligacion");
+        setDocumento("LecturaNumeroObligacion");
         setShowModal(false);
         setNumeroPagoCartera("");
         setResConsultRunt(null);
@@ -254,8 +260,10 @@ const PagoCartera = () => {
 
     const HandleCloseModal = useCallback(() => {
         if (paso === "LecturaNumeroObligacion" && !loadingPeticionBarcode) {
+            setDocumento("LecturaNumeroObligacion")
             HandleCloseTrx();
         } else if (paso === "LecturaNumeroCedula" && !loadingPeticionConsultPagoCartera) {
+            setDocumento("LecturaNumeroCedula")
             HandleCloseTrx();
         } else if (paso === "ResumenTrx" && !loadingPeticionPayRunt) {
             HandleCloseTrx();
@@ -270,7 +278,7 @@ const PagoCartera = () => {
         loadingPeticionPayRunt,
         loadingPeticionConsultPagoCartera,
     ]);
-
+    
     return (
         <Fragment>
             <SimpleLoading show={loadingPeticionConsultPagoCartera}></SimpleLoading>
@@ -323,10 +331,15 @@ const PagoCartera = () => {
                 {/******************************Resumen de trx*******************************************************/}
                 {paso === "ResumenTrx" && (
                     <ComponentsModalSummaryTrx
+                        documento={documento}
+                        numero_obligacion={numero_obligacion}
+                        numero_cedula={numero_cedula}
+                        numeroPagoCartera={numeroPagoCartera}
                         summary={resConsultRunt}
                         loadingPeticion={loadingPeticionPayRunt}
                         peticion={onSubmitPayRunt}
-                        handleClose={HandleCloseTrx}></ComponentsModalSummaryTrx>
+                        handleClose={HandleCloseTrx
+                        }></ComponentsModalSummaryTrx>
                 )}
                 {/******************************Resumen de trx*******************************************************/}
 

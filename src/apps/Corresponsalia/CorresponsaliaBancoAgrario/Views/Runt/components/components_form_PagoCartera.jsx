@@ -44,14 +44,14 @@ export const LecturaNumeroObligacion = ({
           type="text"
           autoComplete="off"
           value={numeroPagoCartera}
-          maxLength={"18"}
+          maxLength={"20"}
           onChange={onChange}
         />
       )}
 
       <ButtonBar className="flex justify-center py-6">
         <Button type={"submit"} onClick={onSubmit} disabled={numeroPagoCartera === "" || numeroPagoCartera === 0 ? !loadingPeticion : loadingPeticion}>
-          Consultar
+          Realizar consulta
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
           Cancelar
@@ -97,14 +97,14 @@ export const LecturaNumeroCedula = ({
           type="text"
           autoComplete="off"
           value={numeroPagoCartera}
-          maxLength={"18"}
+          maxLength={"20"}
           onChange={onChange}
         />
       )}
 
       <ButtonBar className="flex justify-center py-6">
         <Button type={"submit"} onClick={onSubmit} disabled={numeroPagoCartera === "" || numeroPagoCartera === 0 ? !loadingPeticion : loadingPeticion }>
-          Consultar
+          Realizar consulta
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
           Cancelar
