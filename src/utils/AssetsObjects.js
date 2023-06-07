@@ -132,17 +132,20 @@ const svgs = {
   TELEFONIA_MOVIL_COMUNICATE: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Comunicate.png`,
   TELEFONIA_MOVIL_BUENOFON: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Buenofon.png`,
 
+  //RECARGAS CELULAR
+  RECARGA_CELULAR: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/RECARGASCELULAR.svg`,
+
   //MOVISTAR
-  MOVISTAR: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR.svg`,
-  MOVISTAR_RECARGAS: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_RECARGAS.svg`,
-  MOVISTAR_PAQUETES: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_PAQUETES.svg`,
-  MOVISTAR_OPERADOR_PDP: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_OPERADOR_PDP.svg`,
-  MOVISTAR_COMBOS: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_COMBOS.svg`,
-  MOVISTAR_PAQUETES_DATOS: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_PAQUETES.svg`,
-  MOVISTAR_PAQUETE_VOZ: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_PAQUETE_VOZ.svg`,
-  MOVISTAR_TV_PREPAGADA: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_TV_PREPAGADA.svg`,
-  MOVISTAR_CARGUE_DE_PAQUETES: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_CARGUE_DE_PAQUETES.svg`,
-  MOVISTAR_CONCILIACION: `${urlAssets}/assets/svg/recaudo/MOVISTAR/MOVISTAR_CONCILIACION.svg`,
+  MOVISTAR: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR.svg`,
+  MOVISTAR_RECARGAS: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_RECARGAS.svg`,
+  MOVISTAR_PAQUETES: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_PAQUETES.svg`,
+  MOVISTAR_OPERADOR_PDP: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_OPERADOR_PDP.svg`,
+  MOVISTAR_COMBOS: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_COMBOS.svg`,
+  MOVISTAR_PAQUETES_DATOS: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_PAQUETES.svg`,
+  MOVISTAR_PAQUETE_VOZ: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_PAQUETE_VOZ.svg`,
+  MOVISTAR_TV_PREPAGADA: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_TV_PREPAGADA.svg`,
+  MOVISTAR_CARGUE_DE_PAQUETES: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_CARGUE_DE_PAQUETES.svg`,
+  MOVISTAR_CONCILIACION: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_CONCILIACION.svg`,
 
   //PARAMETROS TRANSACCIONALES
   PARAMETROS_TRANSACCIONALES: `${urlAssets}/assets/svg/recaudo/PARAMETROS_TRANSACCIONALES/PARAMETROSTRANSACCIONALES.svg`,
@@ -163,40 +166,10 @@ const svgs = {
   RECAUDO_RETIRO_DIRECTO: `${urlAssets}/assets/svg/recaudo/RECAUDORETIRODIRECTO.svg`,
 
   // Recaudo Y OTROS
-  CATALOGOS_Y_REVISTAS: `${urlAssets}/assets/svg/recaudo/CATALOGOS&REVISTAS.svg`,
-  EPS_Y_SALUD: `${urlAssets}/assets/svg/recaudo/EPS&SALUD.svg`,
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
-  PAGO_DE_SEGURIDAD_SOCIAL: `${urlAssets}/assets/svg/recaudo/PAGO_DE_SEGURIDAD_SOCIAL.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
   RETIRO: `${urlAssets}/assets/svg/recaudo/RETIROSYDEPOSITOS.svg`,
-  SERVICIOS_PUBLICOS: `${urlAssets}/assets/svg/recaudo/SERVICIOS_PUBLICOS.svg`,
-  UNIVERSIDADES: `${urlAssets}/assets/svg/recaudo/UNIVERSIDADES.svg`,
-
-  CorresponsalBancario: `${urlAssets}/assets/img/CORRESPONSAL BANCARIO.png`,
-
-  Depositos: `${urlAssets}/assets/img/DEPÓSITOS.png`,
   DescargarReporte: `${urlAssets}/assets/img/descargar reporte.png`,
-  Desembolso: `${urlAssets}/assets/img/DESEMBOLSO.png`,
-
-  OperadorPdp: `${urlAssets}/assets/img/operador pdp.png`,
-  PagoPorGiro: `${urlAssets}/assets/svg/recaudo/PAGOPORGIRO.svg`,
-
-  PagoProductosPropios: `${urlAssets}/assets/svg/recaudo/PAGODEPRODUCTOSPROPIOS.svg`,
-  PinesEntretenimiento: `${urlAssets}/assets/img/pines entretenimiento.png`,
-
-  RecargaCelular: `${urlAssets}/assets/svg/recaudo/RECARGASCELULAR.svg`,
-  RecaudoCodigoDeBarras: `${urlAssets}/assets/img/recaudo codigo de barras.png`,
-  RecaudoManual: `${urlAssets}/assets/img/RECAUDO MANUAL.png`,
-  Recaudo: `${urlAssets}/assets/img/RECAUDO.png`,
-
-  Reporte: `${urlAssets}/assets/img/REPORTE.png`,
-  RetirosYDepositos: `${urlAssets}/assets/img/RETIROS Y DEPÓSITOS.png`,
-  Reverso: `${urlAssets}/assets/img/REVERSO.png`,
-  ServiciosPublicos: `${urlAssets}/assets/img/servicios publicos.jpg`,
-
-  Transacciones: `${urlAssets}/assets/img/transacciones.png`,
-  VerPagoParticipacion: `${urlAssets}/assets/img/VER PAGO PARTICIPACION-01.png`,
-  LogoRecargasCelular: `${urlAssets}/assets/img/RecargasCelular.png`,
 };
 
 const banners = {

@@ -778,7 +778,7 @@ const allUrlsPrivateApps = [
   //Modulo RecargasCelular
   {
     link: "/recargas-celular",
-    label: <AppIcons Logo={"RecargaCelular"} name="Recargas Celular" />,
+    label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargas Celular" />,
     component: RecargasCelular,
     permission: [65, 66],
     subRoutes: [
