@@ -136,7 +136,7 @@ const rutasColpatria = {
         },
         {
           link: "/corresponsalia/colpatria/recaudo/:id_convenio_pin",
-          label: <AppIcons Logo={"Recaudo"} name={"Recaudo PSP en Efectivo"} />,
+          label: <AppIcons Logo={"RECAUDO"} name={"Recaudo PSP en Efectivo"} />,
           component: TrxRecaudo,
           permission: [PermissionsColpatria.recaudo],
           show: false,
