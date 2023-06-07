@@ -305,29 +305,29 @@ const Transacciones = () => {
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
-            {selected?.id_autorizador === 13 ? (
-              <TicketsDavivienda
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_autorizador === 14 ? (
+            {selected?.ticket.autorizador === 14 ||  selected?.id_autorizador === 14 ? (
               <TicketColpatria
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_autorizador === 17 ? (
+            ) : selected?.ticket?.autorizador === 17 ||  selected?.id_autorizador === 17 ? (
               <TicketsAval
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_autorizador === 16 ? (
+            ) : selected?.ticket?.autorizador === 16 ||  selected?.id_autorizador === 16 ? (
               <TicketsAgrario
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 13 ? (
+              <TicketsDavivienda
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
