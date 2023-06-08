@@ -648,7 +648,7 @@ const CrearPin = () => {
 
   const horaCierre = useMemo(() => { 
     const dia = (new Date()).getDay()  
-    if (dia === enumParametrosPines.diaFinSemana) {
+    if (enumParametrosPines.diaFinSemana.includes(dia)) {
       return enumParametrosPines.horaCierreFinSemana.split(":")
     }
     else{
