@@ -7,7 +7,9 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import {LineasLot_disclamer} from "../../utils/enum";
 import { notify, notifyError } from "../../../../utils/notify";
+import TicketsLot from "../TicketsLot/TicketLot"
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -70,7 +72,7 @@ const SellResp = ({
 
   const ticket = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "VENTA LOTERÍA",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -98,26 +100,30 @@ const SellResp = ({
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
-        ["Billete", sellResponse?.obj?.num_billete],
+        ["Fecha del sorteo","Validar"],
+        [],
+        ["Número",sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
         ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : JSON.stringify(selecFrac).replace(/[[]/,"").replace(/]/,"")],
-        ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
-        ["", ""],
+        ["Tipo de billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
+        [],[],
         ["Valor", parseInt(sellResponse?.obj?.tipoPago) ===
         parseInt(operacion?.Venta_Fisica) || 
         parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
         ? formatMoney.format(sellResponse?.obj?.valor_pago)
         : formatMoney.format(0)],
-        ["", ""],
-        ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
+        [],[],
+        ["Forma de pago", parseInt(sellResponse?.obj?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || 
           parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
           ? "Efectivo"
           : "Bono"],
-        ["", ""],
+        [],
+        [],
+    
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+        LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
     };
   }, [roleInfo, sellResponse,operacion,selecFrac,fecha_trx]);
  
@@ -134,7 +140,7 @@ const SellResp = ({
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <Tickets refPrint={printDiv} ticket={ticket} />
+      <TicketsLot refPrint={printDiv} ticket={ticket} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button
