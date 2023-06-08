@@ -10,6 +10,7 @@ const Deposito = lazy(() => import("./Views/Deposito"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
+const AnulacionPines = lazy(() => import("./Views/Anulacion"));
 const PagoGiro = lazy(() => import("./Views/PagoGiro"));
 const PinDePago = lazy(() => import("./Views/PinDePago"));
 
@@ -44,7 +45,7 @@ const rutasPinesCrc = {
 
 
     {
-      link: "/corresponsalia/colpatria/pines",
+      link: "/Pines/PinesCrc/Ventapines",
       label: (
         <AppIcons
           Logo={"VentaPinRecaudoColpatria"}
@@ -65,9 +66,28 @@ const rutasPinesCrc = {
         },
       ],
     },
-
-
-
+    {
+      link: "/Pines/PinesCrc/AnulacionPines",
+      label: (
+        <AppIcons
+          Logo={"VentaPinRecaudoColpatria"}
+          name={"Anulación"}
+        />
+      ),
+      component: AnulacionPines,
+      permission: [63,53],
+      subRoutes: [
+        {
+          link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
+          label: (
+            <AppIcons Logo={"CrearPines"} name={"Venta de Pines de Recaudo"} />
+          ),
+          component: PinesVenta,
+          permission: [63,53],
+          show: false,
+        },
+      ],
+    },
   ],
 };
 
