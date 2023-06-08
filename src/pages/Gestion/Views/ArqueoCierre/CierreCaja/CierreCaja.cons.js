@@ -26,7 +26,7 @@ export const MESSAGE_NEED_COMMERCE = "Debe ingresar un comercio";
 // Labels
 export const LABEL_BUTTON_GENERATE_REPORT = "Generar reporte";
 export const LABEL_COMMERCE = "Comercio";
-export const LABEL_INITIAL_DATE = "Fecha fin";
+export const LABEL_INITIAL_DATE = "Fecha inicio";
 export const LABEL_FINAL_DATE = "Fecha fin";
 export const LABEL_FIND_COMMERCE = "Buscar Comercio";
 export const LABEL_LOADING = "Cargando";
