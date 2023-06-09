@@ -7,7 +7,8 @@ import { notifyError } from "../../../../utils/notify";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import useMap from "../../../../hooks/useMap";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
-import { makeDateFormatter } from "../../../../utils/functions";
+import { makeDateFormatter, onChangeNumber } from "../../../../utils/functions";
+
 
 const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
 // const urlBackend = `http://localhost:5000/servicio-contingencia-empresarial-pdp`;
@@ -138,12 +139,16 @@ const TablaTransacciones = ({ banco }) => {
         label="Id comercio"
         name="id_comercio"
         type="tel"
+        maxLength={"30"}
+        onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
       />
       <Input
         id="id_transacción"
         label="Id transacción"
         name="id_trx"
         type="tel"
+        maxLength={"30"}
+        onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
       />
       <Select
         className="place-self-stretch"
