@@ -10,7 +10,9 @@ const PinesCrcTrx = lazy(() => import("./PinesCrcTrx"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
-const AnulacionPines = lazy(() => import("./Views/Anulacion"));
+const PeticionesPines = lazy(() => import("./Views/Peticiones"));
+const Anulaciones = lazy(() => import("./Views/AnulacionesPines"));
+const CargueAnulaciones = lazy(() => import("./Views/Anulaciones/CargueAnulaciones"))
 
 
 
@@ -56,24 +58,34 @@ const rutasPinesCrc = {
       ],
     },
     {
-      link: "/Pines/PinesCrc/AnulacionPines",
+      link: "/Pines/PinesCrc/PeticionesPines",
       label: (
         <AppIcons
           Logo={"VentaPinRecaudoColpatria"}
-          name={"Anulación"}
+          name={"Peticiones"}
         />
       ),
-      component: AnulacionPines,
-      permission: [63,53],
+      component: PeticionesPines,
+      permission: [63,53]
+    },
+    {
+      link: "/Pines/PinesCrc/Anulaciones",
+      label: (
+        <AppIcons
+          Logo={"VentaPinRecaudoColpatria"}
+          name={"Anulaciones"}
+        />
+      ),
+      component: Anulaciones,
+      permission: [63],
       subRoutes: [
         {
-          link: "/corresponsalia/colpatria/pines/:id_convenio_pin",
+          link: "/Pines/PinesCrc/Anulaciones/CargueArchivo",
           label: (
-            <AppIcons Logo={"CrearPines"} name={"Venta de Pines de Recaudo"} />
+            <AppIcons Logo={"CrearPines"} name={"Cargue Archivo Anulaciones"} />
           ),
-          component: PinesVenta,
-          permission: [63,53],
-          show: false,
+          component: CargueAnulaciones,
+          permission: [63]
         },
       ],
     },

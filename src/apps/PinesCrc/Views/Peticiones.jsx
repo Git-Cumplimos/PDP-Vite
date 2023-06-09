@@ -24,7 +24,7 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 });
 
 
-const Anulacion = () => {
+const Peticiones = () => {
 
   const formatMoney = new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -311,4 +311,4 @@ const Anulacion = () => {
   );
 };
 
-export default Anulacion;
+export default Peticiones;
