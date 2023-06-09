@@ -20,11 +20,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
     finalizo: false,
     exist: false,
   });
-  const [consultaTrxContadas, setConsultaTrxContadas] = useState({
-    conteoTrx: false,
-    flatTrxContadas: [],
-    valor: 0,
-  });
   const [intervalId, setIntervalId] = useState(null);
   const [consultaReferencia, setConsultaReferencia] = useState([]);
 
@@ -70,7 +65,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.ciudad,
       },
-      flat_trx: consultaTrxContadas.conteoTrx ?? false,
     };
     postConsultaEstadoRecaudoMultiple(obj)
       .then((res) => {
@@ -83,27 +77,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
           finalizo: res.obj?.finalizo ?? false,
           exist: true,
         });
-        consultaTrxContadas.flatTrxContadas[1] = res.obj?.transacciones_contadas;
-        if (consultaTrxContadas.flatTrxContadas[0] === consultaTrxContadas.flatTrxContadas[1]){
-          setConsultaTrxContadas((old)=>({...old,flatTrxContadas:[]}));
-          consultaTrxContadas.flatTrxContadas[0] = res.obj?.transacciones_contadas;
-          consultaTrxContadas.valor++;
-          if (consultaTrxContadas.valor >= 3) {
-            setConsultaTrxContadas((old)=>({...old,conteoTrx:true}));
-            setConsultaRecaudo((old)=>({...old,finalizo:true}));
-          }
-        }
-        else {
-          setConsultaTrxContadas((old)=>({...old,flatTrxContadas:[], valor:0}));
-          consultaTrxContadas.flatTrxContadas[0] = res.obj?.transacciones_contadas;
-        }
-        if (res.obj?.finalizo === true){
-          setConsultaTrxContadas({
-            conteoTrx: false,
-            flatTrxContadas: [],
-            valor: 0,
-          });
-        }
         notify(res?.msg);
       })
       .catch((err) => {
@@ -132,7 +105,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.ciudad,
       },
-      flat_trx: consultaTrxContadas.conteoTrx ?? false,
     };
     postConsultaEstadoRecaudoMultiple(obj)
       .then((res) => {
@@ -146,7 +118,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
           finalizo: res.obj?.finalizo ?? false,
           exist: true,
         });
-        consultaTrxContadas.flatTrxContadas[0]= res.obj?.transacciones_contadas;
         setEstadoTrx(false);
         notify(res?.msg);
       })
@@ -163,7 +134,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
     };
     postConsultaReferencia(obj)
       .then((res) => {
-        console.log(res)
         if (!res?.status) {
           return notifyError(res?.msg);
         }
@@ -223,7 +193,6 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
     };
     postDescargarTickets(obj)
       .then((res) => {
-        console.log(res)
         if (res?.status) {
           notify(res?.msg);
           window.open(res?.obj?.data);
@@ -295,7 +264,7 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
                 </Button>
               </ButtonBar>
             )}
-            {consultaRecaudo?.transacciones_contadas === consultaRecaudo?.total_transacciones && (
+            {consultaRecaudo?.finalizo && (
               <ButtonBar>
                 <Button onClick={fecthDescargarTickets}>
                   Descargar ticket de transacciones
