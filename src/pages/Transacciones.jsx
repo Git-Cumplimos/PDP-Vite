@@ -396,6 +396,23 @@ const Transacciones = () => {
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
+                loteria={"Lotería de Bogotá"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 8 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería del Tolima"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 19 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería de Cundinamarca"}
                 stateTrx={selected?.status_trx}
               />
             ) : (

@@ -3,6 +3,8 @@ const urlAssets = process.env.REACT_APP_ASSETS_URL;
 const images = {
   pdpHorizontal: `${urlAssets}/assets/img/LogofinalPDP.svg`,
   Loteria_de_Bogota: `${urlAssets}/assets/img/Logo_lot_Bogota.png`,
+  Loteria_de_Tolima: `${urlAssets}/assets/img/Logo_lot_Tolima.jpg`,
+  Loteria_de_Cundinamarca: `${urlAssets}/assets/img/Logo_lot_Cundi.png`,
   personas: `${urlAssets}/assets/img/personas.png`,
   PINVUS: `${urlAssets}/assets/img/LogoPinVus.jpg`,
   MiLicencia: `${urlAssets}/assets/img/logo-milicencia.jpg`,

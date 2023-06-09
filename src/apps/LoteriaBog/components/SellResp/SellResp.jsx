@@ -119,8 +119,7 @@ const SellResp = ({
           ? "Efectivo"
           : "Bono"],
         [],
-        [],
-    
+        [],    
       ],
       disclamer:
         LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
@@ -140,7 +139,7 @@ const SellResp = ({
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <TicketsLot refPrint={printDiv} ticket={ticket} />
+      <TicketsLot refPrint={printDiv} ticket={ticket} loteria={sellResponse?.obj?.nom_loteria} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button

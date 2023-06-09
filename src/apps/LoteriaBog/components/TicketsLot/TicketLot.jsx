@@ -1,7 +1,9 @@
 import classes from "./TicketLot.module.css";
 import LogoLoto from "../../../../components/Base/LogoLoto";
+import LogoLoTolima from "../../../../components/Base/LogoLoTolima";
+import LogoLoCundinamarca from "../../../../components/Base/LogoLoCundinamarca"
 
-const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
+const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loteria }) => {
   const { divPrint } = classes;
 
   if (!ticket) {
@@ -15,7 +17,13 @@ const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => 
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
         <div className="flex flex-row justify-center items-center w-full">
-          <LogoLoto xsmall />
+            { 
+                loteria == "Lotería de Bogotá" 
+                ? <LogoLoto xsmall/>
+                : loteria == "Lotería del Tolima"
+                    ? <LogoLoTolima xsmall/>
+                    : <LogoLoCundinamarca xsmall/>
+            }
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-3" />
