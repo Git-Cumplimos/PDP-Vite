@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { PermissionsColpatria } from "./permissions";
+import { PermissionsPinesCrc } from "./permissions";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -14,7 +14,7 @@ const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
 
 
 
-const listPermissions = Object.values(PermissionsColpatria);
+const listPermissions = Object.values(PermissionsPinesCrc);
 
 export const listPermissionsPinesCrc = listPermissions.splice(
   listPermissions.length / 2
@@ -38,11 +38,11 @@ const rutasPinesCrc = {
       label: (
         <AppIcons
           Logo={"VentaPinRecaudoColpatria"}
-          name={"Venta de Pines CRC"}
+          name={"Pines CRC"}
         />
       ),
-      component: PinesConsulta,
-      permission: [PermissionsColpatria.venta_pines],
+      component: PinesVenta,
+      permission:listPermissionsPinesCrc,
       subRoutes: [
         {
           link: "/Pines/PinesCrc/pines/:id_convenio_pin",
@@ -50,7 +50,10 @@ const rutasPinesCrc = {
             <AppIcons Logo={"CrearPines"} name={"Venta de Pines CRC"} />
           ),
           component: PinesVenta,
-          permission: [PermissionsColpatria.venta_pines],
+          permission: [PermissionsPinesCrc.venta_pines,
+             PermissionsPinesCrc.operarPinesVus,
+             PermissionsPinesCrc.administrarPinesVus
+          ],
           show: false,
         },
       ],

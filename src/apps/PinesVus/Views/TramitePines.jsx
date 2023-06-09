@@ -441,8 +441,11 @@ const TramitePines = () => {
                 >
                   Cancelar pin
                 </Button>
-                :
-                ""}
+                :<Button
+                    disabled >
+                No es posible cancelar el Pin
+              </Button>
+                }
                   
                 </ButtonBar>
               </Form>

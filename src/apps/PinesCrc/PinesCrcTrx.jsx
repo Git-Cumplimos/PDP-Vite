@@ -1,5 +1,5 @@
 import HNavbar from "../../components/Base/HNavbar";
 
-const PinesCrcTrxTrx = ({ subRoutes }) => <HNavbar links={subRoutes} isIcon />;
+const PinesCrcTrx = ({ subRoutes }) => <HNavbar links={subRoutes} isIcon />;
 
-export default PinesCrcTrxTrx;
+export default PinesCrcTrx;
