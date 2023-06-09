@@ -10,7 +10,9 @@ const PinesCrcTrx = lazy(() => import("./PinesCrcTrx"));
 
 const PinesConsulta = lazy(() => import("./Views/Pines/ConsultaPines"));
 const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
-
+const PeticionesPines = lazy(() => import("./Views/Peticiones"));
+const Anulaciones = lazy(() => import("./Views/AnulacionesPines"));
+const CargueAnulaciones = lazy(() => import("./Views/Anulaciones/CargueAnulaciones"))
 
 
 
@@ -34,7 +36,7 @@ const rutasPinesCrc = {
 
 
     {
-      link: "/Pines/PinesCrc/pines",
+      link: "/Pines/PinesCrc/Ventapines",
       label: (
         <AppIcons
           Logo={"VentaPinRecaudoColpatria"}
@@ -58,9 +60,38 @@ const rutasPinesCrc = {
         },
       ],
     },
-
-
-
+    {
+      link: "/Pines/PinesCrc/PeticionesPines",
+      label: (
+        <AppIcons
+          Logo={"VentaPinRecaudoColpatria"}
+          name={"Peticiones"}
+        />
+      ),
+      component: PeticionesPines,
+      permission: [63,53]
+    },
+    {
+      link: "/Pines/PinesCrc/Anulaciones",
+      label: (
+        <AppIcons
+          Logo={"VentaPinRecaudoColpatria"}
+          name={"Anulaciones"}
+        />
+      ),
+      component: Anulaciones,
+      permission: [63],
+      subRoutes: [
+        {
+          link: "/Pines/PinesCrc/Anulaciones/CargueArchivo",
+          label: (
+            <AppIcons Logo={"CrearPines"} name={"Cargue Archivo Anulaciones"} />
+          ),
+          component: CargueAnulaciones,
+          permission: [63]
+        },
+      ],
+    },
   ],
 };
 

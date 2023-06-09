@@ -3,6 +3,7 @@ import { fetchSecure } from "../../../utils/functions";
 
 const urlColpatriaTrx = `${process.env.REACT_APP_URL_COLPATRIA}/trx`;
 const urlColpatriaParams = `${process.env.REACT_APP_URL_COLPATRIA}/params`;
+const urlPinesVus = `${process.env.REACT_APP_URL_PinesVus}`
 // const urlColpatriaTrx = `http://localhost:5000/trx`;
 // const urlColpatriaParams = `http://localhost:5000/params`;
 
@@ -204,6 +205,7 @@ export const makeInquiryRecaudo = async (bodyDep) => {
 
 const buildGetFunction = (url) => {
   return async (args = {}) => {
+    console.log("PINES", args)
     try {
       const res = await fetchData(url, "GET", args);
       if (!res?.status) {
@@ -381,3 +383,12 @@ export const getConveniosRecaudoListMassive = async (args = {}) => {
     throw err;
   }
 };
+
+
+export const getPinesExamenesFetch = buildGetFunction(
+  `${urlPinesVus}/pines_examenes`
+);
+
+export const peticionCancelacion = buildPutFunction(
+  `${urlPinesVus}/pines_examenes`
+);

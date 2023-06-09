@@ -700,8 +700,9 @@ const CrearPin = () => {
   }, [venderVehiculo, tipoPin, showModal]);
 
   const horaCierre = useMemo(() => { 
-    const dia = (new Date()).getDay()  
-    if (dia === enumParametrosPines.diaFinSemana) {
+    const dia = (new Date()).getDay() 
+    console.log("DIA --->", dia,enumParametrosPines.diaFinSemana.includes(dia))
+    if (enumParametrosPines.diaFinSemana.includes(dia)) {
       return enumParametrosPines.horaCierreFinSemana.split(":")
     }
     else{
