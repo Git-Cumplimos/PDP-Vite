@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment, useRef } from "react";
+import { useState, useEffect,useMemo, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../../../components/Base/Button";
@@ -21,6 +21,10 @@ import { v4 } from 'uuid';
 // import { useFetchPagoCartera } from "../../hooks/hookRunt";
 import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
+import PaymentSummary from "../../../../../components/Compound/PaymentSummary/PaymentSummary";
+import { formatMoney } from "../../../../../components/Base/MoneyInput";
+import TableEnterprise from "../../../../../components/Base/TableEnterprise/TableEnterprise";
+import Input from "../../../../../components/Base/Input/Input";
 //Constantes Style
 const { styleComponents } = classes;
 
@@ -38,19 +42,26 @@ const options_select = [
 ];
 
 const PagoCartera = () => {
+    const navigate = useNavigate();
+    const [datosTrans, setDatosTrans] = useState({
+        pin: "",
+    });
     const uniqueId = v4();
+    const [selectIndiceObligacion, setSelectIndiceObligacion] = useState(0);
     const [paso, setPaso] = useState("LecturaNumeroObligacion");
     const [documento, setDocumento] = useState("LecturaNumeroObligacion");
     const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
     const [procedimiento, setProcedimiento] = useState(numero_obligacion);
     const [showModal, setShowModal] = useState(false);
+    const [showModalObligacion, setShowModalObligacion] = useState(false);
     const [resConsultRunt, setResConsultRunt] = useState({});
     const [infTicket, setInfTicket] = useState(null);
-    const [datosTrans, setDatosTrans] = useState(0);
+    const [valorPagoCartera, setValorPagoCartera] = useState(0);
     const printDiv = useRef();
     const buttonDelate = useRef(null);
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
+    // const [pagoTotal, setPagoTotal] = useState(0);
     const [loadingPeticionPayRunt, peticionPayRunt] = useFetchPagoCartera(
         url_pago_cartera,
         urlreintentos,
@@ -91,7 +102,7 @@ const PagoCartera = () => {
         setPaso("LecturaNumeroObligacion");
         setDocumento("LecturaNumeroObligacion");
         setNumeroPagoCartera("");
-        setResConsultRunt(null);
+        // setResConsultRunt(null);
         setShowModal(false);
         setProcedimiento(numero_obligacion);
     }, []);
@@ -141,13 +152,15 @@ const PagoCartera = () => {
 
     const onSubmitConsultPagoCartera = (e) => {
         e.preventDefault();
+        // setPagoTotal(0)
+        setShowModal(false);
         const data = {
             oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
                     roleInfo?.tipo_comercio === "KIOSCO"
                     ? true
                     : false,
-            valor_total_trx: datosTrans !== "" ? datosTrans : 0,
+            valor_total_trx: valorPagoCartera !== "" ? valorPagoCartera : 0,
             nombre_comercio: roleInfo?.["nombre comercio"],
             nombre_usuario: pdpUser?.uname ?? "",
             comercio: {
@@ -167,7 +180,7 @@ const PagoCartera = () => {
         peticionConsultCartera({}, data)
             .then((response) => {
                 if (response?.status === true) {
-                    setResConsultRunt(response?.obj?.response_agrario);
+                    setResConsultRunt(response?.obj?.valores_trx);
                     setPaso("ResumenTrx");
                     setShowModal(true);
                 }
@@ -178,7 +191,11 @@ const PagoCartera = () => {
     };
 
     const onSubmitPayRunt = useCallback(
-        (e) => {
+        (e,pagoTotal) => {
+            e.preventDefault();
+            // setValorPagoCartera(pagoTotal);
+            console.log("ESTO ES pagoTotal",pagoTotal);
+            console.log("ESTO ES valorPagoCartera", valorPagoCartera);
             const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
             const data = {
                 oficina_propia:
@@ -186,7 +203,7 @@ const PagoCartera = () => {
                         roleInfo?.tipo_comercio === "KIOSCO"
                         ? true
                         : false,
-                valor_total_trx: datosTrans !== "" ? datosTrans : 0,
+                valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
                 nombre_comercio: roleInfo?.["nombre comercio"],
                 nombre_usuario: pdpUser?.uname ?? "",
                 comercio: {
@@ -208,6 +225,7 @@ const PagoCartera = () => {
             }
             peticionPayRunt(data, dataAditional)
                 .then((response) => {
+                    console.log("ESTA ES LA RESPUESTA del pago",response)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
                         setInfTicket(voucher);
@@ -243,7 +261,7 @@ const PagoCartera = () => {
         setShowModal(false);
         notify("Transacción cancelada");
         setNumeroPagoCartera("");
-        setResConsultRunt(null);
+        // setResConsultRunt(null);
         setProcedimiento(numero_obligacion);
     }, []);
 
@@ -252,13 +270,15 @@ const PagoCartera = () => {
         setDocumento("LecturaNumeroObligacion");
         setShowModal(false);
         setNumeroPagoCartera("");
-        setResConsultRunt(null);
+        // setResConsultRunt(null);
         setInfTicket(null);
         setProcedimiento(numero_obligacion);
         validNavigate("/corresponsalia/corresponsalia-banco-agrario");
     }, [validNavigate]);
 
     const HandleCloseModal = useCallback(() => {
+        setShowModalObligacion(false)
+        setShowModal(false);
         if (paso === "LecturaNumeroObligacion" && !loadingPeticionBarcode) {
             setDocumento("LecturaNumeroObligacion")
             HandleCloseTrx();
@@ -278,7 +298,30 @@ const PagoCartera = () => {
         loadingPeticionPayRunt,
         loadingPeticionConsultPagoCartera,
     ]);
-    
+
+    const tableObligacion = useMemo(() => {
+        if (resConsultRunt?.length > 0){
+            return [
+                ...resConsultRunt?.map(( obligacion ) => {
+                    return {
+                        "Número de obligación": obligacion?.numero_obligacion,
+                        "Tipo de Crédito": obligacion?.tipo_credito,
+                    };
+                }),
+            ];
+        }
+    }, [resConsultRunt]);
+
+    const onSelectAutorizador = useCallback(
+        (e, i) =>
+        {
+            console.log("Esto es el valor",e)
+            console.log("Esto es el indice",i)
+            setShowModalObligacion(true)
+            setSelectIndiceObligacion(i)
+        }
+    );
+
     return (
         <Fragment>
             <SimpleLoading show={loadingPeticionConsultPagoCartera}></SimpleLoading>
@@ -327,20 +370,48 @@ const PagoCartera = () => {
                 {/******************************Respuesta Lectura runt*******************************************************/}
             </Form>
 
-            <Modal show={showModal} handleClose={HandleCloseModal}>
+            {/* <Modal show={showModal} handleClose={HandleCloseModal}> */}
                 {/******************************Resumen de trx*******************************************************/}
                 {paso === "ResumenTrx" && (
-                    <ComponentsModalSummaryTrx
-                        documento={documento}
-                        numero_obligacion={numero_obligacion}
-                        numero_cedula={numero_cedula}
-                        numeroPagoCartera={numeroPagoCartera}
-                        summary={resConsultRunt}
-                        loadingPeticion={loadingPeticionPayRunt}
-                        peticion={onSubmitPayRunt}
-                        handleClose={HandleCloseTrx
-                        }></ComponentsModalSummaryTrx>
+                    <TableEnterprise
+                        title="Seleccione el número de obligación a pagar"
+                        headers={["Número de obligación", "Tipo de Crédito"]}
+                        data={tableObligacion}
+                        onSelectRow={onSelectAutorizador}
+                    >
+                        <Input
+                            id="searchPin"
+                            name="searchPin"
+                            label={"Nombre del tipo de Pin"}
+                            minLength="1"
+                            maxLength="30"
+                            type="text"
+                            autoComplete="off"
+                            onInput={(e) => {
+                                setDatosTrans((old) => {
+                                    return { ...old, pin: e.target.value };
+                                });
+                            }}
+                        />
+                    </TableEnterprise>
                 )}
+            {showModalObligacion === true && (
+                <Modal show={showModal} handleClose={HandleCloseModal}>
+                    <ComponentsModalSummaryTrx
+                            documento={documento}
+                            numero_obligacion={numero_obligacion}
+                            numero_cedula={numero_cedula}
+                            numeroPagoCartera={numeroPagoCartera}
+                            summary={resConsultRunt}
+                            loadingPeticion={loadingPeticionPayRunt}
+                            peticion={onSubmitPayRunt}
+                            handleClose={HandleCloseTrx}
+                            posicion= {selectIndiceObligacion}
+                            >
+                            <Select></Select>
+                    </ComponentsModalSummaryTrx>
+                </Modal>
+            )}
                 {/******************************Resumen de trx*******************************************************/}
 
                 {/**************** TransaccionExitosa **********************/}
@@ -354,7 +425,7 @@ const PagoCartera = () => {
                     </div>
                 )}
                 {/*************** Recarga Exitosa **********************/}
-            </Modal>
+            {/* </Modal> */}
         </Fragment>
     );
 };

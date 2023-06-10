@@ -1,10 +1,13 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import Button from "../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import { formatMoney } from "../../../../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../../../../components/Compound/PaymentSummary";
-
-export const ComponentsModalSummaryTrx = ({
+import Select from "../../../../../../components/Base/Select/Select";
+import Form from "../../../../../../components/Base/Form/Form";
+import classes from "../PagarRunt.module.css"
+const { styleComponents } = classes;
+export const ComponentsModalSummaryTrx = ({  
   documento,
   numero_obligacion,
   numeroPagoCartera,
@@ -13,41 +16,54 @@ export const ComponentsModalSummaryTrx = ({
   loadingPeticion,
   peticion,
   handleClose,
+  posicion,
 }) => {
-  console.log("summary", summary);
-  console.log("paso", documento);
-  console.log("numero_obligacion", numero_obligacion);
-  console.log("numeroPagoCartera", numeroPagoCartera);
-  console.log("numero_cedula", numero_cedula);
-  // console.log("loadingPeticion", loadingPeticion);
-  // console.log("peticion", peticion);
-  // console.log("handleClose", handleClose);
-  // console.log("setPaso:", handleClose.setPaso);
-
+  const [pagoTotal, setPagoTotal] = useState(false);
+  console.log("ESTO ES PETICION summary", summary)
+  console.log("ESTO ES PETICION posicion", posicion)
+  console.log("ESTO ES PETICION summary[posicion - 1];", summary[posicion])
   return (
-    <Fragment>
       <PaymentSummary
         title="¿Está seguro de realizar la transacción?"
         subtitle="Resumen de transacción"
-        summaryTrx={{
-          // "Número RUNT": summary.numero_runt,
-          // "Fecha de pago": summary.fecha_vencimiento,
-          // "Total derechos RUNT": formatMoney.format(summary.valor_runt),
-          // "Total derechos MT": formatMoney.format(summary.valor_mt),
-          // "Total a pagar": formatMoney.format(summary.valor_total_trx),
-          // `${numero_cedula}: ${numeroPagoCartera}`,
-          // numero_cedula + ": " + numeroPagoCartera,
-          // `${numero_cedula}: ${numeroPagoCartera}`,
-          [documento === "LecturaNumeroObligacion" ? "Número de Obligación" : documento === "LecturaNumeroCedula" ? "Número de Cédula" : ""]: numeroPagoCartera,
-          // "Total derechos RUNT": "",
-          // "Total derechos MT": "",
-          "Total a pagar": "",
+      summaryTrx={{          
+        "Valor a pagar para fecha de corte": formatMoney.format(summary[posicion]?.valor_pagar_fechaCorte),
+          // [documento === "LecturaNumeroObligacion" ? "Número de Obligación" : documento === "LecturaNumeroCedula" ? "Número de Cédula" : ""]: numeroPagoCartera,
+        [documento === "LecturaNumeroObligacion" ? "Número de Obligación" : documento === "LecturaNumeroCedula" ? "Número de Cédula" : ""]: summary[posicion]?.numero_obligacion,
+        "Valor total de la deuda": formatMoney.format(summary[posicion]?.valor_deuda),
+          // "Número de oblicación": (summary.numero_obligacion),
+        "Valor total vencido": formatMoney.format(summary[posicion]?.valor_vencido),
+        "Valor total vigente": formatMoney.format(summary[posicion]?.valor_vigente),
+        "Estado del crédito": (summary[posicion]?.estado_credito),
+        "Tipo de crédito": (summary[posicion]?.tipo_credito),
+        "Fecha de corte": (summary[posicion]?.fecha_corte),
+          "Indique el tipo de abono": (
+            <Select
+              required
+              className="place-self-stretch"
+              id="searchBySorteo"
+              name="id_tipo_transaccion"
+              options={[
+                { value: "", label: "" },
+                {
+                  value: summary[posicion]?.valor_deuda,
+                  label: `Valor total deuda`,
+                },
+                {
+                  value: summary[posicion]?.valor_pagar_fechaCorte,
+                  label: `Valor a fecha de corte`,
+                },
+              ]}
+            value={pagoTotal}
+            onChange={(ev) => setPagoTotal(ev.target.value)}
+            />
+          ),
         }}
       >
         {!loadingPeticion ? (
           <>
             <ButtonBar>
-              <Button type={"submit"} onClick={peticion}>
+            <Button type={"submit"} onClick={(e) => peticion(e,pagoTotal)}>
                 Pagar
               </Button>
               <Button onClick={handleClose}>Cancelar</Button>
@@ -57,6 +73,5 @@ export const ComponentsModalSummaryTrx = ({
           <h1 className="text-2xl font-semibold">Procesando . . .</h1>
         )}
       </PaymentSummary>
-    </Fragment>
   );
 };
