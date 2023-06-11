@@ -73,8 +73,15 @@ const TablaTransacciones = ({ banco }) => {
     if ( !tempMap.has("fecha_inicio_inicio") ) { tempMap.delete("fecha_inicio_inicio") }
     if ( !tempMap.has("fecha_inicio_fin") ) { tempMap.delete("fecha_inicio_fin") }
 
-    const queries = new URLSearchParams(tempMap.entries()).toString();
-    fetchTrxs(`${urlBackend}/searchtrx?${queries}`);
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(Object.fromEntries(tempMap))
+    };
+    // const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${urlBackend}/searchtrx`,options);
   }, [fetchTrxs, searchFilters]);
 
   useEffect(() => { searchTrxs(); }, [searchTrxs]);
