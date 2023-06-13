@@ -463,9 +463,10 @@ const CrearPin = () => {
       else{
         setShowPinLicencia(false)
         setDisabledBtns(false)
-
-        //setDisabledBtns(false)
-
+        setCategoria("")
+        setTramite2("")
+        setCategoria2("")
+        setTramite("")
         }
 
       if (resp?.obj?.results?.length > 0) {
@@ -1065,6 +1066,10 @@ const CrearPin = () => {
                 }else{
                 setShowPinLicencia(false)
                 setDisabledBtns(false)
+                setTramite2("")
+                setCategoria2("")
+                setTramite("")
+                setCategoria("")
                 }
              } })
           }}
