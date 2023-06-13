@@ -41,7 +41,7 @@ const FileInputX = () => {
   const [disabledBtn, setDisabledBtn] = useState(false);
   const [procesandoValidacion, setProcesandoValidacion] = useState(false);
   const [type1, setType1] = useState([]);
-  const file_name = `${process.env.REACT_APP_CARPETA_BUCKET_PINES}anulaciones`
+  const file_name = `${process.env.REACT_APP_CARPETA_BUCKET_PINES}`
 
   //------------------Guardar Archivos PDF---------------------//
   const onFileChange = useCallback(
@@ -93,12 +93,12 @@ const FileInputX = () => {
       setDisabledBtn(false);
       return;
     }
-
+    const f = new Date();
     try {
       setProcesandoValidacion(true);
       const presignedData = await Presigned_validar(
         archivo[0],
-        file_name
+        `${file_name}anulaciones/${f.getFullYear()}-${f.getMonth() + 1}-${f.getDate()}-${f.getHours()}-${f.getMinutes()}-${f.getSeconds()}-archivoAnulcaiones.csv`
       );
       const nombreArchivoS3 = presignedData.nombre_archivo;
 

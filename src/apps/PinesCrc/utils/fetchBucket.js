@@ -1,7 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
-const urlBackend = `${process.env.REACT_APP_URL_PinesVus}`;
+// const urlBackend = `${process.env.REACT_APP_URL_PinesVus}`;
+const urlBackend = `${process.env.REACT_APP_BASE_API}/cert/pinesVus`;
 const urlBackendValidar = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-validar-archivos`;
 export const Presigned = async (archivo, filename) => {
   console.log("BODY", archivo);
@@ -120,10 +121,10 @@ export const Presigned_validar = async (archivo, filename) => {
       {},
       true
     );
-
+    console.log("RES", res)
     const formData = new FormData();
-    const url = res.obj[0]?.url;
-    const fields = res.obj[0]?.fields;
+    const url = res.obj?.url;
+    const fields = res.obj?.fields;
     const nombre_archivo = fields?.key;
 
     for (const property in fields) {
@@ -131,13 +132,11 @@ export const Presigned_validar = async (archivo, filename) => {
     }
 
     formData.set("file", archivo);
-
     await fetch(url, {
       method: "POST",
       mode: "no-cors",
       body: formData,
     });
-
     return { nombre_archivo };
   } catch (error) {
     console.error(error);
