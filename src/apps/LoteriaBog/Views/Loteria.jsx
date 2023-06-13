@@ -196,7 +196,6 @@ const Loteria = ({ route }) => {
     }
   }, [sellResponse])
 
-  console.log("***",LineasLot_disclamer[sellResponse?.obj?.nom_loteria],sellResponse?.obj?.nom_loteria)
   const ticket = useMemo(() => {
     return {
       title: "VENTA LOTERÍA",
@@ -218,7 +217,7 @@ const Loteria = ({ route }) => {
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
       trxInfo: [
         ["Sorteo", sorteo],
-        ["Fecha del sorteo", "Validar"],
+        ["Fecha del sorteo",""],
         ["", ""],
         ["Número", numero],
         ["Serie", serie],
@@ -393,6 +392,7 @@ const Loteria = ({ route }) => {
         ) : (
           <SellResp
             codigos_lot={codigos_lot}
+            rta_billeteria={loterias}
             sellResponse={sellResponse}
             setSellResponse={setSellResponse}
             closeModal={closeModal}

@@ -18,6 +18,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 const SellResp = ({
   codigos_lot,
+  rta_billeteria,
   sellResponse,
   setSellResponse,
   closeModal,
@@ -39,12 +40,14 @@ const SellResp = ({
 
   @media print {
     .pagebreak {
-      page-break-before: always;
+      page-break-before: always;hLoteriafisica
     }
   }
 `;
   const { tiposOperaciones } = useLoteria();
-
+  const dateParts = rta_billeteria[0]?.Fecha_sorteo.split(" ");
+  const formattedDateString = `${dateParts[0]}, ${dateParts[2]} ${dateParts[1]} ${dateParts[3]} ${dateParts[4]}`;
+  const fecha_sorteo = new Date(formattedDateString);
   const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
@@ -69,7 +72,6 @@ const SellResp = ({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
-
   const ticket = useMemo(() => {
     return {
       title: "VENTA LOTERÍA",
@@ -100,7 +102,11 @@ const SellResp = ({
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
-        ["Fecha del sorteo","Validar"],
+        ["Fecha del sorteo",Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(fecha_sorteo)],
         [],
         ["Número",sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
@@ -111,7 +117,7 @@ const SellResp = ({
         parseInt(operacion?.Venta_Fisica) || 
         parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
         ? formatMoney.format(sellResponse?.obj?.valor_pago)
-        : formatMoney.format(0)],
+        : formatMoney.format(rta_billeteria[0]?.Valor_fraccion)],
         [],[],
         ["Forma de pago", parseInt(sellResponse?.obj?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || 

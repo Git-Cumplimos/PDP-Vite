@@ -7,7 +7,9 @@ import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 import Modal from "../../../components/Base/Modal";
 import Tickets from "../../../components/Base/Tickets";
+import TicketLot from "../components/TicketsLot/TicketLot";
 import { useAuth } from "../../../hooks/AuthHooks";
+import { LineasLot_disclamer } from "../utils/enum";
 import { useNavigate } from "react-router-dom";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -235,7 +237,7 @@ const Premios = ({ route }) => {
   
   const tickets = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "PAGO PREMIO",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -259,25 +261,25 @@ const Premios = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: ["PAGO PREMIO ", datosComercio.nom_loteria],
+      commerceName: [datosComercio.nom_loteria],
       trxInfo: [
         ["Sorteo", sorteo],
-        ["Billete", billete],
+        ["",""],
+        ["Número", billete],
         ["Serie", serie],
+        ["",""],
         ["Fracción", seleccionarFraccion],
         ["Valor a pagar", formatMoney.format(totalPagar)],
-        [tipopago === 2 && "", tipopago === 2 && ""],
-        [tipopago === 2 && "Nombres", tipopago === 2 && datosCliente?.nombre],
-        [tipopago === 2 && "", tipopago === 2 && ""],
-        [tipopago === 2 && "Apellidos", tipopago === 2 && datosCliente?.apellido],
-        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "", tipopago === 2 && ""],[tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "Nombre", tipopago === 2 && datosCliente?.nombre+" "+datosCliente?.apellido],
+        [tipopago === 2 && "", tipopago === 2 && ""],[tipopago === 2 && "", tipopago === 2 && ""],
         [tipopago === 2 && "Número Documento", tipopago === 2 && datosCliente?.documento],
-        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "", tipopago === 2 && ""],[tipopago === 2 && "", tipopago === 2 && ""],
         [tipopago === 2 && "Celular", tipopago === 2 && datosCliente?.celular],
-        [tipopago === 2 && "", tipopago === 2 && ""],
+        [tipopago === 2 && "", tipopago === 2 && ""],[tipopago === 2 && "", tipopago === 2 && ""],
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+        LineasLot_disclamer[datosComercio.nom_loteria],
     };
   }, [estadoTransaccion,sorteo,billete,serie,checkBilleteFisico,checkBilleteVirtual,seleccionarFraccion,datosCliente,totalPagar,valorbruto,tipopago]);
   
@@ -736,7 +738,7 @@ const Premios = ({ route }) => {
         <Modal show={estadoTransaccion} handleClose={handleClose}>
           {/* <Modal show={showAllmodals.showModalVoucher} handleClose={handleClose}> */}
           <div className="flex flex-col justify-center items-center">
-            <Tickets refPrint={printDiv} ticket={tickets}></Tickets>
+            <TicketLot refPrint={printDiv} ticket={tickets} loteria={datosComercio.nom_loteria}></TicketLot>
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleClose}>Cerrar</Button>
