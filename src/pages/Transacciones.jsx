@@ -14,6 +14,7 @@ import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
+import TicketsLot from "../apps/LoteriaBog/components/TicketsLot/TicketLot";
 import DataTable from "../components/Base/DataTable";
 import useFetchDispatchDebounce from "../hooks/useFetchDispatchDebounce";
 import useMap from "../hooks/useMap";
@@ -364,6 +365,30 @@ const Transacciones = () => {
                   />
                 )}
               </div>
+            ) : selected?.id_autorizador === 3 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería de Bogotá"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 8 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería del Tolima"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 19 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería de Cundinamarca"}
+                stateTrx={selected?.status_trx}
+              />
             ) : (
               <Tickets
                 refPrint={printDiv}
