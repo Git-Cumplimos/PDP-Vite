@@ -18,6 +18,7 @@ import {
 } from "../../utils/fetchFunctions";
 import AddressForm from "../../../../components/Base/AddressForm";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import { onChangeNumber } from "../../../../utils/functions";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const url = process.env.REACT_APP_URL_IAM_PDP;
@@ -389,7 +390,7 @@ const HandleUser = () => {
             onChange={(ev) =>
               setSelected((old) => ({
                 ...old,
-                phone: ev.target.value ?? "",
+                phone: onChangeNumber(ev) ?? "",
               }))
             }
             required

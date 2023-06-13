@@ -124,7 +124,7 @@ const CrearComercios = () => {
     ),
     onError: useCallback((error) => console.error(error), []),
   });
-  [].splice(0, 0, 2);
+
   useFetchDebounce(
     {
       url: useMemo(() => `${url_types}/type-doc`, []),
