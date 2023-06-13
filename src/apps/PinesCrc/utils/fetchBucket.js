@@ -1,16 +1,16 @@
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
-const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
+const urlBackend = `${process.env.REACT_APP_URL_PinesVus}`;
 const urlBackendValidar = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-validar-archivos`;
-export const Presigned = async (archivo, banco) => {
+export const Presigned = async (archivo, filename) => {
   console.log("BODY", archivo);
   if (!archivo) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlBackend}/uploadfile?id_proceso=${banco}`,
+      `${urlBackend}/uploadfile?id_proceso=${filename}`,
       "GET",
       {},
       {},
@@ -110,10 +110,10 @@ export const Presigned = async (archivo, banco) => {
 //   return {"nombre_archivo": nombre_archivo };
 // };
 
-export const Presigned_validar = async (archivo, banco) => {
+export const Presigned_validar = async (archivo, filename) => {
   try {
     const res = await fetchData(
-      `${urlBackendValidar}/uploadfile?id_proceso=${banco}`,
+      `${urlBackend}/CargueS3?filename=${filename}`,
       "GET",
       {},
       {},

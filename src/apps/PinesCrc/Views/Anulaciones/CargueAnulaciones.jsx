@@ -41,6 +41,7 @@ const FileInputX = () => {
   const [disabledBtn, setDisabledBtn] = useState(false);
   const [procesandoValidacion, setProcesandoValidacion] = useState(false);
   const [type1, setType1] = useState([]);
+  const file_name = `${process.env.REACT_APP_CARPETA_BUCKET_PINES}anulaciones`
 
   //------------------Guardar Archivos PDF---------------------//
   const onFileChange = useCallback(
@@ -97,7 +98,7 @@ const FileInputX = () => {
       setProcesandoValidacion(true);
       const presignedData = await Presigned_validar(
         archivo[0],
-        // banco_minuscula
+        file_name
       );
       const nombreArchivoS3 = presignedData.nombre_archivo;
 
