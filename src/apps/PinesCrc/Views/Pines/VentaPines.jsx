@@ -36,6 +36,7 @@ import Select from "../../../../components/Base/Select/Select";
 import { usePinesVus } from "../../../PinesVus/utils/pinesVusHooks" 
 import Fieldset from "../../../../components/Base/Fieldset";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
+import { guardarCliente } from "../../utils/fetchGuardarCliente";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -88,6 +89,39 @@ const VentaPines = () => {
     content: () => printDiv.current,
   });
   const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl, consultaCierreManual} = usePinesVus();
+
+  const homeLocation = {
+    municipio: useState(""),
+    departamento: useState(""),
+    localidad: useState(""),
+    barrio: useState(""),
+    direccion: useState(""),
+    foundMunicipios: useState([]),
+  };
+
+  const infoCliente = useMemo(() => {
+    homeLocation["direccion"][0] = direccion
+    return {infoCliente:{
+      pk_documento_cliente : documento,
+      tipo_documento : tipoDocumento,
+      nombre : nombre,
+      apellidos : apellidos,
+      celular : celular,
+      email : email,
+      direccion : direccion,
+      home_location : homeLocation
+  }};
+  }, [
+    setTipoDocumento,
+    setDocumento,
+    setNombre,
+    setApellidos,
+    setCelular,
+    setEmail,
+    homeLocation,
+    setDireccion
+  ]);  
+
 
   const summary = useMemo(
     () => ({
@@ -266,6 +300,17 @@ const VentaPines = () => {
             const pin_desencriptado = decryptPin(pin_encriptado);
             tempTicket.trxInfo[2][1] = pin_desencriptado;
             setPaymentStatus(tempTicket);
+            if(showFormulario2){ 
+              setIsLoading(true)
+            guardarCliente(infoCliente).then((resp) => {
+            if (!resp?.status){
+              setIsLoading(false)
+              notifyError(resp?.msg)
+            }else{
+              setIsLoading(false)
+            }
+          });
+                }
             return "Transacción satisfactoria";
           },
         },
@@ -362,14 +407,6 @@ const VentaPines = () => {
    * Check if has commerce data
    */
 
-  const homeLocation = {
-    municipio: useState(""),
-    departamento: useState(""),
-    localidad: useState(""),
-    barrio: useState(""),
-    direccion: useState(""),
-    foundMunicipios: useState([]),
-  };
 
   const onSubmitCliente = (e) => {
     e.preventDefault();
@@ -378,7 +415,6 @@ const VentaPines = () => {
     // setShowFormulario(false)
     
  consultaClientes(documento,"",tipoDocumento,roleInfo.id_comercio,"").then((resp) => {
-        
       if (!resp?.status){
         setIsLoading(false)
         notifyError(resp?.msg)
@@ -471,10 +507,10 @@ const VentaPines = () => {
         ])    
     }}
     });
-
+ 
   };
 
-  
+
 
 
   const optionsDocumento = [
