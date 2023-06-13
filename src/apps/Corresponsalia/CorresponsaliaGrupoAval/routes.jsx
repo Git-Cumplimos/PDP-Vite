@@ -41,9 +41,7 @@ const PagoSubsidios = lazy(() => import("./Views/PagoSubsidios/PagoSubsidios"));
 const AhorrosCorriente = lazy(() => import("./Views/AhorrosCorriente"));
 
 const listPermissions = Object.values(enumPermisosAval);
-export const listPermissionsAval = listPermissions.splice(
-  listPermissions.length / 2
-);
+export const listPermissionsAval = listPermissions;
 
 const rutasAvalCB = {
   link: "/corresponsalia/CorresponsaliaGrupoAval",

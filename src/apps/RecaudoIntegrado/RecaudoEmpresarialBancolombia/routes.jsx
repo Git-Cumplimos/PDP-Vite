@@ -33,34 +33,30 @@ export const listPermissionsBancolombia = listPermissions.splice(
 const rutasBancolombiaRecaudoEmpresarial = {
   //RecaudoEmpresarialBancolombia
   link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia",
-  label: (
-    <AppIcons
-      Logo={"CorresponsaliaDavivienda"}
-      name="Recaudo Empresarial Bancolombia"
-    />
-  ),
+  label: <AppIcons Logo={"RECAUDO"} name="Recaudo Empresarial Bancolombia" />,
   component: RecaudoEmpresarialBancolombia,
   permission: [4001],
   subRoutes: [
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia/CargarArchivos",
-      label: <AppIcons Logo={"DepositoDaviplata"} name="Cargue archivo contingencia Bancolombia" />,
+      label: (
+        <AppIcons
+          Logo={"RECAUDO"}
+          name="Cargue archivo contingencia Bancolombia"
+        />
+      ),
       component: CargarArchivos,
       permission: [4001],
     },
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia/HistoricoContingencia",
-      label: (
-        <AppIcons Logo={"DepositoDaviplata"} name="Histórico Contingencia" />
-      ),
+      label: <AppIcons Logo={"RECAUDO"} name="Histórico Contingencia" />,
       component: HistoricoContingencia,
       permission: [4002],
     },
     {
       link: "/recaudoEmpresarial/recaudoEmpresarialBancolombia/TransaccionesRecaudo",
-      label: (
-        <AppIcons Logo={"DepositoDaviplata"} name="Transacciones Recaudo" />
-      ),
+      label: <AppIcons Logo={"RECAUDO"} name="Transacciones Recaudo" />,
       component: TransaccionesRecaudo,
       permission: [4002],
     },
