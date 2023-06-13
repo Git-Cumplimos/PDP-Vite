@@ -411,42 +411,32 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
-    setDisabledBtns(true)
-
-    if (firma === "" && pedirFirma) {
-      notifyError("Asegúrese de tener la firma del cliente en físico ")
+     setDisabledBtns(true)
+    if(homeLocation){
+      if((homeLocation["departamento"][0]=="")||(homeLocation["municipio"][0]=="")){
+        notifyError("Asegúrese de diligenciar los datos de Ubicación")
+        setShowModal(false)
+      }
+      else{
+            consultaClientes(documento,olimpia,tipoDocumento,idPin,tipoPin).then((resp) => {
+          if (!resp?.status){
+            notifyError(resp?.msg)
+            setShowPinLicencia(false)
+            setTipoPin("")
+            setCategoria("")
+            setTramite2("")
+            setTramite("")
+            setCategoria2("")
+            setShowModal(false)
+          }else{  
+            if (firma === "" && pedirFirma) {
+              notifyError("Asegúrese de tener la firma del cliente en físico ")
+            }
+            setShowModal(true)   
+          }})
+      }
     }
-      consultaClientes(documento,olimpia,tipoDocumento,idPin,tipoPin).then((resp) => {
-    if (!resp?.status){
-       notifyError(resp?.msg)
-      setShowPinLicencia(false)
-       setTipoPin("")
-      setDisabledBtns(false)
-      setCategoria("")
-       setTramite2("")
-       setCategoria2("")
-       setDisabledBtns(false)   
-     // console.log(resp)
-    }else{  setShowModal(true)   
-      setDisabledBtns(false)           // console.log(resp)
-      // if(tipoPin==1){
-      //   setShowPinLicencia(true)
-      //   setShowTramiteAdicional(false)
-      //   setTramite2("")
-      //   setCategoria2("")
-      //   settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
-      //   setTramite(7)
-      //   setCategoria("B1")
-      //   setDisabledBtns(false)
-      // }else{
-      // setShowPinLicencia(false)
-      // setDisabledBtns(false)
-
-      // //setDisabledBtns(false)
-
-      // }
-    }})
-   // setShowModal(true) 
+    setDisabledBtns(false)
   };
 
   const onSubmitCliente = (e) => {
@@ -1049,34 +1039,34 @@ const CrearPin = () => {
           required={true}
           onChange={(e) => {
             setTipoPin(parseInt(e.target.value) ?? "");
-            if(isNaN(tipoPin)){
-              setTipoPin("")
-            } setDisabledBtns(true)
+            // if(isNaN(tipoPin)){
+            //   setTipoPin("")
+            // } 
+            setDisabledBtns(true)
             consultaClientes(documento,olimpia,tipoDocumento,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
-                setShowPinLicencia(true)
+                setShowPinLicencia(false)
                 setTipoPin("")
                 setDisabledBtns(false)
-               // console.log(resp)
-              }else{               // console.log(resp)
+              }else{           
+                // if(e.target.value==3){setTipoPin(3)}
+                // if(e.target.value==2){setTipoPin(2)}
                 if(e.target.value==1){
                   setShowPinLicencia(true)
                   setShowTramiteAdicional(false)
                   setTramite2("")
                   setCategoria2("")
                   settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
+                  setTipoPin(1)
                   setTramite(7)
                   setCategoria("B1")
                   setDisabledBtns(false)
                 }else{
                 setShowPinLicencia(false)
                 setDisabledBtns(false)
-
-                //setDisabledBtns(false)
-
                 }
-              }})
+             } })
           }}
         />
         
