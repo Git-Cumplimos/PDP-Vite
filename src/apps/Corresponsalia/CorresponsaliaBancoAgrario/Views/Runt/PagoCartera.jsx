@@ -155,6 +155,7 @@ const PagoCartera = () => {
     const onSubmitConsultPagoCartera = (e) => {
         e.preventDefault();
         // setPagoTotal(0)
+        setShowModalObligacion(false)
         setShowModal(false);
         const data = {
             oficina_propia:
@@ -231,7 +232,8 @@ const PagoCartera = () => {
                     console.log("ESTA ES LA RESPUESTA del pago",response)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
-                        setInfTicket(JSON.parse(voucher));
+                        // setInfTicket(JSON.parse(voucher));
+                        setInfTicket(voucher);
                         setPaso("TransaccionExitosa");
                         notify("Pago del RUNT exitoso");
                         setShowModal(false)
