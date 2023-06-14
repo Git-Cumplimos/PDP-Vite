@@ -1,18 +1,18 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlRegistroCliente =  `${process.env.REACT_APP_URL_PinesVus}`;
+const urlRegistroTrx =  `${process.env.REACT_APP_URL_PinesVus}`;
 
-export const guardarCliente = async (bodyCliente) => {
-    if (!bodyCliente) {
-        throw new Error("sin datos de cliente", { cause: "custom" });
+export const registroTrx = async (bodyTrx) => {
+    if (!bodyTrx) {
+        throw new Error("sin datos de transacción", { cause: "custom" });
     }
     
     try {
         const res = await fetchData(
-        `${urlRegistroCliente}/registroClientes`,
+        `${urlRegistroTrx}/pines_examenes`,
         "POST",
         {},
-        bodyCliente
+        bodyTrx
         );
         if (!res?.status) {
         if (res?.msg) {
