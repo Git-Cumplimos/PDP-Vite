@@ -53,9 +53,10 @@ const PagoCartera = () => {
     const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
     const [procedimiento, setProcedimiento] = useState(numero_obligacion);
     const [showModal, setShowModal] = useState(false);
+    const [showModalTicket, setShowModalTicket] = useState(false);
     const [showModalObligacion, setShowModalObligacion] = useState(false);
     const [resConsultRunt, setResConsultRunt] = useState({});
-    const [infTicket, setInfTicket] = useState(null);
+    const [infTicket, setInfTicket] = useState({});
     const [valorPagoCartera, setValorPagoCartera] = useState(0);
     const printDiv = useRef();
     const buttonDelate = useRef(null);
@@ -213,6 +214,7 @@ const PagoCartera = () => {
                 },
                 PagoCartera: {
                     valReferencia1: numeroPagoCartera,
+                    valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
                     location: {
                         address: roleInfo?.["direccion"],
                         dane_code: roleInfo?.codigo_dane,
@@ -228,9 +230,11 @@ const PagoCartera = () => {
                     console.log("ESTA ES LA RESPUESTA del pago",response)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
-                        setInfTicket(voucher);
+                        setInfTicket(JSON.parse(voucher));
                         setPaso("TransaccionExitosa");
                         notify("Pago del RUNT exitoso");
+                        setShowModal(false)
+                        setShowModalTicket(true)
                     } else if (response?.status === false || response === undefined) {
                         HandleCloseTrxExitosa()
                         notifyError("Error respuesta PDP: Transacción Runt no exitosa")
@@ -269,6 +273,7 @@ const PagoCartera = () => {
         setPaso("LecturaNumeroObligacion");
         setDocumento("LecturaNumeroObligacion");
         setShowModal(false);
+        setShowModalTicket(false)
         setNumeroPagoCartera("");
         // setResConsultRunt(null);
         setInfTicket(null);
@@ -278,6 +283,7 @@ const PagoCartera = () => {
 
     const HandleCloseModal = useCallback(() => {
         setShowModalObligacion(false)
+        setShowModalTicket(false)
         setShowModal(false);
         if (paso === "LecturaNumeroObligacion" && !loadingPeticionBarcode) {
             setDocumento("LecturaNumeroObligacion")
@@ -416,6 +422,7 @@ const PagoCartera = () => {
 
                 {/**************** TransaccionExitosa **********************/}
                 {infTicket && paso === "TransaccionExitosa" && (
+                <Modal show={showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
                         <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
                         <ButtonBar>
@@ -423,6 +430,7 @@ const PagoCartera = () => {
                             <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>
                         </ButtonBar>
                     </div>
+                </Modal>
                 )}
                 {/*************** Recarga Exitosa **********************/}
             {/* </Modal> */}
