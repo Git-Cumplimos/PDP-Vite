@@ -45,13 +45,10 @@ export const useFetchPagoCartera = (
                     };
                     for (let i = 0; i <= 4; i++) { 
                         PeticionConsulta = await fetchConsulta({}, data_consulta);
-                        console.log("PetiionConsulta",PeticionConsulta)
                         if (PeticionConsulta?.obj?.status_trx === "Pendiente") {
-                            console.log("ENTRO AL IF")
                             notify("Su transacción esta siendo procesada, no recargue la página")
                             await sleep(15000);
                         } else {
-                            console.log("ENTRO AL ELSE")
                             break;
                         } 
                     }

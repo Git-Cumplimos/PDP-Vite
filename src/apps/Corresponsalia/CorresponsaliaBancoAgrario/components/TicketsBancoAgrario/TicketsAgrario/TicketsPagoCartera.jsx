@@ -10,21 +10,9 @@ const TicketsPagoCartera = ({
   logo,
 }) => {
   const { divPrint } = classes;
-
-  console.log("ESTO ES EL TIKET DESDE EL COMPONENTEN TicketsAgrario ",ticket);
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
   }
- 
-  console.log("ESTO ES ticket", ticket)
-  console.log("ESTO ES typeof(ticket)", typeof ticket)
-  if (ticket) { 
-
-    console.log("ESTO ES ticket?.timeInfo", ticket?.timeInfo)
-    console.log("ESTO ES ticket?.timeInfo", ticket?.commerceInfo)
-    console.log("ESTO ES ticket?.timeInfo", ticket?.commerceName)
-  }
-  // console.log("ESTO ES timeInfo", timeInfo)
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } = ticket;
   return (
     <div style={{ border: "1px solid black" }}>

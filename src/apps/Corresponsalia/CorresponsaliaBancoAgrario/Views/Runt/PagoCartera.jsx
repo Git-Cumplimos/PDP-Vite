@@ -197,8 +197,6 @@ const PagoCartera = () => {
         (e,pagoTotal) => {
             e.preventDefault();
             // setValorPagoCartera(pagoTotal);
-            console.log("ESTO ES pagoTotal",pagoTotal);
-            console.log("ESTO ES valorPagoCartera", valorPagoCartera);
             const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
             const data = {
                 oficina_propia:
@@ -229,7 +227,6 @@ const PagoCartera = () => {
             }
             peticionPayRunt(data, dataAditional)
                 .then((response) => {
-                    console.log("ESTA ES LA RESPUESTA del pago",response)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
                         // setInfTicket(JSON.parse(voucher));
@@ -324,8 +321,6 @@ const PagoCartera = () => {
     const onSelectAutorizador = useCallback(
         (e, i) =>
         {
-            console.log("Esto es el valor",e)
-            console.log("Esto es el indice",i)
             setShowModalObligacion(true)
             setSelectIndiceObligacion(i)
         }

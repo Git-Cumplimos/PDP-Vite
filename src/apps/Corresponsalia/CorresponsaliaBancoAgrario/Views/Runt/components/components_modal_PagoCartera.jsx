@@ -19,9 +19,6 @@ export const ComponentsModalSummaryTrx = ({
   posicion,
 }) => {
   const [pagoTotal, setPagoTotal] = useState(false);
-  console.log("ESTO ES PETICION summary", summary)
-  console.log("ESTO ES PETICION posicion", posicion)
-  console.log("ESTO ES PETICION summary[posicion - 1];", summary[posicion])
   return (
       <PaymentSummary
         title="¿Está seguro de realizar la transacción?"
