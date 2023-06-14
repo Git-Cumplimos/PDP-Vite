@@ -1,8 +1,12 @@
 import classes from "./Tickets.module.css";
-import LogoPDP from "../LogoPDP/LogoPDP";
+import { useImgs } from "../../../hooks/ImgsHooks";
 
 const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
   const { divPrint } = classes;
+
+  const {
+    imgs: { pdpHorizontal: LogoPng },
+  } = useImgs();
 
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
@@ -15,10 +19,14 @@ const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
         <div className="flex flex-row justify-center items-center w-full">
-          <LogoPDP xsmall />
+          <div className="cursor-pointer w-30">
+            <div className="aspect-w-16 aspect-h-9">
+              <img src={LogoPng} alt="Logo punto de pago" />
+            </div>
+          </div>
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
-        <hr className="border-gray-400 my-3" />
+        <hr className="border-gray-400 my-1" />
         <div className="flex flex-col gap-2 px-2 text-xs">
           <div className="flex flex-row justify-between w-full">
             {Object.entries(timeInfo).map(([key, value], idx) => {
@@ -34,8 +42,8 @@ const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
             })}
           </div>
         </div>
-        <hr className="border-gray-400 my-3" />
-        <div className="flex flex-col gap-2 px-2 text-xs text-left">
+        <hr className="border-gray-400 my-1" />
+        <div className="flex flex-col gap-1 px-2 text-xs text-left">
           {commerceInfo
             .map((e, i, arr) => {
               const chunkSize = 2;
@@ -73,13 +81,13 @@ const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
               );
             })}
         </div>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           {commerceName ?? ""}
         </h1>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           Transacción {stateTrx ? "exitosa" : "rechazada"}
         </h1>
-        <div className="flex flex-col gap-2 px-2 text-xs">
+        <div className="flex flex-col gap-1 px-2 text-xs">
           {trxInfo
             .map((e, i, arr) => {
               const chunkSize = 2;
@@ -117,11 +125,11 @@ const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
               );
             })}
         </div>
-        <hr className="border-gray-400 my-3" />
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <hr className="border-gray-400 my-1" />
+        <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           ***{type}***
         </h1>
-        <h1 className="text-center my-3 text-xs font-normal">{disclamer}</h1>
+        <h1 className="text-center my-1 text-xs font-normal">{disclamer}</h1>
       </div>
     </div>
   );
