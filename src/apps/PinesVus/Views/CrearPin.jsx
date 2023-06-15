@@ -78,7 +78,7 @@ const CrearPin = () => {
   const [descripcionTipDoc, setDescripcionTipDoc] = useState("")
   const [metodoPago, setMetodoPago] = useState("1")
   const [codigoPago, setCodigoPago] = useState("")
-  const [codigoPagoVerificacion, setCodigoPagoVerificacion] = useState("")
+  const [codigoPago2, setCodigoPago2] = useState("")
 
 
   const [olimpia, setOlimpia] = useState("")
@@ -546,7 +546,6 @@ const CrearPin = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (codigoPago === codigoPagoVerificacion){
     setDisabledBtns(true);
     const hora_actual=Intl.DateTimeFormat("es-CO", {
       hour: "numeric",
@@ -587,9 +586,15 @@ const CrearPin = () => {
     objTicket["trxInfo"][6] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
     if (metodoPago === "2") {
       objTicket["trxInfo"][7] = ["", ""]
-      objTicket["trxInfo"][8] = ["Cod. Datafono", codigoPago]
+      objTicket["trxInfo"][8] = ["Código Aprobación", codigoPago]
       objTicket["trxInfo"][9] = ["", ""]
-      }
+    }
+    if (codigoPago2 !== "") {
+      objTicket["trxInfo"][8] = ["Código Aprobación 1", codigoPago]
+      objTicket["trxInfo"][10] = ["Código Aprobación 2", codigoPago2]
+      objTicket["trxInfo"][11] = ["", ""]    
+    }
+
     // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
     // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
     // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
@@ -635,7 +640,7 @@ const CrearPin = () => {
 
     }
 
-    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago )
+    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago, codigoPago2 )
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -657,10 +662,8 @@ const CrearPin = () => {
       })
       .catch(() => setDisabledBtns(false));
     }
-    }
-    else{
-      notifyError("Verifique que el código suministrado por el datafono sea correcto")
-    }
+    
+    
   };
 
   const closeModal = useCallback(async () => {
@@ -1377,19 +1380,19 @@ const CrearPin = () => {
                   setMetodoPago(e.target.value);
                   setDisabledBtnsContinuar(false)
                   setCodigoPago("")
-                  setCodigoPagoVerificacion("")
+                  setCodigoPago2("")
                 }}
               />
               { metodoPago === '2' ?
               <>
               <Input
               id="codPago"
-              label="Código datafono"
+              label="Código Aprobación 1"
               type="text"
               autoComplete="off"
               value={codigoPago}
               minLength="1"
-              maxLength="30"
+              maxLength="20"
               required
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
@@ -1400,25 +1403,17 @@ const CrearPin = () => {
               />
               <Input
               id="codPagoVerificacion"
-              label="Verificación código"
+              label="Código Aprobación 2"
               type="text"
               autoComplete="off"
-              value={codigoPagoVerificacion}
+              value={codigoPago2}
               minLength="1"
-              maxLength="30"
-              required
+              maxLength="20"
               onInput={(e) => {
-                if (
-                  (String(e.target.value).length > 2) &
-                  (String(codigoPagoVerificacion).length < 1)
-                ) {
-                  notifyError("Debe digitar el código y no pegarlo");
-                } else {            
-                  if (!isNaN(e.target.value)) {
-                    const num = e.target.value;
-                    setCodigoPagoVerificacion(num);
-                  }                  
-                }
+                if (!isNaN(e.target.value)) {
+                  const num = e.target.value;
+                  setCodigoPago2(num);
+                }                
               }}
               />
               </>
