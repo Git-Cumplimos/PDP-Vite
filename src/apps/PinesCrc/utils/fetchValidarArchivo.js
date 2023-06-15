@@ -2,19 +2,19 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
 // const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
-const urlBackendValidar = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-validar-archivos`;
-
-export const Validar_archivo = async (banco, nombre_archivo) => {
+const urlBackendValidar = `${process.env.REACT_APP_BASE_API}/cert/pinesVus/validar_archivos`;
+// const urlBackendValidar = `${process.env.REACT_APP_URL_PinesVus}/validar_archivos`
+export const Validar_archivo = async (nombre_archivo) => {
   let new_nombre_archivo = nombre_archivo.substring(
     nombre_archivo.indexOf("/") + 1
   );
   // console.log("BODY", new_nombre_archivo);
-  if (!nombre_archivo || !banco) {
+  if (!nombre_archivo) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlBackendValidar}/verificar?id_proceso=${banco}&nombre_archivo=${new_nombre_archivo}`,
+      `${urlBackendValidar}?nombre_archivo=${nombre_archivo}`,
       "GET",
       {},
       {},
