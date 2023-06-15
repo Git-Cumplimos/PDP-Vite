@@ -237,10 +237,12 @@ const SendForm = ({
             Bono
             <input
               id="Bono"
-              value={operacion?.Venta_Intercambio}
+              value={operacion?.Venta_Fisica}
+              data-alt-value={operacion?.Venta_Intercambio}
               name="pago"
               type="radio"
-              onChange={(e) => formPago(e.target.value)}
+              // onChange={(e) => formPago(e.target.value)}
+              onChange={(e) => formPago(e.target.getAttribute('data-alt-value'))}
             />
           </div>
           <ButtonBar>

@@ -583,7 +583,7 @@ const CrearPin = () => {
     objTicket["commerceName"] = pinData["descripcion"]
     objTicket["trxInfo"][0] = ["Trámite", "Creación de Pin"]
     objTicket["trxInfo"][5] = ["Documento", documento]
-    objTicket["trxInfo"][6] = ["Metodo de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+    objTicket["trxInfo"][6] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
     if (metodoPago === "2") {
       objTicket["trxInfo"][7] = ["", ""]
       objTicket["trxInfo"][8] = ["Código Aprobación", codigoPago]
@@ -1369,7 +1369,7 @@ const CrearPin = () => {
               <Form onSubmit={onSubmit}>
               <Select
                 id="metodoPago"
-                label="Metodo de pago"
+                label="Método de pago"
                 required
                 options={[
                   { value: 1, label: "Efectivo" },

@@ -172,7 +172,6 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.consulta_operaciones, "GET", query);
-
       return res;
     } catch (err) {
       console.error(err);
