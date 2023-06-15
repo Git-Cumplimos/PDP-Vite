@@ -1,4 +1,5 @@
-import { Fragment, useState } from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+import { Fragment, useRef, useState } from "react";
 
 import Accordion from "../../../../../components/Base/Accordion";
 import Button from "../../../../../components/Base/Button";
@@ -12,6 +13,7 @@ import { buscarListaComerciosCierreCaja, buscarReporteCierreCaja } from "../../.
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notifyError } from "../../../../../utils/notify";
 import { useAuth } from "../../../../../hooks/AuthHooks";
+import { useReactToPrint } from "react-to-print";
 
 import "./CierreCaja.style.css";
 import * as CierreCajaCons from "./CierreCaja.cons";
@@ -31,118 +33,118 @@ const GridRow = ({ cols = [], self = false }) => (
       <div key={ind}>{val}</div>
     ))}
   </div>
-);
+)
 
 const TreeView = ({ tree = {}, child }) =>
-  Object.entries(tree).map(([key, info]) => {
-    var cols = []
-    if (child) {
-      cols = [
-        info.id,
-        info.nombre, 
-        info.transaccionesExitosas,
-        info.transaccionesFallidas, 
-        formatMoney.format(info.monto), 
-        formatMoney.format(info.comisiones)
-      ];
-      if (info?.transacciones) {
-        return (
-          <Accordion titulo={<GridRow cols={cols} />} key={key}>
-            {info?.transacciones && (
-              <TreeView tree={info?.transacciones} child={true} />
-            )}
-          </Accordion>
-        );
-      }
-    } else {
-      cols = [
-        "",
-        info.nombre,
-        valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_SUCCESS),
-        valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_FAILURE), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_AMOUNT)), 
-        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_COMMISSION))
-      ];
-      if (info?.autorizadores) {
-        return (
-          <Accordion titulo={<GridRow cols={cols} />} key={key}>
-            {info?.autorizadores && (
-              <TreeView tree={info?.autorizadores} child={true} />
-            )}
-          </Accordion>
-        );
-      }
+Object.entries(tree).map(([key, info]) => {
+  var cols = []
+  if (child) {
+    cols = [
+      info.id,
+      info.nombre, 
+      info.transaccionesExitosas,
+      info.transaccionesFallidas, 
+      formatMoney.format(info.monto), 
+      formatMoney.format(info.comisiones)
+    ];
+    if (info?.transacciones) {
+      return (
+        <Accordion titulo={<GridRow cols={cols} />} key={key}>
+          {info?.transacciones && (
+            <TreeView tree={info?.transacciones} child={true} />
+          )}
+        </Accordion>
+      );
     }
-    return (
-      <GridRow
-        key={key}
-        cols={cols}
-        self
-      />
-    );
-  });
+  } else {
+    cols = [
+      "",
+      info.nombre,
+      valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_SUCCESS),
+      valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_FAILURE), 
+      formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_AMOUNT)), 
+      formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_COMMISSION))
+    ];
+    if (info?.autorizadores) {
+      return (
+        <Accordion titulo={<GridRow cols={cols} />} key={key}>
+          {info?.autorizadores && (
+            <TreeView tree={info?.autorizadores} child={true} />
+          )}
+        </Accordion>
+      );
+    }
+  }
+  return (
+    <GridRow
+      key={key}
+      cols={cols}
+      self
+    />
+  );
+})
 
-  const valoresCalculadosTotales = (gruposTransaccion, valor) => {
-    var valorCalculado = 0
-    if (gruposTransaccion !== null && gruposTransaccion !== undefined) {
-      if (gruposTransaccion.length > 0) {
-        gruposTransaccion.map((autorizadores) => {
-          if (autorizadores.autorizadores.length > 0) {
-            if (valor === CierreCajaCons.TAG_TRX_SUCCESS) {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.transaccionesExitosas);
-              })
-            }
-            if (valor === CierreCajaCons.TAG_TRX_FAILURE) {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.transaccionesFallidas);
-              })
-            }
-            if (valor === CierreCajaCons.TAG_AMOUNT) {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.monto);
-              })
-            }
-            if (valor === CierreCajaCons.TAG_COMMISSION) {
-              autorizadores.autorizadores.map((autorizador) => {
-                valorCalculado += Number(autorizador.comisiones);
-              })
-            }
+const valoresCalculadosTotales = (gruposTransaccion, valor) => {
+  var valorCalculado = 0
+  if (gruposTransaccion !== null && gruposTransaccion !== undefined) {
+    if (gruposTransaccion.length > 0) {
+      gruposTransaccion.map((autorizadores) => {
+        if (autorizadores.autorizadores.length > 0) {
+          if (valor === CierreCajaCons.TAG_TRX_SUCCESS) {
+            autorizadores.autorizadores.map((autorizador) => {
+              valorCalculado += Number(autorizador.transaccionesExitosas);
+            })
           }
+          if (valor === CierreCajaCons.TAG_TRX_FAILURE) {
+            autorizadores.autorizadores.map((autorizador) => {
+              valorCalculado += Number(autorizador.transaccionesFallidas);
+            })
+          }
+          if (valor === CierreCajaCons.TAG_AMOUNT) {
+            autorizadores.autorizadores.map((autorizador) => {
+              valorCalculado += Number(autorizador.monto);
+            })
+          }
+          if (valor === CierreCajaCons.TAG_COMMISSION) {
+            autorizadores.autorizadores.map((autorizador) => {
+              valorCalculado += Number(autorizador.comisiones);
+            })
+          }
+        }
+      })
+    }
+  }
+  return valorCalculado
+}
+  
+const valoresCalculadosGrupos = (autorizadores, valor) => {
+  var valorCalculado = 0
+  if (autorizadores !== null && autorizadores !== undefined) {
+    if (autorizadores.length > 0) {
+      if (valor === CierreCajaCons.TAG_TRX_SUCCESS) {
+        autorizadores.map((autorizador) => {
+          valorCalculado += Number(autorizador.transaccionesExitosas);
+        })
+      }
+      if (valor === CierreCajaCons.TAG_TRX_FAILURE) {
+        autorizadores.map((autorizador) => {
+          valorCalculado += Number(autorizador.transaccionesFallidas);
+        })
+      }
+      if (valor === CierreCajaCons.TAG_AMOUNT) {
+        autorizadores.map((autorizador) => {
+          valorCalculado += Number(autorizador.monto);
+        })
+      }
+      if (valor === CierreCajaCons.TAG_COMMISSION) {
+        autorizadores.map((autorizador) => {
+          valorCalculado += Number(autorizador.comisiones);
         })
       }
     }
-    return valorCalculado
   }
-  
-  const valoresCalculadosGrupos = (autorizadores, valor) => {
-    var valorCalculado = 0
-    if (autorizadores !== null && autorizadores !== undefined) {
-      if (autorizadores.length > 0) {
-        if (valor === CierreCajaCons.TAG_TRX_SUCCESS) {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.transaccionesExitosas);
-          })
-        }
-        if (valor === CierreCajaCons.TAG_TRX_FAILURE) {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.transaccionesFallidas);
-          })
-        }
-        if (valor === CierreCajaCons.TAG_AMOUNT) {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.monto);
-          })
-        }
-        if (valor === CierreCajaCons.TAG_COMMISSION) {
-          autorizadores.map((autorizador) => {
-            valorCalculado += Number(autorizador.comisiones);
-          })
-        }
-      }
-    }
-    return valorCalculado
-  }
+  return valorCalculado
+}
 
 const headers = [
   "",
@@ -155,18 +157,22 @@ const headers = [
 
 const CierreCaja = () => {
 
-  const { roleInfo } = useAuth();
-  const [dataCapitalizar, setDataCapitalizar] = useState({});
-  const [dataComercios, setDataComercios] = useState([]);
-  const [dataInicioDia, setDataInicioDia] = useState({});
-  const [dataTransacciones, setDataTransacciones] = useState([]);
-
-  const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
-  const [comercio, setComercio] = useState("");
-  const [comercioSeleccionado, setComercioSeleccionado] = useState("");
-  const [loadScreen, setLoadScreen] = useState(false);
-
   try {
+
+    const printDiv = useRef();
+  
+    const { roleInfo } = useAuth();
+    const [dataCapitalizar, setDataCapitalizar] = useState({});
+    const [dataComercios, setDataComercios] = useState([]);
+    const [dataInicioDia, setDataInicioDia] = useState({});
+    const [dataTransacciones, setDataTransacciones] = useState([]);
+  
+    const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
+    const [comercio, setComercio] = useState("");
+    const [comercioSeleccionado, setComercioSeleccionado] = useState("");
+    const [loadScreen, setLoadScreen] = useState(false);
+
+    const handlePrint = useReactToPrint({ content: () => printDiv.current, });
     
     const getCommerces = async () => {
       setLoadScreen(true);
@@ -342,81 +348,102 @@ const CierreCaja = () => {
             value={fechas?.[CierreCajaCons.TAG_FINAL_DATE]}
           />
         </Form>
-        <ButtonBar>
-          <Button
-            onClick={() => getData()}
-            type="submit"
-          >
-            {CierreCajaCons.LABEL_BUTTON_GENERATE_REPORT}
-          </Button>
-        </ButtonBar>
-        { dataTransacciones.length > 0 &&
-          <div className="w-full px-10 my-10">          
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={headers}
-                />
-              }
-            />
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={[
-                    "", 
-                    dataInicioDia.nombre, 
-                    "",
-                    "",
-                    dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? (formatMoney.format(dataInicioDia.monto)) : (formatMoney.format(dataInicioDia.monto).toString().replace("$","")), 
-                    formatMoney.format(dataInicioDia.comisiones)
-                  ]}
-                />
-              }
-            />
-            <TreeView
-              tree={dataTransacciones}
-              child={false}
-            />
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={[
-                    "", 
-                    dataCapitalizar.nombre, 
-                    dataCapitalizar.transaccionesExitosas,
-                    dataCapitalizar.transaccionesFallidas,
-                    formatMoney.format(dataCapitalizar.monto), 
-                    formatMoney.format(dataCapitalizar.comisiones)
-                  ]}
-                />
-              }
-            />
-            <Accordion
-              titulo={
-                <GridRow
-                  cols={[
-                    "", 
-                    "Calculado", 
-                    valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas,
-                    valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas,
-                    dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? 
-                      (
-                        formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto))
-                      ) : (
-                        formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto))
-                      ),
-                    formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_COMMISSION))+Number(dataInicioDia.comisiones)+Number(dataCapitalizar.comisiones))
-                  ]}
-                />
-              }
-            />
-          </div>
-        }
+        { dataTransacciones.length === 0 ? (
+          <ButtonBar>
+            <Button
+              onClick={() => getData()}
+              type="submit"
+            >
+              {CierreCajaCons.LABEL_BUTTON_GENERATE_REPORT}
+            </Button>
+          </ButtonBar>
+        ) : (
+          <>
+            <div className="containerCommerceSearch">
+              <ButtonBar>
+                <Button
+                  onClick={() => getData()}
+                  type="submit"
+                >
+                  {CierreCajaCons.LABEL_BUTTON_GENERATE_REPORT}
+                </Button>
+              </ButtonBar>
+              <ButtonBar>
+                <Button
+                  onClick={() => handlePrint()}
+                  type="submit"
+                >
+                  {CierreCajaCons.LABEL_BUTTON_PRINT_REPORT}
+                </Button>
+              </ButtonBar>
+            </div>
+            <div className="w-full px-10 my-10" ref={printDiv}>
+              <Accordion
+                titulo={
+                  <GridRow
+                    cols={headers}
+                  />
+                }
+              />
+              <Accordion
+                titulo={
+                  <GridRow
+                    cols={[
+                      "", 
+                      dataInicioDia.nombre, 
+                      "",
+                      "",
+                      dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? (formatMoney.format(dataInicioDia.monto)) : (formatMoney.format(dataInicioDia.monto).toString().replace("$","")), 
+                      formatMoney.format(dataInicioDia.comisiones)
+                    ]}
+                  />
+                }
+              />
+              <TreeView
+                tree={dataTransacciones}
+                child={false}
+              />
+              <Accordion
+                titulo={
+                  <GridRow
+                    cols={[
+                      "", 
+                      dataCapitalizar.nombre, 
+                      dataCapitalizar.transaccionesExitosas,
+                      dataCapitalizar.transaccionesFallidas,
+                      formatMoney.format(dataCapitalizar.monto), 
+                      formatMoney.format(dataCapitalizar.comisiones)
+                    ]}
+                  />
+                }
+              />
+              <Accordion
+                titulo={
+                  <GridRow
+                    cols={[
+                      "", 
+                      "Calculado", 
+                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas,
+                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas,
+                      dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? 
+                        (
+                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto))
+                        ) : (
+                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto))
+                        ),
+                      formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_COMMISSION))+Number(dataInicioDia.comisiones)+Number(dataCapitalizar.comisiones))
+                    ]}
+                  />
+                }
+              />
+            </div>
+          </>
+        )}
       </Fragment>
-    );
+    )
   } catch (error) {
     return(<Error404 />)
   }
-};
+}
 
 export default CierreCaja;
