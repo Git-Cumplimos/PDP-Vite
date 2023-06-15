@@ -37,6 +37,7 @@ import { usePinesVus } from "../../../PinesVus/utils/pinesVusHooks"
 import Fieldset from "../../../../components/Base/Fieldset";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import { guardarCliente } from "../../utils/fetchGuardarCliente";
+import { registroTrx } from "../../utils/fetchRegistrarTrx";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -121,7 +122,6 @@ const VentaPines = () => {
     homeLocation,
     setDireccion
   ]);  
-
 
   const summary = useMemo(
     () => ({
@@ -219,7 +219,7 @@ const VentaPines = () => {
             if (error?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
-            console.error(error?.message);
+            // console.error(error?.message);
             return "Consulta fallida";
           },
         }
@@ -236,13 +236,8 @@ const VentaPines = () => {
     ]
   );
 
-  const onMakePayment = useCallback(
+  const fetchTrx = useCallback(
     (ev) => {
-      ev.preventDefault();
-      if (valVentaPines <= 0) {
-        notifyError("El valor del pin debe ser mayor a cero");
-        return;
-      }
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -283,49 +278,112 @@ const VentaPines = () => {
           },
         },
       };
-
-      notifyPending(
-        makeSellPin(data),
-        {
-          render: () => {
-            setLoadingSell(true);
-            return "Procesando transacción";
-          },
+    notifyPending(
+      makeSellPin(data),
+      {
+        render: () => {
+          setLoadingSell(true);
+          return "Procesando transacción";
         },
-        {
-          render: ({ data: res }) => {
-            setLoadingSell(false);
-            const tempTicket = res?.obj?.ticket ?? {};
-            const pin_encriptado = res?.obj?.pin_encriptado ?? "";
-            const pin_desencriptado = decryptPin(pin_encriptado);
-            tempTicket.trxInfo[2][1] = pin_desencriptado;
-            setPaymentStatus(tempTicket);
-            if(showFormulario2){ 
-              setIsLoading(true)
-            guardarCliente(infoCliente).then((resp) => {
-            if (!resp?.status){
-              setIsLoading(false)
-              notifyError(resp?.msg)
-            }else{
-              setIsLoading(false)
-            }
-          });
-                }
-            return "Transacción satisfactoria";
-          },
-        },
-        {
-          render: ({ data: error }) => {
-            setLoadingSell(false);
-            navigate("/Pines/PinesCrc", { replace: true });
-            if (error?.cause === "custom") {
-              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-            }
-            console.error(error?.message);
-            return "Transacción fallida";
-          },
+      },
+      {
+        render: ({ data: res }) => {
+          setLoadingSell(false);
+          const tempTicket = res?.obj?.ticket ?? {};
+          const pin_encriptado = res?.obj?.pin_encriptado ?? "";
+          const pin_desencriptado = decryptPin(pin_encriptado);
+          tempTicket.trxInfo[2][1] = pin_desencriptado;
+          const infoPinCrc = {
+          pk_id_trx : res?.obj?.id_trx,
+          id_comercio : roleInfo?.id_comercio,
+          nombre_comercio : roleInfo?.nombre_comercio,
+          referencia : pin_desencriptado,
+          documento : documento,
+          valor_pin : valVentaPines,
+          estado : res?.status?"Aprobado":"Declinado"
         }
-      );
+          notifyPending(
+            registroTrx(infoPinCrc),
+            {
+              render: () => {
+                setLoadingSell(true);
+                return "Procesando transacción";
+              },
+            },
+            {
+              render: ({ infoPinCrc: res }) => {
+                setLoadingSell(false);                
+                console.log(res)
+                return "Registro Transacción satisfactoria";
+              },
+            },
+            {
+              render: ({ infoPinCrc: error }) => {
+                setLoadingSell(false);
+                if (error?.cause === "custom") {
+                  return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+                }
+                return "Registro Transacción fallida";
+              },
+            }
+          );
+          setPaymentStatus(tempTicket);
+          return "Transacción satisfactoria";
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          setLoadingSell(false);
+          navigate("/Pines/PinesCrc", { replace: true });
+          if (error?.cause === "custom") {
+            return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+          }
+          // console.error(error?.message);
+          return "Transacción fallida";
+        },
+      }
+    );
+    }
+);
+
+  const onMakePayment = useCallback(
+    (ev) => {
+      ev.preventDefault();   
+      if (valVentaPines <= 0) {
+        notifyError("El valor del pin debe ser mayor a cero");
+        return;
+      }
+    if(showFormulario2){ 
+          notifyPending(
+            guardarCliente(infoCliente),
+            {
+              render: () => {
+                setLoadingSell(true);
+                return "Procesando transacción";
+              },
+            },
+            {
+              render: ({ infoCliente: res }) => {
+                setLoadingSell(false);
+                fetchTrx();
+                 return "Datos del cliente guardados satisfactoriamente";
+              },
+            },
+            {
+              render: ({ infoCliente: error }) => {
+                setLoadingSell(false);
+                // navigate("/Pines/PinesCrc", { replace: true });
+                if (error?.cause === "custom") {
+                  return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+                }
+                // console.error(error?.message);
+                return "Error guardando datos de cliente";
+              },
+            }
+          );
+    }else{
+      fetchTrx();
+      } 
     },
     [
       datosConvenio,
@@ -363,7 +421,7 @@ const VentaPines = () => {
         // });
       })
       .catch((err) => {
-        console.error(err);
+        // console.error(err);
         notifyError("Error consultando parametros de la transacción");
       });
   }, []);

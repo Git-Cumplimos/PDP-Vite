@@ -26,7 +26,7 @@ const rutasPinesCrc = {
   link: "/Pines/PinesCrc",
   label: (
     <AppIcons
-      Logo={"CrearPines"}
+      Logo={"PINES_GENERACION_LICENCIA"}
       name={"Pines CRC"}
     />
   ),
@@ -39,8 +39,8 @@ const rutasPinesCrc = {
       link: "/Pines/PinesCrc/Ventapines",
       label: (
         <AppIcons
-          Logo={"VentaPinRecaudoColpatria"}
-          name={"Pines CRC"}
+          Logo={"PINES_CREAR"}
+          name={"Crear Pin CRC"}
         />
       ),
       component: PinesVenta,
@@ -49,7 +49,7 @@ const rutasPinesCrc = {
         {
           link: "/Pines/PinesCrc/pines/:id_convenio_pin",
           label: (
-            <AppIcons Logo={"CrearPines"} name={"Venta de Pines CRC"} />
+            <AppIcons Logo={"PINES_CREAR"} name={"Venta de Pines CRC"} />
           ),
           component: PinesVenta,
           permission: [PermissionsPinesCrc.venta_pines,
