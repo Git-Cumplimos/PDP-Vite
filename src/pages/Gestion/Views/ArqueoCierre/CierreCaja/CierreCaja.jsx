@@ -422,7 +422,7 @@ const CierreCaja = () => {
                   <GridRow
                     cols={[
                       "", 
-                      "Calculado", 
+                      CierreCajaCons.LABEL_COLUMN_BALANCE,
                       valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas,
                       valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas,
                       dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? 
