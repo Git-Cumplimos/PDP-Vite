@@ -127,7 +127,9 @@ const FileInputX = () => {
         setDisabledBtn(false);
       });
     } catch (error) {
+      notifyError('Error')
       console.error(error);
+      setProcesandoValidacion(false);
       document.getElementById("anulaciones").value = ""; // <- limpia el valor del campo de archivo
       setDisabledBtn(false);
     }
