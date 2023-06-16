@@ -1,5 +1,5 @@
 .divPrint {
-  size: 80mm 160mm;
+  size: 80mm auto;
   width: 80mm;
   /* max-height: 160mm; */
   /* height: 160mm; */
@@ -9,5 +9,5 @@
 }
 
 @page {
-  size: 80mm 160mm;
+  size: 80mm auto;
 }

@@ -1,6 +1,8 @@
 import classes from "./Tickets.module.css";
 import { useImgs } from "../../../hooks/ImgsHooks";
 
+const { divPrint } = classes;
+
 const Tickets = ({
   refPrint,
   type = "ORIGINAL",
@@ -8,8 +10,6 @@ const Tickets = ({
   stateTrx = true,
   children = null,
 }) => {
-  const { divPrint } = classes;
-
   const {
     imgs: { pdpHorizontal: LogoPng },
   } = useImgs();
