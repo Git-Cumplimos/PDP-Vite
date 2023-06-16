@@ -141,7 +141,12 @@ export const AuthContext = createContext({
 });
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  let authContextCopy = {...useContext(AuthContext)};
+  try{    
+    authContextCopy.roleInfo.tipo_comercio += "-";
+    return authContextCopy;
+  }
+  catch{return authContextCopy}
 };
 
 export const useProvideAuth = () => {
