@@ -624,6 +624,20 @@ const CrearPin = () => {
     objTicket2["trxInfo"][11] = ["", ""]
     objTicket2["trxInfo"][12] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
     objTicket2["trxInfo"][13] = ["", ""]
+    objTicket2["trxInfo"][14] = ["Documento", documento]
+    objTicket2["trxInfo"][15] = ["", ""]
+    objTicket2["trxInfo"][16] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+    objTicket2["trxInfo"][17] = ["", ""]
+    if (metodoPago === "2") {
+      objTicket2["trxInfo"][18] = ["Código Aprobación", codigoPago]
+      objTicket2["trxInfo"][19] = ["", ""]
+    }
+    if (codigoPago2 !== "") {
+      objTicket2["trxInfo"][18] = ["Código Aprobación 1", codigoPago]
+      objTicket2["trxInfo"][19] = ["", ""]
+      objTicket2["trxInfo"][19] = ["Código Aprobación 2", codigoPago2]
+      objTicket2["trxInfo"][20] = ["", ""]    
+    }
 
 
     }
@@ -637,6 +651,20 @@ const CrearPin = () => {
       objTicket2["trxInfo"][5] = ["", ""]
       objTicket2["trxInfo"][6] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
       objTicket2["trxInfo"][7] = ["", ""]
+      objTicket2["trxInfo"][8] = ["Documento", documento]
+      objTicket2["trxInfo"][9] = ["", ""]
+      objTicket2["trxInfo"][10] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+      objTicket2["trxInfo"][11] = ["", ""]
+      if (metodoPago === "2") {
+        objTicket2["trxInfo"][12] = ["Código Aprobación", codigoPago]
+        objTicket2["trxInfo"][13] = ["", ""]
+      }
+      if (codigoPago2 !== "") {
+        objTicket2["trxInfo"][12] = ["Código Aprobación 1", codigoPago]
+        objTicket2["trxInfo"][13] = ["", ""]
+        objTicket2["trxInfo"][14] = ["Código Aprobación 2", codigoPago2]
+        objTicket2["trxInfo"][15] = ["", ""]    
+      }
 
     }
 
