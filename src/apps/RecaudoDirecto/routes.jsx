@@ -114,7 +114,12 @@ export const rutasGestionRecaudoDirecto = {
 
 const rutasRecaudoDirecto = {
   link: "/recaudo-directo",
-  label: <AppIcons Logo={"RETIRO"} name={"Recaudo/Retiro Directos"} />,
+  label: (
+    <AppIcons
+      Logo={"DAVIVIENDA_RETIROS_Y_DEPOSITOS"}
+      name={"Recaudo/Retiro Directos"}
+    />
+  ),
   component: RecaudoEntryPoint,
   permission: listPermissionsRecaudoDirecto,
   subRoutes: [rutasRecaudo, rutasRetiro, rutasGestionRecaudoDirecto],

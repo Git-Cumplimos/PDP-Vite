@@ -265,19 +265,21 @@ const rutasConfiguraciones = {
     },
     {
       link: "/params-operations/convenios-recaudo",
-      label: <AppIcons Logo={"RETIRO"} name={"Convenios de recaudo"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Convenios de recaudo"} />,
       component: ConveniosPDP,
       permission: [20],
       subRoutes: [
         {
           link: "/params-operations/convenios-recaudo/administrar",
-          label: <AppIcons Logo={"RETIRO"} name={"Administrar convenios"} />,
+          label: <AppIcons Logo={"RECAUDO"} name={"Administrar convenios"} />,
           component: AdminConveniosPDP,
           permission: [20],
         },
         {
           link: "/params-operations/convenios-recaudo/autorizadores-recaudo",
-          label: <AppIcons Logo={"RETIRO"} name={"Autorizadores de recaudo"} />,
+          label: (
+            <AppIcons Logo={"RECAUDO"} name={"Autorizadores de recaudo"} />
+          ),
           component: ConveniosAutorizadoresRecaudo,
           permission: [20],
         },
@@ -285,7 +287,7 @@ const rutasConfiguraciones = {
     },
     {
       link: "/params-operations/navconvenios",
-      label: <AppIcons Logo={"RETIRO"} name={"Convenios"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
       component: navConvenios,
       permission: [enumPermisosTrx.convenios, enumPermisosTrx.grupos_comercios],
       subRoutes: [
@@ -324,20 +326,20 @@ const rutasConfiguraciones = {
     },
     {
       link: "/params-operations/configuracion_comercios",
-      label: <AppIcons Logo={"RETIRO"} name={"Configuración comercios"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Configuración comercios"} />,
       component: ConfiguracionComercios,
       permission: [enumPermisosTrx.configuracion_comercios],
     },
     {
       link: "/params-operations/tipo_contrato_comisiones",
-      label: <AppIcons Logo={"RETIRO"} name={"Contratos comisiones"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Contratos comisiones"} />,
       component: TipoContratoComisiones,
       permission: [enumPermisosTrx.contratos_comisiones],
       subRoutes: [
         {
           link: "/params-operations/convenios/autorizadores",
           label: (
-            <AppIcons Logo={"RETIRO"} name={"Autorizadores de convenio"} />
+            <AppIcons Logo={"RECAUDO"} name={"Autorizadores de convenio"} />
           ),
           component: ConvAuto,
           permission: [enumPermisosTrx.contratos_comisiones],
@@ -346,7 +348,7 @@ const rutasConfiguraciones = {
     },
     {
       link: "/params-operations/comercios-params",
-      label: <AppIcons Logo={"RETIRO"} name={"Comercios"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
       component: Comercios,
       permission: [enumPermisosTrx.comercios],
       subRoutes: [

@@ -928,21 +928,21 @@ const allUrlsPrivateApps = [
     subRoutes: [
       {
         link: "/colpensiones/domiciliacion",
-        label: <AppIcons Logo={"RETIRO"} name={"Domiciliación"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"Domiciliación"} />,
         component: moduloDomiciliacion,
         permission: [56, 57],
         subRoutes: [
           {
             link: "/colpensiones/formulario",
             label: (
-              <AppIcons Logo={"IMPUESTO"} name={"Formulario Domiciliación"} />
+              <AppIcons Logo={"RECAUDO"} name={"Formulario Domiciliación"} />
             ),
             component: comprobarEmail,
             permission: [55],
           },
           {
             link: "/colpensiones/modificar",
-            label: <AppIcons Logo={"ACTUALIZACION"} name={"Modificar"} />,
+            label: <AppIcons Logo={"RECAUDO"} name={"Modificar"} />,
             component: ModificarPps,
             permission: [56],
           },
@@ -963,16 +963,14 @@ const allUrlsPrivateApps = [
       }, */
       {
         link: "/colpensiones/voluntariodemanda",
-        label: (
-          <AppIcons Logo={"ACTUALIZACION"} name={"Voluntario a Demanda"} />
-        ),
+        label: <AppIcons Logo={"RECAUDO"} name={"Voluntario a Demanda"} />,
         component: PpsVoluntarioDemanda,
         permission: [56],
         show: false,
       },
       {
         link: "/colpensiones/ppspordemanda",
-        label: <AppIcons Logo={"ACTUALIZACION"} name={"PPS Demanda"} />,
+        label: <AppIcons Logo={"RECAUDO"} name={"PPS Demanda"} />,
         component: BuscarCedulaPpsADemanda,
         permission: [57],
       },
