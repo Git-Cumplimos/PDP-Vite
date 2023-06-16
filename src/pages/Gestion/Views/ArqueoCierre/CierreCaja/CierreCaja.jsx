@@ -377,7 +377,7 @@ const CierreCaja = () => {
                 </Button>
               </ButtonBar>
             </div>
-            <div className="w-full px-10 my-10" ref={printDiv}>
+            <div ref={printDiv}>
               <Accordion
                 titulo={
                   <GridRow
