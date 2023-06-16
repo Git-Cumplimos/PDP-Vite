@@ -93,14 +93,16 @@ const CupoComer = () => {
 
       <TableEnterprise
         title="Cupo comercios"
-        headers={["Id comercio", "Cupo Límite", "Deuda Cupo", "Cupo en Canje"]}
+        headers={["Id comercio", "Sobregiro", "Deuda Cupo", "Cupo en Canje","Base caja","Meta diaria"]}
         data={
           cupoComer?.results.map(
-            ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje }) => ({
+            ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje,base_caja,estado_diario }) => ({
               pk_id_comercio,
               limite_cupo: formatMoney.format(limite_cupo),
               deuda: formatMoney.format(deuda),
               cupo_en_canje: formatMoney.format(cupo_en_canje),
+              base_caja,
+              estado_diario: estado_diario ? "Realizada":"No realizada"
             })
           ) ?? []
         }

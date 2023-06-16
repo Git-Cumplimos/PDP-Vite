@@ -197,7 +197,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
               <MoneyInput
                 id="cupo_limite"
                 name="cupo_limite"
-                label="Límite de cupo"
+                label="Límite de cupo"// Cambio pendiente
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
@@ -205,14 +205,14 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 disabled={true}
                 required
               />
-              <MoneyInput
+              <Input
                 id="deuda"
                 name="deuda"
                 label="Deuda del comercio"
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
-                value={parseInt(cupoComer?.results[0].deuda)}
+                value={"$ "+ cupoComer?.results[0].deuda}
                 disabled={true}
                 required
               />

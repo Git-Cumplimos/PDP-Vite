@@ -65,7 +65,7 @@ const DtlMovLimite = () => {
           "Id comercio",
           "Valor afectación",
           "Fecha afectación",
-          "Límite de Cupo",
+          "Sobregiro",
           "Usuario",
         ]}
         data={

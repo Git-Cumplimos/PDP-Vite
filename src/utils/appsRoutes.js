@@ -120,6 +120,7 @@ const DtlMovCupo = lazy(() =>
 const cupoComercio = lazy(() => import("../apps/Cupo/Views/CupoComer"));
 const CrearCupo = lazy(() => import("../apps/Cupo/Views/CrearCupo"));
 const ModifiCupo = lazy(() => import("../apps/Cupo/Views/ModifiLimiteCanje"));
+const MovBaseCaja = lazy(() => import("../apps/Cupo/Views/MovBaseCaja"));
 const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
 const TipoMovimientoCupo = lazy(() =>
   import("../apps/Cupo/Views/TipoMovimientoCupo")
@@ -634,9 +635,17 @@ const allUrlsPrivateApps = [
       {
         link: "/cupo/modificar-cupo",
         label: (
-          <AppIcons Logo={"RECAUDO"} name={"Modificación límite de cupo"} />
+          <AppIcons Logo={"RECAUDO"} name={"Modificación sobregiro"} />
         ),
         component: ModifiCupo,
+        permission: [60],
+      },
+      {
+        link: "/cupo/base-caja",
+        label: (
+          <AppIcons Logo={"RECAUDO"} name={"Modificación base caja"} />
+        ),
+        component: MovBaseCaja,
         permission: [60],
       },
       {
@@ -652,8 +661,8 @@ const allUrlsPrivateApps = [
         permission: [64],
       },
       {
-        link: "/cupo/detalles-limite-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Detalles límite de cupo"} />,
+        link: "/cupo/detalles-sobregiro",
+        label: <AppIcons Logo={"RECAUDO"} name={"Detalles sobregiro"} />,
         component: DetalleLimite,
         permission: [1],
       },

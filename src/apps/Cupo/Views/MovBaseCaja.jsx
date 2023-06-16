@@ -174,6 +174,7 @@ const ModifiLimiteCanje = () => {
               max={limitesMontos?.max}
               value={valor ?? parseInt(cupoComer?.results?.[0]?.limite_cupo)}
               onInput={onMoneyChange}
+              disabled={true}
               required
             />
             <MoneyInput
@@ -198,9 +199,19 @@ const ModifiLimiteCanje = () => {
               disabled={true}
               required
             />
+            <MoneyInput
+              id="base_caja"
+              name="base_caja"
+              label="Base caja"
+              autoComplete="off"
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
+              value={parseInt(cupoComer?.results[0].base_caja)}
+              required
+            />
             <ButtonBar className={"lg:col-span-2"}>
               <Button type={"submit"} name="AsignarLimiteCupo">
-                Asignar límite cupo
+                Asignar base de caja
               </Button>
             </ButtonBar>
           </Form>
