@@ -24,7 +24,8 @@ export const MESSAGE_INCONSISTENT_DATE = "La fecha inicial no debe ser mayor a l
 export const MESSAGE_NEED_COMMERCE = "Debe ingresar un comercio";
 
 // Labels
-export const LABEL_BUTTON_GENERATE_REPORT = "Generar reporte";
+export const LABEL_BUTTON_GENERATE_REPORT = "Generar Reporte";
+export const LABEL_BUTTON_PRINT_REPORT = "Imprimir Reporte";
 export const LABEL_COMMERCE = "Comercio";
 export const LABEL_INITIAL_DATE = "Fecha inicio";
 export const LABEL_FINAL_DATE = "Fecha fin";
