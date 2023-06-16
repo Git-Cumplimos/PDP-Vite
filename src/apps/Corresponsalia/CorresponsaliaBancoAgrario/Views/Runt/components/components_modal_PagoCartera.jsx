@@ -19,6 +19,7 @@ export const ComponentsModalSummaryTrx = ({
   posicion,
 }) => {
   const [pagoTotal, setPagoTotal] = useState(false);
+  const [choice_numero_obligacion, setChoicePagoTotal] = useState(summary[posicion]?.numero_obligacion);
   return (
       <PaymentSummary
         title="¿Está seguro de realizar la transacción?"
@@ -60,7 +61,7 @@ export const ComponentsModalSummaryTrx = ({
         {!loadingPeticion ? (
           <>
             <ButtonBar>
-            <Button type={"submit"} onClick={(e) => peticion(e,pagoTotal)}>
+            <Button type={"submit"} onClick={(e) => peticion(e, pagoTotal, choice_numero_obligacion)}>
                 Pagar
               </Button>
               <Button onClick={handleClose}>Cancelar</Button>

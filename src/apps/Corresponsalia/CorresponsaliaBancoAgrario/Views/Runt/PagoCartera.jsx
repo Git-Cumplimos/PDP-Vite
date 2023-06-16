@@ -194,7 +194,7 @@ const PagoCartera = () => {
     };
 
     const onSubmitPayRunt = useCallback(
-        (e,pagoTotal) => {
+        (e, pagoTotal, choice_numero_obligacion) => {
             e.preventDefault();
             // setValorPagoCartera(pagoTotal);
             const tipo__comercio = roleInfo.tipo_comercio.toLowerCase();
@@ -213,7 +213,7 @@ const PagoCartera = () => {
                     id_usuario: roleInfo.id_usuario,
                 },
                 PagoCartera: {
-                    valReferencia1: numeroPagoCartera,
+                    valReferencia1: choice_numero_obligacion,
                     valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
                     location: {
                         address: roleInfo?.["direccion"],
