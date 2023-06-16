@@ -1,7 +1,13 @@
 import classes from "./Tickets.module.css";
 import { useImgs } from "../../../hooks/ImgsHooks";
 
-const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
+const Tickets = ({
+  refPrint,
+  type = "ORIGINAL",
+  ticket,
+  stateTrx = true,
+  children = null,
+}) => {
   const { divPrint } = classes;
 
   const {
@@ -19,11 +25,13 @@ const Tickets = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true }) => {
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
         <div className="flex flex-row justify-center items-center w-full">
-          <div className="cursor-pointer w-30">
-            <div className="aspect-w-16 aspect-h-9">
-              <img src={LogoPng} alt="Logo punto de pago" />
+          {children || (
+            <div className="w-30">
+              <div className="aspect-w-16 aspect-h-9">
+                <img src={LogoPng} alt="Logo punto de pago" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-1" />
