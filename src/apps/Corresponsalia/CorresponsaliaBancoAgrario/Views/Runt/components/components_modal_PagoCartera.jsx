@@ -6,6 +6,7 @@ import PaymentSummary from "../../../../../../components/Compound/PaymentSummary
 import Select from "../../../../../../components/Base/Select/Select";
 import Form from "../../../../../../components/Base/Form/Form";
 import classes from "../PagarRunt.module.css"
+import { notify, notifyError } from "../../../../../../utils/notify";
 const { styleComponents } = classes;
 export const ComponentsModalSummaryTrx = ({  
   documento,
@@ -61,7 +62,14 @@ export const ComponentsModalSummaryTrx = ({
         {!loadingPeticion ? (
           <>
             <ButtonBar>
-            <Button type={"submit"} onClick={(e) => peticion(e, pagoTotal, choice_numero_obligacion)}>
+            <Button type={"submit"} onClick={(e) => {
+              e.preventDefault(); // Evitar el envío por defecto del formulario
+              if (pagoTotal !== false) {
+                peticion(e, pagoTotal, choice_numero_obligacion)
+              } else { 
+                notify("Seleccione el tipo de abono")
+              }
+            }}>
                 Pagar
               </Button>
               <Button onClick={handleClose}>Cancelar</Button>
