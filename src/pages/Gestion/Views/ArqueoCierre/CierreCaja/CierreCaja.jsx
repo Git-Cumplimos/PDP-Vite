@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Fragment, useRef, useState } from "react";
 
-import Accordion from "../../../../../components/Base/Accordion";
+import Accordion from "./CierreCaja.component";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Error404 from "../../../../Error404";
@@ -379,6 +379,7 @@ const CierreCaja = () => {
             </div>
             <div ref={printDiv}>
               <Accordion
+                estiloTitulo = {true}
                 titulo={
                   <GridRow
                     cols={headers}
@@ -404,6 +405,7 @@ const CierreCaja = () => {
                 child={false}
               />
               <Accordion
+                estiloTitulo = {false}
                 titulo={
                   <GridRow
                     cols={[
