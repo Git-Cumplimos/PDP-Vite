@@ -204,7 +204,10 @@ const Deposito = () => {
         },
 
         oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
         nombre_comercio: roleInfo?.["nombre comercio"],
         valor_total_trx: valor,
 
@@ -285,6 +288,7 @@ const Deposito = () => {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
+      hour12: false,
     }).format(new Date());
     const objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de pago"] = fecha;
@@ -314,7 +318,10 @@ const Deposito = () => {
       },
 
       oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       nombre_comercio: roleInfo?.["nombre comercio"],
       valor_total_trx: valor,
 
