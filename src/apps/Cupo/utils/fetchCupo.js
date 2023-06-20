@@ -2,6 +2,7 @@ import fetchData from "../../../utils/fetchData";
 import { Auth } from "@aws-amplify/auth";
 
 const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
+// const urlCupo = `http://127.0.0.1:5080`;
 
 export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
   const busqueda = {};

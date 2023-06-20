@@ -120,7 +120,6 @@ const DtlMovCupo = lazy(() =>
 const cupoComercio = lazy(() => import("../apps/Cupo/Views/CupoComer"));
 const CrearCupo = lazy(() => import("../apps/Cupo/Views/CrearCupo"));
 const ModifiCupo = lazy(() => import("../apps/Cupo/Views/ModifiLimiteCanje"));
-const MovBaseCaja = lazy(() => import("../apps/Cupo/Views/MovBaseCaja"));
 const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
 const TipoMovimientoCupo = lazy(() =>
   import("../apps/Cupo/Views/TipoMovimientoCupo")
@@ -638,14 +637,6 @@ const allUrlsPrivateApps = [
           <AppIcons Logo={"RECAUDO"} name={"Modificación sobregiro"} />
         ),
         component: ModifiCupo,
-        permission: [60],
-      },
-      {
-        link: "/cupo/base-caja",
-        label: (
-          <AppIcons Logo={"RECAUDO"} name={"Modificación base caja"} />
-        ),
-        component: MovBaseCaja,
         permission: [60],
       },
       {

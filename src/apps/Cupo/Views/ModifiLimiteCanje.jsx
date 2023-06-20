@@ -7,6 +7,7 @@ import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import { onChangeNumber } from "../../../utils/functions";
 
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
@@ -19,6 +20,8 @@ import {
 const ModifiLimiteCanje = () => {
   const [cupoComer, setCupoComer] = useState(null);
   const [valor, setValor] = useState(null);
+  const [baseCaja, setBaseCaja] = useState(null);
+  const [diasMaxSobregiro, setDiasMaxSobregiro] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
   const [, setAsigLimite] = useState(null);
   const [limit] = useState(10);
@@ -65,15 +68,17 @@ const ModifiLimiteCanje = () => {
         valor !== null &&
         valor !== ""
       ) {
-        if (valor === cupoComer?.results[0].limite_cupo) {
+        const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario,};
+        const data = {};
+        if (baseCaja && baseCaja !== "") data.base_Caja = baseCaja
+        if (diasMaxSobregiro && diasMaxSobregiro !== "") data.max_sobregiro = parseInt(diasMaxSobregiro)
+        if (valor !== cupoComer?.results[0].limite_cupo) data.valor_afectacion = valor
+        if (data === {}){
           notifyError("No se detectaron cambios");
           return;
         }
-        const body = {
-          fk_id_comercio: idComercio,
-          valor_afectacion: valor,
-          usuario: roleInfo.id_usuario,
-        };
+        const body = {...data,...datosComercio}
+        
         postDtlCambioLimiteCanje(body)
           .then((res) => {
             if (!res?.status) {
@@ -95,6 +100,8 @@ const ModifiLimiteCanje = () => {
     [
       idComercio,
       valor,
+      diasMaxSobregiro,
+      baseCaja,
       limit,
       roleInfo.id_usuario,
       page,
@@ -104,7 +111,8 @@ const ModifiLimiteCanje = () => {
     ]
   );
   const onMoneyChange = useCallback((e, valor) => {
-    setValor(valor);
+    if (e.target.name === "sobregiro") setValor(valor);
+    if (e.target.name === "base_caja") setBaseCaja(valor);
   }, []);
   const onSubmitComercio = useCallback(
     (e) => {
@@ -114,14 +122,16 @@ const ModifiLimiteCanje = () => {
         getConsultaCupoComercio(idComercio)
           .then((objUdusrio) => {
             if (!objUdusrio?.maxElems) {
+              setinputId(false);
               notifyError("No se encontraron comercios con ese id");
               return;
-            }
+            } 
             setCupoComer(objUdusrio);
             setValor(objUdusrio?.results[0].limite_cupo);
             tablalimitecupo(idComercio, page, limit);
           })
           .catch((reason) => {
+            setinputId(false);
             notifyError("Error al cargar Datos ");
           });
       }
@@ -131,7 +141,13 @@ const ModifiLimiteCanje = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Modificación sobregiro</h1>
-      <Form onSubmit={onSubmitComercio} grid>
+      <Form onSubmit={
+        cupoComer?.results.length !== 1 ?
+          onSubmitComercio : (e)=>{
+            e.preventDefault();
+            setSubmitName(e.nativeEvent.submitter.name)
+          } 
+      } grid>
         <Input
           id="Id comercio"
           name="Id comercio"
@@ -152,31 +168,8 @@ const ModifiLimiteCanje = () => {
             </Button>
           </ButtonBar>
         ) : (
-          ""
-        )}
-      </Form>
-      {cupoComer?.results.length === 1 ? (
-        <Fragment>
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSubmitName(e.nativeEvent.submitter.name);
-            }}
-            grid
-          >
-            <MoneyInput
-              id="sobregiro"
-              name="sobregiro"
-              label="Límite de cupo" // Cambio pendiente
-              autoComplete="off"
-              maxLength={"14"}
-              min={limitesMontos?.min}
-              max={limitesMontos?.max}
-              value={valor ?? parseInt(cupoComer?.results?.[0]?.limite_cupo)}
-              onInput={onMoneyChange}
-              required
-            />
-            <MoneyInput
+          <>
+            <Input
               id="deuda"
               name="deuda"
               label="Deuda del comercio"
@@ -186,7 +179,7 @@ const ModifiLimiteCanje = () => {
               value={parseInt(cupoComer?.results[0].deuda)}
               disabled={true}
               required
-            />
+              />
             <MoneyInput
               id="cupo_en_canje"
               name="cupo_en_canje"
@@ -198,12 +191,51 @@ const ModifiLimiteCanje = () => {
               disabled={true}
               required
             />
+            <MoneyInput
+              id="sobregiro"
+              name="sobregiro"
+              label="Sobregiro" // Cambio pendiente
+              autoComplete="off"
+              maxLength={"14"}
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
+              value={valor ?? parseInt(cupoComer?.results?.[0]?.limite_cupo)}
+              onInput={onMoneyChange}
+              required
+              />
+            <MoneyInput
+              id="base_de_caja"
+              name="base_de_caja"
+              label="Base de caja"
+              autoComplete="off"
+              maxLength={"14"}
+              min={limitesMontos?.min}
+              max={limitesMontos?.max}
+              value={baseCaja ?? parseInt(cupoComer?.results?.[0]?.base_caja)}
+              onInput={onMoneyChange}
+              required
+              />
+            <Input
+              id="dias_max_sobregiro"
+              name="dias_max_sobregiro"
+              label="Dias maximos sobregiro"
+              type="tel"
+              autoComplete="off"
+              minLength={0}
+              maxLength={2}
+              value={diasMaxSobregiro ?? parseInt(cupoComer?.results?.[0]?.dias_max_sobregiro)}
+              onInput={(ev) => { setDiasMaxSobregiro(onChangeNumber(ev))}}
+              required
+            />
             <ButtonBar className={"lg:col-span-2"}>
               <Button type={"submit"} name="AsignarLimiteCupo">
-                Asignar límite cupo
+                Asignar sobregiro
               </Button>
             </ButtonBar>
-          </Form>
+          </>
+        )}
+      </Form>
+      {cupoComer?.results.length === 1 ? (
           <Modal show={submitName} handleClose={() => setSubmitName("")}>
             <PaymentSummary
               title="Esta seguro de modificar el limite de cupo del comercio?"
@@ -219,7 +251,6 @@ const ModifiLimiteCanje = () => {
               </ButtonBar>
             </PaymentSummary>
           </Modal>
-        </Fragment>
       ) : (
         ""
       )}
