@@ -742,7 +742,6 @@ const Premios = ({ route }) => {
                       id={`archivo_identificacion`}
                       label={"Documento de identificación"}
                       name="file1"
-                      required={true}
                       accept=".pdf,.png,.jpg"
                       allowDrop={true}
                       onGetFile={onChangeFiles_Documento}
@@ -751,7 +750,6 @@ const Premios = ({ route }) => {
                       id={`archivo_formulario`}
                       label={"Formulario"}
                       name="file2"
-                      required={true}
                       accept=".pdf,.png,.jpg"
                       allowDrop={true}
                       onGetFile={onChangeFiles_Formulario}
@@ -828,7 +826,6 @@ const Premios = ({ route }) => {
                             id={`archivo_identificacion`}
                             label={"Documento de identificación"}
                             name="file1"
-                            required={true}
                             accept=".pdf,.png,.jpg"
                             allowDrop={true}
                             onGetFile={onChangeFiles_Documento}
@@ -837,7 +834,6 @@ const Premios = ({ route }) => {
                             id={`archivo_formulario`}
                             label={"Formulario"}
                             name="file2"
-                            required={true}
                             accept=".pdf,.png,.jpg"
                             allowDrop={true}
                             onGetFile={onChangeFiles_Formulario}

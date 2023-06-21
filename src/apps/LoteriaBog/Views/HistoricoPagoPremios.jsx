@@ -3,7 +3,6 @@ import { useLoteria } from "../utils/LoteriaHooks";
 import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../utils/notify";
-import Select from "../../../components/Base/Select"
 
 const HistoricoPagoPremios = ({ route }) => {
   const { historicoPagoPremios } = useLoteria();
@@ -66,6 +65,11 @@ const HistoricoPagoPremios = ({ route }) => {
       .catch((err) => console.error(err));
   };
 
+  const onSelectPagoPremio = (e,i) => {
+    console.log("billete-->",resp_con_sort[i][1])
+    // fetchData(`${url_descargaS3}?billete=${resp_con_sort[i][1]}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&type=${files[type]?.typeArchivo}`,"GET")
+  }; 
+  
   return (
     <>
       <h1 class="text-3xl">Histórico pago de premios</h1>
@@ -77,6 +81,7 @@ const HistoricoPagoPremios = ({ route }) => {
         data={resp_con_sort.map(({num_sorteo,num_billete,serie,id_comercio,valor_neto,fecha_pago}) => {
           return {num_sorteo,num_billete,serie,id_comercio,valor_neto,fecha_pago};
         })}
+        onSelectRow={onSelectPagoPremio}
       >
         <Input
           id="dateInit"
