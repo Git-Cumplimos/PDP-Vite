@@ -7,6 +7,7 @@ import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 import Modal from "../../../components/Base/Modal";
 import InputX from "../../../components/Base/InputX/InputX";
+import FileInput from "../../../components/Base/FileInput/FileInput"
 import TicketLot from "../components/TicketsLot/TicketLot";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { LineasLot_disclamer } from "../utils/enum";
@@ -16,14 +17,30 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
 import { useReactToPrint } from "react-to-print";
-import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar"
 import { notify } from "../../../utils/notify";
+import fetchData from "../../../utils/fetchData"
+
+// const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/`;
+const url_cargueS3 = 'http://loterias-back-cert.us-east-2.elasticbeanstalk.com/subirDocumentosPremios';
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   maximumFractionDigits: 0,
 });
+
+const fetchUploadFileCustom = async (url, formData) => {
+  try {
+    const Peticion = await fetch(url, {
+      method: "POST",
+      body: formData,
+      mode: "no-cors",
+    });
+    return Peticion;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const Premios = ({ route }) => {
   const [respuesta, setRespuesta] = useState(false);
@@ -55,6 +72,7 @@ const Premios = ({ route }) => {
   const { isWinner, makePayment } = useLoteria();
   const [fraccionesporbillete, setFraccionesporbillete] = useState(1);
   const [fracciones_disponibles,setFracciones_disponibles] = useState([]);
+  const [files,setFiles]=useState([]);
 
   const [showAllmodals, setShowAllmodals] = useState({
     showModalVoucher: false,
@@ -83,10 +101,6 @@ const Premios = ({ route }) => {
     codigo_dane: "",
     nom_loteria: "",
   });
-
-  const [progress, setProgress] = useState(0);
-  const [file, setFile] = useState("");
-  const [fileName, setFileName] = useState("");
 
   const handleClose = useCallback(() => {
     setSeleccionarFraccion(0)
@@ -228,13 +242,6 @@ const Premios = ({ route }) => {
       .catch(() => setDisabledBtns(false));
   };
 
-  const onSubmit2 = (event) => {
-    event.preventDefault();
-    if (fileName.includes("-")){
-      notifyError("El nombre del archivo no es correcto, no incluir el carácter guion medio")
-    }
-  };
-
   const selectFraccionP = (fraccionesporbillete) => {
     const optionsDocumento = [
       { value: 0, label: "Seleccione la fracción" }
@@ -301,6 +308,20 @@ const Premios = ({ route }) => {
   
   const onPay1 = (e) => {
     e.preventDefault();
+    if (montoSuperior){
+      if (files?.documento===undefined || files?.formulario===undefined){
+        notifyError("Ingresar documentación requerida");
+        return;
+      }
+      try {
+      subirDocsPagoPremios("documento");
+      subirDocsPagoPremios("formulario");
+      }
+      catch {
+        notifyError("Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])");
+        return;
+      }
+    }
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
@@ -464,23 +485,40 @@ const Premios = ({ route }) => {
     navigate(-1);
   };
 
-  const onChange1 = (files) => {
-    if (Array.isArray(Array.from(files))) {
-      files = Array.from(files);
-      if (files.length === 1) {
-        const m_file = files[0];
-        setFile(m_file);
-        setFileName(m_file.name);
-      } else {
-        if (files.length < 1) {
-          notifyError("Se debe ingresar un archivo para subir");
+  const onChangeFiles_Documento = (infor) => {    
+    setFiles((old)=>({...old,documento:{"files":Array.from(infor)[0],"typeArchivo":infor[0]?.type}}))
+  }
+
+  const onChangeFiles_Formulario = (infor) => {
+    setFiles((old)=>({...old,formulario:{"files":Array.from(infor)[0],"typeArchivo":infor[0]?.type}}))
+  }
+  
+  const subirDocsPagoPremios = (type) => {   
+    console.log("files-->",files[type]) 
+    fetchData(`${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&type=${files[type]?.typeArchivo}`,"GET")
+      .then((respuesta) => {
+        if (!respuesta?.status){
+          notifyError("Error");
         }
-        else if (files.length > 1) {
-          notifyError("Se debe ingresar un solo archivo para subir");
+        else {
+          const formData = new FormData();
+          for (var key in respuesta?.obj?.fields) {
+            formData.append(key, respuesta?.obj?.fields[key]);
+          }
+          formData.set("file", files[type]?.files);
+          fetchUploadFileCustom(respuesta?.obj?.url,formData)
+            .then((rta)=> {
+              console.log("Rta",rta)
+            })
+            .catch((err) => {
+              throw err;
+            });
         }
-      }
-    }
-  };
+      })
+      .catch((err) => {
+        throw err;;
+      });
+  }
 
   return (
     <>
@@ -700,29 +738,24 @@ const Premios = ({ route }) => {
                     legend={
                       "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
                     }>
-                    <InputX
+                    <FileInput
                       id={`archivo_identificacion`}
                       label={"Documento de identificación"}
-                      type="file"
-                      disabled={progress !== 0}
+                      name="file1"
+                      required={true}
                       accept=".pdf,.png,.jpg"
-                      onGetFile={onChange1}
+                      allowDrop={true}
+                      onGetFile={onChangeFiles_Documento}
                     />
-                    <InputX
+                    <FileInput
                       id={`archivo_formulario`}
                       label={"Formulario"}
-                      type="file"
-                      disabled={progress !== 0}
+                      name="file2"
+                      required={true}
                       accept=".pdf,.png,.jpg"
-                      onGetFile={onChange1}
+                      allowDrop={true}
+                      onGetFile={onChangeFiles_Formulario}
                     />
-                    {file && progress === 0 ? (
-                      <ButtonBar>
-                        <Button type="submit">Subir</Button>
-                      </ButtonBar>
-                    ) : (
-                      ""
-                    )}
                   </Fieldset>
                 ) :("")}
                 {checkBilleteVirtual == true || checkBilleteFisico == true ? (
@@ -791,27 +824,24 @@ const Premios = ({ route }) => {
                           legend={
                             "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
                           }>
-                          <InputX
+                          <FileInput
                             id={`archivo_identificacion`}
                             label={"Documento de identificación"}
-                            type="file"
-                            disabled={progress !== 0}
+                            name="file1"
+                            required={true}
                             accept=".pdf,.png,.jpg"
-                            onGetFile={onChange1}
+                            allowDrop={true}
+                            onGetFile={onChangeFiles_Documento}
                           />
-                          <InputX
+                          <FileInput
                             id={`archivo_formulario`}
                             label={"Formulario"}
-                            type="file"
-                            disabled={progress !== 0}
+                            name="file2"
+                            required={true}
                             accept=".pdf,.png,.jpg"
-                            onGetFile={onChange1}
+                            allowDrop={true}
+                            onGetFile={onChangeFiles_Formulario}
                           />
-                          {file && progress === 0 ? (
-                            <ButtonBar>
-                              <Button type="submit">Subir</Button>
-                            </ButtonBar>
-                          ) : ("")}
                       </Fieldset>
                       ) :("")}
                       {checkBilleteFisico === true ||
