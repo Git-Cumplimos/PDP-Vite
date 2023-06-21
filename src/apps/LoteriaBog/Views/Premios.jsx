@@ -358,7 +358,6 @@ const Premios = ({ route }) => {
         notifyError(
           "Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
         );
-        return;
       }
     }
     if (tipopago === 2) {
