@@ -9,6 +9,8 @@ const Tickets = ({
   ticket,
   stateTrx = true,
   children = null,
+  chunkSizeCommerce = 2,
+  chunkSizeTrx = 2,
 }) => {
   const {
     imgs: { pdpHorizontal: LogoPng },
@@ -54,8 +56,9 @@ const Tickets = ({
         <div className="flex flex-col gap-1 px-2 text-xs text-left">
           {commerceInfo
             .map((e, i, arr) => {
-              const chunkSize = 2;
-              return i % chunkSize === 0 ? arr.slice(i, i + chunkSize) : null;
+              return i % chunkSizeCommerce === 0
+                ? arr.slice(i, i + chunkSizeCommerce)
+                : null;
             })
             .filter((e) => e)
             .map((e, i) => {
@@ -63,7 +66,9 @@ const Tickets = ({
                 <div
                   key={i}
                   className={`flex flex-row ${
-                    e.length < 2 ? "justify-center" : "justify-between"
+                    e.length < chunkSizeCommerce
+                      ? "justify-center"
+                      : "justify-between"
                   } w-full`}
                 >
                   {e.map(([key, val], idx) => {
@@ -71,9 +76,9 @@ const Tickets = ({
                       <div
                         key={`${key}_${idx}`}
                         className={`flex flex-row ${
-                          e.length < 2
+                          e.length < chunkSizeCommerce
                             ? "justify-center"
-                            : idx % 2 === 0
+                            : idx % chunkSizeCommerce === 0
                             ? "justify-start"
                             : "justify-end"
                         } flex-auto gap-2`}
@@ -98,8 +103,9 @@ const Tickets = ({
         <div className="flex flex-col gap-1 px-2 text-xs">
           {trxInfo
             .map((e, i, arr) => {
-              const chunkSize = 2;
-              return i % chunkSize === 0 ? arr.slice(i, i + chunkSize) : null;
+              return i % chunkSizeTrx === 0
+                ? arr.slice(i, i + chunkSizeTrx)
+                : null;
             })
             .filter((e) => e)
             .map((e, i) => {
@@ -107,7 +113,9 @@ const Tickets = ({
                 <div
                   key={i}
                   className={`flex flex-row ${
-                    e.length < 2 ? "justify-center" : "justify-between"
+                    e.length < chunkSizeTrx
+                      ? "justify-center"
+                      : "justify-between"
                   } w-full`}
                 >
                   {e.map(([key, val], idx) => {
@@ -115,9 +123,9 @@ const Tickets = ({
                       <div
                         key={`${key}_${idx}`}
                         className={`flex flex-row ${
-                          e.length < 2
+                          e.length < chunkSizeTrx
                             ? "justify-center"
-                            : idx % 2 === 0
+                            : idx % chunkSizeTrx === 0
                             ? "justify-start"
                             : "justify-end"
                         } flex-auto gap-2`}
