@@ -46,6 +46,7 @@ const urls = {
   premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
   pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
   pagopremiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioFisico`,
+  DescargaDocsPagoPremios: `${process.env.REACT_APP_URL_LOTERIAS}/descargarDocumentosPremios`,
 
   ConsultaCrearSort: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_sorteos`,
   CambiarSort: `${process.env.REACT_APP_URL_LOTERIAS}/sorteo`,
@@ -850,6 +851,26 @@ export const useProvideLoteria = () => {
     [sorteosLOT]
   );
 
+  const DescargaDocsPagoPremios = useCallback(
+    async (billete,sorteo,serie,valor_pagado,fecha) => {
+      const query = {
+        billete : billete.billete,
+        idloteria : sorteosLOT,
+        sorteo : billete.sorteo,
+        serie: billete.serie,
+        valor_pagado: billete.valor_pagado,
+        fecha: billete.fecha,
+      }
+      try {
+        const res = await fetchData(urls.DescargaDocsPagoPremios, "GET", query, {});
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [sorteosLOT]
+  );
+
   const reportVentas = useCallback(async (fecha_ini, fecha_fin) => {
     try {
       const res = await fetchData(urls.reportVentas, "GET", {
@@ -1012,6 +1033,7 @@ export const useProvideLoteria = () => {
     descargaVentas_S3,
     historicoCargues,
     historicoPagoPremios,
+    DescargaDocsPagoPremios,
     reportVentas,
     peticionBarcode,
     consultaInventario,

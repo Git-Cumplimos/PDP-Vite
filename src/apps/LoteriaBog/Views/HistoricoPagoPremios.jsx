@@ -1,14 +1,15 @@
 import { useState, useEffect} from "react";
+import { useFetch } from "../../../hooks/useFetch";
 import { useLoteria } from "../utils/LoteriaHooks";
 import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../utils/notify";
-import Select from "../../../components/Base/Select"
 
 const HistoricoPagoPremios = ({ route }) => {
-  const { historicoPagoPremios } = useLoteria();
+  const { historicoPagoPremios,DescargaDocsPagoPremios } = useLoteria();
   const [resp_con_sort, setResp_con_sort] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
+  const [loadingFile, fetchFile] = useFetch();
   const [{ page, limit}, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -66,6 +67,40 @@ const HistoricoPagoPremios = ({ route }) => {
       .catch((err) => console.error(err));
   };
 
+  const onSelectPagoPremio = (e,i) => {
+    DescargaDocsPagoPremios({
+      billete : resp_con_sort[i]["num_billete"],
+      sorteo : resp_con_sort[i]["num_sorteo"],
+      serie: resp_con_sort[i]["serie"],
+      valor_pagado: resp_con_sort[i]["valor_neto"],
+      fecha: resp_con_sort[i]["fecha_pago"],
+    })
+    .then((res) => {
+      console.log("res-->",res)
+      if (res !== undefined) {
+        if (res?.status) {
+          // fetchFile(`${res?.obj?.documento}`, "GET", {
+          //   filename: '2023-06-20_documento_02_2691_0194_122_200000',
+          // })
+          //   .then((res) => {
+          //     if (!res?.status) {
+          //       notifyError(res?.msg);
+          //       return;
+          //     }
+          //     window.open(res?.obj, "_blank");
+          //   })
+          //   .catch((err) => console.error(err));
+
+          console.log("tenemos urls",res?.obj?.documento)
+          console.log("tenemos urls",res?.obj?.formulario)
+        } else {
+          notifyError(res.msg);
+        }
+      }
+    })
+    .catch((err) => console.error(err));    
+  }; 
+  
   return (
     <>
       <h1 class="text-3xl">Histórico pago de premios</h1>
@@ -77,6 +112,7 @@ const HistoricoPagoPremios = ({ route }) => {
         data={resp_con_sort.map(({num_sorteo,num_billete,serie,id_comercio,valor_neto,fecha_pago}) => {
           return {num_sorteo,num_billete,serie,id_comercio,valor_neto,fecha_pago};
         })}
+        onSelectRow={onSelectPagoPremio}
       >
         <Input
           id="dateInit"
