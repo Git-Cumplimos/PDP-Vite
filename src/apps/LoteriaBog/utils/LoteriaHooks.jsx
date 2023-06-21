@@ -34,6 +34,7 @@ const urls = {
   cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTERIAS}/reporteVentaExtra_S3`,
   descargaVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/descarga_reportes_S3`,
   historicoCargues: `${process.env.REACT_APP_URL_LOTERIAS}/historico_cargues`,
+  historicoPagoPremios: `${process.env.REACT_APP_URL_LOTERIAS}/historico_pago_premios`,
   con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/con_sort`,
 
   //ventasReportes: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`,
@@ -827,6 +828,28 @@ export const useProvideLoteria = () => {
     [sorteosLOT]
   );
 
+  const historicoPagoPremios = useCallback(
+    async (fecha_ini,fecha_fin,sorteo,numero,serie,page,limit) => {
+      const query = {
+        fecha_ini : fecha_ini.fecha_ini,
+        fecha_fin : fecha_ini.fecha_fin,
+        codigos_loteria : sorteosLOT,
+        sorteo: fecha_ini.sorteo,
+        numero: fecha_ini.numero,
+        serie: fecha_ini.serie,
+        page : fecha_ini.page,
+        limit: fecha_ini.limit
+      }
+      try {
+        const res = await fetchData(urls.historicoPagoPremios, "GET", query, {});
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [sorteosLOT]
+  );
+
   const reportVentas = useCallback(async (fecha_ini, fecha_fin) => {
     try {
       const res = await fetchData(urls.reportVentas, "GET", {
@@ -988,6 +1011,7 @@ export const useProvideLoteria = () => {
     con_SortVentas_S3,
     descargaVentas_S3,
     historicoCargues,
+    historicoPagoPremios,
     reportVentas,
     peticionBarcode,
     consultaInventario,
