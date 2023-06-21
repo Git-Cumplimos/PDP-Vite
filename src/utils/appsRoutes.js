@@ -95,7 +95,13 @@ const HistoricoCargues = lazy(() =>
 const ArqueoBilletes = lazy(() =>
   import("../apps/LoteriaBog/Views/InventarioBilletes/ArqueoBilletes")
 );
+const PagoDePremios = lazy(() =>
+  import("../apps/LoteriaBog/Views/PagoDePremios")
+);
 const Premios = lazy(() => import("../apps/LoteriaBog/Views/Premios"));
+const HistoricoPagoPremios = lazy(() =>
+  import("../apps/LoteriaBog/Views/HistoricoPagoPremios")
+);
 const Inventario = lazy(() => import("../apps/LoteriaBog/Views/Inventario"));
 const CrearInventario = lazy(() =>
   import("../apps/LoteriaBog/Views/InventarioBilletes/Inventario")
@@ -433,10 +439,27 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/premios`,
-          label: <AppIcons Logo={"Premio"} name='Premios' />,
-          component: Premios,
+          label: <AppIcons Logo={"Premio"} name="Pago de premios" />,
+          component: PagoDePremios,
           extern: false,
-          permission: [3, 44, 95], ///////////////////////////////////////////////////////////////////
+          permission: [3, 44, 95], 
+          subRoutes: [
+            {
+              link: `/loteria/${name}/premios/Pagopremios`,
+              label: <AppIcons Logo={"Premio"} name="Premios" />,
+              component: Premios,
+              permission: [3, 44, 95],
+            },
+            {
+              link: `/loteria/${name}/premios/HistoricoPagopremios`,
+              label: (
+                <AppIcons Logo={"REPORTE"} name="Histórico pago de premios"
+                />
+              ),
+              component: HistoricoPagoPremios,
+              permission: [6],
+            },
+          ],
         },
         {
           link: `/loteria/${name}/inventario`,

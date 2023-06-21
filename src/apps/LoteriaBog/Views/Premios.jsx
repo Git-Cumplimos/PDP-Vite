@@ -6,7 +6,7 @@ import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 import Modal from "../../../components/Base/Modal";
-import Tickets from "../../../components/Base/Tickets";
+import InputX from "../../../components/Base/InputX/InputX";
 import TicketLot from "../components/TicketsLot/TicketLot";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { LineasLot_disclamer } from "../utils/enum";
@@ -16,6 +16,9 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
 import { useReactToPrint } from "react-to-print";
+import ProgressBar from "../../../components/Base/ProgressBar/ProgressBar"
+import { notify } from "../../../utils/notify";
+
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
@@ -37,6 +40,7 @@ const Premios = ({ route }) => {
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
+  const [montoSuperior, setMontoSuperior] = useState("");
   const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
   const [tipopago, setTipopago] = useState("");
@@ -79,6 +83,10 @@ const Premios = ({ route }) => {
     codigo_dane: "",
     nom_loteria: "",
   });
+
+  const [progress, setProgress] = useState(0);
+  const [file, setFile] = useState("");
+  const [fileName, setFileName] = useState("");
 
   const handleClose = useCallback(() => {
     setSeleccionarFraccion(0)
@@ -128,6 +136,7 @@ const Premios = ({ route }) => {
       .then((res) => {
         var salvarRes = res;
         setMaxPago(res?.obj?.max_pago);
+        setMontoSuperior(res?.obj?.monto_superior);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
@@ -217,6 +226,13 @@ const Premios = ({ route }) => {
         }
       })
       .catch(() => setDisabledBtns(false));
+  };
+
+  const onSubmit2 = (event) => {
+    event.preventDefault();
+    if (fileName.includes("-")){
+      notifyError("El nombre del archivo no es correcto, no incluir el carácter guion medio")
+    }
   };
 
   const selectFraccionP = (fraccionesporbillete) => {
@@ -342,6 +358,9 @@ const Premios = ({ route }) => {
                 notifyError(res?.obj?.msg);
                 navigate(-1);
               }
+              else {
+                notify("Pago premio de Lotería exitoso")
+              }
             })
             .catch(() => setDisabledBtns(false));
         }
@@ -405,6 +424,9 @@ const Premios = ({ route }) => {
                 notifyError(res?.obj?.msg);
                 navigate(-1);
               }
+              else {
+                notify("Pago premio de Lotería exitoso")
+              }
             })
             .catch(() => setDisabledBtns(false));
         }
@@ -440,6 +462,24 @@ const Premios = ({ route }) => {
   const cancelar = () => {
     notifyError("Se canceló el pago del premio");
     navigate(-1);
+  };
+
+  const onChange1 = (files) => {
+    if (Array.isArray(Array.from(files))) {
+      files = Array.from(files);
+      if (files.length === 1) {
+        const m_file = files[0];
+        setFile(m_file);
+        setFileName(m_file.name);
+      } else {
+        if (files.length < 1) {
+          notifyError("Se debe ingresar un archivo para subir");
+        }
+        else if (files.length > 1) {
+          notifyError("Se debe ingresar un solo archivo para subir");
+        }
+      }
+    }
   };
 
   return (
@@ -551,7 +591,7 @@ const Premios = ({ route }) => {
               <Fieldset
                 className="lg:col-span-2"
                 legend={
-                  "El valor del premio, supera la ganancia ocasional, por favor diligencie los campos del usuario."
+                  "El valor del premio supera la ganancia ocasional, por favor diligencie los campos del usuario."
                 }>
                 <Input
                   id="nombre"
@@ -653,9 +693,38 @@ const Premios = ({ route }) => {
                     }}
                     required
                   />
-                ) : (
-                  ""
-                )}
+                ) : ("")}
+                {montoSuperior ? (
+                  <Fieldset
+                    className="lg:col-span-2"
+                    legend={
+                      "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
+                    }>
+                    <InputX
+                      id={`archivo_identificacion`}
+                      label={"Documento de identificación"}
+                      type="file"
+                      disabled={progress !== 0}
+                      accept=".pdf,.png,.jpg"
+                      onGetFile={onChange1}
+                    />
+                    <InputX
+                      id={`archivo_formulario`}
+                      label={"Formulario"}
+                      type="file"
+                      disabled={progress !== 0}
+                      accept=".pdf,.png,.jpg"
+                      onGetFile={onChange1}
+                    />
+                    {file && progress === 0 ? (
+                      <ButtonBar>
+                        <Button type="submit">Subir</Button>
+                      </ButtonBar>
+                    ) : (
+                      ""
+                    )}
+                  </Fieldset>
+                ) :("")}
                 {checkBilleteVirtual == true || checkBilleteFisico == true ? (
                   <>
                     <ButtonBar
@@ -667,9 +736,7 @@ const Premios = ({ route }) => {
                       </Button>
                     </ButtonBar>
                   </>
-                ) : (
-                  ""
-                )}
+                ) : ("")}
               </Fieldset>
             </Form>
           ) : (
@@ -703,9 +770,50 @@ const Premios = ({ route }) => {
                           }}
                           required={true}
                         />
-                      ) : (
-                        ""
-                      )}
+                      ) : ("")}
+                      {checkBilleteVirtual == true ? (
+                        <Input
+                          id="codHash"
+                          label="Código de seguridad"
+                          type="text"
+                          maxLength="10"
+                          autoComplete="off"
+                          value={hash}
+                          onChange={(e) => {
+                            setHash(e.target.value);
+                          }}
+                          required
+                        />
+                      ) : ("")}
+                      {montoSuperior ? (
+                        <Fieldset
+                          className="lg:col-span-2"
+                          legend={
+                            "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
+                          }>
+                          <InputX
+                            id={`archivo_identificacion`}
+                            label={"Documento de identificación"}
+                            type="file"
+                            disabled={progress !== 0}
+                            accept=".pdf,.png,.jpg"
+                            onGetFile={onChange1}
+                          />
+                          <InputX
+                            id={`archivo_formulario`}
+                            label={"Formulario"}
+                            type="file"
+                            disabled={progress !== 0}
+                            accept=".pdf,.png,.jpg"
+                            onGetFile={onChange1}
+                          />
+                          {file && progress === 0 ? (
+                            <ButtonBar>
+                              <Button type="submit">Subir</Button>
+                            </ButtonBar>
+                          ) : ("")}
+                      </Fieldset>
+                      ) :("")}
                       {checkBilleteFisico === true ||
                         checkBilleteVirtual === true ? (
                         <>
@@ -718,21 +826,15 @@ const Premios = ({ route }) => {
                             </Button>
                           </ButtonBar>
                         </>
-                      ) : (
-                        ""
-                      )}
+                        ) : ("")}
                     </Fieldset>
                   </Form>
                 </>
-              ) : (
-                ""
-              )}
+              ) : ("")}
             </>
           )}
         </>
-      ) : (
-        ""
-      )}
+      ) : ("")}
       {estadoTransaccion && tipopago === 2 || tipopago === 1 ? (
         /**************** Pago premio Exitosa Voucher **********************/
         <Modal show={estadoTransaccion} handleClose={handleClose}>
