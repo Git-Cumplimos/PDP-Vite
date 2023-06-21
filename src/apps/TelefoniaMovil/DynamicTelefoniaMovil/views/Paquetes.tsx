@@ -43,6 +43,15 @@ const dataPackageInputInitial = {
   celular: "",
 };
 
+const dataTableInitial = [
+  {
+    Código: "Buscando ... ",
+    Tipo: "",
+    Descripción: "",
+    Valor: "",
+  },
+];
+
 const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
   const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
     dataPackageInputInitial
@@ -53,13 +62,14 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [typeInfo, setTypeInfo] = useState<TypeInfo>("Ninguno");
   const [infTicket, setInfTicket] = useState<TypeInfTicket>(null);
-  const [pageTable, setPageTable] = useState({
+  const [pageTable, setPageTable] = useState<{ limit: number; page: number }>({
     limit: 10,
     page: 1,
-    maxPages: 1,
   });
+  const [maxPages, setMaxPages] = useState<number>(1);
   const printDiv = useRef(null);
   const useHookDynamic = operadorCurrent?.backend;
+
   const [loadingPeticion, PeticionGetPaquetes, PeticionTrx] = useHookDynamic(
     operadorCurrent.name,
     "paquetes"
@@ -77,7 +87,7 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
     })
       .then((response: TypeOutputDataGetPaquetes) => {
         setDataGetPackages(response?.results);
-        // setMaxPage(response?.obj?.result?.maxPages);
+        setMaxPages(response?.maxPages);
       })
       .catch((error: any) => {
         let msg = `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - catch) [0010002]`;
@@ -87,7 +97,55 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
         }
         setDataGetPackages([]);
       });
-  }, [operadorCurrent, roleInfo, pdpUser]); //no quitar advertencia
+  }, [
+    operadorCurrent.name,
+    roleInfo,
+    pdpUser,
+    PeticionGetPaquetes,
+    pageTable.limit,
+    pageTable.page,
+  ]);
+
+  const HandleCloseInformacion = useCallback(() => {
+    setTypeInfo("Ninguno");
+    setShowModal(false);
+    setDataPackage(null);
+    setDataPackageInput(dataPackageInputInitial);
+  }, []);
+
+  const HandleCloseResumen = useCallback(() => {
+    setTypeInfo("Ninguno");
+    setShowModal(false);
+    setDataPackage(null);
+    setDataPackageInput(dataPackageInputInitial);
+    notify("Compra cancelada");
+  }, []);
+
+  const HandleCloseTrxExitosa = useCallback(() => {
+    setTypeInfo("Ninguno");
+    setShowModal(false);
+    setDataPackage(null);
+    setDataPackageInput(dataPackageInputInitial);
+    validNavigate("/telefonia-movil");
+  }, [validNavigate]);
+
+  const handleCloseModal = useCallback(() => {
+    if (typeInfo === "Informacion") {
+      HandleCloseInformacion();
+    } else if (typeInfo === "Resumen" && !loadingPeticion?.trx) {
+      HandleCloseResumen();
+    } else if (typeInfo === "TrxExitosa") {
+      HandleCloseTrxExitosa();
+    } else if (loadingPeticion?.trx) {
+      notify("Se está procesando la transacción, por favor esperar");
+    }
+  }, [
+    typeInfo,
+    loadingPeticion?.trx,
+    HandleCloseInformacion,
+    HandleCloseResumen,
+    HandleCloseTrxExitosa,
+  ]);
 
   const onChangeInput = useCallback((e) => {
     let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
@@ -147,52 +205,20 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
           notifyError(msg);
         }
       });
-  }, [roleInfo, pdpUser, dataPackageInput, dataPackage, operadorCurrent]); //no quitar advertencia
+  }, [
+    roleInfo,
+    pdpUser,
+    dataPackageInput,
+    dataPackage,
+    operadorCurrent.name,
+    HandleCloseInformacion,
+    PeticionTrx,
+    id_uuid,
+  ]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-
-  const HandleCloseInformacion = useCallback(() => {
-    setTypeInfo("Ninguno");
-    setShowModal(false);
-    setDataPackage(null);
-    setDataPackageInput(dataPackageInputInitial);
-  }, []);
-
-  const HandleCloseResumen = useCallback(() => {
-    setTypeInfo("Ninguno");
-    setShowModal(false);
-    setDataPackage(null);
-    setDataPackageInput(dataPackageInputInitial);
-    notify("Compra cancelada");
-  }, []);
-
-  const HandleCloseTrxExitosa = useCallback(() => {
-    setTypeInfo("Ninguno");
-    setShowModal(false);
-    setDataPackage(null);
-    setDataPackageInput(dataPackageInputInitial);
-    validNavigate("/telefonia-movil");
-  }, [validNavigate]);
-
-  const handleCloseModal = useCallback(() => {
-    if (typeInfo === "Informacion") {
-      HandleCloseInformacion();
-    } else if (typeInfo === "Resumen" && !loadingPeticion?.trx) {
-      HandleCloseResumen();
-    } else if (typeInfo === "TrxExitosa") {
-      HandleCloseTrxExitosa();
-    } else if (loadingPeticion?.trx) {
-      notify("Se está procesando la transacción, por favor esperar");
-    }
-  }, [
-    typeInfo,
-    loadingPeticion?.trx,
-    HandleCloseInformacion,
-    HandleCloseResumen,
-    HandleCloseTrxExitosa,
-  ]);
 
   return (
     <div className="py-10 flex items-center flex-col">
@@ -204,31 +230,31 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
             : svgs?.[operadorCurrent?.logo]
         }
       ></img>
+
       <TableEnterprise
         title={"Paquetes"}
-        maxPage={3}
+        maxPage={maxPages}
         headers={["Código", "Tipo", "Descripción", "Valor"]}
-        data={dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
-          return {
-            Código: inf.codigo,
-            Tipo: inf.tipo,
-            Descripción: inf.descripcion,
-            Valor: inf.valor,
-          };
-        })}
+        data={
+          loadingPeticion?.getPaquetes
+            ? dataTableInitial
+            : dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
+                return {
+                  Código: inf.codigo,
+                  Tipo: inf.tipo,
+                  Descripción: inf.descripcion,
+                  Valor: inf.valor,
+                };
+              })
+        }
         onSelectRow={(e: any, i: number) => {
           setDataPackage(dataGetPackages?.[i]);
           setShowModal(true);
           setTypeInfo("Informacion");
         }}
-        // onSetPageData={(pagedata: any) => {
-        //   // setPageTable((old: any) => ({
-        //   //   ...old,
-        //   //   page: pagedata.page,
-        //   //   limit: pagedata.limit,
-        //   // }));
-        // }}
+        onSetPageData={setPageTable}
       ></TableEnterprise>
+
       <Modal show={showModal} handleClose={handleCloseModal}>
         {/******************************ResumenPaquete*******************************************************/}
         {typeInfo === "Informacion" && (

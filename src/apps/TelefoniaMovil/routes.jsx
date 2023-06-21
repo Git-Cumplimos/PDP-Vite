@@ -123,7 +123,7 @@ export default GetRoutesTelefoniaMovil([
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendRecargasPractisistemas,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
