@@ -27,9 +27,20 @@ header.headerPDP .usrData {
   @apply flex flex-row flex-wrap items-center justify-center px-0 md:px-4 py-4 gap-0;
 }
 
-header.headerPDP .usrData > .saldoCupo {
+header.headerPDP .usrData > .diasSobregiro {
   max-width: 8.75rem;
-  @apply rounded-full px-6 bg-primary text-white mx-2 text-center;
+  @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
+}
+header.headerPDP .usrData > .diasSobregiroD {
+  max-width: 2.00rem;
+  /* height: 3.00rem; */
+  @apply rounded-full px-2 bg-primary-light text-white mx-0 text-center;
+}
+
+header.headerPDP .usrData > .saldoCupo {
+  /* max-width: 14.75rem; */
+  max-width: 8.75rem;
+  @apply rounded-full /*6/10*/ px-6 bg-primary text-white mx-2 text-center;
 }
 
 header.headerPDP .usrData > .comision {
@@ -42,6 +53,7 @@ header.headerPDP .usrData > .cargar {
   @apply rounded-full px-6 bg-secondary-dark text-white mx-2 text-center;
 }
 
+header.headerPDP .usrData > .diasSobregiro,
 header.headerPDP .usrData > .saldoCupo,
 header.headerPDP .usrData > .comision,
 header.headerPDP .usrData > .cargar {
