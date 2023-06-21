@@ -899,7 +899,7 @@ const Premios = ({ route }) => {
                       ) : (
                         ""
                       )}
-                      {checkBilleteVirtual == true ? (
+                      {/* {checkBilleteVirtual == true ? (
                         <Input
                           id="codHash"
                           label="Código de seguridad"
@@ -914,7 +914,7 @@ const Premios = ({ route }) => {
                         />
                       ) : (
                         ""
-                      )}
+                      )} */}
                       {montoSuperior ? (
                         <Fieldset
                           className="lg:col-span-2"

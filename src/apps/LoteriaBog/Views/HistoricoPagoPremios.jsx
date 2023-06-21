@@ -90,12 +90,16 @@ const HistoricoPagoPremios = ({ route }) => {
           //     window.open(res?.obj, "_blank");
           //   })
           //   .catch((err) => console.error(err));
+          window.open(res?.obj?.documento, "_blank");
 
           console.log("tenemos urls",res?.obj?.documento)
           console.log("tenemos urls",res?.obj?.formulario)
         } else {
           notifyError(res.msg);
         }
+      }
+      else {
+        notifyError("El registro no presenta archivos asociados");
       }
     })
     .catch((err) => console.error(err));    
