@@ -8,10 +8,12 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notifyError } from "../../../utils/notify";
-import { getConsultaCupoComercio, PeticionDescargar } from "../utils/fetchCupo";
+import { PeticionDescargar } from "../utils/fetchCupo";
+import {getConsultaComercios}  from "../utils/fetchFunctions";
 
 const CupoComer = () => {
-  const [cupoComer, setCupoComer] = useState(null);
+  const [cupoComer, setCupoComer] = useState([]);
+  const [maxPages, setMaxPages] = useState(0);
   const [loadDocument, crearData] = useFetch(PeticionDescargar);
   const [idComercio, setIdComercio] = useState("");
   const [limit, setLimit] = useState(10);
@@ -20,23 +22,23 @@ const CupoComer = () => {
 
   const searchCupoComercio = useCallback(
     (comercioId) => {
-      // const comercioId = idComercio || roleInfo?.id_comercio;
-      getConsultaCupoComercio(comercioId, page, limit)
-        .then((objUdusrio) => {
-          setCupoComer(objUdusrio);
-        })
-        .catch((reason) => {
-          console.log(reason.message);
-          notifyError("Error al cargar Datos ");
-        });
+      getConsultaComercios({'pk_id_comercio':comercioId, 'page':page, 'limit':limit})
+      .then((res) => {
+        setCupoComer(res?.obj?.results?.results ?? []);
+        setMaxPages(res?.obj?.results?.maxPages ?? 0);
+      })
+      .catch((reason) => {
+        console.error(reason.message);
+        notifyError("Error al cargar Datos ");
+      });
     },
     [page, limit]
-  );
-
-  useEffect(() => {
-    setIdComercio(roleInfo?.id_comercio ?? "");
-    searchCupoComercio(roleInfo?.id_comercio ?? "");
-  }, [roleInfo?.id_comercio, searchCupoComercio]);
+    );
+    
+    useEffect(() => {
+      setIdComercio(roleInfo?.id_comercio ?? "");
+      searchCupoComercio(roleInfo?.id_comercio ?? "");
+    }, [roleInfo?.id_comercio, searchCupoComercio]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -49,7 +51,7 @@ const CupoComer = () => {
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
-      if (cupoComer?.results.length > 0) {
+      if (cupoComer?.length > 0) {
         if (idComercio === "") {
           notifyError("No se puede descargar reporte falta ID comercio");
         } else {
@@ -66,7 +68,6 @@ const CupoComer = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta cupo comercio</h1>
-
       {roleInfo?.id_comercio ? (
         ""
       ) : (
@@ -93,23 +94,25 @@ const CupoComer = () => {
 
       <TableEnterprise
         title="Cupo comercios"
-        headers={["Id comercio", "Sobregiro", /*"Deuda Cupo", "Cupo en Canje",*/"Base caja",]}
+        headers={["Id comercio", "Sobregiro", "Base caja",]}
         data={
-          cupoComer?.results.map(
-            ({ pk_id_comercio, limite_cupo, deuda, cupo_en_canje,base_caja,estado_diario }) => ({
+          cupoComer?.map(
+            ({ 
+              pk_id_comercio,
+              limite_cupo,
+              base_caja,
+            }) => ({
               pk_id_comercio,
               limite_cupo: formatMoney.format(limite_cupo),
-              // deuda: formatMoney.format(deuda),
-              // cupo_en_canje: formatMoney.format(cupo_en_canje),
               base_caja
-            })
+            }) 
           ) ?? []
         }
         onSetPageData={(pagedata) => {
           setPage(pagedata.page);
           setLimit(pagedata.limit);
         }}
-        maxPage={cupoComer?.maxPages}
+        maxPage={maxPages}
       ></TableEnterprise>
       <Form>
         <ButtonBar className={"lg col-span-2"}>

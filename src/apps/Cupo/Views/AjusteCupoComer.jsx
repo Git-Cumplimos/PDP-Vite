@@ -11,11 +11,12 @@ import TextArea from "../../../components/Base/TextArea";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
-import { getConsultaCupoComercio, putAjusteCupo } from "../utils/fetchCupo";
+import { putAjusteCupo } from "../utils/fetchCupo";
+import {getConsultaCupoComercio}  from "../utils/fetchFunctions";
 
 const AjusteCupoComer = ({ subRoutes }) => {
-  const navegateValid = useNavigate();
-  const [cupoComer, setCupoComer] = useState(null);
+  const navegate = useNavigate();
+  const [cupoComer, setCupoComer] = useState([]);
   const [idComercio, setIdComercio] = useState(null);
   const [valor, setValor] = useState("");
   const [razonAjuste, setRazonAjuste] = useState("");
@@ -28,22 +29,27 @@ const AjusteCupoComer = ({ subRoutes }) => {
   };
 
   const { roleInfo } = useAuth();
-  useEffect(() => {
-    if (cupoComer?.results.length === 0) {
-      notifyError("ID de comercio incorrecto");
-      setinputId(false);
-    }
-  }, [cupoComer]);
+  // useEffect(() => {
+  //   if (cupoComer.length === 0) {
+  //     notifyError("ID de comercio incorrecto");
+  //     setinputId(false);
+  //   }
+  // }, [cupoComer]);
 
-  const consultaCupoComercios = (id_comercio) => {
-    getConsultaCupoComercio(id_comercio)
-      .then((objUdusrio) => {
-        setCupoComer(objUdusrio);
+  const consultaCupoComercios = useCallback((id_comercio) => {
+    getConsultaCupoComercio({'pk_id_comercio':id_comercio ?? idComercio})
+      .then((res) => {
+        if (!res?.obj) {
+          setinputId(false);
+          notifyError("No se encontraron comercios con ese id");
+          return;
+        } 
+        setCupoComer(res?.obj ?? []);
       })
       .catch((reason) => {
         notifyError("Error al cargar Datos ");
       });
-  };
+  },[idComercio]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -60,80 +66,31 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const onSubmitAjuste = useCallback(
     (e) => {
       if (valor !== null && valor !== "") {
+        const args = { pk_id_comercio: idComercio };
+        let body = {
+          valor_afectacion : valor,
+          fk_id_comercio: idComercio,
+          usuario: roleInfo.id_usuario,
+          fk_tipo_de_movimiento: 2,
+          motivo_afectacion: razonAjuste,
+        }
+        if (submitName === "contigencia") body.ajustes_deuda = true
         if (submitName === "Débito") {
-          const args = { pk_id_comercio: idComercio };
-
-          const body = {
-            valor_afectacion: valor,
-            fk_id_comercio: idComercio,
-            usuario: roleInfo.id_usuario,
-            fk_tipo_de_movimiento: 2,
-            ajustes_deuda: true,
-            motivo_afectacion: razonAjuste,
-          };
-
-          putAjusteCupo(args, body)
-            .then((res) => {
-              consultaCupoComercios(idComercio);
-              if (res?.status) {
-                notify(res?.msg);
-                navegateValid(`/cupo`);
-                // navigate(-1, { replace: true });
-              } else {
-                notifyError(res?.msg);
-              }
-            })
-            .catch((err) => console.error(err));
+          body.valor_afectacion = "-" +  valor
+          body.ajustes_deuda = true
         }
-        if (submitName === "Crédito") {
-          const args = { pk_id_comercio: idComercio };
-          const afectacion = "-" + valor;
-          const body = {
-            valor_afectacion: afectacion,
-            fk_id_comercio: idComercio,
-            usuario: roleInfo.id_usuario,
-            fk_tipo_de_movimiento: 2,
-            // ajustes_deuda: true,
-            motivo_afectacion: razonAjuste,
-          };
-
-          putAjusteCupo(args, body)
-            .then((res) => {
-              consultaCupoComercios(idComercio);
-              if (res?.status) {
-                navegateValid(`/cupo`);
-                notify(res?.msg);
-                // navigate(-1, { replace: true });
-              } else {
-                notifyError(res?.msg);
-              }
-            })
-            .catch((err) => console.error(err));
-        }
-        if (submitName === "contigencia") {
-          const args = { pk_id_comercio: idComercio };
-          const afectacion = "-" + valor;
-          const body = {
-            valor_afectacion: afectacion,
-            fk_id_comercio: idComercio,
-            usuario: roleInfo.id_usuario,
-            fk_tipo_de_movimiento: 2,
-            ajustes_deuda: true,
-            motivo_afectacion: razonAjuste,
-          };
-          putAjusteCupo(args, body)
-            .then((res) => {
-              consultaCupoComercios(idComercio);
-              if (res?.status) {
-                navegateValid(`/cupo`);
-                notify(res?.msg);
-                // navigate(-1, { replace: true });
-              } else {
-                notifyError(res?.msg);
-              }
-            })
-            .catch((err) => console.error(err));
-        }
+        putAjusteCupo(args, body)
+        .then((res) => {
+          consultaCupoComercios(idComercio);
+          if (res?.status) {
+            navegate(`/cupo`);
+            notify(res?.msg);
+            // navigate(-1, { replace: true });
+          } else {
+            notifyError(res?.msg);
+          }
+        })
+        .catch((err) => console.error(err));
       } else {
         notifyError("El campo monto no puede estar vacío");
       }
@@ -144,7 +101,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
       razonAjuste,
       roleInfo?.id_usuario,
       submitName,
-      navegateValid,
+      navegate,
+      consultaCupoComercios
     ]
   );
   const onSubmitBusqueda = useCallback(
@@ -155,7 +113,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
         setinputId(true);
       }
     },
-    [idComercio]
+    [idComercio,consultaCupoComercios]
   );
   return (
     <Fragment>
@@ -174,7 +132,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
           disabled={inputId}
           required
         />
-        {cupoComer?.results.length !== 1 ? (
+        {cupoComer.length !== 1 ? (
           <ButtonBar>
             <Button type={"submit"} name="buscarComercio">
               Buscar comercio
@@ -184,7 +142,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
           ""
         )}
       </Form>
-      {cupoComer?.results.length === 1 ? (
+      {cupoComer.length === 1 ? (
         <Fragment>
           <Form
             onSubmit={(e) => {
@@ -195,13 +153,13 @@ const AjusteCupoComer = ({ subRoutes }) => {
           >
             <Fieldset legend={"Datos Cupo"} className={"lg:col-span-2"}>
               <MoneyInput
-                id="cupo_limite"
-                name="cupo_limite"
-                label="Límite de cupo"// Cambio pendiente
+                id="sobregiro"
+                name="sobregiro"
+                label="Sobregiro"
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
-                value={parseInt(cupoComer?.results[0].limite_cupo)}
+                value={parseInt(cupoComer[0]?.limite_cupo)}
                 disabled={true}
                 required
               />
@@ -212,7 +170,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
-                value={"$ "+ cupoComer?.results[0].deuda}
+                value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
                 disabled={true}
                 required
               />
@@ -223,7 +181,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
-                value={parseInt(cupoComer?.results[0].cupo_en_canje)}
+                value={parseInt(cupoComer[0]?.cupo_en_canje)}
                 disabled={true}
                 required
               />

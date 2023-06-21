@@ -17,7 +17,7 @@ export const getConsultaCupoComercio = async (pk_id_comercio, page, limit) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/cupo/sindocumento`,
+      `${urlCupo}/servicio-cupo/cupo-paginated`,
       "GET",
       busqueda,
       {},
@@ -141,7 +141,6 @@ export const getConsultaAsignacionCupoLimite = async (
   if (page) {
     busqueda.page = page;
   }
-  console.log(busqueda);
   try {
     const res = await fetchData(
       `${urlCupo}/servicio-cupo/modcupo`,
