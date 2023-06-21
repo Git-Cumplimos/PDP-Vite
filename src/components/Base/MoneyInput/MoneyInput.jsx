@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useMoney from "../../../hooks/useMoney";
-import { makeMoneyFormatter, moneyValidator } from "../../../utils/functions";
+import {
+  makeMoneyFormatter,
+  moneyValidator,
+  onHandleNegativeNumbers,
+} from "../../../utils/functions";
 import Input from "../Input";
 
 export const formatMoney = makeMoneyFormatter(2);
@@ -43,13 +47,13 @@ const MoneyInput = ({
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = inputLimits;
-      if (moneyValue === min) {
+      if (moneyValue === min && !equalErrorMin) {
         inptRef.current.setCustomValidity(
           `El valor debe ser mayor ${
             !equalErrorMin ? " o igual" : ""
           } a ${moneyFormatter.format(min)}`
         );
-      } else if (moneyValue < min && equalErrorMin) {
+      } else if (moneyValue < min) {
         inptRef.current.setCustomValidity(
           `El valor debe ser mayor  ${
             !equalErrorMin ? " o igual" : ""
@@ -103,7 +107,15 @@ const MoneyInput = ({
     return Object.fromEntries(_props);
   }, [input?.value, input?.defaultValue, localFormatMoney]);
 
-  return <Input {...input} {...dynamicProps} ref={inptRef} onInput={onInput} />;
+  return (
+    <Input
+      {...input}
+      {...dynamicProps}
+      ref={inptRef}
+      onInput={onInput}
+      onKeyDown={onHandleNegativeNumbers}
+    />
+  );
 };
 
 export default MoneyInput;
