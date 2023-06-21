@@ -46,7 +46,7 @@ const urls = {
   premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
   pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
   pagopremiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioFisico`,
-  DescargaDocsPagoPremios: 'http://loterias-back-cert.us-east-2.elasticbeanstalk.com/descargarDocumentosPremios',
+  DescargaDocsPagoPremios: `${process.env.REACT_APP_URL_LOTERIAS}/descargarDocumentosPremios`,
 
   ConsultaCrearSort: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_sorteos`,
   CambiarSort: `${process.env.REACT_APP_URL_LOTERIAS}/sorteo`,
