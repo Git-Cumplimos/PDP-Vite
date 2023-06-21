@@ -55,7 +55,6 @@ const CupoComer = () => {
         if (idComercio === "") {
           notifyError("No se puede descargar reporte falta ID comercio");
         } else {
-          // PeticionDescargar("");
           crearData(`?pk_id_comercio=${idComercio}`);
         }
       } else {
@@ -70,7 +69,7 @@ const CupoComer = () => {
       <h1 className="text-3xl mt-6">Consulta cupo comercio</h1>
       {roleInfo?.id_comercio ? (
         ""
-      ) : (
+      ) : cupoComer === [] ? (
         <Form grid>
           <Input
             id="idCliente"
@@ -90,7 +89,7 @@ const CupoComer = () => {
           />
           <ButtonBar></ButtonBar>
         </Form>
-      )}
+      ):("")}
 
       <TableEnterprise
         title="Cupo comercios"

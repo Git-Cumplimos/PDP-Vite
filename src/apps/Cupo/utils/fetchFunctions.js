@@ -5,18 +5,19 @@ const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 
 const buildGetFunction = (url) => {
     return async (args = {}) => {
-        try {
-            const res = await fetchData(url, "GET", args);
-            if (!res?.status) {
-                if (res?.msg) {
-                throw new Error(res?.msg, { cause: "custom" });
-                }
-                throw new Error(res, { cause: "custom" });
+      try {
+        const new_args = Object.fromEntries(Object.entries(args).filter(([key,value])=>value !=='' && value !== null))
+        const res = await fetchData(url, "GET", new_args);
+        if (!res?.status) {
+            if (res?.msg) {
+            throw new Error(res?.msg, { cause: "custom" });
             }
-            return res;
-        } catch (err) {
-        throw err
+            throw new Error(res, { cause: "custom" });
         }
+        return res;
+      } catch (err) {
+        throw err
+      }
     };
   };
 

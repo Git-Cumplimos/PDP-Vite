@@ -1,5 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 import { Auth } from "@aws-amplify/auth";
+import { notify, notifyError } from "../../../utils/notify";
 
 const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
 // const urlCupo = `http://127.0.0.1:5080`;
@@ -42,7 +43,7 @@ export const postCupoComercio = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/cupo/sindocumento`,
+      `${urlCupo}/servicio-cupo/gestion-cupo`,
       "POST",
       {},
       bodyObj
@@ -72,7 +73,7 @@ export const getConsultaDtlMovCupo = async (
   };
   busqueda.sortBy = "pk_id_dtl_mov";
   busqueda.sortDir = "DESC";
-  console.log(busqueda);
+  // console.log(busqueda);
   if (date_end && date_ini) {
     if (date_end >= date_ini) {
       busqueda.date_end = date_end;
@@ -168,7 +169,7 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/cupo/sindocumento`,
+      `${urlCupo}/servicio-cupo/gestion-cupo`,
       "PUT",
       argsObj,
       bodyObj
@@ -184,35 +185,17 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
 
 export const PeticionDescargar = async (parametro) => {
   try {
-    const session = await Auth.currentSession();
-    const response = await fetch(
-      `${urlCupo}/servicio-cupo/cupo/documento${parametro}`,
-      {
-        headers: { Authorization: `Bearer ${session?.idToken?.jwtToken}` },
-      }
+    const res = await fetchData(
+      `${urlCupo}/servicio-cupo/gestion-cupo${parametro}`,
     );
-    const contentType = response.headers.get("content-type");
-    const nombreDocumento = response.headers
-      .get("Content-Disposition")
-      .slice(22, -1);
-    if (
-      contentType ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ) {
-      const byts = await response.blob();
-      const downloadUrl = URL.createObjectURL(byts);
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      a.download = `${nombreDocumento}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else if (contentType === "application/json") {
-      const json = await response.json();
-      if (!json?.status) {
-        console.error(json?.msg);
-      }
+    if (!res?.status) {
+      notifyError(res?.msg);
+      return res;
+    } else {
+      notify(res?.msg);
+      window.open(res?.obj?.url, "_self")
     }
+
   } catch (error) {
     console.log("Error con fetch - no conecta al servicio");
   }
