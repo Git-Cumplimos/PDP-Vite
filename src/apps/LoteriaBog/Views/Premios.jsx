@@ -378,16 +378,19 @@ const Premios = ({ route }) => {
               }
               const resSubir1 = await subirDocsPagoPremios("documento");
               if (!resSubir1) {
+                setRespuesta(false);
                 return;
               }
               const resSubir2 = await subirDocsPagoPremios("formulario");
               if (!resSubir2) {
+                setRespuesta(false);
                 return;
               }
             }
           } catch (error) {
+            setRespuesta(false);
             notifyError(
-              "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
+              "Error respuesta Frontend PDP: Error al consumir del servicio (Cargue archivos) [0010002]"
             );
             return;
           }
@@ -445,102 +448,104 @@ const Premios = ({ route }) => {
       }
     } else {
       if (
-          seleccionarFraccion === 0 ||
-          seleccionarFraccion === "0" ||
-          seleccionarFraccion === undefined
-        ) {
-          setRespuesta(false);
-          notifyError("Seleccione una fracción");
-        } else if (checkBilleteVirtual === true && hash === "") {
-          setRespuesta(false);
-          notifyError("Ingresar código hash");
-        } else {
-          setRespuesta(true);
-          try {
-            if (montoSuperior) {
+        seleccionarFraccion === 0 ||
+        seleccionarFraccion === "0" ||
+        seleccionarFraccion === undefined
+      ) {
+        setRespuesta(false);
+        notifyError("Seleccione una fracción");
+      } else if (checkBilleteVirtual === true && hash === "") {
+        setRespuesta(false);
+        notifyError("Ingresar código hash");
+      } else {
+        setRespuesta(true);
+        try {
+          if (montoSuperior) {
+            if (
+              files?.documento === undefined ||
+              files?.formulario === undefined
+            ) {
               if (
-                files?.documento === undefined ||
+                files?.documento === undefined &&
+                files?.formulario !== undefined
+              ) {
+                notifyError("Ingresar documento de identificación requerido");
+              }
+              if (
+                files?.documento !== undefined &&
                 files?.formulario === undefined
               ) {
-                if (
-                  files?.documento === undefined &&
-                  files?.formulario !== undefined
-                ) {
-                  notifyError("Ingresar documento de identificación requerido");
-                }
-                if (
-                  files?.documento !== undefined &&
-                  files?.formulario === undefined
-                ) {
-                  notifyError("Ingresar formulario requerido");
-                }
-                if (
-                  files?.documento === undefined &&
-                  files?.formulario === undefined
-                ) {
-                  notifyError("Ingresar documentación requerida");
-                }
-                return;
+                notifyError("Ingresar formulario requerido");
               }
-              const resSubir1 = await subirDocsPagoPremios("documento");
-              if (!resSubir1) {
-                return;
+              if (
+                files?.documento === undefined &&
+                files?.formulario === undefined
+              ) {
+                notifyError("Ingresar documentación requerida");
               }
-              const resSubir2 = await subirDocsPagoPremios("formulario");
-              if (!resSubir2) {
-                return;
-              }
+              return;
             }
-          } catch (error) {
-            notifyError(
-              "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
-            );
-            return;
+            const resSubir1 = await subirDocsPagoPremios("documento");
+            if (!resSubir1) {
+              setRespuesta(false);
+              return;
+            }
+            const resSubir2 = await subirDocsPagoPremios("formulario");
+            if (!resSubir2) {
+              setRespuesta(false);
+              return;
+            }
           }
-          const res = await makePayment(
-            sorteo,
-            billete,
-            serie,
-            checkBilleteFisico,
-            checkBilleteVirtual,
-            seleccionarFraccion,
-            datosCliente?.nombre,
-            datosCliente?.apellido,
-            datosCliente?.documento,
-            datosCliente?.direccion,
-            datosCliente?.celular,
-            totalPagar,
-            valorbruto,
-            valor17,
-            valor20,
-            datosComercio.comercio,
-            datosComercio.terminal,
-            datosComercio.usuario,
-            datosComercio.codigo_dane,
-            idLoteria,
-            tipopago,
-            hash,
-            pdpUser?.uname,
-            tickets
-          );
+        } catch (error) {
           setRespuesta(false);
-          setDatosCliente((old) => {
-            return {
-              ...old,
-              statusPagoPremio: res?.status,
-              idTransaccion: res?.obj?.id_trx,
-              tipo_operacion: res?.obj?.tipo_operacion,
-            };
-          });
-          setEstadoTransaccion(res?.status);
-          if (res?.status === false) {
-            notifyError(res?.obj?.msg);
-            navigate(-1);
-          } else {
-            notify("Pago premio de Lotería exitoso");
-          }
+          notifyError(
+            "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
+          );
+          return;
         }
-       
+        const res = await makePayment(
+          sorteo,
+          billete,
+          serie,
+          checkBilleteFisico,
+          checkBilleteVirtual,
+          seleccionarFraccion,
+          datosCliente?.nombre,
+          datosCliente?.apellido,
+          datosCliente?.documento,
+          datosCliente?.direccion,
+          datosCliente?.celular,
+          totalPagar,
+          valorbruto,
+          valor17,
+          valor20,
+          datosComercio.comercio,
+          datosComercio.terminal,
+          datosComercio.usuario,
+          datosComercio.codigo_dane,
+          idLoteria,
+          tipopago,
+          hash,
+          pdpUser?.uname,
+          tickets
+        );
+        setRespuesta(false);
+        setDatosCliente((old) => {
+          return {
+            ...old,
+            statusPagoPremio: res?.status,
+            idTransaccion: res?.obj?.id_trx,
+            tipo_operacion: res?.obj?.tipo_operacion,
+          };
+        });
+        setEstadoTransaccion(res?.status);
+        if (res?.status === false) {
+          notifyError(res?.obj?.msg);
+          navigate(-1);
+        } else {
+          notify("Pago premio de Lotería exitoso");
+        }
+      }
     }
   };
 
@@ -576,7 +581,6 @@ const Premios = ({ route }) => {
   };
 
   const onChangeFiles = (info, type) => {
-    console.log(info[0]?.type);
     setFiles((old) => ({
       ...old,
       [type]: { files: Array.from(info)[0], typeArchivo: info[0]?.type },
@@ -595,7 +599,7 @@ const Premios = ({ route }) => {
       }
       const formData = new FormData();
       for (var key in resUrlPresind?.obj?.result?.fields) {
-        formData.append(key, resUrlPresind?.obj?.fields[key]);
+        formData.append(key, resUrlPresind?.obj?.result?.fields[key]);
       }
       formData.set("file", files[type]?.files);
       await fetchUploadFileCustom(resUrlPresind?.obj?.result?.url, formData);
