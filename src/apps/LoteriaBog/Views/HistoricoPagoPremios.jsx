@@ -74,6 +74,7 @@ const HistoricoPagoPremios = ({ route }) => {
       serie: resp_con_sort[i]["serie"],
       valor_pagado: resp_con_sort[i]["valor_neto"],
       fecha: resp_con_sort[i]["fecha_pago"],
+      fraccion: resp_con_sort[i]["num_fraccion"],
     })
     .then((res) => {
       console.log("res-->",res)
@@ -111,10 +112,10 @@ const HistoricoPagoPremios = ({ route }) => {
       <TableEnterprise
         title='Registros pago de premios'
         maxPage={maxPages}
-        headers={["Número sorteo","Número billete","Número serie","Id Comercio","Valor Pagado","Fecha"]}
+        headers={["Número sorteo","Número billete","Número serie","Fracción pagada","Id Comercio","Valor Pagado","Fecha"]}
         onSetPageData={setPageData}
-        data={resp_con_sort.map(({num_sorteo,num_billete,serie,id_comercio,valor_neto,fecha_pago}) => {
-          return {num_sorteo,num_billete,serie,id_comercio,valor_neto,fecha_pago};
+        data={resp_con_sort.map(({num_sorteo,num_billete,serie,num_fraccion,id_comercio,valor_neto,fecha_pago}) => {
+          return {num_sorteo,num_billete,serie,num_fraccion,id_comercio,valor_neto,fecha_pago};
         })}
         onSelectRow={onSelectPagoPremio}
       >

@@ -860,6 +860,7 @@ export const useProvideLoteria = () => {
         serie: billete.serie,
         valor_pagado: billete.valor_pagado,
         fecha: billete.fecha,
+        fraccion: billete.fraccion,
       }
       try {
         const res = await fetchData(urls.DescargaDocsPagoPremios, "GET", query, {});

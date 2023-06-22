@@ -355,7 +355,7 @@ const Premios = ({ route }) => {
             files?.documento === undefined &&
             files?.formulario === undefined
           ) {
-            notifyError("Ingresar documentación  requerida");
+            notifyError("Ingresar documentación requerida");
           }
           return;
         }
@@ -543,7 +543,7 @@ const Premios = ({ route }) => {
   const subirDocsPagoPremios = async (type) => {
     try {
       const resUrlPresind = await fetchData(
-        `${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&typefile=${files[type]?.typeArchivo}`,
+        `${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&typefile=${files[type]?.typeArchivo}&fraccion=${seleccionarFraccion}`,
         "GET"
       );
       if (!resUrlPresind?.status) {
