@@ -13,6 +13,7 @@ const PinesVenta = lazy(() => import("./Views/Pines/VentaPines"));
 const PeticionesPines = lazy(() => import("./Views/Peticiones"));
 const Anulaciones = lazy(() => import("./Views/AnulacionesPines"));
 const CargueAnulaciones = lazy(() => import("./Views/Anulaciones/CargueAnulaciones"))
+const DescargaPeticiones = lazy(() => import("./Views/Anulaciones/DescargarArchivoPeticiones"))
 
 
 
@@ -64,7 +65,7 @@ const rutasPinesCrc = {
       link: "/Pines/PinesCrc/PeticionesPines",
       label: (
         <AppIcons
-          Logo={"VentaPinRecaudoColpatria"}
+          Logo={"PINES_TRAMITAR"}
           name={"Peticiones"}
         />
       ),
@@ -75,7 +76,7 @@ const rutasPinesCrc = {
       link: "/Pines/PinesCrc/Anulaciones",
       label: (
         <AppIcons
-          Logo={"VentaPinRecaudoColpatria"}
+          Logo={"PINES_ADMINISTRAR"}
           name={"Anulaciones"}
         />
       ),
@@ -85,9 +86,17 @@ const rutasPinesCrc = {
         {
           link: "/Pines/PinesCrc/Anulaciones/CargueArchivo",
           label: (
-            <AppIcons Logo={"CrearPines"} name={"Cargue Archivo Anulaciones"} />
+            <AppIcons Logo={"CARGAR"} name={"Cargue Archivo Anulaciones"} />
           ),
           component: CargueAnulaciones,
+          permission: [63]
+        },
+        {
+          link: "/Pines/PinesCrc/Anulaciones/DescargarPeticiones",
+          label: (
+            <AppIcons Logo={"DESCARGAR"} name={"Descarga Archivo Peticiones"} />
+          ),
+          component: DescargaPeticiones,
           permission: [63]
         },
       ],
