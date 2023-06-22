@@ -350,197 +350,203 @@ const Premios = ({ route }) => {
           setRespuesta(false);
           notifyError("Ingresar código hash");
         } else {
-            try {
-              if (montoSuperior) {
-                if (files?.documento === undefined || files?.formulario === undefined) {
-                  if (
-                    files?.documento === undefined &&
-                    files?.formulario !== undefined
-                  ) {
-                    notifyError("Ingresar documento de identificación requerido");
-                  }
-                  if (
-                    files?.documento !== undefined &&
-                    files?.formulario === undefined
-                  ) {
-                    notifyError("Ingresar formulario requerido");
-                  }
-                  if (
-                    files?.documento === undefined &&
-                    files?.formulario === undefined
-                  ) {
-                    notifyError("Ingresar documentación requerida");
-                  }
-                  return;
+          try {
+            if (montoSuperior) {
+              if (
+                files?.documento === undefined ||
+                files?.formulario === undefined
+              ) {
+                if (
+                  files?.documento === undefined &&
+                  files?.formulario !== undefined
+                ) {
+                  notifyError("Ingresar documento de identificación requerido");
                 }
-                const resSubir1 = await subirDocsPagoPremios("documento");
-                if (!resSubir1) {
-                  return;
+                if (
+                  files?.documento !== undefined &&
+                  files?.formulario === undefined
+                ) {
+                  notifyError("Ingresar formulario requerido");
                 }
-                const resSubir2 = await subirDocsPagoPremios("formulario");
-                if (!resSubir2) {
-                  return;
+                if (
+                  files?.documento === undefined &&
+                  files?.formulario === undefined
+                ) {
+                  notifyError("Ingresar documentación requerida");
                 }
+                return;
               }
-            } catch (error) {
-              notifyError(
-                "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
-              );
-              return;
+              const resSubir1 = await subirDocsPagoPremios("documento");
+              if (!resSubir1) {
+                return;
+              }
+              const resSubir2 = await subirDocsPagoPremios("formulario");
+              if (!resSubir2) {
+                return;
+              }
             }
-              const res = await makePayment(
-              sorteo,
-              billete,
-              serie,
-              checkBilleteFisico,
-              checkBilleteVirtual,
-              seleccionarFraccion,
-              datosCliente?.nombre,
-              datosCliente?.apellido,
-              datosCliente?.documento,
-              datosCliente?.direccion,
-              datosCliente?.celular,
-              totalPagar,
-              valorbruto,
-              valor17,
-              valor20,
-              datosComercio.comercio,
-              datosComercio.terminal,
-              datosComercio.usuario,
-              datosComercio.codigo_dane,
-              idLoteria,
-              tipopago,
-              hash,
-              pdpUser?.uname,
-              tickets
+          } catch (error) {
+            notifyError(
+              "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
             );
-            setRespuesta(false);
-            setDatosCliente((old) => {
-              return {
-                ...old,
-                statusPagoPremio: res?.status,
-                idTransaccion: res?.obj?.id_trx,
-                tipo_operacion: res?.obj?.tipo_operacion,
-              };
-            });
-            tickets["commerceInfo"].splice(2, 0, [
-              "Id Trx",
-              datosCliente?.idTransaccion,
-            ]);
-            setEstadoTransaccion(res?.status);
-            if (res?.status === false) {
-              notifyError(res?.obj?.msg);
-              navigate(-1);
-            } else {
-              notify("Pago premio de Lotería exitoso");
-            }          
+            return;
           }
+          const res = await makePayment(
+            sorteo,
+            billete,
+            serie,
+            checkBilleteFisico,
+            checkBilleteVirtual,
+            seleccionarFraccion,
+            datosCliente?.nombre,
+            datosCliente?.apellido,
+            datosCliente?.documento,
+            datosCliente?.direccion,
+            datosCliente?.celular,
+            totalPagar,
+            valorbruto,
+            valor17,
+            valor20,
+            datosComercio.comercio,
+            datosComercio.terminal,
+            datosComercio.usuario,
+            datosComercio.codigo_dane,
+            idLoteria,
+            tipopago,
+            hash,
+            pdpUser?.uname,
+            tickets
+          );
+          setRespuesta(false);
+          setDatosCliente((old) => {
+            return {
+              ...old,
+              statusPagoPremio: res?.status,
+              idTransaccion: res?.obj?.id_trx,
+              tipo_operacion: res?.obj?.tipo_operacion,
+            };
+          });
+          tickets["commerceInfo"].splice(2, 0, [
+            "Id Trx",
+            datosCliente?.idTransaccion,
+          ]);
+          setEstadoTransaccion(res?.status);
+          if (res?.status === false) {
+            notifyError(res?.obj?.msg);
+            navigate(-1);
+          } else {
+            notify("Pago premio de Lotería exitoso");
+          }
+        }
       } else {
         notifyError(
           "Número invalido, el N° de celular debe comenzar con el número 3."
         );
       }
     } else {
-        if (String(datosCliente?.celular).charAt(0) === "3"){
-          if (
-            seleccionarFraccion === 0 ||
-            seleccionarFraccion === "0" ||
-            seleccionarFraccion === undefined
-          ) {
-            setRespuesta(false);
-            notifyError("Seleccione una fracción");
-          } else if (checkBilleteVirtual === true && hash === "") {
-            setRespuesta(false);
-            notifyError("Ingresar código hash");
-          } else {
-            setRespuesta(true);
-            try {
-              if (montoSuperior) {
-                if (files?.documento === undefined || files?.formulario === undefined) {
-                  if (
-                    files?.documento === undefined &&
-                    files?.formulario !== undefined
-                  ) {
-                    notifyError("Ingresar documento de identificación requerido");
-                  }
-                  if (
-                    files?.documento !== undefined &&
-                    files?.formulario === undefined
-                  ) {
-                    notifyError("Ingresar formulario requerido");
-                  }
-                  if (
-                    files?.documento === undefined &&
-                    files?.formulario === undefined
-                  ) {
-                    notifyError("Ingresar documentación requerida");
-                  }
-                  return;
-                }
-                const resSubir1 = await subirDocsPagoPremios("documento");
-                if (!resSubir1) {
-                  return;
-                }
-                const resSubir2 = await subirDocsPagoPremios("formulario");
-                if (!resSubir2) {
-                  return;
-                }
-              }
-            } catch (error) {
-              notifyError(
-                "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
-              );
-              return;
-            }
-            const res = await makePayment(
-              sorteo,
-              billete,
-              serie,
-              checkBilleteFisico,
-              checkBilleteVirtual,
-              seleccionarFraccion,
-              datosCliente?.nombre,
-              datosCliente?.apellido,
-              datosCliente?.documento,
-              datosCliente?.direccion,
-              datosCliente?.celular,
-              totalPagar,
-              valorbruto,
-              valor17,
-              valor20,
-              datosComercio.comercio,
-              datosComercio.terminal,
-              datosComercio.usuario,
-              datosComercio.codigo_dane,
-              idLoteria,
-              tipopago,
-              hash,
-              pdpUser?.uname,
-              tickets
-            );
-            setRespuesta(false);
-            setDatosCliente((old) => {
-              return {
-                ...old,
-                statusPagoPremio: res?.status,
-                idTransaccion: res?.obj?.id_trx,
-                tipo_operacion: res?.obj?.tipo_operacion,
-              };
-            });
-            setEstadoTransaccion(res?.status);
-            if (res?.status === false) {
-              notifyError(res?.obj?.msg);
-              navigate(-1);
-            } else {
-              notify("Pago premio de Lotería exitoso");
-            }
-          }
+      if (String(datosCliente?.celular).charAt(0) === "3") {
+        if (
+          seleccionarFraccion === 0 ||
+          seleccionarFraccion === "0" ||
+          seleccionarFraccion === undefined
+        ) {
+          setRespuesta(false);
+          notifyError("Seleccione una fracción");
+        } else if (checkBilleteVirtual === true && hash === "") {
+          setRespuesta(false);
+          notifyError("Ingresar código hash");
         } else {
+          setRespuesta(true);
+          try {
+            if (montoSuperior) {
+              if (
+                files?.documento === undefined ||
+                files?.formulario === undefined
+              ) {
+                if (
+                  files?.documento === undefined &&
+                  files?.formulario !== undefined
+                ) {
+                  notifyError("Ingresar documento de identificación requerido");
+                }
+                if (
+                  files?.documento !== undefined &&
+                  files?.formulario === undefined
+                ) {
+                  notifyError("Ingresar formulario requerido");
+                }
+                if (
+                  files?.documento === undefined &&
+                  files?.formulario === undefined
+                ) {
+                  notifyError("Ingresar documentación requerida");
+                }
+                return;
+              }
+              const resSubir1 = await subirDocsPagoPremios("documento");
+              if (!resSubir1) {
+                return;
+              }
+              const resSubir2 = await subirDocsPagoPremios("formulario");
+              if (!resSubir2) {
+                return;
+              }
+            }
+          } catch (error) {
             notifyError(
-              "Número invalido, el N° de celular debe comenzar con el número 3."
+              "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
             );
+            return;
           }
+          const res = await makePayment(
+            sorteo,
+            billete,
+            serie,
+            checkBilleteFisico,
+            checkBilleteVirtual,
+            seleccionarFraccion,
+            datosCliente?.nombre,
+            datosCliente?.apellido,
+            datosCliente?.documento,
+            datosCliente?.direccion,
+            datosCliente?.celular,
+            totalPagar,
+            valorbruto,
+            valor17,
+            valor20,
+            datosComercio.comercio,
+            datosComercio.terminal,
+            datosComercio.usuario,
+            datosComercio.codigo_dane,
+            idLoteria,
+            tipopago,
+            hash,
+            pdpUser?.uname,
+            tickets
+          );
+          setRespuesta(false);
+          setDatosCliente((old) => {
+            return {
+              ...old,
+              statusPagoPremio: res?.status,
+              idTransaccion: res?.obj?.id_trx,
+              tipo_operacion: res?.obj?.tipo_operacion,
+            };
+          });
+          setEstadoTransaccion(res?.status);
+          if (res?.status === false) {
+            notifyError(res?.obj?.msg);
+            navigate(-1);
+          } else {
+            notify("Pago premio de Lotería exitoso");
+          }
+        }
+      } else {
+        notifyError(
+          "Número invalido, el N° de celular debe comenzar con el número 3."
+        );
       }
+    }
   };
 
   const handlePrint = useReactToPrint({
@@ -593,11 +599,11 @@ const Premios = ({ route }) => {
         return false;
       }
       const formData = new FormData();
-      for (var key in resUrlPresind?.obj?.fields) {
+      for (var key in resUrlPresind?.obj?.result?.fields) {
         formData.append(key, resUrlPresind?.obj?.fields[key]);
       }
       formData.set("file", files[type]?.files);
-      await fetchUploadFileCustom(resUrlPresind?.obj?.url, formData);
+      await fetchUploadFileCustom(resUrlPresind?.obj?.result?.url, formData);
       return true;
     } catch (error) {
       throw error;
