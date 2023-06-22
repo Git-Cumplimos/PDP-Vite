@@ -39,7 +39,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const consultaCupoComercios = useCallback((id_comercio) => {
     getConsultaCupoComercio({'pk_id_comercio':id_comercio ?? idComercio})
       .then((res) => {
-        if (!res?.obj) {
+        if (!res?.obj || res?.obj?.length === 0) {
           setinputId(false);
           notifyError("No se encontraron comercios con ese id");
           return;

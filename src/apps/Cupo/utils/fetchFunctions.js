@@ -25,5 +25,5 @@ export const getConsultaComercios = buildGetFunction(
     `${urlCupo}/servicio-cupo/cupo-paginated`
   );
 export const getConsultaCupoComercio = buildGetFunction(
-    `${urlCupo}/servicio-cupo/cupo-disponible`
+    `${urlCupo}/servicio-cupo/gestion-cupo`
   );

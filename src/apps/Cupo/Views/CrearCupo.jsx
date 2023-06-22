@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
@@ -17,13 +17,14 @@ const CrearCupo = () => {
   const [paymentStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [summary, setSummary] = useState({});
-  const [limite, setLimite] = useState(null);
+  const [sobregiro, setSobregiro] = useState(null);
   const [canje, setCanje] = useState(null);
   const limitesMontos = {
     max: 9999999999,
     min: 0,
   };
   const { roleInfo } = useAuth();
+  const navigate = useNavigate();
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -41,33 +42,33 @@ const CrearCupo = () => {
     (e) => {
       e.preventDefault();
       if (
-        limite !== null &&
-        limite !== "" &&
+        sobregiro !== null &&
+        sobregiro !== "" &&
         deuda !== null &&
         deuda !== "" &&
-        canje !== "" &&
+        canje !== null &&
         canje !== ""
       ) {
         setShowModal(true);
         setSummary({
           "Id del comercio": idComercio,
-          "Límite del cupo": formatMoney.format(limite),
+          "Sobregiro": formatMoney.format(sobregiro),
           Deuda: formatMoney.format(deuda),
           "Cupo en canje": formatMoney.format(canje),
         });
       } else {
         notifyError(
-          "Los campos límite, deuda o cupo en canje no pueden estar vacíos"
+          "Los campos sobregiro, deuda o cupo en canje no pueden estar vacíos"
         );
       }
     },
-    [idComercio, deuda, canje, limite]
+    [idComercio, deuda, canje, sobregiro]
   );
   const crearComercio = useCallback(
     (e) => {
       const body = {
         pk_id_comercio: idComercio,
-        limite_cupo: limite,
+        limite_cupo: sobregiro,
         deuda: deuda,
         cupo_en_canje: canje,
         usuario: roleInfo.id_usuario,
@@ -76,26 +77,24 @@ const CrearCupo = () => {
         .then((res) => {
           if (!res?.status) {
             notifyError(res?.msg);
-            return;
           }
-          notify("Cupo creado exitosamente");
+          else notify("Cupo creado exitosamente");
+          navigate(`/cupo`)
         })
         .catch((r) => {
           console.error(r.message);
           notifyError("Error al crear cupo");
         });
     },
-    [idComercio, deuda, canje, limite, roleInfo.id_usuario]
+    [idComercio, deuda, canje, sobregiro, roleInfo.id_usuario, navigate]
   );
-  const onMoneyChangeDeuda = useCallback((e, valor) => {
-    setDeuda(valor);
+
+  const onMoneyChange = useCallback((e, valor) => {
+    if (e.target.name === "sobregiro") setSobregiro(valor);
+    if (e.target.name === "deuda") setDeuda(valor);
+    if (e.target.name === "cupo_canje") setCanje(valor);
   }, []);
-  const onMoneyChangeLimite = useCallback((e, valor) => {
-    setLimite(valor);
-  }, []);
-  const onMoneyChangeCanje = useCallback((e, valor) => {
-    setCanje(valor);
-  }, []);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Crear cupo Comercios</h1>
@@ -113,14 +112,14 @@ const CrearCupo = () => {
           required
         />
         <MoneyInput
-          id="cupo_limite"
-          name="cupo_limite"
-          label="Límite de cupo"
+          id="sobregiro"
+          name="sobregiro"
+          label="Sobregiro"
           autoComplete="off"
           maxLength={"14"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
-          onInput={onMoneyChangeLimite}
+          onInput={onMoneyChange}
           required
         />
         <MoneyInput
@@ -131,7 +130,7 @@ const CrearCupo = () => {
           maxLength={"14"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
-          onInput={onMoneyChangeDeuda}
+          onInput={onMoneyChange}
           required
         />
         <MoneyInput
@@ -142,7 +141,7 @@ const CrearCupo = () => {
           maxLength={"14"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
-          onInput={onMoneyChangeCanje}
+          onInput={onMoneyChange}
           required
         />
 
@@ -160,11 +159,9 @@ const CrearCupo = () => {
           summaryTrx={summary}
         >
           <ButtonBar>
-            <Link to="/cupo">
-              <Button type="submit" onClick={crearComercio}>
-                Aceptar
-              </Button>
-            </Link>
+            <Button type="submit" onClick={crearComercio}>
+              Aceptar
+            </Button>
             <Button onClick={handleClose}>Cancelar</Button>
           </ButtonBar>
         </PaymentSummary>

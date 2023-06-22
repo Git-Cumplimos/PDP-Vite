@@ -52,11 +52,11 @@ const CupoComer = () => {
     (e) => {
       e.preventDefault();
       if (cupoComer?.length > 0) {
-        if (idComercio === "") {
-          notifyError("No se puede descargar reporte falta ID comercio");
-        } else {
-          crearData(`?pk_id_comercio=${idComercio}`);
-        }
+        // if (idComercio === "") {
+        //   notifyError("No se puede descargar reporte falta ID comercio");
+        // } else {
+        crearData(idComercio ?`?pk_id_comercio=${idComercio}`:"");
+        // }
       } else {
         notifyError("Id de comercio no existe");
       }

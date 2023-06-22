@@ -114,7 +114,7 @@ export const postDtlCambioLimiteCanje = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/modcupo`,
+      `${urlCupo}/servicio-cupo/modificacion-cupo`,
       "POST",
       {},
       bodyObj
@@ -144,7 +144,7 @@ export const getConsultaAsignacionCupoLimite = async (
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/modcupo`,
+      `${urlCupo}/servicio-cupo/modificacion-cupo`,
       "GET",
       busqueda,
       {},
@@ -183,10 +183,10 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
   }
 };
 
-export const PeticionDescargar = async (parametro) => {
+export const PeticionDescargar = async (parametro = "") => {
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/gestion-cupo${parametro}`,
+      `${urlCupo}/servicio-cupo/reporte-cupo${parametro}`,
     );
     if (!res?.status) {
       notifyError(res?.msg);
@@ -272,7 +272,7 @@ export const getTipoMovimientosCupo = async (
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/movimientos`,
+      `${urlCupo}/servicio-cupo/movimientos-cupo`,
       "GET",
       busqueda,
       {},
@@ -297,7 +297,7 @@ export const postTipoMovimientosCupo = async (bodyObj) => {
   }
   try {
     const res = await fetchData(
-      `${urlCupo}/servicio-cupo/movimientos`,
+      `${urlCupo}/servicio-cupo/movimientos-cupo`,
       "POST",
       {},
       bodyObj

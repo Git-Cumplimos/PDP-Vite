@@ -13,7 +13,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../utils/notify";
 import {getConsultaCupoComercio}  from "../utils/fetchFunctions";
 import {
-  getConsultaAsignacionCupoLimite,
+  // getConsultaAsignacionCupoLimite,
   postDtlCambioLimiteCanje,
 } from "../utils/fetchCupo";
 
@@ -23,9 +23,9 @@ const ModifiLimiteCanje = () => {
   const [baseCaja, setBaseCaja] = useState(null);
   const [diasMaxSobregiro, setDiasMaxSobregiro] = useState(null);
   const [idComercio, setIdComercio] = useState(null);
-  const [, setAsigLimite] = useState(null);
-  const [limit] = useState(10);
-  const [page] = useState(1);
+  // const [, setAsigLimite] = useState(null);
+  // const [limit] = useState(10);
+  // const [page] = useState(1);
   const [inputId, setinputId] = useState(false);
   const [submitName, setSubmitName] = useState("");
   const limitesMontos = {
@@ -35,23 +35,23 @@ const ModifiLimiteCanje = () => {
   const { roleInfo } = useAuth();
   const navegateValid = useNavigate();
 
-  useEffect(() => {
-    if (cupoComer?.length === 0) {
-      notifyError("ID de comercio incorrecto");
-      setinputId(false);
-    }
-  }, [cupoComer]);
+  // useEffect(() => {
+  //   if (cupoComer?.length === 0) {
+  //     notifyError("ID de comercio incorrecto");
+  //     setinputId(false);
+  //   }
+  // }, [cupoComer]);
 
-  const tablalimitecupo = (idComercio, page, limit) => {
-    getConsultaAsignacionCupoLimite(idComercio, page, limit)
-      .then((objUdusrio) => {
-        setAsigLimite(objUdusrio);
-      })
-      .catch((reason) => {
-        console.log(reason.message);
-        notifyError("Error al cargar Datos ");
-      });
-  };
+  // const tablalimitecupo = (idComercio, page, limit) => {
+  //   getConsultaAsignacionCupoLimite(idComercio, page, limit)
+  //     .then((objUdusrio) => {
+  //       setAsigLimite(objUdusrio);
+  //     })
+  //     .catch((reason) => {
+  //       console.log(reason.message);
+  //       notifyError("Error al cargar Datos ");
+  //     });
+  // };
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -71,8 +71,8 @@ const ModifiLimiteCanje = () => {
         const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario,};
         const data = {};
         if (baseCaja && baseCaja !== "") data.base_Caja = baseCaja
-        if (diasMaxSobregiro && diasMaxSobregiro !== "") data.max_sobregiro = parseInt(diasMaxSobregiro)
-        if (valor !== cupoComer?.limite_cupo) data.valor_afectacion = valor
+        if (diasMaxSobregiro && diasMaxSobregiro !== "") data.dias_max_sobregiro = parseInt(diasMaxSobregiro)
+        if (valor !== cupoComer?.limite_cupo) data.sobregiro = valor
         
         if (Object.keys(data).length === 0){
           notifyError("No se detectaron cambios");
@@ -87,7 +87,7 @@ const ModifiLimiteCanje = () => {
               return;
             }
             notify("Modificacion exitosa");
-            tablalimitecupo(idComercio, page, limit);
+            // tablalimitecupo(idComercio, page, limit);
             navegateValid(`/cupo`);
           })
           .catch((r) => {
@@ -103,9 +103,9 @@ const ModifiLimiteCanje = () => {
       valor,
       diasMaxSobregiro,
       baseCaja,
-      limit,
+      // limit,
       roleInfo,
-      page,
+      // page,
       navegateValid,
       cupoComer,
       submitName,
@@ -123,14 +123,16 @@ const ModifiLimiteCanje = () => {
         setinputId(true);
         getConsultaCupoComercio({'pk_id_comercio':idComercio})
           .then((res) => {
-            if (!res?.obj) {
-              setinputId(false);
+            if (!res?.obj || res?.obj.length === 0) {
               notifyError("No se encontraron comercios con ese id");
+              setinputId(false);
               return;
-            } 
+            }
+            
             setCupoComer(res?.obj ?? []);
             setValor(res?.limite_cupo);
-            tablalimitecupo(idComercio, page, limit);
+            
+            // tablalimitecupo(idComercio, page, limit);
           })
           .catch((reason) => {
             setinputId(false);
@@ -138,11 +140,15 @@ const ModifiLimiteCanje = () => {
           });
       }
     },
-    [idComercio, page, limit]
+    [
+      idComercio,
+      // page,
+      // limit
+    ]
   );
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Modificación sobregiro</h1>
+      <h1 className="text-3xl mt-6">Modificación cupo</h1>
       <Form onSubmit={
         cupoComer?.length !== 1 ?
           onSubmitComercio : (e)=>{
