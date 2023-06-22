@@ -188,7 +188,7 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
           if (result?.ticket) {
             setInfTicket(result?.ticket);
           }
-          notify(`Recarga ${operadorCurrent.name} exitosa`);
+          notify(`Compra paquete ${operadorCurrent.name} exitosa`);
           setTypeInfo("TrxExitosa");
         } else {
           notifyError(

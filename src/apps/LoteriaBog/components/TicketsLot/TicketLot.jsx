@@ -1,137 +1,75 @@
-import classes from "./TicketLot.module.css";
-import LogoLoto from "../../../../components/Base/LogoLoto";
-import LogoLoTolima from "../../../../components/Base/LogoLoTolima";
-import LogoLoCundinamarca from "../../../../components/Base/LogoLoCundinamarca"
+import Tickets from "../../../../components/Base/Tickets/Tickets";
+import { useImgs } from "../../../../hooks/ImgsHooks";
 
-const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loteria }) => {
-  const { divPrint } = classes;
+const TicketLot = ({
+  refPrint,
+  type = "ORIGINAL",
+  ticket,
+  stateTrx = true,
+  loteria,
+}) => {
+  const {
+    imgs: {
+      Loteria_de_Bogota,
+      Loteria_de_Tolima,
+      Loteria_de_Cundinamarca,
+      pdpHorizontal: LogoPdp,
+    },
+  } = useImgs();
 
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
   }
 
-  const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
-    ticket;
-
   return (
-    <div style={{ border: "1px solid black" }}>
-      <div className={divPrint} ref={refPrint}>
-        <div className="flex flex-row justify-center items-center w-full">
-            { 
-                loteria == "Lotería de Bogotá" 
-                ? <LogoLoto xsmall/>
-                : loteria == "Lotería del Tolima"
-                    ? <LogoLoTolima xsmall/>
-                    : <LogoLoCundinamarca xsmall/>
-            }
-        </div>
-        <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
-        <hr className="border-gray-400 my-3" />
-        <div className="flex flex-col gap-2 px-2 text-xs">
-          <div className="flex flex-row justify-between w-full">
-            {Object.entries(timeInfo).map(([key, value], idx) => {
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-row justify-start flex-auto gap-2"
-                >
-                  <h1 className="font-semibold">{key}:</h1>
-                  <h1>{value}</h1>
-                </div>
-              );
-            })}
+    <Tickets
+      refPrint={refPrint}
+      ticket={ticket}
+      stateTrx={stateTrx}
+      type={type}
+      chunkSizeTrx={3}
+    >
+      {loteria === "Lotería de Bogotá" ? (
+        <div className="flex flex-row gap-4 mx-2 items-center">
+          <div className="mx-auto w-20">
+            <div className="aspect-w-1 aspect-h-1">
+              <img src={Loteria_de_Bogota} alt="Logo loteria bogota" />
+            </div>
+          </div>
+          <div className="mx-auto w-30">
+            <div className="aspect-w-16 aspect-h-9">
+              <img src={LogoPdp} alt="Logo punto de pago" />
+            </div>
           </div>
         </div>
-        <hr className="border-gray-400 my-3" />
-        <div className="flex flex-col gap-2 px-2 text-xs text-left">
-          {commerceInfo
-            .map((e, i, arr) => {
-              const chunkSize = 2;
-              return i % chunkSize === 0 ? arr.slice(i, i + chunkSize) : null;
-            })
-            .filter((e) => e)
-            .map((e, i) => {
-              return (
-                <div
-                  key={i}
-                  className={`flex flex-row ${
-                    e.length < 2 ? "justify-center" : "justify-between"
-                  } w-full`}
-                >
-                  {e.map(([key, val], idx) => {
-                    return (
-                      <div
-                        key={`${key}_${idx}`}
-                        className={`flex flex-row ${
-                          e.length < 2
-                            ? "justify-center"
-                            : idx % 2 === 0
-                            ? "justify-start"
-                            : "justify-end"
-                        } flex-auto gap-2`}
-                      >
-                        <h1 className="font-semibold">
-                          {key ? `${key}:` : ""}
-                        </h1>
-                        <h1>{val}</h1>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+      ) : loteria === "Lotería del Tolima" ? (
+        <div className="flex flex-row gap-4 mx-2 items-center">
+          <div className="w-30 mx-auto">
+            <div className="aspect-w-5 aspect-h-3">
+              <img src={Loteria_de_Tolima} alt="Logo loteria tolima" />
+            </div>
+          </div>
+          <div className="mx-auto w-30">
+            <div className="aspect-w-16 aspect-h-9">
+              <img src={LogoPdp} alt="Logo punto de pago" />
+            </div>
+          </div>
         </div>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
-          {commerceName ?? ""}
-        </h1>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
-          Transacción {stateTrx ? "exitosa" : "rechazada"}
-        </h1>
-        <div className="flex flex-col gap-2 px-2 text-xs">
-          {trxInfo
-            .map((e, i, arr) => {
-              const chunkSize = 3;
-              return i % chunkSize === 0 ? arr.slice(i, i + chunkSize) : null;
-            })
-            .filter((e) => e)
-            .map((e, i) => {
-              return (
-                <div
-                  key={i}
-                  className={`flex flex-row ${
-                    e.length < 3 ? "justify-center" : "justify-between"
-                  } w-full`}
-                >
-                  {e.map(([key, val], idx) => {
-                    return (
-                      <div
-                        key={`${key}_${idx}`}
-                        className={`flex flex-row ${
-                          e.length < 3
-                            ? "justify-center"
-                            : idx % 3 === 0
-                            ? "justify-start"
-                            : "justify-end"
-                        } flex-auto gap-2`}
-                      >
-                        <h1 className="font-semibold">
-                          {key ? `${key}:` : ""}
-                        </h1>
-                        <h1>{val}</h1>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
+      ) : (
+        <div className="flex flex-row mx-2">
+          <div className="w-30 mx-auto">
+            <div className="aspect-w-16 aspect-h-8">
+              <img src={Loteria_de_Cundinamarca} alt="Logo loteria cundinamarca" />
+            </div>
+          </div>
+          <div className="mx-auto w-30">
+            <div className="aspect-w-16 aspect-h-9">
+              <img src={LogoPdp} alt="Logo punto de pago" />
+            </div>
+          </div>
         </div>
-        <hr className="border-gray-400 my-3" />
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
-          ***{type}***
-        </h1>
-        <h1 className="text-center my-3 text-xs font-normal">{disclamer}</h1>
-      </div>
-    </div>
+      )}
+    </Tickets>
   );
 };
 

@@ -26,6 +26,7 @@ const FormularioRetiro = () => {
   const [cargando, setCargando] = useState(false)
   const [dataRetiro, setDataRetiro] = useState('')
   const [dataConvRetiro, setDataConvRetiro] = useState(null)
+  const [disableBtn, setDisableBtn] = useState(false)
   const [id_trx, setId_Trx] = useState('')
   const [pago, setPago] = useState(false)
   const [showModal, setShowModal] = useState(false)
@@ -44,6 +45,7 @@ const FormularioRetiro = () => {
   });
 
   const handleClose = useCallback((err = null) => {
+    setDisableBtn(false)
     if (err) notifyError("Transacción de retiro cancelada por el usuario")
     setShowModal(false);
     setDataReferencias({
@@ -135,7 +137,7 @@ const FormularioRetiro = () => {
 
   const hacerRetiro = useCallback(async (e) => {
     e.preventDefault();
-
+    setDisableBtn(true)
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRetiro.valor_retirado
 
@@ -185,7 +187,10 @@ const FormularioRetiro = () => {
           handleClose()
         });
     }
-    else { notifyError("El valor recibido no cumple con los limites establecidos") }
+    else {
+      setDisableBtn(false); 
+      notifyError("El valor recibido no cumple con los limites establecidos");
+    }
   }, [dataRetiro, roleInfo, dataReferencias, id_trx, valorRecibido,
     dataConvRetiro, pk_id_convenio, handleClose, validarLimiteMax])
 
@@ -272,7 +277,7 @@ const FormularioRetiro = () => {
             />
           )}
           <ButtonBar>
-            <Button type={"submit"} >
+            <Button type={"submit"} disabled={disableBtn}>
               Aceptar
             </Button>
             <Button onClick={() => handleClose(true)} >
