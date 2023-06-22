@@ -444,8 +444,7 @@ const Premios = ({ route }) => {
         );
       }
     } else {
-      if (String(datosCliente?.celular).charAt(0) === "3") {
-        if (
+      if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
           seleccionarFraccion === undefined
@@ -541,11 +540,7 @@ const Premios = ({ route }) => {
             notify("Pago premio de Lotería exitoso");
           }
         }
-      } else {
-        notifyError(
-          "Número invalido, el N° de celular debe comenzar con el número 3."
-        );
-      }
+       
     }
   };
 
