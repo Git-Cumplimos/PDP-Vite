@@ -23,7 +23,9 @@ import classes from "./Premios.module.css";
 
 const { btnBasura, contenedorArchivosBasura } = classes;
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/subirDocumentosPremios`;
+// const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/subirDocumentosPremios`;
+const url_cargueS3 =
+  "http://loterias-back-cert.us-east-2.elasticbeanstalk.com/subirDocumentosPremios";
 const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -323,47 +325,125 @@ const Premios = ({ route }) => {
       disclamer: LineasLot_disclamer[datosComercio.nom_loteria],
     };
   }, [
-    estadoTransaccion,
     sorteo,
     billete,
     serie,
-    checkBilleteFisico,
-    checkBilleteVirtual,
     seleccionarFraccion,
     datosCliente,
     totalPagar,
-    valorbruto,
     tipopago,
+    roleInfo,
+    datosComercio.nom_loteria,
   ]);
 
-  const onPay1 = (e) => {
+  const onPay1 = async (e) => {
     e.preventDefault();
-    if (montoSuperior) {
-      if (files?.documento === undefined || files?.formulario === undefined) {
-        if (files?.documento === undefined && files?.formulario !== undefined) {
-          notifyError("Ingresar documento de identificación requerido");
+    try {
+      if (montoSuperior) {
+        if (files?.documento === undefined || files?.formulario === undefined) {
+          if (
+            files?.documento === undefined &&
+            files?.formulario !== undefined
+          ) {
+            notifyError("Ingresar documento de identificación requerido");
+          }
+          if (
+            files?.documento !== undefined &&
+            files?.formulario === undefined
+          ) {
+            notifyError("Ingresar formulario requerido");
+          }
+          if (
+            files?.documento === undefined &&
+            files?.formulario === undefined
+          ) {
+            notifyError("Ingresar documentación  requerida");
+          }
+          return;
         }
-        if (files?.documento !== undefined && files?.formulario === undefined) {
-          notifyError("Ingresar formulario requerido");
+        const resSubir1 = await subirDocsPagoPremios("documento");
+        if (!resSubir1) {
+          return;
         }
-        if (files?.documento === undefined && files?.formulario === undefined) {
-          notifyError("Ingresar documentación  requerida");
+        const resSubir2 = await subirDocsPagoPremios("formulario");
+        if (!resSubir2) {
+          return;
         }
-        return;
       }
-      try {
-        subirDocsPagoPremios("documento");
-        subirDocsPagoPremios("formulario");
-      } catch {
-        notifyError(
-          "Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
-        );
-        return;
-      }
+    } catch (error) {
+      notifyError(
+        "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
+      );
+      return;
     }
-    if (tipopago === 2) {
-      if (String(datosCliente?.celular).charAt(0) === "3") {
-        setRespuesta(true);
+    try {
+      if (tipopago === 2) {
+        if (String(datosCliente?.celular).charAt(0) === "3") {
+          setRespuesta(true);
+          if (
+            seleccionarFraccion === 0 ||
+            seleccionarFraccion === "0" ||
+            seleccionarFraccion === undefined
+          ) {
+            setRespuesta(false);
+            notifyError("Seleccione una fracción");
+          } else if (checkBilleteVirtual === true && hash === "") {
+            setRespuesta(false);
+            notifyError("Ingresar código hash");
+          } else {
+            const res = await makePayment(
+              sorteo,
+              billete,
+              serie,
+              checkBilleteFisico,
+              checkBilleteVirtual,
+              seleccionarFraccion,
+              datosCliente?.nombre,
+              datosCliente?.apellido,
+              datosCliente?.documento,
+              datosCliente?.direccion,
+              datosCliente?.celular,
+              totalPagar,
+              valorbruto,
+              valor17,
+              valor20,
+              datosComercio.comercio,
+              datosComercio.terminal,
+              datosComercio.usuario,
+              datosComercio.codigo_dane,
+              idLoteria,
+              tipopago,
+              hash,
+              pdpUser?.uname,
+              tickets
+            );
+            setRespuesta(false);
+            setDatosCliente((old) => {
+              return {
+                ...old,
+                statusPagoPremio: res?.status,
+                idTransaccion: res?.obj?.id_trx,
+                tipo_operacion: res?.obj?.tipo_operacion,
+              };
+            });
+            tickets["commerceInfo"].splice(2, 0, [
+              "Id Trx",
+              datosCliente?.idTransaccion,
+            ]);
+            setEstadoTransaccion(res?.status);
+            if (res?.status === false) {
+              notifyError(res?.obj?.msg);
+              navigate(-1);
+            } else {
+              notify("Pago premio de Lotería exitoso");
+            }
+          }
+        } else {
+          notifyError(
+            "Número invalido, el N° de celular debe comenzar con el número 3."
+          );
+        }
+      } else {
         if (
           seleccionarFraccion === 0 ||
           seleccionarFraccion === "0" ||
@@ -375,7 +455,8 @@ const Premios = ({ route }) => {
           setRespuesta(false);
           notifyError("Ingresar código hash");
         } else {
-          makePayment(
+          setRespuesta(true);
+          const res = await makePayment(
             sorteo,
             billete,
             serie,
@@ -400,96 +481,26 @@ const Premios = ({ route }) => {
             hash,
             pdpUser?.uname,
             tickets
-          )
-            .then((res) => {
-              setRespuesta(false);
-              setDatosCliente((old) => {
-                return {
-                  ...old,
-                  statusPagoPremio: res?.status,
-                  idTransaccion: res?.obj?.id_trx,
-                  tipo_operacion: res?.obj?.tipo_operacion,
-                };
-              });
-              tickets["commerceInfo"].splice(2, 0, [
-                "Id Trx",
-                datosCliente?.idTransaccion,
-              ]);
-              setEstadoTransaccion(res?.status);
-              if (res?.status === false) {
-                notifyError(res?.obj?.msg);
-                navigate(-1);
-              } else {
-                notify("Pago premio de Lotería exitoso");
-              }
-            })
-            .catch(() => setDisabledBtns(false));
+          );
+          setRespuesta(false);
+          setDatosCliente((old) => {
+            return {
+              ...old,
+              statusPagoPremio: res?.status,
+              idTransaccion: res?.obj?.id_trx,
+              tipo_operacion: res?.obj?.tipo_operacion,
+            };
+          });
+          setEstadoTransaccion(res?.status);
+          if (res?.status === false) {
+            notifyError(res?.obj?.msg);
+            navigate(-1);
+          } else {
+            notify("Pago premio de Lotería exitoso");
+          }
         }
-      } else {
-        notifyError(
-          "Número invalido, el N° de celular debe comenzar con el número 3."
-        );
       }
-    } else {
-      if (
-        seleccionarFraccion === 0 ||
-        seleccionarFraccion === "0" ||
-        seleccionarFraccion === undefined
-      ) {
-        setRespuesta(false);
-        notifyError("Seleccione una fracción");
-      } else if (checkBilleteVirtual === true && hash === "") {
-        setRespuesta(false);
-        notifyError("Ingresar código hash");
-      } else {
-        setRespuesta(true);
-        makePayment(
-          sorteo,
-          billete,
-          serie,
-          checkBilleteFisico,
-          checkBilleteVirtual,
-          seleccionarFraccion,
-          datosCliente?.nombre,
-          datosCliente?.apellido,
-          datosCliente?.documento,
-          datosCliente?.direccion,
-          datosCliente?.celular,
-          totalPagar,
-          valorbruto,
-          valor17,
-          valor20,
-          datosComercio.comercio,
-          datosComercio.terminal,
-          datosComercio.usuario,
-          datosComercio.codigo_dane,
-          idLoteria,
-          tipopago,
-          hash,
-          pdpUser?.uname,
-          tickets
-        )
-          .then((res) => {
-            setRespuesta(false);
-            setDatosCliente((old) => {
-              return {
-                ...old,
-                statusPagoPremio: res?.status,
-                idTransaccion: res?.obj?.id_trx,
-                tipo_operacion: res?.obj?.tipo_operacion,
-              };
-            });
-            setEstadoTransaccion(res?.status);
-            if (res?.status === false) {
-              notifyError(res?.obj?.msg);
-              navigate(-1);
-            } else {
-              notify("Pago premio de Lotería exitoso");
-            }
-          })
-          .catch(() => setDisabledBtns(false));
-      }
-    }
+    } catch (error) {}
   };
 
   const handlePrint = useReactToPrint({
@@ -523,47 +534,34 @@ const Premios = ({ route }) => {
     navigate(-1);
   };
 
-  const onChangeFiles_Documento = (infor) => {
+  const onChangeFiles = (info, type) => {
+    console.log(info[0]?.type);
     setFiles((old) => ({
       ...old,
-      documento: { files: Array.from(infor)[0], typeArchivo: infor[0]?.type },
+      [type]: { files: Array.from(info)[0], typeArchivo: info[0]?.type },
     }));
   };
 
-  const onChangeFiles_Formulario = (infor) => {
-    setFiles((old) => ({
-      ...old,
-      formulario: { files: Array.from(infor)[0], typeArchivo: infor[0]?.type },
-    }));
-  };
-
-  const subirDocsPagoPremios = (type) => {
-    console.log("files-->", files[type]);
-    fetchData(
-      `${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&type=${files[type]?.typeArchivo}`,
-      "GET"
-    )
-      .then((respuesta) => {
-        if (!respuesta?.status) {
-          notifyError("Error");
-        } else {
-          const formData = new FormData();
-          for (var key in respuesta?.obj?.fields) {
-            formData.append(key, respuesta?.obj?.fields[key]);
-          }
-          formData.set("file", files[type]?.files);
-          fetchUploadFileCustom(respuesta?.obj?.url, formData)
-            .then((rta) => {
-              console.log("Rta", rta);
-            })
-            .catch((err) => {
-              throw err;
-            });
-        }
-      })
-      .catch((err) => {
-        throw err;
-      });
+  const subirDocsPagoPremios = async (type) => {
+    try {
+      const resUrlPresind = await fetchData(
+        `${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&typefile=${files[type]?.typeArchivo}`,
+        "GET"
+      );
+      if (!resUrlPresind?.status) {
+        notifyError(resUrlPresind?.msg);
+        return false;
+      }
+      const formData = new FormData();
+      for (var key in resUrlPresind?.obj?.fields) {
+        formData.append(key, resUrlPresind?.obj?.fields[key]);
+      }
+      formData.set("file", files[type]?.files);
+      await fetchUploadFileCustom(resUrlPresind?.obj?.url, formData);
+      return true;
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (
@@ -812,7 +810,7 @@ const Premios = ({ route }) => {
                         name="file1"
                         accept=".pdf,.png,.jpg"
                         allowDrop={true}
-                        onGetFile={onChangeFiles_Documento}
+                        onGetFile={(info) => onChangeFiles(info, "documento")}
                       />
                     )}
                     {files?.formulario ? (
@@ -836,7 +834,7 @@ const Premios = ({ route }) => {
                         name="file2"
                         accept=".pdf,.png,.jpg"
                         allowDrop={true}
-                        onGetFile={onChangeFiles_Formulario}
+                        onGetFile={(info) => onChangeFiles(info, "formulario")}
                       />
                     )}
                   </Fieldset>
@@ -943,7 +941,9 @@ const Premios = ({ route }) => {
                               name="file1"
                               accept=".pdf,.png,.jpg"
                               allowDrop={true}
-                              onGetFile={onChangeFiles_Documento}
+                              onGetFile={(info) =>
+                                onChangeFiles(info, "documento")
+                              }
                             />
                           )}
                           {files?.formulario ? (
@@ -967,7 +967,9 @@ const Premios = ({ route }) => {
                               name="file2"
                               accept=".pdf,.png,.jpg"
                               allowDrop={true}
-                              onGetFile={onChangeFiles_Formulario}
+                              onGetFile={(info) =>
+                                onChangeFiles(info, "formulario")
+                              }
                             />
                           )}
                         </Fieldset>
