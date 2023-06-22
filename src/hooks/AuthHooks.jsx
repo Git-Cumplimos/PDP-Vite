@@ -326,7 +326,7 @@ export const useProvideAuth = () => {
       const tempRole = { quota: 0, comision: 0, sobregiro : 0 };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
-      tempRole.sobregiro = quota["sobregiro"];
+      tempRole.sobregiro = quota["dias sobregiro"];
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
     onError: useCallback((error) => {
