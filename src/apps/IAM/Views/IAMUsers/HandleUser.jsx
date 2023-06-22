@@ -482,7 +482,7 @@ const HandleUser = () => {
               ))
             ) : (
               <h1 className="text-xl text-center my-auto">
-                No hay comercios relacionados
+                No hay grupos relacionados
               </h1>
             )}
           </ButtonBar>
@@ -494,7 +494,7 @@ const HandleUser = () => {
                 setSearchSelectFunction(() => onSelectGroup);
               }}
             >
-              Agregar comercios
+              Agregar grupos
             </Button>
           </ButtonBar>
         </Fieldset>
