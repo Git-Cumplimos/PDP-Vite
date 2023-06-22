@@ -336,60 +336,59 @@ const Premios = ({ route }) => {
 
   const onPay1 = async (e) => {
     e.preventDefault();
-    try {
-      if (montoSuperior) {
-        if (files?.documento === undefined || files?.formulario === undefined) {
-          if (
-            files?.documento === undefined &&
-            files?.formulario !== undefined
-          ) {
-            notifyError("Ingresar documento de identificación requerido");
-          }
-          if (
-            files?.documento !== undefined &&
-            files?.formulario === undefined
-          ) {
-            notifyError("Ingresar formulario requerido");
-          }
-          if (
-            files?.documento === undefined &&
-            files?.formulario === undefined
-          ) {
-            notifyError("Ingresar documentación requerida");
-          }
-          return;
-        }
-        const resSubir1 = await subirDocsPagoPremios("documento");
-        if (!resSubir1) {
-          return;
-        }
-        const resSubir2 = await subirDocsPagoPremios("formulario");
-        if (!resSubir2) {
-          return;
-        }
-      }
-    } catch (error) {
-      notifyError(
-        "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
-      );
-      return;
-    }
-    try {
-      if (tipopago === 2) {
-        if (String(datosCliente?.celular).charAt(0) === "3") {
-          setRespuesta(true);
-          if (
-            seleccionarFraccion === 0 ||
-            seleccionarFraccion === "0" ||
-            seleccionarFraccion === undefined
-          ) {
-            setRespuesta(false);
-            notifyError("Seleccione una fracción");
-          } else if (checkBilleteVirtual === true && hash === "") {
-            setRespuesta(false);
-            notifyError("Ingresar código hash");
-          } else {
-            const res = await makePayment(
+    if (tipopago === 2) {
+      if (String(datosCliente?.celular).charAt(0) === "3") {
+        setRespuesta(true);
+        if (
+          seleccionarFraccion === 0 ||
+          seleccionarFraccion === "0" ||
+          seleccionarFraccion === undefined
+        ) {
+          setRespuesta(false);
+          notifyError("Seleccione una fracción");
+        } else if (checkBilleteVirtual === true && hash === "") {
+          setRespuesta(false);
+          notifyError("Ingresar código hash");
+        } else {
+            try {
+              if (montoSuperior) {
+                if (files?.documento === undefined || files?.formulario === undefined) {
+                  if (
+                    files?.documento === undefined &&
+                    files?.formulario !== undefined
+                  ) {
+                    notifyError("Ingresar documento de identificación requerido");
+                  }
+                  if (
+                    files?.documento !== undefined &&
+                    files?.formulario === undefined
+                  ) {
+                    notifyError("Ingresar formulario requerido");
+                  }
+                  if (
+                    files?.documento === undefined &&
+                    files?.formulario === undefined
+                  ) {
+                    notifyError("Ingresar documentación requerida");
+                  }
+                  return;
+                }
+                const resSubir1 = await subirDocsPagoPremios("documento");
+                if (!resSubir1) {
+                  return;
+                }
+                const resSubir2 = await subirDocsPagoPremios("formulario");
+                if (!resSubir2) {
+                  return;
+                }
+              }
+            } catch (error) {
+              notifyError(
+                "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
+              );
+              return;
+            }
+              const res = await makePayment(
               sorteo,
               billete,
               serie,
@@ -434,71 +433,114 @@ const Premios = ({ route }) => {
               navigate(-1);
             } else {
               notify("Pago premio de Lotería exitoso");
+            }          
+          }
+      } else {
+        notifyError(
+          "Número invalido, el N° de celular debe comenzar con el número 3."
+        );
+      }
+    } else {
+        if (String(datosCliente?.celular).charAt(0) === "3"){
+          if (
+            seleccionarFraccion === 0 ||
+            seleccionarFraccion === "0" ||
+            seleccionarFraccion === undefined
+          ) {
+            setRespuesta(false);
+            notifyError("Seleccione una fracción");
+          } else if (checkBilleteVirtual === true && hash === "") {
+            setRespuesta(false);
+            notifyError("Ingresar código hash");
+          } else {
+            setRespuesta(true);
+            try {
+              if (montoSuperior) {
+                if (files?.documento === undefined || files?.formulario === undefined) {
+                  if (
+                    files?.documento === undefined &&
+                    files?.formulario !== undefined
+                  ) {
+                    notifyError("Ingresar documento de identificación requerido");
+                  }
+                  if (
+                    files?.documento !== undefined &&
+                    files?.formulario === undefined
+                  ) {
+                    notifyError("Ingresar formulario requerido");
+                  }
+                  if (
+                    files?.documento === undefined &&
+                    files?.formulario === undefined
+                  ) {
+                    notifyError("Ingresar documentación requerida");
+                  }
+                  return;
+                }
+                const resSubir1 = await subirDocsPagoPremios("documento");
+                if (!resSubir1) {
+                  return;
+                }
+                const resSubir2 = await subirDocsPagoPremios("formulario");
+                if (!resSubir2) {
+                  return;
+                }
+              }
+            } catch (error) {
+              notifyError(
+                "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
+              );
+              return;
+            }
+            const res = await makePayment(
+              sorteo,
+              billete,
+              serie,
+              checkBilleteFisico,
+              checkBilleteVirtual,
+              seleccionarFraccion,
+              datosCliente?.nombre,
+              datosCliente?.apellido,
+              datosCliente?.documento,
+              datosCliente?.direccion,
+              datosCliente?.celular,
+              totalPagar,
+              valorbruto,
+              valor17,
+              valor20,
+              datosComercio.comercio,
+              datosComercio.terminal,
+              datosComercio.usuario,
+              datosComercio.codigo_dane,
+              idLoteria,
+              tipopago,
+              hash,
+              pdpUser?.uname,
+              tickets
+            );
+            setRespuesta(false);
+            setDatosCliente((old) => {
+              return {
+                ...old,
+                statusPagoPremio: res?.status,
+                idTransaccion: res?.obj?.id_trx,
+                tipo_operacion: res?.obj?.tipo_operacion,
+              };
+            });
+            setEstadoTransaccion(res?.status);
+            if (res?.status === false) {
+              notifyError(res?.obj?.msg);
+              navigate(-1);
+            } else {
+              notify("Pago premio de Lotería exitoso");
             }
           }
         } else {
-          notifyError(
-            "Número invalido, el N° de celular debe comenzar con el número 3."
-          );
-        }
-      } else {
-        if (
-          seleccionarFraccion === 0 ||
-          seleccionarFraccion === "0" ||
-          seleccionarFraccion === undefined
-        ) {
-          setRespuesta(false);
-          notifyError("Seleccione una fracción");
-        } else if (checkBilleteVirtual === true && hash === "") {
-          setRespuesta(false);
-          notifyError("Ingresar código hash");
-        } else {
-          setRespuesta(true);
-          const res = await makePayment(
-            sorteo,
-            billete,
-            serie,
-            checkBilleteFisico,
-            checkBilleteVirtual,
-            seleccionarFraccion,
-            datosCliente?.nombre,
-            datosCliente?.apellido,
-            datosCliente?.documento,
-            datosCliente?.direccion,
-            datosCliente?.celular,
-            totalPagar,
-            valorbruto,
-            valor17,
-            valor20,
-            datosComercio.comercio,
-            datosComercio.terminal,
-            datosComercio.usuario,
-            datosComercio.codigo_dane,
-            idLoteria,
-            tipopago,
-            hash,
-            pdpUser?.uname,
-            tickets
-          );
-          setRespuesta(false);
-          setDatosCliente((old) => {
-            return {
-              ...old,
-              statusPagoPremio: res?.status,
-              idTransaccion: res?.obj?.id_trx,
-              tipo_operacion: res?.obj?.tipo_operacion,
-            };
-          });
-          setEstadoTransaccion(res?.status);
-          if (res?.status === false) {
-            notifyError(res?.obj?.msg);
-            navigate(-1);
-          } else {
-            notify("Pago premio de Lotería exitoso");
+            notifyError(
+              "Número invalido, el N° de celular debe comenzar con el número 3."
+            );
           }
-        }
       }
-    } catch (error) {}
   };
 
   const handlePrint = useReactToPrint({
