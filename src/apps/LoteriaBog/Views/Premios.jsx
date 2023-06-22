@@ -361,18 +361,21 @@ const Premios = ({ route }) => {
                   files?.formulario !== undefined
                 ) {
                   notifyError("Ingresar documento de identificación requerido");
+                  setRespuesta(false);
                 }
                 if (
                   files?.documento !== undefined &&
                   files?.formulario === undefined
                 ) {
                   notifyError("Ingresar formulario requerido");
+                  setRespuesta(false);
                 }
                 if (
                   files?.documento === undefined &&
                   files?.formulario === undefined
                 ) {
                   notifyError("Ingresar documentación requerida");
+                  setRespuesta(false);
                 }
                 return;
               }
@@ -470,18 +473,21 @@ const Premios = ({ route }) => {
                 files?.formulario !== undefined
               ) {
                 notifyError("Ingresar documento de identificación requerido");
+                setRespuesta(false);
               }
               if (
                 files?.documento !== undefined &&
                 files?.formulario === undefined
               ) {
                 notifyError("Ingresar formulario requerido");
+                setRespuesta(false);
               }
               if (
                 files?.documento === undefined &&
                 files?.formulario === undefined
               ) {
                 notifyError("Ingresar documentación requerida");
+                setRespuesta(false);
               }
               return;
             }
@@ -595,6 +601,7 @@ const Premios = ({ route }) => {
       );
       if (!resUrlPresind?.status) {
         notifyError(resUrlPresind?.msg);
+        navigate(-1);
         return false;
       }
       const formData = new FormData();
@@ -853,7 +860,7 @@ const Premios = ({ route }) => {
                         id={`archivo_identificacion`}
                         label={"Documento de identificación"}
                         name="file1"
-                        accept=".pdf,.png,.jpg"
+                        accept=".pdf,.png,.jpg,.svg"
                         allowDrop={true}
                         onGetFile={(info) => onChangeFiles(info, "documento")}
                       />
@@ -877,7 +884,7 @@ const Premios = ({ route }) => {
                         id={`archivo_formulario`}
                         label={"Formulario"}
                         name="file2"
-                        accept=".pdf,.png,.jpg"
+                        accept=".pdf,.png,.jpg,.svg"
                         allowDrop={true}
                         onGetFile={(info) => onChangeFiles(info, "formulario")}
                       />
@@ -984,7 +991,7 @@ const Premios = ({ route }) => {
                               id={`archivo_identificacion`}
                               label={"Documento de identificación"}
                               name="file1"
-                              accept=".pdf,.png,.jpg"
+                              accept=".pdf,.png,.jpg,.svg"
                               allowDrop={true}
                               onGetFile={(info) =>
                                 onChangeFiles(info, "documento")
@@ -1010,7 +1017,7 @@ const Premios = ({ route }) => {
                               id={`archivo_formulario`}
                               label={"Formulario"}
                               name="file2"
-                              accept=".pdf,.png,.jpg"
+                              accept=".pdf,.png,.jpg,.svg"
                               allowDrop={true}
                               onGetFile={(info) =>
                                 onChangeFiles(info, "formulario")
