@@ -141,7 +141,16 @@ export const AuthContext = createContext({
 });
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  return useContext(AuthContext)
+  // let authContextCopy = {...useContext(AuthContext)};
+  // try{    
+  //   authContextCopy.roleInfo.tipo_comercio += "-";
+  //   return authContextCopy;
+  // }
+  // catch{
+  //   return authContextCopy
+  // }
+  
 };
 
 export const useProvideAuth = () => {
@@ -318,15 +327,16 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0 };
+      const tempRole = { quota: 0, comision: 0, sobregiro : 0 };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
+      tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
     onError: useCallback((error) => {
       dispatchAuth({
         type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0 } },
+        payload: { quota: { quota: 0, comision: 0, sobregiro : 0 } },
       });
       if (error?.cause === "custom") {
         notifyError(error.message);
