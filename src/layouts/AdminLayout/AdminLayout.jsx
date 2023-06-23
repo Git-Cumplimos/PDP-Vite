@@ -157,20 +157,14 @@ const AdminLayout = () => {
           </div>
           <div className={usrData}>
             <div className={saldoCupo}>
-              {/* Cupo disponible {saldoDisponible || "$0.00"} */}
-              Saldo cupo {saldoDisponible || "$0.00"}
+              Cupo disponible {saldoDisponible || "$0.00"}
             </div>
           </div>
           <div className={usrData}>
             <div className={diasSobregiro} >
-              Sobregiro {sobregiro || "0"}
+              Dias sobregiro {sobregiro || "0"}
             </div>
           </div>
-          {/* <div className={usrData}>
-            <div className={diasSobregiroD} >
-              {sobregiro || "0"}
-            </div>
-          </div> */}
           <div className={usrData}>
             <div className={comision} onClick={navigateCommission}>
               Comisiones {comisionTotal || "$0.00"}

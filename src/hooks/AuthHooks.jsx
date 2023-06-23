@@ -141,12 +141,16 @@ export const AuthContext = createContext({
 });
 
 export const useAuth = () => {
-  let authContextCopy = {...useContext(AuthContext)};
-  try{    
-    authContextCopy.roleInfo.tipo_comercio += "-";
-    return authContextCopy;
-  }
-  catch{return authContextCopy}
+  return useContext(AuthContext)
+  // let authContextCopy = {...useContext(AuthContext)};
+  // try{    
+  //   authContextCopy.roleInfo.tipo_comercio += "-";
+  //   return authContextCopy;
+  // }
+  // catch{
+  //   return authContextCopy
+  // }
+  
 };
 
 export const useProvideAuth = () => {
@@ -326,7 +330,7 @@ export const useProvideAuth = () => {
       const tempRole = { quota: 0, comision: 0, sobregiro : 0 };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
-      tempRole.sobregiro = quota["dias sobregiro"];
+      tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
     onError: useCallback((error) => {

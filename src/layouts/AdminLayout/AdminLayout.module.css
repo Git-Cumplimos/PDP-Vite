@@ -28,19 +28,13 @@ header.headerPDP .usrData {
 }
 
 header.headerPDP .usrData > .diasSobregiro {
-  max-width: 8.75rem;
+  max-width: 10.75rem;
   @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
-}
-header.headerPDP .usrData > .diasSobregiroD {
-  max-width: 2.00rem;
-  /* height: 3.00rem; */
-  @apply rounded-full px-2 bg-primary-light text-white mx-0 text-center;
 }
 
 header.headerPDP .usrData > .saldoCupo {
-  /* max-width: 14.75rem; */
-  max-width: 8.75rem;
-  @apply rounded-full /*6/10*/ px-6 bg-primary text-white mx-2 text-center;
+  max-width: 12.75rem;
+  @apply rounded-full px-6 bg-primary text-white mx-2 text-center;
 }
 
 header.headerPDP .usrData > .comision {
