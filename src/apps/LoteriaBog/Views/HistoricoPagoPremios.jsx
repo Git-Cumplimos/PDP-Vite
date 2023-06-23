@@ -76,6 +76,10 @@ const HistoricoPagoPremios = ({ route }) => {
       fraccion: resp_con_sort[i]["num_fraccion"],
     })
       .then((res) => {
+        if (!res.status) {
+          notifyError(res?.msg);
+          return;
+        }
         window.open(res?.obj?.result?.url_presigned_zip, "_blank");
       })
       .catch((error) => {
