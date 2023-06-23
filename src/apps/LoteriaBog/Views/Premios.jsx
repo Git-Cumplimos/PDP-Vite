@@ -6,7 +6,6 @@ import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 import Modal from "../../../components/Base/Modal";
-import InputX from "../../../components/Base/InputX/InputX";
 import FileInput from "../../../components/Base/FileInput/FileInput";
 import TicketLot from "../components/TicketsLot/TicketLot";
 import { useAuth } from "../../../hooks/AuthHooks";
@@ -23,7 +22,7 @@ import classes from "./Premios.module.css";
 
 const { btnBasura, contenedorArchivosBasura } = classes;
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/subirDocumentosPremios`;
+const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/documentos_premios`;
 const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -389,13 +388,8 @@ const Premios = ({ route }) => {
                 }
                 return;
               }
-              const resSubir1 = await subirDocsPagoPremios("documento");
-              if (!resSubir1) {
-                setRespuesta(false);
-                return;
-              }
-              const resSubir2 = await subirDocsPagoPremios("formulario");
-              if (!resSubir2) {
+              const resSubir = await subirDocsPagoPremios();
+              if (!resSubir) {
                 setRespuesta(false);
                 return;
               }
@@ -501,13 +495,8 @@ const Premios = ({ route }) => {
               }
               return;
             }
-            const resSubir1 = await subirDocsPagoPremios("documento");
-            if (!resSubir1) {
-              setRespuesta(false);
-              return;
-            }
-            const resSubir2 = await subirDocsPagoPremios("formulario");
-            if (!resSubir2) {
+            const resSubir = await subirDocsPagoPremios();
+            if (!resSubir) {
               setRespuesta(false);
               return;
             }
@@ -603,23 +592,73 @@ const Premios = ({ route }) => {
     }));
   };
 
-  const subirDocsPagoPremios = async (type) => {
+  const subirDocsPagoPremios = async () => {
     try {
       const resUrlPresind = await fetchData(
-        `${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&typefile=${files[type]?.typeArchivo}&fraccion=${seleccionarFraccion}`,
-        "GET"
+        url_cargueS3,
+        "POST",
+        {},
+        {
+          idloteria: idLoteria,
+          sorteo: sorteo,
+          billete: billete,
+          serie: serie,
+          fraccion: seleccionarFraccion,
+          valor_pagado: totalPagar,
+          typefile: {
+            documento: files.documento.typeArchivo,
+            formulario: files.formulario.typeArchivo,
+          },
+        }
       );
+
       if (!resUrlPresind?.status) {
         notifyError(resUrlPresind?.msg);
         navigate(-1);
         return false;
       }
-      const formData = new FormData();
-      for (var key in resUrlPresind?.obj?.result?.fields) {
-        formData.append(key, resUrlPresind?.obj?.result?.fields[key]);
+
+      const formDataDocumento = new FormData();
+      for (let key in resUrlPresind?.obj?.result?.documento?.fields) {
+        formDataDocumento.append(
+          key,
+          resUrlPresind?.obj?.result?.documento?.fields[key]
+        );
       }
-      formData.set("file", files[type]?.files);
-      await fetchUploadFileCustom(resUrlPresind?.obj?.result?.url, formData);
+      formDataDocumento.set("file", files?.documento?.files);
+      await fetchUploadFileCustom(
+        resUrlPresind?.obj?.result?.documento?.url,
+        formDataDocumento
+      );
+      const formDataFormulario = new FormData();
+      for (let key in resUrlPresind?.obj?.result?.formulario?.fields) {
+        console.log(resUrlPresind?.obj?.result?.formulario?.fields[key]);
+        formDataFormulario.append(
+          key,
+          resUrlPresind?.obj?.result?.formulario?.fields[key]
+        );
+      }
+
+      formDataFormulario.set("file", files?.formulario?.files);
+      await fetchUploadFileCustom(
+        resUrlPresind?.obj?.result?.formulario?.url,
+        formDataFormulario
+      );
+
+      const resZip = await fetchData(
+        url_cargueS3,
+        "PUT",
+        {},
+        {
+          key_documento: resUrlPresind?.obj?.result?.documento?.fields?.key,
+          key_formulario: resUrlPresind?.obj?.result?.formulario?.fields?.key,
+        }
+      );
+      if (!resZip?.status) {
+        notifyError(resZip?.msg);
+        navigate(-1);
+        return false;
+      }
       return true;
     } catch (error) {
       throw error;

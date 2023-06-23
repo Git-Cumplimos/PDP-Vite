@@ -66,40 +66,24 @@ const HistoricoPagoPremios = ({ route }) => {
       .catch((err) => console.error(err));
   };
 
-  const onSelectPagoPremio = async (e, i) => {
-    try {
-      const resDownload = await DescargaDocsPagoPremios({
-        billete: resp_con_sort[i]["num_billete"],
-        sorteo: resp_con_sort[i]["num_sorteo"],
-        serie: resp_con_sort[i]["serie"],
-        valor_pagado: resp_con_sort[i]["valor_neto"],
-        fecha: resp_con_sort[i]["fecha_pago"],
-        fraccion: resp_con_sort[i]["num_fraccion"],
+  const onSelectPagoPremio = (e, i) => {
+    DescargaDocsPagoPremios({
+      billete: resp_con_sort[i]["num_billete"],
+      sorteo: resp_con_sort[i]["num_sorteo"],
+      serie: resp_con_sort[i]["serie"],
+      valor_pagado: resp_con_sort[i]["valor_neto"],
+      fecha: resp_con_sort[i]["fecha_pago"],
+      fraccion: resp_con_sort[i]["num_fraccion"],
+    })
+      .then((res) => {
+        window.open(res?.obj?.result?.url_presigned_zip, "_blank");
+      })
+      .catch((error) => {
+        notifyError(
+          "Error respuesta Frontend PDP: Error al consumir del servicio (descarga de documentos de premios) [0010002])"
+        );
+        console.error(error);
       });
-
-      if (!resDownload?.status) {
-        notifyError(resDownload?.msg);
-        return;
-      }
-
-      await window.open(resDownload?.obj?.result?.documento, "_blank");
-
-      const resDownload1 = await DescargaDocsPagoPremios({
-        billete: resp_con_sort[i]["num_billete"],
-        sorteo: resp_con_sort[i]["num_sorteo"],
-        serie: resp_con_sort[i]["serie"],
-        valor_pagado: resp_con_sort[i]["valor_neto"],
-        fecha: resp_con_sort[i]["fecha_pago"],
-        fraccion: resp_con_sort[i]["num_fraccion"],
-      });
-
-      await window.open(resDownload1?.obj?.result?.formulario, "_blank2");
-    } catch (error) {
-      notifyError(
-        "Error respuesta Frontend PDP: Error al consumir del servicio (descarga de documentos de premios) [0010002])"
-      );
-      console.error(error);
-    }
   };
 
   return (
