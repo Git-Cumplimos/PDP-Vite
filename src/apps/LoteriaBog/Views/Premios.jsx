@@ -60,6 +60,7 @@ const Premios = ({ route }) => {
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
+  const [pagaOficina, setPagaOficina] = useState("");
   const [montoSuperior, setMontoSuperior] = useState("");
   const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
@@ -161,6 +162,7 @@ const Premios = ({ route }) => {
       .then((res) => {
         var salvarRes = res;
         setMaxPago(res?.obj?.max_pago);
+        setPagaOficina(res?.obj?.paga_oficina);
         setMontoSuperior(res?.obj?.monto_superior);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -190,10 +192,16 @@ const Premios = ({ route }) => {
           notifyError(res.msg);
         }
         if (res.status && "msg" in res) {
-          if (res?.obj?.max_pago == true) {
-            notifyError(
-              "El valor del premio, supera el valor asignado para el comercio"
-            );
+          if (res?.obj?.max_pago == true || res?.obj?.paga_oficina == false) {
+            if (res?.obj?.paga_oficina == false) {
+              notifyError(
+                "No se puede pagar, el valor del premio supera el valor asignado para los comercios externos"
+              );
+            } else {
+              notifyError(
+                "No se puede pagar, el valor del premio supera el valor asignado para los comercios PDP"
+              );
+            }
             var gana = res?.obj?.gana;
             var ValNetoFraccion = res?.obj?.ValNetoFraccion;
             var totalPagarLoteria = res?.obj?.total;
@@ -723,7 +731,7 @@ const Premios = ({ route }) => {
             ]}
             data={respagar}
           ></TableEnterprise>
-          {tipopago === 2 && !maxPago ? (
+          {tipopago === 2 && !maxPago && pagaOficina ? (
             <Form onSubmit={onPay1} grid>
               <Fieldset
                 className="lg:col-span-2"
@@ -912,7 +920,7 @@ const Premios = ({ route }) => {
             </Form>
           ) : (
             <>
-              {!maxPago ? (
+              {!maxPago && pagaOficina ? (
                 <>
                   <Form onSubmit={onPay1} grid>
                     <Fieldset

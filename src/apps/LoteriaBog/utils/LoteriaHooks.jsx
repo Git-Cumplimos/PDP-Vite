@@ -471,6 +471,7 @@ export const useProvideLoteria = () => {
             idloteria: loteria,
             fisico: checkBilleteFisico,
             virtual: checkBilleteVirtual,
+            oficina_propia:roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
           },
           {},
           true,
