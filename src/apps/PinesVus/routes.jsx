@@ -37,7 +37,7 @@ export const rutasPinesVus = {
   link: "/Pines/PinesVus",
   label: (
     <AppIcons
-      Logo={"GeneracionLicenciasPines"}
+      Logo={"PINES_GENERACION_LICENCIA"}
       name="Pines para generación de licencias"
     />
   ),
@@ -49,19 +49,19 @@ export const rutasPinesVus = {
   subRoutes: [
     {
       link: "/Pines/PinesVus/Crear",
-      label: <AppIcons Logo={"CrearPines"} name={"Crear Pin"} />,
+      label: <AppIcons Logo={"PINES_CREAR"} name={"Crear Pin"} />,
       component: CrearPines,
       permission: [enumPermisosPinesVus.operarPinesVus],
     },
     {
       link: "/Pines/PinesVus/Tramitar",
-      label: <AppIcons Logo={"TramitarPines"} name={"Tramitar Pines"} />,
+      label: <AppIcons Logo={"PINES_TRAMITAR"} name={"Tramitar Pines"} />,
       component: TramitarPines,
       permission: [enumPermisosPinesVus.operarPinesVus],
     },
     {
       link: "/PinesVus/Administrar",
-      label: <AppIcons Logo={"AdministrarPines"} name={"Administrar Pines"} />,
+      label: <AppIcons Logo={"PINES_ADMINISTRAR"} name={"Administrar Pines"} />,
       component: AdministrarPines,
       permission: [
         enumPermisosPinesVus.operarPinesVus,
@@ -160,7 +160,7 @@ export const rutasPinesVus = {
     },
     {
       link: "/Pines/PinesVus/Citas",
-      label: <AppIcons Logo={"TramitarPines"} name={"Citas"} />,
+      label: <AppIcons Logo={"PINES_TRAMITAR"} name={"Citas"} />,
       component: Citas,
       permission: [
         enumPermisosPinesVus.operarPinesVus,
@@ -171,7 +171,10 @@ export const rutasPinesVus = {
           link: "/Pines/PinesVus/Citas/Consultar",
           label: <AppIcons Logo={"PagoParticipacion"} name={"Consultar"} />,
           component: ConsultaCitas,
-          permission: [enumPermisosPinesVus.operarPinesVus,enumPermisosPinesVus.administrarPinesVus],
+          permission: [
+            enumPermisosPinesVus.operarPinesVus,
+            enumPermisosPinesVus.administrarPinesVus,
+          ],
         },
         {
           link: "/Pines/PinesVus/Citas/Parametrizacion",

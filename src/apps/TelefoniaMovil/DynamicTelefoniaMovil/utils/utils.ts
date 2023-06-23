@@ -157,7 +157,6 @@ export const FuctionEvaluateResponse = (
   }
 };
 
-
 export const fetchCustom = async (
   url_: string,
   metodo_: string,

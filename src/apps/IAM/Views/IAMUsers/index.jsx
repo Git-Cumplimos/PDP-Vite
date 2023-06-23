@@ -120,20 +120,23 @@ const IAMUsers = () => {
           name="uuid"
           label={"Id de usuario"}
           type="tel"
+          maxLength={20}
           autoComplete="off"
-        />
+          />
         <Input
           id="search_name"
           name="uname"
           label={"Nombre de usuario"}
           type="text"
+          maxLength={60}
           autoComplete="off"
-        />
+          />
         <Input
           id="search_email"
           name="email"
           label={"Email"}
           type="email"
+          maxLength={80}
           autoComplete="off"
         />
       </DataTable>

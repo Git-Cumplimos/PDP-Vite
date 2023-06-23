@@ -52,18 +52,21 @@ const CrearPin = () => {
   const [disabledBtns, setDisabledBtns] = useState(false);
   const [disabledBtnsContinuar, setDisabledBtnsContinuar] = useState(false);
   const [showTramiteAdicional, setShowTramiteAdicional] = useState(false);
-  const [showPinLicencia, setShowPinLicencia,] = useState(false);
+  const [showPinLicencia, setShowPinLicencia,] = useState(true);
   const [txtButtonTramiteAdicional, settxtButtonTramiteAdicional] = useState("+ Agregar Segundo Trámite");
   const [respPin, setRespPin] = useState("");
   const [optionsTipoPines, setOptionsTipoPines] = useState([]);
   const [tipoPin, setTipoPin] = useState("");
   const [optionsTramites, setOptionsTramites] = useState([]);
   const [optionsTramites2, setOptionsTramites2] = useState([]);
-  const [tramite, setTramite] = useState("")
+  const [tramite, setTramite] = useState(7)
   const [tramite2, setTramite2] = useState("")
 
   const [nombre, setNombre] = useState("")
   const [apellidos, setApellidos] = useState("")
+  const [direccion, setDireccion] = useState("")
+  const [municipio, setMunicipio] = useState("")
+  const [departamento, setDepartamento] = useState("")
   const [fechaNacimiento, setFechaNacimiento] = useState("")
   const [celular, setCelular] = useState("")
   const [email, setEmail] = useState("")
@@ -75,7 +78,7 @@ const CrearPin = () => {
   const [descripcionTipDoc, setDescripcionTipDoc] = useState("")
   const [metodoPago, setMetodoPago] = useState("1")
   const [codigoPago, setCodigoPago] = useState("")
-  const [codigoPagoVerificacion, setCodigoPagoVerificacion] = useState("")
+  const [codigoPago2, setCodigoPago2] = useState("")
 
 
   const [olimpia, setOlimpia] = useState("")
@@ -100,7 +103,7 @@ const CrearPin = () => {
     { value: "5", label: "Pasaporte" },
     { value: "13", label: "PPT (Permiso por Protección Temporal)" },
   ];
-  const [tipoDocumento, setTipoDocumento] = useState("")
+  const [tipoDocumento, setTipoDocumento] = useState("1")
 
   const optionsGenero = [
     { value: "", label: "" },
@@ -193,7 +196,7 @@ const CrearPin = () => {
     { value: "C3", label: "C3-Vehículos articulados servicio público" },
   ];
 
-  const [categoria, setCategoria] = useState("")
+  const [categoria, setCategoria] = useState("B1")
   const [categoria2, setCategoria2] = useState("")
   const [foundEps, setFoundEps] = useState([])
   const [foundArl, setFoundArl] = useState([])
@@ -408,11 +411,32 @@ const CrearPin = () => {
 
   const onSubmitModal = (e) => {
     e.preventDefault();
-
-    if (firma === "" && pedirFirma) {
-      notifyError("Asegúrese de tener la firma del cliente en físico ")
+     setDisabledBtns(true)
+    if(homeLocation){
+      if((homeLocation["departamento"][0]=="")||(homeLocation["municipio"][0]=="")){
+        notifyError("Asegúrese de diligenciar los datos de Ubicación")
+        setShowModal(false)
+      }
+      else{
+            consultaClientes(documento,olimpia,tipoDocumento,idPin,tipoPin).then((resp) => {
+          if (!resp?.status){
+            notifyError(resp?.msg)
+            setShowPinLicencia(false)
+            setTipoPin("")
+            setCategoria("")
+            setTramite2("")
+            setTramite("")
+            setCategoria2("")
+            setShowModal(false)
+          }else{  
+            if (firma === "" && pedirFirma) {
+              notifyError("Asegúrese de tener la firma del cliente en físico ")
+            }
+            setShowModal(true)   
+          }})
+      }
     }
-    setShowModal(true) 
+    setDisabledBtns(false)
   };
 
   const onSubmitCliente = (e) => {
@@ -424,7 +448,27 @@ const CrearPin = () => {
         notifyError(resp?.msg)
       }else{
       setPedirFirma(!resp?.obj?.firma)
-      setShowFormulario(true)    
+      setShowFormulario(true) 
+      if (tipoPin==""){
+      setTipoPin(1)   
+      setShowPinLicencia(true)
+      setShowTramiteAdicional(false)
+      setTramite2("")
+      setCategoria2("")
+      settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
+      setTramite(7)
+      setCategoria("B1")
+      setDisabledBtns(false)
+      }
+      else{
+        setShowPinLicencia(false)
+        setDisabledBtns(false)
+        setCategoria("")
+        setTramite2("")
+        setCategoria2("")
+        setTramite("")
+        }
+
       if (resp?.obj?.results?.length > 0) {
         const fecha_nacimiento = new Date(resp?.obj?.results?.[0]?.fecha_nacimiento);
         fecha_nacimiento.setHours(fecha_nacimiento.getHours() + 5);
@@ -502,7 +546,6 @@ const CrearPin = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (codigoPago === codigoPagoVerificacion){
     setDisabledBtns(true);
     const hora_actual=Intl.DateTimeFormat("es-CO", {
       hour: "numeric",
@@ -540,12 +583,18 @@ const CrearPin = () => {
     objTicket["commerceName"] = pinData["descripcion"]
     objTicket["trxInfo"][0] = ["Trámite", "Creación de Pin"]
     objTicket["trxInfo"][5] = ["Documento", documento]
-    objTicket["trxInfo"][6] = ["Metodo de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+    objTicket["trxInfo"][6] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
     if (metodoPago === "2") {
       objTicket["trxInfo"][7] = ["", ""]
-      objTicket["trxInfo"][8] = ["Cod. Datafono", codigoPago]
+      objTicket["trxInfo"][8] = ["Código Aprobación", codigoPago]
       objTicket["trxInfo"][9] = ["", ""]
-      }
+    }
+    if (codigoPago2 !== "") {
+      objTicket["trxInfo"][8] = ["Código Aprobación 1", codigoPago]
+      objTicket["trxInfo"][10] = ["Código Aprobación 2", codigoPago2]
+      objTicket["trxInfo"][11] = ["", ""]    
+    }
+
     // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
     // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
     // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
@@ -575,6 +624,20 @@ const CrearPin = () => {
     objTicket2["trxInfo"][11] = ["", ""]
     objTicket2["trxInfo"][12] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva + tramiteData2?.valor)] 
     objTicket2["trxInfo"][13] = ["", ""]
+    objTicket2["trxInfo"][14] = ["Documento", documento]
+    objTicket2["trxInfo"][15] = ["", ""]
+    objTicket2["trxInfo"][16] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+    objTicket2["trxInfo"][17] = ["", ""]
+    if (metodoPago === "2") {
+      objTicket2["trxInfo"][18] = ["Código Aprobación", codigoPago]
+      objTicket2["trxInfo"][19] = ["", ""]
+    }
+    if (codigoPago2 !== "") {
+      objTicket2["trxInfo"][18] = ["Código Aprobación 1", codigoPago]
+      objTicket2["trxInfo"][19] = ["", ""]
+      objTicket2["trxInfo"][19] = ["Código Aprobación 2", codigoPago2]
+      objTicket2["trxInfo"][20] = ["", ""]    
+    }
 
 
     }
@@ -588,10 +651,24 @@ const CrearPin = () => {
       objTicket2["trxInfo"][5] = ["", ""]
       objTicket2["trxInfo"][6] = ["Total", formatMoney.format(tramiteData?.valor + tramiteData?.iva)] 
       objTicket2["trxInfo"][7] = ["", ""]
+      objTicket2["trxInfo"][8] = ["Documento", documento]
+      objTicket2["trxInfo"][9] = ["", ""]
+      objTicket2["trxInfo"][10] = ["Método de pago", metodoPago === "1"? 'Efectivo' : 'Tarjeta']
+      objTicket2["trxInfo"][11] = ["", ""]
+      if (metodoPago === "2") {
+        objTicket2["trxInfo"][12] = ["Código Aprobación", codigoPago]
+        objTicket2["trxInfo"][13] = ["", ""]
+      }
+      if (codigoPago2 !== "") {
+        objTicket2["trxInfo"][12] = ["Código Aprobación 1", codigoPago]
+        objTicket2["trxInfo"][13] = ["", ""]
+        objTicket2["trxInfo"][14] = ["Código Aprobación 2", codigoPago2]
+        objTicket2["trxInfo"][15] = ["", ""]    
+      }
 
     }
 
-    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago )
+    crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago, codigoPago2 )
       .then((res) => {
         setDisabledBtns(false);
         if (!res?.status) {
@@ -613,10 +690,8 @@ const CrearPin = () => {
       })
       .catch(() => setDisabledBtns(false));
     }
-    }
-    else{
-      notifyError("Verifique que el código suministrado por el datafono sea correcto")
-    }
+    
+    
   };
 
   const closeModal = useCallback(async () => {
@@ -647,8 +722,9 @@ const CrearPin = () => {
   }, [venderVehiculo, tipoPin, showModal]);
 
   const horaCierre = useMemo(() => { 
-    const dia = (new Date()).getDay()  
-    if (dia === enumParametrosPines.diaFinSemana) {
+    const dia = (new Date()).getDay() 
+    console.log("DIA --->", dia,enumParametrosPines.diaFinSemana.includes(dia))
+    if (enumParametrosPines.diaFinSemana.includes(dia)) {
       return enumParametrosPines.horaCierreFinSemana.split(":")
     }
     else{
@@ -696,8 +772,8 @@ const CrearPin = () => {
           setDisabledBtnsContinuar(false)
           setShowFormulario(false)
           setTipoPin("")
-          setTramite("")
-          setCategoria("")
+          setTramite(7)
+          setCategoria("B1")
         }}
         required
       />  
@@ -716,11 +792,11 @@ const CrearPin = () => {
           setDisabledBtnsContinuar(false)
           setShowFormulario(false)
           setTipoPin("")
-          setTramite("")
-          setCategoria("")
+          setTramite(7)
+          setCategoria("B1")
         }}
       />
-      <Select
+      {/* <Select
         id="olimpia"
         label="¿Ya inicio el proceso en Olimpia?"
         required
@@ -738,7 +814,7 @@ const CrearPin = () => {
           setTramite("")
           setCategoria("")
         }}
-      />
+      /> */}
       {/* {olimpia === "true" ? 
       <>
        <Input
@@ -765,8 +841,9 @@ const CrearPin = () => {
       </Form>
       {showFormulario? 
       <Form onSubmit={onSubmitModal} grid>
-      <Fieldset legend="Datos cliente" className="lg:col-span-2">
-        {/* <Input
+
+<Fieldset legend="Datos cliente" className="lg:col-span-2">
+        <Input
           id="nombre"
           label="Nombre"
           type="text"
@@ -781,8 +858,8 @@ const CrearPin = () => {
           }}
         />
         <Input
-          id="apellidos"
-          label="Apellidos"
+          id="apellido"
+          label="Apellido"
           type="text"
           minLength="1"
           maxLength="30"
@@ -794,7 +871,7 @@ const CrearPin = () => {
             setApellidos(text);
           }}
         />
-        <Input
+        {/* <Input
           id="dateInit"
           label="Fecha Nacimiento"
           type="date"
@@ -845,7 +922,7 @@ const CrearPin = () => {
             setEmail(text);
           }}
         />
-        <TextArea
+        {/* <TextArea
           id="motivo"
           label="Motivo compra"
           type="input"
@@ -857,7 +934,7 @@ const CrearPin = () => {
           onInput={(e) => {
             setMotivoCompra(e.target.value);
           }}
-        />
+        /> */}
         {/* <InputSuggestions
         id={"searchEps"}
         label={"Eps"}
@@ -891,8 +968,8 @@ const CrearPin = () => {
           callback: searchArl,
           timeOut: 500,
         }}
-        />
-        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> */}
+        />*/}
+        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> 
       </Fieldset>
       {/* <Fieldset legend="Datos Vehículo" className="lg:col-span-2">
         <Select
@@ -975,15 +1052,16 @@ const CrearPin = () => {
             : "" }
         </Fieldset>
       </Fieldset>      */}
+
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
       
         <Select
           className="place-self-stretch"
           id="tipoPin"
           label="Tipo Pin"
-          options={
+          options={                
             Object.fromEntries([    
-              ["",""],        
+               ["",""],        
               ...optionsTipoPines?.map(({ descripcion, id }) => {
                 return [descripcion, id];
               }),
@@ -993,34 +1071,38 @@ const CrearPin = () => {
           required={true}
           onChange={(e) => {
             setTipoPin(parseInt(e.target.value) ?? "");
-            if(isNaN(tipoPin)){
-              setTipoPin("")
-            } setDisabledBtns(true)
+            // if(isNaN(tipoPin)){
+            //   setTipoPin("")
+            // } 
+            setDisabledBtns(true)
             consultaClientes(documento,olimpia,tipoDocumento,idPin,e.target.value).then((resp) => {
               if (!resp?.status){
                 notifyError(resp?.msg)
                 setShowPinLicencia(false)
                 setTipoPin("")
                 setDisabledBtns(false)
-               // console.log(resp)
-              }else{               // console.log(resp)
-                if(e.target.value=="1"){
+              }else{           
+                // if(e.target.value==3){setTipoPin(3)}
+                // if(e.target.value==2){setTipoPin(2)}
+                if(e.target.value==1){
                   setShowPinLicencia(true)
                   setShowTramiteAdicional(false)
                   setTramite2("")
                   setCategoria2("")
                   settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
-                  setTramite("")
-                  setCategoria("")
+                  setTipoPin(1)
+                  setTramite(7)
+                  setCategoria("B1")
                   setDisabledBtns(false)
                 }else{
                 setShowPinLicencia(false)
                 setDisabledBtns(false)
-
-                //setDisabledBtns(false)
-
+                setTramite2("")
+                setCategoria2("")
+                setTramite("")
+                setCategoria("")
                 }
-              }})
+             } })
           }}
         />
         
@@ -1052,7 +1134,6 @@ const CrearPin = () => {
             settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
           }}
         />
-    
     {showPinLicencia ? 
       <>
 
@@ -1316,7 +1397,7 @@ const CrearPin = () => {
               <Form onSubmit={onSubmit}>
               <Select
                 id="metodoPago"
-                label="Metodo de pago"
+                label="Método de pago"
                 required
                 options={[
                   { value: 1, label: "Efectivo" },
@@ -1327,19 +1408,19 @@ const CrearPin = () => {
                   setMetodoPago(e.target.value);
                   setDisabledBtnsContinuar(false)
                   setCodigoPago("")
-                  setCodigoPagoVerificacion("")
+                  setCodigoPago2("")
                 }}
               />
               { metodoPago === '2' ?
               <>
               <Input
               id="codPago"
-              label="Código datafono"
+              label="Código Aprobación 1"
               type="text"
               autoComplete="off"
               value={codigoPago}
               minLength="1"
-              maxLength="30"
+              maxLength="20"
               required
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
@@ -1350,25 +1431,17 @@ const CrearPin = () => {
               />
               <Input
               id="codPagoVerificacion"
-              label="Verificación código"
+              label="Código Aprobación 2"
               type="text"
               autoComplete="off"
-              value={codigoPagoVerificacion}
+              value={codigoPago2}
               minLength="1"
-              maxLength="30"
-              required
+              maxLength="20"
               onInput={(e) => {
-                if (
-                  (String(e.target.value).length > 2) &
-                  (String(codigoPagoVerificacion).length < 1)
-                ) {
-                  notifyError("Debe digitar el código y no pegarlo");
-                } else {            
-                  if (!isNaN(e.target.value)) {
-                    const num = e.target.value;
-                    setCodigoPagoVerificacion(num);
-                  }                  
-                }
+                if (!isNaN(e.target.value)) {
+                  const num = e.target.value;
+                  setCodigoPago2(num);
+                }                
               }}
               />
               </>

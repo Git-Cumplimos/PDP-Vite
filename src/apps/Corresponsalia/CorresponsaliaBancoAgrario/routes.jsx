@@ -51,7 +51,7 @@ export const listPermissionsAgrario = listPermissions;
 
 const rutasAgrarioCB = {
   link: "/corresponsalia/corresponsalia-banco-agrario",
-  label: <AppIcons Logo={"MARKETPLACE"} name='Corresponsalía Banco Agrario' />,
+  label: <AppIcons Logo={"MARKETPLACE"} name="Corresponsalía Banco Agrario" />,
   component: CorresponsaliaBancoAgrario,
   permission: [...listPermissionsAgrario],
   subRoutes: [
@@ -60,7 +60,7 @@ const rutasAgrarioCB = {
       label: (
         <AppIcons
           Logo={"MARKETPLACE"}
-          name='Transacciones cuentas Banco Agrario'
+          name="Transacciones cuentas Banco Agrario"
         />
       ),
       component: TrxCuentasBancoAgrario,
@@ -68,13 +68,13 @@ const rutasAgrarioCB = {
       subRoutes: [
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
-          label: <AppIcons Logo={"MARKETPLACE"} name='Depósito' />,
+          label: <AppIcons Logo={"MARKETPLACE"} name="Depósito" />,
           component: DepositoBancoAgrario,
           permission: [enumPermisosAgrario.agrario_cb_depositos],
         },
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/retiro",
-          label: <AppIcons Logo={"MARKETPLACE"} name='Retiro' />,
+          label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
           component: RetiroEfectivoBancoAgrario,
           permission: [enumPermisosAgrario.agrario_cb_retiros],
         },
@@ -85,7 +85,7 @@ const rutasAgrarioCB = {
       label: (
         <AppIcons
           Logo={"MARKETPLACE"}
-          name='Recaudo servicios públicos y privados'
+          name="Recaudo servicios públicos y privados"
         />
       ),
       component: RecaudoServiciosPublicosPrivadosMenuAgrario,
@@ -96,21 +96,21 @@ const rutasAgrarioCB = {
       subRoutes: [
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/seleccion",
-          label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
+          label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: SeleccionServicioPagarAgrario,
           permission: [enumPermisosAgrario.agrario_cb_recaudo],
         },
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/codbarras",
           label: (
-            <AppIcons Logo={"MARKETPLACE"} name='Recaudo código de barras' />
+            <AppIcons Logo={"MARKETPLACE"} name="Recaudo código de barras" />
           ),
           component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario,
           permission: [enumPermisosAgrario.agrario_cb_recaudo],
         },
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/manual",
-          label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
+          label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: RecaudoServiciosPublicosPrivadosAgrario,
           permission: [enumPermisosAgrario.agrario_cb_recaudo],
           show: false,
@@ -118,7 +118,7 @@ const rutasAgrarioCB = {
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/convenios",
           label: (
-            <AppIcons Logo={"MARKETPLACE"} name='Convenios recaudo Agrario' />
+            <AppIcons Logo={"MARKETPLACE"} name="Convenios recaudo Agrario" />
           ),
           component: ConveniosRecaudoAgrario,
           permission: [enumPermisosAgrario.agrario_cb_convenios_recaudo],
@@ -128,7 +128,7 @@ const rutasAgrarioCB = {
 
     {
       link: "/runt/pagar-runt",
-      label: <AppIcons Logo={"RETIRO"} name={"Pagar RUNT"} />,
+      label: <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name={"Pagar RUNT"} />,
       component: PagarRunt,
       permission: [...listPermissionsAgrario],
       subRoutes: [],

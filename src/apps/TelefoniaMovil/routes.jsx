@@ -1,9 +1,11 @@
 import { lazy } from "react";
 import GetRoutesTelefoniaMovil from "./DynamicTelefoniaMovil/GetRoutesTelefoniaMovil";
-import { useBackendRecargas } from "./ServiciosOperadores/Claro/BackendRecargas";
 import { useBackendRecargasMovistar } from "./ServiciosOperadores/Movistar/BackendRecargas";
 import { useBackendRecargasPractisistemas } from "./ServiciosOperadores/Practisistemas/BackendRecargas";
 import { useBackendPaquetesMovistar } from "./ServiciosOperadores/Movistar/BackendPaquetes";
+import { useBackendPaquetesPractisistemas } from "./ServiciosOperadores/Practisistemas/BackendPaquetes";
+import { useBackendPaquetesClaro } from "./ServiciosOperadores/Claro/BackendPaquetes";
+import { useBackendRecargasClaro } from "./ServiciosOperadores/Claro/BackendRecargas";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -12,29 +14,8 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
 export default GetRoutesTelefoniaMovil([
   {
-    name: "claro",
-    logo: "TELEFONIAMOVIL_CLARO",
-    subModules: {
-      recargas: {
-        backend: useBackendRecargas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
-      },
-      cargarPaquetes: {
-        backend: async () => {},
-      },
-      cargarConciliacion: {
-        backend: async () => {},
-      },
-      descargarConciliacion: {
-        backend: async () => {},
-      },
-    },
-  },
-  {
     name: "movistar",
-    logo: "TELEFONIAMOVIL_MOVISTAR",
+    logo: "TELEFONIA_MOVIL_MOVISTAR",
     subModules: {
       recargas: {
         backend: useBackendRecargasMovistar,
@@ -54,14 +35,35 @@ export default GetRoutesTelefoniaMovil([
     },
   },
   {
+    name: "claro",
+    logo: "TELEFONIA_MOVIL_CLARO",
+    subModules: {
+      recargas: {
+        backend: useBackendRecargasClaro,
+      },
+      paquetes: {
+        backend: useBackendPaquetesClaro,
+      },
+      cargarPaquetes: {
+        backend: async () => {},
+      },
+      cargarConciliacion: {
+        backend: async () => {},
+      },
+      descargarConciliacion: {
+        backend: async () => {},
+      },
+    },
+  },
+  {
     name: "Tigo",
-    logo: "TELEFONIAMOVIL_TIGO",
+    logo: "TELEFONIA_MOVIL_TIGO",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -76,13 +78,13 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "WOM",
-    logo: "TELEFONIAMOVIL_WOM",
+    logo: "TELEFONIA_MOVIL_WOM",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -97,13 +99,10 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Uff",
-    logo: "TELEFONIAMOVIL_UFF",
+    logo: "TELEFONIA_MOVIL_UFF",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -118,13 +117,13 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Exito",
-    logo: "TELEFONIAMOVIL_EXITO",
+    logo: "TELEFONIA_MOVIL_EXITO",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -139,13 +138,13 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Virgin",
-    logo: "TELEFONIAMOVIL_VIRGIN",
+    logo: "TELEFONIA_MOVIL_VIRGIN",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -160,13 +159,10 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Direct TV",
-    logo: "TELEFONIAMOVIL_DIRECTV",
+    logo: "TELEFONIA_MOVIL_DIRECTV",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -181,13 +177,10 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Une",
-    logo: "TELEFONIAMOVIL_UNE",
+    logo: "TELEFONIA_MOVIL_UNE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -202,13 +195,13 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Avantel",
-    logo: "TELEFONIAMOVIL_AVANTEL",
+    logo: "TELEFONIA_MOVIL_AVANTEL",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -223,13 +216,13 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Etb",
-    logo: "TELEFONIAMOVIL_ETB",
+    logo: "TELEFONIA_MOVIL_ETB",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -244,13 +237,10 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Flash Mobile",
-    logo: "TELEFONIAMOVIL_FLASHMOBILE",
+    logo: "TELEFONIA_MOVIL_FLASHMOBILE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -265,13 +255,10 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Comunicate",
-    logo: "TELEFONIAMOVIL_COMUNICATE",
+    logo: "TELEFONIA_MOVIL_COMUNICATE",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
-      },
-      paquetes: {
-        backend: useBackendPaquetesMovistar,
       },
       cargarPaquetes: {
         backend: async () => {},
@@ -286,13 +273,13 @@ export default GetRoutesTelefoniaMovil([
   },
   {
     name: "Buenofon",
-    logo: "TELEFONIAMOVIL_BUENOFON",
+    logo: "TELEFONIA_MOVIL_BUENOFON",
     subModules: {
       recargas: {
         backend: useBackendRecargasPractisistemas,
       },
       paquetes: {
-        backend: useBackendPaquetesMovistar,
+        backend: useBackendPaquetesPractisistemas,
       },
       cargarPaquetes: {
         backend: async () => {},

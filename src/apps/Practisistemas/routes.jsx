@@ -49,7 +49,7 @@ export const rutasPines = {
   link: "/Pines/PinesContenido",
   label: (
     <AppIcons
-      Logo={"ServicioContenidoPines"}
+      Logo={"PINES_SERVICIO_CONTENIDO"}
       name="Pines Servicio y Contenido"
     />
   ),
@@ -79,7 +79,7 @@ export const rutasSoat = {
   subRoutes: [
     {
       link: "/ventaSeguros/ventaSoat",
-      label: <AppIcons Logo={"RECAUDO"} name={"Venta Soat"} />,
+      label: <AppIcons Logo={"VENTA_SEGUROS_SOAT"} name={"Venta Soat"} />,
       component: FormularioVentaSoat,
       permission: [enumPermisosPractisistemas.practisistemasSoat],
     },
@@ -89,7 +89,7 @@ export const rutasSoat = {
 export const rutasRecargas = {
   link: "/recargas-paquetes",
   label: (
-    <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
+    <AppIcons Logo={"RECARGA_CELULAR"} name="Recargas y Venta de Paquetes" />
   ),
   component: RecargasPaquetes,
   permission: [enumPermisosPractisistemas.practisistemasRecargas],
@@ -97,7 +97,10 @@ export const rutasRecargas = {
     {
       link: "/recargas-paquetes/Recargar",
       label: (
-        <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Recargas y Venta de Paquetes"
+        />
       ),
       component: RecargasOperadores,
       permission: [enumPermisosPractisistemas.practisistemasSoat],
@@ -106,14 +109,17 @@ export const rutasRecargas = {
     {
       link: "/recargas-paquetes/Venta-paquetes",
       label: (
-        <AppIcons Logo={"RecargaCelular"} name="Recargas y Venta de Paquetes" />
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Recargas y Venta de Paquetes"
+        />
       ),
       component: SubPaquetesMoviles,
       permission: [enumPermisosPractisistemas.practisistemasRecargas],
     },
     {
       link: "/recargas-paquetes/Recargar-paquete",
-      label: <AppIcons Logo={"RecargaCelular"} name="Venta de paquetes" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Venta de paquetes" />,
       component: RecargarPaquetes,
       permission: [enumPermisosPractisistemas.practisistemasRecargas],
       show: false,

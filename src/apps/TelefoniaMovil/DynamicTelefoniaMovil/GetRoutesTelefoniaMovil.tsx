@@ -87,7 +87,7 @@ const GetRoutesTelefoniaMovil = (params: paramsGetRoutesTelefoniaMovil[]) => {
   //--------------------telefonia movil-----------------------------------
   return {
     link: "/telefonia-movil",
-    label: <AppIcons Logo={"RecargaCelular"} name="Telefonía móvil" />,
+    label: <AppIcons Logo={"RECARGA_CELULAR"} name="Telefonía móvil" />,
     component: ({ subRoutes }: { subRoutes: TypeRouteModule[] }) => (
       <HNavbar links={subRoutes} />
     ),
@@ -95,18 +95,18 @@ const GetRoutesTelefoniaMovil = (params: paramsGetRoutesTelefoniaMovil[]) => {
     subRoutes: [
       {
         link: "/telefonia-movil/recargas",
-        label: <AppIcons Logo={"RecargaCelular"} name="Recargas" />,
+        label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargas" />,
         component: () => WithTelefoniaMovil(operadoresRecargas, Recargas),
         permission: [1], //los permisos son la combinacion de todos los modulos
         subRoutes: [],
       },
-      // {
-      //   link: "/telefonia-movil/paquetes",
-      //   label: <AppIcons Logo={"RecargaCelular"} name="Paquetes" />,
-      //   component: () => WithTelefoniaMovil(operadoresPaquetes, Paquetes),
-      //   permission: [1], //los permisos son la combinacion de todos los modulos
-      //   subRoutes: [],
-      // },
+      {
+        link: "/telefonia-movil/paquetes",
+        label: <AppIcons Logo={"RECARGA_CELULAR"} name="Paquetes" />,
+        component: () => WithTelefoniaMovil(operadoresPaquetes, Paquetes),
+        permission: [1], //los permisos son la combinacion de todos los modulos
+        subRoutes: [],
+      },
       // {
       //   link: "/telefonia-movil/operador-pdp",
       //   label: <AppIcons Logo={"RecargaCelular"} name="Operador Pdp" />,

@@ -34,6 +34,7 @@ const urls = {
   cargueVentasExtra_S3: `${process.env.REACT_APP_URL_LOTERIAS}/reporteVentaExtra_S3`,
   descargaVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/descarga_reportes_S3`,
   historicoCargues: `${process.env.REACT_APP_URL_LOTERIAS}/historico_cargues`,
+  historicoPagoPremios: `${process.env.REACT_APP_URL_LOTERIAS}/historico_pago_premios`,
   con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/con_sort`,
 
   //ventasReportes: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`,
@@ -45,6 +46,7 @@ const urls = {
   premiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/estadoPremioFisico`,
   pagopremio: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioVirtual`,
   pagopremiofisico: `${process.env.REACT_APP_URL_LOTERIAS}/pagoPremioFisico`,
+  DescargaDocsPagoPremios: `${process.env.REACT_APP_URL_LOTERIAS}/descargarDocumentosPremios`,
 
   ConsultaCrearSort: `${process.env.REACT_APP_URL_LOTERIAS}/consulta_sorteos`,
   CambiarSort: `${process.env.REACT_APP_URL_LOTERIAS}/sorteo`,
@@ -172,7 +174,6 @@ export const useProvideLoteria = () => {
     const query = { nit_loteria: nit };
     try {
       const res = await fetchData(urls.consulta_operaciones, "GET", query);
-
       return res;
     } catch (err) {
       console.error(err);
@@ -828,6 +829,48 @@ export const useProvideLoteria = () => {
     [sorteosLOT]
   );
 
+  const historicoPagoPremios = useCallback(
+    async (fecha_ini,fecha_fin,sorteo,numero,serie,page,limit) => {
+      const query = {
+        fecha_ini : fecha_ini.fecha_ini,
+        fecha_fin : fecha_ini.fecha_fin,
+        codigos_loteria : sorteosLOT,
+        sorteo: fecha_ini.sorteo,
+        numero: fecha_ini.numero,
+        serie: fecha_ini.serie,
+        page : fecha_ini.page,
+        limit: fecha_ini.limit
+      }
+      try {
+        const res = await fetchData(urls.historicoPagoPremios, "GET", query, {});
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [sorteosLOT]
+  );
+
+  const DescargaDocsPagoPremios = useCallback(
+    async (billete,sorteo,serie,valor_pagado,fecha) => {
+      const query = {
+        billete : billete.billete,
+        idloteria : sorteosLOT,
+        sorteo : billete.sorteo,
+        serie: billete.serie,
+        valor_pagado: billete.valor_pagado,
+        fecha: billete.fecha,
+      }
+      try {
+        const res = await fetchData(urls.DescargaDocsPagoPremios, "GET", query, {});
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [sorteosLOT]
+  );
+
   const reportVentas = useCallback(async (fecha_ini, fecha_fin) => {
     try {
       const res = await fetchData(urls.reportVentas, "GET", {
@@ -989,6 +1032,8 @@ export const useProvideLoteria = () => {
     con_SortVentas_S3,
     descargaVentas_S3,
     historicoCargues,
+    historicoPagoPremios,
+    DescargaDocsPagoPremios,
     reportVentas,
     peticionBarcode,
     consultaInventario,

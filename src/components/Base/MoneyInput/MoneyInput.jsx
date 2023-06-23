@@ -1,11 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import useMoney from "../../../hooks/useMoney";
-import { makeMoneyFormatter, moneyValidator } from "../../../utils/functions";
+import {
+  makeMoneyFormatter,
+  moneyValidator,
+  onHandleNegativeNumbers,
+} from "../../../utils/functions";
 import Input from "../Input";
 
 export const formatMoney = makeMoneyFormatter(2);
 
-const MoneyInput = ({ decimalDigits = 0, equalError = true, ...input }) => {
+const MoneyInput = ({
+  decimalDigits = 0,
+  equalError = true,
+  equalErrorMin = true,
+  ...input
+}) => {
   const inptRef = useRef(null);
 
   const inputLimits = useMemo(() => {
@@ -21,6 +30,7 @@ const MoneyInput = ({ decimalDigits = 0, equalError = true, ...input }) => {
     limits: inputLimits,
     decimalDigits,
     equalError,
+    equalErrorMin,
   });
 
   const localFormatMoney = useMemo(
@@ -28,38 +38,44 @@ const MoneyInput = ({ decimalDigits = 0, equalError = true, ...input }) => {
     [decimalDigits]
   );
 
-  useEffect(
-    () => {
-      if (inptRef.current) {
-        const moneyFormatter = makeMoneyFormatter(decimalDigits);
-  
-        const moneyValue =
-          Math.round(
-            moneyValidator(inptRef.current.value) * Math.pow(10, decimalDigits)
-          ) / Math.pow(10, decimalDigits);
-  
-        const [min, max] = inputLimits;
-        if (moneyValue < min) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser mayor a ${moneyFormatter.format(min)}`
-          );
-        } else if (moneyValue > max) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser menor${
-              !equalError ? " o igual" : ""
-            } a ${moneyFormatter.format(max)}`
-          );
-        } else if (moneyValue === max && equalError) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser menor a ${moneyFormatter.format(max)}`
-          );
-        } else {
-          inptRef.current.setCustomValidity("");
-        }
+  useEffect(() => {
+    if (inptRef.current) {
+      const moneyFormatter = makeMoneyFormatter(decimalDigits);
+      const moneyValue =
+        Math.round(
+          moneyValidator(inptRef.current.value) * Math.pow(10, decimalDigits)
+        ) / Math.pow(10, decimalDigits);
+
+      const [min, max] = inputLimits;
+      if (moneyValue === min && !equalErrorMin) {
+        inptRef.current.setCustomValidity(
+          `El valor debe ser mayor ${
+            !equalErrorMin ? " o igual" : ""
+          } a ${moneyFormatter.format(min)}`
+        );
+      } else if (moneyValue < min) {
+        inptRef.current.setCustomValidity(
+          `El valor debe ser mayor  ${
+            !equalErrorMin ? " o igual" : ""
+          } a ${moneyFormatter.format(min)}`
+        );
+      } else if (moneyValue > max) {
+        inptRef.current.setCustomValidity(
+          `El valor debe ser menor${
+            !equalError ? " o igual" : ""
+          } a ${moneyFormatter.format(max)}`
+        );
+      } else if (moneyValue === max && equalError) {
+        inptRef.current.setCustomValidity(
+          `El valor debe ser menor ${
+            !equalError ? " o igual" : ""
+          } a ${moneyFormatter.format(max)}`
+        );
+      } else {
+        inptRef.current.setCustomValidity("");
       }
-    },
-    [decimalDigits, equalError, inputLimits]
-  );
+    }
+  }, [decimalDigits, equalError, equalErrorMin, inputLimits]);
 
   const onInput = useCallback(
     (e) => {
@@ -73,21 +89,33 @@ const MoneyInput = ({ decimalDigits = 0, equalError = true, ...input }) => {
   );
 
   const dynamicProps = useMemo(() => {
-    const _props = new Map([
-      ["type", "tel"]
-    ]);
+    const _props = new Map([["type", "tel"]]);
     if (input?.value !== undefined) {
       const moneyValue = moneyValidator(`${input?.value ?? ""}`);
-      _props.set("value", moneyValue === "" ? "$ " : localFormatMoney.format(moneyValue));
+      _props.set(
+        "value",
+        moneyValue === "" ? "$ " : localFormatMoney.format(moneyValue)
+      );
     }
     if (input?.defaultValue !== undefined) {
       const moneyValue = moneyValidator(`${input?.value ?? ""}`);
-      _props.set("value", moneyValue === "" ? "$ " : localFormatMoney.format(moneyValue));
+      _props.set(
+        "value",
+        moneyValue === "" ? "$ " : localFormatMoney.format(moneyValue)
+      );
     }
-    return Object.fromEntries(_props)
-  }, [input?.value, input?.defaultValue, localFormatMoney])
+    return Object.fromEntries(_props);
+  }, [input?.value, input?.defaultValue, localFormatMoney]);
 
-  return <Input {...input} {...dynamicProps} ref={inptRef} onInput={onInput} />;
+  return (
+    <Input
+      {...input}
+      {...dynamicProps}
+      ref={inptRef}
+      onInput={onInput}
+      onKeyDown={onHandleNegativeNumbers}
+    />
+  );
 };
 
 export default MoneyInput;

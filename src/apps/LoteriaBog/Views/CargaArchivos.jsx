@@ -176,6 +176,8 @@ const CargaArchivos = ({ route }) => {
       }
     }
   };
+
+  
   const [disabledBtns, setDisabledBtns] = useState(false);
 
   const onSubmit = (event) => {
