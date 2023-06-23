@@ -71,7 +71,7 @@ export const LecturaRunt = ({
 
       <ButtonBar className="flex justify-center py-6">
         <Button type={"submit"} onClick={onSubmit} disabled={numeroRunt === "" || numeroRunt === 0 ? !loadingPeticion : loadingPeticion }>
-          Consultar
+          Tramitar RUNT
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
           Cancelar

@@ -5,7 +5,7 @@ import { formatMoney } from "../../../../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../../../../components/Compound/PaymentSummary";
 import Select from "../../../../../../components/Base/Select/Select";
 import Form from "../../../../../../components/Base/Form/Form";
-import classes from "../PagarRunt.module.css"
+import classes from "../../Runt/PagarRunt.module.css"
 import { notify, notifyError } from "../../../../../../utils/notify";
 const { styleComponents } = classes;
 export const ComponentsModalSummaryTrx = ({  

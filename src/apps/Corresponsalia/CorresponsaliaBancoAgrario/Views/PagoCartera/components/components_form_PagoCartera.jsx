@@ -3,7 +3,7 @@ import BarcodeReader from "../../../../../../components/Base/BarcodeReader";
 import Button from "../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Input from "../../../../../../components/Base/Input";
-import classes from "../PagarRunt.module.css";
+import classes from "../../Runt/PagarRunt.module.css"
 import Form from "../../../../../../components/Base/Form/Form";
 
 //Clases estilos

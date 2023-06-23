@@ -13,7 +13,8 @@ const CorresponsaliaBancoAgrario = lazy(() =>
 
 const PagarRunt = lazy(() => import("./Views/Runt/PagarRunt"));
 
-const PagoCartera = lazy(() => import("./Views/Runt/PagoCartera"));
+// const PagoCartera = lazy(() => import("./Views/Runt/PagoCartera"));
+const PagoCartera = lazy(() => import("./Views/PagoCartera/PagoCartera"));
 
 const TrxCuentasBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
