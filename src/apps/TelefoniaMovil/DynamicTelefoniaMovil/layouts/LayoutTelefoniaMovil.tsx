@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 
 import { PropOperadoresComponent } from "../utils/TypesUtils";
 import { useImgs } from "../../../../hooks/ImgsHooks";

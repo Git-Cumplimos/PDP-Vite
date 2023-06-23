@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-const notify = (msg = "Info") => {
+const notify = (msg = "Info", otherOptions = {}) => {
   toast.info(msg, {
     position: "top-center",
     autoClose: 5000,
@@ -9,18 +9,20 @@ const notify = (msg = "Info") => {
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
+    ...otherOptions,
   });
 };
 
-const notifyError = (msg = "Error", autoClose = 5000) => {
+const notifyError = (msg = "Error", autoClose = 5000, otherOptions = {}) => {
   toast.warning(msg, {
     position: "top-center",
-    autoClose: autoClose,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
+    ...otherOptions,
+    autoClose: autoClose,
   });
 };
 
