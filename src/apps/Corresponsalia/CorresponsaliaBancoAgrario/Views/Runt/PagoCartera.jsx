@@ -17,7 +17,6 @@ import {
 } from "../Runt/components/components_form_PagoCartera";
 import classes from "./PagarRunt.module.css";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
-import TicketsPagoCartera from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsPagoCartera";
 import { v4 } from 'uuid';
 // import { useFetchPagoCartera } from "../../hooks/hookRunt";
 import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
@@ -422,7 +421,7 @@ const PagoCartera = () => {
                 {infTicket && paso === "TransaccionExitosa" && (
                 <Modal show={showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-                        <TicketsPagoCartera refPrint={printDiv} ticket={infTicket} />
+                        <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
                         <ButtonBar>
                             <Button onClick={handlePrint}>Imprimir</Button>
                             <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>
