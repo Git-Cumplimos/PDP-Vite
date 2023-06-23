@@ -64,7 +64,7 @@ const ModifiLimiteCanje = () => {
   const onSubmitDeposit = useCallback(
     (e) => {
       if (
-        submitName === "AsignarLimiteCupo" &&
+        submitName === "AsignarSobregiro" &&
         valor !== null &&
         valor !== ""
       ) {
@@ -72,7 +72,7 @@ const ModifiLimiteCanje = () => {
         const data = {};
         if (baseCaja && baseCaja !== "") data.base_Caja = baseCaja
         if (diasMaxSobregiro && diasMaxSobregiro !== "") data.dias_max_sobregiro = parseInt(diasMaxSobregiro)
-        if (valor !== cupoComer?.limite_cupo) data.sobregiro = valor
+        if (valor !== cupoComer?.sobregiro) data.sobregiro = valor
         
         if (Object.keys(data).length === 0){
           notifyError("No se detectaron cambios");
@@ -130,7 +130,7 @@ const ModifiLimiteCanje = () => {
             }
             
             setCupoComer(res?.obj ?? []);
-            setValor(res?.limite_cupo);
+            setValor(res?.sobregiro);
             
             // tablalimitecupo(idComercio, page, limit);
           })
@@ -207,7 +207,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={valor ?? parseInt(cupoComer[0]?.limite_cupo)}
+              value={valor ?? parseInt(cupoComer[0]?.sobregiro)}
               onInput={onMoneyChange}
               required
               />
@@ -222,11 +222,11 @@ const ModifiLimiteCanje = () => {
               value={baseCaja ?? parseInt(cupoComer[0]?.base_caja)}
               onInput={onMoneyChange}
               required
-              />
+              /> 
             <Input
               id="dias_max_sobregiro"
               name="dias_max_sobregiro"
-              label="Dias maximos sobregiro"
+              label="Dias máximos sobregiro"
               type="tel"
               autoComplete="off"
               minLength={0}
@@ -236,7 +236,7 @@ const ModifiLimiteCanje = () => {
               required
             />
             <ButtonBar className={"lg:col-span-2"}>
-              <Button type={"submit"} name="AsignarLimiteCupo">
+              <Button type={"submit"} name="AsignarSobregiro">
                 Asignar sobregiro
               </Button>
             </ButtonBar>

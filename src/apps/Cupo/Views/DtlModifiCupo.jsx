@@ -74,16 +74,16 @@ const DtlMovLimite = () => {
             ({
               fk_id_comercio,
               usuario,
-              sobregiro_dsp,
-              base_caja_dsp,
-              dias_max_sobregiro_dsp,
+              sobregiro,
+              base_caja,
+              dias_max_sobregiro,
               fecha,
             }) => ({
               fk_id_comercio,
               usuario,
-              sobregiro_dsp: formatMoney.format( sobregiro_dsp ),
-              base_caja_dsp: formatMoney.format( base_caja_dsp ),
-              dias_max_sobregiro_dsp: dias_max_sobregiro_dsp ,
+              sobregiro: formatMoney.format( sobregiro ),
+              base_caja: formatMoney.format( base_caja ),
+              dias_max_sobregiro: dias_max_sobregiro ??  0,
               fecha,
             })
           ) ?? []

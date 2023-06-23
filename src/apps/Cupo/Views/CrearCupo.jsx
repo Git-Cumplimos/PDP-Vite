@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useState } from "react";
+import { onChangeNumber } from "../../../utils/functions";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -13,12 +14,14 @@ import { postCupoComercio } from "../utils/fetchCupo";
 
 const CrearCupo = () => {
   const [idComercio, setIdComercio] = useState(null);
-  const [deuda, setDeuda] = useState(null);
+  const [deuda, setDeuda] = useState(0);
   const [paymentStatus] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [summary, setSummary] = useState({});
-  const [sobregiro, setSobregiro] = useState(null);
-  const [canje, setCanje] = useState(null);
+  const [sobregiro, setSobregiro] = useState(0);
+  const [diasMaxSobregiro, setDiasMaxSobregiro] = useState(0);
+  const [canje, setCanje] = useState(0);
+  const [baseCaja, setBaseCaja] = useState(0);
   const limitesMontos = {
     max: 9999999999,
     min: 0,
@@ -42,12 +45,7 @@ const CrearCupo = () => {
     (e) => {
       e.preventDefault();
       if (
-        sobregiro !== null &&
-        sobregiro !== "" &&
-        deuda !== null &&
-        deuda !== "" &&
-        canje !== null &&
-        canje !== ""
+        sobregiro !== 0 && deuda !== 0 && canje !== 0
       ) {
         setShowModal(true);
         setSummary({
@@ -55,30 +53,35 @@ const CrearCupo = () => {
           "Sobregiro": formatMoney.format(sobregiro),
           Deuda: formatMoney.format(deuda),
           "Cupo en canje": formatMoney.format(canje),
+          "Base de caja": formatMoney.format(baseCaja),
+          "Dias máximos de sobregiro": diasMaxSobregiro,
         });
       } else {
         notifyError(
-          "Los campos sobregiro, deuda o cupo en canje no pueden estar vacíos"
+          "Los campos sobregiro, deuda o cupo en canje no pueden ser cero"
         );
       }
     },
-    [idComercio, deuda, canje, sobregiro]
+    [idComercio, deuda, canje, sobregiro, baseCaja, diasMaxSobregiro]
   );
   const crearComercio = useCallback(
     (e) => {
       const body = {
         pk_id_comercio: idComercio,
-        limite_cupo: sobregiro,
+        sobregiro: sobregiro,
         deuda: deuda,
         cupo_en_canje: canje,
+        base_caja: baseCaja ?? 0,
+        dias_max_sobregiro: parseInt(diasMaxSobregiro) ?? 0,
         usuario: roleInfo.id_usuario,
       };
       postCupoComercio(body)
         .then((res) => {
           if (!res?.status) {
             notifyError(res?.msg);
+            return;
           }
-          else notify("Cupo creado exitosamente");
+          notify("Cupo creado exitosamente")
           navigate(`/cupo`)
         })
         .catch((r) => {
@@ -86,13 +89,26 @@ const CrearCupo = () => {
           notifyError("Error al crear cupo");
         });
     },
-    [idComercio, deuda, canje, sobregiro, roleInfo.id_usuario, navigate]
+    [
+      idComercio,
+      deuda,
+      baseCaja,
+      diasMaxSobregiro,
+      canje,
+      sobregiro,
+      roleInfo.id_usuario,
+      navigate
+    ]
   );
 
   const onMoneyChange = useCallback((e, valor) => {
-    if (e.target.name === "sobregiro") setSobregiro(valor);
-    if (e.target.name === "deuda") setDeuda(valor);
-    if (e.target.name === "cupo_canje") setCanje(valor);
+    const setValues = {
+      "sobregiro": () => setSobregiro(valor),
+      "deuda": () => setDeuda(valor),
+      "cupo_canje": () => setCanje(valor),
+      "base_caja": () => setBaseCaja(valor),
+    }
+    setValues[e.target.name]?.()
   }, []);
 
   return (
@@ -119,6 +135,7 @@ const CrearCupo = () => {
           maxLength={"14"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
+          value={sobregiro ?? 0}
           onInput={onMoneyChange}
           required
         />
@@ -130,6 +147,7 @@ const CrearCupo = () => {
           maxLength={"14"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
+          value={deuda ?? 0}
           onInput={onMoneyChange}
           required
         />
@@ -141,8 +159,31 @@ const CrearCupo = () => {
           maxLength={"14"}
           min={limitesMontos?.min}
           max={limitesMontos?.max}
+          value={canje ?? 0}
           onInput={onMoneyChange}
           required
+        />
+        <MoneyInput
+          id="base_caja"
+          name="base_caja"
+          label="Base de caja"
+          autoComplete="off"
+          maxLength={"14"}
+          min={limitesMontos?.min}
+          max={limitesMontos?.max}
+          value={baseCaja ?? 0}
+          onInput={onMoneyChange}
+        />
+        <Input
+          id="dias_max_sobregiro"
+          name="dias_max_sobregiro"
+          label="Dias máximos sobregiro"
+          type="tel"
+          autoComplete="off"
+          minLength={0}
+          maxLength={2}
+          defaultValue={0}
+          onInput={(ev) => { setDiasMaxSobregiro(onChangeNumber(ev))}}
         />
 
         <ButtonBar className={"lg  col-span-2"}>

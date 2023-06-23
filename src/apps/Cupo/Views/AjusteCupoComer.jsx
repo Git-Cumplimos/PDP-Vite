@@ -159,7 +159,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
-                value={parseInt(cupoComer[0]?.limite_cupo)}
+                value={parseInt(cupoComer[0]?.sobregiro)}
                 disabled={true}
                 required
               />

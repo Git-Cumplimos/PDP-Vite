@@ -98,11 +98,11 @@ const CupoComer = () => {
           cupoComer?.map(
             ({ 
               pk_id_comercio,
-              limite_cupo,
+              sobregiro,
               base_caja,
             }) => ({
               pk_id_comercio,
-              limite_cupo: formatMoney.format(limite_cupo),
+              sobregiro: formatMoney.format(sobregiro),
               base_caja
             }) 
           ) ?? []
