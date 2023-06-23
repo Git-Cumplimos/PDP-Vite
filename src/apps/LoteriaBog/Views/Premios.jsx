@@ -887,7 +887,7 @@ const Premios = ({ route }) => {
                   <Fieldset
                     className="lg:col-span-2"
                     legend={
-                      "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
+                      "El valor del premio supera el monto estipulado, se requiere adjuntar los siguientes documentos del cliente:"
                     }
                   >
                     {files?.documento ? (
@@ -1018,7 +1018,7 @@ const Premios = ({ route }) => {
                         <Fieldset
                           className="lg:col-span-2"
                           legend={
-                            "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
+                            "El valor del premio supera el monto estipulado, se requiere adjuntar los siguientes documentos del cliente:"
                           }
                         >
                           {files?.documento ? (

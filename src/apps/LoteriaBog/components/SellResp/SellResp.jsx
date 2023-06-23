@@ -102,7 +102,7 @@ const SellResp = ({
       ],
       commerceName: sellResponse?.obj?.cod_loteria !== '064' 
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
-      descriPM: "***Descripción del premios mayor asociado al sorteo***",
+      descriPM: sellResponse?.obj?.descrip_PM,
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Fecha del sorteo",Intl.DateTimeFormat("es-CO", {
