@@ -26,7 +26,7 @@ const TableEnterprise = ({
   maxPage = 1,
   onChange = () => {},
   onSubmit = (e) => e.preventDefault(),
-  onSetPageData = (inf) => {},
+  onSetPageData = (_) => {},
   onSetUtilsFuncs = () => {},
   children = null,
   actions = {},

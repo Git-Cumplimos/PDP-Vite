@@ -38,7 +38,6 @@ export type TypeTableDataGetPaquetes = {
 };
 
 export type TypeOutputDataGetPaquetes = {
-  maxElems: number;
   maxPages: number;
   results: TypeTableDataGetPaquetes[];
 };

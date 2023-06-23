@@ -1,29 +1,42 @@
 import classes from "./TicketLot.module.css";
 import LogoLoto from "../../../../components/Base/LogoLoto";
 import LogoLoTolima from "../../../../components/Base/LogoLoTolima";
-import LogoLoCundinamarca from "../../../../components/Base/LogoLoCundinamarca"
+import LogoLoCundinamarca from "../../../../components/Base/LogoLoCundinamarca";
 
-const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loteria }) => {
+const TicketLot = ({
+  refPrint,
+  type = "ORIGINAL",
+  ticket,
+  stateTrx = true,
+  loteria,
+}) => {
   const { divPrint, smallertext } = classes;
 
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
   }
 
-  const { title, timeInfo, commerceInfo, commerceName, descriPM, trxInfo, disclamer } =
-    ticket;
+  const {
+    title,
+    timeInfo,
+    commerceInfo,
+    commerceName,
+    descriPM,
+    trxInfo,
+    disclamer,
+  } = ticket;
 
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
         <div className="flex flex-row justify-center items-center w-full">
-            { 
-                loteria == "Lotería de Bogotá" 
-                ? <LogoLoto xsmall/>
-                : loteria == "Lotería del Tolima"
-                    ? <LogoLoTolima xsmall/>
-                    : <LogoLoCundinamarca xsmall/>
-            }
+          {loteria == "Lotería de Bogotá" ? (
+            <LogoLoto xsmall />
+          ) : loteria == "Lotería del Tolima" ? (
+            <LogoLoTolima xsmall />
+          ) : (
+            <LogoLoCundinamarca xsmall />
+          )}
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-3" />
@@ -132,7 +145,9 @@ const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loter
         <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
           ***{type}***
         </h1>
-        <h1 className="text-center px-1 my-3 text-xs font-normal">{disclamer}</h1>
+        <h1 className="text-center px-1 my-3 text-xs font-normal">
+          {disclamer}
+        </h1>
         <h1 className="text-center my-3 text-xs font-semibold">
           Vigilado Supersalud
         </h1>
