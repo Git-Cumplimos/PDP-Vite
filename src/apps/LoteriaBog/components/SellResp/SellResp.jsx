@@ -89,6 +89,8 @@ const SellResp = ({
         }).format(fecha_trx),
       },
       commerceInfo: [
+        ["Razón social","Soluciones en Red S.A.S."],
+        ["Nit","830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", sellResponse?.obj?.id_trx],
@@ -100,6 +102,7 @@ const SellResp = ({
       ],
       commerceName: sellResponse?.obj?.cod_loteria !== '064' 
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
+      descriPM: "***Descripción del premios mayor asociado al sorteo***",
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
         ["Fecha del sorteo",Intl.DateTimeFormat("es-CO", {

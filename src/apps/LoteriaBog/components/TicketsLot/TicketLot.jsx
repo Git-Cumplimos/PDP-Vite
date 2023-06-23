@@ -4,13 +4,13 @@ import LogoLoTolima from "../../../../components/Base/LogoLoTolima";
 import LogoLoCundinamarca from "../../../../components/Base/LogoLoCundinamarca"
 
 const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loteria }) => {
-  const { divPrint } = classes;
+  const { divPrint, smallertext } = classes;
 
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
   }
 
-  const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
+  const { title, timeInfo, commerceInfo, commerceName, descriPM, trxInfo, disclamer } =
     ticket;
 
   return (
@@ -43,7 +43,7 @@ const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loter
           </div>
         </div>
         <hr className="border-gray-400 my-3" />
-        <div className="flex flex-col gap-2 px-2 text-xs text-left">
+        <div className={smallertext}>
           {commerceInfo
             .map((e, i, arr) => {
               const chunkSize = 2;
@@ -87,6 +87,9 @@ const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loter
         <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
           Transacción {stateTrx ? "exitosa" : "rechazada"}
         </h1>
+        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+          {descriPM ?? ""}
+        </h1>
         <div className="flex flex-col gap-2 px-2 text-xs">
           {trxInfo
             .map((e, i, arr) => {
@@ -129,7 +132,10 @@ const TicketLot = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, loter
         <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
           ***{type}***
         </h1>
-        <h1 className="text-center my-3 text-xs font-normal">{disclamer}</h1>
+        <h1 className="text-center px-1 my-3 text-xs font-normal">{disclamer}</h1>
+        <h1 className="text-center my-3 text-xs font-semibold">
+          Vigilado Supersalud
+        </h1>
       </div>
     </div>
   );

@@ -292,6 +292,8 @@ const Premios = ({ route }) => {
         }).format(new Date()),
       },
       commerceInfo: [
+        ["Razón social","Soluciones en Red S.A.S."],
+        ["Nit","830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],

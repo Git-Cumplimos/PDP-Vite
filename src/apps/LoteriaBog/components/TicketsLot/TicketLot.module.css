@@ -11,3 +11,13 @@
 @page {
     size: 80mm 160mm;
 }
+
+.smallertext {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    /* padding: 2px; */
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 9px;
+}
