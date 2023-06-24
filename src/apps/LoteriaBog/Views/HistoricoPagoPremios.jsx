@@ -77,7 +77,7 @@ const HistoricoPagoPremios = ({ route }) => {
       sorteo: resp_con_sort[i]["num_sorteo"],
       serie: resp_con_sort[i]["serie"],
       valor_pagado: valor_pagado,
-      fecha: resp_con_sort[i]["fecha_pago"],
+      fecha: resp_con_sort[i]["fecha_pago"].split(" ")[0],
       fraccion: resp_con_sort[i]["num_fraccion"],
     })
       .then((res) => {
