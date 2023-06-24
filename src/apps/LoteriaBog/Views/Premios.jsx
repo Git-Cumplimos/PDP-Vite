@@ -291,8 +291,8 @@ const Premios = ({ route }) => {
         }).format(new Date()),
       },
       commerceInfo: [
-        ["Razón social","Soluciones en Red S.A.S."],
-        ["Nit","830.084.645-1"],
+        ["Razón social", "Soluciones en Red S.A.S."],
+        ["Nit", "830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],
@@ -909,7 +909,7 @@ const Premios = ({ route }) => {
                         id={`archivo_identificacion`}
                         label={"Documento de identificación"}
                         name="file1"
-                        accept=".pdf,.png,.jpg,.svg"
+                        accept=".pdf,.png,.jpg,.svg,.jpeg"
                         allowDrop={true}
                         onGetFile={(info) => onChangeFiles(info, "documento")}
                       />
@@ -933,7 +933,7 @@ const Premios = ({ route }) => {
                         id={`archivo_formulario`}
                         label={"Formulario"}
                         name="file2"
-                        accept=".pdf,.png,.jpg,.svg"
+                        accept=".pdf,.png,.jpg,.svg,.jpeg"
                         allowDrop={true}
                         onGetFile={(info) => onChangeFiles(info, "formulario")}
                       />
@@ -1040,7 +1040,7 @@ const Premios = ({ route }) => {
                               id={`archivo_identificacion`}
                               label={"Documento de identificación"}
                               name="file1"
-                              accept=".pdf,.png,.jpg,.svg"
+                              accept=".pdf,.png,.jpg,.svg,.jpeg"
                               allowDrop={true}
                               onGetFile={(info) =>
                                 onChangeFiles(info, "documento")
@@ -1066,7 +1066,7 @@ const Premios = ({ route }) => {
                               id={`archivo_formulario`}
                               label={"Formulario"}
                               name="file2"
-                              accept=".pdf,.png,.jpg,.svg"
+                              accept=".pdf,.png,.jpg,.svg,.jpeg"
                               allowDrop={true}
                               onGetFile={(info) =>
                                 onChangeFiles(info, "formulario")
