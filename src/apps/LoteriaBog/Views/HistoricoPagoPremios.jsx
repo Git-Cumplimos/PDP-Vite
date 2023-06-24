@@ -103,7 +103,7 @@ const HistoricoPagoPremios = ({ route }) => {
           "Fracción pagada",
           "Id Comercio",
           "Valor Pagado",
-          "Fecha",
+          "Fecha y hora",
         ]}
         onSetPageData={setPageData}
         data={resp_con_sort.map(
