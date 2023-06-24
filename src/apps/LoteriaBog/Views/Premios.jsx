@@ -601,16 +601,16 @@ const Premios = ({ route }) => {
         "documentos con formato incorrecto, solo se recibe los siguientes formatos .png, .jpg, .jpeg, .pdf"
       );
       try {
-        document.getElementById("archivo_formulario1").value = "";
+        document.getElementById("archivo_identificacion1").value = "";
       } catch {}
       try {
-        document.getElementById("archivo_formulario2").value = "";
+        document.getElementById("archivo_identificacion2").value = "";
       } catch {}
       try {
-        document.getElementById("archivo_formulario3").value = "";
+        document.getElementById("archivo_identificacion3").value = "";
       } catch {}
       try {
-        document.getElementById("archivo_formulario4").value = "";
+        document.getElementById("archivo_identificacion4").value = "";
       } catch {}
       return;
     }
@@ -935,7 +935,7 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={`archivo_identificacion1`}
+                        id={"archivo_identificacion1"}
                         label={"Documento de identificación"}
                         name="file1"
                         accept=".pdf,.png,.jpg,.svg,.jpeg"
