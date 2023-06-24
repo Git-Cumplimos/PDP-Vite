@@ -586,26 +586,34 @@ const Premios = ({ route }) => {
   };
 
   const onChangeFiles = (info, type) => {
-    const contentType = [
-      "image/png",
-      "image/jpg",
-      "image/jpeg",
-      "image/svg",
-      "application/pdf",
-    ];
-    const contentTypeFind = contentType.find(
-      (type_) => contentType === info[0]?.type
-    );
-    if (contentTypeFind === undefined) {
-      notifyError(
-        "documentos con formato incorrecto, solo se recibe los siguientes formatos .png, .jpg, .jpeg, .pdf"
-      );
-      // document.getElementById("archivo_formulario1").value = ""; // <- limpia el valor del campo de archivo
-      // document.getElementById("archivo_formulario2").value = ""; // <- limpia el valor del campo de archivo
-      // document.getElementById("archivo_formulario3").value = ""; // <- limpia el valor del campo de archivo
-      // document.getElementById("archivo_formulario4").value = ""; // <- limpia el valor del campo de archivo
-      return;
-    }
+    // const contentType = [
+    //   "image/png",
+    //   "image/jpg",
+    //   "image/jpeg",
+    //   "image/svg",
+    //   "application/pdf",
+    // ];
+    // const contentTypeFind = contentType.find(
+    //   (type_) => contentType === info[0]?.type
+    // );
+    // if (contentTypeFind === undefined) {
+    //   notifyError(
+    //     "documentos con formato incorrecto, solo se recibe los siguientes formatos .png, .jpg, .jpeg, .pdf"
+    //   );
+    //   try {
+    //     document.getElementById("archivo_formulario1").value = "";
+    //   } catch {}
+    //   try {
+    //     document.getElementById("archivo_formulario2").value = "";
+    //   } catch {}
+    //   try {
+    //     document.getElementById("archivo_formulario3").value = "";
+    //   } catch {}
+    //   try {
+    //     document.getElementById("archivo_formulario4").value = "";
+    //   } catch {}
+    //   return;
+    // }
 
     setFiles((old) => ({
       ...old,
