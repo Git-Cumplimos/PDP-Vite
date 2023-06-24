@@ -67,11 +67,16 @@ const HistoricoPagoPremios = ({ route }) => {
   };
 
   const onSelectPagoPremio = (e, i) => {
+    let valor_pagado = resp_con_sort[i]["valor_neto"].split(".").join("");
+    valor_pagado = valor_pagado.split(" ").join("");
+    valor_pagado = valor_pagado.replace("$", "");
+    console.log(valor_pagado);
+
     DescargaDocsPagoPremios({
       billete: resp_con_sort[i]["num_billete"],
       sorteo: resp_con_sort[i]["num_sorteo"],
       serie: resp_con_sort[i]["serie"],
-      valor_pagado: resp_con_sort[i]["valor_neto"],
+      valor_pagado: valor_pagado,
       fecha: resp_con_sort[i]["fecha_pago"],
       fraccion: resp_con_sort[i]["num_fraccion"],
     })

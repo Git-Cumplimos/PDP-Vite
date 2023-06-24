@@ -586,6 +586,27 @@ const Premios = ({ route }) => {
   };
 
   const onChangeFiles = (info, type) => {
+    const contentType = [
+      "image/png",
+      "image/jpg",
+      "image/jpeg",
+      "image/svg",
+      "application/pdf",
+    ];
+    const contentTypeFind = contentType.find(
+      (type_) => contentType === info[0]?.type
+    );
+    if (contentTypeFind === undefined) {
+      notifyError(
+        "documentos con formato incorrecto, solo se recibe los siguientes formatos .png, .jpg, .jpeg, .pdf"
+      );
+      // document.getElementById("archivo_formulario1").value = ""; // <- limpia el valor del campo de archivo
+      // document.getElementById("archivo_formulario2").value = ""; // <- limpia el valor del campo de archivo
+      // document.getElementById("archivo_formulario3").value = ""; // <- limpia el valor del campo de archivo
+      // document.getElementById("archivo_formulario4").value = ""; // <- limpia el valor del campo de archivo
+      return;
+    }
+
     setFiles((old) => ({
       ...old,
       [type]: { files: Array.from(info)[0], typeArchivo: info[0]?.type },
@@ -906,7 +927,7 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={`archivo_identificacion`}
+                        id={`archivo_identificacion1`}
                         label={"Documento de identificación"}
                         name="file1"
                         accept=".pdf,.png,.jpg,.svg,.jpeg"
@@ -930,7 +951,7 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={`archivo_formulario`}
+                        id={`archivo_formulario2`}
                         label={"Formulario"}
                         name="file2"
                         accept=".pdf,.png,.jpg,.svg,.jpeg"
@@ -1037,9 +1058,9 @@ const Premios = ({ route }) => {
                             </label>
                           ) : (
                             <FileInput
-                              id={`archivo_identificacion`}
+                              id={`archivo_identificacion3`}
                               label={"Documento de identificación"}
-                              name="file1"
+                              name="file3"
                               accept=".pdf,.png,.jpg,.svg,.jpeg"
                               allowDrop={true}
                               onGetFile={(info) =>
@@ -1063,9 +1084,9 @@ const Premios = ({ route }) => {
                             </label>
                           ) : (
                             <FileInput
-                              id={`archivo_formulario`}
+                              id={`archivo_formulario4`}
                               label={"Formulario"}
-                              name="file2"
+                              name="file4"
                               accept=".pdf,.png,.jpg,.svg,.jpeg"
                               allowDrop={true}
                               onGetFile={(info) =>
