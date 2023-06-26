@@ -21,7 +21,6 @@ import { v4 } from 'uuid';
 import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise/TableEnterprise";
-import Input from "../../../../../components/Base/Input/Input";
 //Constantes Style
 const { styleComponents } = classes;
 
