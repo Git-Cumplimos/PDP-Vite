@@ -19,6 +19,7 @@ export const ComponentsModalSummaryTrx = ({
   handleClose,
   posicion,
 }) => {
+  const [labelSeleccionado, setLabelSeleccionado] = useState('');
   const [pagoTotal, setPagoTotal] = useState(false);
   const [choice_numero_obligacion, setChoicePagoTotal] = useState(summary[posicion]?.numero_obligacion);
   return (
@@ -53,8 +54,12 @@ export const ComponentsModalSummaryTrx = ({
                   label: `Valor a fecha de corte`,
                 },
               ]}
-            value={pagoTotal}
-            onChange={(ev) => setPagoTotal(ev.target.value)}
+              value={pagoTotal}
+              onChange={(ev) => {
+                setPagoTotal(ev.target.value);
+                const selectedOption = ev.target.options[ev.target.selectedIndex];
+                setLabelSeleccionado(selectedOption.label);
+              }}
             />
           ),
         }}
@@ -65,7 +70,7 @@ export const ComponentsModalSummaryTrx = ({
             <Button type={"submit"} onClick={(e) => {
               e.preventDefault(); // Evitar el envío por defecto del formulario
               if (pagoTotal !== false) {
-                peticion(e, pagoTotal, choice_numero_obligacion)
+                peticion(e, pagoTotal, choice_numero_obligacion, labelSeleccionado)
               } else { 
                 notify("Seleccione el tipo de abono")
               }

@@ -128,6 +128,7 @@ const PagoCartera = () => {
             },
             consultaCartera: {
                 valReferencia1: numeroPagoCartera,
+                numeroConsulta: options_select === 'Número de cédula' ? '000001' : '000002',
                 location: {
                     address: roleInfo?.["direccion"],
                     dane_code: roleInfo?.codigo_dane,
@@ -149,7 +150,7 @@ const PagoCartera = () => {
     };
 
     const onSubmitPayCartera = useCallback(
-        (e, pagoTotal, choice_numero_obligacion) => {
+        (e, pagoTotal, choice_numero_obligacion, labelSeleccionado) => {
             e.preventDefault();
             const data = {
                 oficina_propia:
@@ -168,6 +169,7 @@ const PagoCartera = () => {
                 PagoCartera: {
                     valReferencia1: choice_numero_obligacion,
                     valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
+                    numeroPago: labelSeleccionado === 'Valor total deuda' ? '000002' : '000001',
                     location: {
                         address: roleInfo?.["direccion"],
                         dane_code: roleInfo?.codigo_dane,
