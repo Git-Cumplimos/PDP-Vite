@@ -51,7 +51,6 @@ export const LecturaNumeroObligacion = ({
           Cancelar
         </Button>
       </ButtonBar>
-      {/* </Form> */}
     </Fragment>
   );
 };
@@ -102,7 +101,6 @@ export const LecturaNumeroCedula = ({
           Cancelar
         </Button>
       </ButtonBar>
-      {/* </Form> */}
     </Fragment>
   );
 };
