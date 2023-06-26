@@ -21,10 +21,7 @@ import { v4 } from 'uuid';
 import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise/TableEnterprise";
-//Constantes Style
 const { styleComponents } = classes;
-
-//Constantes
 const url_consult_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/consulta_pago_cartera`;
 const url_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/pago_cartera`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
@@ -34,7 +31,6 @@ const options_select = [
     { value: numero_obligacion, label: numero_obligacion },
     { value: numero_cedula, label: numero_cedula },
 ];
-
 const PagoCartera = () => {
     const uniqueId = v4();
     const [selectIndiceObligacion, setSelectIndiceObligacion] = useState(0);
@@ -50,7 +46,6 @@ const PagoCartera = () => {
     const printDiv = useRef();
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
-    // const [pagoTotal, setPagoTotal] = useState(0);
     const [loadingPeticionPayCartera, peticionPayCartera] = useFetchPagoCartera(
         url_pago_cartera,
         urlreintentos,
@@ -212,7 +207,6 @@ const PagoCartera = () => {
         content: () => printDiv.current,
     });
 
-    //********************Funciones para cerrar el Modal**************************
     const HandleCloseTrx = useCallback(() => {
         setPaso("LecturaNumeroObligacion");
         setDocumento("LecturaNumeroObligacion");
@@ -298,7 +292,6 @@ const PagoCartera = () => {
                         }
                     />
                 </div>
-                {/******************************Lectura Pago Cartera*******************************************************/}
                 {paso === "LecturaNumeroObligacion" && (
                     <LecturaNumeroObligacion
                         loadingPeticion={loadingPeticionConsultPagoCartera}
@@ -310,9 +303,6 @@ const PagoCartera = () => {
                         numero_cedula={numero_cedula}
                         numeroPagoCartera={numeroPagoCartera}></LecturaNumeroObligacion>
                 )}
-                {/******************************Lectura Pago Cartera*******************************************************/}
-
-                {/******************************Respuesta Lectura Pago Cartera*******************************************************/}
                 {paso === "LecturaNumeroCedula" && (
                     <LecturaNumeroCedula
                         loadingPeticion={loadingPeticionConsultPagoCartera}
@@ -324,11 +314,7 @@ const PagoCartera = () => {
                         numero_cedula={numero_cedula}
                         numeroPagoCartera={numeroPagoCartera}></LecturaNumeroCedula>
                 )}
-                {/******************************Respuesta Lectura Pago Cartera*******************************************************/}
             </Form>
-
-            {/* <Modal show={showModal} handleClose={HandleCloseModal}> */}
-                {/******************************Resumen de trx*******************************************************/}
                 {paso === "ResumenTrx" && (
                     <TableEnterprise
                         title="Seleccione el número de obligación a pagar"
@@ -355,9 +341,6 @@ const PagoCartera = () => {
                     </ComponentsModalSummaryTrx>
                 </Modal>
             )}
-                {/******************************Resumen de trx*******************************************************/}
-
-                {/**************** TransaccionExitosa **********************/}
                 {infTicket && paso === "TransaccionExitosa" && (
                 <Modal show={showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
@@ -369,8 +352,6 @@ const PagoCartera = () => {
                     </div>
                 </Modal>
                 )}
-                {/*************** Recarga Exitosa **********************/}
-            {/* </Modal> */}
         </Fragment>
     );
 };
