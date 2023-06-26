@@ -14,6 +14,7 @@ const PeticionesPines = lazy(() => import("./Views/Peticiones"));
 const Anulaciones = lazy(() => import("./Views/AnulacionesPines"));
 const CargueAnulaciones = lazy(() => import("./Views/Anulaciones/CargueAnulaciones"))
 const DescargaPeticiones = lazy(() => import("./Views/Anulaciones/DescargarArchivoPeticiones"))
+const HistoricoAnulaciones = lazy(() => import("./Views/Anulaciones/HistoricoAnulaciones"))
 
 
 
@@ -99,8 +100,17 @@ const rutasPinesCrc = {
           component: DescargaPeticiones,
           permission: [63]
         },
+        {
+          link: "/Pines/PinesCrc/Anulaciones/Historico",
+          label: (
+            <AppIcons Logo={"DESCARGAR"} name={"Historico anulaciones"} />
+          ),
+          component: HistoricoAnulaciones,
+          permission: [63]
+        }
       ],
     },
+    
   ],
 };
 
