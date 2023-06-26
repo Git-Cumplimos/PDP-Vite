@@ -12,6 +12,12 @@ const MainGestionDatafonos = lazy(() =>
 const CreateDatafono = lazy(() =>
   import("./Views/GestionDatafonos/CreateDatafono")
 );
+const MainRecargaDatafonos = lazy(() =>
+  import("./Views/RecargaDatafonos/MainRecargaDatafonos")
+);
+const TransaccionRecargaDatafono = lazy(() =>
+  import("./Views/RecargaDatafonos/TransaccionRecargaDatafono")
+);
 
 const CorresponsaliaTuLlave = lazy(() => import("./CorresponsaliaTuLlave"));
 
@@ -52,8 +58,22 @@ const rutasRecargasTullave = {
       label: (
         <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga datafonos' />
       ),
-      component: MainGestionDatafonos,
+      component: MainRecargaDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
+      subRoutes: [
+        {
+          link: "/recargas-tu-llave/recarga-datafonos/transaccion/:id",
+          label: (
+            <AppIcons
+              Logo={"DAVIVIENDA_PAGO_POR_GIRO"}
+              name={"Recarga datafonos"}
+            />
+          ),
+          component: TransaccionRecargaDatafono,
+          permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
+          show: false,
+        },
+      ],
     },
   ],
 };
