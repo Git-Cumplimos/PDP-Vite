@@ -77,6 +77,7 @@ const TrxRecaudo = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+  const [trueCodbarras, setTrueCodbarras] = useState(false);
 
   const summary = useMemo(
     () => ({
@@ -355,6 +356,9 @@ const TrxRecaudo = () => {
     if ("valor" in urlData) {
       setValTrxRecaudo(urlData.valor);
     }
+    if ("true_codbarras" in urlData) {
+      setTrueCodbarras(true);
+    }
   }, [searchParams, datosConvenio]);
 
   /**
@@ -451,7 +455,7 @@ const TrxRecaudo = () => {
               required
             />
           ))}
-        {datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo ? (
+        {(datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo) && !trueCodbarras ? (
           <Input
             id='valor'
             name='valor'

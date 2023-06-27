@@ -28,7 +28,7 @@ type TypeInfTicket = { [key: string]: any } | null;
 
 //------ constantes generales--------
 const minValor = 1000;
-const maxValor = 100001;
+const maxValor = 100000;
 const dataRecargaInitial = {
   celular: "",
   valor_total_trx: 0,
@@ -190,6 +190,8 @@ const Recargas = ({
               <MoneyInput
                 name="valor"
                 label="Valor a recargar"
+                equalError={false}
+                equalErrorMin={false}
                 autoComplete="off"
                 min={minValor}
                 max={maxValor}

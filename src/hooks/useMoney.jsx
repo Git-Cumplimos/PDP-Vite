@@ -16,6 +16,7 @@ const filterExtraDigit = (data, digits = 0) => {
 const useMoney = ({
   limits = [0, 10000000],
   equalError = false,
+  equalErrorMin = false,
   decimalDigits = 0,
 }) => {
   const onChangeMoney = useCallback(
@@ -32,9 +33,17 @@ const useMoney = ({
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = limits;
-      if (moneyValue < min) {
+      if (moneyValue === min && equalErrorMin) {
         ev.target.setCustomValidity(
-          `El valor debe ser mayor a ${moneyFormatter.format(min)}`
+          `El valor debe ser mayor ${
+            !equalErrorMin ? " o igual" : ""
+          } a ${moneyFormatter.format(min)}`
+        );
+      } else if (moneyValue < min) {
+        ev.target.setCustomValidity(
+          `El valor debe ser mayor ${
+            !equalErrorMin ? " o igual" : ""
+          } a ${moneyFormatter.format(min)}`
         );
       } else if (moneyValue > max) {
         ev.target.setCustomValidity(
@@ -44,7 +53,9 @@ const useMoney = ({
         );
       } else if (moneyValue === max && equalError) {
         ev.target.setCustomValidity(
-          `El valor debe ser menor a ${moneyFormatter.format(max)}`
+          `El valor debe ser menor${
+            !equalError ? " o igual" : ""
+          } a ${moneyFormatter.format(max)}`
         );
       } else {
         ev.target.setCustomValidity("");
@@ -63,7 +74,7 @@ const useMoney = ({
 
       return moneyValue;
     },
-    [limits, decimalDigits, equalError]
+    [limits, decimalDigits, equalError, equalErrorMin]
   );
   return onChangeMoney;
 };

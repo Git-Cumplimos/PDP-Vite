@@ -28,6 +28,7 @@ const RecaudoConjunto = () => {
   const [modificar, setModificar] = useState(false)
   const [valorCodigoBarras, setValorCodigoBarras] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [disableBtn, setDisableBtn] = useState(false)
   const [dataRecaudo, setDataRecaudo] = useState('')
   const [id_trx, setId_Trx] = useState(null)
   const [pago, setPago] = useState(false)
@@ -41,6 +42,7 @@ const RecaudoConjunto = () => {
 
   const handleClose = useCallback((err = null) => {
     setShowModal(false);
+    setDisableBtn(false)
     if (err) notifyError("Transacción de recaudo cancelada por el usuario")
     if (modificar !== true) {
       setDataRecaudo('')
@@ -149,7 +151,7 @@ const RecaudoConjunto = () => {
 
   const hacerRecaudo = useCallback(async (e) => {
     e.preventDefault()
-
+    setDisableBtn(true)
     let resp = ''
     const data = {
       id_trx: id_trx,
@@ -201,7 +203,10 @@ const RecaudoConjunto = () => {
         });
 
     }
-    else { notifyError("El valor recibido no cumple con los limites establecidos") }
+    else {
+      setDisableBtn(false);
+      notifyError("El valor recibido no cumple con los limites establecidos") 
+    }
 
   }, [roleInfo, valorRecibido, dataRecaudo, id_trx,
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites])
@@ -365,7 +370,7 @@ const RecaudoConjunto = () => {
             </>
           )}
           <ButtonBar>
-            <Button type={"submit"} >
+            <Button type={"submit"} disabled={disableBtn}>
               {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
             </Button>
             <Button onClick={() => handleClose(true)} >
