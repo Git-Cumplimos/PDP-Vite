@@ -4,7 +4,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../../utils/notify";
 import useMap from "../../../../hooks/useMap";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
-import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../hooks/useFetchDispatchDebounce";
 import { makeDateFormatter } from "../../../../utils/functions";
 
 const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
@@ -43,10 +43,21 @@ const TablaHistoricoContingencia = ({ banco }) => {
   );
 
   const [fetchExcel] = useFetchDispatchDebounce({
-    onSuccess: useCallback((res) => window.open(res?.url, "_self"), []),
+    onSuccess: useCallback((res) => {
+      if (!res?.status){
+        notifyError(res?.msg ?? "El archivo aun se esta procesando")
+        return;
+      }
+      window.open(res?.url, "_self")
+    }, []),
     onError: useCallback((error) => {
-      console.error(error);
-      notifyError("Error al cargar Datos ");
+      if (error instanceof ErrorPDPFetch) {
+        notifyError(error.message);
+      }
+      else if (!(error instanceof DOMException)) {
+        console.error(error);
+        notifyError("Error al cargar Datos ");
+      }
     }, []),
   });
 
