@@ -334,6 +334,40 @@ const VentaPines = () => {
       {
         render: ({ data: error }) => {
           setLoadingSell(false);
+          const infoPinCrc = {
+            pk_id_trx : inquiryStatus?.id_trx ,//error?.obj?.id_trx,
+            id_comercio : roleInfo?.id_comercio,
+            nombre_comercio : roleInfo?.nombre_comercio,
+            referencia : "",
+            documento : documento,
+            valor_pin : valVentaPines,
+            estado : "Declinado"
+          }
+          notifyPending(
+            registroTrx(infoPinCrc),
+            {
+              render: () => {
+                setLoadingSell(true);
+                return "Procesando transacción";
+              },
+            },
+            {
+              render: ({ infoPinCrc: res }) => {
+                setLoadingSell(false);                
+                console.log(res)
+                return "Registro Transacción satisfactoria";
+              },
+            },
+            {
+              render: ({ infoPinCrc: error }) => {
+                setLoadingSell(false);
+                if (error?.cause === "custom") {
+                  return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+                }
+                return "Registro Transacción fallida";
+              },
+            }
+          );
           navigate("/Pines/PinesCrc", { replace: true });
           if (error?.cause === "custom") {
             return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
@@ -766,7 +800,7 @@ setUserReferences((old) => ({
 
         />
 
-        <Input
+        {/* <Input
           label='Número de convenio pin'
           type='text'
           autoComplete='off'
@@ -786,7 +820,7 @@ setUserReferences((old) => ({
           autoComplete='off'
           value={datosConvenio.nombre_convenio}
           disabled
-        />
+        /> */}
         {/* {[1, 2, 3, 4, 5]
           .filter((ref) => datosConvenio[`referencia_${ref}`])
           .map((ref) => (
@@ -939,7 +973,7 @@ setUserReferences((old) => ({
 
         />
 
-        <Input
+        {/* <Input
           label='Número de convenio pin'
           type='text'
           autoComplete='off'
@@ -959,7 +993,7 @@ setUserReferences((old) => ({
           autoComplete='off'
           value={datosConvenio.nombre_convenio}
           disabled
-        />
+        /> */}
         {/* {[1, 2, 3, 4, 5]
           .filter((ref) => datosConvenio[`referencia_${ref}`])
           .map((ref) => (
