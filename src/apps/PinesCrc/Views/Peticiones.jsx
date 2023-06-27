@@ -33,7 +33,7 @@ const Peticiones = () => {
   });
 
   const navigate = useNavigate();
-  const { roleInfo, userPermissions } = useAuth();  
+  const { roleInfo, userPermissions, pdpUser } = useAuth();  
 
   const [listaConveniosPines, setListaConveniosPines] = useState([]);
   const [maxPages, setMaxPages] = useState(1);
@@ -114,7 +114,8 @@ const Peticiones = () => {
     const args = {"pk_id_trx" : trx?.["Id trx"]}
     const body = {
       estado: "Peticion",
-      motivo_anulacion: motivoPeticion
+      motivo_anulacion: motivoPeticion,
+      usuario_peticion: pdpUser?.uname ?? "",
     }
     setIsLoading(true)
     peticionCancelacion(args,body)

@@ -9,6 +9,7 @@ import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import Modal from "../../../../components/Base/Modal";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 
 const FileInputX = () => {
@@ -42,6 +43,7 @@ const FileInputX = () => {
   const [procesandoValidacion, setProcesandoValidacion] = useState(false);
   const [type1, setType1] = useState([]);
   const file_name = `${process.env.REACT_APP_CARPETA_BUCKET_PINES}`
+  const { pdpUser } = useAuth();
 
   //------------------Guardar Archivos PDF---------------------//
   const onFileChange = useCallback(
