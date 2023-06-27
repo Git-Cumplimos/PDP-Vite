@@ -1,11 +1,11 @@
 import React, { Fragment, useState } from "react";
-import Button from "../../../../../../components/Base/Button";
-import ButtonBar from "../../../../../../components/Base/ButtonBar";
-import { formatMoney } from "../../../../../../components/Base/MoneyInput";
-import PaymentSummary from "../../../../../../components/Compound/PaymentSummary";
-import Select from "../../../../../../components/Base/Select/Select";
-import classes from "../../Runt/PagarRunt.module.css"
-import { notify } from "../../../../../../utils/notify";
+import Button from "../../../../../../../components/Base/Button";
+import ButtonBar from "../../../../../../../components/Base/ButtonBar";
+import { formatMoney } from "../../../../../../../components/Base/MoneyInput";
+import PaymentSummary from "../../../../../../../components/Compound/PaymentSummary";
+import Select from "../../../../../../../components/Base/Select/Select";
+import classes from "../../../Runt/PagarRunt.module.css"
+import { notify } from "../../../../../../../utils/notify";
 const { styleComponents } = classes;
 export const ComponentsModalSummaryTrx = ({  
   documento,
