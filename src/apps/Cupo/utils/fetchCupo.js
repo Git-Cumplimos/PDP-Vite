@@ -182,7 +182,7 @@ export const putAjusteCupo = async (argsObj, bodyObj) => {
     throw err;
   }
 };
-
+ 
 export const PeticionDescargar = async (parametro = "") => {
   try {
     const res = await fetchData(
@@ -219,33 +219,17 @@ export const PeticionDescargarPdf = async (
     busqueda += `&tipo_afectacion=${tipo_afectacion}`;
   }
   try {
-    const session = await Auth.currentSession();
-    const response = await fetch(
+    const res = await fetchData(
       `${urlCupo}/servicio-cupo/dtlcupo/fpdf?fk_id_comercio=${parametro}${busqueda}`,
-      {
-        headers: { Authorization: `Bearer ${session?.idToken?.jwtToken}` },
-      }
     );
-    const contentType = response.headers.get("content-type");
-    const nombreDocumento = response.headers
-      .get("Content-Disposition")
-      .slice(21);
-
-    if (contentType === "application/pdf") {
-      const byts = await response.blob();
-      const downloadUrl = URL.createObjectURL(byts);
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      a.download = `${nombreDocumento}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } else if (contentType === "application/json") {
-      const json = await response.json();
-      if (!json?.status) {
-        console.error(json?.msg);
-      }
+    if (!res?.status) {
+      notifyError(res?.msg);
+      return res;
+    } else {
+      notify(res?.msg);
+      window.open(res?.obj?.url, "_self")
     }
+
   } catch (error) {
     console.log("Error con fetch - no conecta al servicio");
   }
