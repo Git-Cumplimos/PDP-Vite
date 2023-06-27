@@ -4,8 +4,7 @@ import { fetchSecure } from "../../../utils/functions";
 const urlColpatriaTrx = `${process.env.REACT_APP_URL_COLPATRIA}/trx`;
 const urlColpatriaParams = `${process.env.REACT_APP_URL_COLPATRIA}/params`;
 const urlPinesVus = `${process.env.REACT_APP_URL_PinesVus}`
-// const urlColpatriaTrx = `http://localhost:5000/trx`;
-// const urlColpatriaParams = `http://localhost:5000/params`;
+
 
 export const makeDeposit = async (bodyDep) => {
   if (!bodyDep) {

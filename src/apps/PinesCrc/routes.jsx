@@ -73,43 +73,43 @@ const rutasPinesCrc = {
       component: PeticionesPines,
       permission: [63,53]
     },
-    {
-      link: "/Pines/PinesCrc/Anulaciones",
-      label: (
-        <AppIcons
-          Logo={"PINES_ADMINISTRAR"}
-          name={"Anulaciones"}
-        />
-      ),
-      component: Anulaciones,
-      permission: [63],
-      subRoutes: [
-        {
-          link: "/Pines/PinesCrc/Anulaciones/CargueArchivo",
-          label: (
-            <AppIcons Logo={"CARGAR"} name={"Cargue Archivo Anulaciones"} />
-          ),
-          component: CargueAnulaciones,
-          permission: [63]
-        },
-        {
-          link: "/Pines/PinesCrc/Anulaciones/DescargarPeticiones",
-          label: (
-            <AppIcons Logo={"DESCARGAR"} name={"Descarga Archivo Peticiones"} />
-          ),
-          component: DescargaPeticiones,
-          permission: [63]
-        },
-        {
-          link: "/Pines/PinesCrc/Anulaciones/Historico",
-          label: (
-            <AppIcons Logo={"DESCARGAR"} name={"Historico anulaciones"} />
-          ),
-          component: HistoricoAnulaciones,
-          permission: [63]
-        }
-      ],
-    },
+    // {
+    //   link: "/Pines/PinesCrc/Anulaciones",
+    //   label: (
+    //     <AppIcons
+    //       Logo={"PINES_ADMINISTRAR"}
+    //       name={"Anulaciones"}
+    //     />
+    //   ),
+    //   component: Anulaciones,
+    //   permission: [63],
+    //   subRoutes: [
+    //     {
+    //       link: "/Pines/PinesCrc/Anulaciones/CargueArchivo",
+    //       label: (
+    //         <AppIcons Logo={"CARGAR"} name={"Cargue Archivo Anulaciones"} />
+    //       ),
+    //       component: CargueAnulaciones,
+    //       permission: [63]
+    //     },
+    //     {
+    //       link: "/Pines/PinesCrc/Anulaciones/DescargarPeticiones",
+    //       label: (
+    //         <AppIcons Logo={"DESCARGAR"} name={"Descarga Archivo Peticiones"} />
+    //       ),
+    //       component: DescargaPeticiones,
+    //       permission: [63]
+    //     },
+    //     {
+    //       link: "/Pines/PinesCrc/Anulaciones/Historico",
+    //       label: (
+    //         <AppIcons Logo={"DESCARGAR"} name={"Historico anulaciones"} />
+    //       ),
+    //       component: HistoricoAnulaciones,
+    //       permission: [63]
+    //     }
+    //   ],
+    // },
     
   ],
 };

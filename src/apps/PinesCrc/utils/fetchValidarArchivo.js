@@ -1,9 +1,9 @@
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
-// const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
-const urlBackendValidar = `${process.env.REACT_APP_BASE_API}/cert/pinesVus/validar_archivos`;
-// const urlBackendValidar = `${process.env.REACT_APP_URL_PinesVus}/validar_archivos`
+
+const urlBackendValidar = `${process.env.REACT_APP_URL_PinesVus}/validar_archivos`;
+
 export const Validar_archivo = async (nombre_archivo) => {
   let new_nombre_archivo = nombre_archivo.substring(
     nombre_archivo.indexOf("/") + 1
