@@ -130,7 +130,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               ...old,
               ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
               ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
-              ref3: autoArr?.obj.datosCodigoBarras.codigosReferencia[3] ?? "",
+              ref3: autoArr?.obj.datosCodigoBarras.codigosReferencia[2] ?? "",
               showValor: formatMoney.format(valorTrx) ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
@@ -268,7 +268,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
       !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push(["Referencia 2", datosTrans?.ref2 ?? ""]);
+      objTicket["trxInfo"].push(["Referencia 2", datosTransaccion?.ref2 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia2"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "";
@@ -278,7 +278,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
       !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push(["Referencia 3", datosTrans?.ref3 ?? ""]);
+      objTicket["trxInfo"].push(["Referencia 3", datosTransaccion?.ref3 ?? ""]);
       objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";

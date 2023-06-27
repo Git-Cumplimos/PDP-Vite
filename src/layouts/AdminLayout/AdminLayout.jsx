@@ -33,6 +33,8 @@ const AdminLayout = () => {
     usrData,
     saldoCupo,
     comision,
+    diasSobregiro,
+    diasSobregiroD,
     cargar,
   } = classes;
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -42,7 +44,7 @@ const AdminLayout = () => {
   const { pathname } = useLocation();
 
   const { urlsPrivate: urls } = useUrls();
-
+ 
   const [showModal, setShowModal] = useState(false);
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
   const [cajaState, setCajaState] = useState("");
@@ -54,6 +56,10 @@ const AdminLayout = () => {
   const comisionTotal = useMemo(() => {
     return formatMoney.format(quotaInfo?.comision ?? 0);
   }, [quotaInfo?.comision]);
+
+  const sobregiro = useMemo(() => {
+    return quotaInfo?.sobregiro ?? 0;
+  }, [quotaInfo?.sobregiro]);
 
   const nombreComercio = useMemo(
     () => roleInfo?.["nombre comercio"],
@@ -151,7 +157,12 @@ const AdminLayout = () => {
           </div>
           <div className={usrData}>
             <div className={saldoCupo}>
-              Saldo cupo {saldoDisponible || "$0.00"}
+              Cupo disponible {saldoDisponible || "$0.00"}
+            </div>
+          </div>
+          <div className={usrData}>
+            <div className={diasSobregiro} >
+              Dias sobregiro {sobregiro || "0"}
             </div>
           </div>
           <div className={usrData}>

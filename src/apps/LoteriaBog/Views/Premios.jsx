@@ -6,7 +6,6 @@ import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
 import { toast } from "react-toastify";
 import Modal from "../../../components/Base/Modal";
-import InputX from "../../../components/Base/InputX/InputX";
 import FileInput from "../../../components/Base/FileInput/FileInput";
 import TicketLot from "../components/TicketsLot/TicketLot";
 import { useAuth } from "../../../hooks/AuthHooks";
@@ -23,7 +22,7 @@ import classes from "./Premios.module.css";
 
 const { btnBasura, contenedorArchivosBasura } = classes;
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/subirDocumentosPremios`;
+const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/documentos_premios`;
 const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -60,6 +59,7 @@ const Premios = ({ route }) => {
   const [seleccionarFraccion, setSeleccionarFraccion] = useState(0);
   const [hash, setHash] = useState("");
   const [maxPago, setMaxPago] = useState("");
+  const [pagaOficina, setPagaOficina] = useState("");
   const [montoSuperior, setMontoSuperior] = useState("");
   const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
@@ -161,6 +161,7 @@ const Premios = ({ route }) => {
       .then((res) => {
         var salvarRes = res;
         setMaxPago(res?.obj?.max_pago);
+        setPagaOficina(res?.obj?.paga_oficina);
         setMontoSuperior(res?.obj?.monto_superior);
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
@@ -190,10 +191,16 @@ const Premios = ({ route }) => {
           notifyError(res.msg);
         }
         if (res.status && "msg" in res) {
-          if (res?.obj?.max_pago == true) {
-            notifyError(
-              "El valor del premio, supera el valor asignado para el comercio"
-            );
+          if (res?.obj?.max_pago == true || res?.obj?.paga_oficina == false) {
+            if (res?.obj?.paga_oficina == false) {
+              notifyError(
+                "No se puede pagar, el valor del premio supera el valor asignado para los comercios externos"
+              );
+            } else {
+              notifyError(
+                "No se puede pagar, el valor del premio supera el valor asignado para los comercios PDP"
+              );
+            }
             var gana = res?.obj?.gana;
             var ValNetoFraccion = res?.obj?.ValNetoFraccion;
             var totalPagarLoteria = res?.obj?.total;
@@ -284,6 +291,8 @@ const Premios = ({ route }) => {
         }).format(new Date()),
       },
       commerceInfo: [
+        ["Razón social", "Soluciones en Red S.A.S."],
+        ["Nit", "830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", datosCliente.idTransaccion],
@@ -323,44 +332,19 @@ const Premios = ({ route }) => {
       disclamer: LineasLot_disclamer[datosComercio.nom_loteria],
     };
   }, [
-    estadoTransaccion,
     sorteo,
     billete,
     serie,
-    checkBilleteFisico,
-    checkBilleteVirtual,
     seleccionarFraccion,
     datosCliente,
     totalPagar,
-    valorbruto,
     tipopago,
+    roleInfo,
+    datosComercio.nom_loteria,
   ]);
 
-  const onPay1 = (e) => {
+  const onPay1 = async (e) => {
     e.preventDefault();
-    if (montoSuperior) {
-      if (files?.documento === undefined || files?.formulario === undefined) {
-        if (files?.documento === undefined && files?.formulario !== undefined) {
-          notifyError("Ingresar documento de identificación requerido");
-        }
-        if (files?.documento !== undefined && files?.formulario === undefined) {
-          notifyError("Ingresar formulario requerido");
-        }
-        if (files?.documento === undefined && files?.formulario === undefined) {
-          notifyError("Ingresar documentación  requerida");
-        }
-        return;
-      }
-      try {
-        subirDocsPagoPremios("documento");
-        subirDocsPagoPremios("formulario");
-      } catch {
-        notifyError(
-          "Error respuesta PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
-        );
-        return;
-      }
-    }
     if (tipopago === 2) {
       if (String(datosCliente?.celular).charAt(0) === "3") {
         setRespuesta(true);
@@ -375,7 +359,49 @@ const Premios = ({ route }) => {
           setRespuesta(false);
           notifyError("Ingresar código hash");
         } else {
-          makePayment(
+          try {
+            if (montoSuperior) {
+              if (
+                files?.documento === undefined ||
+                files?.formulario === undefined
+              ) {
+                if (
+                  files?.documento === undefined &&
+                  files?.formulario !== undefined
+                ) {
+                  notifyError("Ingresar documento de identificación requerido");
+                  setRespuesta(false);
+                }
+                if (
+                  files?.documento !== undefined &&
+                  files?.formulario === undefined
+                ) {
+                  notifyError("Ingresar formulario requerido");
+                  setRespuesta(false);
+                }
+                if (
+                  files?.documento === undefined &&
+                  files?.formulario === undefined
+                ) {
+                  notifyError("Ingresar documentación requerida");
+                  setRespuesta(false);
+                }
+                return;
+              }
+              const resSubir = await subirDocsPagoPremios();
+              if (!resSubir) {
+                setRespuesta(false);
+                return;
+              }
+            }
+          } catch (error) {
+            setRespuesta(false);
+            notifyError(
+              "Error respuesta Frontend PDP: Error al consumir del servicio (Cargue archivos) [0010002]"
+            );
+            return;
+          }
+          const res = await makePayment(
             sorteo,
             billete,
             serie,
@@ -400,30 +426,27 @@ const Premios = ({ route }) => {
             hash,
             pdpUser?.uname,
             tickets
-          )
-            .then((res) => {
-              setRespuesta(false);
-              setDatosCliente((old) => {
-                return {
-                  ...old,
-                  statusPagoPremio: res?.status,
-                  idTransaccion: res?.obj?.id_trx,
-                  tipo_operacion: res?.obj?.tipo_operacion,
-                };
-              });
-              tickets["commerceInfo"].splice(2, 0, [
-                "Id Trx",
-                datosCliente?.idTransaccion,
-              ]);
-              setEstadoTransaccion(res?.status);
-              if (res?.status === false) {
-                notifyError(res?.obj?.msg);
-                navigate(-1);
-              } else {
-                notify("Pago premio de Lotería exitoso");
-              }
-            })
-            .catch(() => setDisabledBtns(false));
+          );
+          setRespuesta(false);
+          setDatosCliente((old) => {
+            return {
+              ...old,
+              statusPagoPremio: res?.status,
+              idTransaccion: res?.obj?.id_trx,
+              tipo_operacion: res?.obj?.tipo_operacion,
+            };
+          });
+          tickets["commerceInfo"].splice(2, 0, [
+            "Id Trx",
+            datosCliente?.idTransaccion,
+          ]);
+          setEstadoTransaccion(res?.status);
+          if (res?.status === false) {
+            notifyError(res?.obj?.msg);
+            navigate(-1);
+          } else {
+            notify("Pago premio de Lotería exitoso");
+          }
         }
       } else {
         notifyError(
@@ -443,7 +466,49 @@ const Premios = ({ route }) => {
         notifyError("Ingresar código hash");
       } else {
         setRespuesta(true);
-        makePayment(
+        try {
+          if (montoSuperior) {
+            if (
+              files?.documento === undefined ||
+              files?.formulario === undefined
+            ) {
+              if (
+                files?.documento === undefined &&
+                files?.formulario !== undefined
+              ) {
+                notifyError("Ingresar documento de identificación requerido");
+                setRespuesta(false);
+              }
+              if (
+                files?.documento !== undefined &&
+                files?.formulario === undefined
+              ) {
+                notifyError("Ingresar formulario requerido");
+                setRespuesta(false);
+              }
+              if (
+                files?.documento === undefined &&
+                files?.formulario === undefined
+              ) {
+                notifyError("Ingresar documentación requerida");
+                setRespuesta(false);
+              }
+              return;
+            }
+            const resSubir = await subirDocsPagoPremios();
+            if (!resSubir) {
+              setRespuesta(false);
+              return;
+            }
+          }
+        } catch (error) {
+          setRespuesta(false);
+          notifyError(
+            "Error respuesta Frontend PDP: (Error al consumir del servicio (Cargue archivos) [0010002])"
+          );
+          return;
+        }
+        const res = await makePayment(
           sorteo,
           billete,
           serie,
@@ -468,26 +533,23 @@ const Premios = ({ route }) => {
           hash,
           pdpUser?.uname,
           tickets
-        )
-          .then((res) => {
-            setRespuesta(false);
-            setDatosCliente((old) => {
-              return {
-                ...old,
-                statusPagoPremio: res?.status,
-                idTransaccion: res?.obj?.id_trx,
-                tipo_operacion: res?.obj?.tipo_operacion,
-              };
-            });
-            setEstadoTransaccion(res?.status);
-            if (res?.status === false) {
-              notifyError(res?.obj?.msg);
-              navigate(-1);
-            } else {
-              notify("Pago premio de Lotería exitoso");
-            }
-          })
-          .catch(() => setDisabledBtns(false));
+        );
+        setRespuesta(false);
+        setDatosCliente((old) => {
+          return {
+            ...old,
+            statusPagoPremio: res?.status,
+            idTransaccion: res?.obj?.id_trx,
+            tipo_operacion: res?.obj?.tipo_operacion,
+          };
+        });
+        setEstadoTransaccion(res?.status);
+        if (res?.status === false) {
+          notifyError(res?.obj?.msg);
+          navigate(-1);
+        } else {
+          notify("Pago premio de Lotería exitoso");
+        }
       }
     }
   };
@@ -523,47 +585,113 @@ const Premios = ({ route }) => {
     navigate(-1);
   };
 
-  const onChangeFiles_Documento = (infor) => {
+  const onChangeFiles = (info, type) => {
+    const contentType = [
+      "image/png",
+      "image/jpg",
+      "image/jpeg",
+      "image/svg",
+      "application/pdf",
+    ];
+    const contentTypeFind = contentType.find(
+      (type_) => type_ === info[0]?.type
+    );
+    if (contentTypeFind === undefined) {
+      notifyError(
+        "documentos con formato incorrecto, solo se recibe los siguientes formatos .png, .jpg, .jpeg, .pdf"
+      );
+      try {
+        document.getElementById("archivo_identificacion1").value = "";
+      } catch {}
+      try {
+        document.getElementById("archivo_identificacion2").value = "";
+      } catch {}
+      try {
+        document.getElementById("archivo_identificacion3").value = "";
+      } catch {}
+      try {
+        document.getElementById("archivo_identificacion4").value = "";
+      } catch {}
+      return;
+    }
+
     setFiles((old) => ({
       ...old,
-      documento: { files: Array.from(infor)[0], typeArchivo: infor[0]?.type },
+      [type]: { files: Array.from(info)[0], typeArchivo: info[0]?.type },
     }));
   };
 
-  const onChangeFiles_Formulario = (infor) => {
-    setFiles((old) => ({
-      ...old,
-      formulario: { files: Array.from(infor)[0], typeArchivo: infor[0]?.type },
-    }));
-  };
-
-  const subirDocsPagoPremios = (type) => {
-    console.log("files-->", files[type]);
-    fetchData(
-      `${url_cargueS3}?tipo=${type}&idloteria=${idLoteria}&sorteo=${sorteo}&billete=${billete}&serie=${serie}&valor_pagado=${totalPagar}&type=${files[type]?.typeArchivo}`,
-      "GET"
-    )
-      .then((respuesta) => {
-        if (!respuesta?.status) {
-          notifyError("Error");
-        } else {
-          const formData = new FormData();
-          for (var key in respuesta?.obj?.fields) {
-            formData.append(key, respuesta?.obj?.fields[key]);
-          }
-          formData.set("file", files[type]?.files);
-          fetchUploadFileCustom(respuesta?.obj?.url, formData)
-            .then((rta) => {
-              console.log("Rta", rta);
-            })
-            .catch((err) => {
-              throw err;
-            });
+  const subirDocsPagoPremios = async () => {
+    try {
+      const resUrlPresind = await fetchData(
+        url_cargueS3,
+        "POST",
+        {},
+        {
+          idloteria: idLoteria,
+          sorteo: sorteo,
+          billete: billete,
+          serie: serie,
+          fraccion: seleccionarFraccion,
+          valor_pagado: totalPagar,
+          typefile: {
+            documento: files.documento.typeArchivo,
+            formulario: files.formulario.typeArchivo,
+          },
         }
-      })
-      .catch((err) => {
-        throw err;
-      });
+      );
+
+      if (!resUrlPresind?.status) {
+        notifyError(resUrlPresind?.msg);
+        navigate(-1);
+        return false;
+      }
+
+      const formDataDocumento = new FormData();
+      for (let key in resUrlPresind?.obj?.result?.documento?.fields) {
+        formDataDocumento.append(
+          key,
+          resUrlPresind?.obj?.result?.documento?.fields[key]
+        );
+      }
+      formDataDocumento.set("file", files?.documento?.files);
+      await fetchUploadFileCustom(
+        resUrlPresind?.obj?.result?.documento?.url,
+        formDataDocumento
+      );
+      const formDataFormulario = new FormData();
+      for (let key in resUrlPresind?.obj?.result?.formulario?.fields) {
+        console.log(resUrlPresind?.obj?.result?.formulario?.fields[key]);
+        formDataFormulario.append(
+          key,
+          resUrlPresind?.obj?.result?.formulario?.fields[key]
+        );
+      }
+
+      formDataFormulario.set("file", files?.formulario?.files);
+      await fetchUploadFileCustom(
+        resUrlPresind?.obj?.result?.formulario?.url,
+        formDataFormulario
+      );
+
+      const resZip = await fetchData(
+        url_cargueS3,
+        "PUT",
+        {},
+        {
+          key_documento: resUrlPresind?.obj?.result?.documento?.fields?.key,
+          key_formulario: resUrlPresind?.obj?.result?.formulario?.fields?.key,
+        }
+      );
+      if (!resZip?.status) {
+        notifyError(resZip?.msg);
+        navigate(-1);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (
@@ -673,7 +801,7 @@ const Premios = ({ route }) => {
             ]}
             data={respagar}
           ></TableEnterprise>
-          {tipopago === 2 && !maxPago ? (
+          {tipopago === 2 && !maxPago && pagaOficina ? (
             <Form onSubmit={onPay1} grid>
               <Fieldset
                 className="lg:col-span-2"
@@ -788,7 +916,7 @@ const Premios = ({ route }) => {
                   <Fieldset
                     className="lg:col-span-2"
                     legend={
-                      "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
+                      "El valor del premio supera el monto estipulado, se requiere adjuntar los siguientes documentos del cliente:"
                     }
                   >
                     {files?.documento ? (
@@ -807,12 +935,12 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={`archivo_identificacion`}
+                        id={"archivo_identificacion1"}
                         label={"Documento de identificación"}
                         name="file1"
-                        accept=".pdf,.png,.jpg"
+                        accept=".pdf,.png,.jpg,.svg,.jpeg"
                         allowDrop={true}
-                        onGetFile={onChangeFiles_Documento}
+                        onGetFile={(info) => onChangeFiles(info, "documento")}
                       />
                     )}
                     {files?.formulario ? (
@@ -831,12 +959,12 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={`archivo_formulario`}
+                        id={`archivo_formulario2`}
                         label={"Formulario"}
                         name="file2"
-                        accept=".pdf,.png,.jpg"
+                        accept=".pdf,.png,.jpg,.svg,.jpeg"
                         allowDrop={true}
-                        onGetFile={onChangeFiles_Formulario}
+                        onGetFile={(info) => onChangeFiles(info, "formulario")}
                       />
                     )}
                   </Fieldset>
@@ -862,7 +990,7 @@ const Premios = ({ route }) => {
             </Form>
           ) : (
             <>
-              {!maxPago ? (
+              {!maxPago && pagaOficina ? (
                 <>
                   <Form onSubmit={onPay1} grid>
                     <Fieldset
@@ -919,7 +1047,7 @@ const Premios = ({ route }) => {
                         <Fieldset
                           className="lg:col-span-2"
                           legend={
-                            "El valor del premio supera el monto estipulado por la Lotería y se requiere adjuntar los siguientes documentos del cliente:"
+                            "El valor del premio supera el monto estipulado, se requiere adjuntar los siguientes documentos del cliente:"
                           }
                         >
                           {files?.documento ? (
@@ -938,12 +1066,14 @@ const Premios = ({ route }) => {
                             </label>
                           ) : (
                             <FileInput
-                              id={`archivo_identificacion`}
+                              id={`archivo_identificacion3`}
                               label={"Documento de identificación"}
-                              name="file1"
-                              accept=".pdf,.png,.jpg"
+                              name="file3"
+                              accept=".pdf,.png,.jpg,.svg,.jpeg"
                               allowDrop={true}
-                              onGetFile={onChangeFiles_Documento}
+                              onGetFile={(info) =>
+                                onChangeFiles(info, "documento")
+                              }
                             />
                           )}
                           {files?.formulario ? (
@@ -962,12 +1092,14 @@ const Premios = ({ route }) => {
                             </label>
                           ) : (
                             <FileInput
-                              id={`archivo_formulario`}
+                              id={`archivo_formulario4`}
                               label={"Formulario"}
-                              name="file2"
-                              accept=".pdf,.png,.jpg"
+                              name="file4"
+                              accept=".pdf,.png,.jpg,.svg,.jpeg"
                               allowDrop={true}
-                              onGetFile={onChangeFiles_Formulario}
+                              onGetFile={(info) =>
+                                onChangeFiles(info, "formulario")
+                              }
                             />
                           )}
                         </Fieldset>

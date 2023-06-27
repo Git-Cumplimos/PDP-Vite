@@ -204,6 +204,8 @@ const Loteria = ({ route }) => {
         Hora: "",
       },
       commerceInfo: [
+        ["Razón social","Soluciones en Red S.A.S."],
+        ["Nit","830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", ""],
@@ -215,6 +217,7 @@ const Loteria = ({ route }) => {
       ],
       commerceName: sellResponse?.obj?.cod_loteria !== '064' 
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
+      descriPM: "***Descripción del premios mayor asociado al sorteo***",
       trxInfo: [
         ["Sorteo", sorteo],
         ["Fecha del sorteo",""],
