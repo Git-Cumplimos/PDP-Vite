@@ -1,29 +1,29 @@
 import { useState,useMemo, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../../../components/Base/Button";
-import ButtonBar from "../../../../../components/Base/ButtonBar";
-import Form from "../../../../../components/Base/Form";
-import Modal from "../../../../../components/Base/Modal";
-import Select from "../../../../../components/Base/Select";
-import { useAuth } from "../../../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../../../utils/notify";
-import { useFetch } from "../../../../../hooks/useFetch";
-import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
-import { ComponentsModalSummaryTrx } from "../PagoCartera/components/components_modal_PagoCartera";
+import Button from "../../../../../../components/Base/Button";
+import ButtonBar from "../../../../../../components/Base/ButtonBar";
+import Form from "../../../../../../components/Base/Form";
+import Modal from "../../../../../../components/Base/Modal";
+import Select from "../../../../../../components/Base/Select";
+import { useAuth } from "../../../../../../hooks/AuthHooks";
+import { notify, notifyError } from "../../../../../../utils/notify";
+import { useFetch } from "../../../../../../hooks/useFetch";
+import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
+import { ComponentsModalSummaryTrx } from "../../PagoCartera/PagoCarteraEfectivo/components/components_modal_PagoCartera";
 import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
-} from "../PagoCartera/components/components_form_PagoCartera.jsx";
-import classes from "../Runt/PagarRunt.module.css"
-import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
+} from "../PagoCarteraEfectivo/components/components_form_PagoCartera.jsx";
+import classes from "../../Runt/PagarRunt.module.css"
+import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';
-import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
-import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
-import TableEnterprise from "../../../../../components/Base/TableEnterprise/TableEnterprise";
+import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
+import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
+import TableEnterprise from "../../../../../../components/Base/TableEnterprise/TableEnterprise";
 const { styleComponents } = classes;
-const url_consult_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/consulta_pago_cartera`;
-const url_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/pago_cartera`;
+const url_consult_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/consulta_pago_cartera`;
+const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
 const numero_obligacion = "Número de obligación";

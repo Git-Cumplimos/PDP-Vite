@@ -1,8 +1,8 @@
 import { Fragment } from "react";
-import Button from "../../../../../../components/Base/Button";
-import ButtonBar from "../../../../../../components/Base/ButtonBar";
-import Input from "../../../../../../components/Base/Input";
-import classes from "../../Runt/PagarRunt.module.css"
+import Button from "../../../../../../../components/Base/Button";
+import ButtonBar from "../../../../../../../components/Base/ButtonBar";
+import Input from "../../../../../../../components/Base/Input";
+import classes from "../../../Runt/PagarRunt.module.css"
 const { styleComponentsInput, formItem } = classes;
 
 export const LecturaNumeroObligacion = ({
