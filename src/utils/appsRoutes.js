@@ -51,6 +51,7 @@ import rutasRecaudoMultiple, {
   listPermissionsRecaudoMultiple,
 } from "../apps/Corresponsalia/RecaudoMultiple/routes";
 import rutasRecargasTullave from "../apps/RecargasTuLlave/routes";
+import rutasPowwi from "../apps/Powwi/routes";
 
 /**
 
@@ -1170,6 +1171,7 @@ const allUrlsPrivateApps = [
   rutasApuestas,
   rutasRecaudoDirecto,
   rutasRecargasTullave,
+  rutasPowwi,
 ];
 
 export { allUrlsPrivateApps };
