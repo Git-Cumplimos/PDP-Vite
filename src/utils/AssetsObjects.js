@@ -31,12 +31,12 @@ const svgs = {
   LOTERIA_BOGOTA: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_BOGOTA.svg`,
   LOTERIA_TOLIMA: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_TOLIMA.svg`,
   LOTERIA_CUNDINAMARCA: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_CUNDINAMARCA.svg`,
-  Ventas: `${urlAssets}/assets/img/ventas.png`,
+  LOTERIA_VENTAS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_VENTAS.svg`,
+  LOTERIA_PREMIOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_PREMIOS.svg`,
+  LOTERIA_ARQUEO_BILLETES: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_ARQUEO_BILLETES.svg`,
   CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
-  ArqueoBilletes: `${urlAssets}/assets/img/arqueo de billetes.png`,
-  Premio: `${urlAssets}/assets/img/premio.png`,
 
   //TRANSACCIONES
   TRANSACCIONES: `${urlAssets}/assets/svg/recaudo/TRANSACCIONES/TRANSACCIONES.svg`,
@@ -59,8 +59,16 @@ const svgs = {
 
   //PINES VUS
   PINES: `${urlAssets}/assets/svg/recaudo/PINES/PINES.svg`,
-  PINES_CREAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CREAR.svg`,
   PINES_TRAMITAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_TRAMITAR.svg`,
+  PINES_CREAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CREAR.svg`,
+  PINES_CITAS: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CITAS.svg`,
+  PINES_CONSULTAR_CITAS: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CONSULTAR_CITAS.svg`,
+  PINES_QX: `${urlAssets}/assets/svg/recaudo/PINES/PIINES_QX.svg`,
+  PINES_CIERRE_MANUAL: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CIERRE_MANUAL.svg`,
+  PINES_PARTICIPACION: `${urlAssets}/assets/svg/recaudo/PINES/PINES_PARTICIPACION.svg`,
+  PINES_REPORTES: `${urlAssets}/assets/svg/recaudo/PINES/PINES_REPORTES.svg`,
+  PINES_PAGO_PARTICIPACION: `${urlAssets}/assets/svg/recaudo/PINES/PINES_PAGO_PARTICIPACION.svg`,
+  PINES_VER_PAGO_PARTICIPACION: `${urlAssets}/assets/svg/recaudo/PINES/PINES_VER_PAGO_PARTICIPACION.svg`,
   PINES_ADMINISTRAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_ADMINISTAR.svg`,
   PINES_GENERACION_LICENCIA: `${urlAssets}/assets/svg/recaudo/PINES/PINES_GENERACION_LICENCIA.svg`,
   PINES_SERVICIO_CONTENIDO: `${urlAssets}/assets/svg/recaudo/PINES/PINES_SERVICIO_Y_CONTENIDO.svg`,
@@ -110,6 +118,24 @@ const svgs = {
   COLPATRIA_LISTA_ERRORES: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
   COLPATRIA_CONVENIO_PINES_RECAUDO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
   COLPATRIA_CONVENIO_RECAUDO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
+
+  //CORRESPONSALIA/AVAL
+  AVAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL.svg`,
+  AVAL_TRANSACCIONES_CUENTAS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_TRANSACCIONES_CUENTAS.svg`,
+  AVAL_RECAUDO_SERVICIOS_PUBLICOS_PRIVADOS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_SERVICIOS_PUBLICOS_PRIVADOS.svg`,
+  AVAL_PAGO_DE_TERCEROS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_PAGO_DE_TERCEROS.svg`,
+  AVAL_PAGO_DE_SUBSIDIOS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_PAGO_DE_SUBSIDIOS.svg`,
+  AVAL_DEPOSITO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_DEPOSITO.svg`,
+  AVAL_RETIROS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RETIROS.svg`,
+  AVAL_RECAUDO_MANUAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_MANUAL.svg`,
+  AVAL_RECAUDO_CODIGO_DE_BARRAS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_CODIGO_DE_BARRAS.svg`,
+  AVAL_CONVENIO_RECAUDO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_CONVENIO_RECAUDO.svg`,
+
+  //CORRESPONSALIA/RECAUDO MULTIPLE
+  RECAUDO_MULTIPLE: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE.svg`,
+  RECAUDO_MULTIPLE_CARGAR: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CARGAR.svg`,
+  RECAUDO_MULTIPLE_CONSULTAR: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CONSULTAR.svg`,
+  RECAUDO_MULTIPLE_CONSULTAR_PAGINADO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CONSULTAR_PAGINADO.svg`,
 
   //SMS
   SMS: `${urlAssets}/assets/svg/recaudo/SMS/SMS.svg`,

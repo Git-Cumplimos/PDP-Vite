@@ -1,29 +1,29 @@
-import { useState,useMemo, useCallback, Fragment, useRef } from "react";
+import { useState, useMemo, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../../../components/Base/Button";
-import ButtonBar from "../../../../../components/Base/ButtonBar";
-import Form from "../../../../../components/Base/Form";
-import Modal from "../../../../../components/Base/Modal";
-import Select from "../../../../../components/Base/Select";
-import { useAuth } from "../../../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../../../utils/notify";
-import { useFetch } from "../../../../../hooks/useFetch";
-import { fetchCustom, ErrorCustom } from "../../utils/fetchRunt";
-import { ComponentsModalSummaryTrx } from "../PagoCartera/components/components_modal_PagoCartera";
+import Button from "../../../../../../components/Base/Button";
+import ButtonBar from "../../../../../../components/Base/ButtonBar";
+import Form from "../../../../../../components/Base/Form";
+import Modal from "../../../../../../components/Base/Modal";
+import Select from "../../../../../../components/Base/Select";
+import { useAuth } from "../../../../../../hooks/AuthHooks";
+import { notify, notifyError } from "../../../../../../utils/notify";
+import { useFetch } from "../../../../../../hooks/useFetch";
+import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
+import { ComponentsModalSummaryTrx } from "../../PagoCartera/PagoCarteraEfectivo/components/components_modal_PagoCartera";
 import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
-} from "../PagoCartera/components/components_form_PagoCartera.jsx";
-import classes from "../Runt/PagarRunt.module.css"
-import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
+} from "../PagoCarteraEfectivo/components/components_form_PagoCartera.jsx";
+import classes from "../../Runt/PagarRunt.module.css"
+import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';
-import { useFetchPagoCartera } from "../../hooks/hookPagoCartera";
-import SimpleLoading from "../../../../../components/Base/SimpleLoading/SimpleLoading";
-import TableEnterprise from "../../../../../components/Base/TableEnterprise/TableEnterprise";
+import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
+import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
+import TableEnterprise from "../../../../../../components/Base/TableEnterprise/TableEnterprise";
 const { styleComponents } = classes;
-const url_consult_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/consulta_pago_cartera`;
-const url_pago_cartera = `${process.env.REACT_APP_URL_PAGO_CARTERA_AGRARIO}/pago_cartera`;
+const url_consult_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/consulta_pago_cartera`;
+const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
 const numero_obligacion = "Número de obligación";
@@ -122,7 +122,7 @@ const PagoCartera = () => {
                 id_usuario: roleInfo.id_usuario,
             },
             consultaCartera: {
-                valReferencia1: numeroPagoCartera,
+                numeroObligacion: numeroPagoCartera,
                 numeroConsulta: options_select === 'Número de cédula' ? '000001' : '000002',
                 location: {
                     address: roleInfo?.["direccion"],
@@ -162,8 +162,7 @@ const PagoCartera = () => {
                     id_usuario: roleInfo.id_usuario,
                 },
                 PagoCartera: {
-                    valReferencia1: choice_numero_obligacion,
-                    valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
+                    numeroObligacion: choice_numero_obligacion,
                     numeroPago: labelSeleccionado === 'Valor total deuda' ? '000002' : '000001',
                     location: {
                         address: roleInfo?.["direccion"],
@@ -253,9 +252,9 @@ const PagoCartera = () => {
     ]);
 
     const tableObligacion = useMemo(() => {
-        if (resConsultCartera?.length > 0){
+        if (resConsultCartera?.length > 0) {
             return [
-                ...resConsultCartera?.map(( obligacion ) => {
+                ...resConsultCartera?.map((obligacion) => {
                     return {
                         "Número de obligación": obligacion?.numero_obligacion,
                         "Tipo de Crédito": obligacion?.tipo_credito,
@@ -266,8 +265,7 @@ const PagoCartera = () => {
     }, [resConsultCartera]);
 
     const onSelectAutorizador = useCallback(
-        (e, i) =>
-        {
+        (e, i) => {
             setShowModalObligacion(true)
             setSelectIndiceObligacion(i)
         }
@@ -315,33 +313,33 @@ const PagoCartera = () => {
                         numeroPagoCartera={numeroPagoCartera}></LecturaNumeroCedula>
                 )}
             </Form>
-                {paso === "ResumenTrx" && (
-                    <TableEnterprise
-                        title="Seleccione el número de obligación a pagar"
-                        headers={["Número de obligación", "Tipo de Crédito"]}
-                        data={tableObligacion}
-                        onSelectRow={onSelectAutorizador}
-                    >
-                    </TableEnterprise>
-                )}
+            {paso === "ResumenTrx" && (
+                <TableEnterprise
+                    title="Seleccione el número de obligación a pagar"
+                    headers={["Número de obligación", "Tipo de Crédito"]}
+                    data={tableObligacion}
+                    onSelectRow={onSelectAutorizador}
+                >
+                </TableEnterprise>
+            )}
             {showModalObligacion === true && (
                 <Modal show={showModal} handleClose={HandleCloseModal}>
                     <ComponentsModalSummaryTrx
-                            documento={documento}
-                            numero_obligacion={numero_obligacion}
-                            numero_cedula={numero_cedula}
-                            numeroPagoCartera={numeroPagoCartera}
-                            summary={resConsultCartera}
-                            loadingPeticion={loadingPeticionPayCartera}
-                            peticion={onSubmitPayCartera}
-                            handleClose={HandleCloseTrx}
-                            posicion= {selectIndiceObligacion}
-                            >
-                            <Select></Select>
+                        documento={documento}
+                        numero_obligacion={numero_obligacion}
+                        numero_cedula={numero_cedula}
+                        numeroPagoCartera={numeroPagoCartera}
+                        summary={resConsultCartera}
+                        loadingPeticion={loadingPeticionPayCartera}
+                        peticion={onSubmitPayCartera}
+                        handleClose={HandleCloseTrx}
+                        posicion={selectIndiceObligacion}
+                    >
+                        <Select></Select>
                     </ComponentsModalSummaryTrx>
                 </Modal>
             )}
-                {infTicket && paso === "TransaccionExitosa" && (
+            {infTicket && paso === "TransaccionExitosa" && (
                 <Modal show={showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
                         <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
@@ -351,7 +349,7 @@ const PagoCartera = () => {
                         </ButtonBar>
                     </div>
                 </Modal>
-                )}
+            )}
         </Fragment>
     );
 };

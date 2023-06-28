@@ -35,7 +35,9 @@ const useMoney = ({
       const [min, max] = limits;
       if (moneyValue === min && equalErrorMin) {
         ev.target.setCustomValidity(
-          `El valor debe ser mayor ${
+          `El valor debe ser mayor a ${moneyFormatter.format(
+            min
+          )}``El valor debe ser mayor ${
             !equalErrorMin ? " o igual" : ""
           } a ${moneyFormatter.format(min)}`
         );
@@ -53,7 +55,9 @@ const useMoney = ({
         );
       } else if (moneyValue === max && equalError) {
         ev.target.setCustomValidity(
-          `El valor debe ser menor${
+          `El valor debe ser menor a ${moneyFormatter.format(
+            max
+          )}``El valor debe ser menor${
             !equalError ? " o igual" : ""
           } a ${moneyFormatter.format(max)}`
         );

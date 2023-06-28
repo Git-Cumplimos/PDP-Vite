@@ -1,72 +1,87 @@
 import fetchData from "../../../../utils/fetchData";
-import { notify, notifyError } from "../../../../utils/notify";
-import { ValidationRetiroEfectivo } from "../utils/ErroresCuztomizados";
+import { notifyError } from "../../../../utils/notify";
+
 const url_retiro_efectivo = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/retiro-efectivo`;
 
-// export ValidationRetiroEfectivo
+export class ValidationRetiroEfectivo extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ValidationRetiroEfectivo";
+  }
+}
 
 export const fetchRetiroEfectivo = async (data_) => {
+  let Peticion;
+  //Realizar Peticion
   try {
-    var Peticion = await fetchData(url_retiro_efectivo, "POST", {}, data_);
-
-    try {
-      if (
-        // Para los errores
-        !Peticion?.status &&
-        Peticion?.obj?.error &&
-        Peticion?.obj?.error_msg
-      ) {
-        const error_msg = Peticion?.obj?.error_msg;
-        const error_msg_key = Object.keys(error_msg);
-        const error_msg_vector = [];
-        error_msg_key.map((nombre_error) => {
-          const error_msg_ind = error_msg[nombre_error];
-          if (error_msg_ind?.see && error_msg_ind?.see == true) {
-            error_msg_vector.push(`${error_msg_ind?.global} (${nombre_error})`);
-          }
-        });
-        if (error_msg_vector.length > 0) {
-          notifyError(`Retiro NO EXITOSO >> ${error_msg_vector.join(", ")} `);
-        }
-        throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
-      }
-
-      if (!Peticion?.status && !Peticion?.obj?.error) {
-        // cuando status es false pero no hay errores
-        notify(`${Peticion?.msg}`); //cupo insuficiente
-        throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
-      }
-    } catch (error) {
-      if (error instanceof ValidationRetiroEfectivo) {
-        throw new ValidationRetiroEfectivo(`${error.message}`);
-      } else {
-        notifyError(
-          "Falla en el sistema: Error con el código del fetch [Front]"
-        );
-      }
-    }
-    return Peticion;
+    Peticion = await fetchData(url_retiro_efectivo, "POST", {}, data_);
   } catch (error) {
-    if (error instanceof ValidationRetiroEfectivo) {
-      throw new ValidationRetiroEfectivo(`${error.message}`);
-    } else {
-      notifyError(
-        "Falla en el sistema: no conecta con el servicio /banco-agrario/retiro-efectivo"
-      );
-    }
+    notifyError(
+      "Error respuesta Frontend PDP: Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]"
+    );
+    console.error({
+      "Error PDP":
+        "Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]",
+      "Error Sequence": "fetchRetiroEfectivo - Error con la petición del fetch",
+      "Error Console": `${error.message}`,
+    });
+    throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
   }
 
+  //Evaluar peticion
   try {
-    if (!Peticion?.status && Peticion?.obj?.error && Peticion?.obj?.error_msg) {
-      const error_msg = Peticion?.obj?.error_msg;
-      const error_msg_key = Object.keys(error_msg);
-      const error_msg_vector = [];
-      error_msg_key.map((nombre_error) => {
-        const error_msg_ind = error_msg[nombre_error];
-        error_msg_vector.push(`${error_msg_ind.global} [${nombre_error}]`);
+    if (
+      // Evaluar la respuesta de la peticion, cuando status es false pero hay errores
+      !Peticion?.status &&
+      (Peticion?.obj?.error || Peticion?.obj?.error_status) &&
+      Peticion?.obj?.error_msg
+    ) {
+      console.error({
+        "Error PDP": `${Peticion?.msg}`,
+        "Error Sequence":
+          "fetchRetiroEfectivo - Evaluar la respuesta de la peticion, cuando status es false pero hay errores",
+        "Error Console": "Error que proviene del backend",
       });
-
-      notifyError(`"Falla en el sistema: ${error_msg_vector.join(", ")}`);
+      throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
+    } else if (
+      // Evaluar la respuesta de la peticion, cuando status es false pero no hay errores
+      !Peticion?.status &&
+      (!Peticion?.obj?.error || !Peticion?.obj?.error_status)
+    ) {
+      console.error({
+        "Error PDP": `${Peticion?.msg}`,
+        "Error Sequence":
+          "fetchRetiroEfectivo - Evaluar la respuesta de la peticion, cuando status es false pero no hay errores",
+        "Error Console": "Msg que proviene del backend",
+      });
+      throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
+    } else if (
+      // Evaluar la respuesta de la peticion, cuando status es false pero no se sabe si hay errores
+      !Peticion?.status
+    ) {
+      console.error({
+        "Error PDP": `${Peticion?.msg}`,
+        "Error Sequence":
+          "fetchRetiroEfectivo - Evaluar la respuesta de la peticion, cuando status es false pero no se sabe si hay errores",
+        "Error Console": "Msg que proviene del backend",
+      });
+      throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
     }
-  } catch (error) {}
+  } catch (error) {
+    if (error instanceof ValidationRetiroEfectivo) {
+      notifyError(`${error.message}`);
+    } else {
+      notifyError(
+        "Error respuesta Frontend PDP: Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]"
+      );
+      console.error({
+        "Error PDP":
+          "Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]",
+        "Error Sequence": "fetchRetiroEfectivo - Evaluar peticion",
+        "Error Console": `${error.message}`,
+      });
+    }
+    throw new ValidationRetiroEfectivo(`${error.message}`);
+  }
+  return Peticion;
 };
