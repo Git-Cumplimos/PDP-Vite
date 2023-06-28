@@ -59,8 +59,8 @@ const svgs = {
 
   //PINES VUS
   PINES: `${urlAssets}/assets/svg/recaudo/PINES/PINES.svg`,
-  PINES_CREAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CREAR.svg`,
   PINES_TRAMITAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_TRAMITAR.svg`,
+  PINES_CREAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CREAR.svg`,
   PINES_CITAS: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CITAS.svg`,
   PINES_CONSULTAR_CITAS: `${urlAssets}/assets/svg/recaudo/PINES/PINES_CONSULTAR_CITAS.svg`,
   PINES_QX: `${urlAssets}/assets/svg/recaudo/PINES/PIINES_QX.svg`,
