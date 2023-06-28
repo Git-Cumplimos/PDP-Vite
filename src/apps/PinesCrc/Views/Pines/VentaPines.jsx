@@ -620,7 +620,7 @@ const VentaPines = () => {
     if (canal == "1") {
       return{
     "codigo_pin": "0807", 
-    "fk_id_convenio": 23,//2041, 
+    "fk_id_convenio": 2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CRC", 
     "permite_modificar": true, 
@@ -633,7 +633,7 @@ const VentaPines = () => {
   };}
   else{ return{
     "codigo_pin": "0043", 
-    "fk_id_convenio": 23,//2041, 
+    "fk_id_convenio": 2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CRC", 
     "permite_modificar": false, 
