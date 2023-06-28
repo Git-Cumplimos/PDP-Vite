@@ -71,7 +71,7 @@ const VentaPines = () => {
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
-    min: 5000,
+    min: 50000,
   });
 
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -302,31 +302,32 @@ const VentaPines = () => {
           valor_pin : valVentaPines,
           estado : res?.status?"Aprobado":"Declinado"
         }
-          notifyPending(
-            registroTrx(infoPinCrc),
-            {
-              render: () => {
-                setLoadingSell(true);
-                return "Procesando transacción";
-              },
-            },
-            {
-              render: ({ infoPinCrc: res }) => {
-                setLoadingSell(false);                
-                console.log(res)
-                return "Registro Transacción satisfactoria";
-              },
-            },
-            {
-              render: ({ infoPinCrc: error }) => {
-                setLoadingSell(false);
-                if (error?.cause === "custom") {
-                  return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-                }
-                return "Registro Transacción fallida";
-              },
-            }
-          );
+        registroTrx(infoPinCrc)
+          // notifyPending(
+          //   registroTrx(infoPinCrc),
+          //   {
+          //     render: () => {
+          //       // setLoadingSell(true);
+          //       // return "Procesando transacción";
+          //     },
+          //   },
+          //   {
+          //     render: ({ infoPinCrc: res }) => {
+          //       // setLoadingSell(false);                
+          //       console.log(res)
+          //       // return "Registro Transacción satisfactoria";
+          //     },
+          //   },
+          //   {
+          //     render: ({ infoPinCrc: error }) => {
+          //       setLoadingSell(false);
+          //       if (error?.cause === "custom") {
+          //         return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+          //       }
+          //       return "Registro Transacción fallida";
+          //     },
+          //   }
+          // );
           setPaymentStatus(tempTicket);
           return "Transacción satisfactoria";
         },
@@ -343,31 +344,32 @@ const VentaPines = () => {
             valor_pin : valVentaPines,
             estado : "Declinado"
           }
-          notifyPending(
-            registroTrx(infoPinCrc),
-            {
-              render: () => {
-                setLoadingSell(true);
-                return "Procesando transacción";
-              },
-            },
-            {
-              render: ({ infoPinCrc: res }) => {
-                setLoadingSell(false);                
-                console.log(res)
-                return "Registro Transacción satisfactoria";
-              },
-            },
-            {
-              render: ({ infoPinCrc: error }) => {
-                setLoadingSell(false);
-                if (error?.cause === "custom") {
-                  return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-                }
-                return "Registro Transacción fallida";
-              },
-            }
-          );
+          registroTrx(infoPinCrc)
+          // notifyPending(
+          //   registroTrx(infoPinCrc),
+          //   {
+          //     render: () => {
+          //       setLoadingSell(true);
+          //       return "Procesando transacción";
+          //     },
+          //   },
+          //   {
+          //     render: ({ infoPinCrc: res }) => {
+          //       setLoadingSell(false);                
+          //       console.log(res)
+          //       return "Registro Transacción satisfactoria";
+          //     },
+          //   },
+          //   {
+          //     render: ({ infoPinCrc: error }) => {
+          //       setLoadingSell(false);
+          //       if (error?.cause === "custom") {
+          //         return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+          //       }
+          //       return "Registro Transacción fallida";
+          //     },
+          //   }
+          // );
           navigate("/Pines/PinesCrc", { replace: true });
           if (error?.cause === "custom") {
             return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
@@ -618,7 +620,7 @@ const VentaPines = () => {
     if (canal == "1") {
       return{
     "codigo_pin": "0807", 
-    "fk_id_convenio": 23,//2041, 
+    "fk_id_convenio": 2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CRC", 
     "permite_modificar": true, 
@@ -631,7 +633,7 @@ const VentaPines = () => {
   };}
   else{ return{
     "codigo_pin": "0043", 
-    "fk_id_convenio": 23,//2041, 
+    "fk_id_convenio": 2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CRC", 
     "permite_modificar": false, 

@@ -47,7 +47,7 @@ const MoneyInput = ({
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = inputLimits;
-      if (moneyValue === min && !equalErrorMin) {
+      if (moneyValue === min && equalErrorMin) {
         inptRef.current.setCustomValidity(
           `El valor debe ser mayor ${
             !equalErrorMin ? " o igual" : ""
@@ -75,7 +75,7 @@ const MoneyInput = ({
         inptRef.current.setCustomValidity("");
       }
     }
-  }, [decimalDigits, equalError, equalErrorMin, inputLimits]);
+  }, [decimalDigits, equalError, inputLimits, equalErrorMin]);
 
   const onInput = useCallback(
     (e) => {

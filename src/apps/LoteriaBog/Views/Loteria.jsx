@@ -297,7 +297,7 @@ const Loteria = ({ route }) => {
       <SimpleLoading show={loadConsulta}></SimpleLoading>
       <Select
         className={"place-self-strech"}
-        disabled={serie !== "" || numero !== ""}
+        // disabled={serie !== "" || numero !== ""}
         id="selectSorteo"
         label="Tipo de sorteo"
         options={opcionesdisponibles}
