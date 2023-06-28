@@ -95,6 +95,7 @@ const RetiroEfectivo = () => {
         dane_code: roleInfo.codigo_dane,
       },
     };
+    //enviar peticion
     peticionRetiroEfectivo(dataPeticion)
       .then((resPeticion) => {
         setInfTicket(resPeticion?.obj?.result?.ticket);
