@@ -12,7 +12,10 @@ const CorresponsaliaBancoAgrario = lazy(() =>
 );
 
 const PagarRunt = lazy(() => import("./Views/Runt/PagarRunt"));
+
 const PagoCartera = lazy(() => import("./Views/PagoCartera/PagoCarteraEfectivo/PagoCartera.jsx"));
+
+const PagoCarteraTargCredito = lazy(() => import("./Views/PagoCartera/PagoCarteraTargCredito/PagoCarteraTargCredito.jsx"));
 
 const TrxCuentasBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
@@ -137,7 +140,15 @@ const rutasAgrarioCB = {
       label: <AppIcons Logo={"MARKETPLACE"} name={"Consulta de cartera"} />,
       component: PagoCartera,
       // permission: [...listPermissionsAgrario],
-      permission: [enumPermisosAgrario.pago_cartera],
+      permission: [enumPermisosAgrario.pago_cartera_efectivo],
+      subRoutes: [],
+    },
+    {
+      link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera-tarjeta-credito",
+      label: <AppIcons Logo={"MARKETPLACE"} name={"Pago de tarjeta crédito"} />,
+      component: PagoCarteraTargCredito,
+      // permission: [...listPermissionsAgrario],
+      permission: [enumPermisosAgrario.pago_cartera_targ_credito],
       subRoutes: [],
     },
   ],
