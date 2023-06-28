@@ -1,4 +1,4 @@
-import { useState,useMemo, useCallback, Fragment, useRef } from "react";
+import { useState, useMemo, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../../../../components/Base/Button";
@@ -122,7 +122,7 @@ const PagoCartera = () => {
                 id_usuario: roleInfo.id_usuario,
             },
             consultaCartera: {
-                valReferencia1: numeroPagoCartera,
+                numeroObligacion: numeroPagoCartera,
                 numeroConsulta: options_select === 'Número de cédula' ? '000001' : '000002',
                 location: {
                     address: roleInfo?.["direccion"],
@@ -162,8 +162,7 @@ const PagoCartera = () => {
                     id_usuario: roleInfo.id_usuario,
                 },
                 PagoCartera: {
-                    valReferencia1: choice_numero_obligacion,
-                    valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
+                    numeroObligacion: choice_numero_obligacion,
                     numeroPago: labelSeleccionado === 'Valor total deuda' ? '000002' : '000001',
                     location: {
                         address: roleInfo?.["direccion"],
@@ -253,9 +252,9 @@ const PagoCartera = () => {
     ]);
 
     const tableObligacion = useMemo(() => {
-        if (resConsultCartera?.length > 0){
+        if (resConsultCartera?.length > 0) {
             return [
-                ...resConsultCartera?.map(( obligacion ) => {
+                ...resConsultCartera?.map((obligacion) => {
                     return {
                         "Número de obligación": obligacion?.numero_obligacion,
                         "Tipo de Crédito": obligacion?.tipo_credito,
@@ -266,8 +265,7 @@ const PagoCartera = () => {
     }, [resConsultCartera]);
 
     const onSelectAutorizador = useCallback(
-        (e, i) =>
-        {
+        (e, i) => {
             setShowModalObligacion(true)
             setSelectIndiceObligacion(i)
         }
@@ -315,33 +313,33 @@ const PagoCartera = () => {
                         numeroPagoCartera={numeroPagoCartera}></LecturaNumeroCedula>
                 )}
             </Form>
-                {paso === "ResumenTrx" && (
-                    <TableEnterprise
-                        title="Seleccione el número de obligación a pagar"
-                        headers={["Número de obligación", "Tipo de Crédito"]}
-                        data={tableObligacion}
-                        onSelectRow={onSelectAutorizador}
-                    >
-                    </TableEnterprise>
-                )}
+            {paso === "ResumenTrx" && (
+                <TableEnterprise
+                    title="Seleccione el número de obligación a pagar"
+                    headers={["Número de obligación", "Tipo de Crédito"]}
+                    data={tableObligacion}
+                    onSelectRow={onSelectAutorizador}
+                >
+                </TableEnterprise>
+            )}
             {showModalObligacion === true && (
                 <Modal show={showModal} handleClose={HandleCloseModal}>
                     <ComponentsModalSummaryTrx
-                            documento={documento}
-                            numero_obligacion={numero_obligacion}
-                            numero_cedula={numero_cedula}
-                            numeroPagoCartera={numeroPagoCartera}
-                            summary={resConsultCartera}
-                            loadingPeticion={loadingPeticionPayCartera}
-                            peticion={onSubmitPayCartera}
-                            handleClose={HandleCloseTrx}
-                            posicion= {selectIndiceObligacion}
-                            >
-                            <Select></Select>
+                        documento={documento}
+                        numero_obligacion={numero_obligacion}
+                        numero_cedula={numero_cedula}
+                        numeroPagoCartera={numeroPagoCartera}
+                        summary={resConsultCartera}
+                        loadingPeticion={loadingPeticionPayCartera}
+                        peticion={onSubmitPayCartera}
+                        handleClose={HandleCloseTrx}
+                        posicion={selectIndiceObligacion}
+                    >
+                        <Select></Select>
                     </ComponentsModalSummaryTrx>
                 </Modal>
             )}
-                {infTicket && paso === "TransaccionExitosa" && (
+            {infTicket && paso === "TransaccionExitosa" && (
                 <Modal show={showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
                         <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
@@ -351,7 +349,7 @@ const PagoCartera = () => {
                         </ButtonBar>
                     </div>
                 </Modal>
-                )}
+            )}
         </Fragment>
     );
 };
