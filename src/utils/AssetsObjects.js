@@ -31,12 +31,12 @@ const svgs = {
   LOTERIA_BOGOTA: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_BOGOTA.svg`,
   LOTERIA_TOLIMA: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_TOLIMA.svg`,
   LOTERIA_CUNDINAMARCA: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_CUNDINAMARCA.svg`,
-  Ventas: `${urlAssets}/assets/img/ventas.png`,
+  LOTERIA_VENTAS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_VENTAS.svg`,
+  LOTERIA_PREMIOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_PREMIOS.svg`,
+  LOTERIA_ARQUEO_BILLETES: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_ARQUEO_BILLETES.svg`,
   CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
-  ArqueoBilletes: `${urlAssets}/assets/img/arqueo de billetes.png`,
-  Premio: `${urlAssets}/assets/img/premio.png`,
 
   //TRANSACCIONES
   TRANSACCIONES: `${urlAssets}/assets/svg/recaudo/TRANSACCIONES/TRANSACCIONES.svg`,
