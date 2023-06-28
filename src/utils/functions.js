@@ -40,7 +40,6 @@ export const moneyValidator = (value) => {
 
 export const onHandleNegativeNumbers = (ev) => {
   if (ev.keyCode === 189) {
-    ev.preventDefault();
     let caret_pos = ev.target.selectionStart ?? 0;
     const len = ev.target.value.length;
     if (ev.target.value.at(0) !== "-") {

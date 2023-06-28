@@ -1,6 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-
-import useQuery from "../../../../hooks/useQuery";
+import { Fragment, useCallback, useState } from "react";
 
 import Button from "../../../../components/Base/Button";
 import FormComission from "../../components/FormComission/FormComission";
@@ -129,7 +127,6 @@ const CreatePlanComision = () => {
           // defaultValue={""}
         />
       </Form>
-      {/* {JSON.stringify(newComision)} */}
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type='submit' onClick={createComission}>
           Crear comision

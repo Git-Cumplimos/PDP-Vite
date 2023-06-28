@@ -84,7 +84,7 @@ const FormComission = ({
 
       setComissionData({ ...copy });
     },
-    [comissionData]
+    [comissionData, setComissionData]
   );
   const onClickDelete = useCallback(
     (ev, ind) => {
@@ -96,7 +96,7 @@ const FormComission = ({
       copy?.ranges.splice(ind, 1);
       setComissionData({ ...copy });
     },
-    [comissionData]
+    [comissionData, setComissionData]
   );
 
   return (
@@ -104,9 +104,9 @@ const FormComission = ({
       {comissionData ? (
         <Form onSubmit={onSubmit} onChange={onChange} grid>
           <Select
-            id='comissionType'
-            name='comissionType'
-            label='Tipo de pago de comisión'
+            id="comissionType"
+            name="comissionType"
+            label="Tipo de pago de comisión"
             options={{
               "Transacción Escalonada": "trxEsc",
               "Transacción Acumulada": "trx",
@@ -123,145 +123,79 @@ const FormComission = ({
               <Fieldset
                 legend={`Rango ${ind + 1}`}
                 key={ind}
-                className='lg:col-span-2'>
-                {Object.entries(_comission).map(([key, val], idx) => {
-                  if (key === "Rango minimo" || key === "Rango maximo") {
-                    if (
-                      comissionData?.type === "trx" ||
-                      comissionData?.type === "trxEsc"
-                    )
-                      return (
-                        <Input
-                          key={`${key}_${ind}`}
-                          id={`${key}_${ind}`}
-                          label={
-                            key === "Rango minimo"
-                              ? "Rango mínimo"
-                              : key === "Rango maximo"
-                              ? "Rango máximo"
-                              : key
-                          }
-                          name={`${key}|${ind}`}
-                          type={"text"}
-                          value={val}
-                          onInput={(e) => {
-                            let valor = e.target.value;
-                            let num = valor.replace(/[\s.-]/g, "");
-                            // num = num.replace(/^0[0-9]/, "");
-                            if (!isNaN(num)) {
-                              let copyData = { ...comissionData };
-                              copyData.ranges[ind][key] = !isNaN(parseInt(num))
-                                ? parseInt(num)
-                                : 0;
-                              setComissionData(copyData);
-                            }
-                          }}
-                          autoComplete='off'
-                          required={
-                            comissionData?.ranges.length === ind + 1 &&
-                            key === "Rango maximo"
-                              ? false
-                              : true
-                          }
-                          disabled={
-                            (key === "Rango minimo"
-                              ? true
-                              : key === "Rango maximo"
-                              ? comissionData?.ranges.length === ind + 1
-                                ? false
-                                : true
-                              : true) || disabledState
-                          }
-                        />
-                      );
-                    else
-                      return (
-                        <MoneyInput
-                          id={`${key}_${ind}`}
-                          key={`${key}_${ind}`}
-                          name={`${key}|${ind}`}
-                          label={
-                            key === "Rango minimo"
-                              ? "Rango mínimo"
-                              : key === "Rango maximo"
-                              ? "Rango máximo"
-                              : key
-                          }
-                          type='text'
-                          autoComplete='off'
-                          maxLength={"15"}
-                          value={val}
-                          onInput={(e, valor) => {
-                            if (!isNaN(valor)) {
-                              const num = valor;
-                              let copyData = { ...comissionData };
-                              copyData.ranges[ind][key] = num;
-                              setComissionData(copyData);
-                            }
-                          }}
-                          required={
-                            comissionData?.ranges.length === ind + 1 &&
-                            key === "Rango maximo"
-                              ? false
-                              : true
-                          }
-                          disabled={disabledState}></MoneyInput>
-                      );
-                  } else if (key === "Comision porcentual") {
-                    return (
+                className="lg:col-span-2"
+              >
+                {Object.entries(_comission).map(([key, val]) =>
+                  key === "Rango minimo" || key === "Rango maximo" ? (
+                    comissionData?.type === "trx" ||
+                    comissionData?.type === "trxEsc" ? (
                       <Input
                         key={`${key}_${ind}`}
                         id={`${key}_${ind}`}
-                        label={"Comisión porcentual"}
+                        label={
+                          key === "Rango minimo"
+                            ? "Rango mínimo"
+                            : key === "Rango maximo"
+                            ? "Rango máximo"
+                            : key
+                        }
                         name={`${key}|${ind}`}
-                        type={"tel"}
+                        type={"text"}
                         value={val}
-                        // onChange={() => {}}
                         onInput={(e) => {
                           let valor = e.target.value;
-                          let num = valor.replace(/[\s-]/g, "");
+                          let num = valor.replace(/[\s.-]/g, "");
                           // num = num.replace(/^0[0-9]/, "");
-                          if (num > 10) {
-                            notifyError(
-                              "Está introduciendo un valor porcentual inusualmente alto",
-                              false,
-                              { toastId: "comision-per-error-high" }
-                            );
-                          }
-
-                          if (num > 100) {
-                            e.target.value = 100;
-                            // replace the value with 100
-                            let copyData = { ...comissionData };
-                            copyData.ranges[ind][key] = 100;
-                            return setComissionData(copyData);
-                          }
-                          if (num < 0) {
-                            e.target.value = 0;
-                            // replace the value with 0
-                            let copyData = { ...comissionData };
-                            copyData.ranges[ind][key] = 0;
-                            return setComissionData(copyData);
-                          }
                           if (!isNaN(num)) {
                             let copyData = { ...comissionData };
-                            if (copyData.ranges[ind]["Comision fija"] > 0) {
-                              notifyError(
-                                "Se esta introduciendo una comisión porcentual teniendo configurado una comisión fija",
-                                false,
-                                { toastId: "comision-per-error-mix" }
-                              );
-                            }
-                            copyData.ranges[ind][key] =
-                              num.slice(-1) === "."
-                                ? num
-                                : !isNaN(parseFloat(num))
-                                ? parseFloat(num)
-                                : 0;
-                            return setComissionData(copyData);
+                            copyData.ranges[ind][key] = !isNaN(parseInt(num))
+                              ? parseInt(num)
+                              : 0;
+                            setComissionData(copyData);
                           }
                         }}
-                        autoComplete='off'
+                        autoComplete="off"
+                        required={
+                          comissionData?.ranges.length === ind + 1 &&
+                          key === "Rango maximo"
+                            ? false
+                            : true
+                        }
+                        disabled={
+                          (key === "Rango minimo"
+                            ? true
+                            : key === "Rango maximo"
+                            ? comissionData?.ranges.length === ind + 1
+                              ? false
+                              : true
+                            : true) || disabledState
+                        }
+                      />
+                    ) : (
+                      <MoneyInput
+                        id={`${key}_${ind}`}
+                        key={`${key}_${ind}`}
+                        name={`${key}|${ind}`}
+                        label={
+                          key === "Rango minimo"
+                            ? "Rango mínimo"
+                            : key === "Rango maximo"
+                            ? "Rango máximo"
+                            : key
+                        }
+                        type="text"
+                        autoComplete="off"
+                        maxLength={"15"}
+                        value={val}
+                        equalErrorMin={false}
+                        onInput={(e, valor) => {
+                          if (!isNaN(valor)) {
+                            const num = valor;
+                            const copyData = structuredClone(comissionData);
+                            copyData.ranges[ind][key] = num;
+                            setComissionData(copyData);
+                          }
+                        }}
                         required={
                           comissionData?.ranges.length === ind + 1 &&
                           key === "Rango maximo"
@@ -270,62 +204,125 @@ const FormComission = ({
                         }
                         disabled={disabledState}
                       />
-                    );
-                  } else if (key === "Comision fija") {
-                    return (
-                      <MoneyInput
-                        id={`${key}_${ind}`}
-                        key={`${key}_${ind}`}
-                        name={`${key}|${ind}`}
-                        label={"Comisión fija"}
-                        type='tel'
-                        autoComplete='off'
-                        maxLength={"15"}
-                        value={val}
-                        max='10000'
-                        onInput={(e, valor) => {
-                          if (!isNaN(valor)) {
-                            const num = valor;
-                            let copyData = { ...comissionData };
-                            if (
-                              copyData.ranges[ind]["Comision porcentual"] > 0
-                            ) {
-                              notifyError(
-                                "Se esta introduciendo una comisión fija teniendo configurado una comisión porcentual",
-                                false,
-                                { toastId: "comision-fix-error-mix" }
-                              );
-                            }
-                            copyData.ranges[ind][key] = num;
-                            setComissionData(copyData);
-                          }
-                          if (Math.abs(valor) >= 2000) {
+                    )
+                  ) : key === "Comision porcentual" ? (
+                    <Input
+                      key={`${key}_${ind}`}
+                      id={`${key}_${ind}`}
+                      label={"Comisión porcentual"}
+                      name={`${key}|${ind}`}
+                      type={"tel"}
+                      value={val}
+                      // onChange={() => {}}
+                      onInput={(e) => {
+                        let valor = e.target.value;
+                        let num = valor.replace(/[\s-]/g, "");
+                        // num = num.replace(/^0[0-9]/, "");
+                        if (num > 10) {
+                          notifyError(
+                            "Está introduciendo un valor porcentual inusualmente alto",
+                            false,
+                            { toastId: "comision-per-error-high" }
+                          );
+                        }
+
+                        if (num > 100) {
+                          e.target.value = 100;
+                          // replace the value with 100
+                          let copyData = { ...comissionData };
+                          copyData.ranges[ind][key] = 100;
+                          return setComissionData(copyData);
+                        }
+                        if (num < 0) {
+                          e.target.value = 0;
+                          // replace the value with 0
+                          let copyData = { ...comissionData };
+                          copyData.ranges[ind][key] = 0;
+                          return setComissionData(copyData);
+                        }
+                        if (!isNaN(num)) {
+                          let copyData = { ...comissionData };
+                          if (copyData.ranges[ind]["Comision fija"] > 0) {
                             notifyError(
-                              "Está introduciendo un valor fijo inusualmente alto",
+                              "Se esta introduciendo una comisión porcentual teniendo configurado una comisión fija",
                               false,
-                              { toastId: "comision-fix-error-high" }
+                              { toastId: "comision-per-error-mix" }
                             );
                           }
-                        }}
-                        required={
-                          comissionData?.ranges.length === ind + 1 &&
-                          key === "Rango maximo"
-                            ? false
-                            : true
+                          copyData.ranges[ind][key] =
+                            num.slice(-1) === "."
+                              ? num
+                              : !isNaN(parseFloat(num))
+                              ? parseFloat(num)
+                              : 0;
+                          return setComissionData(copyData);
                         }
-                        disabled={disabledState}></MoneyInput>
-                    );
-                  }
-                })}
-                <ButtonBar className='lg:col-span-2'>
+                      }}
+                      autoComplete="off"
+                      required={
+                        comissionData?.ranges.length === ind + 1 &&
+                        key === "Rango maximo"
+                          ? false
+                          : true
+                      }
+                      disabled={disabledState}
+                    />
+                  ) : key === "Comision fija" ? (
+                    <MoneyInput
+                      id={`${key}_${ind}`}
+                      key={`${key}_${ind}`}
+                      name={`${key}|${ind}`}
+                      label={"Comisión fija"}
+                      type="tel"
+                      autoComplete="off"
+                      maxLength={"15"}
+                      value={val}
+                      max="10000"
+                      min="-10000"
+                      onInput={(e, valor) => {
+                        if (!isNaN(valor)) {
+                          const num = valor;
+                          const copyData = structuredClone(comissionData);
+                          if (copyData.ranges[ind]["Comision porcentual"] > 0) {
+                            notifyError(
+                              "Se esta introduciendo una comisión fija teniendo configurado una comisión porcentual",
+                              false,
+                              { toastId: "comision-fix-error-mix" }
+                            );
+                          }
+                          copyData.ranges[ind][key] = num;
+                          setComissionData(copyData);
+                        }
+                        if (Math.abs(valor) >= 2000) {
+                          notifyError(
+                            "Está introduciendo un valor fijo inusualmente alto",
+                            false,
+                            { toastId: "comision-fix-error-high" }
+                          );
+                        }
+                      }}
+                      required={
+                        comissionData?.ranges.length === ind + 1 &&
+                        key === "Rango maximo"
+                          ? false
+                          : true
+                      }
+                      disabled={disabledState}
+                    />
+                  ) : (
+                    ""
+                  )
+                )}
+                <ButtonBar className="lg:col-span-2">
                   {!disabledState &&
                     comissionData?.ranges?.length > 1 &&
                     ind !== 0 && (
                       <Button
-                        type='button'
+                        type="button"
                         onClick={(e) => {
                           onClickDelete(e, ind);
-                        }}>
+                        }}
+                      >
                         Eliminar rango
                       </Button>
                     )}
@@ -333,9 +330,9 @@ const FormComission = ({
               </Fieldset>
             );
           })}
-          <ButtonBar className='lg:col-span-2'>
+          <ButtonBar className="lg:col-span-2">
             {!disabledState && (
-              <Button type='button' onClick={onClick}>
+              <Button type="button" onClick={onClick}>
                 Agregar rango
               </Button>
             )}
