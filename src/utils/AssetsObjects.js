@@ -78,6 +78,8 @@ const svgs = {
   PINES_ADMINISTRAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_ADMINISTAR.svg`,
   PINES_GENERACION_LICENCIA: `${urlAssets}/assets/svg/recaudo/PINES/PINES_GENERACION_LICENCIA.svg`,
   PINES_SERVICIO_CONTENIDO: `${urlAssets}/assets/svg/recaudo/PINES/PINES_SERVICIO_Y_CONTENIDO.svg`,
+  PINES_DESCARGA_REPORTE: `${urlAssets}/assets/svg/recaudo/PINES/PINES_DESCARGA_REPORTE.svg`,
+
   PagoParticipacion: `${urlAssets}/assets/img/pago participacion.png`,
   ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
 

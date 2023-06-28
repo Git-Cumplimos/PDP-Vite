@@ -116,7 +116,7 @@ export const rutasPinesVus = {
               link: "/Pines/PinesVus/Administrar/Reporte/DescargarReportes",
               label: (
                 <AppIcons
-                  Logo={"DescargarReporte"}
+                  Logo={"PINES_DESCARGA_REPORTE"}
                   name={"Descargar Reportes Pines"}
                 />
               ),
