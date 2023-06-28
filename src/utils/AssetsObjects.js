@@ -34,6 +34,12 @@ const svgs = {
   LOTERIA_VENTAS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_VENTAS.svg`,
   LOTERIA_PREMIOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_PREMIOS.svg`,
   LOTERIA_ARQUEO_BILLETES: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_ARQUEO_BILLETES.svg`,
+  LOTERIA_CARGA_ARCHIVOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_CARGA_DE_ARCHIVOS.svg`,
+  LOTERIA_DESCARGA_DE_ARCHIVOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_DESCARGA_DE_ARCHIVOS.svg`,
+  LOTERIA_SORTEOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_SORTEOS.svg`,
+  LOTERIA_INVENTARIO_BILLETES: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_INVENTARIO_BILLETES.svg`,
+  LOTERIA_HISTORICO_CARGUE_ARCHIVOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_HISTORICO_CARGUE_ARCHIVOS.svg`,
+
   CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
