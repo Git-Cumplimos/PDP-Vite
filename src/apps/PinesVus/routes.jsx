@@ -187,7 +187,7 @@ export const rutasPinesVus = {
           link: "/Pines/PinesVus/Citas/Parametrizacion",
           label: (
             <AppIcons
-              Logo={"PagoParticipacion"}
+              Logo={"PINES_PARAMETRIZAR_HORARIOS"}
               name={"Parametrizar horarios"}
             />
           ),

@@ -79,6 +79,7 @@ const svgs = {
   PINES_GENERACION_LICENCIA: `${urlAssets}/assets/svg/recaudo/PINES/PINES_GENERACION_LICENCIA.svg`,
   PINES_SERVICIO_CONTENIDO: `${urlAssets}/assets/svg/recaudo/PINES/PINES_SERVICIO_Y_CONTENIDO.svg`,
   PINES_DESCARGA_REPORTE: `${urlAssets}/assets/svg/recaudo/PINES/PINES_DESCARGA_REPORTE.svg`,
+  PINES_PARAMETRIZAR_HORARIOS: `${urlAssets}/assets/svg/recaudo/PINES/PINES_PARAMETRIZAR_HORARIOS.svg`,
 
   PagoParticipacion: `${urlAssets}/assets/img/pago participacion.png`,
   ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
@@ -138,7 +139,8 @@ const svgs = {
   AVAL_RECAUDO_MANUAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_MANUAL.svg`,
   AVAL_RECAUDO_CODIGO_DE_BARRAS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_CODIGO_DE_BARRAS.svg`,
   AVAL_CONVENIO_RECAUDO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_CONVENIO_RECAUDO.svg`,
-
+  //CORRESPONSALIA/AGRARIO
+  AGRARIO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AGRARIO/AGRARIO.svg`,
   //CORRESPONSALIA/RECAUDO MULTIPLE
   RECAUDO_MULTIPLE: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE.svg`,
   RECAUDO_MULTIPLE_CARGAR: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CARGAR.svg`,
