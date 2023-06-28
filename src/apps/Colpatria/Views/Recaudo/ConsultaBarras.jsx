@@ -39,6 +39,7 @@ const ConsultaBarras = () => {
             const builderSP = new URLSearchParams();
             builderSP.append("refs", JSON.stringify(refs));
             builderSP.append("valor", res?.obj?.barcode?.valor ?? "0");
+            builderSP.append("true_codbarras", true);
 
             const pk_codigo_convenio =
               res?.obj?.convenio?.pk_codigo_convenio ?? "";

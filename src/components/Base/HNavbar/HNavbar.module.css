@@ -17,3 +17,17 @@ nav.navbar > ul.icon {
 nav.navbar > ul.text > li {
   @apply px-4;
 }
+
+.lineaSup {
+  border: none;
+  background-image: linear-gradient(to right, rgba(239, 75, 47, 0.8), #ee2744);
+  margin: 20px 90px;
+  height: 2.5px;
+}
+
+.lineaInf {
+  border: none;
+  background-image: linear-gradient(to right, #ee2744, rgba(239, 75, 47, 0.8));
+  margin: 20px 90px;
+  height: 2.5px;
+}

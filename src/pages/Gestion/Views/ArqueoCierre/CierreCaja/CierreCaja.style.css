@@ -1,0 +1,36 @@
+.containerCommerce {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+}
+
+.containerCommerceSearch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  display: flex;
+}
+
+.commerceSelected {
+  width: 95%;
+}
+
+.searchButton {
+  margin-top: 30%;
+}
+
+.accordion {
+  @apply cursor-pointer border-0 outline-none p-4 w-full text-left;
+  border: 1px solid #000;
+}
+
+.tittle {
+  @apply bg-primary-light text-black transition-colors duration-300;
+}
+
+.active, .accordion:hover {
+  @apply bg-primary-extra-light;
+}
+
+.panel {
+  @apply py-0 pl-4 overflow-hidden bg-white;
+}

@@ -214,7 +214,7 @@ const FormComission = ({
                         id={`${key}_${ind}`}
                         label={"Comisión porcentual"}
                         name={`${key}|${ind}`}
-                        type={"text"}
+                        type={"tel"}
                         value={val}
                         // onChange={() => {}}
                         onInput={(e) => {
@@ -224,7 +224,8 @@ const FormComission = ({
                           if (num > 10) {
                             notifyError(
                               "Está introduciendo un valor porcentual inusualmente alto",
-                              false
+                              false,
+                              { toastId: "comision-per-error-high" }
                             );
                           }
 
@@ -247,7 +248,8 @@ const FormComission = ({
                             if (copyData.ranges[ind]["Comision fija"] > 0) {
                               notifyError(
                                 "Se esta introduciendo una comisión porcentual teniendo configurado una comisión fija",
-                                false
+                                false,
+                                { toastId: "comision-per-error-mix" }
                               );
                             }
                             copyData.ranges[ind][key] =
@@ -276,7 +278,7 @@ const FormComission = ({
                         key={`${key}_${ind}`}
                         name={`${key}|${ind}`}
                         label={"Comisión fija"}
-                        type='text'
+                        type='tel'
                         autoComplete='off'
                         maxLength={"15"}
                         value={val}
@@ -290,16 +292,18 @@ const FormComission = ({
                             ) {
                               notifyError(
                                 "Se esta introduciendo una comisión fija teniendo configurado una comisión porcentual",
-                                false
+                                false,
+                                { toastId: "comision-fix-error-mix" }
                               );
                             }
                             copyData.ranges[ind][key] = num;
                             setComissionData(copyData);
                           }
-                          if (valor >= 2000) {
+                          if (Math.abs(valor) >= 2000) {
                             notifyError(
                               "Está introduciendo un valor fijo inusualmente alto",
-                              false
+                              false,
+                              { toastId: "comision-fix-error-high" }
                             );
                           }
                         }}

@@ -23,7 +23,7 @@ const mainStreetTypes = [
   { label: "Transversal", value: "TV" },
   { label: "Troncal", value: "TC" },
   { label: "Variante", value: "VT" },
-  { label: "Via", value: "VI" },
+  { label: "Vía", value: "VI" },
 ];
 
 const initialAddress = {
@@ -454,7 +454,7 @@ const AddressForm = ({
       </div>
       <div>
         <div className="grid grid-rows-2">
-          <label htmlFor="addressComplete">Direccion</label>
+          <label htmlFor="addressComplete">Dirección</label>
           <input
             id="addressComplete"
             nameu="addressComplete"

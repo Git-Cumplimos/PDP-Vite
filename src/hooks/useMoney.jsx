@@ -78,7 +78,7 @@ const useMoney = ({
 
       return moneyValue;
     },
-    [limits, decimalDigits, equalError]
+    [limits, decimalDigits, equalError, equalErrorMin]
   );
   return onChangeMoney;
 };

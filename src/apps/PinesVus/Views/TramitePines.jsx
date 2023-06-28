@@ -58,6 +58,7 @@ const TramitePines = () => {
   const [msgRespReenvio, setMsgRespReenvio] = useState("")
   const [urlAutogestion, setUrlAutogestion] = useState("")
   const [datosOlimpia,   setDatosOlimpia] = useState("")
+  const [pagoTarjeta,   setPagoTarjeta] = useState(false)
 
   useEffect(() => {
     ///////////////
@@ -244,7 +245,7 @@ const TramitePines = () => {
 
   const horaCierre = useMemo(() => { 
     const dia = (new Date()).getDay()  
-    if (dia === enumParametrosPines.diaFinSemana) {
+    if (enumParametrosPines.diaFinSemana.includes(dia)) {
       return enumParametrosPines.horaCierreFinSemana.split(":")
     }
     else{
@@ -374,7 +375,7 @@ const TramitePines = () => {
                 setName_tramite(info?.obj?.results?.[index]?.name_tramite);
                 setId_pin(info?.obj?.results?.[index]?.id_pin)
                 setInfoComercioCreacion(info?.obj?.results?.[index]?.datos_comercio_creacion)
-
+                info?.obj?.results?.[index]?.datos_comercio_creacion?.metodo_pago=="tarjeta"?setPagoTarjeta(true):setPagoTarjeta(false)
                 setShowModal(true);
                 setActivarNavigate(false);
               }
@@ -440,8 +441,12 @@ const TramitePines = () => {
                 >
                   Cancelar pin
                 </Button>
-                :
-                ""}
+                :""
+              //   <Button
+              //       disabled >
+              //   No es posible cancelar el Pin
+              // </Button>
+                }
                   
                 </ButtonBar>
               </Form>
@@ -479,6 +484,7 @@ const TramitePines = () => {
             setActivarNavigate={setActivarNavigate}
             closeModal={closeModal}
             valores={valores}
+            pagoTarjeta={pagoTarjeta}
           ></CancelPin>
         ) : (
           ""

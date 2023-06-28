@@ -13,6 +13,8 @@ const {
   limitsBtn,
 } = classes;
 
+const onSelectRowFunction = (e, i) => {};
+
 const TableEnterprise = ({
   title = "Titulo tabla",
   headers = ["Header 1", "Header 2"],
@@ -20,14 +22,14 @@ const TableEnterprise = ({
     [1, 2],
     ["a", "b"],
   ],
-  onSelectRow = null,
+  onSelectRow = null || onSelectRowFunction,
   maxPage = 1,
   onChange = () => {},
   onSubmit = (e) => e.preventDefault(),
-  onSetPageData = () => {},
+  onSetPageData = (_) => {},
   onSetUtilsFuncs = () => {},
   children = null,
-  actions = {}
+  actions = {},
 }) => {
   const [showFilters, setShowFilters] = useState(true);
 
@@ -80,14 +82,11 @@ const TableEnterprise = ({
               className={`bi bi-funnel-fill ${iconBtn}`}
               onClick={() => setShowFilters((old) => !old)}
             />
-            ) : (
-              ""
-              )}
+          ) : (
+            ""
+          )}
           {Object.entries(actions).map(([item, action]) => (
-              <span
-                className={`bi bi-${item} ${iconBtn}`}
-                onClick={action}
-              />
+            <span className={`bi bi-${item} ${iconBtn}`} onClick={action} />
           ))}
         </div>
       </div>

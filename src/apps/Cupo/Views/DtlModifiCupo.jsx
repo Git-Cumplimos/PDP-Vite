@@ -38,7 +38,7 @@ const DtlMovLimite = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Detalle límite cupo comercio</h1>
+      <h1 className="text-3xl mt-6">Detalle modificación cupo comercio</h1>
       {!roleInfo?.id_comercio ? (
         <Form grid onSubmit={onChangeId}>
           <Input
@@ -60,30 +60,31 @@ const DtlMovLimite = () => {
         ""
       )}
       <TableEnterprise
-        title="Historial cupo límite del comercio"
+        title="Historial modificación cupo del comercio"
         headers={[
           "Id comercio",
-          "Valor afectación",
-          "Fecha afectación",
-          "Límite de Cupo",
           "Usuario",
+          "Sobregiro",
+          "Base de caja",
+          "Dias máximos sobregiro",
+          "Fecha afectación",
         ]}
         data={
           asigLimite?.results.map(
             ({
               fk_id_comercio,
-              valor_afectacion,
-              fecha,
-              limite_cupo_dsp_afectacion,
               usuario,
+              sobregiro,
+              base_caja,
+              dias_max_sobregiro,
+              fecha,
             }) => ({
               fk_id_comercio,
-              valor_afectacion: formatMoney.format(valor_afectacion),
-              fecha,
-              limite_cupo_dsp_afectacion: formatMoney.format(
-                limite_cupo_dsp_afectacion
-              ),
               usuario,
+              sobregiro: formatMoney.format( sobregiro ),
+              base_caja: formatMoney.format( base_caja ),
+              dias_max_sobregiro: dias_max_sobregiro ??  0,
+              fecha,
             })
           ) ?? []
         }

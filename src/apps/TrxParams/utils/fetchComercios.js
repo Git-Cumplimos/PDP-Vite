@@ -107,18 +107,16 @@ export const postCrearComercio = async (bodyObj) => {
     throw err;
   }
 };
-export const putModificarComercio = async (pkComercio, bodyObj) => {
+export const putModificarComercio = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComercios}/comercios/modificar?pk_comercio=${pkComercio}`,
+      `${urlComercios}/comercios/modificar`,
       "PUT",
       {},
       bodyObj,
-      {},
-      true
     );
     if (!res?.status) {
       console.error(res?.msg);

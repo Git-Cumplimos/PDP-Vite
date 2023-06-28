@@ -23,7 +23,7 @@ export const listPermissionsIAM = listPermissions.splice(listPermissions.length 
 
 const rutasIAM = {
   link: "/iam",
-  label: <AppIcons Logo={"MARKETPLACE"} name="IAM" />,
+  label: <AppIcons Logo={"IAM"} name="IAM" />,
   component: IAMIndex,
   permission: listPermissionsIAM,
   subRoutes: [

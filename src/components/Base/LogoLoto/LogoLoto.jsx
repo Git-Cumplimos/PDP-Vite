@@ -1,21 +1,17 @@
 import { useImgs } from "../../../hooks/ImgsHooks";
-import classes from "./LogoLoto.module.css";
+import LogoPDP from "../LogoPDP/LogoPDP"
 
-const LogoLoto = ({ large = false, small = false, xsmall = false }) => {
-  const { logoPDP, lgImg, smImg, xsImg } = classes;
+const LogoLoto = () => {
 
   const {
     imgs: { Loteria_de_Bogota: LogoPng },
   } = useImgs();
   return (
-    <div
-      className={`${logoPDP} ${large ? lgImg : ""} ${small ? smImg : ""} ${
-        xsmall ? xsImg : ""
-      } ${!large && !small && !xsmall ? small : ""}`}
-    >
-      <div className="aspect-w-8 aspect-h-9">
+    <div className="flex flex-row flex-nowrap justify-center items-center p-2" >
+      <div className="p-1 mx-2" style={{ display: 'inline-block', maxWidth: '30%' }}>
         <img src={LogoPng} alt="Logo loteria de bogota" />
       </div>
+      <LogoPDP xsmall/>
     </div>
   );
 };

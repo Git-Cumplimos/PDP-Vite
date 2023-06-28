@@ -5,6 +5,7 @@ import Select from "../../../components/Base/Select";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
+import { LineasLot_disclamer } from "../utils/enum";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
@@ -197,12 +198,14 @@ const Loteria = ({ route }) => {
 
   const ticket = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "VENTA LOTERÍA",
       timeInfo: {
         "Fecha de pago": "",
         Hora: "",
       },
       commerceInfo: [
+        ["Razón social","Soluciones en Red S.A.S."],
+        ["Nit","830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", ""],
@@ -212,21 +215,25 @@ const Loteria = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.obj?.nom_loteria,
+      commerceName: sellResponse?.obj?.cod_loteria !== '064' 
+      ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
+      descriPM: "***Descripción del premios mayor asociado al sorteo***",
       trxInfo: [
         ["Sorteo", sorteo],
-        ["Billete", numero],
+        ["Fecha del sorteo",""],
+        ["", ""],
+        ["Número", numero],
         ["Serie", serie],
         ["Fracción", ""],
-        ["Tipo de Billete", ""],
-        ["", ""],
+        ["Tipo de billete", ""],
+        ["", ""],["", ""],
         ["Valor", ""],
-        ["", ""],
-        ["Forma de Pago", ""],
-        ["", ""],
+        ["", ""],["", ""],
+        ["Forma de pago", ""],
+        ["", ""],["", ""],
       ],
-      disclamer:
-        "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+      disclamer: 
+        LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
     };
   }, [roleInfo,sellResponse,sorteo,serie,numero]
   );
@@ -290,7 +297,7 @@ const Loteria = ({ route }) => {
       <SimpleLoading show={loadConsulta}></SimpleLoading>
       <Select
         className={"place-self-strech"}
-        disabled={serie !== "" || numero !== ""}
+        // disabled={serie !== "" || numero !== ""}
         id="selectSorteo"
         label="Tipo de sorteo"
         options={opcionesdisponibles}
@@ -388,6 +395,7 @@ const Loteria = ({ route }) => {
         ) : (
           <SellResp
             codigos_lot={codigos_lot}
+            rta_billeteria={loterias}
             sellResponse={sellResponse}
             setSellResponse={setSellResponse}
             closeModal={closeModal}
