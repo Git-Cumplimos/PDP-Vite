@@ -18,7 +18,7 @@ const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
   const { roleInfo } = useAuth();
-  const { searchLoteriafisica,searchLoteria } = useLoteria();
+  const { searchLoteriafisica, searchLoteria } = useLoteria();
   const { pathname } = useLocation();
   const nitsLoterias = {
     "loteria-de-bogota": "899.999.270-1",
@@ -27,13 +27,13 @@ const Loteria = ({ route }) => {
   };
   const [maxPages, setMaxPages] = useState(0);
   const [loterias, setLoterias] = useState([]);
-  const [{ page, limit}, setPageData] = useState({
+  const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
-  
-  const [fecha_trx, setFecha_trx] = useState(new Date())
-   
+
+  const [fecha_trx, setFecha_trx] = useState(new Date());
+
   const {
     infoLoto: {
       numero,
@@ -63,7 +63,7 @@ const Loteria = ({ route }) => {
   const [nom_loteria, setNom_loteria] = useState(null);
   const navigate = useNavigate();
   const [isInputDisabled, setIsInputDisabled] = useState(false);
-  
+
   const validarEntradaScanner = useCallback(
     (validarNum) => {
       if (validarNum[0] === "]") {
@@ -91,13 +91,13 @@ const Loteria = ({ route }) => {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
         if (res?.status) {
-          setNom_loteria(res['obj'][0]['nombre'])
+          setNom_loteria(res["obj"][0]["nombre"]);
         } else {
           navigate(-1);
         }
       });
     }
-  }, [pathname,idloteria,navigate]);
+  }, [pathname, idloteria, navigate]);
 
   useEffect(() => {
     const query = {
@@ -117,7 +117,7 @@ const Loteria = ({ route }) => {
         });
         if (sortOrd.length > 0) {
           setSorteoOrdi(sortOrd[0]);
-        } 
+        }
         if (sortExt.length > 0) {
           setSorteoExtra(sortExt[0]);
         }
@@ -130,7 +130,7 @@ const Loteria = ({ route }) => {
         });
         if (sortOrdfisico.length > 0) {
           setSorteofisico(sortOrdfisico[0]);
-        } 
+        }
         if (sortExtfisico.length > 0) {
           setSorteofisicoextraordinario(sortExtfisico[0]);
         }
@@ -175,7 +175,19 @@ const Loteria = ({ route }) => {
       });
     }
     SetOpcionesDisponibles([...copy]);
-  }, [setCustomer,loterias,setNumero,setSellResponse,setSerie,sorteoExtra,sorteoExtrafisico,sorteoOrdi,sorteoOrdifisico,sorteosLOT,codigos_lot]);
+  }, [
+    setCustomer,
+    loterias,
+    setNumero,
+    setSellResponse,
+    setSerie,
+    sorteoExtra,
+    sorteoExtrafisico,
+    sorteoOrdi,
+    sorteoOrdifisico,
+    sorteosLOT,
+    codigos_lot,
+  ]);
 
   const closeModal = useCallback(() => {
     navigate(-1);
@@ -185,16 +197,14 @@ const Loteria = ({ route }) => {
     setSelected(null);
     setSelecFrac([]);
     setTipoPago(null);
-  },
-    [setCustomer,setSelected,setSellResponse,navigate]
-  );
-  
+  }, [setCustomer, setSelected, setSellResponse, navigate]);
+
   useEffect(() => {
-    if (sellResponse !== null){
-      const fecha_venta =new Date();
-      setFecha_trx(fecha_venta)
+    if (sellResponse !== null) {
+      const fecha_venta = new Date();
+      setFecha_trx(fecha_venta);
     }
-  }, [sellResponse])
+  }, [sellResponse]);
 
   const ticket = useMemo(() => {
     return {
@@ -204,8 +214,8 @@ const Loteria = ({ route }) => {
         Hora: "",
       },
       commerceInfo: [
-        ["Razón social","Soluciones en Red S.A.S."],
-        ["Nit","830.084.645-1"],
+        ["Razón social", "Soluciones en Red S.A.S."],
+        ["Nit", "830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", ""],
@@ -215,38 +225,41 @@ const Loteria = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.obj?.cod_loteria !== '064' 
-      ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
+      commerceName:
+        sellResponse?.obj?.cod_loteria !== "064"
+          ? sellResponse?.obj?.nom_loteria
+          : sellResponse?.obj?.nom_loteria + " Extraordinario",
       descriPM: "***Descripción del premios mayor asociado al sorteo***",
       trxInfo: [
         ["Sorteo", sorteo],
-        ["Fecha del sorteo",""],
+        ["Fecha del sorteo", ""],
         ["", ""],
         ["Número", numero],
         ["Serie", serie],
         ["Fracción", ""],
         ["Tipo de billete", ""],
-        ["", ""],["", ""],
+        ["", ""],
+        ["", ""],
         ["Valor", ""],
-        ["", ""],["", ""],
+        ["", ""],
+        ["", ""],
         ["Forma de pago", ""],
-        ["", ""],["", ""],
+        ["", ""],
+        ["", ""],
       ],
-      disclamer: 
-        LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
+      disclamer: LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
     };
-  }, [roleInfo,sellResponse,sorteo,serie,numero]
-  );
+  }, [roleInfo, sellResponse, sorteo, serie, numero]);
 
   useEffect(() => {
-    if (sorteo.split("-")[0] !== ""){
+    if (sorteo.split("-")[0] !== "") {
       fetchTablaBilletes();
     }
-  }, [page,limit,sorteo,numero,serie])
+  }, [page, limit, sorteo, numero, serie]);
 
   const fetchTablaBilletes = () => {
-    if (sorteo.split("-")[1] === "true"){
-      searchLoteriafisica({ 
+    if (sorteo.split("-")[1] === "true") {
+      searchLoteriafisica({
         sorteo: sorteo.split("-")[0],
         lot: sorteo.split("-")[2],
         num: numero,
@@ -260,35 +273,34 @@ const Loteria = ({ route }) => {
               setLoterias(res.Resultado ?? []);
               setMaxPages(res.Num_Datos ?? 1);
             } else {
-              notifyError(res.msg);
+              notifyError(res.msg, 5000, { toastId: "notify-lot" });
+              setLoterias([]);
+            }
+          }
+        })
+        .catch((err) => console.error(err));
+    } else {
+      searchLoteria({
+        sorteo: sorteo.split("-")[0],
+        lot: sorteo.split("-")[2],
+        num: numero,
+        ser: serie,
+        page,
+        limit,
+      })
+        .then((res) => {
+          if (res !== undefined) {
+            if (!("msg" in res)) {
+              setLoterias(res.Resultado ?? []);
+              setMaxPages(res.Num_Datos ?? 1);
+            } else {
+              notifyError(res.msg, 5000, { toastId: "notify-lot2" });
               setLoterias([]);
             }
           }
         })
         .catch((err) => console.error(err));
     }
-    else {
-      searchLoteria({ 
-        sorteo: sorteo.split("-")[0],
-        lot: sorteo.split("-")[2],
-        num: numero,
-        ser: serie,
-        page,
-        limit,
-      })
-        .then((res) => {
-          if (res !== undefined) {
-            if (!("msg" in res)) {
-              setLoterias(res.Resultado ?? []);
-              setMaxPages(res.Num_Datos ?? 1);
-            } else {
-              notifyError(res.msg);
-              setLoterias([]);
-            }
-          }
-        })
-        .catch((err) => console.error(err));
-    }    
   };
   // *****************************************BANDERA******************
   return (
@@ -308,21 +320,27 @@ const Loteria = ({ route }) => {
           setSerie("");
         }}
       />
-      {sorteo !== "" ?
-          <TableEnterprise
-          title={sorteo.split("-")[1] === "true" ? 'Billetería física' : 'Billetería virtual'}
+      {sorteo !== "" ? (
+        <TableEnterprise
+          title={
+            sorteo.split("-")[1] === "true"
+              ? "Billetería física"
+              : "Billetería virtual"
+          }
           maxPage={maxPages}
-          headers={["Número","Serie","Fracciones disponibles"]}
+          headers={["Número", "Serie", "Fracciones disponibles"]}
           onSetPageData={setPageData}
-          data={loterias.map(({Num_billete,serie:Serie_lot,Fracciones_disponibles}) => {
-              return {Num_billete,serie:Serie_lot,Fracciones_disponibles};
-            })}
+          data={loterias.map(
+            ({ Num_billete, serie: Serie_lot, Fracciones_disponibles }) => {
+              return { Num_billete, serie: Serie_lot, Fracciones_disponibles };
+            }
+          )}
           onSelectRow={(e, index) => {
             setSelected(loterias[index]);
             setShowModal(true);
           }}
-          >
-            <Input
+        >
+          <Input
             id="numTicket"
             label="Número de billete"
             type="search"
@@ -337,8 +355,8 @@ const Loteria = ({ route }) => {
                 setNumero(num);
               }
             }}
-            />
-            <Input
+          />
+          <Input
             id="numSerie"
             label="Número de serie"
             type="search"
@@ -353,30 +371,34 @@ const Loteria = ({ route }) => {
                 setSerie(num);
               }
             }}
-            />
-            {sorteo.split("-")[1] === "true" ?
-              <Input
-                label="Escanee el código de barras"
-                type="search"
-                value={datosEscaneados}
-                onInput={(e) => {
-                  const num = e.target.value || "";
-                  setDatosEscaneados(validarEntradaScanner(num));
-                  if (num?.length === 20) {
-                    fetchTablaBilletes();
-                    setNumero(String(num.substr(-9, 4)));
-                    setSerie(String(num.substr(-5, 3)));
-                  } else {
-                    setNumero("");
-                    setSerie("");
-                    setIsInputDisabled(true);
-                  }
-                }}
-                disabled={isInputDisabled}
-              ></Input>
-              : ""}
-          </TableEnterprise>
-          : ""}
+          />
+          {sorteo.split("-")[1] === "true" ? (
+            <Input
+              label="Escanee el código de barras"
+              type="search"
+              value={datosEscaneados}
+              onInput={(e) => {
+                const num = e.target.value || "";
+                setDatosEscaneados(validarEntradaScanner(num));
+                if (num?.length === 20) {
+                  fetchTablaBilletes();
+                  setNumero(String(num.substr(-9, 4)));
+                  setSerie(String(num.substr(-5, 3)));
+                } else {
+                  setNumero("");
+                  setSerie("");
+                  setIsInputDisabled(true);
+                }
+              }}
+              disabled={isInputDisabled}
+            ></Input>
+          ) : (
+            ""
+          )}
+        </TableEnterprise>
+      ) : (
+        ""
+      )}
       <Modal show={showModal} handleClose={() => closeModal()}>
         {sellResponse === null ? (
           <SendForm
