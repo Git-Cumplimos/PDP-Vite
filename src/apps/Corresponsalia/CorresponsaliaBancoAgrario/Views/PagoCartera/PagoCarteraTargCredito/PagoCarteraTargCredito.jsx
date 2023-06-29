@@ -84,7 +84,7 @@ const PagoCarteraTargCredito = () => {
                     id_terminal: roleInfo.id_dispositivo,
                     id_usuario: roleInfo.id_usuario,
                 },
-                PagoCartera: {
+                PagoCarteraTarjCredito: {
                     numeroTarjCredito: parseInt(numero_tarjcredito),
                     location: {
                         address: roleInfo?.["direccion"],
