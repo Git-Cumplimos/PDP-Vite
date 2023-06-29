@@ -153,7 +153,7 @@ const PagoCartera = () => {
                         roleInfo?.tipo_comercio === "KIOSCO"
                         ? true
                         : false,
-                valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
+                valor_total_trx: parseInt(pagoTotal !== "" ? pagoTotal : 0),
                 nombre_comercio: roleInfo?.["nombre comercio"],
                 nombre_usuario: pdpUser?.uname ?? "",
                 comercio: {
@@ -162,7 +162,7 @@ const PagoCartera = () => {
                     id_usuario: roleInfo.id_usuario,
                 },
                 PagoCartera: {
-                    numeroObligacion: choice_numero_obligacion,
+                    numeroObligacion: parseInt(choice_numero_obligacion),
                     numeroPago: labelSeleccionado === 'Valor total deuda' ? '000002' : '000001',
                     location: {
                         address: roleInfo?.["direccion"],
