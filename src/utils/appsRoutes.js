@@ -29,6 +29,11 @@ import {
 import { rutasPinesVus } from "../apps/PinesVus/routes";
 import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
 
+
+import rutasPinesCrc, {
+  listPermissionsPinesCrc,
+} from "../apps/PinesCrc/routes";
+
 /**
  * * Providers
  */
@@ -163,6 +168,7 @@ const DesembolsoFDLM = lazy(() =>
  * Pines Vus
  */
 const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
+const PinesCrc = lazy(() => import("../apps/PinesCrc/Views/Pines/VentaPines"));
 
 /**
  * IAM
@@ -333,12 +339,75 @@ const ConciliacionMovistarCarga = lazy(() =>
   import("../apps/RecargasCelular/Movistar/Views/ConciliacionMovistarCarga")
 );
 
+/**
+ * Modulo Gestion transaccional
+ */
+const GestionTransaccional = lazy(() =>
+  import("../pages/GestionTransaccional")
+);
+
+
+/**
+ * Gestion anulación pines CRC
+ */
+const AnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/AnulacionesPines"));
+const CargueAnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/CargueAnulaciones"))
+const DescargaPeticionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/DescargarArchivoPeticiones"))
+const HistoricoAnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/HistoricoAnulaciones"))
+
+
+
 const allUrlsPrivateApps = [
   {
     link: "https://portal.solucionesenred.co/",
     label: <AppIcons Logo={"SUSER"} name='SUSER' />,
     extern: true,
     permission: [1],
+  },
+  {
+    link: "/GestionTransaccional",
+    label: <AppIcons Logo={"PINES_ADMINISTRAR"} name="Gestión Transaccional" />,
+    component: GestionTransaccional,
+    permission: [63,53],
+    subRoutes: [
+      {
+        link: "/GestionTransaccional/AnulacionesPinesCRC",
+        label: (
+          <AppIcons
+            Logo={"PINES_ADMINISTRAR"}
+            name={"Anulaciones Pines CRC"}
+          />
+        ),
+        component: AnulacionesPinesCRC,
+        permission: [63],
+        subRoutes: [
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCRC/CargueArchivo",
+            label: (
+              <AppIcons Logo={"CARGAR"} name={"Cargue Archivo Anulaciones"} />
+            ),
+            component: CargueAnulacionesPinesCRC,
+            permission: [63]
+          },
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCRC/DescargarPeticiones",
+            label: (
+              <AppIcons Logo={"DESCARGAR"} name={"Descarga Archivo Peticiones"} />
+            ),
+            component: DescargaPeticionesPinesCRC,
+            permission: [63]
+          },
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCRC/Historico",
+            label: (
+              <AppIcons Logo={"DESCARGAR"} name={"Historico anulaciones"} />
+            ),
+            component: HistoricoAnulacionesPinesCRC,
+            permission: [63]
+          }
+        ],
+      },
+    ],
   },
   {
     link: "/loteria",
@@ -595,9 +664,10 @@ const allUrlsPrivateApps = [
       enumPermisosPinesVus.administrarPinesVus,
       enumPermisosPinesVus.operarPinesVus,
       enumPermisosPractisistemas.practisistemasPines,
+      ...listPermissionsPinesCrc,
     ],
     provider: ProvidepinesVus,
-    subRoutes: [rutasPines, rutasPinesVus],
+    subRoutes: [rutasPines, rutasPinesVus, rutasPinesCrc],
   },
   {
     link: "/recaudo",

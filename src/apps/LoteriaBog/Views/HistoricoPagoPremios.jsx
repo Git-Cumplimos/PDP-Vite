@@ -66,7 +66,6 @@ const HistoricoPagoPremios = ({ route }) => {
     let valor_pagado = resp_con_sort[i]["valor_neto"].split(".").join("");
     valor_pagado = valor_pagado.split(" ").join("");
     valor_pagado = valor_pagado.replace("$", "");
-    console.log(valor_pagado);
 
     DescargaDocsPagoPremios({
       billete: resp_con_sort[i]["num_billete"],

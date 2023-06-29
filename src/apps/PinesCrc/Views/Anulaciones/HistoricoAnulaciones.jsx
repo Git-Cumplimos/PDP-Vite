@@ -4,16 +4,15 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../../utils/notify";
 import useMap from "../../../../hooks/useMap";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
-import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../hooks/useFetchDispatchDebounce";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { makeDateFormatter } from "../../../../utils/functions";
 
-const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
-// const urlBackend = `http://localhost:5000/servicio-contingencia-empresarial-pdp`;
+const urlBackend = `${process.env.REACT_APP_BASE_API}/cert/pinesVus`;
+const urlBackend2 = `${process.env.REACT_APP_BASE_API}/cert/pinesVus`;
 
 const initialSearchFilters = new Map([
-  ["fecha_inicio_inicio", ""],
-  ["fecha_inicio_fin", ""],
-  ["identificador_banco", ""],
+  ["fecha_ini", ""],
+  ["fecha_fin", ""],
   ["name_tipo_transaccion", ""],
   ["page", 1],
   ["limit", 10],
@@ -21,11 +20,11 @@ const initialSearchFilters = new Map([
 
 const dateFormatter = makeDateFormatter(true);
 
-const TablaHistoricoContingencia = ({ banco }) => {
+const HistoricoAnulaciones = () => {
   const [datosTablaContingencia, setDatosTablaContingencia] = useState([]);
   const [cantidadPaginas, setCantidadPaginas] = useState(0);
 
-  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
+  const [searchFilters, { setAll: setSearchFilters}] =
     useMap(initialSearchFilters);
 
   const setPageData = useCallback(
@@ -43,27 +42,16 @@ const TablaHistoricoContingencia = ({ banco }) => {
   );
 
   const [fetchExcel] = useFetchDispatchDebounce({
-    onSuccess: useCallback((res) => {
-      if (!res?.status){
-        notifyError(res?.msg ?? "El archivo aun se esta procesando")
-        return;
-      }
-      window.open(res?.url, "_self")
-    }, []),
+    onSuccess: useCallback((res) => window.open(res?.obj?.url, "_self"), []),
     onError: useCallback((error) => {
-      if (error instanceof ErrorPDPFetch) {
-        notifyError(error.message);
-      }
-      else if (!(error instanceof DOMException)) {
-        console.error(error);
-        notifyError("Error al cargar Datos ");
-      }
+      console.error(error);
+      notifyError("Error al cargar Datos ");
     }, []),
   });
 
   const downloadExcel = useCallback(
     (data) => {
-      fetchExcel(`${urlBackend}/generarexcel`, {
+      fetchExcel(`${urlBackend2}/generarExcelHistorico`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" },
@@ -83,15 +71,15 @@ const TablaHistoricoContingencia = ({ banco }) => {
         }
       });
       if (
-        !tempMap.has("fecha_inicio_inicio") ||
-        !tempMap.has("fecha_inicio_fin")
+        !tempMap.has("fecha_ini") ||
+        !tempMap.has("fecha_fin")
       ) {
-        tempMap.delete("fecha_inicio_inicio");
-        tempMap.delete("fecha_inicio_fin");
+        tempMap.delete("fecha_ini");
+        tempMap.delete("fecha_fin");
       }
 
       const queries = new URLSearchParams(tempMap.entries()).toString();
-      return { url: `${urlBackend}/search?${queries}`, options: {} };
+      return { url: `${urlBackend}/consultarAnulaciones?${queries}`, options: {} };
     }, [searchFilters]),
     {
       onSuccess: useCallback((res) => {
@@ -99,8 +87,8 @@ const TablaHistoricoContingencia = ({ banco }) => {
           notifyError("No se encontraron registros");
           return;
         }
-        setCantidadPaginas(res?.obj?.results?.maxPages);
-        setDatosTablaContingencia(res?.obj?.results?.results);
+        setCantidadPaginas(res?.obj?.maxPages);
+        setDatosTablaContingencia(res?.obj?.results);
       }, []),
       onError: useCallback((error) => {
         console.error(error);
@@ -109,16 +97,15 @@ const TablaHistoricoContingencia = ({ banco }) => {
     }
   );
 
-  useEffect(() => {
-    setSingleFilter("identificador_banco", (old) => banco ?? old);
-  }, [banco, setSingleFilter]);
+//   useEffect(() => {
+//     setSingleFilter("identificador_banco", (old) => banco ?? old);
+//   }, [banco, setSingleFilter]);
 
   return (
     <TableEnterprise
       title="Histórico de contingencia"
       maxPage={cantidadPaginas}
       headers={[
-        "Banco",
         "Cantidad de registros del archivo",
         "Cantidad de registros procesados exitosamente",
         "Cantidad de registros fallidos",
@@ -131,11 +118,6 @@ const TablaHistoricoContingencia = ({ banco }) => {
           tempDate.setHours(tempDate.getHours() + 5);
           created = dateFormatter.format(tempDate);
           return {
-            identificador_banco: inf.identificador_banco
-              .toLowerCase()
-              .split(" ")
-              .map((word) => word.replace(word[0], word[0].toUpperCase()))
-              .join(" "),
             cantidad_registros: inf.cantidad_registros,
             cantidad_trx_exitos: inf.cantidad_trx_exitosas,
             cantidad_trx_fallidas: inf.cantidad_trx_fallidas,
@@ -144,21 +126,11 @@ const TablaHistoricoContingencia = ({ banco }) => {
           };
         }) ?? []
       }
-      onSelectRow={(_, i) =>
+      onSelectRow={(_, i) =>{
+        console.log(datosTablaContingencia[i].pk_estado_cargue_anulaciones)
         downloadExcel({
-          pk_contingencia_recaudo_bancos:datosTablaContingencia[i].pk_contingencia_recaudo_bancos,
-          nombre_banco: datosTablaContingencia[i].identificador_banco,
-          // fecha_carga: datosTablaContingencia[i].fecha_carga_archivo,
-          // total_registros: datosTablaContingencia[i].cantidad_registros,
-          // registros_procesados: datosTablaContingencia[i].cantidad_trx_exitosas,
-          // registros_fallidos: datosTablaContingencia[i].cantidad_trx_fallidas,
-          // respuesta_trx_exitosas: JSON.stringify(
-          //   datosTablaContingencia[i].respuuestas_trx
-          // ),
-          // respuesta_trx_fallidas: JSON.stringify(
-          //   datosTablaContingencia[i].respuestas_trx_fallidas
-          // ),
-        })
+            pk_estado_cargue_anulaciones:datosTablaContingencia[i].pk_estado_cargue_anulaciones,
+        })}
       }
       onSetPageData={setPageData}
       onChange={(ev) =>
@@ -170,17 +142,17 @@ const TablaHistoricoContingencia = ({ banco }) => {
       <Input
         id="dateInit"
         label="Fecha inicial"
-        name="fecha_inicio_inicio"
+        name="fecha_ini"
         type="date"
       />
       <Input
         id="dateEnd"
         label="Fecha final"
-        name="fecha_inicio_fin"
+        name="fecha_fin"
         type="date"
       />
     </TableEnterprise>
   );
 };
 
-export default TablaHistoricoContingencia;
+export default HistoricoAnulaciones;
