@@ -78,7 +78,7 @@ const FileInputX = () => {
     e.preventDefault();
     setShowModal(false);
     notifyError("El usuario canceló el proceso de anulacion");
-    navigate("/Pines/PinesCrc/Anulaciones/CargueArchivo");
+    navigate("/GestionTransaccional/AnulacionesPinesCRC/CargueArchivo");
     document.getElementById("anulaciones").value = ""; // <- limpia el valor del campo de archivo
     setArchivo([]);
     setNombreDocumento("");

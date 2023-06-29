@@ -38,11 +38,30 @@ import Fieldset from "../../../../components/Base/Fieldset";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import { guardarCliente } from "../../../PinesCrc/utils/fetchGuardarCliente";
 import { registroTrx } from "../../../PinesCrc/utils/fetchRegistrarTrx";
+import LocationFormPinVus from "../../components/LocationForm/LocationFormPinesVus"
 
 const formatMoney = makeMoneyFormatter(2);
 
 const VentaPines = ({
-    infoCliente
+  infoCliente,
+  homeLocation,
+  setDocumento, documento,
+  setTipoDocumento, tipoDocumento,
+  setNombre, nombre,
+  setApellidos, apellidos, 
+  setCelular, celular,
+  setEmail, email,
+  setFechaNacimiento, fechaNacimiento,
+  setGenero, genero,
+  setEps, eps,
+  setArl, arl,
+  setTiene_vehiculo, tiene_vehiculo,
+  setModelo, modelo,
+  setVenderVehiculo, venderVehiculo,
+  setCreditoVehiculo, creditoVehiculo,
+  setBanco, banco,
+  setComprarVehiculo, comprarVehiculo,
+  setVehiculoCompra, vehiculoCompra,
 }) => {
   const navigate = useNavigate();
 
@@ -54,18 +73,17 @@ const VentaPines = ({
   const [idConvenioPin, setIdConvenioPin ] = useState("108928");
   const [datosConvenio, setDatosConvenio] = useState("");
   const [canal, setCanal ] = useState("1");
-  const [nombre, setNombre] = useState("");
-  const [apellidos, setApellidos] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [email, setEmail] = useState("");
-  const [documento, setDocumento] = useState("");
-  const [celular, setCelular] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState(1);
   const [isLoading, setIsLoading] = useState(false)
   const [showFormulario, setShowFormulario] = useState(false)
   const [showFormulario2, setShowFormulario2] = useState(false)
 
-  const [userReferences, setUserReferences] = useState({});
+  const userReferences = useMemo(() => {
+  return {
+    referencia_1: String(documento), 
+    referencia_2: String(celular)};
+  },[documento, celular])
+
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -91,39 +109,53 @@ const VentaPines = ({
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl, consultaCierreManual} = usePinesVus();
+  const { consultaClientes} = usePinesVus();
 
-  const homeLocation = {
-    municipio: useState(""),
-    departamento: useState(""),
-    localidad: useState(""),
-    barrio: useState(""),
-    direccion: useState(""),
-    foundMunicipios: useState([]),
-  };
-
-//   const infoCliente = useMemo(() => {
-//     homeLocation["direccion"][0] = direccion
-//     return {infoCliente:{
-//       pk_documento_cliente : documento,
-//       tipo_documento : tipoDocumento,
-//       nombre : nombre,
-//       apellidos : apellidos,
-//       celular : celular,
-//       email : email,
-//       direccion : direccion,
-//       home_location : homeLocation
-//   }};
-//   }, [
-//     setTipoDocumento,
-//     setDocumento,
-//     setNombre,
-//     setApellidos,
-//     setCelular,
-//     setEmail,
-//     homeLocation,
-//     setDireccion
-//   ]);  
+  infoCliente = useMemo(() => {
+    return {
+      pk_documento_cliente : documento,
+      tipo_documento : tipoDocumento,
+      nombre : nombre,
+      apellidos : apellidos,
+      fecha_nacimiento : fechaNacimiento,
+      genero : genero,
+      celular : celular,
+      email : email,
+      eps : eps,
+      arl : arl,
+      municipio : parseInt(homeLocation?.foundMunicipios?.[0]?.[0]?.c_digo_dane_del_municipio.replace(".","")),
+      departamento : parseInt(homeLocation?.foundMunicipios?.[0]?.[0]?.c_digo_dane_del_departamento),
+      barrio : homeLocation?.barrio?.[0],
+      direccion : homeLocation?.direccion?.[0],
+      info_vehiculo : {
+        vehiculo : tiene_vehiculo,
+        modelo : modelo,
+        esta_vendiendo : venderVehiculo,
+        sigue_pagando_vehiculo : creditoVehiculo,
+        banco : banco
+      },
+      interes_compra_vehiculo : vehiculoCompra,
+      home_location : homeLocation
+    };
+  }, [
+    setTipoDocumento,
+    setDocumento,
+    setNombre,
+    setApellidos,
+    setFechaNacimiento,
+    setGenero,
+    setCelular,
+    setEmail,
+    setEps,
+    setArl,
+    homeLocation,
+    setTiene_vehiculo,
+    setModelo,
+    setVenderVehiculo,
+    setCreditoVehiculo,
+    setBanco,
+    setVehiculoCompra,
+  ]); 
 
   const summary = useMemo(
     () => ({
@@ -160,7 +192,8 @@ const VentaPines = ({
     if (!paymentStatus) {
       notifyError("Transacción cancelada por el usuario");
     }
-    navigate("/Pines/PinesCrc");
+    setInquiryStatus(null)
+    // navigate("/Pines");
   }, [navigate, paymentStatus]);
 
   const onMakeInquiry = useCallback(
@@ -214,7 +247,7 @@ const VentaPines = ({
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
-            navigate("/Pines/PinesCrc", { replace: true });
+            navigate("/Pines", { replace: true });
             if (error?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
@@ -319,7 +352,7 @@ const VentaPines = ({
             estado : "Declinado"
           }
           registroTrx(infoPinCrc)
-          navigate("/Pines/PinesCrc", { replace: true });
+          navigate("/Pines", { replace: true });
           if (error?.cause === "custom") {
             return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
           }
@@ -357,7 +390,7 @@ const VentaPines = ({
             {
               render: ({ infoCliente: error }) => {
                 setLoadingSell(false);
-                // navigate("/Pines/PinesCrc", { replace: true });
+                // navigate("/Pines", { replace: true });
                 if (error?.cause === "custom") {
                   return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
                 }
@@ -568,16 +601,6 @@ const datosConven = useMemo(() => {
 [datosConveni]
 );
 
-const nuevoCelular = useMemo(() => {
-  if(showFormulario==true){
-setUserReferences((old) => ({
-  ...old,
-  ["referencia_2"]: String(celular),
-}))}
-},
-[celular]
-);
-
   const hasData = useMemo(() => {
     if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
       return false;
@@ -632,10 +655,76 @@ setUserReferences((old) => ({
       <SimpleLoading show={isLoading}></SimpleLoading>
 
       {/* <h1 className='text-3xl mt-6 mb-10'>Pines CRC</h1> */}
-      <Fieldset >
       <Form
         onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
         grid>
+      <Fieldset legend="Datos cliente" className="lg:col-span-2">
+        <Input
+          id="nombre"
+          label="Nombre"
+          type="text"
+          minLength="1"
+          maxLength="30"
+          required
+          autoComplete="off"
+          value={nombre}
+          onInput={(e) => {
+            const text = e.target.value.toUpperCase()
+            setNombre(text);
+          }}
+        />
+        <Input
+          id="apellido"
+          label="Apellido"
+          type="text"
+          minLength="1"
+          maxLength="30"
+          required
+          autoComplete="off"
+          value={apellidos}
+          onInput={(e) => {
+            const text = e.target.value.toUpperCase()
+            setApellidos(text);
+          }}
+        />
+        <Input
+          id="celular"
+          label="Celular"
+          type="text"
+          required
+          minLength="10"
+          maxLength="10"
+          autoComplete="off"
+          value={celular}
+          onInput={(e) => {
+            if (celular?.length === 0 & e.target.value!=="3"){
+              notifyError("El número de celular debe iniciar por 3")
+              setCelular("");
+            } 
+            else {
+            const num = parseInt(e.target.value) || "";
+            setCelular(num);
+          }
+          }}
+        />
+        <Input
+          id="email"
+          label="Email"
+          type="email"
+          minLength="5"
+          maxLength="100"
+          required
+          autoComplete="off"
+          value={email}
+          onInput={(e) => {
+            const text = e.target.value.toUpperCase()
+            setEmail(text);
+          }}
+        />
+        <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> 
+      </Fieldset>
+      <Fieldset legend="Pin exámenes médicos  " className="lg:col-span-2">
+      
 
         <Select
           className="place-self-stretch"
@@ -676,8 +765,9 @@ setUserReferences((old) => ({
             Realizar {!inquiryStatus ? "consulta" : "venta de pin"}
           </Button>
         </ButtonBar>
-      </Form>
+      
       </Fieldset>
+      </Form>
       <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={inquiryStatus}
@@ -697,7 +787,7 @@ setUserReferences((old) => ({
                 <Button type='submit' disabled={loadingSell}>
                  Realizar pago
                 </Button>
-                <Button onClick={handleClose} disabled={loadingSell}>
+                <Button type='button' onClick={handleClose} disabled={loadingSell}>
                   Cancelar
                 </Button>
               </ButtonBar>

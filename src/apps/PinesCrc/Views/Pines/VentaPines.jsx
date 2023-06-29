@@ -615,7 +615,7 @@ const VentaPines = () => {
     { value: "5", label: "Pasaporte" },
     { value: "13", label: "PPT (Permiso por Protección Temporal)" },
   ];
-
+  console.log(userReferences)
   const datosConveni = useMemo(() => {
     if (canal == "1") {
       return{

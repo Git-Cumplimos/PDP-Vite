@@ -5,21 +5,27 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import { usePinesVus } from "../../utils/pinesVusHooks";
-import { toast } from "react-toastify";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { notifyError } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import TicketsPines from "../../components/TicketsPines/TicketsPines"
-import Tickets from "../../../../components/Base/Tickets"
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select";
 import { useNavigate } from "react-router-dom";
 import Fieldset from "../../../../components/Base/Fieldset";
 import LocationFormPinVus from "../../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../../utils/enumParametrosPines";
-import InputSuggestions from "../../../../components/Base/InputSuggestions";
 import FirmaTratamientoDatos from "../../components/FirmaTratamientoDatos/FirmaTratamientoDatos";
-import TextArea from "../../../../components/Base/TextArea";
 import VentaPines from "./VentaPinesCRC";
+import useMoney from "../../../../hooks/useMoney";
+import {
+  makeSellPin,
+  makeInquiryPin,
+} from "../../../PinesCrc/utils/fetchFunctions";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import ScreenBlocker from "../../../PinesCrc/components/ScreenBlocker";
+import TicketColpatria from "../../../PinesCrc/components/TicketColpatria/TicketColpatria";
+import { decryptPin } from "../../../PinesCrc/utils/functions";
+import { registroTrx } from "../../../PinesCrc/utils/fetchRegistrarTrx";
 
 const dateFormatter = Intl.DateTimeFormat("az", {
   year: "numeric",
@@ -34,6 +40,21 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 
 const CrearPin = () => {
+
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 9999999,
+    min: 1000,
+  });
+
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+  });
+
+  const [valVentaPines, setValVentaPines] = useState(0);
+  const [loadingInquiry, setLoadingInquiry] = useState(false);
+  const [inquiryStatus, setInquiryStatus] = useState(null);
+  const [loadingSell, setLoadingSell] = useState(false);
+
   const navigate = useNavigate();
 
   const printDiv = useRef();
@@ -42,10 +63,14 @@ const CrearPin = () => {
     // pageStyle: "@page {size: 80mm 160mm; margin: 0; padding: 0;}",
   });
 
-  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaEpsArl, consultaCierreManual} = usePinesVus();
+  const { crearPinVus, con_estado_tipoPin, consultaTramite, consultaClientes, consultaCierreManual} = usePinesVus();
   const { infoTicket } = useAuth();
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
+  const [userAddress /* , setUserAddress */] = useState(
+    roleInfo?.direccion ?? ""
+  );
+
   const [showFormulario, setShowFormulario] = useState(false)
   const [documento, setDocumento] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -81,7 +106,7 @@ const CrearPin = () => {
   const [codigoPago, setCodigoPago] = useState("")
   const [codigoPago2, setCodigoPago2] = useState("")
 
-
+  const [pinData, setPinData] = useState({})
   const [olimpia, setOlimpia] = useState("")
 
   const [motivoCompra, setMotivoCompra] = useState("")
@@ -106,29 +131,12 @@ const CrearPin = () => {
   ];
   const [tipoDocumento, setTipoDocumento] = useState("1")
 
-  const optionsGenero = [
-    { value: "", label: "" },
-    { value: "F", label: "Femenino" },
-    { value: "M", label: "Masculino" },
-    { value: "O", label: "Otro" }, 
-  ];
   const [genero, setGenero] = useState("")
 
-
-  const optionsVehiculo = [
-    { value: "", label: "" },
-    { value: "Carro", label: "Carro" },
-    { value: "Moto", label: "Moto" },
-  ];
   const [tiene_vehiculo, setTiene_vehiculo] = useState("")
 
   const [modelo, setModelo] = useState("")
 
-  const optionsSiNo = [
-    { value: "", label: "" },
-    { value: "false", label: "No" },
-    { value: "true", label: "Si" },
-  ];
   const [venderVehiculo, setVenderVehiculo] = useState("")
 
   const [creditoVehiculo, setCreditoVehiculo] = useState("")
@@ -139,51 +147,7 @@ const CrearPin = () => {
 
   const [vehiculoCompra, setVehiculoCompra] = useState("")
 
-  const infoCliente = useMemo(() => {
-    return {
-      pk_documento_cliente : documento,
-      tipo_documento : tipoDocumento,
-      nombre : nombre,
-      apellidos : apellidos,
-      fecha_nacimiento : fechaNacimiento,
-      genero : genero,
-      celular : celular,
-      email : email,
-      eps : eps,
-      arl : arl,
-      municipio : parseInt(homeLocation?.foundMunicipios?.[0]?.[0]?.c_digo_dane_del_municipio.replace(".","")),
-      departamento : parseInt(homeLocation?.foundMunicipios?.[0]?.[0]?.c_digo_dane_del_departamento),
-      barrio : homeLocation?.barrio?.[0],
-      direccion : homeLocation?.direccion?.[0],
-      info_vehiculo : {
-        vehiculo : tiene_vehiculo,
-        modelo : modelo,
-        esta_vendiendo : venderVehiculo,
-        sigue_pagando_vehiculo : creditoVehiculo,
-        banco : banco
-      },
-      interes_compra_vehiculo : vehiculoCompra,
-      home_location : homeLocation
-    };
-  }, [
-    setTipoDocumento,
-    setDocumento,
-    setNombre,
-    setApellidos,
-    setFechaNacimiento,
-    setGenero,
-    setCelular,
-    setEmail,
-    setEps,
-    setArl,
-    homeLocation,
-    setTiene_vehiculo,
-    setModelo,
-    setVenderVehiculo,
-    setCreditoVehiculo,
-    setBanco,
-    setVehiculoCompra,
-  ]);  
+  const [paymentStatus, setPaymentStatus] = useState(null);
 
   const optionsCategoria = [
     { value: "", label: "" },
@@ -199,58 +163,243 @@ const CrearPin = () => {
 
   const [categoria, setCategoria] = useState("B1")
   const [categoria2, setCategoria2] = useState("")
-  const [foundEps, setFoundEps] = useState([])
-  const [foundArl, setFoundArl] = useState([])
-  const [optionsEps, setOptionsEps] = useState([])
-  const [optionsArl, setOptionsArl] = useState([])
   const [cierreManual, setCierreManual] = useState(false)
 
-  const searchEps = useCallback((e) => {
-    const query = (e.target.value);
-    if (query.length > 1) {
-    const datos = [];
-    const resp = optionsEps.map((eps) => {
-      if (eps.includes(query)){
-      datos.push(
-        <div onClick={ (e) => {
-          setEps(eps)
-        }}
-          >
-          <h1>{eps}</h1>
-          </div>
-        )
-      }
-      return datos
-    })  
-      setFoundEps(resp[0]) 
-    } else {
-      setFoundEps([]);
-    }
-  }, [optionsEps]);
+  const  optionsCanales = [
+    {"descripcion": "Olimpia",
+    "id":1},
+    {"descripcion": "Paynet(Indra)" ,
+    "id":2}
+  ]
+  const [canal, setCanal ] = useState("1");
 
-  const searchArl = useCallback((e) => {
-    const query = (e.target.value);
-    if (query.length > 1) {
-    const datos = [];
-    const resp = optionsArl.map((arl) => {
-      if (arl.includes(query)){
-      datos.push(
-        <div onClick={ (e) => {
-          setArl(arl)
-        }}
-          >
-          <h1>{arl}</h1>
-          </div>
-        )
-      }
-      return datos
-    })  
-      setFoundArl(resp[0]) 
-    } else {
-      setFoundArl([]);
-    }
-  }, [optionsArl]);
+  const datosConvenio = useMemo(() => {
+    if (canal == "1") {
+      return{
+    "codigo_pin": "0807", 
+    "fk_id_convenio": 2310,//2041, 
+    "fk_tipo_valor": 1, 
+    "nombre_convenio": "Venta pines CRC", 
+    "permite_modificar": true, 
+    "pk_codigo_convenio": "108928", 
+    "referencia_1": "Documento", 
+    "referencia_2": "Celular", 
+    "referencia_3": null, 
+    "referencia_4": null, 
+    "referencia_5": null
+  };}
+  else{ return{
+    "codigo_pin": "0043", 
+    "fk_id_convenio": 2310,//2041, 
+    "fk_tipo_valor": 1, 
+    "nombre_convenio": "Venta pines CRC", 
+    "permite_modificar": false, 
+    "pk_codigo_convenio": "108928", 
+    "referencia_1": "Documento", 
+    "referencia_2": "Celular", 
+    "referencia_3": null, 
+    "referencia_4": null, 
+    "referencia_5": null
+    };}
+  },
+    [canal]
+  );
 
+  const userReferences = useMemo(() => {
+    return {
+      referencia_1: String(documento), 
+      referencia_2: String(celular)};
+    },[documento, celular])
+
+  const onMakeInquiry = useCallback(
+    (ev) => {
+      ev.preventDefault();
+
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
+
+        // Datos trx colpatria
+        colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
+          codigo_pin: datosConvenio?.codigo_pin,
+          ...userReferences,
+          location: {
+            address: userAddress,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad.substring(0, 7),
+          },
+        },
+      };
+
+      notifyPending(
+        makeInquiryPin(data),
+        {
+          render: () => {
+            setLoadingInquiry(true);
+            return "Procesando consulta";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setLoadingInquiry(false);
+            setInquiryStatus(res?.obj);
+            if (canal==2){
+            setValVentaPines(res?.obj?.valor);
+            }
+            return "Consulta satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            setLoadingInquiry(false);
+            navigate("/Pines", { replace: true });
+            if (error?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+            }
+            // console.error(error?.message);
+            return "Consulta fallida";
+          },
+        }
+      );
+    },
+    [
+      datosConvenio,
+      userReferences,
+      userAddress,
+      valVentaPines,
+      roleInfo,
+      pdpUser?.uname,
+      navigate,
+    ]
+  );
+
+  const fetchTrx = useCallback(
+    (ev) => {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Convenio", datosConvenio?.nombre_convenio],
+          ["No. Pin", "pin_desencriptado"],
+          ...Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ]),
+          ["Valor", formatMoney.format(valVentaPines)],
+        ].reduce((list, elem, i) => {
+          list.push(elem);
+          if ((i + 1) % 1 === 0) list.push(["", ""]);
+          return list;
+        }, []),
+
+        id_trx: inquiryStatus?.id_trx,
+        // Datos trx colpatria
+        colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
+          codigo_pin: datosConvenio?.codigo_pin,
+          ...userReferences,
+          location: {
+            address: userAddress,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad.substring(0, 7),
+          },
+        },
+      };
+    notifyPending(
+      makeSellPin(data),
+      {
+        render: () => {
+          setLoadingSell(true);
+          return "Procesando transacción";
+        },
+      },
+      {
+        render: ({ data: res }) => {
+          setLoadingSell(false);
+          const tempTicket = res?.obj?.ticket ?? {};
+          const pin_encriptado = res?.obj?.pin_encriptado ?? "";
+          const pin_desencriptado = decryptPin(pin_encriptado);
+          tempTicket.trxInfo[2][1] = pin_desencriptado;
+          const infoPinCrc = {
+          pk_id_trx : res?.obj?.id_trx,
+          id_comercio : roleInfo?.id_comercio,
+          nombre_comercio : roleInfo?.nombre_comercio,
+          referencia : pin_desencriptado,
+          documento : documento,
+          valor_pin : valVentaPines,
+          estado : res?.status?"Aprobado":"Declinado"
+        }
+          registroTrx(infoPinCrc);
+          onSubmit();
+          setPaymentStatus(tempTicket);
+          return "Transacción satisfactoria";
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          setLoadingSell(false);
+          const infoPinCrc = {
+            pk_id_trx : inquiryStatus?.id_trx ,//error?.obj?.id_trx,
+            id_comercio : roleInfo?.id_comercio,
+            nombre_comercio : roleInfo?.nombre_comercio,
+            referencia : "",
+            documento : documento,
+            valor_pin : valVentaPines,
+            estado : "Declinado"
+          }
+          registroTrx(infoPinCrc)
+          navigate("/Pines", { replace: true });
+          if (error?.cause === "custom") {
+            return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+          }
+          // console.error(error?.message);
+          return "Transacción fallida";
+        },
+      }
+    );
+    }
+  );
+
+  const onMakePayment = useCallback(
+    (ev) => {
+      ev.preventDefault();   
+      if (valVentaPines <= 0) {
+        notifyError("El valor del pin CRC debe ser mayor a cero");
+        return;
+      }    
+      fetchTrx();
+    },
+    [
+      datosConvenio,
+      userReferences,
+      userAddress,
+      valVentaPines,
+      inquiryStatus,
+      roleInfo,
+      pdpUser?.uname,
+      navigate,
+    ]
+  );
   const [ticket1, setTicket1] = useState("")
   const [ticket2, setTicket2] = useState("")
 
@@ -313,7 +462,51 @@ const CrearPin = () => {
     disclamer: "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
   });
 
-  
+    const infoCliente = useMemo(() => {
+    return {
+      pk_documento_cliente : documento,
+      tipo_documento : tipoDocumento,
+      nombre : nombre,
+      apellidos : apellidos,
+      fecha_nacimiento : fechaNacimiento,
+      genero : genero,
+      celular : celular,
+      email : email,
+      eps : eps,
+      arl : arl,
+      municipio : parseInt(homeLocation?.foundMunicipios?.[0]?.[0]?.c_digo_dane_del_municipio.replace(".","")),
+      departamento : parseInt(homeLocation?.foundMunicipios?.[0]?.[0]?.c_digo_dane_del_departamento),
+      barrio : homeLocation?.barrio?.[0],
+      direccion : homeLocation?.direccion?.[0],
+      info_vehiculo : {
+        vehiculo : tiene_vehiculo,
+        modelo : modelo,
+        esta_vendiendo : venderVehiculo,
+        sigue_pagando_vehiculo : creditoVehiculo,
+        banco : banco
+      },
+      interes_compra_vehiculo : vehiculoCompra,
+      home_location : homeLocation
+    };
+  }, [
+    setTipoDocumento,
+    setDocumento,
+    setNombre,
+    setApellidos,
+    setFechaNacimiento,
+    setGenero,
+    setCelular,
+    setEmail,
+    setEps,
+    setArl,
+    homeLocation,
+    setTiene_vehiculo,
+    setModelo,
+    setVenderVehiculo,
+    setCreditoVehiculo,
+    setBanco,
+    setVehiculoCompra,
+  ]);  
 
   useEffect(() => {
     con_estado_tipoPin("tipo_pines_vus")
@@ -324,6 +517,13 @@ const CrearPin = () => {
       } else {
         const pin = res?.obj?.results
         setOptionsTipoPines(pin.filter(pin => pin.id === 1));
+        const resp = pin.filter(pin => pin.id === 1);
+        setPinData({
+          descripcion : resp[0]?.descripcion.toUpperCase(),
+          valor : resp[0]?.valor,
+          iva : resp[0]?.iva,
+          total : resp[0]?.valor + resp[0]?.iva
+        }) 
       }
     })
     .catch(() => setDisabledBtns(false));
@@ -340,17 +540,17 @@ const CrearPin = () => {
     })
     .catch(() => setDisabledBtns(false));
 
-    consultaEpsArl()
-    .then((res) => {
-      setDisabledBtns(false);
-      if (!res?.status) {
-        notifyError(res?.msg);
-      } else {
-        setOptionsEps(res?.obj?.eps);
-        setOptionsArl(res?.obj?.arl);
-      }
-    })
-    .catch(() => setDisabledBtns(false));
+    // consultaEpsArl()
+    // .then((res) => {
+    //   setDisabledBtns(false);
+    //   if (!res?.status) {
+    //     notifyError(res?.msg);
+    //   } else {
+    //     setOptionsEps(res?.obj?.eps);
+    //     setOptionsArl(res?.obj?.arl);
+    //   }
+    // })
+    // .catch(() => setDisabledBtns(false));
 
     ///////////////
     consultaCierreManual()
@@ -364,16 +564,16 @@ const CrearPin = () => {
     .catch(() => console.log("Falla en consulta estado cierre manual"));
   }, []);
 
-  const pinData = useMemo(() => {
-    const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
-    const pinData = {
-      descripcion : resp[0]?.descripcion.toUpperCase(),
-      valor : resp[0]?.valor,
-      iva : resp[0]?.iva,
-      total : resp[0]?.valor + resp[0]?.iva
-    }
-    return pinData;
-  }, [optionsTipoPines, tipoPin]);
+  // const pinData = useMemo(() => {
+  //   const resp = optionsTipoPines?.filter((id) => id.id === tipoPin);
+  //   const pinData = {
+  //     descripcion : resp[0]?.descripcion.toUpperCase(),
+  //     valor : resp[0]?.valor,
+  //     iva : resp[0]?.iva,
+  //     total : resp[0]?.valor + resp[0]?.iva
+  //   }
+  //   return pinData;
+  // }, [optionsTipoPines, tipoPin]);
 
   const tramiteData = useMemo(() => {
     const resp = optionsTramites?.filter((id) => id.id === tramite);
@@ -420,26 +620,14 @@ const CrearPin = () => {
         setShowModal(false)
       }
       else{
-            consultaClientes(documento,olimpia,tipoDocumento,idPin,tipoPin).then((resp) => {
-          if (!resp?.status){
-            notifyError(resp?.msg)
-            setShowPinLicencia(false)
-            setCategoria("")
-            setTramite2("")
-            setTramite("")
-            setCategoria2("")
-            setShowModal(false)
-          }else{  
-            if (firma === "" && pedirFirma) {
-              notifyError("Asegúrese de tener la firma del cliente en físico ")
-            }
-            setShowModal(true)   
-          }})
+        if (firma === "" && pedirFirma) {
+          notifyError("Asegúrese de tener la firma del cliente en físico ")
+        }
+        onMakeInquiry(e)
       }
     }
     setDisabledBtns(false)
   };
-
   const onSubmitCliente = (e) => {
     e.preventDefault();
     setDisabledBtnsContinuar(true);
@@ -544,7 +732,8 @@ const CrearPin = () => {
     });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = useCallback(
+    (e) => {
     e.preventDefault();
     setDisabledBtns(true);
     const hora_actual=Intl.DateTimeFormat("es-CO", {
@@ -594,10 +783,6 @@ const CrearPin = () => {
       objTicket["trxInfo"][10] = ["Código Aprobación 2", codigoPago2]
       objTicket["trxInfo"][11] = ["", ""]    
     }
-
-    // objTicket["trxInfo"][2] = ["Valor Pin", formatMoney.format(respPin?.valor)]
-    // objTicket["trxInfo"][3] = ["IVA Pin",formatMoney.format(respPin?.valor_iva)]
-    // objTicket["trxInfo"][4] = ["Total", formatMoney.format(respPin?.valor + respPin?.valor_iva)] 
 
     const objTicket2 = { ...objTicketActual2 };
     objTicket2["title"] = "Recibo de pago: TRÁMITE "+ tramiteData?.descripcion.toUpperCase() 
@@ -692,7 +877,7 @@ const CrearPin = () => {
     }
     
     
-  };
+  });
 
   const closeModal = useCallback(async () => {
     if(respPin !== ""){
@@ -753,6 +938,68 @@ const CrearPin = () => {
 
   }, [venderVehiculo,tipoPin, hora, horaCierre, navigate, cierreManual])
 
+  const handleClose = useCallback(() => {
+    if (!paymentStatus) {
+      notifyError("Transacción cancelada por el usuario");
+    }
+    setInquiryStatus(null)
+    // navigate("/Pines");
+  }, [navigate, paymentStatus]);
+
+
+  const summary = useMemo(() =>     
+      {
+        console.log("PRUEBA -->",showTramiteAdicional)
+      let datos = {}
+      if(!showTramiteAdicional){
+      datos = {
+        "Número de convenio": datosConvenio.pk_codigo_convenio,
+        "Convenio": datosConvenio.nombre_convenio, 
+        ...Object.fromEntries(
+          Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ])
+        ),
+        "Valor Pin CRC":formatMoney.format(valVentaPines),
+        "Valor Trámite 1": formatMoney.format(tramiteData.valor),
+        "IVA Trámite 1": formatMoney.format(tramiteData.iva),
+        "Valor Pin": formatMoney.format(pinData.valor),
+        "IVA Pin": formatMoney.format(pinData.iva),
+        "Total": formatMoney.format(pinData.total + tramiteData.total + valVentaPines)}
+      }
+      else{
+      datos = {
+        "Número de convenio": datosConvenio.pk_codigo_convenio,
+        "Convenio": datosConvenio.nombre_convenio, 
+        ...Object.fromEntries(
+          Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ])
+        ),
+        "Valor Pin CRC":formatMoney.format(valVentaPines),
+        "Valor Trámite 1": formatMoney.format(tramiteData.valor),
+        "IVA Trámite 1": formatMoney.format(tramiteData.iva),
+        "Valor Trámite 2": formatMoney.format(tramiteData2.valor),
+        "IVA Trámite 2": formatMoney.format(tramiteData2.iva),
+        "Valor Pin": formatMoney.format(pinData.valor),
+        "IVA Pin": formatMoney.format(pinData.iva),
+        "Total": formatMoney.format(pinData.total + tramiteData.total + tramiteData2.total + valVentaPines)
+      }        
+      }
+      console.log("DATOS--->",datos)
+      return datos 
+    },
+    [userReferences, 
+    datosConvenio, 
+    valVentaPines,
+    showTramiteAdicional,
+    valVentaPines,
+    tramiteData,
+    pinData,
+    onChangeMoney]
+  );
   return (
     <>
     {"id_comercio" in roleInfo ? (
@@ -835,8 +1082,30 @@ const CrearPin = () => {
       </ButtonBar>
       </Form>
       {showFormulario? 
-      <Form onSubmit={onSubmitModal} grid>
-
+      <>    
+      {/* <VentaPines 
+        homeLocation={homeLocation}
+        infoCliente={infoCliente}
+        setDocumento={setDocumento} documento={documento}
+        setTipoDocumento={setTipoDocumento} tipoDocumento={tipoDocumento}
+        setNombre={setNombre} nombre={nombre}
+        setApellidos={setApellidos} apellidos={apellidos} 
+        setCelular={setCelular} celular={celular}
+        setEmail={setEmail} email={email}
+        setFechaNacimiento={setFechaNacimiento} fechaNacimiento={fechaNacimiento}
+        setGenero={setGenero} genero={genero}
+        setEps={setEps} eps={eps}
+        setArl={setArl} arl={arl}
+        setTiene_vehiculo={setTiene_vehiculo} tiene_vehiculo={tiene_vehiculo}
+        setModelo={setModelo} modelo={modelo}
+        setVenderVehiculo={setVenderVehiculo} venderVehiculo={venderVehiculo}
+        setCreditoVehiculo={setCreditoVehiculo} creditoVehiculo={creditoVehiculo}
+        setBanco={setBanco} banco={banco}
+        setComprarVehiculo={setComprarVehiculo} comprarVehiculo={comprarVehiculo}
+        setVehiculoCompra={setVehiculoCompra} vehiculoCompra={vehiculoCompra}
+        setPaymentStatus={setPaymentStatus} paymentStatus={paymentStatus} 
+        ></VentaPines> */}
+      <Form onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onSubmitModal} grid>
       <Fieldset legend="Datos cliente" className="lg:col-span-2">
         <Input
           id="nombre"
@@ -902,7 +1171,42 @@ const CrearPin = () => {
         />
         <LocationFormPinVus place="Residencia" location={homeLocation} addressInput="input"/> 
       </Fieldset>
-      <VentaPines infoCliente={infoCliente}></VentaPines>
+      <Fieldset legend="Pin exámenes médicos  " className="lg:col-span-2">     
+        <Select
+          className="place-self-stretch"
+          id="tramite"
+          label="Canal"
+          options={ 
+            Object.fromEntries([
+              ...optionsCanales?.map(({ descripcion, id }) => {
+                return [descripcion, id];
+              }),
+            ]) || { "": "" }
+          }
+          value={canal}
+          required={true}
+          onChange={(e) => {
+            setCanal(e.target.value);
+            console.log(infoCliente)
+          }}
+
+        />
+        {(datosConvenio.fk_tipo_valor === 1 && canal == 1)? (
+          <Input
+            id='valor'
+            name='valor'
+            label='Valor a pagar'
+            autoComplete='off'
+            type='tel'
+            minLength={"5"}
+            maxLength={"12"}
+            onInput={(ev) => setValVentaPines(onChangeMoney(ev))}
+            required
+          />
+        ) : (
+          ""
+        )}      
+      </Fieldset>
       <Fieldset legend="Datos Trámite" className="lg:col-span-2">
       
         <Select
@@ -917,8 +1221,7 @@ const CrearPin = () => {
             ]) || { "": "" }
           }
           value={tipoPin}
-          required={true}
-          
+          required={true}          
         />
         
 
@@ -948,10 +1251,7 @@ const CrearPin = () => {
             setCategoria2("")
             settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
           }}
-        />
-    {showPinLicencia ? 
-      <>
-
+        />   
 
         <Select
           className="place-self-stretch"
@@ -972,7 +1272,7 @@ const CrearPin = () => {
             settxtButtonTramiteAdicional("+ Agregar Segundo Trámite")
           }
         }
-          />
+        />
 
           <br></br>
 
@@ -1069,14 +1369,11 @@ const CrearPin = () => {
       
               :
               ""
-              }  
-                      </>
-      :"" 
-      }
+              }
       </Fieldset>       
       <ButtonBar className="col-auto md:col-span-2">
         <Button type="submit" disabled={disabledBtns}>
-          Crear pin
+          Consultar
         </Button>
         <Button type="button"
         onClick={() => {
@@ -1088,13 +1385,54 @@ const CrearPin = () => {
         </Button>
       </ButtonBar>
       </Form>
+      </>
       :
       ""
-      }    
-      
-        
-
-      <Modal show={showModal} handleClose={() => closeModal()}>
+      }
+      <ScreenBlocker show={loadingInquiry} />
+      <Modal
+        show={inquiryStatus}
+        handleClose={loadingSell ? () => {} : handleClose}>
+        {respPin !== ""? (
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div ref={printDiv}>
+            <TicketColpatria 
+              refPrint={null} 
+              ticket={paymentStatus} 
+            />
+            <TicketsPines
+              refPrint={null} 
+              ticket={ticket1} 
+              logo = 'LogoVus'
+            />
+            <TicketsPines
+              refPrint={null} 
+              ticket={ticket2}
+              logo = 'LogoVus'
+            />
+            </div>
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={handleClose}>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        ) : (
+          <form onSubmit={onMakePayment}>
+            
+            <PaymentSummary summaryTrx={summary}>
+            <ButtonBar>
+              <Button type='submit' disabled={loadingSell}>
+                Realizar pago
+              </Button>
+              <Button type='button' onClick={handleClose} disabled={loadingSell}>
+                Cancelar
+              </Button>
+            </ButtonBar>
+            </PaymentSummary>
+          </form>
+        )}
+      </Modal>
+      {/* <Modal show={showModal} handleClose={() => closeModal()}>
         {respPin !== ""? 
         <div className="flex flex-col justify-center items-center" >
           <div ref={printDiv}>
@@ -1268,7 +1606,7 @@ const CrearPin = () => {
           </div>
         </div>     
         }   
-      </Modal>
+      </Modal> */}
       <Modal show={showModalFirma} handleClose={() => closeModalFirma()}>
         <FirmaTratamientoDatos
         closeModal={closeModalFirma}

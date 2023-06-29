@@ -405,7 +405,7 @@ const allUrlsPrivateApps = [
           {
             link: "/GestionTransaccional/AnulacionesPinesCRC/Historico",
             label: (
-              <AppIcons Logo={"DESCARGAR"} name={"Historico anulaciones"} />
+              <AppIcons Logo={"DESCARGAR"} name={"Histórico Anulaciones"} />
             ),
             component: HistoricoAnulacionesPinesCRC,
             permission: [63],
