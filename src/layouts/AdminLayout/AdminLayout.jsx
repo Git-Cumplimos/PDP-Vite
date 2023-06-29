@@ -161,7 +161,7 @@ const AdminLayout = () => {
             </div>
           </div>
           <div className={usrData}>
-            <div className={diasSobregiro} >
+            <div className={diasSobregiro}>
               Dias sobregiro {sobregiro || "0"}
             </div>
           </div>
@@ -214,7 +214,7 @@ const AdminLayout = () => {
         </Modal>
         <Modal show={showModalPublicidad} handleClose={handleClose}>
           <img
-            src={`${urlAssets}/assets/img/MODALPUBLICIDAD.png`}
+            src={`${urlAssets}/assets/svg/recaudo/MODAL_PUBLICIDAD/MODAL_PUBLICIDAD.jpg`}
             alt="Proximamente Corresponsal Colpatria"
           ></img>
         </Modal>
