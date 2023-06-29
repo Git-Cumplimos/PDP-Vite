@@ -23,19 +23,15 @@ const HistoricoPagoPremios = ({ route }) => {
   });
 
   const handleChange = (e) => {
-    if (e.target.value) {
       setDatosTrans((old) => {
         return { ...old, fecha_ini: e.target.value };
       });
-    }
   };
 
   const handleChange2 = (e) => {
-    if (e.target.value) {
       setDatosTrans((old) => {
         return { ...old, fecha_fin: e.target.value };
       });
-    }
   };
 
   useEffect(() => {
@@ -138,12 +134,14 @@ const HistoricoPagoPremios = ({ route }) => {
           id="dateInit"
           label="Fecha inicial"
           type="date"
+          value={datosTrans.fecha_ini}
           onChange={handleChange}
         />
         <Input
           id="dateEnd"
           label="Fecha final"
           type="date"
+          value={datosTrans.fecha_fin}
           onInput={handleChange2}
         />
         <Input

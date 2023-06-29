@@ -181,7 +181,7 @@ const CargaArchivos = ({ route }) => {
   const [disabledBtns, setDisabledBtns] = useState(false);
 
   const onSubmit = (event) => {
-    const regex=/[<>:"\/\\|?* -(){}~`#%]/g;
+    const regex=/[<>:"\/\\|?*$ -(){}~`#%,.;'!@=+]/g;
     event.preventDefault();
     if (!regex.test(fileName)){
       setShowModal(true);
