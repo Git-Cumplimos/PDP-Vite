@@ -125,7 +125,6 @@ const PagoCarteraTargCredito = () => {
    
     const validacionDatos = (e) => {
         e.preventDefault();
-        console.log("SI ENTRO validacionDatos")
         setConfirmacionDatos(true)
         setShowModal(true)
     }    
