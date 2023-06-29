@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Form from "../../../../../../components/Base/Form";
+import { formatMoney } from "../../../../../../components/Base/MoneyInput"
 import Modal from "../../../../../../components/Base/Modal";
 import Select from "../../../../../../components/Base/Select";
 import { useAuth } from "../../../../../../hooks/AuthHooks";
@@ -36,6 +37,7 @@ const options_select = [
 const PagoCartera = () => {
     const uniqueId = v4();
     const [inputNumTarCredi, setInputNumTarCredi] = useState("");
+    const [inputValorTarCredi, setInputValorTarCredi] = useState("");
     const [selectIndiceObligacion, setSelectIndiceObligacion] = useState(0);
     const [paso, setPaso] = useState("LecturaNumeroObligacion");
     const [documento, setDocumento] = useState("LecturaNumeroObligacion");
@@ -211,6 +213,8 @@ const PagoCartera = () => {
     });
 
     const HandleCloseTrx = useCallback(() => {
+        setInputValorTarCredi("")
+        setInputNumTarCredi("")
         setPaso("LecturaNumeroObligacion");
         setDocumento("LecturaNumeroObligacion");
         setShowModal(false);
@@ -277,15 +281,18 @@ const PagoCartera = () => {
 
     function onChangeInput(e) {
         const { name, value } = e.target;
-        const numericValue = value.replace(/[^0-9]/g, '');
-
-        setInputNumTarCredi(prevState => ({
-            ...prevState,
-            [name]: numericValue,
-        }));
-
+        const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 16));
+        setInputNumTarCredi(numericValue);    
         if (value === "") { 
             setInputNumTarCredi("")
+        }
+    }
+    function onChangeInput2(e) {
+        const { name, value } = e.target;
+        const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 8));
+        setInputValorTarCredi(numericValue);
+        if (value === "" || value === 0) { 
+            setInputValorTarCredi("")
         }
     }
     return (
@@ -301,16 +308,29 @@ const PagoCartera = () => {
                     minLength="5"
                     maxLength="16"
                     autoComplete="off"
-                    value={inputNumTarCredi.name}
+                    value={inputNumTarCredi}
                     onChange={onChangeInput}
                     required
                     ></Input>
                 </div>
+                <div className={styleComponents}>
+                    <Input
+                    name="ValorPagar"
+                    label="Valor a pagar"
+                    type="number"
+                    minLength="4"
+                    maxLength="8"
+                    autoComplete="off"
+                    value={inputValorTarCredi}
+                    onChange={onChangeInput2}
+                    required
+                    ></Input>
+                </div>
                     <ButtonBar className="flex justify-center py-6">
-                        <Button type={"submit"} onClick={"onSubmit"} disabled={inputNumTarCredi === ""}>
-                            Realizar consulta
+                    <Button type={"submit"} onClick={"onSubmit"} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
+                            Realizar Pago
                         </Button>
-                        <Button type={"reset"} onClick={"handleClose"} disabled={true}>
+                    <Button type={"reset"} onClick={HandleCloseTrx} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
                             Cancelar
                         </Button>
                     </ButtonBar>
