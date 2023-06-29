@@ -302,7 +302,11 @@ const Loteria = ({ route }) => {
         label="Tipo de sorteo"
         options={opcionesdisponibles}
         value={sorteo}
-        onChange={(e) => setSorteo(e.target.value)}
+        onChange={(e) => {
+          setSorteo(e.target.value);
+          setNumero("");
+          setSerie("");
+        }}
       />
       {sorteo !== "" ?
           <TableEnterprise
