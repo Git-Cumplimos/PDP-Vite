@@ -24,8 +24,7 @@ import SimpleLoading from "../../../../../../components/Base/SimpleLoading/Simpl
 import TableEnterprise from "../../../../../../components/Base/TableEnterprise/TableEnterprise";
 import Input from "../../../../../../components/Base/Input/Input";
 const { styleComponents } = classes;
-const url_consult_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/consulta_pago_cartera`;
-const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera`;
+const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
 const numero_tarCredito = "Número tarjeta de crédito";
@@ -34,7 +33,7 @@ const options_select = [
     { value: numero_tarCredito, label: numero_tarCredito },
     // { value: numero_cedula, label: numero_cedula },
 ];
-const PagoCartera = () => {
+const PagoCarteraTargCredito = () => {
     const uniqueId = v4();
     const [inputNumTarCredi, setInputNumTarCredi] = useState("");
     const [inputValorTarCredi, setInputValorTarCredi] = useState("");
@@ -55,10 +54,6 @@ const PagoCartera = () => {
         url_pago_cartera,
         urlreintentos,
         "PagoCartera"
-    );
-
-    const [loadingPeticionConsultPagoCartera, peticionConsultCartera] = useFetch(
-        fetchCustom(url_consult_pago_cartera, "POST", "Consultar Pago Cartera")
     );
 
     const CallErrorPeticion = useCallback((error) => {
@@ -91,34 +86,15 @@ const PagoCartera = () => {
         setProcedimiento(numero_obligacion);
     }, []);
 
-    const onChangeNumeroCartera = useCallback((e) => {
-        setNumeroPagoCartera(e.target.value);
-    }, []);
-
-    const onChangeSelect = useCallback((e) => {
-        if (e.target.value === numero_obligacion) {
-            setDocumento("LecturaNumeroObligacion");
-            setPaso("LecturaNumeroObligacion");
-            setProcedimiento(numero_obligacion);
-        } else if (e.target.value === numero_cedula) {
-            setPaso("LecturaNumeroCedula");
-            setDocumento("LecturaNumeroCedula");
-            setProcedimiento(numero_cedula);
-        }
-        setNumeroPagoCartera("");
-    }, []);
-
-    const onSubmitConsultPagoCartera = (e) => {
+    const onSubmitPayCartera = (e) => {
         e.preventDefault();
-        setShowModalObligacion(false)
-        setShowModal(false);
         const data = {
             oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
                     roleInfo?.tipo_comercio === "KIOSCO"
                     ? true
                     : false,
-            valor_total_trx: 0,
+            valor_total_trx: parseInt(inputValorTarCredi !== "" ? inputValorTarCredi : 0),
             nombre_comercio: roleInfo?.["nombre comercio"],
             nombre_usuario: pdpUser?.uname ?? "",
             comercio: {
@@ -126,9 +102,8 @@ const PagoCartera = () => {
                 id_terminal: roleInfo.id_dispositivo,
                 id_usuario: roleInfo.id_usuario,
             },
-            consultaCartera: {
-                valReferencia1: numeroPagoCartera,
-                numeroConsulta: options_select === 'Número de cédula' ? '000001' : '000002',
+            PagoCartera: {
+                numeroTarjCredito: parseInt(inputNumTarCredi),
                 location: {
                     address: roleInfo?.["direccion"],
                     dane_code: roleInfo?.codigo_dane,
@@ -136,77 +111,29 @@ const PagoCartera = () => {
                 },
             },
         };
-        peticionConsultCartera({}, data)
+        const dataAditional = {
+            id_uuid_trx: uniqueId,
+        }
+        peticionPayCartera(data, dataAditional)
             .then((response) => {
+                console.log("en peticionPayCartera valor de inputNumTarCredi", inputNumTarCredi)
+                console.log("en peticionPayCartera valor de inputValorTarCredi", inputValorTarCredi)
                 if (response?.status === true) {
-                    setResConsultCartera(response?.obj?.valores_trx);
-                    setPaso("ResumenTrx");
-                    setShowModal(true);
+                    const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
+                    setInfTicket(voucher);
+                    setPaso("TransaccionExitosa");
+                    notify("Pago de Cartera exitoso");
+                    setShowModal(false)
+                    setShowModalTicket(true)
+                } else if (response?.status === false || response === undefined) {
+                    HandleCloseTrxExitosa()
+                    notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
                 }
             })
             .catch((error) => {
                 CallErrorPeticion(error);
             });
-    };
-
-    const onSubmitPayCartera = useCallback(
-        (e, pagoTotal, choice_numero_obligacion, labelSeleccionado) => {
-            e.preventDefault();
-            const data = {
-                oficina_propia:
-                    roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-                        roleInfo?.tipo_comercio === "KIOSCO"
-                        ? true
-                        : false,
-                valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
-                nombre_comercio: roleInfo?.["nombre comercio"],
-                nombre_usuario: pdpUser?.uname ?? "",
-                comercio: {
-                    id_comercio: roleInfo.id_comercio,
-                    id_terminal: roleInfo.id_dispositivo,
-                    id_usuario: roleInfo.id_usuario,
-                },
-                PagoCartera: {
-                    valReferencia1: choice_numero_obligacion,
-                    valor_total_trx: pagoTotal !== "" ? pagoTotal : 0,
-                    numeroPago: labelSeleccionado === 'Valor total deuda' ? '000002' : '000001',
-                    location: {
-                        address: roleInfo?.["direccion"],
-                        dane_code: roleInfo?.codigo_dane,
-                        city: roleInfo?.["ciudad"],
-                    },
-                },
-            };
-            const dataAditional = {
-                id_uuid_trx: uniqueId,
-            }
-            peticionPayCartera(data, dataAditional)
-                .then((response) => {
-                    if (response?.status === true) {
-                        const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
-                        setInfTicket(voucher);
-                        setPaso("TransaccionExitosa");
-                        notify("Pago de Cartera exitoso");
-                        setShowModal(false)
-                        setShowModalTicket(true)
-                    } else if (response?.status === false || response === undefined) {
-                        HandleCloseTrxExitosa()
-                        notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
-                    }
-                })
-                .catch((error) => {
-                    CallErrorPeticion(error);
-                });
-        },
-        [
-            numeroPagoCartera,
-            pdpUser,
-            roleInfo,
-            peticionPayCartera,
-            resConsultCartera,
-            CallErrorPeticion,
-        ]
-    );
+    }    
 
     const handlePrint = useReactToPrint({
         content: () => printDiv.current,
@@ -243,9 +170,6 @@ const PagoCartera = () => {
         if (paso === "LecturaNumeroObligacion") {
             setDocumento("LecturaNumeroObligacion")
             HandleCloseTrx();
-        } else if (paso === "LecturaNumeroCedula" && !loadingPeticionConsultPagoCartera) {
-            setDocumento("LecturaNumeroCedula")
-            HandleCloseTrx();
         } else if (paso === "ResumenTrx" && !loadingPeticionPayCartera) {
             HandleCloseTrx();
         } else if (paso === "TransaccionExitosa") {
@@ -255,8 +179,7 @@ const PagoCartera = () => {
         paso,
         HandleCloseTrx,
         HandleCloseTrxExitosa,
-        loadingPeticionPayCartera,
-        loadingPeticionConsultPagoCartera,
+        loadingPeticionPayCartera,        
     ]);
 
     const tableObligacion = useMemo(() => {
@@ -297,7 +220,7 @@ const PagoCartera = () => {
     }
     return (
         <Fragment>
-            <SimpleLoading show={loadingPeticionConsultPagoCartera}></SimpleLoading>
+            <SimpleLoading show={loadingPeticionPayCartera}></SimpleLoading>
             <h1 className='text-3xl mt-6'>Pago Tarjeta Crédito</h1>
             <Form>
                 <div className={styleComponents}>
@@ -327,7 +250,7 @@ const PagoCartera = () => {
                     ></Input>
                 </div>
                     <ButtonBar className="flex justify-center py-6">
-                    <Button type={"submit"} onClick={"onSubmit"} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
+                    <Button type={"submit"} onClick={onSubmitPayCartera} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
                             Realizar Pago
                         </Button>
                     <Button type={"reset"} onClick={HandleCloseTrx} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
@@ -376,4 +299,4 @@ const PagoCartera = () => {
     );
 };
 
-export default PagoCartera;
+export default PagoCarteraTargCredito;
