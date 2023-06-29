@@ -355,6 +355,11 @@ const CargueAnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anul
 const DescargaPeticionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/DescargarArchivoPeticiones"))
 const HistoricoAnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/HistoricoAnulaciones"))
 
+/**
+ * Pines Combinados -- CRC y Comsión premium
+ */
+const PinesCombinados = lazy(() => import("../apps/PinesVus/Views/PinesCombinados/CrearPin"))
+
 
 
 const allUrlsPrivateApps = [
@@ -669,7 +674,14 @@ const allUrlsPrivateApps = [
       ...listPermissionsPinesCrc,
     ],
     provider: ProvidepinesVus,
-    subRoutes: [rutasPines, rutasPinesVus, rutasPinesCrc],
+    subRoutes: [rutasPines, rutasPinesVus, rutasPinesCrc,
+    {
+      link: "/Pines/Combinados",
+      label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
+      component: PinesCombinados,
+      permission: [53]
+    },
+    ],
   },
   {
     link: "/recaudo",
