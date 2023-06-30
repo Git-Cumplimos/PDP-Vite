@@ -15,7 +15,6 @@ import Fieldset from "../../../../components/Base/Fieldset";
 import LocationFormPinVus from "../../components/LocationForm/LocationFormPinesVus"
 import { enumParametrosPines } from "../../utils/enumParametrosPines";
 import FirmaTratamientoDatos from "../../components/FirmaTratamientoDatos/FirmaTratamientoDatos";
-import VentaPines from "./VentaPinesCRC";
 import useMoney from "../../../../hooks/useMoney";
 import {
   makeSellPin,
