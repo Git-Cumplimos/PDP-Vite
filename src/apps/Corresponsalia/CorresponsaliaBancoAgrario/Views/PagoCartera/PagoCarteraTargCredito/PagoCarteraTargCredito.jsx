@@ -149,7 +149,7 @@ const PagoCarteraTargCredito = () => {
         setShowModalTicket(false)
         setNumeroPagoCartera("");
         setInfTicket(null);
-        validNavigate("/corresponsalia/corresponsalia-banco-agrario");
+        validNavigate("/corresponsalia/corresponsalia-banco-agrario/pago-cartera");
     }, [validNavigate]);
 
     const HandleCloseModal = useCallback(() => {

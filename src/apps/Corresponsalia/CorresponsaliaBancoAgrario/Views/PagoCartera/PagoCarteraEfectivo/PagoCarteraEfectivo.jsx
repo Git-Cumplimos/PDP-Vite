@@ -225,7 +225,7 @@ const PagoCartera = () => {
         setResConsultCartera({});
         setInfTicket(null);
         setProcedimiento(numero_obligacion);
-        validNavigate("/corresponsalia/corresponsalia-banco-agrario");
+        validNavigate("/corresponsalia/corresponsalia-banco-agrario/pago-cartera");
     }, [validNavigate]);
 
     const HandleCloseModal = useCallback(() => {
