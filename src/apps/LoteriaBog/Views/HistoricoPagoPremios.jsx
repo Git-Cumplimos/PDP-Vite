@@ -26,11 +26,23 @@ const HistoricoPagoPremios = ({ route }) => {
     setDatosTrans((old) => {
       return { ...old, fecha_ini: e.target.value };
     });
+    setPageData((old) => {
+      return { ...old, page: 1};
+    });
+    setPageData((old) => {
+      return { ...old, limit: 10};
+    });
   };
 
   const handleChange2 = (e) => {
     setDatosTrans((old) => {
       return { ...old, fecha_fin: e.target.value };
+    });
+    setPageData((old) => {
+      return { ...old, page: 1};
+    });
+    setPageData((old) => {
+      return { ...old, limit: 10};
     });
   };
 
@@ -54,7 +66,7 @@ const HistoricoPagoPremios = ({ route }) => {
             setResp_con_sort(res.obj?.result?.info ?? []);
             setMaxPages(res.obj?.result?.num_datos ?? 1);
           } else {
-            notifyError(res.msg);
+            notifyError(res.msg,5000,{toastId: "notify-lot"});
             setResp_con_sort([]);
           }
         }
@@ -156,6 +168,12 @@ const HistoricoPagoPremios = ({ route }) => {
               setDatosTrans((old) => {
                 return { ...old, sorteo: e.target.value };
               });
+              setPageData((old) => {
+                return { ...old, page: 1};
+              });
+              setPageData((old) => {
+                return { ...old, limit: 10};
+              });
             }
           }}
         />
@@ -172,6 +190,12 @@ const HistoricoPagoPremios = ({ route }) => {
               setDatosTrans((old) => {
                 return { ...old, numero: e.target.value };
               });
+              setPageData((old) => {
+                return { ...old, page: 1};
+              });
+              setPageData((old) => {
+                return { ...old, limit: 10};
+              });
             }
           }}
         />
@@ -187,6 +211,12 @@ const HistoricoPagoPremios = ({ route }) => {
             if (!isNaN(e.target.value)) {
               setDatosTrans((old) => {
                 return { ...old, serie: e.target.value };
+              });
+              setPageData((old) => {
+                return { ...old, page: 1};
+              });
+              setPageData((old) => {
+                return { ...old, limit: 10};
               });
             }
           }}
