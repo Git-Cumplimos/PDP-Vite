@@ -262,7 +262,7 @@ const CrearPin = () => {
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
-            navigate("/Pines", { replace: true });
+            // navigate("/Pines", { replace: true });
             if (error?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
@@ -283,123 +283,6 @@ const CrearPin = () => {
     ]
   );
 
-  const fetchTrx = useCallback(
-    (ev) => {
-      const data = {
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-        },
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO",
-        valor_total_trx: valVentaPines,
-        nombre_usuario: pdpUser?.uname ?? "",
-        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
-        ticket_init: [
-          ["Convenio", datosConvenio?.nombre_convenio],
-          ["No. Pin", "pin_desencriptado"],
-          ...Object.entries(userReferences).map(([, val], index) => [
-            datosConvenio[`referencia_${index + 1}`],
-            val,
-          ]),
-          ["Valor", formatMoney.format(valVentaPines)],
-        ].reduce((list, elem, i) => {
-          list.push(elem);
-          if ((i + 1) % 1 === 0) list.push(["", ""]);
-          return list;
-        }, []),
-
-        id_trx: inquiryStatus?.id_trx,
-        // Datos trx colpatria
-        colpatria: {
-          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
-          codigo_convenio: datosConvenio?.pk_codigo_convenio,
-          codigo_pin: datosConvenio?.codigo_pin,
-          ...userReferences,
-          location: {
-            address: userAddress,
-            dane_code: roleInfo?.codigo_dane,
-            city: roleInfo?.ciudad.substring(0, 7),
-          },
-        },
-      };
-    notifyPending(
-      makeSellPin(data),
-      {
-        render: () => {
-          setLoadingSell(true);
-          return "Procesando transacción";
-        },
-      },
-      {
-        render: ({ data: res }) => {
-          setLoadingSell(false);
-          const tempTicket = res?.obj?.ticket ?? {};
-          const pin_encriptado = res?.obj?.pin_encriptado ?? "";
-          const pin_desencriptado = decryptPin(pin_encriptado);
-          tempTicket.trxInfo[2][1] = pin_desencriptado;
-          const infoPinCrc = {
-          pk_id_trx : res?.obj?.id_trx,
-          id_comercio : roleInfo?.id_comercio,
-          nombre_comercio : roleInfo?.nombre_comercio,
-          referencia : pin_desencriptado,
-          documento : documento,
-          valor_pin : valVentaPines,
-          estado : res?.status?"Aprobado":"Declinado"
-        }
-          registroTrx(infoPinCrc);
-          onSubmit();
-          setPaymentStatus(tempTicket);
-          return "Transacción satisfactoria";
-        },
-      },
-      {
-        render: ({ data: error }) => {
-          setLoadingSell(false);
-          const infoPinCrc = {
-            pk_id_trx : inquiryStatus?.id_trx ,//error?.obj?.id_trx,
-            id_comercio : roleInfo?.id_comercio,
-            nombre_comercio : roleInfo?.nombre_comercio,
-            referencia : "",
-            documento : documento,
-            valor_pin : valVentaPines,
-            estado : "Declinado"
-          }
-          registroTrx(infoPinCrc)
-          navigate("/Pines", { replace: true });
-          if (error?.cause === "custom") {
-            return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-          }
-          // console.error(error?.message);
-          return "Transacción fallida";
-        },
-      }
-    );
-    }
-  );
-
-  const onMakePayment = useCallback(
-    (ev) => {
-      ev.preventDefault();   
-      if (valVentaPines <= 0) {
-        notifyError("El valor del pin CRC debe ser mayor a cero");
-        return;
-      }    
-      fetchTrx();
-    },
-    [
-      datosConvenio,
-      userReferences,
-      userAddress,
-      valVentaPines,
-      inquiryStatus,
-      roleInfo,
-      pdpUser?.uname,
-      navigate,
-    ]
-  );
   const [ticket1, setTicket1] = useState("")
   const [ticket2, setTicket2] = useState("")
 
@@ -734,7 +617,7 @@ const CrearPin = () => {
 
   const onSubmit = useCallback(
     (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     setDisabledBtns(true);
     const hora_actual=Intl.DateTimeFormat("es-CO", {
       hour: "numeric",
@@ -879,6 +762,124 @@ const CrearPin = () => {
     
   });
 
+  const fetchTrx = useCallback(
+    (ev) => {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO",
+        valor_total_trx: valVentaPines,
+        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        ticket_init: [
+          ["Convenio", datosConvenio?.nombre_convenio],
+          ["No. Pin", "pin_desencriptado"],
+          ...Object.entries(userReferences).map(([, val], index) => [
+            datosConvenio[`referencia_${index + 1}`],
+            val,
+          ]),
+          ["Valor", formatMoney.format(valVentaPines)],
+        ].reduce((list, elem, i) => {
+          list.push(elem);
+          if ((i + 1) % 1 === 0) list.push(["", ""]);
+          return list;
+        }, []),
+
+        id_trx: inquiryStatus?.id_trx,
+        // Datos trx colpatria
+        colpatria: {
+          codigo_convenio_pdp: datosConvenio?.fk_id_convenio,
+          codigo_convenio: datosConvenio?.pk_codigo_convenio,
+          codigo_pin: datosConvenio?.codigo_pin,
+          ...userReferences,
+          location: {
+            address: userAddress,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad.substring(0, 7),
+          },
+        },
+      };
+    notifyPending(
+      makeSellPin(data),
+      {
+        render: () => {
+          setLoadingSell(true);
+          return "Procesando transacción";
+        },
+      },
+      {
+        render: ({ data: res }) => {
+          setLoadingSell(false);
+          const tempTicket = res?.obj?.ticket ?? {};
+          const pin_encriptado = res?.obj?.pin_encriptado ?? "";
+          const pin_desencriptado = decryptPin(pin_encriptado);
+          tempTicket.trxInfo[2][1] = pin_desencriptado;
+          const infoPinCrc = {
+          pk_id_trx : res?.obj?.id_trx,
+          id_comercio : roleInfo?.id_comercio,
+          nombre_comercio : roleInfo?.nombre_comercio,
+          referencia : pin_desencriptado,
+          documento : documento,
+          valor_pin : valVentaPines,
+          estado : res?.status?"Aprobado":"Declinado"
+        }
+          registroTrx(infoPinCrc);
+          onSubmit();
+          setPaymentStatus(tempTicket);
+          return "Transacción satisfactoria";
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          setLoadingSell(false);
+          const infoPinCrc = {
+            pk_id_trx : inquiryStatus?.id_trx ,//error?.obj?.id_trx,
+            id_comercio : roleInfo?.id_comercio,
+            nombre_comercio : roleInfo?.nombre_comercio,
+            referencia : "",
+            documento : documento,
+            valor_pin : valVentaPines,
+            estado : "Declinado"
+          }
+          registroTrx(infoPinCrc)
+          navigate("/Pines", { replace: true });
+          if (error?.cause === "custom") {
+            return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+          }
+          // console.error(error?.message);
+          return "Transacción fallida";
+        },
+      }
+    );
+    }
+  );
+
+  const onMakePayment = useCallback(
+    (ev) => {
+      ev.preventDefault();   
+      if (valVentaPines <= 0) {
+        notifyError("El valor del pin CRC debe ser mayor a cero");
+        return;
+      }    
+      fetchTrx();
+    },
+    [
+      datosConvenio,
+      userReferences,
+      userAddress,
+      valVentaPines,
+      inquiryStatus,
+      roleInfo,
+      pdpUser?.uname,
+      navigate,
+    ]
+  );
+
   const closeModal = useCallback(async () => {
     if(respPin !== ""){
       navigate(-1);
@@ -941,9 +942,11 @@ const CrearPin = () => {
   const handleClose = useCallback(() => {
     if (!paymentStatus) {
       notifyError("Transacción cancelada por el usuario");
+    }else{
+      navigate("/Pines");
     }
     setInquiryStatus(null)
-    // navigate("/Pines");
+    
   }, [navigate, paymentStatus]);
 
 
@@ -953,36 +956,39 @@ const CrearPin = () => {
       let datos = {}
       if(!showTramiteAdicional){
       datos = {
-        "Número de convenio": datosConvenio.pk_codigo_convenio,
-        "Convenio": datosConvenio.nombre_convenio, 
+        // "Número de convenio": datosConvenio.pk_codigo_convenio,
         ...Object.fromEntries(
           Object.entries(userReferences).map(([, val], index) => [
             datosConvenio[`referencia_${index + 1}`],
             val,
           ])
         ),
+        "Convenio": datosConvenio.nombre_convenio,
         "Valor Pin CRC":formatMoney.format(valVentaPines),
-        "Valor Trámite 1": formatMoney.format(tramiteData.valor),
-        "IVA Trámite 1": formatMoney.format(tramiteData.iva),
+        "Trámite": tramiteData.descripcion,
+        "Valor Trámite": formatMoney.format(tramiteData.valor),
+        // "IVA Trámite": formatMoney.format(tramiteData.iva),
         "Valor Pin": formatMoney.format(pinData.valor),
         "IVA Pin": formatMoney.format(pinData.iva),
         "Total": formatMoney.format(pinData.total + tramiteData.total + valVentaPines)}
       }
       else{
       datos = {
-        "Número de convenio": datosConvenio.pk_codigo_convenio,
-        "Convenio": datosConvenio.nombre_convenio, 
+        // "Número de convenio": datosConvenio.pk_codigo_convenio,      
         ...Object.fromEntries(
           Object.entries(userReferences).map(([, val], index) => [
             datosConvenio[`referencia_${index + 1}`],
             val,
           ])
         ),
+        "Convenio": datosConvenio.nombre_convenio,
         "Valor Pin CRC":formatMoney.format(valVentaPines),
+        "Trámite 1": tramiteData.descripcion,
         "Valor Trámite 1": formatMoney.format(tramiteData.valor),
-        "IVA Trámite 1": formatMoney.format(tramiteData.iva),
+        // "IVA Trámite 1": formatMoney.format(tramiteData.iva),
+        "Trámite 2": tramiteData2.descripcion,
         "Valor Trámite 2": formatMoney.format(tramiteData2.valor),
-        "IVA Trámite 2": formatMoney.format(tramiteData2.iva),
+        // "IVA Trámite 2": formatMoney.format(tramiteData2.iva),
         "Valor Pin": formatMoney.format(pinData.valor),
         "IVA Pin": formatMoney.format(pinData.iva),
         "Total": formatMoney.format(pinData.total + tramiteData.total + tramiteData2.total + valVentaPines)
