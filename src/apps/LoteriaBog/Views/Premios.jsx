@@ -61,6 +61,7 @@ const Premios = ({ route }) => {
   const [maxPago, setMaxPago] = useState("");
   const [pagaOficina, setPagaOficina] = useState("");
   const [montoSuperior, setMontoSuperior] = useState("");
+  const [documentosCompletos, setDocumentosCompletos] = useState("");
   const { pdpUser, roleInfo, infoTicket } = useAuth();
   const [respagar, setRespagar] = useState([]);
   const [tipopago, setTipopago] = useState("");
@@ -163,6 +164,7 @@ const Premios = ({ route }) => {
         setMaxPago(res?.obj?.max_pago);
         setPagaOficina(res?.obj?.paga_oficina);
         setMontoSuperior(res?.obj?.monto_superior);
+        setDocumentosCompletos(res?.obj?.documento_completos)
         seIdLoteria(res?.obj?.idloteria);
         setTotalPagar(res?.obj?.total);
         setTipopago(salvarRes?.obj?.tipo_ganancia);
@@ -360,7 +362,7 @@ const Premios = ({ route }) => {
           notifyError("Ingresar código hash");
         } else {
           try {
-            if (montoSuperior) {
+            if (documentosCompletos) {
               if (
                 files?.documento === undefined ||
                 files?.formulario === undefined
@@ -386,6 +388,17 @@ const Premios = ({ route }) => {
                   notifyError("Ingresar documentación requerida");
                   setRespuesta(false);
                 }
+                return;
+              }
+              const resSubir = await subirDocsPagoPremios();
+              if (!resSubir) {
+                setRespuesta(false);
+                return;
+              }
+            } else if (montoSuperior) {
+              if (files?.documento === undefined) {
+                notifyError("Ingresar documento de identificación requerido");
+                setRespuesta(false);         
                 return;
               }
               const resSubir = await subirDocsPagoPremios();
@@ -467,7 +480,7 @@ const Premios = ({ route }) => {
       } else {
         setRespuesta(true);
         try {
-          if (montoSuperior) {
+          if (documentosCompletos) {
             if (
               files?.documento === undefined ||
               files?.formulario === undefined
@@ -493,6 +506,18 @@ const Premios = ({ route }) => {
                 notifyError("Ingresar documentación requerida");
                 setRespuesta(false);
               }
+              return;
+            }
+            const resSubir = await subirDocsPagoPremios();
+            if (!resSubir) {
+              setRespuesta(false);
+              return;
+            }
+          }
+          else if (montoSuperior) {
+            if (files?.documento === undefined) {
+              notifyError("Ingresar documento de identificación requerido");
+              setRespuesta(false);         
               return;
             }
             const resSubir = await subirDocsPagoPremios();
@@ -623,6 +648,17 @@ const Premios = ({ route }) => {
 
   const subirDocsPagoPremios = async () => {
     try {
+      let archivos={}
+      if (documentosCompletos){
+        archivos = {
+          documento: files.documento.typeArchivo,
+          formulario: files.formulario.typeArchivo,
+        }
+      } else {
+        archivos = {
+          documento: files.documento.typeArchivo
+        }
+      }
       const resUrlPresind = await fetchData(
         url_cargueS3,
         "POST",
@@ -634,10 +670,7 @@ const Premios = ({ route }) => {
           serie: serie,
           fraccion: seleccionarFraccion,
           valor_pagado: totalPagar,
-          typefile: {
-            documento: files.documento.typeArchivo,
-            formulario: files.formulario.typeArchivo,
-          },
+          typefile: archivos,
         }
       );
 
@@ -646,7 +679,6 @@ const Premios = ({ route }) => {
         navigate(-1);
         return false;
       }
-
       const formDataDocumento = new FormData();
       for (let key in resUrlPresind?.obj?.result?.documento?.fields) {
         formDataDocumento.append(
@@ -659,29 +691,40 @@ const Premios = ({ route }) => {
         resUrlPresind?.obj?.result?.documento?.url,
         formDataDocumento
       );
-      const formDataFormulario = new FormData();
-      for (let key in resUrlPresind?.obj?.result?.formulario?.fields) {
-        console.log(resUrlPresind?.obj?.result?.formulario?.fields[key]);
-        formDataFormulario.append(
-          key,
-          resUrlPresind?.obj?.result?.formulario?.fields[key]
+      if (documentosCompletos){        
+        const formDataFormulario = new FormData();
+        for (let key in resUrlPresind?.obj?.result?.formulario?.fields) {
+          console.log(resUrlPresind?.obj?.result?.formulario?.fields[key]);
+          formDataFormulario.append(
+            key,
+            resUrlPresind?.obj?.result?.formulario?.fields[key]
+          );
+        }
+        formDataFormulario.set("file", files?.formulario?.files);
+        await fetchUploadFileCustom(
+          resUrlPresind?.obj?.result?.formulario?.url,
+          formDataFormulario
         );
       }
-
-      formDataFormulario.set("file", files?.formulario?.files);
-      await fetchUploadFileCustom(
-        resUrlPresind?.obj?.result?.formulario?.url,
-        formDataFormulario
-      );
-
+      let archivosKey={}
+      if (documentosCompletos){
+        archivosKey=
+        {
+          key_documento: resUrlPresind?.obj?.result?.documento?.fields?.key,
+          key_formulario: resUrlPresind?.obj?.result?.formulario?.fields?.key
+        }
+      }
+      else {
+        archivosKey=
+        {
+          key_documento: resUrlPresind?.obj?.result?.documento?.fields?.key
+        }
+      }
       const resZip = await fetchData(
         url_cargueS3,
         "PUT",
         {},
-        {
-          key_documento: resUrlPresind?.obj?.result?.documento?.fields?.key,
-          key_formulario: resUrlPresind?.obj?.result?.formulario?.fields?.key,
-        }
+        archivosKey
       );
       if (!resZip?.status) {
         notifyError(resZip?.msg);
@@ -912,7 +955,7 @@ const Premios = ({ route }) => {
                 ) : (
                   ""
                 )}
-                {montoSuperior ? (
+                { documentosCompletos ? (
                   <Fieldset
                     className="lg:col-span-2"
                     legend={
@@ -935,12 +978,14 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={"archivo_identificacion1"}
+                        id={`archivo_identificacion3`}
                         label={"Documento de identificación"}
-                        name="file1"
+                        name="file3"
                         accept=".pdf,.png,.jpg,.svg,.jpeg"
                         allowDrop={true}
-                        onGetFile={(info) => onChangeFiles(info, "documento")}
+                        onGetFile={(info) =>
+                          onChangeFiles(info, "documento")
+                        }
                       />
                     )}
                     {files?.formulario ? (
@@ -959,17 +1004,53 @@ const Premios = ({ route }) => {
                       </label>
                     ) : (
                       <FileInput
-                        id={`archivo_formulario2`}
+                        id={`archivo_formulario4`}
                         label={"Formulario"}
-                        name="file2"
+                        name="file4"
                         accept=".pdf,.png,.jpg,.svg,.jpeg"
                         allowDrop={true}
-                        onGetFile={(info) => onChangeFiles(info, "formulario")}
+                        onGetFile={(info) =>
+                          onChangeFiles(info, "formulario")
+                        }
                       />
                     )}
                   </Fieldset>
                 ) : (
-                  ""
+                  montoSuperior ? (
+                    <Fieldset
+                      className="lg:col-span-2"
+                      legend={
+                        "El valor del premio supera el monto estipulado, se requiere adjuntar la siguiente documentación:"
+                      }
+                    >
+                      {files?.documento ? (
+                        <label className={contenedorArchivosBasura}>
+                          <h1 className=" flex flex-col md:flex-row justify-center items-center font-semibold">
+                            {files?.documento?.files?.name}
+                          </h1>
+                          <button
+                            className={btnBasura}
+                            onClick={(e) => deleteField(e, "documento")}
+                          >
+                            <img
+                              src={`${urlAssets}/assets/img/basura25negra.png`}
+                            />
+                          </button>
+                        </label>
+                      ) : (
+                        <FileInput
+                          id={"archivo_identificacion1"}
+                          label={"Documento de identificación"}
+                          name="file1"
+                          accept=".pdf,.png,.jpg,.svg,.jpeg"
+                          allowDrop={true}
+                          onGetFile={(info) => onChangeFiles(info, "documento")}
+                        />
+                      )}
+                    </Fieldset>
+                  ) : (
+                    ""
+                  )
                 )}
                 {checkBilleteVirtual == true || checkBilleteFisico == true ? (
                   <>
@@ -1027,23 +1108,8 @@ const Premios = ({ route }) => {
                       ) : (
                         ""
                       )}
-                      {/* {checkBilleteVirtual == true ? (
-                        <Input
-                          id="codHash"
-                          label="Código de seguridad"
-                          type="text"
-                          maxLength="10"
-                          autoComplete="off"
-                          value={hash}
-                          onChange={(e) => {
-                            setHash(e.target.value);
-                          }}
-                          required
-                        />
-                      ) : (
-                        ""
-                      )} */}
-                      {montoSuperior ? (
+                       {/* ###############################################################  */}
+                      {documentosCompletos ? (
                         <Fieldset
                           className="lg:col-span-2"
                           legend={
@@ -1103,9 +1169,46 @@ const Premios = ({ route }) => {
                             />
                           )}
                         </Fieldset>
-                      ) : (
-                        ""
+                      ) : ( 
+                        montoSuperior ? (
+                          <Fieldset
+                            className="lg:col-span-2"
+                            legend={
+                              "El valor del premio supera el monto estipulado, se requiere adjuntar la siguiente documentación:"
+                            }
+                          >
+                            {files?.documento ? (
+                              <label className={contenedorArchivosBasura}>
+                                <h1 className=" flex flex-col md:flex-row justify-center items-center font-semibold">
+                                  {files?.documento?.files?.name}
+                                </h1>
+                                <button
+                                  className={btnBasura}
+                                  onClick={(e) => deleteField(e, "documento")}
+                                >
+                                  <img
+                                    src={`${urlAssets}/assets/img/basura25negra.png`}
+                                  />
+                                </button>
+                              </label>
+                            ) : (
+                              <FileInput
+                                id={`archivo_identificacion3`}
+                                label={"Documento de identificación"}
+                                name="file3"
+                                accept=".pdf,.png,.jpg,.svg,.jpeg"
+                                allowDrop={true}
+                                onGetFile={(info) =>
+                                  onChangeFiles(info, "documento")
+                                }
+                              />
+                            )}
+                          </Fieldset>
+                        ) : (
+                          ""
+                        )
                       )}
+                      
                       {checkBilleteFisico === true ||
                       checkBilleteVirtual === true ? (
                         <>
