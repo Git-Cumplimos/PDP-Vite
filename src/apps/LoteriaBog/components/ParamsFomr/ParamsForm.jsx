@@ -59,11 +59,16 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
     setDisabledBtns(false);
   }, [params]);
 
-  const onMoneyChange = useCallback(
-    (e, max_pago) => {
-      setMax_pago(max_pago);
+  const onChange = useCallback(
+    (e) => {
+      const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+      if (valueInput>0){
+        setMax_pago(valueInput);
+      } else{
+        notifyError("Valor de UVT máximo para pagos debe ser mayor a cero")
+      }
     },
-    [setMax_pago, max_pago]
+    [setMax_pago]
   );
 
   const onMoneyChange2 = useCallback(
@@ -102,7 +107,7 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
               onInput={onMoneyChange2}
               required="true"
             />
-            <h1 className="text-2xl font-semibold mt-4 mx-4">Valor máximo de pago</h1>
+            <h1 className="text-2xl font-semibold mt-4 mx-4">Cantidad UVT para máximo de pago</h1>
             <Input
               className="mt-4 mx-4"
               id="max_pago"
@@ -110,17 +115,19 @@ const ParamsForm = ({ closeModal, params, setParams }) => {
               type="text"
               autoComplete="off"
               required="true"
-              value={formatMoney.format(params?.max_pago)}
+              value={params?.max_pago}
             />
-            <MoneyInput
+            <Input
               className="mt-4 mx-4"
               id="valor"
               name="valor"
               label="Nuevo valor"
+              type="text"
               autoComplete="off"
-              max={10000000}
+              minLength={"1"}
+              maxLength={"3"}
               value={max_pago}
-              onInput={onMoneyChange}
+              onInput={onChange}
               required="true"
             />
 
