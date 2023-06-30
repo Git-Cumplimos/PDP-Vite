@@ -15,9 +15,8 @@
 .smallertext {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    /* padding: 2px; */
-    padding-left: 10px;
-    padding-right: 10px;
-    font-size: 9px;
+    gap: 3px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 10px;
 }

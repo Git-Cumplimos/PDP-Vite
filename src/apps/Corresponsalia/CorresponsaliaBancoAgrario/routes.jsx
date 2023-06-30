@@ -50,7 +50,7 @@ export const listPermissionsAgrario = listPermissions;
 
 const rutasAgrarioCB = {
   link: "/corresponsalia/corresponsalia-banco-agrario",
-  label: <AppIcons Logo={"MARKETPLACE"} name="Corresponsalía Banco Agrario" />,
+  label: <AppIcons Logo={"AGRARIO"} name="Corresponsalía Banco Agrario" />,
   component: CorresponsaliaBancoAgrario,
   permission: [...listPermissionsAgrario],
   subRoutes: [

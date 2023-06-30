@@ -453,14 +453,22 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/cargar`,
-          label: <AppIcons Logo={"CARGAR"} name="Carga de archivos" />,
+          label: (
+            <AppIcons
+              Logo={"LOTERIA_CARGA_ARCHIVOS"}
+              name="Carga de archivos"
+            />
+          ),
           component: CargaArchivos,
           permission: [4],
         },
         {
           link: `/loteria/${name}/historico_cargues`,
           label: (
-            <AppIcons Logo={"REPORTE"} name="Histórico cargues de archivos" />
+            <AppIcons
+              Logo={"LOTERIA_HISTORICO_CARGUE_ARCHIVOS"}
+              name="Histórico cargues de archivos"
+            />
           ),
           component: HistoricoCargues,
           extern: false,
@@ -468,13 +476,13 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/sorteos`,
-          label: <AppIcons Logo={"SORTEO01"} name="Sorteos" />,
+          label: <AppIcons Logo={"LOTERIA_SORTEOS"} name="Sorteos" />,
           component: Sorteos,
           permission: [5, 6],
           subRoutes: [
             {
               link: `/loteria/${name}/sorteos/tramitarSorteos`,
-              label: <AppIcons Logo={"SORTEO01"} name="Sorteos" />,
+              label: <AppIcons Logo={"LOTERIA_SORTEOS"} name="Sorteos" />,
               component: CrearSorteos,
               permission: [5],
             },
@@ -488,7 +496,12 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/descargarArchivos`,
-          label: <AppIcons Logo={"DESCARGAR"} name="Descarga de archivos" />,
+          label: (
+            <AppIcons
+              Logo={"LOTERIA_DESCARGA_DE_ARCHIVOS"}
+              name="Descarga de archivos"
+            />
+          ),
           component: DownloadArchivos,
           permission: [6],
           subRoutes: [
@@ -536,7 +549,12 @@ const allUrlsPrivateApps = [
         },
         {
           link: `/loteria/${name}/inventario`,
-          label: <AppIcons Logo={"REPORTE"} name="Inventario Billetes" />,
+          label: (
+            <AppIcons
+              Logo={"LOTERIA_INVENTARIO_BILLETES"}
+              name="Inventario Billetes"
+            />
+          ),
           component: Inventario,
           extern: false,
           permission: [3, 6, 44, 95], ///////////////////////////////////////////////////////////////////

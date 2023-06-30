@@ -39,8 +39,8 @@ const TicketLot = ({
           )}
         </div>
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
-        <hr className="border-gray-400 my-3" />
-        <div className="flex flex-col gap-2 px-2 text-xs">
+        <hr className="border-gray-400 my-1" />
+        <div className="flex flex-col gap-1 px-2 text-xs">
           <div className="flex flex-row justify-between w-full">
             {Object.entries(timeInfo).map(([key, value], idx) => {
               return (
@@ -55,7 +55,7 @@ const TicketLot = ({
             })}
           </div>
         </div>
-        <hr className="border-gray-400 my-3" />
+        <hr className="border-gray-400 my-1" />
         <div className={smallertext}>
           {commerceInfo
             .map((e, i, arr) => {
@@ -81,7 +81,7 @@ const TicketLot = ({
                             : idx % 2 === 0
                             ? "justify-start"
                             : "justify-end"
-                        } flex-auto gap-2`}
+                        } flex-auto gap-1`}
                       >
                         <h1 className="font-semibold">
                           {key ? `${key}:` : ""}
@@ -94,16 +94,16 @@ const TicketLot = ({
               );
             })}
         </div>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           {commerceName ?? ""}
         </h1>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           Transacción {stateTrx ? "exitosa" : "rechazada"}
         </h1>
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <h1 className="uppercase text-center px-8 my-1 text-xs font-semibold">
           {descriPM ?? ""}
         </h1>
-        <div className="flex flex-col gap-2 px-2 text-xs">
+        <div className="flex flex-col gap-1 px-2 my-1 text-xs">
           {trxInfo
             .map((e, i, arr) => {
               const chunkSize = 3;
@@ -128,7 +128,7 @@ const TicketLot = ({
                             : idx % 3 === 0
                             ? "justify-start"
                             : "justify-end"
-                        } flex-auto gap-2`}
+                        } flex-auto gap-1`}
                       >
                         <h1 className="font-semibold">
                           {key ? `${key}:` : ""}
@@ -141,14 +141,14 @@ const TicketLot = ({
               );
             })}
         </div>
-        <hr className="border-gray-400 my-3" />
-        <h1 className="uppercase text-center px-8 my-3 text-sm font-semibold">
+        <hr className="border-gray-400 my-1" />
+        <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           ***{type}***
         </h1>
-        <h1 className="text-center px-1 my-3 text-xs font-normal">
+        <h1 className="text-center px-1 my-1 text-xs font-normal">
           {disclamer}
         </h1>
-        <h1 className="text-center my-3 text-xs font-semibold">
+        <h1 className="text-center my-1 text-xs font-semibold">
           Vigilado Supersalud
         </h1>
       </div>

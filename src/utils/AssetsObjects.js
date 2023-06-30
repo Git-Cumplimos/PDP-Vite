@@ -34,6 +34,12 @@ const svgs = {
   LOTERIA_VENTAS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_VENTAS.svg`,
   LOTERIA_PREMIOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_PREMIOS.svg`,
   LOTERIA_ARQUEO_BILLETES: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_ARQUEO_BILLETES.svg`,
+  LOTERIA_CARGA_ARCHIVOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_CARGA_DE_ARCHIVOS.svg`,
+  LOTERIA_DESCARGA_DE_ARCHIVOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_DESCARGA_DE_ARCHIVOS.svg`,
+  LOTERIA_SORTEOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_SORTEOS.svg`,
+  LOTERIA_INVENTARIO_BILLETES: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_INVENTARIO_BILLETES.svg`,
+  LOTERIA_HISTORICO_CARGUE_ARCHIVOS: `${urlAssets}/assets/svg/recaudo/LOTERIA/LOTERIA_HISTORICO_CARGUE_ARCHIVOS.svg`,
+
   CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
@@ -72,6 +78,9 @@ const svgs = {
   PINES_ADMINISTRAR: `${urlAssets}/assets/svg/recaudo/PINES/PINES_ADMINISTAR.svg`,
   PINES_GENERACION_LICENCIA: `${urlAssets}/assets/svg/recaudo/PINES/PINES_GENERACION_LICENCIA.svg`,
   PINES_SERVICIO_CONTENIDO: `${urlAssets}/assets/svg/recaudo/PINES/PINES_SERVICIO_Y_CONTENIDO.svg`,
+  PINES_DESCARGA_REPORTE: `${urlAssets}/assets/svg/recaudo/PINES/PINES_DESCARGA_REPORTE.svg`,
+  PINES_PARAMETRIZAR_HORARIOS: `${urlAssets}/assets/svg/recaudo/PINES/PINES_PARAMETRIZAR_HORARIOS.svg`,
+
   PagoParticipacion: `${urlAssets}/assets/img/pago participacion.png`,
   ReportePines: `${urlAssets}/assets/img/reporte pines.png`,
 
@@ -130,7 +139,8 @@ const svgs = {
   AVAL_RECAUDO_MANUAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_MANUAL.svg`,
   AVAL_RECAUDO_CODIGO_DE_BARRAS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_RECAUDO_CODIGO_DE_BARRAS.svg`,
   AVAL_CONVENIO_RECAUDO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_CONVENIO_RECAUDO.svg`,
-
+  //CORRESPONSALIA/AGRARIO
+  AGRARIO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AGRARIO/AGRARIO.svg`,
   //CORRESPONSALIA/RECAUDO MULTIPLE
   RECAUDO_MULTIPLE: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE.svg`,
   RECAUDO_MULTIPLE_CARGAR: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CARGAR.svg`,

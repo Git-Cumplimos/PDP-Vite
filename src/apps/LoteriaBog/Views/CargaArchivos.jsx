@@ -181,14 +181,14 @@ const CargaArchivos = ({ route }) => {
   const [disabledBtns, setDisabledBtns] = useState(false);
 
   const onSubmit = (event) => {
-    const regex=/[<>:"\/\\|?* -(){}~`#%]/g;
+    const regex=/[<>:"\/\\|?*$ -(){}~`#%,;'!@=+]/g;
     event.preventDefault();
-    if (!regex.test(fileName)){
+    if (!regex.test(fileName) && fileName.split('.').length == 2){
       setShowModal(true);
       setDisabledBtns(false);
     }
     else {
-      notifyError("El nombre del archivo es incorrecto, puede incluir letras (a-z, A-Z), números (0-9), guiones bajos (_) y puntos (.).")
+      notifyError("El nombre del archivo es incorrecto, puede incluir letras (a-z, A-Z), números (0-9), guiones bajos (_) y únicamente el punto (.) de la extensión.")
       setShowModal(false);
       setDisabledBtns(true);
       setProgress(0);
