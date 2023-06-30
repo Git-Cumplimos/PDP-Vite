@@ -52,7 +52,6 @@ const Loteria = ({ route }) => {
     codigos_lot,
     loadConsulta,
   } = useLoteria();
-
   const { idloteria } = useLoteria();
   const [sorteoOrdi, setSorteoOrdi] = useState(null);
   const [sorteoExtra, setSorteoExtra] = useState(null);
@@ -148,7 +147,6 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     setSellResponse(null);
-    setCustomer({ fracciones: "", phone: "", doc_id: "" });
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
