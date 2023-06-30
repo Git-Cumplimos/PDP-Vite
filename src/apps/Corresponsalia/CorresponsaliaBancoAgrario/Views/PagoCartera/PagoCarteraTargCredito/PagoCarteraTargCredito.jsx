@@ -72,6 +72,9 @@ const PagoCarteraTargCredito = () => {
     const onSubmitPayCarteraTarjCredito = useCallback(
         (e, numero_tarjcredito, valor_pagar) => {
             e.preventDefault();
+            if (isNaN(valor_pagar)) {
+                return notifyError("El valor no es un numero")
+            }
             const data = {
                 oficina_propia:
                     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -144,12 +147,12 @@ const PagoCarteraTargCredito = () => {
         setNumeroPagoCartera("");
     }, []);
 
-    const HandleCloseTrxExitosa = useCallback(() => {
+    const HandleCloseTrxExitosa = useCallback(() => {                   
         setShowModal(false);
         setShowModalTicket(false)
         setNumeroPagoCartera("");
         setInfTicket(null);
-        validNavigate("/corresponsalia/corresponsalia-banco-agrario/pago-cartera");
+        validNavigate(-1);
     }, [validNavigate]);
 
     const HandleCloseModal = useCallback(() => {

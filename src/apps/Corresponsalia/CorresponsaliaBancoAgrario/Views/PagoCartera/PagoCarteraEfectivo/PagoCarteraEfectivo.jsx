@@ -146,7 +146,10 @@ const PagoCartera = () => {
 
     const onSubmitPayCartera = useCallback(
         (e, pagoTotal, choice_numero_obligacion, labelSeleccionado) => {
-            e.preventDefault();
+            e.preventDefault(); 
+            if (isNaN(pagoTotal)) {
+                return notifyError("El valor no es un numero")
+            }
             const data = {
                 oficina_propia:
                     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -225,7 +228,7 @@ const PagoCartera = () => {
         setResConsultCartera({});
         setInfTicket(null);
         setProcedimiento(numero_obligacion);
-        validNavigate("/corresponsalia/corresponsalia-banco-agrario/pago-cartera");
+        validNavigate(-1);
     }, [validNavigate]);
 
     const HandleCloseModal = useCallback(() => {
