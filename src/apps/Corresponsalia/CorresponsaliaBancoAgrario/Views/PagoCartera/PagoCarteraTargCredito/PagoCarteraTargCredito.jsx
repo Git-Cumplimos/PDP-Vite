@@ -102,7 +102,7 @@ const PagoCarteraTargCredito = () => {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
                         setInfTicket(voucher);
                         setPaso("TransaccionExitosa");
-                        notify("Pago de Cartera exitoso");
+                        notify("Pago de Cartera Tarjeta de Crédito exitoso");
                         setShowModal(false)
                         setShowModalTicket(true)
                     } else if (response?.status === false || response === undefined) {
