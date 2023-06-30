@@ -13,7 +13,7 @@ const CorresponsaliaBancoAgrario = lazy(() =>
 
 const PagarRunt = lazy(() => import("./Views/Runt/PagarRunt"));
 
-const PagoCartera = lazy(() => import("./Views/PagoCartera/PagoCarteraEfectivo/PagoCartera.jsx"));
+const PagoCarteraEfectivo = lazy(() => import("./Views/PagoCartera/PagoCarteraEfectivo/PagoCarteraEfectivo.jsx"));
 
 const PagoCarteraTargCredito = lazy(() => import("./Views/PagoCartera/PagoCarteraTargCredito/PagoCarteraTargCredito.jsx"));
 
@@ -137,19 +137,33 @@ const rutasAgrarioCB = {
     },
     {
       link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera",
-      label: <AppIcons Logo={"MARKETPLACE"} name={"Consulta de cartera"} />,
-      component: PagoCartera,
-      // permission: [...listPermissionsAgrario],
-      permission: [enumPermisosAgrario.pago_cartera_efectivo],
-      subRoutes: [],
-    },
-    {
-      link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera-tarjeta-credito",
-      label: <AppIcons Logo={"MARKETPLACE"} name={"Pago de tarjeta crédito"} />,
-      component: PagoCarteraTargCredito,
-      // permission: [...listPermissionsAgrario],
-      permission: [enumPermisosAgrario.pago_cartera_targ_credito],
-      subRoutes: [],
+      label: (
+        <AppIcons
+          Logo={"MARKETPLACE"}
+          name="Recaudo de productos propios"
+        />
+      ),
+      component: RecaudoServiciosPublicosPrivadosMenuAgrario,
+      permission: [
+        enumPermisosAgrario.agrario_cb_recaudo,
+        enumPermisosAgrario.agrario_cb_convenios_recaudo,
+      ],
+      subRoutes: [
+        {
+          link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera-tarjeta-credito",
+          label: <AppIcons Logo={"MARKETPLACE"} name={"Pago de tarjeta crédito"} />,
+          component: PagoCarteraTargCredito,
+          permission: [enumPermisosAgrario.pago_cartera_targ_credito],
+          subRoutes: [],
+        },
+        {
+          link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera-efectivo",
+          label: <AppIcons Logo={"MARKETPLACE"} name={"Consulta de cartera"} />,
+          component: PagoCarteraEfectivo,
+          permission: [enumPermisosAgrario.pago_cartera_efectivo],
+          subRoutes: [],
+        },
+      ],
     },
   ],
 };

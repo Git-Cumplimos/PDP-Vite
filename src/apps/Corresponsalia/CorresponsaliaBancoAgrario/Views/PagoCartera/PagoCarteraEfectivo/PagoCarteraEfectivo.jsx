@@ -10,11 +10,11 @@ import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import { useFetch } from "../../../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
-import { ComponentsModalSummaryTrx } from "../../PagoCartera/PagoCarteraEfectivo/components/components_modal_PagoCartera";
+import { ComponentsModalSummaryTrx } from "./components/components_modal_PagoCartera";
 import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
-} from "../PagoCarteraEfectivo/components/components_form_PagoCartera.jsx";
+} from "./components/components_form_PagoCartera.jsx";
 import classes from "../../Runt/PagarRunt.module.css"
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';

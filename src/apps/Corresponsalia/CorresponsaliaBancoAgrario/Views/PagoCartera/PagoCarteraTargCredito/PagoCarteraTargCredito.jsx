@@ -8,6 +8,7 @@ import Modal from "../../../../../../components/Base/Modal";
 import Select from "../../../../../../components/Base/Select";
 import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
+import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
 import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
 import { ComponentsModalSummaryTrxTarjCredito } from "../PagoCarteraTargCredito/components/components_modal_PagoCarteraTarCredito";
 import classes from "../../Runt/PagarRunt.module.css"
@@ -16,6 +17,7 @@ import { v4 } from 'uuid';
 import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
 import Input from "../../../../../../components/Base/Input/Input";
+import MoneyInput from "../../../../../../components/Base/MoneyInput/MoneyInput";
 const { styleComponents } = classes;
 const url_pago_cartera_tarjcredito = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
@@ -201,19 +203,20 @@ const PagoCarteraTargCredito = () => {
                     required
                     ></Input>
                 </div>
-                <div className={styleComponents}>
-                    <Input
-                    name="ValorPagar"
-                    label="Valor a pagar"
-                    type="number"
-                    minLength="4"
-                    maxLength="8"
-                    autoComplete="off"
-                    value={inputValorTarCredi}
-                    onChange={onChangeInput2}
-                    required
-                    ></Input>
-                </div>
+                
+                    <MoneyInput
+                        id='valCashOut'
+                        name='ValorPagar'
+                        label='Valor a pagar'
+                        type='text'
+                        min={enumParametrosPagoCartera.minPagoCarteraTarjCredito}
+                        max={enumParametrosPagoCartera.maxPagoCarteraTarjCredito}
+                        autoComplete='off'
+                        maxLength={"8"}
+                        value={parseInt(inputValorTarCredi)}
+                        onInput={onChangeInput2}
+                        required
+                    />                
                     <ButtonBar className="flex justify-center py-6">
                     <Button type={"submit"} onClick={validacionDatos} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
                             Realizar Pago
