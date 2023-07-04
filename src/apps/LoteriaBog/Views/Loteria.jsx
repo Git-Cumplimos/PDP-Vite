@@ -9,6 +9,8 @@ import { LineasLot_disclamer } from "../utils/enum";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
+import BarcodeReader from "../../../components/Base/BarcodeReader/BarcodeReader";
+import Button from "../../../components/Base/Button/Button";
 import { useLocation } from "react-router-dom";
 import { notifyError } from "../../../utils/notify";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -62,18 +64,44 @@ const Loteria = ({ route }) => {
   const [nit_loteria, setNit_loteria] = useState(null);
   const [nom_loteria, setNom_loteria] = useState(null);
   const navigate = useNavigate();
-  const [isInputDisabled, setIsInputDisabled] = useState(false);
+  const [flagEscaner, setFlagEscaner] = useState(false);
 
   const validarEntradaScanner = useCallback(
     (validarNum) => {
-      if (validarNum[0] === "]") {
-        return validarNum.replace("]C1", "");
+      var cod = "";
+      if (codigos_lot?.length === 2) {
+        cod = [`0${codigos_lot?.[0]?.cod_loteria}`,`${codigos_lot?.[1]?.cod_loteria}`];
       } else {
-        return validarNum;
+        cod = [`0${codigos_lot?.[0]?.cod_loteria}`];
+      }
+      if (validarNum?.length===23){
+        if (validarNum.substring(0, 3) === "]C1") {
+          if (cod.includes(validarNum.substring(4, 7))){
+            setNumero(String(validarNum.substr(-9, 4)));
+            setSerie(String(validarNum.substr(-5, 3)));
+            setFlagEscaner(true)
+            setDatosEscaneados(validarNum.replace("]C1", ""));
+          } else{
+            setFlagEscaner(false)
+            notifyError("El código de barras escaneado no corresponde a la lotería seleccionada")
+          }
+        } else {
+          setFlagEscaner(false)
+          notifyError("El código de barras escaneado es incorrecto")
+        }
+      } else {
+        setFlagEscaner(false)
+        notifyError("El código de barras escaneado es incorrecto")
       }
     },
-    [datosEscaneados]
+    [setNumero,setSerie,codigos_lot]
   );
+
+  const limpiarCampos = () =>{
+    setNumero("");
+    setSerie("");
+    setFlagEscaner(false)
+  }
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -355,6 +383,7 @@ const Loteria = ({ route }) => {
                 setNumero(num);
               }
             }}
+            disabled={flagEscaner}
           />
           <Input
             id="numSerie"
@@ -371,27 +400,25 @@ const Loteria = ({ route }) => {
                 setSerie(num);
               }
             }}
+            disabled={flagEscaner}
           />
           {sorteo.split("-")[1] === "true" ? (
-            <Input
-              label="Escanee el código de barras"
-              type="search"
+            !flagEscaner ? (
+              <>
+                <BarcodeReader onSearchCodigo={validarEntradaScanner}/>
+                <Button type="reset">Escanear de nuevo</Button>
+              </>
+             ) :
+             <>
+              <Input
+              label="Código de barras"
+              type="text"
+              autoComplete="off"
               value={datosEscaneados}
-              onInput={(e) => {
-                const num = e.target.value || "";
-                setDatosEscaneados(validarEntradaScanner(num));
-                if (num?.length === 20) {
-                  fetchTablaBilletes();
-                  setNumero(String(num.substr(-9, 4)));
-                  setSerie(String(num.substr(-5, 3)));
-                } else {
-                  setNumero("");
-                  setSerie("");
-                  setIsInputDisabled(true);
-                }
-              }}
-              disabled={isInputDisabled}
-            ></Input>
+              disabled
+              />
+              <Button onClick={()=>limpiarCampos()}>Limpiar campos</Button>
+             </>                 
           ) : (
             ""
           )}
