@@ -23,18 +23,25 @@ const url_pago_cartera_tarjcredito = `${process.env.REACT_APP_URL_BANCO_AGRARIO}
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const PagoCarteraTargCredito = () => {
     const uniqueId = v4();
-    const [inputNumTarCredi, setInputNumTarCredi] = useState("");
-    const [confirmacionDatos, setConfirmacionDatos] = useState(false);
-    const [inputValorTarCredi, setInputValorTarCredi] = useState("");
+    const [datosTarjCredito, setDatosTarjCredito] = useState({
+        inputNumTarCredi: "",
+        inputValorTarCredi: "",
+        numeroPagoCartera: "",
+        confirmacionDatos: false,
+    });
+
+    const [showModalGeneric, setShowModalGeneric] = useState({
+        showModal: false,
+        showModalTicket: false,
+    });
+
     const [paso, setPaso] = useState("LecturaNumeroObligacion");
-    const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
-    const [showModal, setShowModal] = useState(false);
-    const [showModalTicket, setShowModalTicket] = useState(false);
     const [infTicket, setInfTicket] = useState({});
     const printDiv = useRef();
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
-    const [loadingPeticionPayCarteraTarjCredito, peticionPayCarteraTarjCredito] = useFetchPagoCartera(
+    const [loadingPeticionPayCarteraTarjCredito, peticionPayCarteraTarjCredito] = 
+    useFetchPagoCartera(
         url_pago_cartera_tarjcredito,
         urlreintentos,
         "PagoCartera"
@@ -63,10 +70,18 @@ const PagoCarteraTargCredito = () => {
                 notifyError(msg);
             }
         }
-        setNumeroPagoCartera("");
-        setShowModal(false);
-        setInputValorTarCredi("")
-        setInputNumTarCredi("")
+        setDatosTarjCredito((old) => {
+            return { ...old, numeroPagoCartera: "" };
+        });
+        setShowModalGeneric((old) => {
+            return { ...old, showModal: false };
+        });
+        setDatosTarjCredito((old) => {
+            return { ...old, inputValorTarCredi: "" };
+        });
+        setDatosTarjCredito((old) => {
+            return { ...old, inputNumTarCredi: "" };
+        });
     }, []);
 
     const onSubmitPayCarteraTarjCredito = useCallback(
@@ -108,8 +123,12 @@ const PagoCarteraTargCredito = () => {
                         setInfTicket(voucher);
                         setPaso("TransaccionExitosa");
                         notify("Pago de Cartera Tarjeta de Crédito exitoso");
-                        setShowModal(false)
-                        setShowModalTicket(true)
+                        setShowModalGeneric((old) => {
+                            return { ...old, showModal: false };
+                        });
+                        setShowModalGeneric((old) => {
+                            return { ...old, showModalTicket: true };
+                        });
                     } else if (response?.status === false || response === undefined) {
                         HandleCloseTrxExitosa()
                         notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
@@ -120,7 +139,7 @@ const PagoCarteraTargCredito = () => {
                 });
         },
         [
-            numeroPagoCartera,
+            datosTarjCredito?.numeroPagoCartera,
             pdpUser,
             roleInfo,
             peticionPayCarteraTarjCredito,
@@ -130,8 +149,12 @@ const PagoCarteraTargCredito = () => {
    
     const validacionDatos = (e) => {
         e.preventDefault();
-        setConfirmacionDatos(true)
-        setShowModal(true)
+        setDatosTarjCredito((old) => {
+            return { ...old, confirmacionDatos: true };
+        });
+        setShowModalGeneric((old) => {
+            return { ...old, showModal: true };
+        });
     }    
 
     const handlePrint = useReactToPrint({
@@ -139,25 +162,45 @@ const PagoCarteraTargCredito = () => {
     });
 
     const HandleCloseTrx = useCallback(() => {
-        setInputValorTarCredi("")
-        setConfirmacionDatos(false)
-        setInputNumTarCredi("")
-        setShowModal(false);
+        setDatosTarjCredito((old) => {
+            return { ...old, inputValorTarCredi: "" };
+        });
+        setDatosTarjCredito((old) => {
+            return { ...old, confirmacionDatos: false };
+        });
+        setDatosTarjCredito((old) => {
+            return { ...old, inputNumTarCredi: "" };
+        });
+        setShowModalGeneric((old) => {
+            return { ...old, showModal: false };
+        });
         notify("Transacción cancelada");
-        setNumeroPagoCartera("");
+        setDatosTarjCredito((old) => {
+            return { ...old, numeroPagoCartera: "" };
+        });
     }, []);
 
-    const HandleCloseTrxExitosa = useCallback(() => {                   
-        setShowModal(false);
-        setShowModalTicket(false)
-        setNumeroPagoCartera("");
+    const HandleCloseTrxExitosa = useCallback(() => {
+        setShowModalGeneric((old) => {
+            return { ...old, showModal: false };
+        });
+        setDatosTarjCredito((old) => {
+            return { ...old, numeroPagoCartera: "" };
+        });
+        setDatosTarjCredito((old) => {
+            return { ...old, showModalTicket: false };
+        });
         setInfTicket(null);
         validNavigate(-1);
     }, [validNavigate]);
 
     const HandleCloseModal = useCallback(() => {
-        setShowModalTicket(false)
-        setShowModal(false);
+        setShowModalGeneric((old) => {
+            return { ...old, showModalTicket: false };
+        });
+        setShowModalGeneric((old) => {
+            return { ...old, showModal: false };
+        });
         if (paso === "ResumenTrx" && !loadingPeticionPayCarteraTarjCredito) {
             HandleCloseTrx();
         } else if (paso === "TransaccionExitosa") {
@@ -172,19 +215,27 @@ const PagoCarteraTargCredito = () => {
 
     function onChangeInput(e) {
         const { name, value } = e.target;
-        const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 16));
-        setInputNumTarCredi(numericValue);    
-        if (value === "") { 
-            setInputNumTarCredi("")
+        const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 16)); 
+        setDatosTarjCredito((old) => {
+            return { ...old, inputNumTarCredi: numericValue };
+        });
+        if (value === "") {
+            setDatosTarjCredito((old) => {
+                return { ...old, inputNumTarCredi: "" };
+            });
         }
     }
 
     function onChangeInput2(e) {
         const { name, value } = e.target;
         const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 8));
-        setInputValorTarCredi(numericValue);
-        if (value === "" || value === 0) { 
-            setInputValorTarCredi("")
+        setDatosTarjCredito((old) => {
+            return { ...old, inputValorTarCredi: numericValue };
+        });
+        if (value === "" || value === 0) {
+            setDatosTarjCredito((old) => {
+                return { ...old, inputValorTarCredi: "" };
+            });
         }
     }
 
@@ -201,7 +252,7 @@ const PagoCarteraTargCredito = () => {
                     minLength="5"
                     maxLength="16"
                     autoComplete="off"
-                    value={inputNumTarCredi}
+                        value={datosTarjCredito?.inputNumTarCredi}
                     onChange={onChangeInput}
                     required
                     ></Input>
@@ -216,25 +267,25 @@ const PagoCarteraTargCredito = () => {
                         max={enumParametrosPagoCartera.maxPagoCarteraTarjCredito}
                         autoComplete='off'
                         maxLength={"8"}
-                        value={parseInt(inputValorTarCredi)}
+                    value={parseInt(datosTarjCredito?.inputValorTarCredi)}
                         onInput={onChangeInput2}
                         required
                     />                
                     <ButtonBar className="flex justify-center py-6">
-                    <Button type={"submit"} onClick={validacionDatos} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
+                    <Button type={"submit"} onClick={validacionDatos} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputValorTarCredi.length > 8}>
                             Realizar Pago
                         </Button>
-                    <Button type={"reset"} onClick={HandleCloseTrx} disabled={inputNumTarCredi === "" || inputValorTarCredi === "" || inputNumTarCredi.length > 16 || inputValorTarCredi.length > 8}>
+                    <Button type={"reset"} onClick={HandleCloseTrx} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputValorTarCredi.length > 8}>
                             Cancelar
                         </Button>
                     </ButtonBar>
             </Form>
 
-            {confirmacionDatos === true && (
-                <Modal show={showModal} handleClose={HandleCloseModal}>
+            {datosTarjCredito?.confirmacionDatos === true && (
+                <Modal show={showModalGeneric?.showModal} handleClose={HandleCloseModal}>
                     <ComponentsModalSummaryTrxTarjCredito
-                        numero_tarjcredito={inputNumTarCredi}
-                        valor_pagar={inputValorTarCredi}
+                        numero_tarjcredito={datosTarjCredito?.inputNumTarCredi}
+                        valor_pagar={datosTarjCredito?.inputValorTarCredi}
                         loadingPeticion={loadingPeticionPayCarteraTarjCredito}
                         peticion={onSubmitPayCarteraTarjCredito}
                         handleClose={HandleCloseTrx}
@@ -244,7 +295,7 @@ const PagoCarteraTargCredito = () => {
                 </Modal>
             )}
             {infTicket && paso === "TransaccionExitosa" && (
-                <Modal show={showModalTicket} handleClose={HandleCloseModal}>
+                <Modal show={showModalGeneric?.showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
                         <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
                         <ButtonBar>

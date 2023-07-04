@@ -39,6 +39,7 @@ const PagoCartera = () => {
     const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
     const [procedimiento, setProcedimiento] = useState(numero_obligacion);
     const [showModal, setShowModal] = useState(false);
+    const [loadingPayCartera, setLoadingPayCartera] = useState(false);
     const [showModalTicket, setShowModalTicket] = useState(false);
     const [showModalObligacion, setShowModalObligacion] = useState(false);
     const [resConsultCartera, setResConsultCartera] = useState({});
@@ -146,6 +147,7 @@ const PagoCartera = () => {
 
     const onSubmitPayCartera = useCallback(
         (e, pagoTotal, choice_numero_obligacion, labelSeleccionado) => {
+            setLoadingPayCartera(true)
             e.preventDefault(); 
             if (isNaN(pagoTotal)) {
                 return notifyError("El valor no es un numero")
@@ -179,6 +181,7 @@ const PagoCartera = () => {
             }
             peticionPayCartera(data, dataAditional)
                 .then((response) => {
+                    setLoadingPayCartera(false)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
                         setInfTicket(voucher);
@@ -276,7 +279,7 @@ const PagoCartera = () => {
 
     return (
         <Fragment>
-            <SimpleLoading show={loadingPeticionConsultPagoCartera}></SimpleLoading>
+            <SimpleLoading show={loadingPeticionConsultPagoCartera || loadingPayCartera}></SimpleLoading>
             <h1 className='text-3xl mt-6'>Pago de cartera en efectivo</h1>
             <Form>
                 <div className={styleComponents}>
