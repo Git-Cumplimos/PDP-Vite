@@ -25,7 +25,7 @@ const rutasPowwi = {
       link: "/corresponsaliaPowwi/Retiro",
       label: (
         <AppIcons
-          Logo={"RETIRO"}
+          Logo={"DAVIVIENDA_RETIROS"}
           name="Retiro"
         />
       ),
@@ -36,7 +36,7 @@ const rutasPowwi = {
       link: "/corresponsaliaPowwi/Deposito",
       label: (
         <AppIcons
-          Logo={"DEPOSITO"}
+          Logo={"DAVIVIENDA_DEPOSITOS"}
           name="Depósito"
         />
       ),

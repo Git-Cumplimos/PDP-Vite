@@ -1,10 +1,7 @@
-export const enumParametrosDavivienda = Object.freeze({
-    maxDepositoCuentas : 9900000,
-    minDepositoCuentas : 1,
+export const enumParametrosPowwi = Object.freeze({
+    maxDepositoCuentas : 1000000,
+    minDepositoCuentas : 100,
     maxRetiroCuentas : 720000,
     minRetiroCuentas : 10000,
-    maxCashInDaviplata : 1000000,
-    minCashInDaviplata : 10000,
-
   });
 

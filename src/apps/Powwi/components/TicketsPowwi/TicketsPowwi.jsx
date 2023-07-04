@@ -1,11 +1,11 @@
-import classes from "./TicketsDavivienda.module.css";
+import classes from "./TicketsPowwi.module.css";
 import { useCallback, useEffect, useState } from "react";
-import { consultarMensajePublicitarioDavivienda } from "../../utils/fetchCorresponsaliaPowwi";
-import { useImgs } from "../../../../../hooks/ImgsHooks";
+import { useImgs } from "../../../../hooks/ImgsHooks";
+import LogoPowwi from "./LogoPowwi.png"
 
 const { divPrint } = classes;
 
-const TicketsDavivienda = ({
+const TicketsPowwi = ({
   refPrint,
   type = "ORIGINAL",
   ticket = {
@@ -33,22 +33,7 @@ const TicketsDavivienda = ({
 }) => {
   const { title, timeInfo, commerceInfo, commerceName, trxInfo, disclamer } =
     ticket;
-  const [mensajePubli, setMensajePubli] = useState(false);
-
-  const fetchMensajePublicitario = useCallback(
-    () =>
-      consultarMensajePublicitarioDavivienda()
-        .then((autoArr) => {
-          setMensajePubli(autoArr?.results[0].mensaje ?? "");
-        })
-        .catch((err) => console.error(err)),
-    []
-  );
-
-  useEffect(() => {
-    fetchMensajePublicitario();
-  }, [fetchMensajePublicitario]);
-
+    
   const {
     imgs: { pdpHorizontal: LogoPng },
   } = useImgs();
@@ -56,10 +41,15 @@ const TicketsDavivienda = ({
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
-        <div className="flex flex-row justify-center items-center w-full">
-          <div className="w-30">
+        <div className="flex flex-row mx-2 ">
+          <div className="w-30 mx-auto mt-2 ml-1">
+            <div className="aspect-w-14 aspect-h-5">
+              <img src={LogoPowwi} alt="Logo punto de pago"/>
+            </div>
+          </div>
+          <div className="w-30 mx-auto">
             <div className="aspect-w-16 aspect-h-9">
-              <img src={LogoPng} alt="Logo punto de pago" />
+              <img src={LogoPng} alt="Logo punto de pago"/>
             </div>
           </div>
         </div>
@@ -129,9 +119,9 @@ const TicketsDavivienda = ({
         <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           {commerceName ?? ""}
         </h1>
-        {/* <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
+        <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
           Transacción exitosa
-        </h1> */}
+        </h1>
         <div className="flex flex-col gap-1 px-2 text-xs">
           {trxInfo
             .map((e, i, arr) => {
@@ -175,40 +165,13 @@ const TicketsDavivienda = ({
           ***{type}***
         </h1>
         <div className="flex px-2">
-          <div className="flex">
-            <h1
-              className="text-center my-1  font-normal"
-              style={{
-                writingMode: "vertical-lr",
-                transform: "rotate(-180deg)",
-                padding: "0 1px",
-                fontSize: "5px",
-              }}
-            >
-              SUPERINTENDENCIA
-            </h1>
-            <h1
-              className="text-center my-1  font-normal"
-              style={{
-                writingMode: "vertical-lr",
-                transform: "rotate(-180deg)",
-                padding: "0 1px",
-                fontSize: "6px",
-              }}
-            >
-              FINANCIERA DE COLOMBIA
-            </h1>
-          </div>
           <div className="block justify-center items-center">
             <h1 className="text-center my-1 text-xs font-normal whitespace-pre-wrap">
               {disclamer}
             </h1>
-            <h1 className="text-center my-1 text-xs font-normal whitespace-pre-wrap">
-              {`${mensajePubli}`}
-            </h1>
           </div>
         </div>
-        <div className="flex px-2">
+        {/* <div className="flex px-2">
           <div>
             <h1
               className="text-center my-1 text-xs font-normal"
@@ -232,10 +195,10 @@ const TicketsDavivienda = ({
               Punto DaviPlata - Corresponsal Bancario Davivienda
             </h1>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
 };
 
-export default TicketsDavivienda;
+export default TicketsPowwi;

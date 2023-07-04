@@ -8,15 +8,11 @@ import useQuery from "../../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import {
-  retiroCorresponsal,
-  consultaCosto,
-} from "../../utils/fetchCorresponsaliaPowwi";
-import {
   notify,
   notifyError,
   notifyPending,
-} from ".../../../../utils/notify";
-import Tickets from "../../components/TicketsDavivienda";
+} from "../../../../utils/notify";
+import Tickets from "../../components/TicketsPowwi";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
   formatMoney,
@@ -31,37 +27,15 @@ import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { encryptPin } from "../../../Colpatria/utils/functions";
 import { v4 } from "uuid";
+import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
+
+const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/consultaRetiroPowwi`;
+const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/retiroCorresponsalPowwi`;
 
 const Retiro = () => {
   const navigate = useNavigate();
 
   const { roleInfo, infoTicket } = useAuth();
-
-  // const [objTicketActual, setObjTicketActual] = useState({
-  //   title: "Retiro De Cuentas Davivienda",
-  //   timeInfo: {
-  //     "Fecha de venta": "",
-  //     Hora: "",
-  //   },
-  //   commerceInfo: [
-  //     /*id transaccion recarga*/
-  //     /*id_comercio*/
-  //     ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-  //     /*id_dispositivo*/
-  //     ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-  //     /*ciudad*/
-  //     ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
-  //     /*direccion*/
-  //     ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
-  //     ["Tipo de operación", "Retiro De Cuentas"],
-  //     ["", ""],
-  //   ],
-  //   commerceName: roleInfo?.["nombre comercio"]
-  //     ? roleInfo?.["nombre comercio"]
-  //     : "No hay datos",
-  //   trxInfo: [],
-  //   disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
-  // });
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosPowwi.maxRetiroCuentas,
@@ -72,18 +46,14 @@ const Retiro = () => {
     limits: [limitesMontos.min, limitesMontos.max],
     equalError: false,
   });
-
-  const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
-    useFetch(retiroCorresponsal);
-  const [loadingconsultaCosto, fetchconsultaCosto] =
-    useFetch(consultaCosto);
+  
   const [, fetchTypes] = useFetch();
 
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("01");
+  const [tipoDocumento, setTipoDocumento] = useState("1");
   const [isUploading, setIsUploading] = useState(false);
   const [userDoc, setUserDoc] = useState("");
   const [numeroTelefono, setNumeroTelefono] = useState("");
@@ -93,8 +63,8 @@ const Retiro = () => {
   const [uuid, setUuid] = useState(v4());
 
   const optionsDocumento = [
-    { value: "01", label: "Cédula Ciudadanía" },
-    { value: "03", label: "NIT" },
+    { value: "1", label: "Cédula Ciudadanía" },
+    { value: "3", label: "NIT" },
   ];
 
   const printDiv = useRef();
@@ -134,7 +104,7 @@ const Retiro = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTipoCuenta("");
-    setTipoDocumento("01");
+    setTipoDocumento("1");
     setValor("");
     setUserDoc("");
     setNumeroTelefono("");
@@ -142,6 +112,13 @@ const Retiro = () => {
     setSummary([]);
     setUuid(v4());
   }, []);
+
+  const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(
+    fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo")
+  );
+  const [loadingPeticionRetiro, peticionRetiro] = useFetch(
+    fetchCustom(URL_RETIRO, "POST", "Retiro")
+  );
 
   const onSubmitRetiro = useCallback(
     (e) => {
@@ -153,7 +130,6 @@ const Retiro = () => {
       } else {
         if (valor % 10000 === 0) {
           const { min, max } = limitesMontos;
-
           if (valor >= min && valor <= max) {
             const formData = new FormData(e.target);
             const userDoc = formData.get("docCliente");
@@ -161,7 +137,7 @@ const Retiro = () => {
             const valorFormat = formData.get("valor");
             const otp = formData.get("OTP");
 
-            const body = {
+            const data = {
               comercio: {
                 id_comercio: roleInfo?.id_comercio,
                 id_usuario: roleInfo?.id_usuario,
@@ -175,43 +151,48 @@ const Retiro = () => {
               oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
               valor_total_trx: valor,
               Datos: {
-                numeroProducto: numeroTelefono,
+                numeroProducto: "(+57)"+numeroTelefono,
               },
             };
-            fetchconsultaCosto(body)
-              .then((res) => {
-                setIsUploading(false);
-                if (!res?.status) {
-                  notifyError(res?.msg);
-                  setTipoCuenta("");
-                  setTipoDocumento("01");
-                  setValor("");
-                  setUserDoc("");
-                  setOtp("");
-                  return;
-                } else {
-                  notifyError(
-                    "Recuerde verificar si posee el efectivo suficiente para continuar con el retiro"
-                  );
-                  setDatosConsulta(res?.obj?.Data);
+            notifyPending(
+              peticionConsultaCosto({}, data),
+              {
+                render: () => {
+                  setIsUploading(true);
+                  return "Procesando consulta";
+                },
+              },
+              {
+                render: ({data: res }) =>{
+                  setIsUploading(false);
+                  setDatosConsulta(res?.obj);
                   const summary = {
                     "Número Powwi": numeroTelefono,
-                    "Tipo documento cliente": tipoDocumento,
+                    "Tipo documento cliente": tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
                     "Número documento": userDoc,
                     "Valor a retirar": valorFormat,
-                    "Costo de la transacción": res?.costoTotal,
+                    "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
                     "Valor Total": valorFormat,
                   };
                   setSummary(summary);
                   setShowModal(true);
-                }
-                //notify("Transaccion satisfactoria");
-              })
-              .catch((err) => {
-                setIsUploading(false);
-                console.error(err);
-                notifyError("No se ha podido conectar al servidor");
-              });
+                  return "Consulta satisfactoria";
+                },
+              },
+              {
+                render: ( { data: error}) => {
+                  setIsUploading(false);
+                  navigate("/corresponsaliaPowwi/Retiro");
+                  setTipoCuenta("");
+                  setTipoDocumento("1");
+                  setValor("");
+                  setUserDoc("");
+                  setNumeroTelefono("");
+                  setOtp("");
+                  return error?.message ?? "Consulta fallida";
+                },
+              }
+            );
           } else {
             setIsUploading(false);
             notifyError(
@@ -241,10 +222,11 @@ const Retiro = () => {
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
-
+  
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
-    const body = {
+    console.log("soy consulta datos", datosConsulta)
+    const data = {
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -257,9 +239,11 @@ const Retiro = () => {
       nombre_comercio: roleInfo?.["nombre comercio"],
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       valor_total_trx: valor,
+      id_trx: datosConsulta?.id_trx,
+      id_uuid_trx: uuid,
       ticket_init: [
         ["Número Powwi", numeroTelefono],
-        ["Valor Depósito", formatMoney.format(valor ?? "0")],
+        ["Valor Retiro", formatMoney.format(valor ?? "0")],
         ["Costo transacción",formatMoney.format(datosConsulta?.costoTotal),],
         ["Valor Total",formatMoney.format(valor + datosConsulta?.costoTotal),],
       ].reduce((list, elem, i) => {
@@ -270,33 +254,41 @@ const Retiro = () => {
       Datos: {
         tipoIdentificacionCliente: tipoDocumento,
         identificacionCliente: userDoc,
-        numeroProducto: numeroTelefono,
+        numeroProducto: "(+57)"+numeroTelefono,
         otp: encryptPin(otp),
       },
     };
-    
-    fetchRetiroCorresponsal(body)
-      .then((res) => {
-        setIsUploading(false);
-        if (!res?.status) {
-          notifyError(res?.msg);
-          handleClose();
-          return;
-        }
-        notify("Transaccion satisfactoria");
-        setPaymentStatus(res?.obj?.ticket);
-        setPaymentStatus(res?.obj?.ticket);
-      })
-      .catch((err) => {
-        setIsUploading(false);
-        console.error(err);
-        notifyError("No se ha podido conectar al servidor");
-      });
+    notifyPending(
+      peticionRetiro({}, data),
+      {
+        render: () => {
+          return "Procesando transacción";
+        },
+      },
+      {
+        render: ({ data: res }) => {
+          setIsUploading(false);
+          setPaymentStatus(res?.obj?.ticket ?? {});
+          return "Transaccion satisfactoria";
+        },
+      },
+      {
+        render({ data: err }) {
+          setIsUploading(false);
+          navigate("/corresponsaliaPowwi");
+          if (err?.cause === "custom") {
+            return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
+          }
+          console.error(err?.message);
+          return err?.message ?? "Consulta fallida";
+        },
+      }
+    );
   }, [
     valor,
     userDoc,
     numeroTelefono,
-    fetchRetiroCorresponsal,
+    peticionRetiro,
     roleInfo,
     infoTicket,
     datosConsulta,
@@ -387,23 +379,23 @@ const Retiro = () => {
             required
           />
           <ButtonBar className={"lg:col-span-2"}>
-            <Button type={"submit"} disabled={loadingconsultaCosto}>
-              Realizar Retiro
+            <Button type={"submit"} disabled={loadingPeticionConsultaCosto}>
+              Realizar consulta
             </Button>
-            <Button onClick={handleClose}>
+            <Button  
+              onClick={() => 
+                {
+                  goToRecaudo();
+                  notifyError("Transacción cancelada por el usuario");
+                }}
+            >
               Cancelar
             </Button>
           </ButtonBar>
         </Form>
         <Modal
           show={showModal}
-          handleClose={
-            paymentStatus
-              ? goToRecaudo
-              : loadingRetiroCorresponsal
-              ? () => {}
-              : handleClose
-          }>
+          handleClose={paymentStatus || loadingPeticionRetiro ? () => {} : handleClose}>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
               <ButtonBar>
@@ -413,20 +405,21 @@ const Retiro = () => {
               <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
-            <PaymentSummary summaryTrx={summary}>
-              <h1 className='text-2xl font-semibold'>
-                ¿Está seguro de realizar el retiro?
-              </h1>
+            <PaymentSummary summaryTrx={summary} title='Respuesta de consulta Powwi' subtitle = "Resumen de la transacción">
               <ButtonBar>
                 <Button
                   type='submit'
                   onClick={onMakePayment}
-                  disabled={loadingRetiroCorresponsal}>
+                  disabled={loadingPeticionRetiro}>
                   Aceptar
                 </Button>
                 <Button
-                  onClick={handleClose}
-                  disabled={loadingRetiroCorresponsal}>
+                  onClick={() => 
+                    {
+                      handleClose();
+                      notifyError("Transacción cancelada por el usuario");
+                    }}
+                  disabled={loadingPeticionRetiro}>
                   Cancelar
                 </Button>
               </ButtonBar>
