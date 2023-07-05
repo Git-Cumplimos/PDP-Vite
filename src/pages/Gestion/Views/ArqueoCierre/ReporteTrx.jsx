@@ -99,15 +99,15 @@ const ReporteTrx = () => {
       roleInfo?.id_usuario !== null,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_comercio !== null,
-      roleInfo?.id_dispositivo !== undefined,
-      roleInfo?.id_dispositivo !== null,
+      // roleInfo?.id_dispositivo !== undefined,
+      // roleInfo?.id_dispositivo !== null,
     ];
     if (conditions.every((val) => val)) {
       setLoading(true);
       buscarReporteTrxArqueo({
         id_usuario: roleInfo?.id_usuario,
         id_comercio: roleInfo?.id_comercio,
-        id_terminal: roleInfo?.id_dispositivo,
+        // id_terminal: roleInfo?.id_dispositivo,
         status: trxState,
       })
         .then((res) => {
@@ -127,7 +127,7 @@ const ReporteTrx = () => {
     }
   }, [
     roleInfo?.id_comercio,
-    roleInfo?.id_dispositivo,
+    // roleInfo?.id_dispositivo,
     roleInfo?.id_usuario,
     trxState,
   ]);
