@@ -10,7 +10,7 @@ import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
 import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
-import { ComponentsModalSummaryTrxTarjCredito } from "../PagoCarteraTargCredito/components/components_modal_PagoCarteraTarCredito";
+import { ComponentsModalSummaryTrxTarjCredito } from "./components/components_modal_PagoCarteraTarCredito";
 import classes from "../../Runt/PagarRunt.module.css"
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';
@@ -21,7 +21,7 @@ import MoneyInput from "../../../../../../components/Base/MoneyInput/MoneyInput"
 const { styleComponents } = classes;
 const url_pago_cartera_tarjcredito = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
-const PagoCarteraTargCredito = () => {
+const PagoTarjCredito = () => {
     const uniqueId = v4();
     const [datosTarjCredito, setDatosTarjCredito] = useState({
         inputNumTarCredi: "",
@@ -312,4 +312,4 @@ const PagoCarteraTargCredito = () => {
     );
 };
 
-export default PagoCarteraTargCredito;
+export default PagoTarjCredito;
