@@ -148,6 +148,8 @@ const CrearPin = () => {
 
   const [paymentStatus, setPaymentStatus] = useState(null);
 
+  const [finProceso, setFinProceso] = useState(false)
+
   const optionsCategoria = [
     { value: "", label: "" },
     { value: "A1", label: "A1-Motocicletas con cilindrada hasta 125" },
@@ -738,8 +740,10 @@ const CrearPin = () => {
     crearPinVus(documento, tipoPin, tramite,tramite2, user, tramiteData, tramiteData2, infoCliente, olimpia, categoria, categoria2, idPin,firma, motivoCompra, descripcionTipDoc, objTicket,objTicket2, codigoPago, codigoPago2 )
       .then((res) => {
         setDisabledBtns(false);
+        setFinProceso(true)
         if (!res?.status) {
-          notifyError(res?.msg);
+          notifyError("Solo se completo la venta del pin para exámenes médicos, para crear el pin premium diríjase al módulo Pines para generación de licencias", false)
+          // notifyError(res?.msg);
         } else {
           setRespPin(res?.obj);
           setShowModal(true);
@@ -755,7 +759,10 @@ const CrearPin = () => {
           setTicket2(objTicket2)
         }
       })
-      .catch(() => setDisabledBtns(false));
+      .catch(() => {
+        notifyError("Solo se completo la venta del pin para exámenes médicos, para crear el pin premium diríjase al módulo Pines para generación de licencias", false)
+        setDisabledBtns(false)
+        setFinProceso(true)});
     }
     
     
@@ -939,12 +946,14 @@ const CrearPin = () => {
   }, [venderVehiculo,tipoPin, hora, horaCierre, navigate, cierreManual])
 
   const handleClose = useCallback(() => {
+    
     if (!paymentStatus) {
       notifyError("Transacción cancelada por el usuario");
     }else{
       navigate("/Pines");
     }
     setInquiryStatus(null)
+    setFinProceso(false)
     
   }, [navigate, paymentStatus]);
 
@@ -1398,13 +1407,15 @@ const CrearPin = () => {
       <Modal
         show={inquiryStatus}
         handleClose={loadingSell ? () => {} : handleClose}>
-        {respPin !== ""? (
+        {finProceso ? (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <div ref={printDiv}>
             <TicketColpatria 
               refPrint={null} 
               ticket={paymentStatus} 
             />
+            {respPin !== ""? 
+            <>
             <TicketsPines
               refPrint={null} 
               ticket={ticket1} 
@@ -1415,6 +1426,9 @@ const CrearPin = () => {
               ticket={ticket2}
               logo = 'LogoVus'
             />
+            </>:
+            ""}
+            
             </div>
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
