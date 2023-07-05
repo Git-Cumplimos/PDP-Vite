@@ -25,7 +25,7 @@ import HideInput from "../../../../components/Base/HideInput";
 import { makeMoneyFormatter } from "../../../../utils/functions";
 import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
-import { encryptPin } from "../../../Colpatria/utils/functions";
+import { cifrarAES } from "../../../../utils/cryptoUtils"
 import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
 
@@ -255,7 +255,11 @@ const Retiro = () => {
         tipoIdentificacionCliente: tipoDocumento,
         identificacionCliente: userDoc,
         numeroProducto: "(+57)"+numeroTelefono,
-        otp: encryptPin(otp),
+        otp: cifrarAES(
+          `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+          `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+          otp
+        ),
       },
     };
     notifyPending(
