@@ -10,7 +10,7 @@ import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
 import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
-import { ComponentsModalSummaryTrxTarjCredito } from "./components/components_modal_PagoCarteraTarCredito";
+import { ComponentsModalSummaryTrxTarjCredito } from "./components/ComponentsModalSummaryTrxTarjCredito";
 import classes from "../../Runt/PagarRunt.module.css"
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from 'uuid';

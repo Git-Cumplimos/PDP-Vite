@@ -10,7 +10,7 @@ import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import { useFetch } from "../../../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
-import { ComponentsModalSummaryTrx } from "./components/components_modal_PagoCartera";
+import { ComponentsModalSummaryTrx } from "./components/ComponentsModalSummaryTrx";
 import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
@@ -27,7 +27,7 @@ const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrar
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
 const numero_obligacion = "Número de obligación";
-const PagoCartera = () => {
+const PagoCarteraEfectivo = () => {
     const uniqueId = v4();
     const [datosPagoEfectivo, setDatosPagoEfectivo] = useState({
         numero_cedula : "Número de cédula ",
@@ -405,4 +405,4 @@ const PagoCartera = () => {
     );
 };
 
-export default PagoCartera;
+export default PagoCarteraEfectivo;
