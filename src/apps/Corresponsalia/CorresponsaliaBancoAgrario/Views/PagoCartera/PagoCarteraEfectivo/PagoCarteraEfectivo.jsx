@@ -27,22 +27,33 @@ const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrar
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
 const numero_obligacion = "Número de obligación";
-const options_select = [
-    { value: numero_obligacion, label: numero_obligacion },
-    { value: numero_cedula, label: numero_cedula },
-];
 const PagoCartera = () => {
     const uniqueId = v4();
+    const [datosPagoEfectivo, setDatosPagoEfectivo] = useState({
+        numero_cedula : "Número de cédula ",
+        numero_obligacion : "Número de obligación",
+        documento: "LecturaNumeroObligacion",
+        confirmacionTicket: "",
+        confirmacionConsulta: "",
+        seleccionCedulaObligacion: "LecturaNumeroObligacion",
+        numeroPagoCartera: "",
+        procedimiento: numero_obligacion,
+        resConsultCartera: {},
+    });
+    
+    const options_select = [
+        { value: datosPagoEfectivo?.numero_obligacion, label: numero_obligacion },
+        { value: datosPagoEfectivo?.numero_cedula, label: numero_cedula },
+    ];
+    
+    const [showModalGenerico, setShowModalGenerico] = useState({
+        showModal: false,
+        showModalTicket: false,
+        showModalObligacion: false,
+    });
+    
     const [selectIndiceObligacion, setSelectIndiceObligacion] = useState(0);
-    const [paso, setPaso] = useState("LecturaNumeroObligacion");
-    const [documento, setDocumento] = useState("LecturaNumeroObligacion");
-    const [numeroPagoCartera, setNumeroPagoCartera] = useState("");
-    const [procedimiento, setProcedimiento] = useState(numero_obligacion);
-    const [showModal, setShowModal] = useState(false);
     const [loadingPayCartera, setLoadingPayCartera] = useState(false);
-    const [showModalTicket, setShowModalTicket] = useState(false);
-    const [showModalObligacion, setShowModalObligacion] = useState(false);
-    const [resConsultCartera, setResConsultCartera] = useState({});
     const [infTicket, setInfTicket] = useState({});
     const printDiv = useRef();
     const validNavigate = useNavigate();
@@ -80,34 +91,46 @@ const PagoCartera = () => {
                 notifyError(msg);
             }
         }
-        setPaso("LecturaNumeroObligacion");
-        setDocumento("LecturaNumeroObligacion");
-        setNumeroPagoCartera("");
-        setShowModal(false);
-        setProcedimiento(numero_obligacion);
+        setDatosPagoEfectivo((old) => {
+            return { ...old, documento: "LecturaNumeroObligacion" };
+        });
+        setDatosPagoEfectivo((old) => {
+            return { ...old, numeroPagoCartera: "" };
+        });
+        setShowModalGenerico((old) => {
+            return { ...old, showModal: false };
+        });
+        setDatosPagoEfectivo((old) => {
+            return { ...old, procedimiento: datosPagoEfectivo?.numero_obligacion };
+        });
     }, []);
 
     const onChangeNumeroCartera = useCallback((e) => {
-        setNumeroPagoCartera(e.target.value);
+        setDatosPagoEfectivo((old) => {
+            return { ...old, numeroPagoCartera: e.target.value };
+        });
     }, []);
 
     const onChangeSelect = useCallback((e) => {
-        if (e.target.value === numero_obligacion) {
-            setDocumento("LecturaNumeroObligacion");
-            setPaso("LecturaNumeroObligacion");
-            setProcedimiento(numero_obligacion);
-        } else if (e.target.value === numero_cedula) {
-            setPaso("LecturaNumeroCedula");
-            setDocumento("LecturaNumeroCedula");
-            setProcedimiento(numero_cedula);
+        if (e.target.value === datosPagoEfectivo?.numero_obligacion) {
+            setDatosPagoEfectivo((old) => {
+                return { ...old, documento: "LecturaNumeroObligacion", procedimiento: datosPagoEfectivo?.numero_obligacion, seleccionCedulaObligacion: "LecturaNumeroObligacion" };
+            });
+        } else if (e.target.value === datosPagoEfectivo?.numero_cedula) {
+            setDatosPagoEfectivo((old) => {
+                return { ...old, documento: "LecturaNumeroCedula", procedimiento: datosPagoEfectivo?.numero_cedula, seleccionCedulaObligacion: "LecturaNumeroCedula" };
+            });
         }
-        setNumeroPagoCartera("");
+        setDatosPagoEfectivo((old) => {
+            return { ...old, numeroPagoCartera: "" };
+        });
     }, []);
 
     const onSubmitConsultPagoCartera = (e) => {
         e.preventDefault();
-        setShowModalObligacion(false)
-        setShowModal(false);
+        setShowModalGenerico((old) => {
+            return { ...old, showModal: false, setShowModalObligacion:false };
+        });
         const data = {
             oficina_propia:
                 roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -123,7 +146,7 @@ const PagoCartera = () => {
                 id_usuario: roleInfo.id_usuario,
             },
             consultaCartera: {
-                numeroObligacion: numeroPagoCartera,
+                numeroObligacion: datosPagoEfectivo?.numeroPagoCartera,
                 numeroConsulta: options_select === 'Número de cédula' ? '000001' : '000002',
                 location: {
                     address: roleInfo?.["direccion"],
@@ -135,9 +158,12 @@ const PagoCartera = () => {
         peticionConsultCartera({}, data)
             .then((response) => {
                 if (response?.status === true) {
-                    setResConsultCartera(response?.obj?.valores_trx);
-                    setPaso("ResumenTrx");
-                    setShowModal(true);
+                    setDatosPagoEfectivo((old) => {
+                        return { ...old, seleccionCedulaObligacion:"", confirmacionConsulta: "ResumenConsulta", resConsultCartera: response?.obj?.valores_trx };
+                    });
+                    setShowModalGenerico((old) => {
+                        return { ...old, showModal: true };
+                    });
                 }
             })
             .catch((error) => {
@@ -185,10 +211,13 @@ const PagoCartera = () => {
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
                         setInfTicket(voucher);
-                        setPaso("TransaccionExitosa");
+                        setDatosPagoEfectivo((old) => {
+                            return { ...old, confirmacionTicket: "TransaccionExitosa" };
+                        });
                         notify("Pago de Cartera Efectivo exitoso");
-                        setShowModal(false)
-                        setShowModalTicket(true)
+                        setShowModalGenerico((old) => {
+                            return { ...old, showModal: false,showModalTicket: true };
+                        });
                     } else if (response?.status === false || response === undefined) {
                         HandleCloseTrxExitosa()
                         notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
@@ -199,11 +228,10 @@ const PagoCartera = () => {
                 });
         },
         [
-            numeroPagoCartera,
+            datosPagoEfectivo,
             pdpUser,
             roleInfo,
             peticionPayCartera,
-            resConsultCartera,
             CallErrorPeticion,
         ]
     );
@@ -213,54 +241,69 @@ const PagoCartera = () => {
     });
 
     const HandleCloseTrx = useCallback(() => {
-        setPaso("LecturaNumeroObligacion");
-        setDocumento("LecturaNumeroObligacion");
-        setShowModal(false);
+        setShowModalGenerico((old) => {
+            return { ...old, confirmacionConsulta:"",showModal: false };
+        });
         notify("Transacción cancelada");
-        setNumeroPagoCartera("");
-        setResConsultCartera({});
-        setProcedimiento(numero_obligacion);
-    }, []);
-
-    const HandleCloseTrxExitosa = useCallback(() => {
-        setPaso("LecturaNumeroObligacion");
-        setDocumento("LecturaNumeroObligacion");
-        setShowModal(false);
-        setShowModalTicket(false)
-        setNumeroPagoCartera("");
-        setResConsultCartera({});
-        setInfTicket(null);
-        setProcedimiento(numero_obligacion);
+        setDatosPagoEfectivo((old) => {
+            return {
+            ...old,
+            documento: "LecturaNumeroObligacion",
+            numeroPagoCartera: "",
+            procedimiento: datosPagoEfectivo?.numero_obligacion, 
+            seleccionCedulaObligacion: "LecturaNumeroObligacion",
+            resConsultCartera: {}
+            };
+        });
         validNavigate(-1);
     }, [validNavigate]);
 
+    const HandleCloseTrxExitosa = useCallback(() => {
+        setDatosPagoEfectivo((old) => {
+            return {
+                ...old,
+                seleccionCedulaObligacion: "LecturaNumeroObligacion", documento: "LecturaNumeroObligacion", numeroPagoCartera: "",
+                procedimiento: datosPagoEfectivo?.numero_obligacion,
+                confirmacionConsulta: "",
+                resConsultCartera: {},
+            };
+        });
+        setShowModalGenerico((old) => {
+            return {
+                ...old,                
+                showModal: false,
+                showModalTicket: false
+            };
+        });
+        setInfTicket(null);
+        validNavigate(-1);
+    }, [validNavigate]);
+    
     const HandleCloseModal = useCallback(() => {
-        setShowModalObligacion(false)
-        setShowModalTicket(false)
-        setShowModal(false);
-        if (paso === "LecturaNumeroObligacion") {
-            setDocumento("LecturaNumeroObligacion")
+        setShowModalGenerico((old) => {
+            return {
+                ...old,                
+                showModal: false,
+                showModalTicket: false,
+                showModalObligacion: false
+            };
+        });
+        if (datosPagoEfectivo?.confirmacionTicket === "ResumenTrx" && !loadingPeticionPayCartera) {
             HandleCloseTrx();
-        } else if (paso === "LecturaNumeroCedula" && !loadingPeticionConsultPagoCartera) {
-            setDocumento("LecturaNumeroCedula")
-            HandleCloseTrx();
-        } else if (paso === "ResumenTrx" && !loadingPeticionPayCartera) {
-            HandleCloseTrx();
-        } else if (paso === "TransaccionExitosa") {
+        } else if (datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa") {
             HandleCloseTrxExitosa();
         }
     }, [
-        paso,
+        datosPagoEfectivo,
         HandleCloseTrx,
         HandleCloseTrxExitosa,
         loadingPeticionPayCartera,
-        loadingPeticionConsultPagoCartera,
     ]);
 
     const tableObligacion = useMemo(() => {
-        if (resConsultCartera?.length > 0) {
+        if (datosPagoEfectivo?.resConsultCartera?.length > 0) {
             return [
-                ...resConsultCartera?.map((obligacion) => {
+                ...datosPagoEfectivo?.resConsultCartera?.map((obligacion) => {
                     return {
                         "Número de obligación": obligacion?.numero_obligacion,
                         "Tipo de Crédito": obligacion?.tipo_credito,
@@ -268,11 +311,13 @@ const PagoCartera = () => {
                 }),
             ];
         }
-    }, [resConsultCartera]);
+    }, [datosPagoEfectivo?.resConsultCartera]);
 
     const onSelectAutorizador = useCallback(
         (e, i) => {
-            setShowModalObligacion(true)
+            setShowModalGenerico((old) => {
+                return { ...old, showModalObligacion: true };
+            });
             setSelectIndiceObligacion(i)
         }
     );
@@ -288,7 +333,7 @@ const PagoCartera = () => {
                         label=''
                         options={options_select}
                         onChange={onChangeSelect}
-                        value={procedimiento}
+                        value={datosPagoEfectivo?.procedimiento}
                         disabled={
                             loadingPeticionConsultPagoCartera
                                 ? true
@@ -296,30 +341,30 @@ const PagoCartera = () => {
                         }
                     />
                 </div>
-                {paso === "LecturaNumeroObligacion" && (
+                {datosPagoEfectivo?.seleccionCedulaObligacion === "LecturaNumeroObligacion" && (
                     <LecturaNumeroObligacion
                         loadingPeticion={loadingPeticionConsultPagoCartera}
                         onSubmit={onSubmitConsultPagoCartera}
                         handleClose={HandleCloseTrx}
                         onChange={onChangeNumeroCartera}
-                        procedimiento={procedimiento}
+                        procedimiento={datosPagoEfectivo?.procedimiento}
                         numero_obligacion={numero_obligacion}
                         numero_cedula={numero_cedula}
-                        numeroPagoCartera={numeroPagoCartera}></LecturaNumeroObligacion>
+                        numeroPagoCartera={datosPagoEfectivo?.numeroPagoCartera}></LecturaNumeroObligacion>
                 )}
-                {paso === "LecturaNumeroCedula" && (
+                {datosPagoEfectivo?.seleccionCedulaObligacion === "LecturaNumeroCedula" && (
                     <LecturaNumeroCedula
                         loadingPeticion={loadingPeticionConsultPagoCartera}
                         onSubmit={onSubmitConsultPagoCartera}
                         handleClose={HandleCloseTrx}
                         onChange={onChangeNumeroCartera}
-                        procedimiento={procedimiento}
+                        procedimiento={datosPagoEfectivo?.procedimiento}
                         numero_obligacion={numero_obligacion}
                         numero_cedula={numero_cedula}
-                        numeroPagoCartera={numeroPagoCartera}></LecturaNumeroCedula>
+                        numeroPagoCartera={datosPagoEfectivo?.numeroPagoCartera}></LecturaNumeroCedula>
                 )}
             </Form>
-            {paso === "ResumenTrx" && (
+            {datosPagoEfectivo?.confirmacionConsulta === "ResumenConsulta" && (
                 <TableEnterprise
                     title="Seleccione el número de obligación a pagar"
                     headers={["Número de obligación", "Tipo de Crédito"]}
@@ -328,14 +373,14 @@ const PagoCartera = () => {
                 >
                 </TableEnterprise>
             )}
-            {showModalObligacion === true && (
-                <Modal show={showModal} handleClose={HandleCloseModal}>
+            {showModalGenerico?.showModalObligacion === true && (
+                <Modal show={showModalGenerico?.showModal} handleClose={HandleCloseModal}>
                     <ComponentsModalSummaryTrx
-                        documento={documento}
+                        documento={datosPagoEfectivo?.documento}
                         numero_obligacion={numero_obligacion}
                         numero_cedula={numero_cedula}
-                        numeroPagoCartera={numeroPagoCartera}
-                        summary={resConsultCartera}
+                        numeroPagoCartera={datosPagoEfectivo?.numeroPagoCartera}
+                        summary={datosPagoEfectivo?.resConsultCartera}
                         loadingPeticion={loadingPeticionPayCartera}
                         peticion={onSubmitPayCartera}
                         handleClose={HandleCloseTrx}
@@ -345,8 +390,8 @@ const PagoCartera = () => {
                     </ComponentsModalSummaryTrx>
                 </Modal>
             )}
-            {infTicket && paso === "TransaccionExitosa" && (
-                <Modal show={showModalTicket} handleClose={HandleCloseModal}>
+            {infTicket && datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa" && (
+                <Modal show={showModalGenerico?.showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
                         <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
                         <ButtonBar>

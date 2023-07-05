@@ -28,6 +28,7 @@ const PagoCarteraTargCredito = () => {
         inputValorTarCredi: "",
         numeroPagoCartera: "",
         confirmacionDatos: false,
+        confirmacionTicket: ""
     });
 
     const [showModalGeneric, setShowModalGeneric] = useState({
@@ -35,7 +36,6 @@ const PagoCarteraTargCredito = () => {
         showModalTicket: false,
     });
 
-    const [paso, setPaso] = useState("LecturaNumeroObligacion");
     const [infTicket, setInfTicket] = useState({});
     const printDiv = useRef();
     const validNavigate = useNavigate();
@@ -121,7 +121,9 @@ const PagoCarteraTargCredito = () => {
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
                         setInfTicket(voucher);
-                        setPaso("TransaccionExitosa");
+                        setDatosTarjCredito((old) => {
+                            return { ...old, confirmacionTicket: "TransaccionExitosa" };
+                        });
                         notify("Pago de Cartera Tarjeta de Crédito exitoso");
                         setShowModalGeneric((old) => {
                             return { ...old, showModal: false };
@@ -178,7 +180,8 @@ const PagoCarteraTargCredito = () => {
         setDatosTarjCredito((old) => {
             return { ...old, numeroPagoCartera: "" };
         });
-    }, []);
+        validNavigate(-1);
+    }, [validNavigate]);
 
     const HandleCloseTrxExitosa = useCallback(() => {
         setShowModalGeneric((old) => {
@@ -201,13 +204,13 @@ const PagoCarteraTargCredito = () => {
         setShowModalGeneric((old) => {
             return { ...old, showModal: false };
         });
-        if (paso === "ResumenTrx" && !loadingPeticionPayCarteraTarjCredito) {
+        if (datosTarjCredito?.confirmacionTicket === "ResumenTrx" && !loadingPeticionPayCarteraTarjCredito) {
             HandleCloseTrx();
-        } else if (paso === "TransaccionExitosa") {
+        } else if (datosTarjCredito?.confirmacionTicket === "TransaccionExitosa") {
             HandleCloseTrxExitosa();
         }
     }, [
-        paso,
+        datosTarjCredito,
         HandleCloseTrx,
         HandleCloseTrxExitosa,
         loadingPeticionPayCarteraTarjCredito,        
@@ -294,7 +297,7 @@ const PagoCarteraTargCredito = () => {
                     </ComponentsModalSummaryTrxTarjCredito>
                 </Modal>
             )}
-            {infTicket && paso === "TransaccionExitosa" && (
+            {infTicket && datosTarjCredito?.confirmacionTicket === "TransaccionExitosa" && (
                 <Modal show={showModalGeneric?.showModalTicket} handleClose={HandleCloseModal}>
                     <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
                         <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
