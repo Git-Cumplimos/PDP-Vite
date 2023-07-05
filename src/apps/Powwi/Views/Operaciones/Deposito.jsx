@@ -216,7 +216,6 @@ const Deposito = () => {
   
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
-    console.log("soy consulta datos", datosConsulta)
     const data = {
       comercio: {
         id_comercio: roleInfo?.id_comercio,
