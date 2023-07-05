@@ -1,40 +1,22 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
-import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../hooks/useFetchDispatchDebounce";
+import { Fragment, useCallback, useState } from "react";
 import { useAuth } from "../../../hooks/AuthHooks";
-// import useMap from "../../../hooks/useMap";
-// import Modal from "../../../components/Base/Modal";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
-// import DataTable from "../../../components/Base/DataTable";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
-import { notify, notifyError, notifyPending } from "../../../utils/notify";
-// import { onChangeNumber } from "../../../utils/functions";
+import { notifyPending } from "../../../utils/notify";
 
-// const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-const url = "http://127.0.0.1:5000";
+import { downloadReport } from "../utils/fetchReportesComisiones";
 
 const ReporteComercios = () => {
+  const [disableBtn, setDisableBtn] = useState(false)
+
   const { roleInfo } = useAuth();
-  
-  const [downloadReport] = useFetchDispatchDebounce({
-    onSuccess: useCallback((data) => {
-      notify(data?.msg)
-      window.open(data?.obj?.url, "_self")
-    }, []),
-    onError: useCallback((error) => {
-      if (error instanceof ErrorPDPFetch) {
-        notifyError(error.message);
-      }
-      else if (!(error instanceof DOMException)) {
-        notifyError("Error al cargar Datos ");
-      }
-    }, []),
-  });
   
   const getReportCsv = 
     useCallback(async (e) =>{
       e.preventDefault();
+      setDisableBtn(true);
       const formData = new FormData(e.currentTarget);
       const timebody = Object.fromEntries(
         Object.entries(Object.fromEntries(formData))
@@ -43,16 +25,27 @@ const ReporteComercios = () => {
         ...timebody,
         id_comercio : roleInfo?.id_comercio
       }
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      notifyPending(
+        downloadReport(body),
+        {
+          render() { return "Procesando" },
         },
-        body: JSON.stringify(body)
-      };
-      downloadReport(`${url}/download-report-commerce`, options)
-
-    },[roleInfo,downloadReport])
+        {
+          render({ data: res }) {
+            window.open(res?.obj?.url, "_self")
+            setDisableBtn(false)
+            return res?.msg !== "" ? res?.msg : "Archivo generado exitosamente";
+          },
+        },
+        {
+          render({ data: err }) {
+            console.error(err)
+            setDisableBtn(false)
+            return err !== "" ? err : "Error en la generacion del archivo";
+          },
+        }
+      );
+    },[roleInfo])
 
   return (
     <Fragment>
@@ -74,12 +67,7 @@ const ReporteComercios = () => {
           required
         />
         <ButtonBar>
-          <Button
-            type='submit'
-            onClick={() => {
-              // setShowModal(true);
-              // setSelectedOpt("operacion");
-            }}>
+          <Button type='submit' disabled={disableBtn}>
             Generar reporte
           </Button>
         </ButtonBar>
