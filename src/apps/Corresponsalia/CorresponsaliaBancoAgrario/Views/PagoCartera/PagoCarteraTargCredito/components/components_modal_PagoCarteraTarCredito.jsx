@@ -21,7 +21,7 @@ export const ComponentsModalSummaryTrxTarjCredito = ({
       {!loadingPeticion ? (
         <>
           <ButtonBar>
-            <Button type={"submit"} onClick={(e) => {
+            <Button type={"submit"} disabled={loadingPeticion} onClick={(e) => {
               e.preventDefault();
               peticion(e, numero_tarjcredito, valor_pagar)
             }}>

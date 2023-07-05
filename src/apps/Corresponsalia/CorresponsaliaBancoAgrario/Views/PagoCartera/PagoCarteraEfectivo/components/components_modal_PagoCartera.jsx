@@ -64,7 +64,7 @@ export const ComponentsModalSummaryTrx = ({
         {!loadingPeticion ? (
           <>
             <ButtonBar>
-            <Button type={"submit"} onClick={(e) => {
+            <Button type={"submit"} disabled={loadingPeticion} onClick={(e) => {
               e.preventDefault(); 
               if (pagoTotal !== false) {
                 peticion(e, pagoTotal, choice_numero_obligacion, labelSeleccionado)
