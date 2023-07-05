@@ -74,7 +74,7 @@ export const ComponentsModalSummaryTrx = ({
             }}>
                 Pagar
               </Button>
-              <Button onClick={handleClose}>Cancelar</Button>
+            <Button disabled={loadingPeticion} onClick={handleClose}>Cancelar</Button>
             </ButtonBar>
           </>
         ) : (
