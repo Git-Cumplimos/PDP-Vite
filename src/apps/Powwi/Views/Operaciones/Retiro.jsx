@@ -34,39 +34,33 @@ const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/correspons
 
 const Retiro = () => {
   const navigate = useNavigate();
-
   const { roleInfo, infoTicket } = useAuth();
-
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosPowwi.maxRetiroCuentas,
     min: enumParametrosPowwi.minRetiroCuentas,
   });
-
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
     equalError: false,
   });
-  
   const [, fetchTypes] = useFetch();
-
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("1");
+  const [datosTrx, setDatosTrx] = useState({
+    tipoDocumento: "1",
+    userDoc: "",
+    numeroTelefono: "",
+    otp: ""
+  });
   const [isUploading, setIsUploading] = useState(false);
-  const [userDoc, setUserDoc] = useState("");
-  const [numeroTelefono, setNumeroTelefono] = useState("");
   const [valor, setValor] = useState("");
-  const [otp, setOtp] = useState("");
   const [summary, setSummary] = useState([]);
   const [uuid, setUuid] = useState(v4());
-
   const optionsDocumento = [
     { value: "1", label: "Cédula Ciudadanía" },
     { value: "3", label: "NIT" },
   ];
-
   const printDiv = useRef();
 
   useEffect(() => {
@@ -103,12 +97,13 @@ const Retiro = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setTipoCuenta("");
-    setTipoDocumento("1");
+    setDatosTrx({
+      tipoDocumento: "1",
+      userDoc: "",
+      numeroTelefono: "",
+      otp: "",
+    });
     setValor("");
-    setUserDoc("");
-    setNumeroTelefono("");
-    setOtp("");
     setSummary([]);
     setUuid(v4());
   }, []);
@@ -124,7 +119,7 @@ const Retiro = () => {
     (e) => {
       e.preventDefault();
       setIsUploading(true);
-      if (otp.length < 6) {
+      if (datosTrx.otp.length < 6) {
         setIsUploading(false);
         notifyError("El número OTP debe ser de 6 dígitos");
       } else {
@@ -135,8 +130,6 @@ const Retiro = () => {
             const userDoc = formData.get("docCliente");
             const numeroTelefono = formData.get("numeroTelefono");
             const valorFormat = formData.get("valor");
-            const otp = formData.get("OTP");
-
             const data = {
               comercio: {
                 id_comercio: roleInfo?.id_comercio,
@@ -168,7 +161,7 @@ const Retiro = () => {
                   setDatosConsulta(res?.obj);
                   const summary = {
                     "Número Powwi": numeroTelefono,
-                    "Tipo documento cliente": tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
+                    "Tipo documento cliente": datosTrx.tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
                     "Número documento": userDoc,
                     "Valor a retirar": valorFormat,
                     "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
@@ -183,12 +176,13 @@ const Retiro = () => {
                 render: ( { data: error}) => {
                   setIsUploading(false);
                   navigate("/corresponsaliaPowwi/Retiro");
-                  setTipoCuenta("");
-                  setTipoDocumento("1");
+                  setDatosTrx({
+                    tipoDocumento: "1",
+                    userDoc: "",
+                    numeroTelefono: "",
+                    otp: "",
+                  });
                   setValor("");
-                  setUserDoc("");
-                  setNumeroTelefono("");
-                  setOtp("");
                   return error?.message ?? "Consulta fallida";
                 },
               }
@@ -209,7 +203,7 @@ const Retiro = () => {
         }
       }
     },
-    [valor, limitesMontos, otp]
+    [valor, limitesMontos, datosTrx.otp]
   );
 
   const onMoneyChange = useCallback(
@@ -241,7 +235,7 @@ const Retiro = () => {
       id_trx: datosConsulta?.id_trx,
       id_uuid_trx: uuid,
       ticket_init: [
-        ["Número Powwi", numeroTelefono],
+        ["Número Powwi", datosTrx.numeroTelefono],
         ["Valor Retiro", formatMoney.format(valor ?? "0")],
         ["Costo transacción",formatMoney.format(datosConsulta?.costoTotal),],
         ["Valor Total",formatMoney.format(valor + datosConsulta?.costoTotal),],
@@ -251,13 +245,13 @@ const Retiro = () => {
         return list;
       }, []),
       Datos: {
-        tipoIdentificacionCliente: tipoDocumento,
-        identificacionCliente: userDoc,
-        numeroProducto: "(+57)"+numeroTelefono,
+        tipoIdentificacionCliente: datosTrx.tipoDocumento,
+        identificacionCliente: datosTrx.userDoc,
+        numeroProducto: "(+57)"+datosTrx.numeroTelefono,
         otp: cifrarAES(
           `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
           `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
-          otp
+          datosTrx.otp
         ),
       },
     };
@@ -289,13 +283,14 @@ const Retiro = () => {
     );
   }, [
     valor,
-    userDoc,
-    numeroTelefono,
+    datosTrx.userDoc,
+    datosTrx.numeroTelefono,
     peticionRetiro,
     roleInfo,
     infoTicket,
     datosConsulta,
-    tipoDocumento,
+    datosTrx.tipoDocumento,
+    datosTrx.otp,
   ]);
 
   return (
@@ -313,24 +308,30 @@ const Retiro = () => {
             maxLength='10'
             required
             autoComplete='off'
-            value={numeroTelefono}
+            value={datosTrx.numeroTelefono}
             onInput={(e) => {
               let valor = e.target.value;
               let num = valor.replace(/[\s\.]/g, "");
               if (!isNaN(num)) {
-                if (numeroTelefono.length === 0 && num !== "3") {
+                if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                   return notifyError("El número debe comenzar por 3");
                 }
-                setNumeroTelefono(num);
+                setDatosTrx(prevState => ({
+                  ...prevState,
+                  numeroTelefono: num
+                }));
               }
             }}/>
           <Select
             id='tipoDocumento'
             label='Tipo de documento'
             options={optionsDocumento}
-            value={tipoDocumento}
+            value={datosTrx.tipoDocumento}
             onChange={(e) => {
-              setTipoDocumento(e.target.value);
+              setDatosTrx(prevState => ({
+                ...prevState,
+                tipoDocumento: e.target.value
+              }));
             }}
             required
           />
@@ -342,11 +343,14 @@ const Retiro = () => {
             autoComplete='off'
             minLength={"5"}
             maxLength={"15"}
-            value={userDoc}
+            value={datosTrx.userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.]/g, "");
               if (!isNaN(num)) {
-                setUserDoc(num);
+                setDatosTrx(prevState => ({
+                  ...prevState,
+                  userDoc: num
+                }));
               }
             }}
             required
@@ -360,14 +364,17 @@ const Retiro = () => {
             maxLength={"6"}
             autoComplete='off'
             required
-            value={otp}
+            value={datosTrx.otp}
             onInput={(e, valor) => {
               let num = valor.replace(/[\s\.]/g, "");
               if (!isNaN(valor)) {
-                setOtp(num);
+                setDatosTrx(prevState => ({
+                  ...prevState,
+                  otp: num
+                }));
               }
             }}></HideInput>
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a retirar'
@@ -377,7 +384,7 @@ const Retiro = () => {
             maxLength={"8"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
+            value={valor}
             onInput={(ev) => setValor(onChangeMoney(ev))}
             required
           />

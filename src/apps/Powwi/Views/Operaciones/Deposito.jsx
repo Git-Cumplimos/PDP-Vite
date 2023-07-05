@@ -33,31 +33,28 @@ const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/correspo
 
 const Deposito = () => {
   const navigate = useNavigate();
-
   const { roleInfo, infoTicket } = useAuth();
-
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosPowwi.maxDepositoCuentas,
     min: enumParametrosPowwi.minDepositoCuentas,
   });
-
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
     equalError: false,
   });
-  
   const [, fetchTypes] = useFetch();
-
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-  const [tipoCuenta, setTipoCuenta] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("1");
   const [isUploading, setIsUploading] = useState(false);
-  const [userDoc, setUserDoc] = useState("");
-  const [userDocDepositante, setUserDocDepositante] = useState("");
-  const [numeroTelefono, setNumeroTelefono] = useState("");
-  const [numeroTelefonoDepositante, setNumeroTelefonoDepositante] = useState("");
+
+  const [datosTrx, setDatosTrx] = useState({
+    tipoDocumento: "1",
+    userDoc: "",
+    userDocDepositante: "",
+    numeroTelefono: "",
+    numeroTelefonoDepositante: ""
+  });
   const [valor, setValor] = useState("");
   const [summary, setSummary] = useState([]);
   const [uuid, setUuid] = useState(v4());
@@ -103,13 +100,14 @@ const Deposito = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setTipoCuenta("");
-    setTipoDocumento("1");
+    setDatosTrx({
+      tipoDocumento: "1",
+      userDoc: "",
+      userDocDepositante: "",
+      numeroTelefono: "",
+      numeroTelefonoDepositante: "",
+    });
     setValor("");
-    setUserDoc("");
-    setUserDocDepositante("");
-    setNumeroTelefono("");
-    setNumeroTelefonoDepositante("");
     setSummary([]);
     setUuid(v4());
   }, []);
@@ -163,7 +161,7 @@ const Deposito = () => {
               setDatosConsulta(res?.obj);
               const summary = {
                 "Número Powwi": numeroTelefono,
-                "Tipo documento destinatario": tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
+                "Tipo documento destinatario": datosTrx.tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
                 "Número documento destinatario": userDoc,
                 "Valor a depositar": valorFormat,
                 "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
@@ -178,13 +176,14 @@ const Deposito = () => {
             render: ( { data: error}) => {
               setIsUploading(false);
               navigate("/corresponsaliaPowwi/Deposito");
-              setTipoCuenta("");
-              setTipoDocumento("1");
+              setDatosTrx({
+                tipoDocumento: "1",
+                userDoc: "",
+                userDocDepositante: "",
+                numeroTelefono: "",
+                numeroTelefonoDepositante: ""
+              });
               setValor("");
-              setUserDoc("");
-              setUserDocDepositante("");
-              setNumeroTelefono("");
-              setNumeroTelefonoDepositante("");
               return error?.message ?? "Consulta fallida";
             },
           }
@@ -232,7 +231,7 @@ const Deposito = () => {
       id_trx: datosConsulta?.id_trx,
       id_uuid_trx: uuid,
       ticket_init: [
-        ["Número Powwi", numeroTelefono],
+        ["Número Powwi", datosTrx.numeroTelefono],
         ["Valor Depósito", formatMoney.format(valor ?? "0")],
         ["Costo transacción",formatMoney.format(datosConsulta?.costoTotal),],
         ["Valor Total",formatMoney.format(valor + datosConsulta?.costoTotal),],
@@ -242,11 +241,11 @@ const Deposito = () => {
         return list;
       }, []),
       Datos: {
-        tipoIdentificacionCliente: tipoDocumento,
-        identificacionCliente: userDoc,
-        numeroProducto: "(+57)"+numeroTelefono,
-        celularDepositante: "(+57)"+numeroTelefonoDepositante,
-        identDepositante: userDocDepositante,
+        tipoIdentificacionCliente: datosTrx.tipoDocumento,
+        identificacionCliente: datosTrx.userDoc,
+        numeroProducto: "(+57)"+datosTrx.numeroTelefono,
+        celularDepositante: "(+57)"+datosTrx.numeroTelefonoDepositante,
+        identDepositante: datosTrx.userDocDepositante,
       },
     };
     notifyPending(
@@ -277,15 +276,15 @@ const Deposito = () => {
     );
   }, [
     valor,
-    userDoc,
-    userDocDepositante,
-    numeroTelefono,
-    numeroTelefonoDepositante,
+    datosTrx.userDoc,
+    datosTrx.userDocDepositante,
+    datosTrx.numeroTelefono,
+    datosTrx.numeroTelefonoDepositante,
     peticionDeposito,
     roleInfo,
     infoTicket,
     datosConsulta,
-    tipoDocumento,
+    datosTrx.tipoDocumento,
   ]);
 
   return (
@@ -303,25 +302,31 @@ const Deposito = () => {
                 maxLength='10'
                 required
                 autoComplete='off'
-                value={numeroTelefono}
+                value={datosTrx.numeroTelefono}
                 onInput={(e) => {
-                    let valor = e.target.value;
-                    let num = valor.replace(/[\s\.]/g, "");
-                    if (!isNaN(num)) {
-                    if (numeroTelefono.length === 0 && num !== "3") {
+                  let valor = e.target.value;
+                  let num = valor.replace(/[\s\.]/g, "");
+                  if (!isNaN(num)) {
+                    if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                         return notifyError("El número debe comenzar por 3");
                     }
-                    setNumeroTelefono(num);
-                    }
+                    setDatosTrx(prevState => ({
+                      ...prevState,
+                      numeroTelefono: num
+                    }));
+                  }
                 }}
             />
             <Select
                 id='tipoDocumento'
                 label='Tipo Documento Destinatario'
                 options={optionsDocumento}
-                value={tipoDocumento}
+                value={datosTrx.tipoDocumento}
                 onChange={(e) => {
-                    setTipoDocumento(e.target.value);
+                  setDatosTrx(prevState => ({
+                    ...prevState,
+                    tipoDocumento: e.target.value
+                  }));
                 }}
                 required
             />
@@ -333,11 +338,14 @@ const Deposito = () => {
                 autoComplete='off'
                 minLength={"5"}
                 maxLength={"15"}
-                value={userDoc}
+                value={datosTrx.userDoc}
                 onInput={(e) => {
                     const num = e.target.value.replace(/[\s\.]/g, "");
                     if (!isNaN(num)) {
-                    setUserDoc(num);
+                      setDatosTrx(prevState => ({
+                        ...prevState,
+                        userDoc: num
+                      }));
                     }
                 }}
                 required
@@ -351,15 +359,18 @@ const Deposito = () => {
                 maxLength='10'
                 required
                 autoComplete='off'
-                value={numeroTelefonoDepositante}
+                value={datosTrx.numeroTelefonoDepositante}
                 onInput={(e) => {
                 let valor = e.target.value;
                 let num = valor.replace(/[\s\.]/g, "");
                 if (!isNaN(num)) {
-                    if (numeroTelefonoDepositante.length === 0 && num !== "3") {
+                    if (datosTrx.numeroTelefonoDepositante.length === 0 && num !== "3") {
                     return notifyError("El número debe comenzar por 3");
                     }
-                    setNumeroTelefonoDepositante(num);
+                    setDatosTrx(prevState => ({
+                      ...prevState,
+                      numeroTelefonoDepositante: num
+                    }));
                 }
                 }}
             />
@@ -371,16 +382,19 @@ const Deposito = () => {
                 autoComplete='off'
                 minLength={"5"}
                 maxLength={"15"}
-                value={userDocDepositante}
+                value={datosTrx.userDocDepositante}
                 onInput={(e) => {
                 const num = e.target.value.replace(/[\s\.]/g, "");
                 if (!isNaN(num)) {
-                    setUserDocDepositante(num);
+                  setDatosTrx(prevState => ({
+                    ...prevState,
+                    userDocDepositante: num
+                  }));
                 }
                 }}
                 required
             />
-            <Input
+            <MoneyInput
                 id='valor'
                 name='valor'
                 label='Valor a depositar'
@@ -390,7 +404,7 @@ const Deposito = () => {
                 maxLength={"8"}
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
-                value={makeMoneyFormatter(0).format(valor)}
+                value={valor}
                 onInput={(ev) => setValor(onChangeMoney(ev))}
                 required
             />

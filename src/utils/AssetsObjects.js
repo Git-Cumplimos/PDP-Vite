@@ -11,6 +11,7 @@ const images = {
   LogoOccidente: `${urlAssets}/assets/img/banco-de-occidente.png`,
   ScotiabankColpatria: `${urlAssets}/assets/img/ScotiabankColpatria.webp`,
   LogoAgrario: `${urlAssets}/assets/img/Banco-agrario.jpg`,
+  LogoPowwi: `${urlAssets}/assets/img/LogoPowwi.png`,
 };
 
 const svgs = {

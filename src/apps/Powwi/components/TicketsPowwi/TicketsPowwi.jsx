@@ -1,7 +1,6 @@
 import classes from "./TicketsPowwi.module.css";
 import { useCallback, useEffect, useState } from "react";
 import { useImgs } from "../../../../hooks/ImgsHooks";
-import LogoPowwi from "./LogoPowwi.png"
 
 const { divPrint } = classes;
 
@@ -35,7 +34,7 @@ const TicketsPowwi = ({
     ticket;
     
   const {
-    imgs: { pdpHorizontal: LogoPng },
+    imgs: { LogoPowwi, pdpHorizontal: LogoPng },
   } = useImgs();
 
   return (
