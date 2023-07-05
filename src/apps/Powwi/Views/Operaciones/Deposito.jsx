@@ -405,7 +405,7 @@ const Deposito = () => {
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={valor}
-                onInput={(ev) => setValor(onChangeMoney(ev))}
+                onInput={onMoneyChange}
                 required
             />
             <ButtonBar className={"lg:col-span-2"}>

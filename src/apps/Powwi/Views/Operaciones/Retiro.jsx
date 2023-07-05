@@ -39,10 +39,6 @@ const Retiro = () => {
     max: enumParametrosPowwi.maxRetiroCuentas,
     min: enumParametrosPowwi.minRetiroCuentas,
   });
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
-  });
   const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -385,7 +381,7 @@ const Retiro = () => {
             min={limitesMontos?.min}
             max={limitesMontos?.max}
             value={valor}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            onInput={onMoneyChange}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>
