@@ -5,5 +5,5 @@ export const enumPermisosAgrario = Object.freeze({
   agrario_cb_convenios_recaudo: 16003,
   agrario_cb_runt: 16004,
   pago_cartera_efectivo: 16005,
-  pago_cartera_targ_credito: 16005,
+  pago_cartera_targ_credito: 16006,
 });

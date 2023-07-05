@@ -145,8 +145,8 @@ const rutasAgrarioCB = {
       ),
       component: RecaudoServiciosPublicosPrivadosMenuAgrario,
       permission: [
-        enumPermisosAgrario.agrario_cb_recaudo,
-        enumPermisosAgrario.agrario_cb_convenios_recaudo,
+        enumPermisosAgrario.pago_cartera_targ_credito,
+        enumPermisosAgrario.pago_cartera_efectivo,
       ],
       subRoutes: [
         {

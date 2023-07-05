@@ -124,7 +124,7 @@ const PagoCarteraTargCredito = () => {
                         setDatosTarjCredito((old) => {
                             return { ...old, confirmacionTicket: "TransaccionExitosa" };
                         });
-                        notify("Pago de Cartera Tarjeta de Crédito exitoso");
+                        notify("Pago Tarjeta de Crédito exitoso");
                         setShowModalGeneric((old) => {
                             return { ...old, showModal: false };
                         });
