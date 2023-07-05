@@ -8,7 +8,7 @@ const LogoLoCundinamarca = () => {
   } = useImgs();
   return (
     <div className="flex flex-row flex-nowrap justify-center items-center" >
-      <div className="mx-2" style={{ display: 'inline-block', maxWidth: '50%' }}>
+      <div style={{ display: 'inline-block', maxWidth: '50%' }}>
         <img src={LogoPng} alt="Logo loteria de Cundinamarca" />
       </div>
       <LogoPDP xsmall/>

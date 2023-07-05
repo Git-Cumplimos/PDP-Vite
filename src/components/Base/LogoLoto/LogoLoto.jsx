@@ -8,7 +8,7 @@ const LogoLoto = () => {
   } = useImgs();
   return (
     <div className="flex flex-row flex-nowrap justify-center items-center" >
-      <div className="mx-2" style={{ display: 'inline-block', maxWidth: '30%' }}>
+      <div style={{ display: 'inline-block', maxWidth:'30%'}}>
         <img src={LogoPng} alt="Logo loteria de bogota" />
       </div>
       <LogoPDP xsmall/>

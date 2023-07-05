@@ -8,8 +8,8 @@ const LogoLoTolima = () => {
   } = useImgs();
   return (
     <div className="flex flex-row flex-nowrap justify-center items-center" >
-      <div className="mx-2" style={{ display: 'inline-block', maxWidth: '45%' }}>
-        <img src={LogoPng} alt="Logo loteria de tolima" />
+      <div style={{width:'80%',height:'100%'}}>
+        <img src={LogoPng} alt="Logo loteria de tolima" style={{width:'100%',height:'87px'}}/>
       </div>
       <LogoPDP xsmall/>
     </div>

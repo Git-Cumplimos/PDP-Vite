@@ -10,7 +10,7 @@ const TicketLot = ({
   stateTrx = true,
   loteria,
 }) => {
-  const { divPrint, smallertext } = classes;
+  const {divPrint, smallertext} = classes;
 
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
@@ -29,15 +29,20 @@ const TicketLot = ({
   return (
     <div style={{ border: "1px solid black" }}>
       <div className={divPrint} ref={refPrint}>
-        <div className="flex flex-row justify-center items-center w-full">
-          {loteria == "Lotería de Bogotá" ? (
-            <LogoLoto xsmall />
-          ) : loteria == "Lotería del Tolima" ? (
-            <LogoLoTolima xsmall />
-          ) : (
-            <LogoLoCundinamarca xsmall />
-          )}
-        </div>
+        {loteria === "Lotería de Bogotá" ? (
+          <div className="flex flex-row items-center justify-center w-full" style={{width:'200px',height:'70px',paddingLeft:'110px'}}>
+            <LogoLoto xsmall/>
+          </div>
+        ) : loteria === "Lotería del Tolima" ? (
+          <div className="flex flex-row items-center justify-center w-full" style={{width:'100%',height:'70px'}}>
+            <LogoLoTolima xsmall/>
+          </div>
+        ) : (
+          <div className="flex flex-row items-center justify-center w-full" style={{width:'100%',height:'70px'}}>
+            <LogoLoCundinamarca xsmall/>
+          </div>
+        )}
+        
         <h1 className="text-xl font-semibold text-center uppercase">{title}</h1>
         <hr className="border-gray-400 my-1" />
         <div className="flex flex-col gap-1 px-2 text-xs">
