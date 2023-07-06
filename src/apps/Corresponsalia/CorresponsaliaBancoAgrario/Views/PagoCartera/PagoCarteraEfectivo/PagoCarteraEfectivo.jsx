@@ -244,7 +244,7 @@ const PagoCarteraEfectivo = () => {
         setShowModalGenerico((old) => {
             return { ...old, confirmacionConsulta:"",showModal: false };
         });
-        notifyError("Transacción cancelada");
+        notifyError("Transacción cancelada por el usuario");
         setDatosPagoEfectivo((old) => {
             return {
             ...old,

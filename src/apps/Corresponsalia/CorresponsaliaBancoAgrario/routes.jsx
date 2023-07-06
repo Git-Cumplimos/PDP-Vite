@@ -158,7 +158,7 @@ const rutasAgrarioCB = {
         },
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios/pago-cartera-efectivo",
-          label: <AppIcons Logo={"MARKETPLACE"} name={"Consulta de cartera"} />,
+          label: <AppIcons Logo={"MARKETPLACE"} name={"Pago de Cartera"} />,
           component: PagoCarteraEfectivo,
           permission: [enumPermisosAgrario.pago_cartera_efectivo],
           subRoutes: [],
