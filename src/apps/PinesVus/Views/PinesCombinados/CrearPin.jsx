@@ -263,6 +263,7 @@ const CrearPin = () => {
         {
           render: ({ data: error }) => {
             setLoadingInquiry(false);
+            navigate("/Pines");   
             // navigate("/Pines", { replace: true });
             if (error?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
@@ -353,7 +354,7 @@ const CrearPin = () => {
       nombre : nombre,
       apellidos : apellidos,
       fecha_nacimiento : fechaNacimiento,
-      genero : genero,
+      genero : tipoDocumento==='4' ? "DDD":genero ,
       celular : celular,
       email : email,
       eps : eps,
@@ -949,9 +950,8 @@ const CrearPin = () => {
     
     if (!paymentStatus) {
       notifyError("Transacción cancelada por el usuario");
-    }else{
-      navigate("/Pines");
     }
+    navigate("/Pines");    
     setInquiryStatus(null)
     setFinProceso(false)
     
