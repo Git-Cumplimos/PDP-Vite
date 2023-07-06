@@ -1,4 +1,4 @@
 export const enumParametrosPagoCartera = Object.freeze({
-  minPagoCarteraTarjCredito: 10000000,
-  maxPagoCarteraTarjCredito: 5000,
+  minPagoCarteraTarjCredito: 5000,
+  maxPagoCarteraTarjCredito: 10000000,
 });

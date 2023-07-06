@@ -176,7 +176,7 @@ const PagoTarjCredito = () => {
         setShowModalGeneric((old) => {
             return { ...old, showModal: false };
         });
-        notifyError("Transacción cancelada");
+        notifyError("Transacción cancelada por el usuario");
         setDatosTarjCredito((old) => {
             return { ...old, numeroPagoCartera: "" };
         });
