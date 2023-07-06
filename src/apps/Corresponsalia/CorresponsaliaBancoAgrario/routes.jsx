@@ -136,7 +136,7 @@ const rutasAgrarioCB = {
       subRoutes: [],
     },
     {
-      link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera",
+      link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios",
       label: (
         <AppIcons
           Logo={"MARKETPLACE"}
@@ -150,14 +150,14 @@ const rutasAgrarioCB = {
       ],
       subRoutes: [
         {
-          link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera-tarjeta-credito",
+          link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios/pago-cartera-tarjeta-credito",
           label: <AppIcons Logo={"MARKETPLACE"} name={"Pago de tarjeta crédito"} />,
           component: PagoTarjCredito,
           permission: [enumPermisosAgrario.pago_cartera_targ_credito],
           subRoutes: [],
         },
         {
-          link: "/corresponsalia/corresponsalia-banco-agrario/pago-cartera-efectivo",
+          link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios/pago-cartera-efectivo",
           label: <AppIcons Logo={"MARKETPLACE"} name={"Consulta de cartera"} />,
           component: PagoCarteraEfectivo,
           permission: [enumPermisosAgrario.pago_cartera_efectivo],
