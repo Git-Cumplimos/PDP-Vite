@@ -2,6 +2,28 @@ import fetchData from "../../../utils/fetchData";
 
 const urlComisiones =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlComercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+
+export const descargarReporte = (url) => {
+  return async (body) => {
+    if (!body) {
+      throw new Error("Sin datos en el body", { cause: "custom" });
+    }
+    try {
+      const res = await fetchData(url, "POST", {}, body);
+      
+      if (!res?.status) throw res?.msg;
+
+      return res;
+    } catch (err) {
+      throw err
+    }
+  };
+};
+
+export const downloadReport = descargarReporte(
+  `${urlComercios}/download-report-commerce`
+);
 
 export const postObtenerReporteComisionesAplicadas = async (bodyObj) => {
   // if (!bodyObj) {
