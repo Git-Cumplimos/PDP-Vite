@@ -176,7 +176,6 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     setSellResponse(null);
-    setCustomer({ fracciones: "", phone: "", doc_id: "" });
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
