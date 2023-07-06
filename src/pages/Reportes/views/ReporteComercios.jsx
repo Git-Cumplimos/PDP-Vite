@@ -54,8 +54,8 @@ const ReporteComercios = () => {
         <Input
           type="tel"
           autoComplete="off"
-          name={"comercio"}
-          label={"Comercio"}
+          name={"id_comercio"}
+          label={"Id comercio"}
           value={roleInfo?.id_comercio ?? ""}
           disabled
         />
