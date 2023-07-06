@@ -39,6 +39,10 @@ const Retiro = () => {
     max: enumParametrosPowwi.maxRetiroCuentas,
     min: enumParametrosPowwi.minRetiroCuentas,
   });
+  const onChangeMoney = useMoney({
+    limits: [limitesMontos.min, limitesMontos.max],
+    equalError: false,
+  });
   const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -200,13 +204,6 @@ const Retiro = () => {
       }
     },
     [valor, limitesMontos, datosTrx.otp]
-  );
-
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setValor(valor);
-    },
-    [valor]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -377,11 +374,11 @@ const Retiro = () => {
             autoComplete='off'
             type='text'
             minLength={"1"}
-            maxLength={"8"}
+            maxLength={"11"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
             value={valor}
-            onInput={onMoneyChange}
+            onInput={(ev) => setValor(onChangeMoney(ev))}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>

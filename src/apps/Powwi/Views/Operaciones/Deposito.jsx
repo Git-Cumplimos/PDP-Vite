@@ -201,14 +201,7 @@ const Deposito = () => {
     },
     [valor, limitesMontos]
   );
-
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setValor(valor);
-    },
-    [valor]
-  );
-
+  
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
@@ -401,11 +394,11 @@ const Deposito = () => {
                 autoComplete='off'
                 type='text'
                 minLength={"1"}
-                maxLength={"8"}
+                maxLength={"11"}
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={valor}
-                onInput={onMoneyChange}
+                onInput={(ev) => setValor(onChangeMoney(ev))}
                 required
             />
             <ButtonBar className={"lg:col-span-2"}>
