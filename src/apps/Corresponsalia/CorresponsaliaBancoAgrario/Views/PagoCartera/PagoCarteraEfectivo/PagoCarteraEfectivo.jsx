@@ -233,7 +233,6 @@ const PagoCarteraEfectivo = () => {
             roleInfo,
             peticionPayCartera,
             CallErrorPeticion,
-            uniqueId
         ]
     );
 
