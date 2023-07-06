@@ -269,7 +269,7 @@ const PagoTarjCredito = () => {
                         min={enumParametrosPagoCartera.minPagoCarteraTarjCredito}
                         max={enumParametrosPagoCartera.maxPagoCarteraTarjCredito}
                         autoComplete='off'
-                        maxLength={"8"}
+                        maxLength={"11"}
                     value={parseInt(datosTarjCredito?.inputValorTarCredi)}
                         onInput={onChangeInput2}
                         required
