@@ -37,9 +37,7 @@ const useMoney = ({
         ev.target.setCustomValidity(
           `El valor debe ser mayor a ${moneyFormatter.format(
             min
-          )}``El valor debe ser mayor ${
-            !equalErrorMin ? " o igual" : ""
-          } a ${moneyFormatter.format(min)}`
+          )}`
         );
       } else if (moneyValue < min) {
         ev.target.setCustomValidity(
@@ -57,9 +55,7 @@ const useMoney = ({
         ev.target.setCustomValidity(
           `El valor debe ser menor a ${moneyFormatter.format(
             max
-          )}``El valor debe ser menor${
-            !equalError ? " o igual" : ""
-          } a ${moneyFormatter.format(max)}`
+          )}`
         );
       } else {
         ev.target.setCustomValidity("");
