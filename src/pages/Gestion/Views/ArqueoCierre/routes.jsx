@@ -6,7 +6,9 @@ const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
  * COMPONENTES ROL CAJERO
  */
 const Panel = lazy(() => import("./Panel"));
-const ReporteTrx = lazy(() => import("./ReporteTrx"));
+const ReporteTrx = lazy(() => import("./ReporteArqueoCaja/ReporteTrx"));
+const ReporteEfectivo = lazy(() => import("./ReporteArqueoCaja/ReporteEfectivo"));
+const ReporteTarjeta = lazy(() => import("./ReporteArqueoCaja/ReporteTarjeta"));
 const CierreCaja = lazy(() => import("./CierreCaja/CierreCaja"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
@@ -38,10 +40,22 @@ export const rutasArqueo = [
     permission: [PermissionsCaja.RealizarArqueoCierre],
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/reporte-trxs",
-    label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
+    link: "/gestion/arqueo/arqueo-cierre/reporte-general-trxs",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte General Arqueo de caja" />,
     // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     component: ReporteTrx,
+    permission: [PermissionsCaja.VerReporteTrxCierre],
+  },
+  {
+    link: "/gestion/arqueo/arqueo-cierre/reporte-efectivo-trxs",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte Efectivo Arqueo de Caja" />,
+    component: ReporteEfectivo,
+    permission: [PermissionsCaja.VerReporteTrxCierre],
+  },
+  {
+    link: "/gestion/arqueo/arqueo-cierre/reporte-tarjeta-trxs",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte Tarjeta Arqueo de Caja" />,
+    component: ReporteTarjeta,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {
