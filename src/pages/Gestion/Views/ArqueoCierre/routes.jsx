@@ -40,13 +40,6 @@ export const rutasArqueo = [
     permission: [PermissionsCaja.RealizarArqueoCierre],
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/reporte-general-trxs",
-    label: <AppIcons Logo={"RECAUDO"} name="Reporte General Arqueo de caja" />,
-    // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
-    component: ReporteTrx,
-    permission: [PermissionsCaja.VerReporteTrxCierre],
-  },
-  {
     link: "/gestion/arqueo/arqueo-cierre/reporte-efectivo-trxs",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte Efectivo Arqueo de Caja" />,
     component: ReporteEfectivo,

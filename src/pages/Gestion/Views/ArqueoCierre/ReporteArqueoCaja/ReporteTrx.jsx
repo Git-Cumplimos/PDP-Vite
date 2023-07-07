@@ -119,7 +119,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       buscarReporteTrxArqueo({
         id_usuario: roleInfo?.id_usuario,
         id_comercio: roleInfo?.id_comercio,
-        type_report: tipo_reporte === "" ? tipo_reporte : tipo_reporte === 1 ? "Efectivo" : "Tarjeta",
+        type_report: tipo_reporte === 2 ? "Tarjeta": "Efectivo",
         status: trxState,
       })
         .then((res) => {
