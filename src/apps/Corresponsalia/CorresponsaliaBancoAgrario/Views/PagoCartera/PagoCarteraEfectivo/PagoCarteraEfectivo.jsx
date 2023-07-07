@@ -9,7 +9,7 @@ import Select from "../../../../../../components/Base/Select";
 import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import { useFetch } from "../../../../../../hooks/useFetch";
-import { fetchCustom, ErrorCustom } from "../../../utils/fetchRunt";
+import { fetchCustom, ErrorCustom } from "../../../utils/fetchCarteraCredito";
 import { ComponentsModalSummaryTrx } from "./components/ComponentsModalSummaryTrx";
 import {
     LecturaNumeroObligacion,
@@ -87,7 +87,6 @@ const PagoCarteraEfectivo = () => {
         } else {
             if (error.message === "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagoCartera) [0010002]") {
             } else {
-
                 notifyError(msg);
             }
         }
@@ -218,7 +217,14 @@ const PagoCarteraEfectivo = () => {
                         setShowModalGenerico((old) => {
                             return { ...old, showModal: false,showModalTicket: true };
                         });
-                    } else if (response?.status === false || response === undefined) {
+                    } else if (response?.status === false) {
+                        HandleCloseTrxExitosa()
+                        if (response?.msg) {
+                            notifyError(response?.msg);
+                        } else {
+                            notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
+                        }
+                    } else if (response === undefined) {
                         HandleCloseTrxExitosa()
                         notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
                     }
