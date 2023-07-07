@@ -128,6 +128,8 @@ const MostrarRecaudosPagar = ({
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
+        idterminal_punto: roleInfo?.idterminal_punto,
+        serial_dispositivo: roleInfo?.serial_dispositivo,
       },
       ubicacion: {
         address: roleInfo?.direccion,
