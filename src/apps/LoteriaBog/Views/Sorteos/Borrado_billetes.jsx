@@ -99,7 +99,7 @@ const Borrado_billetes = ({ route }) => {
         setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
-  }, [sorteosLOT,sorteos]);
+  }, []);
 
   const handleCloseCancelar = useCallback(() => {
     notifyError("Eliminación de billetería cancelada por el usuario");
@@ -111,7 +111,7 @@ const Borrado_billetes = ({ route }) => {
         setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
-  }, [sorteosLOT,sorteos])
+  }, [])
   
   return (
     <>
