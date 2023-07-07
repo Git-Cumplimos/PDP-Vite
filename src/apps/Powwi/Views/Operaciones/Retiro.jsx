@@ -22,7 +22,6 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../components/Base/HideInput";
-import { makeMoneyFormatter } from "../../../../utils/functions";
 import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { cifrarAES } from "../../../../utils/cryptoUtils"
