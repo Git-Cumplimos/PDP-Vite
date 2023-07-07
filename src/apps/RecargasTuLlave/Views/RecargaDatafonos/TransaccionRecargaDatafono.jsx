@@ -202,7 +202,7 @@ const TransaccionRecargaDatafono = () => {
             min={enumParametrosTuLlave.MINRECARGADATAFONO}
             max={enumParametrosTuLlave.MAXRECARGADATAFONO}
             autoComplete='off'
-            maxLength={"9"}
+            maxLength={"11"}
             value={parseInt(valor)}
             onInput={(e, val) => {
               setValor(val);

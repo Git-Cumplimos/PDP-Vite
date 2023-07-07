@@ -31,7 +31,6 @@ const TransaccionRecargaTarjeta = () => {
     telefonoCliente: "",
     emailCliente: "",
   });
-  const [valor, setValor] = useState(0);
   const [estadoPeticion, setEstadoPeticion] = useState(0);
 
   const [showModal, setShowModal] = useState(false);
@@ -48,7 +47,7 @@ const TransaccionRecargaTarjeta = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: valor,
+        valor_total_trx: dataUsuario?.valorRecarga,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -85,7 +84,7 @@ const TransaccionRecargaTarjeta = () => {
         }
       );
     },
-    [dataUsuario, navigate, valor, roleInfo, pdpUser]
+    [dataUsuario, navigate, roleInfo, pdpUser]
   );
   const [loadingPeticionConsultaTarjeta, peticionConsultaTarjeta] = useFetch(
     fetchCustom(URL_CONSULTAR_TARJETA, "GET", "Consultar tarjeta")
@@ -100,13 +99,13 @@ const TransaccionRecargaTarjeta = () => {
   const handleShow = useCallback(
     (ev) => {
       ev.preventDefault();
-      if (valor % 50 !== 0) {
-        return notifyError("El valor de la recarga debe ser multiplo de 50");
-      }
+      // if (valor % 50 !== 0) {
+      //   return notifyError("El valor de la recarga debe ser multiplo de 50");
+      // }
       setEstadoPeticion(0);
       setShowModal(true);
     },
-    [valor]
+    [dataUsuario]
   );
   const printDiv = useRef();
 
@@ -132,50 +131,91 @@ const TransaccionRecargaTarjeta = () => {
     <>
       <h1 className='text-3xl'>Recargar datafono</h1>
       <Form onSubmit={handleShow} grid>
-        <Fieldset legend='Datos usuario' className='lg:col-span-2'>
+        <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
           <Input
-            id='pos_id'
-            name='pos_id'
-            label={"Pos Id"}
+            id='NTargeta'
+            name='NTargeta'
+            label={"Número tarjeta"}
             type='text'
             autoComplete='off'
-            value={dataUsuario?.["pos_id"]}
-            maxLength={15}
-            onChange={() => {}}
+            value={dataUsuario?.["NTargeta"]}
+            maxLength={16}
+            onChange={onChangeFormatNumber}
             required
             disabled={
               loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
             }
           />
-          <TextArea
-            id='comentarios'
-            name='comentarios'
-            label={"Comentarios"}
-            type='text'
-            autoComplete='off'
-            value={dataDatafono?.["comentarios"]}
-            maxLength={200}
-            onChange={() => {}}
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
-          />
-        </Fieldset>
-        <Fieldset legend='Valor a recargar' className='lg:col-span-2'>
           <MoneyInput
             id='valor'
             name='valor'
             label='Valor a recargar'
             type='text'
-            min={enumParametrosTuLlave.MINRECARGADATAFONO}
-            max={enumParametrosTuLlave.MAXRECARGADATAFONO}
+            min={enumParametrosTuLlave.MINRECARGATARJETA}
+            max={enumParametrosTuLlave.MAXRECARGATARJETA}
             autoComplete='off'
-            maxLength={"9"}
-            value={parseInt(valor)}
+            maxLength={"11"}
+            value={parseInt(dataUsuario?.valorRecarga)}
             onInput={(e, val) => {
-              setValor(val);
+              setDataUsuario((old) => {
+                return { ...old, valorRecarga: val };
+              });
             }}
             required
+            disabled={
+              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
+            }
+          />
+        </Fieldset>
+        <Fieldset legend='Datos opcionales' className='lg:col-span-2'>
+          <Input
+            id='nombresCliente'
+            name='nombresCliente'
+            label={"Nombres cliente"}
+            type='text'
+            autoComplete='off'
+            value={dataUsuario?.["nombresCliente"]}
+            maxLength={50}
+            onChange={onChangeFormat}
+            disabled={
+              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
+            }
+          />
+          <Input
+            id='apellidosCliente'
+            name='apellidosCliente'
+            label={"Apellidos cliente"}
+            type='text'
+            autoComplete='off'
+            value={dataUsuario?.["apellidosCliente"]}
+            maxLength={50}
+            onChange={onChangeFormat}
+            disabled={
+              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
+            }
+          />
+          <Input
+            id='telefonoCliente'
+            name='telefonoCliente'
+            label={"Telefono cliente"}
+            type='text'
+            autoComplete='off'
+            value={dataUsuario?.["telefonoCliente"]}
+            maxLength={15}
+            onChange={onChangeFormatNumber}
+            disabled={
+              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
+            }
+          />
+          <Input
+            id='emailCliente'
+            name='emailCliente'
+            label={"Correo cliente"}
+            type='email'
+            autoComplete='off'
+            value={dataUsuario?.["emailCliente"]}
+            maxLength={50}
+            onChange={onChangeFormat}
             disabled={
               loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
             }
@@ -197,7 +237,7 @@ const TransaccionRecargaTarjeta = () => {
             disabled={
               loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
             }>
-            Recargar datafono
+            Recargar tarjeta
           </Button>
         </ButtonBar>
       </Form>
@@ -211,9 +251,23 @@ const TransaccionRecargaTarjeta = () => {
               <h1 className='text-2xl text-center mb-5 font-semibold'>
                 ¿Está seguro de realizar la recarga?
               </h1>
-              <h2>{`PosId datafono: ${dataDatafono?.["pos_id"]}`}</h2>
+              <h2>{`Número tarjeta: ${dataUsuario?.NTargeta}`}</h2>
+              {dataUsuario?.nombresCliente !== "" && (
+                <h2>{`Nombres cliente: ${dataUsuario?.nombresCliente}`}</h2>
+              )}
+              {dataUsuario?.apellidosCliente !== "" && (
+                <h2>{`Apellidos cliente: ${dataUsuario?.apellidosCliente}`}</h2>
+              )}
+              {dataUsuario?.telefonoCliente !== "" && (
+                <h2>{`Telefono cliente: ${dataUsuario?.telefonoCliente}`}</h2>
+              )}
+              {dataUsuario?.emailCliente !== "" && (
+                <h2>{`Correo cliente: ${dataUsuario?.emailCliente}`}</h2>
+              )}
               <h2 className='text-base'>
-                {`Valor a recargar: ${formatMoney.format(valor)} `}
+                {`Valor a recargar: ${formatMoney.format(
+                  dataUsuario?.valorRecarga
+                )} `}
               </h2>
               <>
                 <ButtonBar>
