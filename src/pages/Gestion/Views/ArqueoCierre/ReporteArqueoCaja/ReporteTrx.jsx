@@ -1,6 +1,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
+import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../../hooks/useMap";
 import TicketsDavivienda from "../../../../../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import TicketsPines from "../../../../../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../../../../../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
@@ -19,8 +21,8 @@ import Tickets from "../../../../../components/Base/Tickets";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
-import { notifyError } from "../../../../../utils/notify";
-import { buscarReporteTrxArqueo } from "../../../utils/fetchCaja";
+import { notifyError,notifyPending } from "../../../../../utils/notify";
+import { buscarReporteTrxArqueo, buscarTicketReporte } from "../../../utils/fetchCaja";
 import Input from "../../../../../components/Base/Input/Input";
 
 const formatMoney = makeMoneyFormatter(2);
@@ -78,6 +80,12 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   const { roleInfo } = useAuth();
   const { pathname } = useLocation();
 
+  const initialSearchFilters = new Map([
+    ["id_comercio", roleInfo?.id_comercio],
+    ["id_usuario", roleInfo?.id_usuario],
+    ["type_report", tipo_reporte === 2 ? "Tarjeta": "Efectivo"],
+    ["status", "true"],
+  ]);
   const printDiv = useRef();
 
   const [tipoReporte, setTipoReporte] = useState("");
@@ -90,7 +98,8 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
     content: () => printDiv.current,
   });
 
-  const [trxState, setTrxState] = useState("true");
+  const [searchFilters, { setAll: setSearchFilters }] =
+    useMap(initialSearchFilters);
 
   const [trxTree, setTrxTree] = useState({});
   const [montoTotal, setMontoTotal] = useState(0.0);
@@ -99,53 +108,75 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   const [totalTrxType, setTotalTrxType] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(false);
+  const [selectedInfo, setSelectedInfo] = useState(false);
   const [summaryTrx, setSummaryTrx] = useState(null);
 
   const handleClose = useCallback(() => {
     setSelected(false);
+    setSelectedInfo(false);
     setSummaryTrx(null);
   }, []);
 
-
-  useEffect(() => {
-    const conditions = [
-      roleInfo?.id_usuario !== undefined,
-      roleInfo?.id_usuario !== null,
-      roleInfo?.id_comercio !== undefined,
-      roleInfo?.id_comercio !== null,
-    ];
-    if (conditions.every((val) => val)) {
-      setLoading(true);
-      buscarReporteTrxArqueo({
-        id_usuario: roleInfo?.id_usuario,
-        id_comercio: roleInfo?.id_comercio,
-        type_report: tipo_reporte === 2 ? "Tarjeta": "Efectivo",
-        status: trxState,
-      })
-        .then((res) => {
-          setTrxTree(res?.obj?.results);
-          setMontoTotal(res?.obj?.monto);
-          setTotal_monto_type(res?.obj?.total_monto_type ?? 0);
-          setTotalTransacciones(res?.obj?.total_trxs);
-          setTotalTrxType(res?.obj?.total_trxs_type ?? 0);
-        })
-        .catch((error) => {
-          if (error?.cause === "custom") {
-            notifyError(error?.message);
-            return;
-          }
-          console.error(error?.message);
-          notifyError("Consulta fallida");
-        })
-        .finally(() => setLoading(false));
+  const getTicket = useCallback(() => {
+    if (selectedInfo === false) return;
+    const data = {
+      id_trx : selectedInfo?.id_trx,
+      id_comercio : roleInfo?.id_comercio,
+      id_tipo_transaccion : selectedInfo?.id_tipo_transaccion,
     }
-  }, [
-    roleInfo?.id_comercio,
-    roleInfo?.id_usuario,
-    tipoReporte,
-    tipo_reporte,
-    trxState,
-  ]);
+    notifyPending(
+      buscarTicketReporte(data),
+      {
+        render() {
+          return "Procesando peticion";
+        },
+      },
+      {
+        render({ data: res }) {
+          setSelected(res?.obj?.results ?? {});
+          return "Peticion satisfactoria";
+        },
+      },
+      {
+        render({ data: err }) {
+          console.error(err?.message);
+          return "Peticion fallida";
+        },
+      }
+    );
+  }, [selectedInfo, roleInfo]);
+
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((res) => {
+      setTrxTree(res?.obj?.results);
+      setMontoTotal(res?.obj?.monto);
+      setTotal_monto_type(res?.obj?.total_monto_type ?? 0);
+      setTotalTransacciones(res?.obj?.total_trxs);
+      setTotalTrxType(res?.obj?.total_trxs_type ?? 0);
+      setLoading(false)
+    }, []),
+    onError: useCallback((error) => {
+      setLoading(false)
+      if (error instanceof ErrorPDPFetch) {
+        notifyError(error.message);
+      }
+      else if (!(error instanceof DOMException)) {
+        console.error(error);
+        notifyError("Error al cargar Datos ");
+      }
+    }, []),
+  });
+  
+  const searchTrxs = useCallback(() => {
+    const tempMap = new Map(searchFilters);
+    const url =buscarReporteTrxArqueo()
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  }, [fetchTrxs,searchFilters]
+  );
+
+  useEffect(() => { searchTrxs() }, [searchTrxs]);
+  useEffect(() => { getTicket() }, [selectedInfo, getTicket]);
 
   return (
     <Fragment>
@@ -161,7 +192,13 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
               { value: "true", label: "Aprobada" },
               { value: "false", label: "Fallida" },
             ]}
-            onChange={(ev) => setTrxState(ev.target.value)}
+            onChange={(ev) => {
+              setSearchFilters((old)=>{
+                const copy = new Map(old)
+                  .set("status", ev.target.value);
+                return copy;
+              });
+            }}
             defaultValue={"true"}
             disabled={loading}
           />
@@ -218,16 +255,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
         <TreeView
           tree={trxTree}
           onClickLastChild={(info, ev) => {
-            setSelected(info);
-            setSummaryTrx({
-              "Tipo transaccion": info?.nombre_tipo_transaccion,
-              Fecha: info?.date_trx,
-              "Mensaje de respuesta trx": info?.message_trx,
-              Monto: formatMoney.format(info?.monto),
-              "Estado de la trasaccion": info?.status
-                ? "Transaccion aprobada"
-                : "Transaccion rechazada",
-            });
+            setSelectedInfo(info)
           }}
         />
       </div>
