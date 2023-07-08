@@ -58,7 +58,7 @@ const Deposito = () => {
   const [uuid, setUuid] = useState(v4());
 
   const optionsDocumento = [
-    { value: "1", label: "Cédula Ciudadanía" },
+    { value: "1", label: "Cédula de ciudadanía" },
     { value: "3", label: "NIT" },
   ];
 
@@ -159,7 +159,7 @@ const Deposito = () => {
               setDatosConsulta(res?.obj);
               const summary = {
                 "Número Powwi": numeroTelefono,
-                "Tipo documento destinatario": datosTrx.tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
+                "Tipo documento destinatario": datosTrx.tipoDocumento === "1" ? "Cédula de ciudadanía" : "NIT",
                 "Número documento destinatario": userDoc,
                 "Valor a depositar": valorFormat,
                 "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),

@@ -57,7 +57,7 @@ const Retiro = () => {
   const [summary, setSummary] = useState([]);
   const [uuid, setUuid] = useState(v4());
   const optionsDocumento = [
-    { value: "1", label: "Cédula Ciudadanía" },
+    { value: "1", label: "Cédula de ciudadanía" },
     { value: "3", label: "NIT" },
   ];
   const printDiv = useRef();
@@ -160,8 +160,8 @@ const Retiro = () => {
                   setDatosConsulta(res?.obj);
                   const summary = {
                     "Número Powwi": numeroTelefono,
-                    "Tipo documento cliente": datosTrx.tipoDocumento === "1" ? "Cédula Ciudadanía" : "NIT",
-                    "Número documento": userDoc,
+                    "Tipo documento cliente": datosTrx.tipoDocumento === "1" ? "Cédula de ciudadanía" : "NIT",
+                    "Número documento cliente": userDoc,
                     "Valor a retirar": valorFormat,
                     "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
                     "Valor Total": valorFormat,
