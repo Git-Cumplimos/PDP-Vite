@@ -316,7 +316,7 @@ const Retiro = () => {
             }}/>
           <Select
             id='tipoDocumento'
-            label='Tipo de documento'
+            label='Tipo Documento Cliente'
             options={optionsDocumento}
             value={datosTrx.tipoDocumento}
             onChange={(e) => {
