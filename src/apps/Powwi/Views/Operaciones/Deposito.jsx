@@ -173,7 +173,6 @@ const Deposito = () => {
           {
             render: ( { data: error}) => {
               setIsUploading(false);
-              navigate("/corresponsaliaPowwi/Deposito");
               setDatosTrx({
                 tipoDocumento: "1",
                 userDoc: "",
