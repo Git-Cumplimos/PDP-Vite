@@ -27,6 +27,14 @@ import Input from "../../../../../components/Base/Input/Input";
 
 const formatMoney = makeMoneyFormatter(2);
 
+const dateFormatter = Intl.DateTimeFormat("es-CO", {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+});
+
 const GridRow = ({ cols = [], self = false, onClick = () => { } }) => (
   <div
     className={`grid gap-4 ${self ? "py-4 px-2 bg-secondary-light" : ""
@@ -81,8 +89,8 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   const { pathname } = useLocation();
 
   const initialSearchFilters = new Map([
-    ["id_comercio", roleInfo?.id_comercio],
-    ["id_usuario", roleInfo?.id_usuario],
+    ["id_comercio", roleInfo?.id_comercio ?? ""],
+    ["id_usuario", roleInfo?.id_usuario ?? ""],
     ["type_report", tipo_reporte === 2 ? "Tarjeta": "Efectivo"],
     ["status", "true"],
   ]);
@@ -98,7 +106,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
     content: () => printDiv.current,
   });
 
-  const [searchFilters, { setAll: setSearchFilters }] =
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter  }] =
     useMap(initialSearchFilters);
 
   const [trxTree, setTrxTree] = useState({});
@@ -128,19 +136,33 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       buscarTicketReporte(data),
       {
         render() {
-          return "Procesando peticion";
+          return "Procesando petición";
         },
       },
       {
         render({ data: res }) {
-          setSelected(res?.obj?.results ?? {});
-          return "Peticion satisfactoria";
+          const data = res?.obj?.results ?? {}
+          const fecha = new Date(data?.created);
+          fecha.setHours(fecha.getHours() + 5);
+          setSummaryTrx({
+            "Tipo transacción": data?.["Tipo transaccion"] ?? "",
+            Fecha: dateFormatter.format(fecha),
+            "Mensaje de respuesta trx": data?.message_trx ??"",
+            Monto: data?.monto ? formatMoney.format(data?.monto): "",
+            "Estado de la transacción": (
+               searchFilters.get('status') === "true" ?
+                "Transacción aprobada" : "Transacción rechazada"
+              ),
+          })
+
+          setSelected(data)
+          return "Petición satisfactoria";
         },
       },
       {
         render({ data: err }) {
           console.error(err?.message);
-          return "Peticion fallida";
+          return "Petición fallida";
         },
       }
     );
@@ -165,17 +187,21 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
         notifyError("Error al cargar Datos ");
       }
     }, []),
-  });
+  },{delay:1000});
   
   const searchTrxs = useCallback(() => {
-    const tempMap = new Map(searchFilters);
-    const url =buscarReporteTrxArqueo()
-    const queries = new URLSearchParams(tempMap.entries()).toString();
-    fetchTrxs(`${url}?${queries}`);
-  }, [fetchTrxs,searchFilters]
+    setSingleFilter("id_comercio", (old) => roleInfo.id_comercio ?? old);
+    setSingleFilter("id_usuario", (old) => roleInfo.id_usuario ?? old);
+    if(roleInfo?.id_comercio !== undefined && roleInfo?.id_usuario !== undefined){
+      const tempMap = new Map(searchFilters);
+      const url =buscarReporteTrxArqueo()
+      const queries = new URLSearchParams(tempMap.entries()).toString();
+      fetchTrxs(`${url}?${queries}`);
+    }
+  }, [fetchTrxs,setSingleFilter,searchFilters,roleInfo]
   );
 
-  useEffect(() => { searchTrxs() }, [searchTrxs]);
+  useEffect(() => { searchTrxs() }, [searchTrxs,roleInfo]);
   useEffect(() => { getTicket() }, [selectedInfo, getTicket]);
 
   return (
