@@ -19,6 +19,7 @@ import DataTable from "../components/Base/DataTable";
 import useFetchDispatchDebounce from "../hooks/useFetchDispatchDebounce";
 import useMap from "../hooks/useMap";
 import { onChangeNumber } from "../utils/functions";
+import MoneyRange from "../components/Compound/MoneyRange/MoneyRange";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -34,6 +35,8 @@ const initialSearchFilters = new Map([
   ["id_usuario", ""],
   ["id_tipo_transaccion", ""],
   ["id_trx", ""],
+  ["referencia", ""],
+  ["monto", null],
   ["date_ini", ""],
   ["date_end", ""],
   ["page", 1],
@@ -168,6 +171,8 @@ const Transacciones = () => {
         headers={[
           "Id transaccion",
           "Operación",
+          "Referencia 1",
+          // "Referencia 2",
           "Monto",
           "Fecha",
           "Estado de la trasacción",
@@ -176,6 +181,8 @@ const Transacciones = () => {
           ({
             id_trx,
             "Tipo transaccion": Tipo_operacion,
+            referencia_1,
+            // referencia_2,
             monto,
             created,
             status_trx_text,
@@ -187,9 +194,11 @@ const Transacciones = () => {
             return {
               id_trx,
               Tipo_operacion,
+              referencia_1,
+              // referencia_2,
               money,
               created,
-              status_trx_text
+              status_trx_text,
             };
           }
         )}
@@ -230,6 +239,7 @@ const Transacciones = () => {
         }
         onChange={(ev) => {
           setSearchFilters((old) => {
+            if (!ev.target.name) return old;
             const copy = new Map(old)
               .set(
                 ev.target.name,
@@ -277,7 +287,28 @@ const Transacciones = () => {
           name="id_trx"
           label="Id de transaccion"
           type="tel"
+          maxLength={30}
           value={searchFilters.get("id_trx")}
+          onChange={() => {}}
+        />
+        <MoneyRange
+          label="Rango de monto"
+          value={searchFilters.get("monto")}
+          onChange={(val) =>
+            setSingleFilter("monto", () => {
+              if (val[1] < val[0]) return null;
+              if (val[1] === 0 && val[0] === 0) return null;
+              return val;
+            })
+          }
+        />
+        <Input
+          id="referencia"
+          name="referencia"
+          label="Referencia"
+          type="text"
+          maxLength={30}
+          value={searchFilters.get("referencia")}
           onChange={() => {}}
         />
         {userPermissions
@@ -306,21 +337,24 @@ const Transacciones = () => {
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
-            {selected?.ticket.autorizador === 14 ||  selected?.id_autorizador === 14 ? (
+            {selected?.ticket.autorizador === 14 ||
+            selected?.id_autorizador === 14 ? (
               <TicketColpatria
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.ticket?.autorizador === 17 ||  selected?.id_autorizador === 17 ? (
+            ) : selected?.ticket?.autorizador === 17 ||
+              selected?.id_autorizador === 17 ? (
               <TicketsAval
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.ticket?.autorizador === 16 ||  selected?.id_autorizador === 16 ? (
+            ) : selected?.ticket?.autorizador === 16 ||
+              selected?.id_autorizador === 16 ? (
               <TicketsAgrario
                 refPrint={printDiv}
                 type="Reimpresión"
