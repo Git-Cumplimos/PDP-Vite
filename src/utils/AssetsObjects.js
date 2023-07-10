@@ -204,6 +204,9 @@ const svgs = {
   //RECAUDO RETIRO DIRECTO
   RECAUDO_RETIRO_DIRECTO: `${urlAssets}/assets/svg/recaudo/RECAUDORETIRODIRECTO.svg`,
 
+  //POWWI
+  POWWI: `${urlAssets}/assets/svg/recaudo/POWWI/po.jpg`,
+
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,

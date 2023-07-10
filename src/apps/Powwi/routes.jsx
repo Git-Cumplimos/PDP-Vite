@@ -23,23 +23,13 @@ const rutasPowwi = {
   subRoutes: [
     {
       link: "/corresponsaliaPowwi/Retiro",
-      label: (
-        <AppIcons
-          Logo={"DAVIVIENDA_RETIROS"}
-          name="Retiro"
-        />
-      ),
+      label: <AppIcons Logo={"DAVIVIENDA_RETIROS"} name="Retiro" />,
       component: RetiroPowwi,
       permission: [enumPermisosPowwi.powwi_retiros],
     },
     {
       link: "/corresponsaliaPowwi/Deposito",
-      label: (
-        <AppIcons
-          Logo={"DAVIVIENDA_DEPOSITOS"}
-          name="Depósito"
-        />
-      ),
+      label: <AppIcons Logo={"DAVIVIENDA_DEPOSITOS"} name="Depósito" />,
       component: DepositoPowwi,
       permission: [enumPermisosPowwi.powwi_depositos],
     },
