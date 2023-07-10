@@ -205,10 +205,12 @@ const svgs = {
   RECAUDO_RETIRO_DIRECTO: `${urlAssets}/assets/svg/recaudo/RECAUDORETIRODIRECTO.svg`,
 
   //POWWI
-  POWWI: `${urlAssets}/assets/svg/recaudo/POWWI/po.jpg`,
+  POWWI: `${urlAssets}/assets/svg/recaudo/POWWI/POWWI.svg`,
+  POWWI_RETIRO: `${urlAssets}/assets/svg/recaudo/POWWI/POWWI_RETIRO.svg`,
+  POWWI_DEPOSITO: `${urlAssets}/assets/svg/recaudo/POWWI/POWWI_RECAUDO.svg`,
 
   //TULLAVE
-  RECARGASTULLAVE: `${urlAssets}/assets/svg/recaudo/TULLAVE/t.svg`,
+  RECARGASTULLAVE: `${urlAssets}/assets/svg/recaudo/TULLAVE/TULLAVE_RECARGAS.svg`,
 
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
