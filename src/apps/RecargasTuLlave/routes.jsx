@@ -20,13 +20,13 @@ export const listPermissionsTuLlave = listPermissions;
 
 const rutasRecargasTullave = {
   link: "/recargas-tu-llave",
-  label: <AppIcons Logo={"RECARGASTULLAVE"} name='Recargas Tu Llave' />,
+  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Recargas Tu Llave" />,
   component: CorresponsaliaTuLlave,
   permission: listPermissionsTuLlave,
   subRoutes: [
     {
       link: "/recargas-tu-llave/gestion-datafonos",
-      label: <AppIcons Logo={"DAVIPLATA"} name='Gestión datafonos' />,
+      label: <AppIcons Logo={"DAVIPLATA"} name="Gestión datafonos" />,
       component: MainGestionDatafonos,
       permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
       subRoutes: [
@@ -50,7 +50,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/recarga-datafonos",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga datafonos' />
+        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name="Recarga datafonos" />
       ),
       component: MainGestionDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],

@@ -207,6 +207,9 @@ const svgs = {
   //POWWI
   POWWI: `${urlAssets}/assets/svg/recaudo/POWWI/po.jpg`,
 
+  //TULLAVE
+  RECARGASTULLAVE: `${urlAssets}/assets/svg/recaudo/TULLAVE/t.svg`,
+
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
