@@ -12,6 +12,7 @@ import rutasRecaudoDirecto from "../apps/RecaudoDirecto/routes";
 
 import rutasColpatria, {
   listPermissionsColpatria,
+  rutasGestionColpatria,
 } from "../apps/Colpatria/routes";
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
@@ -28,7 +29,6 @@ import {
 
 import { rutasPinesVus } from "../apps/PinesVus/routes";
 import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
-
 
 import rutasPinesCrc, {
   listPermissionsPinesCrc,
@@ -137,7 +137,9 @@ const AjusteCupo = lazy(() => import("../apps/Cupo/Views/AjusteCupoComer"));
 const TipoMovimientoCupo = lazy(() =>
   import("../apps/Cupo/Views/TipoMovimientoCupo")
 );
-const DetalleModificacionCupo = lazy(() => import("../apps/Cupo/Views/DtlModifiCupo"));
+const DetalleModificacionCupo = lazy(() =>
+  import("../apps/Cupo/Views/DtlModifiCupo")
+);
 /**
  * Movii
  */
@@ -347,21 +349,28 @@ const GestionTransaccional = lazy(() =>
   import("../pages/GestionTransaccional")
 );
 
-
 /**
  * Gestion anulación pines CRC
  */
-const AnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/AnulacionesPines"));
-const CargueAnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/CargueAnulaciones"))
-const DescargaPeticionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/DescargarArchivoPeticiones"))
-const HistoricoAnulacionesPinesCRC = lazy(() => import("../apps/PinesCrc/Views/Anulaciones/HistoricoAnulaciones"))
+const AnulacionesPinesCRC = lazy(() =>
+  import("../apps/PinesCrc/Views/AnulacionesPines")
+);
+const CargueAnulacionesPinesCRC = lazy(() =>
+  import("../apps/PinesCrc/Views/Anulaciones/CargueAnulaciones")
+);
+const DescargaPeticionesPinesCRC = lazy(() =>
+  import("../apps/PinesCrc/Views/Anulaciones/DescargarArchivoPeticiones")
+);
+const HistoricoAnulacionesPinesCRC = lazy(() =>
+  import("../apps/PinesCrc/Views/Anulaciones/HistoricoAnulaciones")
+);
 
 /**
  * Pines Combinados -- CRC y Comsión premium
  */
-const PinesCombinados = lazy(() => import("../apps/PinesVus/Views/PinesCombinados/CrearPin"))
-
-
+const PinesCombinados = lazy(() =>
+  import("../apps/PinesVus/Views/PinesCombinados/CrearPin")
+);
 
 const allUrlsPrivateApps = [
   {
@@ -413,6 +422,7 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      rutasGestionColpatria,
     ],
   },
   {
@@ -693,13 +703,16 @@ const allUrlsPrivateApps = [
       ...listPermissionsPinesCrc,
     ],
     provider: ProvidepinesVus,
-    subRoutes: [rutasPines, rutasPinesVus, rutasPinesCrc,
-    {
-      link: "/Pines/Combinados",
-      label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
-      component: PinesCombinados,
-      permission: [53]
-    },
+    subRoutes: [
+      rutasPines,
+      rutasPinesVus,
+      rutasPinesCrc,
+      {
+        link: "/Pines/Combinados",
+        label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
+        component: PinesCombinados,
+        permission: [53],
+      },
     ],
   },
   {
