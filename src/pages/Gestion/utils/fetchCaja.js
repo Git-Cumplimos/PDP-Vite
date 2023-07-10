@@ -120,8 +120,12 @@ export const editarComprobante = buildPutFunction(
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
 export const buscarNotas = buildGetFunction(`${urlNotas}/administrar`);
 
-export const buscarReporteTrxArqueo = buildGetFunction(
-  `${urlReportes}/trx-arqueo-usuario`
+export const buscarReporteTrxArqueo = () => {
+  return `${urlReportes}/trx-arqueo-usuario`
+};
+
+export const buscarTicketReporte = buildGetFunction(
+  `${urlReportes}/trx-ticket`
 );
 
 export const buscarReportesArqueo = async (args) => {
