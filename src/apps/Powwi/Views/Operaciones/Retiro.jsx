@@ -173,7 +173,6 @@ const Retiro = () => {
             {
               render: ( { data: error}) => {
                 setIsUploading(false);
-                navigate("/corresponsaliaPowwi/Retiro");
                 setDatosTrx({
                   tipoDocumento: "1",
                   userDoc: "",
