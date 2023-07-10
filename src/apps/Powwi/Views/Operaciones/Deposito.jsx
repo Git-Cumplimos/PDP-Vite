@@ -189,7 +189,7 @@ const Deposito = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          `El valor del retiro debe estar entre ${formatMoney
+          `El valor del déposito debe estar entre ${formatMoney
             .format(min)
             .replace(/(\$\s)/g, "$")} y ${formatMoney
             .format(max)

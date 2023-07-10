@@ -122,83 +122,78 @@ const Retiro = () => {
         setIsUploading(false);
         notifyError("El número OTP debe ser de 6 dígitos");
       } else {
-        if (valor % 10000 === 0) {
-          const { min, max } = limitesMontos;
-          if (valor >= min && valor <= max) {
-            const formData = new FormData(e.target);
-            const userDoc = formData.get("docCliente");
-            const numeroTelefono = formData.get("numeroTelefono");
-            const valorFormat = formData.get("valor");
-            const data = {
-              comercio: {
-                id_comercio: roleInfo?.id_comercio,
-                id_usuario: roleInfo?.id_usuario,
-                id_terminal: roleInfo?.id_dispositivo,
+        const { min, max } = limitesMontos;
+        if (valor >= min && valor <= max) {
+          const formData = new FormData(e.target);
+          const userDoc = formData.get("docCliente");
+          const numeroTelefono = formData.get("numeroTelefono");
+          const valorFormat = formData.get("valor");
+          const data = {
+            comercio: {
+              id_comercio: roleInfo?.id_comercio,
+              id_usuario: roleInfo?.id_usuario,
+              id_terminal: roleInfo?.id_dispositivo,
+            },
+            address: roleInfo?.direccion,
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.ciudad,
+            nombre_usuario: roleInfo?.["nombre comercio"],
+            nombre_comercio: roleInfo?.["nombre comercio"],
+            oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+            valor_total_trx: valor,
+            Datos: {
+              numeroProducto: "(+57)"+numeroTelefono,
+            },
+          };
+          notifyPending(
+            peticionConsultaCosto({}, data),
+            {
+              render: () => {
+                setIsUploading(true);
+                return "Procesando consulta";
               },
-              address: roleInfo?.direccion,
-              dane_code: roleInfo?.codigo_dane,
-              city: roleInfo?.ciudad,
-              nombre_usuario: roleInfo?.["nombre comercio"],
-              nombre_comercio: roleInfo?.["nombre comercio"],
-              oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-              valor_total_trx: valor,
-              Datos: {
-                numeroProducto: "(+57)"+numeroTelefono,
+            },
+            {
+              render: ({data: res }) =>{
+                setIsUploading(false);
+                setDatosConsulta(res?.obj);
+                const summary = {
+                  "Número Powwi": numeroTelefono,
+                  "Tipo documento cliente": datosTrx.tipoDocumento === "1" ? "Cédula de ciudadanía" : "NIT",
+                  "Número documento cliente": userDoc,
+                  "Valor a retirar": valorFormat,
+                  "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
+                  "Valor Total": valorFormat,
+                };
+                setSummary(summary);
+                setShowModal(true);
+                return "Consulta satisfactoria";
               },
-            };
-            notifyPending(
-              peticionConsultaCosto({}, data),
-              {
-                render: () => {
-                  setIsUploading(true);
-                  return "Procesando consulta";
-                },
+            },
+            {
+              render: ( { data: error}) => {
+                setIsUploading(false);
+                navigate("/corresponsaliaPowwi/Retiro");
+                setDatosTrx({
+                  tipoDocumento: "1",
+                  userDoc: "",
+                  numeroTelefono: "",
+                  otp: "",
+                });
+                setValor("");
+                return error?.message ?? "Consulta fallida";
               },
-              {
-                render: ({data: res }) =>{
-                  setIsUploading(false);
-                  setDatosConsulta(res?.obj);
-                  const summary = {
-                    "Número Powwi": numeroTelefono,
-                    "Tipo documento cliente": datosTrx.tipoDocumento === "1" ? "Cédula de ciudadanía" : "NIT",
-                    "Número documento cliente": userDoc,
-                    "Valor a retirar": valorFormat,
-                    "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
-                    "Valor Total": valorFormat,
-                  };
-                  setSummary(summary);
-                  setShowModal(true);
-                  return "Consulta satisfactoria";
-                },
-              },
-              {
-                render: ( { data: error}) => {
-                  setIsUploading(false);
-                  navigate("/corresponsaliaPowwi/Retiro");
-                  setDatosTrx({
-                    tipoDocumento: "1",
-                    userDoc: "",
-                    numeroTelefono: "",
-                    otp: "",
-                  });
-                  setValor("");
-                  return error?.message ?? "Consulta fallida";
-                },
-              }
-            );
-          } else {
-            setIsUploading(false);
-            notifyError(
-              `El valor del retiro debe estar entre ${formatMoney
-                .format(min)
-                .replace(/(\$\s)/g, "$")} y ${formatMoney
-                .format(max)
-                .replace(/(\$\s)/g, "$")}`
-            );
-          }
+            }
+          );
         } else {
           setIsUploading(false);
-          notifyError("El valor a retirar debe ser múltiplo de $10.000");
+          notifyError(
+            `El valor del retiro debe estar entre ${formatMoney
+              .format(min)
+              .replace(/(\$\s)/g, "$")} y ${formatMoney
+              .format(max)
+              .replace(/(\$\s)/g, "$")}`
+          );
         }
       }
     },
