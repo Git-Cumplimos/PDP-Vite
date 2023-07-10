@@ -24,7 +24,7 @@ const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
 
 export const rutasGestionColpatria = {
   link: "/corresponsalia/colpatria/gestion",
-  label: <AppIcons Logo={"COLPATRIA_GESTION"} name={"Gestión"} />,
+  label: <AppIcons Logo={"COLPATRIA_GESTION"} name={"Gestión Corresponsalía Colpatria"} />,
   component: AdminColpatria,
   permission: [PermissionsColpatria.gestion],
   subRoutes: [
@@ -157,7 +157,7 @@ const rutasColpatria = {
       component: PinDePago,
       permission: [PermissionsColpatria.pin_pago],
     },
-    rutasGestionColpatria,
+    // rutasGestionColpatria,
   ],
 };
 
