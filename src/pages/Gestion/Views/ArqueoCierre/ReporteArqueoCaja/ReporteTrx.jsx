@@ -186,7 +186,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
           <Select
             id="trxState"
             name="trxState"
-            label="Estado de la transaccion"
+            label="Estado de la transacción"
             options={[
               // { value: "null", label: "" },
               { value: "true", label: "Aprobada" },
