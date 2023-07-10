@@ -14,6 +14,7 @@ import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
+import TicketsPowwi from "../apps/Powwi/components/TicketsPowwi/TicketsPowwi";
 import TicketsLot from "../apps/LoteriaBog/components/TicketsLot/TicketLot";
 import DataTable from "../components/Base/DataTable";
 import useFetchDispatchDebounce from "../hooks/useFetchDispatchDebounce";
@@ -329,6 +330,14 @@ const Transacciones = () => {
               />
             ) : selected?.id_autorizador === 13 ? (
               <TicketsDavivienda
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_tipo_transaccion === 148 || 
+                selected?.id_tipo_transaccion === 151  ? (
+              <TicketsPowwi
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
