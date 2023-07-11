@@ -59,7 +59,7 @@ const Deposito = () => {
     title: "Recibo de Pago",
     timeInfo: {
       "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-        year: "2-digit",
+        year: "numeric",
         month: "2-digit",
         day: "2-digit",
       }).format(new Date()),
@@ -70,6 +70,7 @@ const Deposito = () => {
       }).format(new Date()),
     },
     commerceInfo: [
+      ["Id comercio", roleInfo.id_comercio],
       ["Comercio", roleInfo?.["nombre comercio"]],
       ["No. Terminal", roleInfo?.id_dispositivo],
       ["Dirección", roleInfo?.direccion],
@@ -77,7 +78,7 @@ const Deposito = () => {
     ],
     commerceName: "Depósito",
     trxInfo: [],
-    disclamer: `Corresponsal bancario para Banco Agrario. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
+    disclamer: `POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO  `,
   });
 
   const options = [
@@ -167,7 +168,7 @@ const Deposito = () => {
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
+      year: "numeric",
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
@@ -238,16 +239,16 @@ const Deposito = () => {
           const comercio = objTicket["commerceInfo"];
           delete objTicket["commerceInfo"];
           objTicket["commerceInfo"] = [];
-          objTicket["commerceInfo"].push(comercio[1]);
-          objTicket["commerceInfo"].push(comercio[3]);
-          objTicket["commerceInfo"].push(["No. Trx", res?.obj?.id_trx]);
+          objTicket["commerceInfo"].push(comercio[0]);
+          objTicket["commerceInfo"].push(comercio[2]);
+          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
           objTicket["commerceInfo"].push([
-            "No. Aprobación",
+            "Id Aut",
             res?.obj?.codigo_autorizacion,
           ]);
-          objTicket["commerceInfo"].push(comercio[0]);
+          objTicket["commerceInfo"].push(comercio[1]);
           objTicket["commerceInfo"].push(["", ""]);
-          objTicket["commerceInfo"].push(comercio[2]);
+          objTicket["commerceInfo"].push(comercio[3]);
           objTicket["commerceInfo"].push(["", ""]);
           objTicket["trxInfo"].push([
             "Costo transacción",
@@ -336,7 +337,7 @@ const Deposito = () => {
               <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
-                <Button onClick={goToRecaudo}>Cerrar</Button>
+                <Button type={"submit"} onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
             </div>
           ) : (
