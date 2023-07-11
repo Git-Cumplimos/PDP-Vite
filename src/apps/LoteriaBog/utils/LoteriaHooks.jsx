@@ -36,6 +36,7 @@ const urls = {
   historicoCargues: `${process.env.REACT_APP_URL_LOTERIAS}/historico_cargues`,
   historicoPagoPremios: `${process.env.REACT_APP_URL_LOTERIAS}/historico_pago_premios`,
   con_SortVentas_S3: `${process.env.REACT_APP_URL_LOTERIAS}/con_sort`,
+  reportePagoPremios_S3 : `${process.env.REACT_APP_URL_LOTERIAS}/reportePagoPremios_S3`,
 
   //ventasReportes: `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`,
   //pagosReportes:`${process.env.REACT_APP_URL_LOTERIAS}/reportes_pago_premios`,
@@ -902,6 +903,27 @@ export const useProvideLoteria = () => {
     [sorteosLOT]
   );
 
+  const reportePagoPremios_S3 = useCallback(
+    async (sorteo) => {
+      const query = {
+        sorteo:sorteo,
+        codigos_loteria: sorteosLOT,
+      };
+      try {
+        const res = await fetchData(
+          urls.reportePagoPremios_S3,
+          "GET",
+          query,
+          {}
+        );
+        return res;
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [sorteosLOT]
+  );
+
   const reportVentas = useCallback(async (fecha_ini, fecha_fin) => {
     try {
       const res = await fetchData(urls.reportVentas, "GET", {
@@ -1065,6 +1087,7 @@ export const useProvideLoteria = () => {
     historicoCargues,
     historicoPagoPremios,
     DescargaDocsPagoPremios,
+    reportePagoPremios_S3,
     reportVentas,
     peticionBarcode,
     consultaInventario,
