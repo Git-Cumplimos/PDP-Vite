@@ -18,6 +18,8 @@ import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
 import Input from "../../../../../../components/Base/Input/Input";
 import MoneyInput from "../../../../../../components/Base/MoneyInput/MoneyInput";
+import { makeMoneyFormatter } from "../../../../../../utils/functions";
+import useMoney from "../../../../../../hooks/useMoney";
 const { styleComponents } = classes;
 const url_pago_cartera_tarjcredito = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
@@ -40,8 +42,7 @@ const PagoTarjCredito = () => {
     const printDiv = useRef();
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
-    const [loadingPeticionPayCarteraTarjCredito, peticionPayCarteraTarjCredito] = 
-    useFetchPagoCartera(
+    const [loadingPeticionPayCarteraTarjCredito, peticionPayCarteraTarjCredito] =     useFetchPagoCartera(
         url_pago_cartera_tarjcredito,
         urlreintentos,
         "PagoCartera"
@@ -234,25 +235,16 @@ const PagoTarjCredito = () => {
             });
         }
     }
-
-    function onChangeInput2(e) {
-        const { name, value } = e.target;
-        const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 8));
-        setDatosTarjCredito((old) => {
-            return { ...old, inputValorTarCredi: numericValue };
-        });
-        if (value === "" || value === 0) {
-            setDatosTarjCredito((old) => {
-                return { ...old, inputValorTarCredi: "" };
-            });
-        }
-    }
+    const onChangeMoney = useMoney({
+        limits: [enumParametrosPagoCartera.minPagoCarteraTarjCredito, enumParametrosPagoCartera.maxPagoCarteraTarjCredito],
+        equalError: false,
+    });
 
     return (
         <Fragment>
             <SimpleLoading show={loadingPeticionPayCarteraTarjCredito}></SimpleLoading>
             <h1 className='text-3xl mt-6'>Pago Tarjeta Crédito</h1>
-            <Form>
+            <Form onSubmit={validacionDatos}>
                 <div className={styleComponents}>
                     <Input
                     name="credito"
@@ -266,24 +258,26 @@ const PagoTarjCredito = () => {
                     required
                     ></Input>
                 </div>
-                
-                    <MoneyInput
-                        id='valCashOut'
-                        name='ValorPagar'
-                        label='Valor a pagar'
-                        type='text'
-                        min={enumParametrosPagoCartera.minPagoCarteraTarjCredito}
-                        max={enumParametrosPagoCartera.maxPagoCarteraTarjCredito}
-                        autoComplete='off'
-                        maxLength={"11"}
-                    value={parseInt(datosTarjCredito?.inputValorTarCredi)}
-                        onInput={onChangeInput2}
-                        required
-                    />                
-                    <ButtonBar className="flex justify-center py-6">
-                    <Button type={"submit"} onClick={validacionDatos} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputNumTarCredi.length < 6 || datosTarjCredito?.inputValorTarCredi.length > 8}>
-                            Realizar Pago
-                        </Button>
+                <Input
+                    id='valCashOut'
+                    name='ValorPagar'
+                    label='Valor a pagar'
+                    autoComplete='off'
+                    type='text'
+                    minLength={"4"}
+                    maxLength={"12"}
+                    min={enumParametrosPagoCartera.minPagoCarteraTarjCredito}
+                    max={enumParametrosPagoCartera.maxPagoCarteraTarjCredito}
+                    value={makeMoneyFormatter(0).format(datosTarjCredito?.inputValorTarCredi)}
+                    onInput={(ev) => setDatosTarjCredito((old) => {
+                        return { ...old, inputValorTarCredi: (onChangeMoney(ev)) };
+                    })}
+                    required
+                />
+                <ButtonBar className="flex justify-center py-6">
+                    <Button type={"submit"} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputValorTarCredi.length > 8}>
+                        Realizar Pago
+                    </Button>
                     <Button type={"reset"} onClick={HandleCloseTrx} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputValorTarCredi.length > 8}>
                             Cancelar
                         </Button>
