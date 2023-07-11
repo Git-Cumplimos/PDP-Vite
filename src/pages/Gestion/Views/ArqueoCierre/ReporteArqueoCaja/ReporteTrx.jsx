@@ -166,7 +166,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
         },
       }
     );
-  }, [selectedInfo, roleInfo]);
+  }, [selectedInfo, searchFilters, roleInfo]);
 
   const [fetchTrxs] = useFetchDispatchDebounce({
     onSuccess: useCallback((res) => {
@@ -190,8 +190,8 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   },{delay:1000});
   
   const searchTrxs = useCallback(() => {
-    setSingleFilter("id_comercio", (old) => roleInfo.id_comercio ?? old);
-    setSingleFilter("id_usuario", (old) => roleInfo.id_usuario ?? old);
+    setSingleFilter("id_comercio", (old) => roleInfo?.id_comercio ?? old);
+    setSingleFilter("id_usuario", (old) => roleInfo?.id_usuario ?? old);
     if(roleInfo?.id_comercio !== undefined && roleInfo?.id_usuario !== undefined){
       const tempMap = new Map(searchFilters);
       const url =buscarReporteTrxArqueo()
