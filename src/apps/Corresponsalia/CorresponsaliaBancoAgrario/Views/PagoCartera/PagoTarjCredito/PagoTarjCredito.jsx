@@ -281,7 +281,7 @@ const PagoTarjCredito = () => {
                         required
                     />                
                     <ButtonBar className="flex justify-center py-6">
-                    <Button type={"submit"} onClick={validacionDatos} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputValorTarCredi.length > 8}>
+                    <Button type={"submit"} onClick={validacionDatos} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputNumTarCredi.length < 6 || datosTarjCredito?.inputValorTarCredi.length > 8}>
                             Realizar Pago
                         </Button>
                     <Button type={"reset"} onClick={HandleCloseTrx} disabled={datosTarjCredito?.inputNumTarCredi === "" || datosTarjCredito?.inputValorTarCredi === "" || datosTarjCredito?.inputNumTarCredi.length > 16 || datosTarjCredito?.inputValorTarCredi.length > 8}>

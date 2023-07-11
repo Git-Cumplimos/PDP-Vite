@@ -44,7 +44,7 @@ export const LecturaNumeroObligacion = ({
       )}
 
       <ButtonBar className="flex justify-center py-6">
-        <Button type={"submit"} onClick={onSubmit} disabled={numeroPagoCartera === "" || numeroPagoCartera === 0 ? !loadingPeticion : loadingPeticion}>
+        <Button type={"submit"} onClick={onSubmit} disabled={numeroPagoCartera.length < 6|| numeroPagoCartera === "" || numeroPagoCartera === 0 ? !loadingPeticion : loadingPeticion}>
           Realizar consulta
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
