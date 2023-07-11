@@ -8,7 +8,6 @@ import Button from "../../../../components/Base/Button/Button";
 import Modal from "../../../../components/Base/Modal/Modal";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchTuLlave";
-import TextArea from "../../../../components/Base/TextArea/TextArea";
 import Form from "../../../../components/Base/Form/Form";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import MoneyInput, {
@@ -16,13 +15,21 @@ import MoneyInput, {
 } from "../../../../components/Base/MoneyInput/MoneyInput";
 import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
 import { useReactToPrint } from "react-to-print";
+import Select from "../../../../components/Base/Select/Select";
 
-const URL_CONSULTAR_TARJETA = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
-const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-datafono`;
+const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
 
 const TransaccionRecargaTarjeta = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
+  const optionsTipoDocumento = [
+    { value: "", label: "" },
+    { value: "1", label: "Cédula de ciudadanía" },
+    { value: "2", label: "Cédula de extranjería" },
+    { value: "4", label: "Número único de identificación" },
+    { value: "5", label: "Tarjeta de identidad" },
+    { value: "6", label: "Pasaporte" },
+  ];
   const [dataUsuario, setDataUsuario] = useState({
     NTargeta: "",
     valorRecarga: 0,
@@ -30,6 +37,9 @@ const TransaccionRecargaTarjeta = () => {
     apellidosCliente: "",
     telefonoCliente: "",
     emailCliente: "",
+    tipoDocumentoId: "",
+    tipoDocumento: "",
+    documento: "",
   });
   const [estadoPeticion, setEstadoPeticion] = useState(0);
 
@@ -55,15 +65,33 @@ const TransaccionRecargaTarjeta = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        address: roleInfo?.["direccion"],
-        dane_code: roleInfo?.codigo_dane,
-        city: roleInfo?.["ciudad"],
-        recarga_datafono_tu_llave: {
-          posId: dataUsuario?.["pos_id"],
+        location: {
+          address: roleInfo?.["direccion"],
+          dane_code: roleInfo?.codigo_dane,
+          city: roleInfo?.["ciudad"],
+        },
+        recarga_tarjeta: {
+          numero_tarjeta: dataUsuario?.NTargeta,
         },
       };
+      if (dataUsuario?.nombresCliente !== "")
+        data["recarga_tarjeta"]["nombres_cliente"] =
+          dataUsuario?.nombresCliente;
+      if (dataUsuario?.apellidosCliente !== "")
+        data["recarga_tarjeta"]["apellidos_cliente"] =
+          dataUsuario?.apellidosCliente;
+      if (dataUsuario?.telefonoCliente !== "")
+        data["recarga_tarjeta"]["telefono_cliente"] =
+          dataUsuario?.telefonoCliente;
+      if (dataUsuario?.emailCliente !== "")
+        data["recarga_tarjeta"]["email_cliente"] = dataUsuario?.emailCliente;
+      if (dataUsuario?.tipoDocumentoId !== "")
+        data["recarga_tarjeta"]["tipo_id_cliente"] =
+          dataUsuario?.tipoDocumentoId;
+      if (dataUsuario?.documento !== "")
+        data["recarga_tarjeta"]["id_cliente"] = dataUsuario?.documento;
       notifyPending(
-        peticionRecargaDatafono({ pk_tullave_datafonos: "" }, data),
+        peticionRecargaTarjeta({}, data),
         {
           render: () => {
             return "Procesando recarga";
@@ -86,10 +114,7 @@ const TransaccionRecargaTarjeta = () => {
     },
     [dataUsuario, navigate, roleInfo, pdpUser]
   );
-  const [loadingPeticionConsultaTarjeta, peticionConsultaTarjeta] = useFetch(
-    fetchCustom(URL_CONSULTAR_TARJETA, "GET", "Consultar tarjeta")
-  );
-  const [loadingPeticionRecargaTarjeta, peticionRecargaDatafono] = useFetch(
+  const [loadingPeticionRecargaTarjeta, peticionRecargaTarjeta] = useFetch(
     fetchCustom(
       URL_REALIZAR_RECARGA_TARJETA,
       "POST",
@@ -112,15 +137,23 @@ const TransaccionRecargaTarjeta = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const onChangeFormatNumber = useCallback((ev) => {
-    const valor = ev.target.value;
-    let num = valor.replace(/[\s\.]/g, "");
-    if (!isNaN(num)) {
-      setDataUsuario((old) => {
-        return { ...old, [ev.target.name]: num };
-      });
-    }
-  }, []);
+  const onChangeFormatNumber = useCallback(
+    (ev) => {
+      const valor = ev.target.value;
+      let num = valor.replace(/[\s\.]/g, "");
+      if (!isNaN(num)) {
+        if (ev.target.name === "telefonoCliente") {
+          if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
+            return notifyError("El número de telefono debe comenzar por 3");
+          }
+        }
+        setDataUsuario((old) => {
+          return { ...old, [ev.target.name]: num };
+        });
+      }
+    },
+    [dataUsuario.telefonoCliente]
+  );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
     setDataUsuario((old) => {
@@ -142,9 +175,7 @@ const TransaccionRecargaTarjeta = () => {
             maxLength={16}
             onChange={onChangeFormatNumber}
             required
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
+            disabled={loadingPeticionRecargaTarjeta}
           />
           <MoneyInput
             id='valor'
@@ -162,9 +193,7 @@ const TransaccionRecargaTarjeta = () => {
               });
             }}
             required
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
+            disabled={loadingPeticionRecargaTarjeta}
           />
         </Fieldset>
         <Fieldset legend='Datos opcionales' className='lg:col-span-2'>
@@ -177,9 +206,7 @@ const TransaccionRecargaTarjeta = () => {
             value={dataUsuario?.["nombresCliente"]}
             maxLength={50}
             onChange={onChangeFormat}
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
+            disabled={loadingPeticionRecargaTarjeta}
           />
           <Input
             id='apellidosCliente'
@@ -190,9 +217,7 @@ const TransaccionRecargaTarjeta = () => {
             value={dataUsuario?.["apellidosCliente"]}
             maxLength={50}
             onChange={onChangeFormat}
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
+            disabled={loadingPeticionRecargaTarjeta}
           />
           <Input
             id='telefonoCliente'
@@ -203,9 +228,7 @@ const TransaccionRecargaTarjeta = () => {
             value={dataUsuario?.["telefonoCliente"]}
             maxLength={15}
             onChange={onChangeFormatNumber}
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
+            disabled={loadingPeticionRecargaTarjeta}
           />
           <Input
             id='emailCliente'
@@ -216,9 +239,31 @@ const TransaccionRecargaTarjeta = () => {
             value={dataUsuario?.["emailCliente"]}
             maxLength={50}
             onChange={onChangeFormat}
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }
+            disabled={loadingPeticionRecargaTarjeta}
+          />
+          <Input
+            id='documento'
+            name='documento'
+            label={"Documento cliente"}
+            type='text'
+            autoComplete='off'
+            value={dataUsuario?.["documento"]}
+            maxLength={50}
+            onChange={onChangeFormatNumber}
+            disabled={loadingPeticionRecargaTarjeta}
+          />
+          <Select
+            id='tipoDocumentoId'
+            label='Tipo de documento'
+            options={optionsTipoDocumento}
+            value={dataUsuario?.tipoDocumentoId}
+            onChange={(e) => {
+              setDataUsuario((old) => ({
+                ...old,
+                tipoDocumentoId: e.target.value,
+                tipoDocumento: e.target[e.target.selectedIndex].text,
+              }));
+            }}
           />
         </Fieldset>
         <ButtonBar className='lg:col-span-2'>
@@ -227,16 +272,10 @@ const TransaccionRecargaTarjeta = () => {
             onClick={() => {
               navigate(-1);
             }}
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }>
+            disabled={loadingPeticionRecargaTarjeta}>
             Cancelar
           </Button>
-          <Button
-            type='submit'
-            disabled={
-              loadingPeticionConsultaTarjeta || loadingPeticionRecargaTarjeta
-            }>
+          <Button type='submit' disabled={loadingPeticionRecargaTarjeta}>
             Recargar tarjeta
           </Button>
         </ButtonBar>
@@ -264,6 +303,12 @@ const TransaccionRecargaTarjeta = () => {
               {dataUsuario?.emailCliente !== "" && (
                 <h2>{`Correo cliente: ${dataUsuario?.emailCliente}`}</h2>
               )}
+              {dataUsuario?.documento !== "" && (
+                <h2>{`Documento cliente: ${dataUsuario?.documento}`}</h2>
+              )}
+              {dataUsuario?.tipoDocumento !== "" && (
+                <h2>{`Tipo documento cliente: ${dataUsuario?.tipoDocumento}`}</h2>
+              )}
               <h2 className='text-base'>
                 {`Valor a recargar: ${formatMoney.format(
                   dataUsuario?.valorRecarga
@@ -276,19 +321,13 @@ const TransaccionRecargaTarjeta = () => {
                       handleClose();
                       notifyError("Transacción cancelada por el usuario");
                     }}
-                    disabled={
-                      loadingPeticionConsultaTarjeta ||
-                      loadingPeticionRecargaTarjeta
-                    }>
+                    disabled={loadingPeticionRecargaTarjeta}>
                     Cancelar
                   </Button>
                   <Button
                     type='submit'
                     onClick={makeRecharge}
-                    disabled={
-                      loadingPeticionConsultaTarjeta ||
-                      loadingPeticionRecargaTarjeta
-                    }>
+                    disabled={loadingPeticionRecargaTarjeta}>
                     Realizar recarga
                   </Button>
                 </ButtonBar>
