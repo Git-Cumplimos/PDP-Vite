@@ -35,6 +35,7 @@ const Deposito = () => {
     max: enumParametrosBancoAgrario.maxDepositoCuentas,
     min: enumParametrosBancoAgrario.minDepositoCuentas,
   });
+  
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
     equalError: false,
@@ -47,7 +48,7 @@ const Deposito = () => {
     fetchDepositoCorresponsalBancoAgrario,
   ] = useFetch(depositoBancoAgrario);
   const [, fetchTypes] = useFetch();
-
+  const validNavigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [tipoCuenta, setTipoCuenta] = useState("01");
@@ -152,7 +153,9 @@ const Deposito = () => {
     setNumCuenta("");
     setValor("");
     setSummary([]);
-  }, []);
+    notifyError("Transacción cancelada por el usuario");
+    validNavigate(-1);
+  }, [validNavigate]);
 
   const onMoneyChange = useCallback(
     (e, valor) => {
@@ -235,7 +238,7 @@ const Deposito = () => {
           handleClose();
           return;
         } else {
-          notify("Transaccion satisfactoria");
+          notify("Transacción satisfactoria");
           const comercio = objTicket["commerceInfo"];
           delete objTicket["commerceInfo"];
           objTicket["commerceInfo"] = [];
@@ -271,6 +274,7 @@ const Deposito = () => {
     fetchDepositoCorresponsalBancoAgrario,
     roleInfo,
   ]);
+
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -347,7 +351,7 @@ const Deposito = () => {
                   type='submit'
                   onClick={onMakePayment}
                   disabled={loadingDepositoCorresponsalBancoAgrario}>
-                  Realizar deposito
+                    Realizar Depósito
                 </Button>
                 <Button
                   onClick={handleClose}
