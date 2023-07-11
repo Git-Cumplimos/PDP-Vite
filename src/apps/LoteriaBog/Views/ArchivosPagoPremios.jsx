@@ -4,6 +4,7 @@ import Button from "../../../components/Base/Button";
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 import { useLoteria } from "../utils/LoteriaHooks";
+import { useFetch } from "../../../hooks/useFetch";
 import Select from "../../../components/Base/Select"
 
 const url = process.env.REACT_APP_URL_LOTERIAS;
@@ -13,6 +14,7 @@ const ArchivosPagoPremios = () => {
   const { codigos_lot,reportePagoPremios_S3} = useLoteria();
   const [opciones, setOpciones] = useState([]);
   const [sorteo, setSorteo] = useState(" ");
+  const [fetchFile] = useFetch();
   
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -44,21 +46,44 @@ const ArchivosPagoPremios = () => {
 
   const onSubmit = (e) => {
     if (sorteo === " "){
-      notifyError("Debe escoger el sorteo para generar los archivos de pago de premios")
+      notifyError("Debe escoger el sorteo para generar el archivo de pago de premios")
     }
     else{
-      console.log("solicitar archivos")
-      reportePagoPremios_S3(sorteo)
+      reportePagoPremios_S3(sorteo);
+      descargarReporte();
+      setSorteo(" ");
     }
   }
 
+  const descargarReporte = (()=>{
+    const fecha = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    const partesFecha = fecha.split("/");
+    const fechaFormateada = `${partesFecha[2]}-${partesFecha[1]}-${partesFecha[0]}`;
+    const sort=sorteosLOT.split(",")[0];
+    const filename= `${sort}/${fechaFormateada}/sorteo_${sorteo}.zip`
+    fetchData(`${url}/readPagoPremiosS3`, "GET", {filename: filename})
+      .then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+          setSorteo(" ")
+          return;
+        }
+        window.open(res?.obj, "_blank");
+      })
+      .catch((err) => console.error(err));
+  })
+ 
   return (
     <Fragment>
       <h1 className="text-3xl font-medium my-6">Archivos pago de premios</h1>
       <Select
         className="place-self-stretch"
         id="selectSorteo"
-        label="Sorteos disponibles"
+        label="Seleccione un sorteo"
         options={opciones}
         value={sorteo}
         onChange={(e) => {
