@@ -153,7 +153,6 @@ const Deposito = () => {
     setNumCuenta("");
     setValor("");
     setSummary([]);
-    notifyError("Transacción cancelada por el usuario");
     validNavigate(-1);
   }, [validNavigate]);
 
@@ -275,6 +274,16 @@ const Deposito = () => {
     roleInfo,
   ]);
 
+  const HandleCloseModal = useCallback(() => {
+    setShowModal(false);
+    setTipoCuenta("01");
+    setNumCuenta("");
+    setValor("");
+    setSummary([]);
+    notifyError("Transacción cancelada por el usuario");
+    validNavigate(-1);
+  }, [validNavigate]);
+
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -354,7 +363,7 @@ const Deposito = () => {
                     Realizar Depósito
                 </Button>
                 <Button
-                  onClick={handleClose}
+                  onClick={HandleCloseModal}
                   disabled={loadingDepositoCorresponsalBancoAgrario}>
                   Cancelar
                 </Button>
