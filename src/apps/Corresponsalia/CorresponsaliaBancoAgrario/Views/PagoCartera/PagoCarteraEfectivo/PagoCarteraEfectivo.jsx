@@ -163,6 +163,16 @@ const PagoCarteraEfectivo = () => {
                     setShowModalGenerico((old) => {
                         return { ...old, showModal: true };
                     });
+                } else if (response?.status === false) {
+                    HandleCloseTrxExitosa()
+                    if (response?.msg) {
+                        notifyError(response?.msg);
+                    } else {
+                        notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
+                    }
+                } else if (response === undefined) {
+                    HandleCloseTrxExitosa()
+                    notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
                 }
             })
             .catch((error) => {
