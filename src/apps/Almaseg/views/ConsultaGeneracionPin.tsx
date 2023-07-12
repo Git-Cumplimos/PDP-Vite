@@ -15,6 +15,13 @@ import {
 type TypeDataInput = {
   numero_factura: string;
 };
+type TypeDataOutput = null | {
+  CompanyID: string;
+  IdentificationType: string;
+  Name: string;
+  PayableAmount: string;
+  numero_factura: string;
+};
 
 //--------- constantes ------------------
 const dataInputInitial = {
@@ -25,12 +32,16 @@ const url_consulta = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/cons
 //--------- componente ------------------
 const ConsultaGeneracionPin = (): JSX.Element => {
   const [dataInput, setDataInput] = useState<TypeDataInput>(dataInputInitial);
-  const [dataOutput, setDataOutput] = useState<any>(null);
+  const [dataOutput, setDataOutput] = useState<TypeDataOutput>(null);
   const [loadingPeticionConsultaPin, peticionConsultaPin] = useFetchAlmaseg(
     url_consulta,
     "consulta generacion pin",
     "GET"
   );
+
+  const doOnChange = useCallback((ev: ChangeEvent<HTMLFormElement>) => {
+    setDataInput((old) => ({ ...old, [ev.target.name]: ev.target.value }));
+  }, []);
 
   const doOnReset = useCallback(() => {
     setDataInput(dataInputInitial);
@@ -66,10 +77,6 @@ const ConsultaGeneracionPin = (): JSX.Element => {
     },
     [peticionConsultaPin, doOnReset, dataInput]
   );
-
-  const doOnChange = useCallback((ev: ChangeEvent<HTMLFormElement>) => {
-    setDataInput((old) => ({ ...old, [ev.target.name]: ev.target.value }));
-  }, []);
 
   return (
     <div>
