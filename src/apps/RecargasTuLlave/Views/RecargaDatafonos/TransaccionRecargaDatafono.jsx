@@ -63,11 +63,13 @@ const TransaccionRecargaDatafono = () => {
             id_usuario: roleInfo?.id_usuario,
             id_terminal: roleInfo?.id_dispositivo,
           },
-          address: roleInfo?.["direccion"],
-          dane_code: roleInfo?.codigo_dane,
-          city: roleInfo?.["ciudad"],
           recarga_datafono_tu_llave: {
             posId: dataDatafono?.["pos_id"],
+          },
+          location: {
+            address: roleInfo?.["direccion"],
+            dane_code: roleInfo?.codigo_dane,
+            city: roleInfo?.["ciudad"],
           },
         };
         notifyPending(
