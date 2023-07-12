@@ -20,8 +20,8 @@ type TypeDataInput = {
 const dataInputInitial = {
   numero_factura: "",
 };
-const url_consulta = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/consulta-generacion-pin`;
-
+// const url_consulta = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/consulta-generacion-pin`;
+const url_consulta = `http://127.0.0.1:5000/servicio_almaseg/consulta-generacion-pin`;
 //--------- componente ------------------
 const ConsultaGeneracionPin = (): JSX.Element => {
   const [dataInput, setDataInput] = useState<TypeDataInput>(dataInputInitial);
@@ -103,8 +103,10 @@ const ConsultaGeneracionPin = (): JSX.Element => {
             <h2 className="font-semibold">Número de factura: </h2>
             <h2>{dataOutput?.numero_factura ?? ""}</h2>
             <h2 className="font-semibold">Tipo de identificación: </h2>
-            <h2>{dataOutput?.CompanyID ?? ""} </h2>
+            <h2>{dataOutput?.IdentificationType ?? ""} </h2>
             <h2 className="font-semibold">Número de identificación: </h2>
+            <h2>{dataOutput?.CompanyID ?? ""} </h2>
+            <h2 className="font-semibold">Nombre: </h2>
             <h2>{dataOutput?.Name ?? ""} </h2>
             <h2 className="font-semibold">Valor del PIN: </h2>
             <h2>{`$ ${dataOutput?.PayableAmount ?? ""}`} </h2>
