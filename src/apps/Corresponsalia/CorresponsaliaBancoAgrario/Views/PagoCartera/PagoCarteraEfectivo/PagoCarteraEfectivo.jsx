@@ -163,6 +163,16 @@ const PagoCarteraEfectivo = () => {
                     setShowModalGenerico((old) => {
                         return { ...old, showModal: true };
                     });
+                } else if (response?.status === false) {
+                    HandleCloseTrxExitosa()
+                    if (response?.msg) {
+                        notifyError(response?.msg);
+                    } else {
+                        notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
+                    }
+                } else if (response === undefined) {
+                    HandleCloseTrxExitosa()
+                    notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
                 }
             })
             .catch((error) => {
@@ -206,6 +216,9 @@ const PagoCarteraEfectivo = () => {
             }
             peticionPayCartera(data, dataAditional)
                 .then((response) => {
+                    console.log("response", response)
+                    console.log("response status", response?.status)
+                    console.log("response type", typeof(response?.status))
                     setLoadingPayCartera(false)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
