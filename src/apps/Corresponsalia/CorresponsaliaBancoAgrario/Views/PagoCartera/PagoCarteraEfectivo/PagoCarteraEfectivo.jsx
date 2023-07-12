@@ -298,12 +298,16 @@ const PagoCarteraEfectivo = () => {
             HandleCloseTrx();
         } else if (datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa") {
             HandleCloseTrxExitosa();
+        } else if (datosPagoEfectivo?.confirmacionTicket !== "TransaccionExitosa" && datosPagoEfectivo?.confirmacionTicket !== "ResumenTrx") {
+            notifyError("Transacción cancelada por el usuario");
         }
+        validNavigate(-1);
     }, [
         datosPagoEfectivo,
         HandleCloseTrx,
         HandleCloseTrxExitosa,
         loadingPeticionPayCartera,
+        validNavigate
     ]);
 
     const tableObligacion = useMemo(() => {
