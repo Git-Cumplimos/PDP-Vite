@@ -216,9 +216,6 @@ const PagoCarteraEfectivo = () => {
             }
             peticionPayCartera(data, dataAditional)
                 .then((response) => {
-                    console.log("response", response)
-                    console.log("response status", response?.status)
-                    console.log("response type", typeof(response?.status))
                     setLoadingPayCartera(false)
                     if (response?.status === true) {
                         const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
