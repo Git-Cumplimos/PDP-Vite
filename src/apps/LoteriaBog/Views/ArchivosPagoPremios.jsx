@@ -1,10 +1,8 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
-
 import Button from "../../../components/Base/Button";
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 import { useLoteria } from "../utils/LoteriaHooks";
-import { useFetch } from "../../../hooks/useFetch";
 import Select from "../../../components/Base/Select"
 
 const url = process.env.REACT_APP_URL_LOTERIAS;
@@ -14,7 +12,6 @@ const ArchivosPagoPremios = () => {
   const { codigos_lot,reportePagoPremios_S3} = useLoteria();
   const [opciones, setOpciones] = useState([]);
   const [sorteo, setSorteo] = useState(" ");
-  const [fetchFile] = useFetch();
   
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -42,7 +39,7 @@ const ArchivosPagoPremios = () => {
       setOpciones([...copy])
     })
     .catch((err) => console.error(err));
-  }, []);
+  }, [sorteosLOT]);
 
   const onSubmit = (e) => {
     if (sorteo === " "){
@@ -76,7 +73,8 @@ const ArchivosPagoPremios = () => {
       })
       .catch((err) => console.error(err));
   })
- 
+
+  console.log("codigos_lot-->",codigos_lot)
   return (
     <Fragment>
       <h1 className="text-3xl font-medium my-6">Archivos pago de premios</h1>
