@@ -52,6 +52,7 @@ import rutasRecaudoMultiple, {
 } from "../apps/Corresponsalia/RecaudoMultiple/routes";
 import rutasRecargasTullave from "../apps/RecargasTuLlave/routes";
 import rutasPowwi from "../apps/Powwi/routes";
+import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
 
 /**
 
@@ -1215,6 +1216,9 @@ const allUrlsPrivateApps = [
   rutasRecaudoDirecto,
   rutasRecargasTullave,
   rutasPowwi,
+
+  //Modulo Almaseg
+  routesAlmaseg,
 ];
 
 export { allUrlsPrivateApps };
