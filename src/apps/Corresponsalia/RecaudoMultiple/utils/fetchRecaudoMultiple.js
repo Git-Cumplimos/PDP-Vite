@@ -185,3 +185,23 @@ export const postDescargarTickets = async (bodyObj) => {
     throw err;
   }
 };
+
+export const checkEstadoDescargaTickets = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlRecaudoMultiple}/consultar-zip-bucket`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
