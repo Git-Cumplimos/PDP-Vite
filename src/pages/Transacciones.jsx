@@ -169,13 +169,13 @@ const Transacciones = () => {
       <DataTable
         title="Transacciones"
         headers={[
-          "Id transaccion",
+          "Id transacción",
           "Operación",
           "Referencia 1",
           // "Referencia 2",
           "Monto",
           "Fecha",
-          "Estado de la trasacción",
+          "Estado de la transacción",
         ]}
         data={trxs.map(
           ({
@@ -272,7 +272,7 @@ const Transacciones = () => {
           className="place-self-stretch"
           id="searchBySorteo"
           name="id_tipo_transaccion"
-          label="Tipo de busqueda"
+          label="Tipo de búsqueda"
           options={[
             { value: "", label: "" },
             ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
@@ -285,7 +285,7 @@ const Transacciones = () => {
         <Input
           id="id_trx"
           name="id_trx"
-          label="Id de transaccion"
+          label="Id de transacción"
           type="tel"
           maxLength={30}
           value={searchFilters.get("id_trx")}
