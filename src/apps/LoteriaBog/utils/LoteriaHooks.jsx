@@ -490,7 +490,8 @@ export const useProvideLoteria = () => {
             fisico: checkBilleteFisico,
             virtual: checkBilleteVirtual,
             oficina_propia:
-              roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+                roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
           },
           {},
           true,
@@ -564,7 +565,8 @@ export const useProvideLoteria = () => {
               idLoteria: idLoteria,
               tipo_ganancia: tipopago,
               oficina_propia:
-                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+                roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
               nombre_usuario: nombre_usuario,
               cod_distribuidor: codigosOficina?.cod_oficina_lot,
               cod_dane_ciudad: codigo_dane,
@@ -606,7 +608,8 @@ export const useProvideLoteria = () => {
               idLoteria: idLoteria,
               tipo_ganancia: tipopago,
               oficina_propia:
-                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ? true : false,
+                roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+                roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
               nombre_usuario: nombre_usuario,
               cod_distribuidor: codigosOficina?.cod_oficina_lot,
               cod_dane_ciudad: codigo_dane,
