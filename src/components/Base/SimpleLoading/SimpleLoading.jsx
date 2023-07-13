@@ -18,7 +18,7 @@ const SimpleLoading = ({ show = false }) => {
       </div>
     </div>
   ) : (
-    ""
+    <></>
   );
 };
 
