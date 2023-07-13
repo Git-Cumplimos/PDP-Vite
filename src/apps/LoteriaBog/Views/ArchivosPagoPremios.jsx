@@ -9,7 +9,7 @@ const url = process.env.REACT_APP_URL_LOTERIAS;
 
 const ArchivosPagoPremios = () => {
 
-  const { codigos_lot,reportePagoPremios_S3} = useLoteria();
+  const { codigos_lot} = useLoteria();
   const [opciones, setOpciones] = useState([]);
   const [sorteo, setSorteo] = useState(" ");
   
@@ -46,11 +46,26 @@ const ArchivosPagoPremios = () => {
       notifyError("Debe escoger el sorteo para generar el archivo de pago de premios")
     }
     else{
-      reportePagoPremios_S3(sorteo);
-      descargarReporte();
+      reportePagoPremios_S3();
       setSorteo(" ");
     }
   }
+
+  const reportePagoPremios_S3 = (()=>{
+    fetchData(`${url}/reportePagoPremios_S3`, "GET", {sorteo:sorteo,
+      codigos_loteria: sorteosLOT})
+      .then((res) => {
+        if (!res?.estado) {
+          notifyError(res?.msg);
+          setSorteo(" ")
+          return;
+        }
+        else {
+          descargarReporte();
+        }
+      })
+      .catch((err) => console.error(err));
+  })
 
   const descargarReporte = (()=>{
     const fecha = Intl.DateTimeFormat("es-CO", {
@@ -74,7 +89,6 @@ const ArchivosPagoPremios = () => {
       .catch((err) => console.error(err));
   })
 
-  console.log("codigos_lot-->",codigos_lot)
   return (
     <Fragment>
       <h1 className="text-3xl font-medium my-6">Archivos pago de premios</h1>
