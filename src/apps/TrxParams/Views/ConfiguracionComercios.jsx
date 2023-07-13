@@ -257,7 +257,7 @@ const ConfiguracionComercios = () => {
             id='Pago comision'
             name='Pago comision'
             label='Pago comision cada:'
-            options={{ "": "", Transacción: "Transaccion", Mensual: "Mensual" }}
+            options={{ "": "", Transacción: "Transaccion", Mensual: "Mensual",Directo: "Directo" }}
             value={selectedAuto?.["Pago comision"]}
             onChange={() => {}}
             required
