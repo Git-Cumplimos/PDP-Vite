@@ -16,6 +16,7 @@ import MoneyInput, {
 } from "../../../../components/Base/MoneyInput/MoneyInput";
 import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
 import { useReactToPrint } from "react-to-print";
+import Tickets from "../../../../components/Base/Tickets/Tickets";
 
 const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
 const URL_REALIZAR_RECARGA_DATAFONO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-datafono`;
@@ -24,6 +25,7 @@ const TransaccionRecargaDatafono = () => {
   const navigate = useNavigate();
   const params = useParams();
   const { roleInfo, pdpUser } = useAuth();
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [dataDatafono, setDataDatafono] = useState({
     comentarios: "",
     estado: true,
@@ -81,8 +83,8 @@ const TransaccionRecargaDatafono = () => {
           },
           {
             render: ({ data: res }) => {
-              console.log("respuesta recarga", data);
-              navigate(-1);
+              setObjTicketActual(res?.obj?.ticket);
+              setEstadoPeticion(1);
               return "Recarga satisfactoria";
             },
           },
@@ -110,13 +112,13 @@ const TransaccionRecargaDatafono = () => {
   useEffect(() => {
     fetchDatafonosFunc();
   }, [params.id]);
-  const fetchDatafonosFunc = () => {
+  const fetchDatafonosFunc = useCallback(() => {
     if (params.id) {
       const data = {
         pk_tullave_datafonos: params.id,
       };
       notifyPending(
-        peticionConsultaDatafono({}, data),
+        peticionConsultaDatafono(data, {}),
         {
           render: () => {
             return "Procesando consulta";
@@ -149,7 +151,7 @@ const TransaccionRecargaDatafono = () => {
         }
       );
     }
-  };
+  }, [params.id]);
   const handleShow = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -276,7 +278,7 @@ const TransaccionRecargaDatafono = () => {
             </div>
           ) : estadoPeticion === 1 ? (
             <div className='flex flex-col justify-center items-center'>
-              {/* <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} /> */}
+              <Tickets ticket={objTicketActual} refPrint={printDiv} />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>

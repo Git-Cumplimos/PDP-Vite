@@ -16,6 +16,7 @@ import MoneyInput, {
 import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
+import Tickets from "../../../../components/Base/Tickets/Tickets";
 
 const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
 
@@ -42,7 +43,7 @@ const TransaccionRecargaTarjeta = () => {
     documento: "",
   });
   const [estadoPeticion, setEstadoPeticion] = useState(0);
-
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -99,8 +100,8 @@ const TransaccionRecargaTarjeta = () => {
         },
         {
           render: ({ data: res }) => {
-            console.log("respuesta recarga", data);
-            navigate(-1);
+            setObjTicketActual(res?.obj?.ticket);
+            setEstadoPeticion(1);
             return "Recarga satisfactoria";
           },
         },
@@ -335,7 +336,7 @@ const TransaccionRecargaTarjeta = () => {
             </div>
           ) : estadoPeticion === 1 ? (
             <div className='flex flex-col justify-center items-center'>
-              {/* <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} /> */}
+              <Tickets ticket={objTicketActual} refPrint={printDiv} />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
