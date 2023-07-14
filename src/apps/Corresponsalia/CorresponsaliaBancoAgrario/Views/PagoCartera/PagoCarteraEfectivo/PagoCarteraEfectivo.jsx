@@ -163,6 +163,16 @@ const PagoCarteraEfectivo = () => {
                     setShowModalGenerico((old) => {
                         return { ...old, showModal: true };
                     });
+                } else if (response?.status === false) {
+                    HandleCloseTrxExitosa()
+                    if (response?.msg) {
+                        notifyError(response?.msg);
+                    } else {
+                        notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
+                    }
+                } else if (response === undefined) {
+                    HandleCloseTrxExitosa()
+                    notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
                 }
             })
             .catch((error) => {
@@ -298,12 +308,16 @@ const PagoCarteraEfectivo = () => {
             HandleCloseTrx();
         } else if (datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa") {
             HandleCloseTrxExitosa();
+        } else if (datosPagoEfectivo?.confirmacionTicket !== "TransaccionExitosa" && datosPagoEfectivo?.confirmacionTicket !== "ResumenTrx") {
+            notifyError("Transacción cancelada por el usuario");
         }
+        validNavigate(-1);
     }, [
         datosPagoEfectivo,
         HandleCloseTrx,
         HandleCloseTrxExitosa,
         loadingPeticionPayCartera,
+        validNavigate
     ]);
 
     const tableObligacion = useMemo(() => {

@@ -91,7 +91,7 @@ const Peticiones = () => {
               "No. documento": row?.documento,
               "Valor pin": formatMoney.format(row?.valor_pin),
               "Fecha pago": dateFormatter.format(fecha_pago),
-              "Estado": row?.estado,
+              "Estado": row?.estado === 'Peticion' ? 'Petición' : row?.estado,
               "Fecha anulación": fecha_anulacion !== '' ? dateFormatter.format(fecha_anulacion) : ""
             };})
           )
