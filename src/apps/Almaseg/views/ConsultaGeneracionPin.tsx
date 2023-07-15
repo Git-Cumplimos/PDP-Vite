@@ -98,7 +98,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
           <ButtonBar className={"lg:col-span-2"}>
             {dataOutput ? (
               <Button type="reset" onClick={doOnReset}>
-                Busqueda nueva
+                Búsqueda nueva
               </Button>
             ) : (
               <Button type={"submit"}>Buscar</Button>
@@ -113,7 +113,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
             <h2>{dataOutput?.IdentificationType ?? ""} </h2>
             <h2 className="font-semibold">Número de identificación: </h2>
             <h2>{dataOutput?.CompanyID ?? ""} </h2>
-            <h2 className="font-semibold">Nombre: </h2>
+            <h2 className="font-semibold">Nombres y Apellidos: </h2>
             <h2>{dataOutput?.Name ?? ""} </h2>
             <h2 className="font-semibold">Valor del PIN: </h2>
             <h2>{`$ ${dataOutput?.PayableAmount ?? ""}`} </h2>
