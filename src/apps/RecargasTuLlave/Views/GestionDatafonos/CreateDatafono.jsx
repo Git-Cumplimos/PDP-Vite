@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { notifyPending } from "../../../../utils/notify";
-import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
@@ -21,7 +20,6 @@ const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACIO
 const CreateDatafono = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const [isUploading, setIsUploading] = useState(false);
   const [dataDatafono, setDataDatafono] = useState({
     comentarios: "",
     estado: true,
@@ -192,7 +190,6 @@ const CreateDatafono = () => {
   }, []);
   return (
     <>
-      <SimpleLoading show={isUploading} />
       <h1 className='text-3xl'>
         {params?.id
           ? "Actualizar datafono Tu Llave"

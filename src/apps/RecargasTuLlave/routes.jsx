@@ -12,6 +12,15 @@ const MainGestionDatafonos = lazy(() =>
 const CreateDatafono = lazy(() =>
   import("./Views/GestionDatafonos/CreateDatafono")
 );
+const MainRecargaDatafonos = lazy(() =>
+  import("./Views/RecargaDatafonos/MainRecargaDatafonos")
+);
+const TransaccionRecargaDatafono = lazy(() =>
+  import("./Views/RecargaDatafonos/TransaccionRecargaDatafono")
+);
+const TransaccionRecargaTarjeta = lazy(() =>
+  import("./Views/RecargaDatafonos/TransaccionRecargaTarjeta")
+);
 
 const CorresponsaliaTuLlave = lazy(() => import("./CorresponsaliaTuLlave"));
 
@@ -52,8 +61,30 @@ const rutasRecargasTullave = {
       label: (
         <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name="Recarga datafonos" />
       ),
-      component: MainGestionDatafonos,
+      component: MainRecargaDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
+      subRoutes: [
+        {
+          link: "/recargas-tu-llave/recarga-datafonos/transaccion/:id",
+          label: (
+            <AppIcons
+              Logo={"DAVIVIENDA_PAGO_POR_GIRO"}
+              name={"Recarga datafonos"}
+            />
+          ),
+          component: TransaccionRecargaDatafono,
+          permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
+          show: false,
+        },
+      ],
+    },
+    {
+      link: "/recargas-tu-llave/recarga-tarjetas",
+      label: (
+        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga tarjetas' />
+      ),
+      component: TransaccionRecargaTarjeta,
+      permission: [enumPermisosTuLlave.RECARGA_TARJETAS_TULLAVE],
     },
   ],
 };

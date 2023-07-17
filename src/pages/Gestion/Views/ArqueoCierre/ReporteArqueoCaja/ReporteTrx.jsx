@@ -91,7 +91,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   const initialSearchFilters = new Map([
     ["id_comercio", roleInfo?.id_comercio ?? ""],
     ["id_usuario", roleInfo?.id_usuario ?? ""],
-    ["type_report", tipo_reporte === 2 ? "Tarjeta": "Efectivo"],
+    ["type_report", tipo_reporte === 2 ? "Tarjeta": tipo_reporte === 1 ? "Efectivo" : ""],
     ["status", "true"],
   ]);
   const printDiv = useRef();
