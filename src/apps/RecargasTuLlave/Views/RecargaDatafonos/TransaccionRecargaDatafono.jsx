@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { v4 } from "uuid";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
@@ -17,12 +18,15 @@ import MoneyInput, {
 import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
+import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
 
 const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
 const URL_REALIZAR_RECARGA_DATAFONO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-datafono`;
+const URL_CONSULTAR_RECARGA_DATAFONO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-datafono`;
 
 const TransaccionRecargaDatafono = () => {
   const navigate = useNavigate();
+  const uniqueId = v4();
   const params = useParams();
   const { roleInfo, pdpUser } = useAuth();
   const [objTicketActual, setObjTicketActual] = useState({});
@@ -64,6 +68,7 @@ const TransaccionRecargaDatafono = () => {
             id_comercio: roleInfo?.id_comercio,
             id_usuario: roleInfo?.id_usuario,
             id_terminal: roleInfo?.id_dispositivo,
+            id_uuid_trx: uniqueId,
           },
           recarga_datafono_tu_llave: {
             posId: dataDatafono?.["pos_id"],
@@ -74,8 +79,11 @@ const TransaccionRecargaDatafono = () => {
             city: roleInfo?.["ciudad"],
           },
         };
+        const dataAditional = {
+          id_uuid_trx: uniqueId,
+        };
         notifyPending(
-          peticionRecargaDatafono({ pk_tullave_datafonos: "" }, data),
+          peticionRecargaDatafono(data, dataAditional),
           {
             render: () => {
               return "Procesando recarga";
@@ -102,13 +110,12 @@ const TransaccionRecargaDatafono = () => {
   const [loadingPeticionConsultaDatafono, peticionConsultaDatafono] = useFetch(
     fetchCustom(URL_CONSULTAR_DATAFONO, "GET", "Consultar datafono")
   );
-  const [loadingPeticionRecargaDatafono, peticionRecargaDatafono] = useFetch(
-    fetchCustom(
+  const [loadingPeticionRecargaDatafono, peticionRecargaDatafono] =
+    useFetchTuLlave(
       URL_REALIZAR_RECARGA_DATAFONO,
-      "POST",
+      URL_CONSULTAR_RECARGA_DATAFONO,
       "Realizar recarga datafono"
-    )
-  );
+    );
   useEffect(() => {
     fetchDatafonosFunc();
   }, [params.id]);
@@ -170,7 +177,7 @@ const TransaccionRecargaDatafono = () => {
   });
   return (
     <>
-      <h1 className='text-3xl'>Recargar datafono</h1>
+      <h1 className='text-3xl'>Recargar datafono Tu Llave</h1>
       <Form onSubmit={handleShow} grid>
         <Fieldset legend='Datos datafono' className='lg:col-span-2'>
           <Input

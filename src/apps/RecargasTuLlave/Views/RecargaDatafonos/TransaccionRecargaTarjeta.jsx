@@ -1,13 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
 import Modal from "../../../../components/Base/Modal/Modal";
-import { useFetch } from "../../../../hooks/useFetch";
-import { fetchCustom } from "../../utils/fetchTuLlave";
 import Form from "../../../../components/Base/Form/Form";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import MoneyInput, {
@@ -17,11 +16,14 @@ import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
 import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
+import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
 
 const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
+const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
 
 const TransaccionRecargaTarjeta = () => {
   const navigate = useNavigate();
+  const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
   const optionsTipoDocumento = [
     { value: "", label: "" },
@@ -65,6 +67,7 @@ const TransaccionRecargaTarjeta = () => {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
+          id_uuid_trx: uniqueId,
         },
         location: {
           address: roleInfo?.["direccion"],
@@ -91,8 +94,11 @@ const TransaccionRecargaTarjeta = () => {
           dataUsuario?.tipoDocumentoId;
       if (dataUsuario?.documento !== "")
         data["recarga_tarjeta"]["id_cliente"] = dataUsuario?.documento;
+      const dataAditional = {
+        id_uuid_trx: uniqueId,
+      };
       notifyPending(
-        peticionRecargaTarjeta({}, data),
+        peticionRecargaTarjeta(data, dataAditional),
         {
           render: () => {
             return "Procesando recarga";
@@ -115,13 +121,12 @@ const TransaccionRecargaTarjeta = () => {
     },
     [dataUsuario, navigate, roleInfo, pdpUser]
   );
-  const [loadingPeticionRecargaTarjeta, peticionRecargaTarjeta] = useFetch(
-    fetchCustom(
+  const [loadingPeticionRecargaTarjeta, peticionRecargaTarjeta] =
+    useFetchTuLlave(
       URL_REALIZAR_RECARGA_TARJETA,
-      "POST",
+      URL_CONSULTAR_RECARGA_TARJETA,
       "Realizar recarga tarjeta"
-    )
-  );
+    );
   const handleShow = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -163,7 +168,7 @@ const TransaccionRecargaTarjeta = () => {
   }, []);
   return (
     <>
-      <h1 className='text-3xl'>Recargar datafono</h1>
+      <h1 className='text-3xl'>Recargar tarjeta Tu Llave</h1>
       <Form onSubmit={handleShow} grid>
         <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
           <Input
