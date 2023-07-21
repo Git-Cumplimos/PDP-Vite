@@ -126,7 +126,7 @@ const CreateDatafono = () => {
         pk_tullave_datafonos: params.id,
       };
       notifyPending(
-        peticionConsultaDatafono({}, data),
+        peticionConsultaDatafono(data, {}),
         {
           render: () => {
             return "Procesando consulta";
