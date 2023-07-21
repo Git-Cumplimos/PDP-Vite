@@ -108,13 +108,13 @@ const TransaccionRecargaDatafono = () => {
     [params?.id, dataDatafono, navigate, valor, roleInfo, pdpUser]
   );
   const [loadingPeticionConsultaDatafono, peticionConsultaDatafono] = useFetch(
-    fetchCustom(URL_CONSULTAR_DATAFONO, "GET", "Consultar datafono")
+    fetchCustom(URL_CONSULTAR_DATAFONO, "GET", "Consultar datáfono")
   );
   const [loadingPeticionRecargaDatafono, peticionRecargaDatafono] =
     useFetchTuLlave(
       URL_REALIZAR_RECARGA_DATAFONO,
       URL_CONSULTAR_RECARGA_DATAFONO,
-      "Realizar recarga datafono"
+      "Realizar recarga datáfono"
     );
   useEffect(() => {
     fetchDatafonosFunc();
@@ -177,9 +177,9 @@ const TransaccionRecargaDatafono = () => {
   });
   return (
     <>
-      <h1 className='text-3xl'>Recargar datafono Tu Llave</h1>
+      <h1 className='text-3xl'>Recargar datáfono Tu Llave</h1>
       <Form onSubmit={handleShow} grid>
-        <Fieldset legend='Datos datafono' className='lg:col-span-2'>
+        <Fieldset legend='Datos datáfono' className='lg:col-span-2'>
           <Input
             id='pos_id'
             name='pos_id'
@@ -240,7 +240,7 @@ const TransaccionRecargaDatafono = () => {
             disabled={
               loadingPeticionConsultaDatafono || loadingPeticionRecargaDatafono
             }>
-            Recargar datafono
+            Recargar datáfono
           </Button>
         </ButtonBar>
       </Form>
@@ -254,7 +254,7 @@ const TransaccionRecargaDatafono = () => {
               <h1 className='text-2xl text-center mb-5 font-semibold'>
                 ¿Está seguro de realizar la recarga?
               </h1>
-              <h2>{`PosId datafono: ${dataDatafono?.["pos_id"]}`}</h2>
+              <h2>{`PosId datáfono: ${dataDatafono?.["pos_id"]}`}</h2>
               <h2 className='text-base'>
                 {`Valor a recargar: ${formatMoney.format(valor)} `}
               </h2>

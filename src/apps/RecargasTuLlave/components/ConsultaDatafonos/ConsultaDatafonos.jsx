@@ -4,6 +4,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise/TableEn
 import Input from "../../../../components/Base/Input/Input";
 import Select from "../../../../components/Base/Select/Select";
 import { notifyError } from "../../../../utils/notify";
+import useDelayedCallback from "../../../../hooks/useDelayedCallback";
 
 const ConsultaDatafonos = ({
   navigate,
@@ -50,50 +51,54 @@ const ConsultaDatafonos = ({
       fetchDatafonosOnlyCommerceFunc();
     }
   }, [page, limit, dataDatafonos, type]);
-  const fetchDatafonosFunc = useCallback(() => {
-    let obj = {};
-    if (parseInt(dataDatafonos.pos_id))
-      obj["pos_id"] = parseInt(dataDatafonos.pos_id);
-    if (dataDatafonos.fk_comercio_asociado)
-      obj["fk_comercio_asociado"] = dataDatafonos.fk_comercio_asociado;
-    if (dataDatafonos.estado !== "") obj["estado"] = dataDatafonos.estado;
+  const fetchDatafonosFunc = useDelayedCallback(
+    useCallback(() => {
+      let obj = {};
+      if (dataDatafonos.pos_id) obj["pos_id"] = dataDatafonos.pos_id;
+      if (dataDatafonos.fk_comercio_asociado)
+        obj["fk_comercio_asociado"] = dataDatafonos.fk_comercio_asociado;
+      if (dataDatafonos.estado !== "") obj["estado"] = dataDatafonos.estado;
 
-    fetchDatafonosTuLlave({
-      ...obj,
-      page,
-      limit,
-      sortBy: "pk_tullave_datafonos",
-      sortDir: "DESC",
-    })
-      .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
-        setDatafonos(autoArr?.results ?? []);
+      fetchDatafonosTuLlave({
+        ...obj,
+        page,
+        limit,
+        sortBy: "pk_tullave_datafonos",
+        sortDir: "DESC",
       })
-      .catch((err) => console.error(err));
-  }, [page, limit, dataDatafonos]);
-  const fetchDatafonosOnlyCommerceFunc = useCallback(() => {
-    let obj = {};
-    if (parseInt(dataDatafonos.pos_id))
-      obj["pos_id"] = parseInt(dataDatafonos.pos_id);
-    if (id_comercio) {
-      obj["fk_comercio_asociado"] = id_comercio;
-    } else {
-      return notifyError("Error al obtener el id comercio");
-    }
+        .then((autoArr) => {
+          setMaxPages(autoArr?.maxPages);
+          setDatafonos(autoArr?.results ?? []);
+        })
+        .catch((err) => console.error(err));
+    }, [page, limit, dataDatafonos]),
+    500
+  );
+  const fetchDatafonosOnlyCommerceFunc = useDelayedCallback(
+    useCallback(() => {
+      let obj = {};
+      if (dataDatafonos.pos_id) obj["pos_id"] = dataDatafonos.pos_id;
+      if (id_comercio) {
+        obj["fk_comercio_asociado"] = id_comercio;
+      } else {
+        return notifyError("Error al obtener el id comercio");
+      }
 
-    fetchDatafonosTuLlave({
-      ...obj,
-      page,
-      limit,
-      sortBy: "pk_tullave_datafonos",
-      sortDir: "DESC",
-    })
-      .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
-        setDatafonos(autoArr?.results ?? []);
+      fetchDatafonosTuLlave({
+        ...obj,
+        page,
+        limit,
+        sortBy: "pk_tullave_datafonos",
+        sortDir: "DESC",
       })
-      .catch((err) => console.error(err));
-  }, [page, limit, dataDatafonos]);
+        .then((autoArr) => {
+          setMaxPages(autoArr?.maxPages);
+          setDatafonos(autoArr?.results ?? []);
+        })
+        .catch((err) => console.error(err));
+    }, [page, limit, dataDatafonos]),
+    500
+  );
   const selectDatafono = useCallback(
     (ev, i) => {
       ev.preventDefault();

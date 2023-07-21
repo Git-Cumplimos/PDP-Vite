@@ -41,14 +41,14 @@ const rutasRecargasTullave = {
       subRoutes: [
         {
           link: "/recargas-tu-llave/gestion-datafonos/crear",
-          label: <AppIcons Logo={"IMPUESTO"} name={"Crear datafono"} />,
+          label: <AppIcons Logo={"IMPUESTO"} name={"Crear datáfono"} />,
           component: CreateDatafono,
           permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
           show: false,
         },
         {
           link: "/recargas-tu-llave/gestion-datafonos/editar/:id",
-          label: <AppIcons Logo={"RECAUDO"} name={"Editar datafono"} />,
+          label: <AppIcons Logo={"RECAUDO"} name={"Editar datáfono"} />,
           component: CreateDatafono,
           permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
           show: false,
