@@ -58,89 +58,100 @@ export const useProvideFDLM = () => {
     setRespuestaconsultarecaudocreditos,
   ] = useState();
 
-  const mostrarcredito = useCallback(async (numero, param, user) => {
-    const body = {
-      Comercio: user?.Comercio,
-      Usuario: user?.Usuario,
-      Dispositivo: user?.Dispositivo,
-      nombre_usuario: pdpUser?.uname ?? "",
-      nroBusqueda: numero,
-      ParametroBusqueda: param,
-      Depto: parseInt(user?.Depto),
-      Municipio: parseInt(user?.Municipio),
-    };
-    try {
-      const res = await fetchData(urls.mostrarcreditos, "POST", {}, body);
-      return res;
-    } catch (err) {
-      throw err;
-    }
-  }, [pdpUser]);
+  const mostrarcredito = useCallback(
+    async (numero, param, user) => {
+      const body = {
+        Comercio: user?.Comercio,
+        Usuario: user?.Usuario,
+        Dispositivo: user?.Dispositivo,
+        nombre_usuario: pdpUser?.uname ?? "",
+        nroBusqueda: numero,
+        ParametroBusqueda: param,
+        Depto: parseInt(user?.Depto),
+        Municipio: parseInt(user?.Municipio),
+      };
+      try {
+        const res = await fetchData(urls.mostrarcreditos, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    [pdpUser]
+  );
 
-  const ingresoreversorecibo = useCallback(async (values) => {
-    const body = {
-      Tipo: values?.tipo,
-      Usuario: values?.usuario,
-      Dispositivo: values?.dispositivo,
-      Comercio: values?.comercio,
-      nombre_usuario: pdpUser?.uname ?? "",
-      Credito: parseInt(values?.credit),
-      Valor: parseFloat(values?.val),
-      referenciaPago: values?.reference,
-      id_trx: values?.idtrx,
-      motivo: values?.motivo,
-    };
-    try {
-      const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
-      return res;
-    } catch (err) {
-      throw err;
-    }
-  }, [pdpUser]);
+  const ingresoreversorecibo = useCallback(
+    async (values) => {
+      const body = {
+        Tipo: values?.tipo,
+        Usuario: values?.usuario,
+        Dispositivo: values?.dispositivo,
+        Comercio: values?.comercio,
+        nombre_usuario: pdpUser?.uname ?? "",
+        Credito: parseInt(values?.credit),
+        Valor: parseFloat(values?.val),
+        referenciaPago: values?.reference,
+        id_trx: values?.idtrx,
+        motivo: values?.motivo,
+      };
+      try {
+        const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    [pdpUser]
+  );
 
-  const ingresorecibo = useCallback(async (values) => {
-    const body = {
-      Tipo: values?.Tipo,
-      Usuario: parseInt(values?.Usuario),
-      nombre_usuario: pdpUser?.uname ?? "",
-      Dispositivo: values?.Dispositivo,
-      Comercio: values?.Comercio,
-      Credito: parseInt(values?.Credito),
-      Depto: parseInt(values?.Depto),
-      Municipio: parseInt(values?.Municipio),
-      Valor: parseFloat(values?.Valor),
-      referenciaPago: values?.referenciaPago,
-      cedula: values?.cedula,
-      cliente: values?.cliente,
-      nombre_comercio: values?.nombre_comercio,
-      ticket: values?.ticket
-    };
-    try {
-      const res = await fetchData(urls.ingresorecibo, "POST", {}, body);
-      return res;
-    } catch (err) {
-      throw err;
-    }
-  }, [pdpUser]);
+  const ingresorecibo = useCallback(
+    async (values) => {
+      const body = {
+        Tipo: values?.Tipo,
+        Usuario: parseInt(values?.Usuario),
+        nombre_usuario: pdpUser?.uname ?? "",
+        Dispositivo: values?.Dispositivo,
+        Comercio: values?.Comercio,
+        Credito: parseInt(values?.Credito),
+        Depto: parseInt(values?.Depto),
+        Municipio: parseInt(values?.Municipio),
+        Valor: parseFloat(values?.Valor),
+        referenciaPago: values?.referenciaPago,
+        cedula: values?.cedula,
+        cliente: values?.cliente,
+        nombre_comercio: values?.nombre_comercio,
+        ticket: values?.ticket,
+      };
+      try {
+        const res = await fetchData(urls.ingresorecibo, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    [pdpUser]
+  );
 
-  const valorcuota = useCallback(async (numero, user) => {
-    const body = {
-      Usuario: user?.Usuario,
-      Dispositivo: user?.Dispositivo,
-      Comercio: user?.Comercio,
-      nombre_usuario: pdpUser?.uname ?? "",
-      Credito: numero,
-      Depto: parseInt(user?.Depto),
-      Municipio: parseInt(user?.Municipio),
-    };
-    console.log(body);
-    try {
-      const res = await fetchData(urls.valorcuota, "POST", {}, body);
-      return res;
-    } catch (err) {
-      throw err;
-    }
-  }, [pdpUser]);
+  const valorcuota = useCallback(
+    async (numero, user) => {
+      const body = {
+        Usuario: user?.Usuario,
+        Dispositivo: user?.Dispositivo,
+        Comercio: user?.Comercio,
+        nombre_usuario: pdpUser?.uname ?? "",
+        Credito: numero,
+        Depto: parseInt(user?.Depto),
+        Municipio: parseInt(user?.Municipio),
+      };
+      try {
+        const res = await fetchData(urls.valorcuota, "POST", {}, body);
+        return res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    [pdpUser]
+  );
 
   const consultarPines = useCallback(async (documento, pin, user) => {
     const body = {
@@ -150,7 +161,6 @@ export const useProvideFDLM = () => {
       nroPIN: String(pin),
       documento: String(documento),
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.consultarPines, "POST", {}, body);
       return res;
@@ -167,7 +177,6 @@ export const useProvideFDLM = () => {
       nroPIN: info?.CodigoPIN,
       documento: info?.Cedula,
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.cancelarDesembolso, "POST", {}, body);
       return res;
@@ -177,10 +186,9 @@ export const useProvideFDLM = () => {
   }, []);
 
   const desembolsospin = useCallback(async (info, user) => {
-    console.log(info);
-    let tipo_comercio = user?.Tipo
-    if (user?.Tipo === "KIOSCO"){
-      tipo_comercio = "OFICINAS PROPIAS"
+    let tipo_comercio = user?.Tipo;
+    if (user?.Tipo === "KIOSCO") {
+      tipo_comercio = "OFICINAS PROPIAS";
     }
     const body = {
       Tipo: tipo_comercio,
@@ -196,7 +204,6 @@ export const useProvideFDLM = () => {
       documento: info?.Cedula,
       valorDesembolso: info?.ValorDesembolso,
     };
-    console.log(body);
     try {
       const res = await fetchData(urls.desembolsospin, "POST", {}, body);
       return res;
@@ -205,7 +212,6 @@ export const useProvideFDLM = () => {
     }
   }, []);
 
-  console.log(roleInfo);
   return {
     infoLoto: {
       respuestamujer,

@@ -18,7 +18,6 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { enumParametrosFundacion } from "../utils/enumParametrosFundacion";
 import { useNavigate } from "react-router-dom";
 
-
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
 const Recaudo = () => {
@@ -55,7 +54,7 @@ const Recaudo = () => {
   const [permiteCambio, setPermiteCambio] = useState("");
   const [paraMax, setParaMax] = useState(null);
   const [paraMin, setParaMin] = useState(null);
-  const [tickets, setTickets] = useState("")
+  const [tickets, setTickets] = useState("");
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -98,7 +97,7 @@ const Recaudo = () => {
       /*id_dispositivo*/
       ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
       ["Id Trx", ""],
-      ["Id Aut", ""],  
+      ["Id Aut", ""],
       /*ciudad*/
       ["Comercio", roleInfo?.["nombre comercio"]],
       ["", ""],
@@ -108,7 +107,8 @@ const Recaudo = () => {
     ],
     commerceName: "FUNDACIÓN DE LA MUJER",
     trxInfo: [],
-    disclamer: "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
+    disclamer:
+      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
   });
   // const tickets = useMemo(() => {
   //   return {
@@ -160,7 +160,6 @@ const Recaudo = () => {
 
   const params = useCallback(async () => {
     const queries = { tipo_op: 5 };
-    console.log(queries);
     try {
       const res = await fetchData(url_params, "GET", queries);
       if ("Parametros" in res?.obj?.[0]) {
@@ -214,11 +213,11 @@ const Recaudo = () => {
       minute: "2-digit",
       second: "2-digit",
     }).format(new Date());
-    let objTicket = {}
+    let objTicket = {};
     objTicket = { ...objTicketActual };
     objTicket["timeInfo"]["Fecha de venta"] = fecha;
     objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"] = []
+    objTicket["trxInfo"] = [];
     objTicket["trxInfo"].push(["CRÉDITO", selected?.Credito]);
     objTicket["trxInfo"].push(["VALOR", formatMoney.format(formatMon)]);
     objTicket["trxInfo"].push(["Cliente", selected?.Cliente]);
@@ -227,9 +226,9 @@ const Recaudo = () => {
     objTicket["trxInfo"].push(["", ""]);
 
     setStop(true);
-    let tipo_comercio = roleInfo?.tipo_comercio
-    if (roleInfo?.tipo_comercio === "KIOSCO"){
-      tipo_comercio = "OFICINAS PROPIAS"
+    let tipo_comercio = roleInfo?.tipo_comercio;
+    if (roleInfo?.tipo_comercio === "KIOSCO") {
+      tipo_comercio = "OFICINAS PROPIAS";
     }
 
     const body = {
@@ -245,28 +244,19 @@ const Recaudo = () => {
       cliente: selected?.Cliente,
       cedula: selected?.Cedula,
       nombre_comercio: roleInfo?.["nombre comercio"],
-      ticket: objTicket
+      ticket: objTicket,
     };
-    console.log(body);
     ingresorecibo(body)
       .then((res) => {
         if (res?.status === true) {
-          console.log(res);
           setResponse(res?.obj);
-          objTicket["commerceInfo"][2]=[
-            "Id Trx",
-            res?.obj?.id_trx,
-          ]
-          objTicket["commerceInfo"][3]=[
-            "Id Aut",
-            res?.obj?.Confirmacion,
-          ]
-          setTickets(objTicket)
+          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
+          objTicket["commerceInfo"][3] = ["Id Aut", res?.obj?.Confirmacion];
+          setTickets(objTicket);
           setTicket(true);
           setStop(false);
         } else {
           closeModal();
-          console.log(res);
           notifyError(res?.msg);
           setStop(false);
         }
@@ -292,7 +282,6 @@ const Recaudo = () => {
     if (tipobusqueda === "2") {
       valorcuota(String(number), user)
         .then((res) => {
-          console.log(res);
           setPermiteCambio(res?.obj?.PermiteCambio);
           [res?.obj].map((row) => {
             setCuota([
@@ -307,13 +296,10 @@ const Recaudo = () => {
             }
           });
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => {});
     }
     mostrarcredito(String(number), tipobusqueda, user)
       .then((res) => {
-        console.log(res);
         setInfo(res);
         setDisabledBtn(false);
         if (res?.status === false) {
@@ -340,66 +326,61 @@ const Recaudo = () => {
 
   return (
     <>
-      {"id_comercio" in roleInfo ? (
-        <>
-          <h1 className="text-3xl mt-6">Recaudo Fundación de la mujer</h1>
-          <Form onSubmit={onSubmit} grid>
-            <Select
-              id="searchBySorteo"
-              label="Tipo de busqueda"
-              options={[
-                { value: "", label: "" },
-                {
-                  value: 1,
-                  label: `Documento`,
-                },
-                {
-                  value: 2,
-                  label: `Nº credito`,
-                },
-              ]}
-              value={tipobusqueda}
-              onChange={(e) => {
-                setTiposBusqueda(e.target.value);
-                if (e.target.value == 1) {
-                  setLabel("Documento");
-                }
-                if (e.target.value == 2) {
-                  setLabel("Número crédito");
-                }
+      <>
+        <h1 className='text-3xl mt-6'>Recaudo Fundación de la mujer</h1>
+        <Form onSubmit={onSubmit} grid>
+          <Select
+            id='searchBySorteo'
+            label='Tipo de busqueda'
+            options={[
+              { value: "", label: "" },
+              {
+                value: 1,
+                label: `Documento`,
+              },
+              {
+                value: 2,
+                label: `Nº credito`,
+              },
+            ]}
+            value={tipobusqueda}
+            onChange={(e) => {
+              setTiposBusqueda(e.target.value);
+              if (e.target.value == 1) {
+                setLabel("Documento");
+              }
+              if (e.target.value == 2) {
+                setLabel("Número crédito");
+              }
+            }}
+          />
+          {tipobusqueda?.length > 0 && (
+            <Input
+              id='numpin'
+              label={label}
+              type='text'
+              minLength='5'
+              maxLength='12'
+              autoComplete='off'
+              value={number}
+              onInput={(e) => {
+                const num = parseInt(e.target.value) || "";
+                setNumber(num);
               }}
             />
-            {tipobusqueda?.length > 0 && (
-              <Input
-                id="numpin"
-                label={label}
-                type="text"
-                minLength="5"
-                maxLength="12"
-                autoComplete="off"
-                value={number}
-                onInput={(e) => {
-                  const num = parseInt(e.target.value) || "";
-                  setNumber(num);
-                }}
-              />
-            )}
-            <ButtonBar className="col-auto md:col-span-2">
-              <Button type="submit" disabled={disabledBtn}>
-                Consultar recaudos
-              </Button>
-            </ButtonBar>
-          </Form>
-        </>
-      ) : (
-        <h1 className="text-3xl mt-6">El usuario no tiene comercio asociado</h1>
-      )}
-
+          )}
+          <ButtonBar className='col-auto md:col-span-2'>
+            <Button type='submit' disabled={disabledBtn}>
+              Consultar recaudos
+            </Button>
+          </ButtonBar>
+        </Form>
+      </>
       {info?.status && (
         <>
           {creditStatus && (
             <TableEnterprise
-              title="Parametros"
+              title='Parametros'
               // maxPage={maxPages}
               // onChange={onChange}
               headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
@@ -409,7 +390,7 @@ const Recaudo = () => {
           )}
           <br />
           <TableEnterprise
-            title="Información de credito"
+            title='Información de credito'
             // maxPage={maxPages}
             // onChange={onChange}
             headers={[
@@ -435,32 +416,30 @@ const Recaudo = () => {
         <Modal show={showModal} handleClose={() => closeModal()}>
           {ticket !== true && (
             <>
-              <h1 className="xl:text-center font-semibold">
+              <h1 className='xl:text-center font-semibold'>
                 Resumen de la transacción
               </h1>
-              <h2 className="sm:text-center font-semibold">
+              <h2 className='sm:text-center font-semibold'>
                 Crédito # {table[0]?.Credito}
               </h2>
             </>
           )}
           <>
             {ticket !== false ? (
-              <div className="flex flex-col justify-center items-center">
+              <div className='flex flex-col justify-center items-center'>
                 <Tickets refPrint={printDiv} ticket={tickets} />
                 <ButtonBar>
                   <Button
                     onClick={() => {
                       handlePrint();
-                    }}
-                  >
+                    }}>
                     Imprimir
                   </Button>
                   <Button
                     onClick={() => {
                       closeModal();
                       setTicket(false);
-                    }}
-                  >
+                    }}>
                     Cerrar
                   </Button>
                 </ButtonBar>
@@ -468,10 +447,10 @@ const Recaudo = () => {
             ) : (
               <Form onSubmit={bankCollection}>
                 <MoneyInput
-                  id="numPago"
-                  label="Valor a pagar"
-                  type="number"
-                  autoComplete="off"
+                  id='numPago'
+                  label='Valor a pagar'
+                  type='number'
+                  autoComplete='off'
                   max={paraMax}
                   min={paraMin}
                   required
@@ -500,7 +479,7 @@ const Recaudo = () => {
                   }}
                 /> */}
                 <ButtonBar>
-                  <Button type="submit" disabled={stop}>
+                  <Button type='submit' disabled={stop}>
                     Realizar pago
                   </Button>
                 </ButtonBar>

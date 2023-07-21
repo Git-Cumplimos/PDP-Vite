@@ -88,9 +88,8 @@ const Sellfundamujer = ({
     roleInfo?.id_dispositivo,
     respPago,
   ]);
-  console.log(respPago);
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className='flex flex-col justify-center items-center'>
       <Voucher ticket={tickets} refPrint={printDiv} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
@@ -99,8 +98,7 @@ const Sellfundamujer = ({
             closeModal();
             // setrespPago();
             // getQuota();
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>

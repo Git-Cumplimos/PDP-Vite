@@ -19,9 +19,6 @@ const Sellfundamujerrecaudo = ({
   });
 
   const voucherInfo = {};
-
-  console.log(respuestamujer);
-
   voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
     year: "numeric",
     month: "numeric",
@@ -43,7 +40,7 @@ const Sellfundamujerrecaudo = ({
   voucherInfo["id"] = respuestamujer["id"];
 
   return "msg" ? (
-    <div className="flex flex-col justify-center items-center">
+    <div className='flex flex-col justify-center items-center'>
       <Voucher {...voucherInfo} refPrint={printDiv} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
@@ -52,14 +49,13 @@ const Sellfundamujerrecaudo = ({
             closeModal();
             setRespuestamujer();
             getQuota();
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>
     </div>
   ) : (
-    <div className="flex flex-col justify-center items-center">
+    <div className='flex flex-col justify-center items-center'>
       <Voucher {...voucherInfo} refPrint={printDiv} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
@@ -68,8 +64,7 @@ const Sellfundamujerrecaudo = ({
             closeModal();
             setRespuestamujer();
             getQuota();
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>

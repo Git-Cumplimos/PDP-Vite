@@ -18,23 +18,6 @@ const Sellfundamujerrecaudo = ({
     content: () => printDiv.current,
   });
 
-  /* 
-const ticket  = useCallback(async () => {
-  try {
-    const res = await fetchData(urls.ticket, "GET", {
-      id_trx:2,
-      Tipo_operacion=3,
-      Ticket: {} 
-    });
-
-    console.log(res);
-    return res;
-  } catch (err) {
-    console.error(err);
-  }
-}, []);
-
- */
   const voucherInfo = {};
 
   voucherInfo["Fecha de venta"] = Intl.DateTimeFormat("es-CO", {
@@ -54,7 +37,7 @@ const ticket  = useCallback(async () => {
   voucherInfo["Referencia"] = respuestamujer["Referencia"];
 
   return "msg" ? (
-    <div className="flex flex-col justify-center items-center">
+    <div className='flex flex-col justify-center items-center'>
       <Voucher {...voucherInfo} refPrint={printDiv} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
@@ -63,14 +46,13 @@ const ticket  = useCallback(async () => {
             closeModal();
             setRespuestamujer();
             getQuota();
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>
     </div>
   ) : (
-    <div className="flex flex-col justify-center items-center">
+    <div className='flex flex-col justify-center items-center'>
       <Voucher {...voucherInfo} refPrint={printDiv} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
@@ -79,8 +61,7 @@ const ticket  = useCallback(async () => {
             closeModal();
             setRespuestamujer();
             getQuota();
-          }}
-        >
+          }}>
           Cerrar
         </Button>
       </ButtonBar>
