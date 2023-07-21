@@ -228,7 +228,7 @@ const TransaccionRecargaTarjeta = () => {
           <Input
             id='telefonoCliente'
             name='telefonoCliente'
-            label={"Telefono cliente"}
+            label={"Teléfono cliente"}
             type='text'
             autoComplete='off'
             value={dataUsuario?.["telefonoCliente"]}
@@ -304,7 +304,7 @@ const TransaccionRecargaTarjeta = () => {
                 <h2>{`Apellidos cliente: ${dataUsuario?.apellidosCliente}`}</h2>
               )}
               {dataUsuario?.telefonoCliente !== "" && (
-                <h2>{`Telefono cliente: ${dataUsuario?.telefonoCliente}`}</h2>
+                <h2>{`Teléfono cliente: ${dataUsuario?.telefonoCliente}`}</h2>
               )}
               {dataUsuario?.emailCliente !== "" && (
                 <h2>{`Correo cliente: ${dataUsuario?.emailCliente}`}</h2>

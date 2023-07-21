@@ -115,8 +115,8 @@ const ConsultaDatafonos = ({
       <TableEnterprise
         title={
           type === "Gestion"
-            ? "Consulta Datafonos"
-            : "Seleccione el datafono a recargar"
+            ? "Consulta Datáfonos"
+            : "Seleccione el datáfono a recargar"
         }
         maxPage={maxPages}
         headers={
@@ -129,7 +129,7 @@ const ConsultaDatafonos = ({
         onSetPageData={setPageData}>
         <Input
           id='pos_id'
-          label='Id datafono'
+          label='Id datáfono'
           type='text'
           name='pos_id'
           minLength='1'
@@ -164,7 +164,7 @@ const ConsultaDatafonos = ({
               className='place-self-stretch'
               id='estado'
               name='estado'
-              label='Estado del datafono'
+              label='Estado del datáfono'
               required={true}
               options={{
                 Inactivo: false,
