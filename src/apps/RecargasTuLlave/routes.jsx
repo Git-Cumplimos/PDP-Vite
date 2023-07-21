@@ -13,13 +13,13 @@ const CreateDatafono = lazy(() =>
   import("./Views/GestionDatafonos/CreateDatafono")
 );
 const MainRecargaDatafonos = lazy(() =>
-  import("./Views/RecargaDatafonos/MainRecargaDatafonos")
+  import("./Views/RecargaTullave/MainRecargaDatafonos")
 );
 const TransaccionRecargaDatafono = lazy(() =>
-  import("./Views/RecargaDatafonos/TransaccionRecargaDatafono")
+  import("./Views/RecargaTullave/TransaccionRecargaDatafono")
 );
 const TransaccionRecargaTarjeta = lazy(() =>
-  import("./Views/RecargaDatafonos/TransaccionRecargaTarjeta")
+  import("./Views/RecargaTullave/TransaccionRecargaTarjeta")
 );
 
 const CorresponsaliaTuLlave = lazy(() => import("./CorresponsaliaTuLlave"));
@@ -29,13 +29,13 @@ export const listPermissionsTuLlave = listPermissions;
 
 const rutasRecargasTullave = {
   link: "/recargas-tu-llave",
-  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Recargas Tu Llave" />,
+  label: <AppIcons Logo={"RECARGASTULLAVE"} name='Recargas Tu Llave' />,
   component: CorresponsaliaTuLlave,
   permission: listPermissionsTuLlave,
   subRoutes: [
     {
       link: "/recargas-tu-llave/gestion-datafonos",
-      label: <AppIcons Logo={"DAVIPLATA"} name="Gestión datafonos" />,
+      label: <AppIcons Logo={"DAVIPLATA"} name='Gestión datafonos' />,
       component: MainGestionDatafonos,
       permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
       subRoutes: [
@@ -59,7 +59,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/recarga-datafonos",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name="Recarga datafonos" />
+        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga datafonos' />
       ),
       component: MainRecargaDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
