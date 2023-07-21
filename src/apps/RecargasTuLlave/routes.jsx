@@ -35,7 +35,7 @@ const rutasRecargasTullave = {
   subRoutes: [
     {
       link: "/recargas-tu-llave/gestion-datafonos",
-      label: <AppIcons Logo={"DAVIPLATA"} name='Gestión datafonos' />,
+      label: <AppIcons Logo={"DAVIPLATA"} name='Gestión datáfonos' />,
       component: MainGestionDatafonos,
       permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
       subRoutes: [
@@ -59,7 +59,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/recarga-datafonos",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga datafonos' />
+        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga datáfonos' />
       ),
       component: MainRecargaDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
@@ -69,7 +69,7 @@ const rutasRecargasTullave = {
           label: (
             <AppIcons
               Logo={"DAVIVIENDA_PAGO_POR_GIRO"}
-              name={"Recarga datafonos"}
+              name={"Recarga datáfonos"}
             />
           ),
           component: TransaccionRecargaDatafono,

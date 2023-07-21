@@ -243,25 +243,3 @@ export class msgCustomBackend extends ErrorCustom {
     super(message, "msgCustomBackend", error_msg, null);
   }
 }
-
-const postCheckEstadoRecargaTarjetaTuLlave = async (bodyObj) => {
-  if (!bodyObj) {
-    return "Sin datos body";
-  }
-  try {
-    const res = await fetchData(
-      `${URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-datafono`,
-      "POST",
-      {},
-      bodyObj,
-      {},
-      true
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
