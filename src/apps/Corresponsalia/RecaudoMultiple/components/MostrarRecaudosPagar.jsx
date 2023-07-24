@@ -7,6 +7,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { notify, notifyError } from "../../../../utils/notify";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import {
   postConsultaRecaudoMultiple,
   postConsultaRecaudoMultipleComercios,
@@ -24,6 +25,8 @@ const MostrarRecaudosPagar = ({
   setUuid,
   type = "Operaciones",
 }) => {
+  const { quotaInfo } = useAuth();
+  const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
   const [recaudosMultiples, setRecaudosMultiples] = useState({
     valor_total: 0,
     cantidad_transacciones: 0,
@@ -211,9 +214,11 @@ const MostrarRecaudosPagar = ({
           console.error(err);
         });
     } else {
+      let valor_trx_total = recaudosMultiples.valor_total ?? "0";
       obj["comercio"]["idterminal_punto"] = roleInfo?.idterminal_punto;
       obj["comercio"]["serial_dispositivo"] = roleInfo?.serial_dispositivo;
-      postInicializacionRecaudoMultipleComercios(obj)
+      if (cupoLogin >= valor_trx_total) {
+        postInicializacionRecaudoMultipleComercios(obj)
         .then((res) => {
           if (res?.message === "Endpoint request timed out") {
             setIsUploading(false);
@@ -237,6 +242,34 @@ const MostrarRecaudosPagar = ({
           setEstadoTrx(0);
           console.error(err);
         });
+      } else {
+          obj["cupo_comercio"] = 0;
+          obj["valor_trx_total"] = valor_trx_total;
+          postInicializacionRecaudoMultipleComercios(obj)
+          .then((res) => {
+            if (res?.message === "Endpoint request timed out") {
+              setIsUploading(false);
+              setEstadoTrx(2);
+              setUuid(uniqueId);
+              return notify("Inicializacion de transacción multiple exitosa");
+            }
+            if (!res?.status) {
+              setIsUploading(false);
+              setEstadoTrx(0);
+              return notifyError(res?.msg);
+            }
+            setIsUploading(false);
+            notify(res?.msg);
+            setEstadoTrx(2);
+            setUuid(uniqueId);
+          })
+          .catch((err) => {
+            notifyError("Error de conexion con el servicio");
+            setIsUploading(false);
+            setEstadoTrx(0);
+            console.error(err);
+          });
+      }
     }
   };
   return (
