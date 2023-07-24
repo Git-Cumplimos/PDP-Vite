@@ -156,9 +156,12 @@ const ConsultaDatafonos = ({
               // required
               value={dataDatafonos.fk_comercio_asociado}
               onInput={(e) => {
-                setDataDatafonos((old) => {
-                  return { ...old, fk_comercio_asociado: e.target.value };
-                });
+                if (!isNaN(e.target.value)) {
+                  const num = e.target.value;
+                  setDataDatafonos((old) => {
+                    return { ...old, fk_comercio_asociado: num };
+                  });
+                }
               }}></Input>
             <Select
               className='place-self-stretch'
