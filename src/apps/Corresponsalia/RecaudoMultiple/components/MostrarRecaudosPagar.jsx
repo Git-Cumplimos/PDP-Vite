@@ -26,7 +26,7 @@ const MostrarRecaudosPagar = ({
   type = "Operaciones",
 }) => {
   const { quotaInfo } = useAuth();
-  const [cupoLogin, setCupoLogin] = useState(quotaInfo?.["quota"]);
+  const [habilita, setHabilita] = useState(true)
   const [recaudosMultiples, setRecaudosMultiples] = useState({
     valor_total: 0,
     cantidad_transacciones: 0,
@@ -214,6 +214,7 @@ const MostrarRecaudosPagar = ({
           console.error(err);
         });
     } else {
+      let cupoLogin = quotaInfo?.["quota"];
       let valor_trx_total = recaudosMultiples.valor_total ?? "0";
       obj["comercio"]["idterminal_punto"] = roleInfo?.idterminal_punto;
       obj["comercio"]["serial_dispositivo"] = roleInfo?.serial_dispositivo;
@@ -243,7 +244,6 @@ const MostrarRecaudosPagar = ({
           console.error(err);
         });
       } else {
-          obj["cupo_comercio"] = 0;
           obj["valor_trx_total"] = valor_trx_total;
           postInicializacionRecaudoMultipleComercios(obj)
           .then((res) => {
@@ -255,7 +255,9 @@ const MostrarRecaudosPagar = ({
             }
             if (!res?.status) {
               setIsUploading(false);
-              setEstadoTrx(0);
+              setShowModal(false);
+              // setEstadoTrx(0);
+              setHabilita(false);
               return notifyError(res?.msg);
             }
             setIsUploading(false);
@@ -286,6 +288,7 @@ const MostrarRecaudosPagar = ({
           onClick={() => {
             setShowModal(true);
           }}
+          disabled={!habilita}
           type='submit'>
           Realizar transacción
         </Button>
