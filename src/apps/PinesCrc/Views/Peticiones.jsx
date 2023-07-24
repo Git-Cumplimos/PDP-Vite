@@ -101,7 +101,7 @@ const Peticiones = () => {
       .catch((err) => {
         if (err?.cause === "custom") {
           setIsLoading(false)
-          notifyError(err?.message);
+          notifyError(err?.message, 5000, {toastId: "notify-lot"});
           return;
         }
         setIsLoading(false)
@@ -298,7 +298,7 @@ const Peticiones = () => {
                 onClick={() => {
                   setShowModalPeticion(false)
                   setMotivoPeticion("")
-                  notify("Petición cancelada por el usuario")
+                  notify("Petición cancelada por el usuario", 5000, {toastId: "notify-lot"})
                 }}
               >
                 Cancelar
