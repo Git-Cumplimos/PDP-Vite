@@ -1,18 +1,17 @@
 import { useCallback, useState } from "react";
-import {
-  ErrorCustomBackend,
-  EvaluateResponse,
-  fetchCustom,
-  msgCustomBackend,
-} from "../utils/fetchRunt";
-import { notify, notifyError } from "../../../../utils/notify";
+import { ErrorCustomBackend, fetchCustom } from "../utils/fetchTuLlave";
+import { notify, notifyError } from "../../../utils/notify";
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
-export const useFetchRunt = (url_trx_ = "", url_consulta_ = "", name_ = "") => {
+export const useFetchTuLlave = (
+  url_trx_ = "",
+  url_consulta_ = "",
+  name_ = ""
+) => {
   const [state, setState] = useState(false);
 
-  const fetchRuntTrx = useCallback(
+  const fetchTuLlaveTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(
         url_trx_,
@@ -50,14 +49,13 @@ export const useFetchRunt = (url_trx_ = "", url_consulta_ = "", name_ = "") => {
       if (banderaConsulta) {
         try {
           let data_consulta = {
-            idComercio: data_?.comercio?.id_comercio,
-            idUsuario: data_?.comercio?.id_usuario,
-            idTerminal: data_?.comercio?.id_terminal,
+            id_comercio: data_?.comercio?.id_comercio,
+            id_terminal: data_?.comercio?.id_terminal,
             id_uuid_trx: data_additional_?.id_uuid_trx,
           };
           for (let i = 0; i <= 4; i++) {
             PeticionConsulta = await fetchConsulta({}, data_consulta);
-            if (PeticionConsulta?.obj?.status_trx === "Pendiente") {
+            if (PeticionConsulta?.msg.includes("No ha terminado")) {
               notify(
                 "Su transacción esta siendo procesada, no recargue la página"
               );
@@ -97,7 +95,7 @@ export const useFetchRunt = (url_trx_ = "", url_consulta_ = "", name_ = "") => {
     [setState, url_trx_, url_consulta_, name_]
   );
 
-  return [state, fetchRuntTrx];
+  return [state, fetchTuLlaveTrx];
 };
 
 export class ErrorCustom extends Error {

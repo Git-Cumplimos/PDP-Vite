@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { notifyPending } from "../../../../utils/notify";
-import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
@@ -21,7 +20,6 @@ const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACIO
 const CreateDatafono = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const [isUploading, setIsUploading] = useState(false);
   const [dataDatafono, setDataDatafono] = useState({
     comentarios: "",
     estado: true,
@@ -98,7 +96,7 @@ const CreateDatafono = () => {
           {
             render: ({ data: res }) => {
               navigate(-1);
-              return "Datafono creado";
+              return "Datáfono creado";
             },
           },
           {
@@ -112,12 +110,12 @@ const CreateDatafono = () => {
     [params?.id, dataDatafono, navigate]
   );
   const [loadingPeticionConsultaDatafono, peticionConsultaDatafono] = useFetch(
-    fetchCustom(URL_CONSULTAR_DATAFONO, "GET", "Consultar datafono")
+    fetchCustom(URL_CONSULTAR_DATAFONO, "GET", "Consultar datáfono")
   );
   const [loadingPeticionActualizacionDatafono, peticionActualizacionDatafono] =
-    useFetch(fetchCustom(URL_EDITAR_DATAFONO, "PUT", "Editar datafono"));
+    useFetch(fetchCustom(URL_EDITAR_DATAFONO, "PUT", "Editar datáfono"));
   const [loadingPeticionCreacionDatafono, peticionCreacionDatafono] = useFetch(
-    fetchCustom(URL_CREAR_DATAFONO, "POST", "Crear datafono")
+    fetchCustom(URL_CREAR_DATAFONO, "POST", "Crear datáfono")
   );
   useEffect(() => {
     fetchDatafonosFunc();
@@ -128,7 +126,7 @@ const CreateDatafono = () => {
         pk_tullave_datafonos: params.id,
       };
       notifyPending(
-        peticionConsultaDatafono({}, data),
+        peticionConsultaDatafono(data, {}),
         {
           render: () => {
             return "Procesando consulta";
@@ -192,11 +190,10 @@ const CreateDatafono = () => {
   }, []);
   return (
     <>
-      <SimpleLoading show={isUploading} />
       <h1 className='text-3xl'>
         {params?.id
-          ? "Actualizar datafono Tu Llave"
-          : "Crear datafono Tu Llave"}
+          ? "Actualizar datáfono Tu Llave"
+          : "Crear datáfono Tu Llave"}
       </h1>
       <Form onSubmit={createDatafono} grid>
         <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
@@ -286,7 +283,7 @@ const CreateDatafono = () => {
             className='place-self-stretch'
             id='estado'
             name='estado'
-            label='Estado del datafono'
+            label='Estado del datáfono'
             required={true}
             options={{
               Inactivo: false,
@@ -364,7 +361,7 @@ const CreateDatafono = () => {
               loadingPeticionActualizacionDatafono ||
               loadingPeticionCreacionDatafono
             }>
-            {params?.id ? "Actualizar datafono" : "Crear datafono"}
+            {params?.id ? "Actualizar datáfono" : "Crear datáfono"}
           </Button>
         </ButtonBar>
       </Form>

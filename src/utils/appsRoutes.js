@@ -541,7 +541,7 @@ const allUrlsPrivateApps = [
           label: <AppIcons Logo={"LOTERIA_PREMIOS"} name="Pago de premios" />,
           component: PagoDePremios,
           extern: false,
-          permission: [3, 44, 95],
+          permission: [3, 6, 44, 95],
           subRoutes: [
             {
               link: `/loteria/${name}/premios/Pagopremios`,

@@ -3,7 +3,7 @@ import { notify, notifyError } from "../../../utils/notify";
 
 const urlParametrizacion =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
-
+const URL_CORRESPONSALIA_OTROS = process.env.REACT_APP_URL_CORRESPONSALIA_OTROS;
 export const fetchDatafonosTuLlave = async (obj) => {
   try {
     const res = await fetchData(

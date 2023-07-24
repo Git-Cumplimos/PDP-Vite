@@ -28,6 +28,52 @@ export const fetchRetiroEfectivo = async (data_) => {
     throw new ValidationRetiroEfectivo(`${Peticion?.msg}`);
   }
 
+  //Evaluar si la respuesta es json
+  try {
+    if (typeof Peticion !== "object") {
+      throw new Error("Pagina no encontrada");
+    }
+  } catch (error) {
+    notifyError(
+      "Error respuesta Frontend PDP: Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]"
+    );
+    console.error({
+      "Error PDP":
+        "Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]",
+      "Error Sequence": "fetchRetiroEfectivo - Evaluar si la respuesta es json",
+      "Error Console": `${error.message}`,
+    });
+    throw error;
+  }
+
+  //evaluar respuesta de api gateway
+  try {
+    if (Peticion?.hasOwnProperty("status") === false) {
+      //No es una respuesta directamente del servicio sino del api gateway
+      if (Peticion?.hasOwnProperty("message") === true) {
+        if (Peticion.message === "Endpoint request timed out") {
+          throw new Error(
+            "Api gateway respondio -> Endpoint request timed out"
+          );
+        } else {
+          throw new Error(`Api gateway respondio -> ${Peticion?.message}`);
+        }
+      }
+    }
+  } catch (error) {
+    notifyError(
+      "Error respuesta Frontend PDP: Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]"
+    );
+    console.error({
+      "Error PDP":
+        "Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]",
+      "Error Sequence":
+        "fetchRetiroEfectivo - evaluar respuesta de api gateway",
+      "Error Console": `${error.message}`,
+    });
+    throw error;
+  }
+
   //Evaluar peticion
   try {
     if (
