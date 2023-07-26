@@ -25,6 +25,7 @@ const initialSearchFilters = new Map([
 const ComerciosBroker = () => {
   const navigate = useNavigate()
 
+  const [permisos, setPermisos] = useState({})
   const [comercios, setComercios] = useState([])
   const [selected, setSelected] = useState(null);
   const [isNextPage, setIsNextPage] = useState(false);
@@ -77,33 +78,25 @@ const ComerciosBroker = () => {
     searchCommerces();
   }, [searchCommerces]);
 
-  const filterAndAddToArray = useCallback((old, property, data) => {
-    return [
-      ...(old[property] ?? []),
-      data
-    ].filter((value, index, self) => index === self.findIndex((item) => value === item));
-  }, []);
-
   const onSelectGroup = useCallback(
     (selectedGroup) => {
-      console.log(selected)
-      console.log(selectedGroup)
-      setSelected((old) => ({
-        ...old,
-        permisos_broker: filterAndAddToArray(old, 'permisos_broker', selectedGroup?.pk_permiso_broker.toString()),
-        nombres_permisos_broker: filterAndAddToArray(old, 'nombres_permisos_broker', selectedGroup?.tipo_trx),
-      }));
+      let type = selectedGroup?.tipo_trx;
+      let pk_permission = selectedGroup?.pk_permiso_broker.toString();
+      setPermisos((old) => {
+        const copy = structuredClone(old);
+        copy[pk_permission] = type;
+        return copy;
+      })
       handleClose(true);
     },
 
-    [handleClose, filterAndAddToArray,selected]
+    [handleClose]
   );
 
   const modifyCommerce = useCallback((e) => {
     e.preventDefault();
-    console.log(selected)
     const body = {
-      pk_grupo_permiso_broker: selected?.permisos_broker
+      pk_grupo_permiso_broker: Object.keys(permisos) ?? []
     }
     notifyPending(
       updateCommerce({ pk_comercio: selected?.pk_comercio, }, body),
@@ -128,15 +121,15 @@ const ComerciosBroker = () => {
         },
       }
     )
-  }, [handleClose, navigate, selected])
+  }, [handleClose, navigate, selected, permisos])
 
   return (
     <Fragment>
       <DataTable
-        title="Convenios de Recaudos"
+        title="Comercios"
         headers={[
-          "Código convenio",
-          "Nombre convenio",
+          "Id",
+          "Comercio",
         ]}
         data={comercios.map(
           ({
@@ -150,6 +143,7 @@ const ComerciosBroker = () => {
         onClickRow={(_, index) => {
           setShowModal(true)
           setSelected(comercios[index])
+          setPermisos(Object.keys(comercios[index]?.list_permissions)[0] === "0" ? {} : comercios[index]?.list_permissions)
         }}
         tblFooter={
           <Fragment>
@@ -223,30 +217,31 @@ const ComerciosBroker = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={modifyCommerce} grid>
           <ButtonBar className={"lg:col-span-2"}>
-            {selected?.nombres_permisos_broker?.length > 0 ? (
-              selected?.nombres_permisos_broker?.map((index, ind) => (
+            {Object.keys(permisos).length > 0 ? (
+              Object.entries(permisos).map((index, ind) => (
                 <button
                   type="button"
                   className="rounded-md bg-primary-light px-4 py-2 my-2 text-base text-white"
-                  title={index}
-                  key={index}
+                  title={index[1]}
+                  key={index[1]}
                 >
-                  {index} &nbsp;&nbsp;
+                  {index[1]} &nbsp;&nbsp;
                   <span
                     className="bi bi-x-lg pointer-events-auto"
-                    onClick={() =>
-                      setSelected((old) => {
+                    onClick={() =>{
+                      setPermisos((old) => {
+                        const key = Object.keys(old)[0]
                         const copy = structuredClone(old);
-                        copy.nombres_permisos_broker.splice(ind, 1);
+                        delete copy[key]
                         return copy;
-                      })
+                      })}
                     }
                   />
                 </button>
               ))
             ) : (
               <h1 className="text-xl text-center my-auto">
-                No hay grupos relacionados
+                No hay permisos relacionados
               </h1>
             )}
           </ButtonBar>
