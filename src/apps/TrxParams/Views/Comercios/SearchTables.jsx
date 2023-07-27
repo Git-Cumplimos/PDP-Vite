@@ -2,13 +2,14 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import DataTable from "../../../../components/Base/DataTable";
 import useFetchDispatchDebounce, { ErrorPDPFetch } from "../../../../hooks/useFetchDispatchDebounce";
 import { notifyError } from "../../../../utils/notify";
+import { onChangeNumber } from "../../../../utils/functions";
 import useMap from "../../../../hooks/useMap";
 import Input from "../../../../components/Base/Input";
 import { getListPermissions } from "../../utils/fecthBrokerComercios";
 
 const initialSearchFilters = new Map([
-  ["id_grupo", ""],
-  ["nombre_grupo", ""],
+  ["pk_permiso_broker", ""],
+  ["tipo_trx", ""],
   ["page", 1],
   ["limit", 10],
 ]);
@@ -25,7 +26,6 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
 
   const [fetchCommerce] = useFetchDispatchDebounce({
     onSuccess: useCallback((data) => {
-      console.log(data?.obj?.results ?? [])
       setListPermissions(data?.obj?.results ?? []);
       setIsNextPage(data?.obj?.next_exist ?? false);
     }, []),
@@ -62,7 +62,7 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
     <Fragment>
       <DataTable
         title="Buscar grupos"
-        headers={["Id del permiso", "Tipo de transaccion","Nombre del grupo"]}
+        headers={["Id del grupo", "Tipo de transacción","Nombre del grupo"]}
         data={listPermissions.map(
           ({
             pk_permiso_broker,
@@ -113,17 +113,18 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
       >
         <Fragment>
           <Input
-            id="id_group"
-            name="id_grupo"
+            id="pk_permiso_broker"
+            name="pk_permiso_broker"
             label={"Id de grupo"}
             type="tel"
+            onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
             maxLength={10}
             autoComplete="off"
           />
           <Input
-            id="name_group"
-            name="nombre_grupo"
-            label={"Nombre de grupo"}
+            id="tipo_trx"
+            name="tipo_trx"
+            label={"Tipo de transacción"}
             type="text"
             maxLength={60}
             autoComplete="off"

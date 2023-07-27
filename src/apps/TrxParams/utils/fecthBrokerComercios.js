@@ -46,7 +46,6 @@ const buildPutFunction = (url) => {
             });
         }
         try {
-            console.log(body,"-------",args)
             const res = await fetchData(url, "PUT", args, body);
             if (!res?.status) {
 
@@ -69,10 +68,18 @@ const buildPutFunction = (url) => {
 export const getListCommerce = () => {
     return `${urlComercios}/comercios/comercios-permisos-broker`
 };
-export const updateCommerce = buildPutFunction(
-    `${urlComercios}/comercios/comercios-permisos-broker`
-)
 
 export const getListPermissions = () => {
     return `${urlComercios}/comercios/permisos-broker`
 };
+
+export const updateCommerce = buildPutFunction(
+    `${urlComercios}/comercios/comercios-permisos-broker`
+);
+
+export const updateGroup = buildPutFunction(
+    `${urlComercios}/comercios/permisos-broker`
+);
+export const createGroup = buildPostFunction(
+    `${urlComercios}/comercios/permisos-broker`
+);

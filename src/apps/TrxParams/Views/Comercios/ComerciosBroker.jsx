@@ -17,7 +17,6 @@ import Modal from "../../../../components/Base/Modal";
 const initialSearchFilters = new Map([
   ["pk_comercio", ""],
   ["nombre_comercio", ""],
-  ["ascendente", "false"],
   ["page", 1],
   ["limit", 10],
 ]);
@@ -184,7 +183,7 @@ const ComerciosBroker = () => {
           label={"Código de convenio"}
           name={"pk_comercio"}
           type="tel"
-          maxLength={"4"}
+          maxLength={"6"}
           onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
           autoComplete="off"
         />
@@ -195,23 +194,6 @@ const ComerciosBroker = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-        />
-        <Select
-          id="ascendente"
-          name="ascendente"
-          label="Orden ascendente"
-          options={[
-            { value: "true", label: "true" },
-            { value: "false", label: "false" },
-          ]}
-          onChange={(ev) => {
-            setSearchFilters((old) => {
-              const copy = new Map(old)
-                .set("ascendente", ev.target.value);
-              return copy;
-            });
-          }}
-          defaultValue={"false"}
         />
       </DataTable>
       <Modal show={showModal} handleClose={handleClose}>
