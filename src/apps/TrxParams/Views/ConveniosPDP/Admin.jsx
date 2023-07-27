@@ -243,7 +243,7 @@ const AdminConveniosPDP = () => {
           />
           <TextArea
             id="descripcion_convenio"
-            label="Nombre de convenio"
+            label="Descripcion del convenio"
             name={"descripcion_convenio"}
             autoComplete="off"
             value={selectedConvenio?.descripcion_convenio}
