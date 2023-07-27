@@ -52,6 +52,7 @@ import rutasRecaudoMultiple, {
 } from "../apps/Corresponsalia/RecaudoMultiple/routes";
 import rutasRecargasTullave from "../apps/RecargasTuLlave/routes";
 import rutasPowwi from "../apps/Powwi/routes";
+import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
 
 /**
 
@@ -540,7 +541,7 @@ const allUrlsPrivateApps = [
           label: <AppIcons Logo={"LOTERIA_PREMIOS"} name="Pago de premios" />,
           component: PagoDePremios,
           extern: false,
-          permission: [3, 44, 95],
+          permission: [3, 6, 44, 95],
           subRoutes: [
             {
               link: `/loteria/${name}/premios/Pagopremios`,
@@ -1215,6 +1216,9 @@ const allUrlsPrivateApps = [
   rutasRecaudoDirecto,
   rutasRecargasTullave,
   rutasPowwi,
+
+  //Modulo Almaseg
+  routesAlmaseg,
 ];
 
 export { allUrlsPrivateApps };

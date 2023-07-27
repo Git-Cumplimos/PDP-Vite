@@ -66,7 +66,7 @@ const rutasAgrarioCB = {
         />
       ),
       component: TrxCuentasBancoAgrario,
-      permission: [enumPermisosAgrario.agrario_cb_depositos],
+      permission: [enumPermisosAgrario.agrario_cb_depositos, enumPermisosAgrario.agrario_cb_retiros],
       subRoutes: [
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
