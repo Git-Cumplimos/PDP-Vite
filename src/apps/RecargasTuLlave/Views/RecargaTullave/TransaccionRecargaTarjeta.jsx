@@ -17,6 +17,7 @@ import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
+import useMoney from "../../../../hooks/useMoney";
 
 const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
 const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
@@ -150,7 +151,7 @@ const TransaccionRecargaTarjeta = () => {
       if (!isNaN(num)) {
         if (ev.target.name === "telefonoCliente") {
           if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
-            return notifyError("El número de telefono debe comenzar por 3");
+            return notifyError("El número de teléfono debe comenzar por 3");
           }
         }
         setDataUsuario((old) => {
@@ -166,6 +167,13 @@ const TransaccionRecargaTarjeta = () => {
       return { ...old, [ev.target.name]: value };
     });
   }, []);
+  const onChangeMoney = useMoney({
+    limits: [
+      enumParametrosTuLlave.MINRECARGATARJETA,
+      enumParametrosTuLlave.MAXRECARGATARJETA,
+    ],
+    equalError: false,
+  });
   return (
     <>
       <h1 className='text-3xl'>Recargar tarjeta Tu Llave</h1>
@@ -193,9 +201,9 @@ const TransaccionRecargaTarjeta = () => {
             autoComplete='off'
             maxLength={"11"}
             value={parseInt(dataUsuario?.valorRecarga)}
-            onInput={(e, val) => {
+            onInput={(ev) => {
               setDataUsuario((old) => {
-                return { ...old, valorRecarga: val };
+                return { ...old, valorRecarga: onChangeMoney(ev) };
               });
             }}
             required
