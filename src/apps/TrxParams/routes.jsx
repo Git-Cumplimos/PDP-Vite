@@ -57,6 +57,8 @@ const ConfiguracionComercios = lazy(() =>
 );
 const CrearComercios = lazy(() => import("./Views/Comercios/CrearComercios"));
 const ListarComercios = lazy(() => import("./Views/Comercios/ListarComercios"));
+const GestionPermisosBroker = lazy(() => import("./Views/Comercios/GestionPermisosBroker"));
+const ComerciosBroker = lazy(() => import("./Views/Comercios/ComerciosBroker"));
 const TipoNivelComercio = lazy(() => import("./Views/TipoNivelComercios"));
 const ListarMensajePublicitario = lazy(() =>
   import("./Views/MensajesPublicitarios/ListarMensajePublicitario")
@@ -370,6 +372,18 @@ const rutasConfiguraciones = {
           component: CrearComercios,
           permission: [enumPermisosTrx.comercios],
           show: false,
+        },
+        {
+          link: "/params-operations/comercios-params/gestion-permisos-broker",
+          label: <AppIcons Logo={"RECAUDO"} name={"Gestion Permisos Broker"} />,
+          component: GestionPermisosBroker,
+          permission: [enumPermisosTrx.comercios],
+        },
+        {
+          link: "/params-operations/comercios-params/permisos-broker",
+          label: <AppIcons Logo={"RECAUDO"} name={"Permisos Comercios Broker"} />,
+          component: ComerciosBroker,
+          permission: [enumPermisosTrx.comercios],
         },
         {
           link: "/params-operations/comercios-params/grupos-comercio",
