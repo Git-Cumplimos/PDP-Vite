@@ -17,6 +17,7 @@ import fetchData from "../../../utils/fetchData";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { enumParametrosFundacion } from "../utils/enumParametrosFundacion";
 import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
 
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 
@@ -56,6 +57,7 @@ const Recaudo = () => {
   const [paraMin, setParaMin] = useState(null);
   const [tickets, setTickets] = useState("");
   const [valueValor, setValueValor] = useState(false);
+  const [uuid, setUuid] = useState(v4());
   
 
   const notify = (msg) => {
@@ -88,78 +90,6 @@ const Recaudo = () => {
   }
 `;
 
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de pago(Recaudo)",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      ["Id Trx", ""],
-      ["Id Aut", ""],
-      /*ciudad*/
-      ["Comercio", roleInfo?.["nombre comercio"]],
-      ["", ""],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
-      ["", ""],
-    ],
-    commerceName: "FUNDACIÓN DE LA MUJER",
-    trxInfo: [],
-    disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-  });
-  // const tickets = useMemo(() => {
-  //   return {
-  //     title: "Recibo de pago(Recaudo)",
-  //     timeInfo: {
-  //       "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-  //         year: "numeric",
-  //         month: "numeric",
-  //         day: "numeric",
-  //       }).format(new Date()),
-  //       Hora: Intl.DateTimeFormat("es-CO", {
-  //         hour: "numeric",
-  //         minute: "numeric",
-  //         second: "numeric",
-  //         hour12: false,
-  //       }).format(new Date()),
-  //     },
-  //     commerceInfo: Object.entries({
-  //       "Id Comercio": roleInfo?.id_comercio,
-  //       "No. terminal": roleInfo?.id_dispositivo,
-  //       Municipio: roleInfo?.ciudad,
-  //       Dirección: roleInfo?.direccion,
-  //       "Id Trx": response.id_trx,
-  //       "Id Confirmación": response.Confirmacion,
-  //     }),
-  //     commerceName: "FUNDACIÓN DE LA MUJER",
-  //     trxInfo: [
-  //       ["CRÉDITO", selected?.Credito],
-  //       ["VALOR", formatMoney.format(formatMon)],
-  //       ["Cliente", selected?.Cliente],
-  //       ["", ""],
-  //       ["Cédula", selected?.Cedula],
-  //       ["", ""],
-  //     ],
-  //     disclamer:
-  //       "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-  //   };
-  // }, [
-  //   roleInfo?.ciudad,
-  //   roleInfo?.direccion,
-  //   roleInfo?.id_comercio,
-  //   roleInfo?.id_dispositivo,
-  //   response,
-  //   formatMon,
-  //   table,
-  // ]);
-
-  // const { infoTicket } = useAuth();
-  
   const params = useCallback(async () => {
     const queries = { tipo_op: 5 };
     try {
@@ -181,10 +111,6 @@ const Recaudo = () => {
     params();
   }, [info]);
 
-  // useEffect(() => {
-  //   infoTicket(response?.id_trx, 5, tickets);
-  // }, [infoTicket, response]);
-
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
@@ -203,61 +129,40 @@ const Recaudo = () => {
     setPermiteCambio("");
     setCuota("");
     setValueValor(false);
+    setUuid(v4());
   }, []);
 
   const bankCollection = (e) => {
     e.preventDefault();
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    let objTicket = {};
-    objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"] = [];
-    objTicket["trxInfo"].push(["CRÉDITO", selected?.Credito]);
-    objTicket["trxInfo"].push(["VALOR", formatMoney.format(formatMon)]);
-    objTicket["trxInfo"].push(["Cliente", selected?.Cliente]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Cédula", selected?.Cedula]);
-    objTicket["trxInfo"].push(["", ""]);
-
     setStop(true);
-    let tipo_comercio = roleInfo?.tipo_comercio;
-    if (roleInfo?.tipo_comercio === "KIOSCO") {
-      tipo_comercio = "OFICINAS PROPIAS";
-    }
-
     const body = {
-      Tipo: tipo_comercio,
-      Usuario: roleInfo?.id_usuario,
-      Dispositivo: roleInfo?.id_dispositivo,
-      Comercio: roleInfo?.id_comercio,
       Credito: selected?.Credito,
-      Depto: roleInfo?.codigo_dane.slice(0, 2),
-      Municipio: roleInfo?.codigo_dane.slice(2),
       Valor: parseFloat(formatMon),
-      referenciaPago: referencia,
+      Depto: roleInfo?.codigo_dane?.slice(0, 2),
+      Municipio: roleInfo?.codigo_dane?.slice(2),
+      ReferenciaPago: referencia,
       cliente: selected?.Cliente,
       cedula: selected?.Cedula,
-      nombre_comercio: roleInfo?.["nombre comercio"],
-      ticket: objTicket,
+      ticket: [
+        ["CRÉDITO", selected?.Credito],
+        ["VALOR", formatMoney.format(formatMon)],
+        ["Cliente", selected?.Cliente],
+        ["Cédula", selected?.Cedula],
+      ].reduce((list, elem, i) => {
+        list.push(elem);
+        if ((i + 1) % 1 === 0) list.push(["", ""]);
+        return list;
+      }, []),
+      id_trx: info?.obj?.id_trx,
+      uuid_key: uuid,
+      Direccion: roleInfo?.direccion ? roleInfo?.direccion : "No hay datos",
     };
     ingresorecibo(body)
       .then((res) => {
+        console.log(res)
         if (res?.status === true) {
           setResponse(res?.obj);
-          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
-          objTicket["commerceInfo"][3] = ["Id Aut", res?.obj?.Confirmacion];
-          setTickets(objTicket);
+          setTickets(res?.obj?.ticket);
           setTicket(true);
           setStop(false);
         } else {

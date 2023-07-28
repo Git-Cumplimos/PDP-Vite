@@ -88,16 +88,23 @@ export const useProvideFDLM = () => {
   const ingresoreversorecibo = useCallback(
     async (values) => {
       const body = {
-        Tipo: values?.tipo,
-        Usuario: values?.usuario,
-        Dispositivo: values?.dispositivo,
-        Comercio: values?.comercio,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
-        Credito: parseInt(values?.credit),
-        Valor: parseFloat(values?.val),
-        referenciaPago: values?.reference,
-        id_trx: values?.idtrx,
-        motivo: values?.motivo,
+        id_trx: values?.id_trx,
+        valor_total_trx: parseFloat(values?.val),
+        ticket_init: values?.ticket,
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+        Datos: {
+          Depto: parseInt(values?.Depto),
+          Municipio: parseInt(values?.Municipio),
+          nroBusqueda: values?.reference,
+          Direccion: values?.Direccion,
+        },
       };
       try {
         const res = await fetchData(urls.ingresoreverso, "POST", {}, body);
@@ -106,26 +113,31 @@ export const useProvideFDLM = () => {
         throw err;
       }
     },
-    [pdpUser]
+    [pdpUser, roleInfo]
   );
 
   const ingresorecibo = useCallback(
     async (values) => {
       const body = {
-        Tipo: values?.Tipo,
-        Usuario: parseInt(values?.Usuario),
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        id_uuid_trx: values?.uuid_key,
+        nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
-        Dispositivo: values?.Dispositivo,
-        Comercio: values?.Comercio,
-        Credito: parseInt(values?.Credito),
-        Depto: parseInt(values?.Depto),
-        Municipio: parseInt(values?.Municipio),
-        Valor: parseFloat(values?.Valor),
-        referenciaPago: values?.referenciaPago,
-        cedula: values?.cedula,
-        cliente: values?.cliente,
-        nombre_comercio: values?.nombre_comercio,
-        ticket: values?.ticket,
+        id_trx: values?.id_trx,
+        valor_total_trx: parseFloat(values?.Valor),
+        ticket_init: values?.ticket,
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+        Datos: {
+          Depto: parseInt(values?.Depto),
+          Municipio: parseInt(values?.Municipio),
+          nroBusqueda: values?.Credito,
+          referenciaPago: values?.ReferenciaPago,
+          Direccion: values?.Direccion,
+        },
       };
       try {
         const res = await fetchData(urls.ingresorecibo, "POST", {}, body);
@@ -134,7 +146,7 @@ export const useProvideFDLM = () => {
         throw err;
       }
     },
-    [pdpUser]
+    [pdpUser, roleInfo]
   );
 
   const valorcuota = useCallback(
