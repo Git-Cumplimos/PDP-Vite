@@ -61,14 +61,19 @@ export const useProvideFDLM = () => {
   const mostrarcredito = useCallback(
     async (numero, param, user) => {
       const body = {
-        Comercio: user?.Comercio,
-        Usuario: user?.Usuario,
-        Dispositivo: user?.Dispositivo,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
-        nroBusqueda: numero,
-        ParametroBusqueda: param,
-        Depto: parseInt(user?.Depto),
-        Municipio: parseInt(user?.Municipio),
+        Datos: {
+          Depto: parseInt(user?.Depto),
+          Municipio: parseInt(user?.Municipio),
+          nroBusqueda: numero,
+          ParametroBusqueda: param,
+        },
       };
       try {
         const res = await fetchData(urls.mostrarcreditos, "POST", {}, body);
@@ -77,7 +82,7 @@ export const useProvideFDLM = () => {
         throw err;
       }
     },
-    [pdpUser]
+    [pdpUser,roleInfo]
   );
 
   const ingresoreversorecibo = useCallback(
@@ -133,15 +138,21 @@ export const useProvideFDLM = () => {
   );
 
   const valorcuota = useCallback(
-    async (numero, user) => {
+    async (numero, user, idTrx) => {
       const body = {
-        Usuario: user?.Usuario,
-        Dispositivo: user?.Dispositivo,
-        Comercio: user?.Comercio,
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
-        Credito: numero,
-        Depto: parseInt(user?.Depto),
-        Municipio: parseInt(user?.Municipio),
+        id_trx: idTrx?.obj?.id_trx,
+        Datos: {
+          Depto: parseInt(user?.Depto),
+          Municipio: parseInt(user?.Municipio),
+          nroBusqueda: numero,
+        },
       };
       try {
         const res = await fetchData(urls.valorcuota, "POST", {}, body);

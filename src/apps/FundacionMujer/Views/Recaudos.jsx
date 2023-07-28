@@ -55,6 +55,8 @@ const Recaudo = () => {
   const [paraMax, setParaMax] = useState(null);
   const [paraMin, setParaMin] = useState(null);
   const [tickets, setTickets] = useState("");
+  const [valueValor, setValueValor] = useState(false);
+  
 
   const notify = (msg) => {
     toast.info(msg, {
@@ -157,7 +159,7 @@ const Recaudo = () => {
   // ]);
 
   // const { infoTicket } = useAuth();
-
+  
   const params = useCallback(async () => {
     const queries = { tipo_op: 5 };
     try {
@@ -197,7 +199,10 @@ const Recaudo = () => {
     setCreditStatus(false);
     setInfo("");
     setTicket(false);
-    setReferencia("");
+    setValueValor(false);
+    setPermiteCambio("");
+    setCuota("");
+    setValueValor(false);
   }, []);
 
   const bankCollection = (e) => {
@@ -278,26 +283,9 @@ const Recaudo = () => {
       Comercio: roleInfo?.id_comercio,
       Depto: roleInfo?.codigo_dane?.slice(0, 2),
       Municipio: roleInfo?.codigo_dane?.slice(2),
+      TipoBusqueda: tipobusqueda,
+      Credito: parseFloat(number),
     };
-    if (tipobusqueda === "2") {
-      valorcuota(String(number), user)
-        .then((res) => {
-          setPermiteCambio(res?.obj?.PermiteCambio);
-          [res?.obj].map((row) => {
-            setCuota([
-              {
-                min: formatMoney.format(row.ValorMin),
-                max: formatMoney.format(row.ValorMaximo),
-                cuota: formatMoney.format(row.ValorPagar),
-              },
-            ]);
-            if (row.ValorPagar !== 0) {
-              setCreditStatus(true);
-            }
-          });
-        })
-        .catch((err) => {});
-    }
     mostrarcredito(String(number), tipobusqueda, user)
       .then((res) => {
         setInfo(res);
@@ -307,19 +295,30 @@ const Recaudo = () => {
             "Consulte soporte, servicio de Fundación de la mujer presenta fallas"
           );
         }
+        if (tipobusqueda === "2") {
+          valorcuota(String(number), user, res)
+            .then((res) => {
+              setPermiteCambio(res?.obj?.PermiteCambio);
+              setCuota(res?.obj);
+              setValueValor(true);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
         [res?.obj].map((row) => {
           setTable([
             {
               Cedula: row?.Cedula,
               Mensaje: row?.Mensaje,
-              Cliente: row?.NombreCliente,
+              Cliente: row?.NombreCLiente1,
               Producto: row?.NombreProducto,
               Credito: row?.Nrocredito,
-              Valor: formatMoney.format(row?.ValorPagar),
+              Valor: formatMoney.format(row?.ValorPagar1),
             },
           ]);
-          setFormatMon(row?.ValorPagar);
-        });
+          setFormatMon(row?.ValorPagar1);
+        });        
       })
       .catch((err) => console.log("error", err));
   };
@@ -346,10 +345,10 @@ const Recaudo = () => {
             value={tipobusqueda}
             onChange={(e) => {
               setTiposBusqueda(e.target.value);
-              if (e.target.value == 1) {
+              if (e.target.value === 1) {
                 setLabel("Documento");
               }
-              if (e.target.value == 2) {
+              if (e.target.value === 2) {
                 setLabel("Número crédito");
               }
             }}
@@ -378,21 +377,9 @@ const Recaudo = () => {
       </>
       {info?.status && (
         <>
-          {creditStatus && (
-            <TableEnterprise
-              title='Parametros'
-              // maxPage={maxPages}
-              // onChange={onChange}
-              headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
-              data={cuota || []}
-              // onSetPageData={setPageData}
-            ></TableEnterprise>
-          )}
           <br />
           <TableEnterprise
             title='Información de credito'
-            // maxPage={maxPages}
-            // onChange={onChange}
             headers={[
               "Cédula",
               "Mensaje",
@@ -404,15 +391,14 @@ const Recaudo = () => {
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              if (info?.obj?.NroMensaje === 1) {
+              if (info?.obj?.Nromensaje1 === 1) {
                 setShowModal(true);
               }
             }}
-            // onSetPageData={setPageData}
           ></TableEnterprise>
         </>
       )}
-      {info?.obj?.NroMensaje === 1 && (
+      {info?.obj?.Nromensaje1 === 1 && (
         <Modal show={showModal} handleClose={() => closeModal()}>
           {ticket !== true && (
             <>
@@ -445,7 +431,30 @@ const Recaudo = () => {
                 </ButtonBar>
               </div>
             ) : (
-              <Form onSubmit={bankCollection}>
+              <Form grid onSubmit={bankCollection}>
+                <>
+                <h2>{`Nombre del Cliente: ${
+                  info?.obj?.NombreCLiente1 ?? ""
+                }`}
+                </h2>
+                <h2>{`Documento del Cliente: ${
+                  info?.obj?.Cedula ?? ""
+                }`}
+                </h2>
+                </>
+                {valueValor !== false ? (
+                  <>
+                    <h2>{`Valor de pago mínimo: ${formatMoney.format(
+                      cuota?.ValorPagarMin
+                    )}`}</h2>
+                    <h2>{`Valor de pago máximo: ${formatMoney.format(
+                      cuota?.ValorPagarMaximo
+                    )}`}</h2>
+                    <h2>{`Valor de pago total: ${formatMoney.format(
+                      cuota?.ValorPagar
+                    )}`}</h2>
+                  </>
+                ): ""}
                 <MoneyInput
                   id='numPago'
                   label='Valor a pagar'
@@ -455,7 +464,7 @@ const Recaudo = () => {
                   min={paraMin}
                   required
                   value={formatMon}
-                  disabled={permiteCambio == "N"}
+                  disabled={permiteCambio === "N"}
                   onInput={(e, valor) => {
                     const num = valor || "";
                     if (num > paraMax || num < paraMin) {
@@ -466,18 +475,6 @@ const Recaudo = () => {
                     setFormatMon(num);
                   }}
                 />
-                {/* <Input
-                  id="refPago"
-                  label="Referencia pago"
-                  type="text"
-                  maxLength="15"
-                  autoComplete="off"
-                  value={referencia}
-                  onInput={(e) => {
-                    const ref = String(e.target.value) || "";
-                    setReferencia(ref);
-                  }}
-                /> */}
                 <ButtonBar>
                   <Button type='submit' disabled={stop}>
                     Realizar pago
