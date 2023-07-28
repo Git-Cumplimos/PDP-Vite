@@ -1,5 +1,5 @@
 import { Auth } from "@aws-amplify/auth";
-import * as LineasNegocioCons from "./LineasNegocio.cons";
+import * as BusinessLineCons from "./LineasNegocio.cons";
 
 const API = `${process.env.REACT_APP_URL_BUSINESS_LINES}`;
 
@@ -62,32 +62,39 @@ export const petitions = {
 /* GETS */
 export const getAuthorizers = async () => {
   const response = await petitions.get({
-    uri: LineasNegocioCons.PATH_AUTHORIZER,
+    uri: BusinessLineCons.PATH_AUTHORIZER,
   });
   return response;
 };
 
 export const getBusinessLines = async () => {
   const response = await petitions.get({
-    uri: LineasNegocioCons.PATH_BUSINESS_LINES,
+    uri: BusinessLineCons.PATH_BUSINESS_LINES,
+  });
+  return response;
+};
+
+export const getDetailedLines = async () => {
+  const response = await petitions.get({
+    uri: BusinessLineCons.PATH_DETAILED_LINES,
   });
   return response;
 };
 
 export const getTransactionTypes = async () => {
   const response = await petitions.get({
-    uri: LineasNegocioCons.PATH_TRANSACTION_TYPES,
+    uri: BusinessLineCons.PATH_TRANSACTION_TYPES,
   });
   return response;
 };
 
 /* POSTS */
+
+/* PUTS */
 export const putBusinessLine = async (body) => {
   const response = await petitions.put({
-    uri: LineasNegocioCons.PATH_BUSINESS_LINES,
+    uri: BusinessLineCons.PATH_BUSINESS_LINES,
     body,
   });
   return response;
 };
-
-/* PUTS */

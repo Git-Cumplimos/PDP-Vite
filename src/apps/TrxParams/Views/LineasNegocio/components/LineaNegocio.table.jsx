@@ -4,8 +4,7 @@ import classes from "../../../../../components/Base/TableEnterprise/TableEnterpr
 import Form from "../../../../../components/Base/Form";
 import PropTypes from "prop-types";
 
-import * as LineasNegocioCons from "../utils/LineasNegocio.cons";
-
+import * as BusinessLineCons from "../utils/LineasNegocio.cons";
 
 const {
   tableEnterprise,
@@ -20,17 +19,18 @@ const {
 const onSelectRowFunction = (e, i) => {};
 
 const TableEnterprise = ({
-  title = "",
-  headers = [],
+  actions = {},
+  children = null,
   data = [],
-  onSelectRow = null || onSelectRowFunction,
+  headers = [],
   maxPage = 1,
+  updateEvent,
+  title = "",
   onChange = () => {},
-  onSubmit = (e) => e.preventDefault(),
+  onSelectRow = null || onSelectRowFunction,
   onSetPageData = (_) => {},
   onSetUtilsFuncs = () => {},
-  children = null,
-  actions = {},
+  onSubmit = (e) => e.preventDefault(),
 }) => {
   const [showFilters, setShowFilters] = useState(true);
 
@@ -42,7 +42,7 @@ const TableEnterprise = ({
       try {
         if (headers.length+2 !== objtemp.length) {
           console.error(headers, objtemp);
-          throw new Error(`Bad "data" format, wrong count columns in data row`);
+          throw new Error(BusinessLineCons.MESSAGE_BAD_FORMAT_TABLE);
         }
       } catch (error) {
         console.error("Error. ", error);
@@ -94,6 +94,24 @@ const TableEnterprise = ({
             <span className={`bi bi-${item} ${iconBtn}`} onClick={action} />
           ))}
         </div>
+        <button
+          onClick={()=> {updateEvent()}}
+          title={BusinessLineCons.LABEL_UPDATE}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5" 
+            fill="#000000" 
+            viewBox="0 0 27.971 27.971"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth="2" 
+              d="M23.92,14.746l-4.05-4.051h2.374l-0.068-0.177c-1.407-3.561-4.882-6.088-8.95-6.088c-5.312,0-9.62,4.307-9.62,9.616 c0,5.316,4.308,9.623,9.62,9.623c3.907,0,7.271-2.128,8.775-5.479l3.854,0.039c-0.013,0.03-3.032,8.918-12.693,8.918 C5.893,27.148,0,21.254,0,13.987C0,6.715,5.893,0.824,13.161,0.824c6.08,0,11.195,4.116,12.709,9.715l0.032,0.156h2.069 L23.92,14.746z"
+            /> 
+          </svg>
+        </button>
       </div>
       {children ? (
         <div className={`${filterDiv} ${showFilters ? "block" : "hidden"}`}>
@@ -129,7 +147,7 @@ const TableEnterprise = ({
           <tbody>
             {!sortedData?.length ? (
               <tr>
-                <td colSpan={headers?.length}>No hay datos</td>
+                <td colSpan={headers?.length}>{BusinessLineCons.MESSAGE_NO_DATA}</td>
               </tr>
             ) : (
               sortedData.map((obj, index) => (
@@ -138,7 +156,7 @@ const TableEnterprise = ({
                   onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
                 >
                   {obj.map(([key, value], idx) => {
-                    if (key !== LineasNegocioCons.TAG_DETAILED_LINE_ID && key !== LineasNegocioCons.TAG_TRANSACTION_TYPE_ID) {
+                    if (key !== BusinessLineCons.TAG_DETAILED_LINE_ID && key !== BusinessLineCons.TAG_TRANSACTION_TYPE_ID) {
                       return (
                         <td
                           key={`${key}_${index}`}
@@ -173,7 +191,7 @@ const TableEnterprise = ({
         >
           {[5, 10, 20, 50].map((val, idx) => (
             <option value={val} key={idx}>
-              {val} items por página
+              {val} {BusinessLineCons.LABEL_ITEMS_PER_PAGE}
             </option>
           ))}
         </select>
