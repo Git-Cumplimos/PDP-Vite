@@ -13,14 +13,13 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
-import useMoney from "../../../hooks/useMoney";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
   currency: "COP",
   maximumFractionDigits: 0,
 });
-const MoviiPDPCashOut = () => {
+const MoviiPDPCashIn = () => {
   const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
@@ -189,18 +188,14 @@ const MoviiPDPCashOut = () => {
         console.error(err);
       });
   };
-  const onChangeMoney = useMoney({
-    limits: [limiteRecarga.inferior, limiteRecarga.superior],
-    equalError: false,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Retiro MOVII</h1>
+      <h1 className='text-3xl'>Cash Out MOVII</h1>
       <Form grid onSubmit={onSubmit}>
         <Input
           id='numeroTelefono'
-          label='Número de télefono'
+          label='Número de telefono'
           type='text'
           name='numeroTelefono'
           minLength='10'
@@ -244,13 +239,14 @@ const MoviiPDPCashOut = () => {
           type='text'
           autoComplete='off'
           maxLength={"15"}
-          min={limiteRecarga.inferior}
-          max={limiteRecarga.superior}
           value={datosTrans.valorCashOut ?? ""}
-          onInput={(ev) => {
-            setDatosTrans((old) => {
-              return { ...old, valorCashOut: onChangeMoney(ev) };
-            });
+          onInput={(e, valor) => {
+            if (!isNaN(valor)) {
+              const num = valor;
+              setDatosTrans((old) => {
+                return { ...old, valorCashOut: num };
+              });
+            }
           }}
           required></MoneyInput>
         <ButtonBar className='lg:col-span-2'>
@@ -260,28 +256,50 @@ const MoviiPDPCashOut = () => {
       <Modal show={showModal} handleClose={hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {!peticion ? (
-            <>
-              <h1 className='text-2xl font-semibold'>
-                ¿Está seguro de realizar el retiro?
-              </h1>
-              <h2 className='text-base'>
-                {`Valor de transacción: ${formatMoney.format(
-                  datosTrans.valorCashOut
-                )} COP`}
-              </h2>
-              <h2>{`Número de teléfono: ${datosTrans.numeroTelefono}`}</h2>
-              <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
-              <ButtonBar>
-                <Button
-                  disabled={botonAceptar}
-                  type='submit'
-                  onClick={peticionCashOut}>
-                  Aceptar
-                </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
-              </ButtonBar>
-            </>
+            datosTrans.valorCashOut < limiteRecarga.superior &&
+            datosTrans.valorCashOut > limiteRecarga.inferior ? (
+              <>
+                <h1 className='text-2xl font-semibold'>
+                  ¿Está seguro de realizar el cash out?
+                </h1>
+                <h2 className='text-base'>
+                  {`Valor de transacción: ${formatMoney.format(
+                    datosTrans.valorCashOut
+                  )} COP`}
+                </h2>
+                <h2>{`Número de telefono: ${datosTrans.numeroTelefono}`}</h2>
+                <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
+                <ButtonBar>
+                  <Button
+                    disabled={botonAceptar}
+                    type='submit'
+                    onClick={peticionCashOut}>
+                    Aceptar
+                  </Button>
+                  <Button onClick={hideModal}>Cancelar</Button>
+                </ButtonBar>
+              </>
+            ) : (
+              <>
+                <h2 className='text-2xl font-semibold'>
+                  {datosTrans.valorCashOut <= limiteRecarga.inferior
+                    ? `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
+                        limiteRecarga.inferior
+                      )}`
+                    : "ERROR El valor de cash out debe ser menor a " +
+                      formatMoney.format(limiteRecarga.superior) +
+                      " COP"}
+                </h2>
+
+                <ButtonBar>
+                  <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+                </ButtonBar>
+              </>
+            )
           ) : (
+            ""
+          )}
+          {peticion && (
             <>
               <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
               <h2>
@@ -300,8 +318,50 @@ const MoviiPDPCashOut = () => {
           )}
         </div>
       </Modal>
+
+      {/*peticion de autorizacion y confirmacion */}
+      {/* <Modal
+        show={showModal2}
+        handleClose={() => {
+          setShowModal2(false);
+        }}
+      >
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+          {peticion && (
+            <>
+              <Tickets></Tickets>
+              <h2>
+                <ButtonBar>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      // setPeticion(false);
+                      setShowModal2(false);
+                      // peticionRecarga();
+                    }}
+                  >
+                    Aceptar
+                  </Button>
+                </ButtonBar>
+              </h2>
+            </>
+          )}
+        </div>
+      </Modal> */}
+
+      {/* Manejo de errores con el servidor */}
+      {/* <Modal
+        show={showModal3}
+        handleClose={() => {
+          setShowModal3(false);
+        }}
+      >
+        <h1>
+          {"ERROR, hubo un problema con la peticion al servidor " + dataCard}
+        </h1>
+      </Modal> */}
     </>
   );
 };
 
-export default MoviiPDPCashOut;
+export default MoviiPDPCashIn;
