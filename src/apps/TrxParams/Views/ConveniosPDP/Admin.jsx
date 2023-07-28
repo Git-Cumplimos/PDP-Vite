@@ -28,6 +28,8 @@ const AdminConveniosPDP = () => {
     pk_id_convenio: "",
     nombre_convenio: "",
     tags: "",
+    pk_fk_id_autorizador: "",
+    id_convenio_autorizador: "",
     estado: "",
   });
   const [autorizadoresRecaudo, setAutorizadoresRecaudo] = useState([]);
@@ -132,6 +134,7 @@ const AdminConveniosPDP = () => {
               descripcion_convenio: "",
               tags: [""],
               relaciones: [],
+              ean: [],
             });
             setIsCreate(true);
           }}
@@ -172,7 +175,6 @@ const AdminConveniosPDP = () => {
           autoComplete="off"
           maxLength={"10"}
           onChange={(ev) => (ev.target.value = onChangeNumber(ev))}
-          required
         />
         <Input
           id={"nombre_convenio"}
@@ -181,7 +183,6 @@ const AdminConveniosPDP = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-          required
         />
         <Input
           id={"tags"}
@@ -190,7 +191,6 @@ const AdminConveniosPDP = () => {
           type="text"
           autoComplete="off"
           maxLength={"30"}
-          required
         />
         <Select
           id={"estado"}
@@ -201,7 +201,29 @@ const AdminConveniosPDP = () => {
             { value: "true", label: "Activo" },
             { value: "false", label: "Inactivo" },
           ]}
-          required
+        />
+        <Select
+          id={"pk_fk_id_autorizador"}
+          label={"Id autorizador"}
+          name={"pk_fk_id_autorizador"}
+          options={[
+            { value: "", label: "" },
+            ...autorizadoresRecaudo.map(
+              ({ pk_id_autorizador, nombre_autorizador }) => ({
+                value: pk_id_autorizador,
+                label: nombre_autorizador,
+              })
+            ),
+          ]}
+        />
+        <Input
+          id={"id_convenio_autorizador"}
+          label={"Código de convenio (autorizador)"}
+          name={"id_convenio_autorizador"}
+          type="tel"
+          autoComplete="off"
+          maxLength={"15"}
+          onChange={(ev) => (ev.target.value = onChangeNumber(ev))}
         />
       </TableEnterprise>
       <Modal
@@ -328,6 +350,56 @@ const AdminConveniosPDP = () => {
               </Button>
             </ButtonBar>
           </Fieldset>
+          <Fieldset legend={"Ean"}>
+            {selectedConvenio?.ean?.map((val, ind) => (
+              <div className="flex align-middle justify-center" key={ind}>
+                <Input
+                  id={`eanConvenio_${ind}`}
+                  name="ean"
+                  type="text"
+                  autoComplete="off"
+                  maxLength={13}
+                  minLength={13}
+                  value={val}
+                  onChange={(ev) =>
+                    setSelectedConvenio((old) => {
+                      const copy = { ...old };
+                      copy.ean[ind] = ev.target.value;
+                      return { ...copy };
+                    })
+                  }
+                  required
+                />
+                <ButtonBar className="w-52">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      // if (selectedConvenio?.ean.length < 2) {
+                      //   return;
+                      // }
+                      const copy = { ...selectedConvenio };
+                      copy?.ean.splice(ind, 1);
+                      setSelectedConvenio({ ...copy });
+                    }}
+                  >
+                    Eliminar ean
+                  </Button>
+                </ButtonBar>
+              </div>
+            ))}
+            <ButtonBar>
+              <Button
+                type="button"
+                onClick={() => {
+                  const copy = { ...selectedConvenio };
+                  copy?.ean.push("");
+                  setSelectedConvenio({ ...copy });
+                }}
+              >
+                Añadir ean
+              </Button>
+            </ButtonBar>
+          </Fieldset>
           <Fieldset legend={"Convenios Autorizador"}>
             {selectedConvenio?.relaciones.map(([key, val], relIndex) => {
               const allAuths = autorizadoresRecaudo.map(
@@ -415,16 +487,19 @@ const AdminConveniosPDP = () => {
               );
             })}
             <ButtonBar>
-              <Button
-                type="button"
-                onClick={() => {
-                  const copy = { ...selectedConvenio };
-                  copy?.relaciones.push(["", ""]);
-                  setSelectedConvenio({ ...copy });
-                }}
-              >
-                Añadir autorizador
-              </Button>
+              {selectedConvenio?.relaciones.length !==
+                autorizadoresRecaudo.length && (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const copy = { ...selectedConvenio };
+                    copy?.relaciones.push(["", ""]);
+                    setSelectedConvenio({ ...copy });
+                  }}
+                >
+                  Añadir autorizador
+                </Button>
+              )}
             </ButtonBar>
           </Fieldset>
           <ButtonBar>
