@@ -11,7 +11,6 @@ import Form from "../../../../components/Base/Form";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Input from "../../../../components/Base/Input";
-import Select from "../../../../components/Base/Select";
 import Modal from "../../../../components/Base/Modal";
 
 const initialSearchFilters = new Map([
@@ -212,7 +211,7 @@ const ComerciosBroker = () => {
                     className="bi bi-x-lg pointer-events-auto"
                     onClick={() =>{
                       setPermisos((old) => {
-                        const key = Object.keys(old)[0]
+                        const key = parseInt(index[0])
                         const copy = structuredClone(old);
                         delete copy[key]
                         return copy;
