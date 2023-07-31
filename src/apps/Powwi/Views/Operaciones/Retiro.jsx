@@ -20,7 +20,6 @@ import MoneyInput, {
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../components/Base/HideInput";
 import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
@@ -272,7 +271,6 @@ const Retiro = () => {
 
   return (
     <>
-      <SimpleLoading show={isUploading} />
       <Fragment>
         <h1 className='text-3xl mt-6'>Retiro Powwi</h1>
         <Form onSubmit={onSubmitRetiro} grid>
