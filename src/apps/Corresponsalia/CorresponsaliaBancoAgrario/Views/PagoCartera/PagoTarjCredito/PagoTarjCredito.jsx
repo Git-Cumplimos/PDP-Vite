@@ -90,6 +90,12 @@ const PagoTarjCredito = () => {
             if (isNaN(valor_pagar)) {
                 return notifyError("El valor no es un numero")
             }
+            else if (valor_pagar > enumParametrosPagoCartera.maxPagoCarteraTarjCredito) {
+                return notifyError(`Supera el valor máximo de ${enumParametrosPagoCartera.maxPagoCarteraTarjCredito} para pago tarjeta.`)
+
+            } else if (valor_pagar < enumParametrosPagoCartera.minPagoCarteraTarjCredito) {
+                return notifyError(`El valor mínimo para pago tarjeta es de ${enumParametrosPagoCartera.minPagoCarteraTarjCredito}.`)
+            }
             const data = {
                 oficina_propia:
                     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
