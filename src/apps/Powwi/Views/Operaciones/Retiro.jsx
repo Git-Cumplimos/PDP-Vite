@@ -220,16 +220,7 @@ const Retiro = () => {
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
       id_uuid_trx: uuid,
-      ticket_init: [
-        ["Número Powwi", datosTrx.numeroTelefono],
-        ["Valor Retiro", formatMoney.format(valor ?? "0")],
-        ["Costo transacción",formatMoney.format(datosConsulta?.costoTotal),],
-        ["Valor Total",formatMoney.format(valor + datosConsulta?.costoTotal),],
-      ].reduce((list, elem, i) => {
-        list.push(elem);
-        if ((i + 1) % 1 === 0) list.push(["", ""]);
-        return list;
-      }, []),
+      costo_trx: datosConsulta?.costoTotal,
       Datos: {
         tipoIdentificacionCliente: datosTrx.tipoDocumento,
         identificacionCliente: datosTrx.userDoc,
