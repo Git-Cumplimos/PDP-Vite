@@ -15,6 +15,7 @@ import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
 } from "./components/components_form_PagoCartera.jsx";
+import { makeMoneyFormatter } from "../../../../../../utils/functions";
 import classes from "../../Runt/PagarRunt.module.css"
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
@@ -190,11 +191,11 @@ const PagoCarteraEfectivo = () => {
                 return notifyError("El valor no es un numero")
             } else if (pagoTotal > enumParametrosPagoCartera.maxPagoCartera) {
                 setLoadingPayCartera(false)
-                return notifyError(`Supera el valor máximo de ${enumParametrosPagoCartera.maxPagoCartera} para pago cartera.`)
+                return notifyError(`Supera el valor máximo de ${makeMoneyFormatter(0).format(enumParametrosPagoCartera.maxPagoCartera)} para pago cartera.`)
                 
             } else if (pagoTotal < enumParametrosPagoCartera.minPagoCartera) { 
                 setLoadingPayCartera(false)
-                return notifyError(`El valor mínimo para pago cartera es de ${enumParametrosPagoCartera.minPagoCartera}.`)
+                return notifyError(`El valor mínimo para pago cartera es de ${makeMoneyFormatter(0).format(enumParametrosPagoCartera.minPagoCartera)}.`)
             }
             const data = {
                 oficina_propia:
