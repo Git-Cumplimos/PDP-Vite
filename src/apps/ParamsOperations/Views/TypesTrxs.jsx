@@ -183,29 +183,30 @@ const TypesTrxs = () => {
           })
           .catch((err) => console.error(err));
       } else {
-        if (selected?.id_autorizador !== "") {
-          fetchData(
-            `${url_types}/tipos-operaciones`,
-            "POST",
-            {},
-            {
-              id_autorizador: selected?.id_autorizador,
-              Nombre_operacion: selected?.Nombre,
-              Parametros: selected?.Parametros,
-            }
-          )
-            .then((res) => {
-              if (res?.status) {
-                notify(res?.msg);
-                handleClose();
-              } else {
-                notifyError(res?.msg);
-              }
-            })
-            .catch((err) => console.error(err));
-        } else {
+        if (selected?.id_autorizador === "") {
           notifyError("Se requiere seleccionar autorizador")
+          return
         }
+        fetchData(
+          `${url_types}/tipos-operaciones`,
+          "POST",
+          {},
+          {
+            id_autorizador: selected?.id_autorizador,
+            Nombre_operacion: selected?.Nombre,
+            Parametros: selected?.Parametros,
+          }
+        )
+          .then((res) => {
+            if (res?.status) {
+              notify(res?.msg);
+              handleClose();
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => console.error(err));
+
 
       }
     },

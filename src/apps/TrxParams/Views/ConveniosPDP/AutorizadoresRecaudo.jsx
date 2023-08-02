@@ -79,6 +79,10 @@ const AutorizadoresRecaudo = () => {
       if ("nombre_tipo_transaccion" in objCopy) {
         delete objCopy.nombre_tipo_transaccion;
       }
+      if (selectedAutorizadorRecaudo?.pk_id_autorizador === "") {
+        notifyError("Se requiere seleccionar un autorizador")
+        return
+      }
       notifyPending(
         isCreate
           ? crearAutorizadorRecaudo(objCopy)
@@ -257,6 +261,7 @@ const AutorizadoresRecaudo = () => {
               })
             }
             maxLength={30}
+            required
             disabled={
               !isCreate || selectedAutorizadorRecaudo?.fk_id_tipo_transaccion
             }
@@ -321,6 +326,7 @@ const AutorizadoresRecaudo = () => {
               })
             }
             maxLength={30}
+            required
             disabled={!selectedAutorizadorRecaudo?.pk_id_autorizador}
           />
           <ButtonBar>
