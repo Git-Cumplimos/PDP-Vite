@@ -5,6 +5,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Select from "../../../../components/Base/Select";
 import fetchData from "../../../../utils/fetchData";
+import { onChangeNumber } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
@@ -16,6 +17,7 @@ const PermissionForm = ({ onCloseModal }) => {
         type: "number",
         required: false,
         info: "Campo opcional",
+        maxLength:8
       },
       "Nombre del permiso": {},
     };
@@ -57,13 +59,15 @@ const PermissionForm = ({ onCloseModal }) => {
       <Form onSubmit={onSubmit} grid>
         {Object.entries(makeForm).map(([key, val]) => {
           if (!Object.keys(val).includes("options")) {
-            const { required, type, ...rest } = val;
+            const { maxLength=60,type="text",required, ...rest } = val;
             return (
               <Input
                 key={`${key}_new`}
                 id={`${key}_new`}
                 name={key}
                 label={key}
+                maxLength={maxLength}
+                onChange={(ev) => type === "number" ?(ev.target.value = onChangeNumber(ev)):ev.target.value}
                 required={required ?? true}
                 {...rest}
               />
