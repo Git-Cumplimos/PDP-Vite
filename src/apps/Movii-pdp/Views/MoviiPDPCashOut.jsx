@@ -5,15 +5,20 @@ import Modal from "../../../components/Base/Modal";
 import { useAuth } from "../../../hooks/AuthHooks";
 import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
-import { notify, notifyError } from "../../../utils/notify";
+import { notifyError, notifyPending } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
-import { postRealizarCashout } from "../utils/fetchMoviiRed";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
 import useMoney from "../../../hooks/useMoney";
+import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
+import { useFetchMovii } from "../hooks/fetchMovii";
+import { enumParametrosMovii } from "../utils/enumParametrosMovii";
+
+const URL_REALIZAR_RETIRO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/retiro-corresponsal-movii`;
+const URL_CONSULTAR_RETIRO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/check-estado-retiro-movii`;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -23,18 +28,19 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const MoviiPDPCashOut = () => {
   const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const uniqueId = v4();
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 20000000,
-    inferior: 100,
+    superior: enumParametrosMovii.MAXCASHOUTMOVII,
+    inferior: enumParametrosMovii.MINCASHOUTMOVII,
   });
   const [peticion, setPeticion] = useState(false);
-  const [botonAceptar, setBotonAceptar] = useState(false);
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
     numeroTelefono: "",
     valorCashOut: "",
   });
-  const [isUploading, setIsUploading] = useState(false);
   useEffect(() => {
     fetchParametrosAutorizadoresFunc();
   }, []);
@@ -60,142 +66,109 @@ const MoviiPDPCashOut = () => {
       })
       .catch((err) => console.error(err));
   }, []);
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de cash-out Movii",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
-      /*direccion*/
-      [
-        "Dirección",
-        roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
-      ],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "prod",
-    trxInfo: [],
-    disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-  });
-
-  // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   const onSubmit = (e) => {
     e.preventDefault();
     habilitarModal();
   };
-
-  /*Funcion para habilitar el modal*/
   const habilitarModal = () => {
     setShowModal(!showModal);
   };
 
-  const hideModal = () => {
+  const hideModal = useCallback(() => {
     setShowModal(false);
-    setDatosTrans({
-      otp: "",
-      numeroTelefono: "",
-      valorCashOut: "",
-    });
-    setObjTicketActual((old) => {
-      return { ...old, trxInfo: [] };
-    });
-    setPeticion(false);
-  };
+    navigate(-1);
+  }, []);
 
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-
-  const peticionCashOut = () => {
-    const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
-    /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Numero de telefono",
-      datosTrans.numeroTelefono,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(datosTrans.valorCashOut),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    setIsUploading(true);
-    postRealizarCashout({
-      id_comercio: roleInfo?.id_comercio,
-      id_usuario: roleInfo?.id_usuario,
-      id_terminal: roleInfo?.id_dispositivo,
-      amount: datosTrans?.valorCashOut,
-      issuer_id_dane: roleInfo?.codigo_dane,
-      nombre_comercio: roleInfo?.["nombre comercio"],
-      nombre_usuario: pdpUser?.uname ?? "",
-      Ticket: objTicket,
-      subscriberNum: datosTrans.numeroTelefono,
-      otp: datosTrans.otp,
-      oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO"
-          ? true
-          : false,
-    })
-      .then((res) => {
-        if (res?.status) {
-          setIsUploading(false);
-          notify(res?.msg);
-          // hideModal();
-          objTicket["trxInfo"].push([
-            "Id cash out",
-            res?.obj?.respuesta_movii?.cashOutId,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Id transacción",
-            res?.obj?.respuesta_movii?.transactionId,
-            // res?.obj?.respuesta_movii?.correlationId,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-
-          setObjTicketActual(objTicket);
-          setPeticion(true);
-        } else {
-          setIsUploading(false);
-          notifyError(res?.msg);
-          hideModal();
+  const [loadingPeticionCashoutMovii, peticionCashoutMovii] = useFetchMovii(
+    URL_REALIZAR_RETIRO_MOVII,
+    URL_CONSULTAR_RETIRO_MOVII,
+    "Realizar retiro Movii"
+  );
+  const peticionCashOut = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const data = {
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+        valor_total_trx: datosTrans.valorCashOut,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        id_uuid_trx: uniqueId,
+        address: roleInfo?.["direccion"],
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.["ciudad"],
+        otp: datosTrans.otp,
+        subscriberNum: datosTrans.numeroTelefono,
+      };
+      const dataAditional = {
+        id_uuid_trx: uniqueId,
+      };
+      notifyPending(
+        peticionCashoutMovii(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando transacción";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setObjTicketActual(res?.obj?.ticket);
+            setPeticion(true);
+            return "Transacción satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            navigate(-1);
+            return error?.message ?? "Transacción fallida";
+          },
         }
-      })
-      .catch((err) => {
-        setIsUploading(false);
-        notifyError("No se ha podido conectar al servidor");
-        console.error(err);
-      });
-  };
+      );
+    },
+    [datosTrans, pdpUser, roleInfo, uniqueId]
+  );
+  const onChangeFormatNumber = useCallback(
+    (ev) => {
+      const valor = ev.target.value;
+      let num = valor.replace(/[\s\.]/g, "");
+      if (!isNaN(num)) {
+        if (ev.target.name === "numeroTelefono") {
+          if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
+            return notifyError("El número de teléfono debe comenzar por 3");
+          }
+        }
+        setDatosTrans((old) => {
+          return { ...old, [ev.target.name]: num };
+        });
+      }
+    },
+    [datosTrans]
+  );
+  const onChangeFormat = useCallback((ev) => {
+    let value = ev.target.value;
+    setDatosTrans((old) => {
+      return { ...old, [ev.target.name]: value };
+    });
+  }, []);
   const onChangeMoney = useMoney({
     limits: [limiteRecarga.inferior, limiteRecarga.superior],
     equalError: false,
   });
   return (
     <>
-      <SimpleLoading show={isUploading} />
       <h1 className='text-3xl'>Retiro MOVII</h1>
       <Form grid onSubmit={onSubmit}>
         <Input
@@ -208,17 +181,8 @@ const MoviiPDPCashOut = () => {
           required
           autoComplete='off'
           value={datosTrans.numeroTelefono}
-          onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
-                return notifyError("El número Movii debe comenzar por 3");
-              }
-              setDatosTrans((old) => {
-                return { ...old, numeroTelefono: num };
-              });
-            }
-          }}></Input>
+          onInput={onChangeFormatNumber}
+        />
         <Input
           id='otp'
           label='Número OTP'
@@ -229,21 +193,15 @@ const MoviiPDPCashOut = () => {
           required
           autoComplete='off'
           value={datosTrans.otp}
-          onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setDatosTrans((old) => {
-                return { ...old, otp: num };
-              });
-            }
-          }}></Input>
+          onInput={onChangeFormatNumber}
+        />
         <MoneyInput
           id='valCashOut'
           name='valCashOut'
           label='Valor'
           type='text'
           autoComplete='off'
-          maxLength={"15"}
+          maxLength={"11"}
           min={limiteRecarga.inferior}
           max={limiteRecarga.superior}
           value={datosTrans.valorCashOut ?? ""}
@@ -254,7 +212,9 @@ const MoviiPDPCashOut = () => {
           }}
           required></MoneyInput>
         <ButtonBar className='lg:col-span-2'>
-          <Button type='submit'>Aceptar</Button>
+          <Button type='submit' disabled={loadingPeticionCashoutMovii}>
+            Aceptar
+          </Button>
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={hideModal}>
@@ -273,12 +233,16 @@ const MoviiPDPCashOut = () => {
               <h2>{`Número de otp: ${datosTrans.otp}`}</h2>
               <ButtonBar>
                 <Button
-                  disabled={botonAceptar}
+                  disabled={loadingPeticionCashoutMovii}
+                  onClick={hideModal}>
+                  Cancelar
+                </Button>
+                <Button
+                  disabled={loadingPeticionCashoutMovii}
                   type='submit'
                   onClick={peticionCashOut}>
                   Aceptar
                 </Button>
-                <Button onClick={hideModal}>Cancelar</Button>
               </ButtonBar>
             </>
           ) : (
@@ -286,11 +250,7 @@ const MoviiPDPCashOut = () => {
               <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
               <h2>
                 <ButtonBar>
-                  <Button
-                    type='submit'
-                    onClick={() => {
-                      hideModal();
-                    }}>
+                  <Button type='submit' onClick={hideModal}>
                     Aceptar
                   </Button>
                   <Button onClick={handlePrint}>Imprimir</Button>
