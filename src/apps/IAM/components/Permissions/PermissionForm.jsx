@@ -14,7 +14,7 @@ const PermissionForm = ({ onCloseModal }) => {
   const makeForm = useMemo(() => {
     return {
       "Id del permiso": {
-        type: "number",
+        type: "tel",
         required: false,
         info: "Campo opcional",
         maxLength:8
@@ -67,7 +67,7 @@ const PermissionForm = ({ onCloseModal }) => {
                 name={key}
                 label={key}
                 maxLength={maxLength}
-                onChange={(ev) => type === "number" ?(ev.target.value = onChangeNumber(ev)):ev.target.value}
+                onChange={(ev) => type === "tel" ?(ev.target.value = onChangeNumber(ev)):ev.target.value}
                 required={required ?? true}
                 {...rest}
               />
