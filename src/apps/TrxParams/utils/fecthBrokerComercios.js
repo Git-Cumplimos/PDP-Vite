@@ -73,6 +73,10 @@ export const getListPermissions = () => {
     return `${urlComercios}/comercios/permisos-broker`
 };
 
+export const getListTypeOperations = () => {
+    return `${urlComercios}/comercios/permisos-tipo-operaciones`
+};
+
 export const updateCommerce = buildPutFunction(
     `${urlComercios}/comercios/comercios-permisos-broker`
 );

@@ -3,6 +3,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import DataTable from "../../../../components/Base/DataTable";
 import useFetchDispatchDebounce, { ErrorPDPFetch } from "../../../../hooks/useFetchDispatchDebounce";
 import { notifyError, notifyPending } from "../../../../utils/notify";
+import SearchTables from "./SearchTables";
 import { onChangeNumber } from "../../../../utils/functions";
 import useMap from "../../../../hooks/useMap";
 import Modal from "../../../../components/Base/Modal";
@@ -15,7 +16,7 @@ import { createGroup, updateGroup, getListPermissions } from "../../utils/fecthB
 
 const initialSearchFilters = new Map([
   ["pk_permiso_broker", ""],
-  ["tipo_trx", ""],
+  ["nombre_grupo", ""],
   ["page", 1],
   ["limit", 10],
 ]);
@@ -28,10 +29,9 @@ const GestionPermisosBroker = () => {
   const [listPermissions, setListPermissions] = useState([]);
   const [showModal, setShowModal] = useState(false)
   const [selected, setSelected] = useState(false);
-
-  const [paths, setPaths] = useState([{
-    "Path": "",
-  }])
+  const [searchType, setSearchType] = useState(null);
+  const [searchSelectFunction, setSearchSelectFunction] = useState(null);
+  const [permisos, setPermisos] = useState({})
 
 
 
@@ -66,39 +66,43 @@ const GestionPermisosBroker = () => {
     searchPermisions();
   }, [searchPermisions]);
 
-  useEffect(() => {
-    let referencia = []
-    if (selected['path_permisos']) {
-      for (let i in selected['path_permisos']) {
-        referencia.push({
-          "Path": selected['path_permisos'][i],
-        })
-      }
+
+  const handleClose = useCallback((err = null) => {
+    if (err) setSearchType(null);
+    else {
+      setSearchType(null);
+      setShowModal(false);
+      setSelected(null);
     }
-    setPaths(referencia)
-  }, [selected]);
-
-
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    setSelected(false);
-    setPaths([{
-      "Path": "",
-    }])
   }, []);
+
+  const onSelectGroup = useCallback(
+    (selectedGroup) => {
+      try {
+        let type = selectedGroup?.nombre_operacion;
+        let pk_permission = selectedGroup?.id_tipo_op.toString();
+        setPermisos((old) => {
+          const copy = structuredClone(old);
+          copy[pk_permission] = type;
+          return copy;
+        })
+        handleClose(true);
+      }catch (e){
+        console.log(e)
+        notifyError("Error interno");
+      }
+    },
+
+    [handleClose]
+  );
 
   const crearModificarGrupo = useCallback((e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
-    let urls = []
-    if (body['Path']){
-      for (let item in paths){
-        urls.push(paths[item]?.Path)
-      }
-      body["path_permisos"]=urls
-      delete body['Path']
-    }
+    let body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    
+    body["tipos_op"] = Object.keys(permisos) ?? []
+    
     notifyPending(
       selected
         ? updateGroup({ pk_permiso_broker: selected?.pk_permiso_broker ?? '' }, body)
@@ -127,7 +131,7 @@ const GestionPermisosBroker = () => {
       }
     )
 
-  }, [handleClose, searchPermisions, selected, paths])
+  }, [handleClose, searchPermisions, selected, permisos])
 
 
   return (
@@ -140,21 +144,22 @@ const GestionPermisosBroker = () => {
       </ButtonBar>
       <DataTable
         title="Grupos Permisos Broker"
-        headers={["Id del grupo", "Tipo de transacción", "Nombre del grupo"]}
+        headers={["Id del grupo", "Nombre del grupo", "Tipo"]}
         data={listPermissions.map(
           ({
             pk_permiso_broker,
-            tipo_trx,
-            nombre_grupo_broker,
+            nombre_grupo,
+            tipo_grupo,
           }) => ({
             pk_permiso_broker,
-            tipo_trx,
-            nombre_grupo_broker,
+            nombre_grupo,
+            tipo_grupo,
           })
         )}
         onClickRow={(_, index) => {
           setShowModal(true);
           setSelected(listPermissions[index])
+          setPermisos(Object.keys(listPermissions[index]?.list_operations)[0] === "0" ? {} : listPermissions[index]?.list_operations)
         }}
         tblFooter={
           <Fragment>
@@ -197,12 +202,13 @@ const GestionPermisosBroker = () => {
             label={"Id de grupo"}
             type="tel"
             maxLength={10}
+            onChange={(ev) => { ev.target.value = onChangeNumber(ev); }}
             autoComplete="off"
           />
           <Input
-            id="tipo_trx"
-            name="tipo_trx"
-            label={"Tipo de transacción"}
+            id="nombre_grupo"
+            name="nombre_grupo"
+            label={"Nombre del grupo"}
             type="text"
             maxLength={60}
             autoComplete="off"
@@ -219,33 +225,33 @@ const GestionPermisosBroker = () => {
               name={"pk_permiso_broker"}
               autoComplete="off"
               defaultValue={selected?.pk_permiso_broker ?? ""}
-              onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
+              onChange={(ev) => { ev.target.value = onChangeNumber(ev); }}
               disabled={selected ? true : false}
               required
             />
           )}
           <Input
-            id={"nombre_grupo_broker"}
-            label={"Nombre grupo"}
-            name={"nombre_grupo_broker"}
+            id={"nombre_grupo"}
+            name={"nombre_grupo"}
+            label={"Nombre del grupo"}
             type="text"
             maxLength={"60"}
-            defaultValue={selected?.nombre_grupo_broker ?? ""}
+            defaultValue={selected?.nombre_grupo ?? ""}
             autoComplete="off"
             required
           />
           <Input
-            id={"tipo_trx"}
-            label={"Tipo de Transaccion"}
-            name={"tipo_trx"}
+            id={"tipo_grupo"}
+            name={"tipo_grupo"}
+            label={"Tipo del grupo"}
             type="text"
             maxLength={"60"}
-            defaultValue={selected?.tipo_trx ?? ""}
+            defaultValue={selected?.tipo_grupo ?? ""}
             autoComplete="off"
             required
           />
 
-          <Fieldset legend={"Paths"}>
+          {/* <Fieldset legend={"Paths"}>
             {paths?.map((obj, index) => {
               return (
                 <div key={index}>
@@ -258,7 +264,7 @@ const GestionPermisosBroker = () => {
                         name={keyRef}
                         label={`${keyRef} ${index + 1}`}
                         type={"text"}
-                        maxLength={"40"}
+                        maxLength={"60"}
                         autoComplete="off"
                         value={valRef}
                         onInput={(ev) => {
@@ -285,13 +291,13 @@ const GestionPermisosBroker = () => {
                 </div>
               )
             })}
-            {paths.length < 10 &&
+            {paths.length < 50 &&
               <ButtonBar>
                 <Button
                   type='button'
                   onClick={() => {
                     let copyRef = [...paths]
-                    if (copyRef.length < 10) {
+                    if (copyRef.length < 50) {
                       copyRef.push({
                         "Path": "",
                       })
@@ -301,6 +307,51 @@ const GestionPermisosBroker = () => {
                 >Añadir path</Button>
               </ButtonBar>
             }
+          </Fieldset> */}
+          <Fieldset legend={"Tipos Operaciones"}>
+
+
+            <ButtonBar className={"lg:col-span-2"}>
+              {Object.keys(permisos).length > 0 ? (
+                Object.entries(permisos).map((index, ind) => (
+                  <button
+                    type="button"
+                    className="rounded-md bg-primary-light px-4 py-2 my-2 text-base text-white"
+                    title={index[1]}
+                    key={index[1]}
+                  >
+                    {index[1]} &nbsp;&nbsp;
+                    <span
+                      className="bi bi-x-lg pointer-events-auto"
+                      onClick={() => {
+                        setPermisos((old) => {
+                          const key = parseInt(index[0])
+                          const copy = structuredClone(old);
+                          delete copy[key]
+                          return copy;
+                        })
+                      }
+                      }
+                    />
+                  </button>
+                ))
+              ) : (
+                <h1 className="text-xl text-center my-auto">
+                  No hay tipos de operaciones relacionados
+                </h1>
+              )}
+            </ButtonBar>
+            <ButtonBar className={"lg:col-span-2"}>
+              <Button
+                type="button"
+                onClick={() => {
+                  setSearchType("operations");
+                  setSearchSelectFunction(() => onSelectGroup);
+                }}
+              >
+                Agregar tipos de operaciones
+              </Button>
+            </ButtonBar>
           </Fieldset>
           <ButtonBar>
             <Button type={"submit"} >
@@ -308,6 +359,14 @@ const GestionPermisosBroker = () => {
             </Button>
           </ButtonBar>
         </Form>
+      </Modal>
+      <Modal show={searchType} handleClose={() => { handleClose(true) }}>
+        {searchType && (
+          <SearchTables
+            onSelectItem={searchSelectFunction}
+            type_search = {searchType} 
+          />
+        )}
       </Modal>
     </Fragment>
   );
