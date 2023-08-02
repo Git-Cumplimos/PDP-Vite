@@ -5,24 +5,40 @@ import { notifyError } from "../../../../utils/notify";
 import { onChangeNumber } from "../../../../utils/functions";
 import useMap from "../../../../hooks/useMap";
 import Input from "../../../../components/Base/Input";
-import { getListPermissions } from "../../utils/fecthBrokerComercios";
+import { getListPermissions, getListTypeOperations } from "../../utils/fecthBrokerComercios";
 
 const initialSearchFilters = new Map([
   ["pk_permiso_broker", ""],
-  ["tipo_trx", ""],
+  ["nombre_grupo", ""],
+  ["id_tipo_op", ""],
+  ["nombre_operacion", ""],
   ["page", 1],
   ["limit", 10],
 ]);
 
 
-const SearchTables = ({ onSelectItem = () => { } }) => {
+const SearchTables = ({ onSelectItem = () => { }, type_search = 'groups' }) => {
   const [isNextPage, setIsNextPage] = useState(false);
+  const [typeSearch, setTypeSearch] = useState(false);
+  const [title, setTitle] = useState(null);
+  const [headers, setHeaders] = useState([]);
 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
   const [listPermissions, setListPermissions] = useState([]);
 
+  useEffect(() => {
+    setTypeSearch(type_search);
+    if (type_search !== "groups") {
+      setHeaders(["Id", "Nombre operación"])
+      setTitle("Buscar Tipos Operaciones")
+    }
+    else {
+      setHeaders(["Id del grupo", "Nombre del grupo", "Tipo"])
+      setTitle("Buscar grupos")
+    }
+  }, [type_search]);
 
   const [fetchCommerce] = useFetchDispatchDebounce({
     onSuccess: useCallback((data) => {
@@ -41,7 +57,7 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
 
 
   const searchPermisions = useCallback(() => {
-    const url = getListPermissions();
+    const url = typeSearch === 'groups' ? getListPermissions() : getListTypeOperations();
     const tempMap = new Map(searchFilters);
     tempMap.forEach((val, key, map) => {
       if (!val) {
@@ -51,7 +67,7 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
     const queries = new URLSearchParams(tempMap.entries()).toString();
     fetchCommerce(`${url}?${queries}`);
 
-  }, [searchFilters, fetchCommerce]);
+  }, [searchFilters, fetchCommerce, typeSearch]);
 
   useEffect(() => {
     searchPermisions();
@@ -61,18 +77,20 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
   return (
     <Fragment>
       <DataTable
-        title="Buscar grupos"
-        headers={["Id del grupo", "Tipo de transacción","Nombre del grupo"]}
+        title={title}
+        headers={headers}
         data={listPermissions.map(
-          ({
-            pk_permiso_broker,
-            tipo_trx,
-            nombre_grupo_broker,
-          }) => ({
-            pk_permiso_broker,
-            tipo_trx,
-            nombre_grupo_broker,
-          })
+          typeSearch === 'groups' ?
+            ({
+              pk_permiso_broker, nombre_grupo, tipo_grupo,
+            }) => ({
+              pk_permiso_broker, nombre_grupo, tipo_grupo,
+            }) :
+            ({
+              id_tipo_op, nombre_operacion
+            }) => ({
+              id_tipo_op, nombre_operacion
+            })
         )}
         onClickRow={(_, index) => {
           onSelectItem(listPermissions[index])
@@ -112,23 +130,48 @@ const SearchTables = ({ onSelectItem = () => { } }) => {
         }}
       >
         <Fragment>
-          <Input
-            id="pk_permiso_broker"
-            name="pk_permiso_broker"
-            label={"Id de grupo"}
-            type="tel"
-            onInput={(ev) => { ev.target.value = onChangeNumber(ev); }}
-            maxLength={10}
-            autoComplete="off"
-          />
-          <Input
-            id="tipo_trx"
-            name="tipo_trx"
-            label={"Tipo de transacción"}
-            type="text"
-            maxLength={60}
-            autoComplete="off"
-          />
+          {type_search === "groups" ?
+            (
+              <>
+                <Input
+                  id="pk_permiso_broker"
+                  name="pk_permiso_broker"
+                  label={"Id de grupo"}
+                  type="tel"
+                  onChange={(ev) => { ev.target.value = onChangeNumber(ev); }}
+                  maxLength={10}
+                  autoComplete="off"
+                />
+                <Input
+                  id="nombre_grupo"
+                  name="nombre_grupo"
+                  label={"Nombre del grupo"}
+                  type="text"
+                  maxLength={60}
+                  autoComplete="off"
+                />
+              </>
+            ) : (
+              <>
+                <Input
+                  id="id_tipo_op"
+                  name="id_tipo_op"
+                  label={"Id"}
+                  type="tel"
+                  onChange={(ev) => { ev.target.value = onChangeNumber(ev); }}
+                  maxLength={10}
+                  autoComplete="off"
+                />
+                <Input
+                  id="nombre_operacion"
+                  name="nombre_operacion"
+                  label={"Nombre de operación"}
+                  type="text"
+                  maxLength={60}
+                  autoComplete="off"
+                />
+              </>
+            )}
         </Fragment>
       </DataTable>
     </Fragment>
