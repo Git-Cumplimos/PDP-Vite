@@ -299,6 +299,7 @@ const Autorizadores = () => {
           label={"Buscar autorizador"}
           type='text'
           autoComplete='off'
+          maxLength={30}
           defaultValue={searchAuto}
         />
       </TableEnterprise>
@@ -319,6 +320,7 @@ const Autorizadores = () => {
             label={"Nombre de autorizador"}
             type='text'
             autoComplete='off'
+            maxLength={50}
             // value={selectedAuto?.["Nombre de autorizador"]}
             defaultValue={selectedAuto?.["Autorizador"]}
             required
@@ -348,10 +350,11 @@ const Autorizadores = () => {
           <TextArea
             id='textAuto'
             name='Descripcion'
-            label={"Descripcion"}
+            label={"Descripción"}
             autoCapitalize='sentences'
             autoComplete='off'
             // value={selectedAuto?.Descripcion ?? ""}
+            maxLength={100}
             defaultValue={selectedAuto?.Descripcion ?? ""}
             onChange={() => {}}
           />
