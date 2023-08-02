@@ -143,16 +143,6 @@ const Recaudo = () => {
       ReferenciaPago: referencia,
       cliente: selected?.Cliente,
       cedula: selected?.Cedula,
-      ticket: [
-        ["CRÉDITO", selected?.Credito],
-        ["VALOR", formatMoney.format(formatMon)],
-        ["Cliente", selected?.Cliente],
-        ["Cédula", selected?.Cedula],
-      ].reduce((list, elem, i) => {
-        list.push(elem);
-        if ((i + 1) % 1 === 0) list.push(["", ""]);
-        return list;
-      }, []),
       id_trx: info?.obj?.id_trx,
       uuid_key: uuid,
       Direccion: roleInfo?.direccion ? roleInfo?.direccion : "No hay datos",

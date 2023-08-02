@@ -311,11 +311,10 @@ const Reversos = () => {
       tipo_comercio = "OFICINAS PROPIAS"
     }
     const values = {
-      tipo: tipo_comercio,
-      dispositivo: selected?.id_terminal,
-      usuario: selected?.id_usuario,
-      comercio: selected?.id_comercio,
+      cliente: selected?.res_obj?.info?.cliente,
+      cedula: selected?.res_obj?.obj?.info?.cedula,
       idtrx: selected?.id_trx,
+      id_trx_consulta: selected?.res_obj?.obj?.id_trx,
       val: value,
       motivo: motivo,
       ...data,
@@ -485,7 +484,7 @@ const Reversos = () => {
                 minute: "numeric",
               }).format(tempDate);
               monto = formatMoney.format(monto);
-              const referencia = res_obj?.Referencia;
+              const referencia = res_obj?.obj?.Referencia;
               const credito = res_obj?.info?.credito;
               const cedula = res_obj?.info?.cedula;
               return {

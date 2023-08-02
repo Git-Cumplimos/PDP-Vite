@@ -97,13 +97,12 @@ export const useProvideFDLM = () => {
         nombre_usuario: pdpUser?.uname ?? "",
         id_trx: values?.id_trx,
         valor_total_trx: parseFloat(values?.val),
-        ticket_init: values?.ticket,
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
         Datos: {
-          Depto: parseInt(values?.Depto),
-          Municipio: parseInt(values?.Municipio),
-          nroBusqueda: values?.reference,
-          Direccion: values?.Direccion,
+          nroBusqueda: values?.credit,
+          Motivo: values?.motivo,
+          Cliente: values?.cliente,
+          Cedula: values?.cedula,
         },
       };
       try {
@@ -137,6 +136,8 @@ export const useProvideFDLM = () => {
           nroBusqueda: values?.Credito,
           referenciaPago: values?.ReferenciaPago,
           Direccion: values?.Direccion,
+          Cliente: values?.cliente,
+          Cedula: values?.cedula,
         },
       };
       try {
