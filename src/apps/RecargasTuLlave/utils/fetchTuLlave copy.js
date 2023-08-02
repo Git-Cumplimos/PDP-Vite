@@ -1,55 +1,16 @@
 import fetchData from "../../../utils/fetchData";
-import { notify } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 
-const url = process.env.REACT_APP_URL_MOVII;
-export const postRealizarCashout = async (bodyObj) => {
-  if (!bodyObj) {
-    return "Sin datos body";
-  }
+const urlParametrizacion =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const URL_CORRESPONSALIA_OTROS = process.env.REACT_APP_URL_CORRESPONSALIA_OTROS;
+export const fetchDatafonosTuLlave = async (obj) => {
   try {
     const res = await fetchData(
-      `${url}movii-pdp/cash-out`,
-      "POST",
-      {},
-      bodyObj
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
-export const postRealizarReversoCashout = async (bodyObj) => {
-  if (!bodyObj) {
-    return "Sin datos body";
-  }
-  try {
-    const res = await fetchData(
-      `${url}movii-pdp/cash-out/reverso`,
-      "POST",
-      {},
-      bodyObj
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
-export const fetchConsultarReversosCashout = async (bodyObj) => {
-  if (!bodyObj) {
-    return "Sin datos body";
-  }
-  try {
-    const res = await fetchData(
-      `${url}movii-pdp/cash-out/reverso/consultar`,
-      "POST",
-      {},
-      bodyObj
+      `${urlParametrizacion}/tullave-gestion-datafonos/consultar`,
+      "GET",
+      obj,
+      {}
     );
     if (res?.status) {
       return { ...res?.obj };
@@ -61,7 +22,24 @@ export const fetchConsultarReversosCashout = async (bodyObj) => {
     throw err;
   }
 };
-
+export const fetchComerciosDatafonos = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlParametrizacion}/tullave-gestion-datafonos/consultar-comercios`,
+      "GET",
+      obj,
+      {}
+    );
+    if (res?.status) {
+      return { ...res?.obj };
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
 export const fetchCustom = (
   url_,
   metodo_,
