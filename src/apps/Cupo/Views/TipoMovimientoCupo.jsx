@@ -145,6 +145,9 @@ const TipoMovimientoCupo = () => {
         }}
         maxPage={dataTipoMovimientoCupo?.maxPages}
       >
+        {
+          console.log(dataTipoMovimientoCupo)
+        }
         <Form onChange={onChange} grid>
           <Input
             id="Id tipo de movimiento"

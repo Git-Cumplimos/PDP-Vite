@@ -1,6 +1,6 @@
 import { lazy } from "react";
 import { enumPermisosFdlm } from "./enumFdlm";
-import ProvideFundamujer from "./components/Providefundamujer";
+
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
@@ -19,7 +19,6 @@ const rutasFundacionMujer = {
   label: <AppIcons Logo={"FUNDACION_MUJER"} name='Fundación de la mujer' />,
   component: FunMujer,
   permission: listPermissions,
-  provider: ProvideFundamujer,
   subRoutes: [
     {
       link: "/funmujer/recaudo",
