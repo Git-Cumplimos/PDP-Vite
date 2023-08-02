@@ -5,6 +5,7 @@ import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 import Select from "../../../../components/Base/Select";
 import fetchData from "../../../../utils/fetchData";
+import { onChangeNumber } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 
 const url_iam = process.env.REACT_APP_URL_IAM_PDP;
@@ -12,7 +13,9 @@ const url_iam = process.env.REACT_APP_URL_IAM_PDP;
 const GroupForm = ({ onCloseModal }) => {
   const makeForm = useMemo(() => {
     return {
-      "Nombre del grupo": {},
+      "Nombre del grupo": {
+        maxLength: 60
+      },
     };
   }, []);
 
@@ -51,14 +54,16 @@ const GroupForm = ({ onCloseModal }) => {
       <Form onSubmit={onSubmit} grid>
         {Object.entries(makeForm).map(([key, val]) => {
           if (!Object.keys(val).includes("options")) {
-            const { required, type } = val;
+            const { maxLength=60,type = "text",required, } = val;
             return (
               <Input
                 key={`${key}_new`}
                 id={`${key}_new`}
                 name={key}
                 label={key}
-                type={type || "text"}
+                maxLength={maxLength}
+                type={type}
+                onChange={(ev) => type === "number" ?(ev.target.value = onChangeNumber(ev)):ev.target.value}
                 autoComplete="off"
                 required={required ?? true}
               />

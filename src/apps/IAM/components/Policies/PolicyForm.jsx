@@ -69,7 +69,7 @@ const PolicyForm = ({ onCloseModal }) => {
     const _selectedR = Object.entries(selectedRoles).filter(([, val]) => val);
 
     if (_selectedG.length === 0 || _selectedR.length === 0) {
-      notifyError("No hay politicas para agregar");
+      notifyError("No hay políticas para agregar");
       return;
     }
 
@@ -109,7 +109,7 @@ const PolicyForm = ({ onCloseModal }) => {
 
   return (
     <div className="flex flex-col justify-center items-center mx-auto">
-      <h1 className="text-2xl my-4">Creacion de politica</h1>
+      <h1 className="text-2xl my-4">Creación de política</h1>
       <PaginationAuth
         filters={{
           gname: { label: "Nombre del grupo" },
@@ -180,7 +180,7 @@ const PolicyForm = ({ onCloseModal }) => {
           ""
         )}
         <ButtonBar>
-          <Button type={"submit"}>Crear politica(s)</Button>
+          <Button type={"submit"}>Crear política(s)</Button>
         </ButtonBar>
       </Form>
     </div>
