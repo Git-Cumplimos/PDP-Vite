@@ -256,6 +256,7 @@ const AutorizadoresRecaudo = () => {
                 return copy;
               })
             }
+            maxLength={30}
             disabled={
               !isCreate || selectedAutorizadorRecaudo?.fk_id_tipo_transaccion
             }
@@ -319,6 +320,7 @@ const AutorizadoresRecaudo = () => {
                 return copy;
               })
             }
+            maxLength={30}
             disabled={!selectedAutorizadorRecaudo?.pk_id_autorizador}
           />
           <ButtonBar>
