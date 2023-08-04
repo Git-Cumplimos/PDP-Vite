@@ -10,6 +10,7 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import useQuery from "../../../hooks/useQuery";
 import fetchData from "../../../utils/fetchData";
+import { onChangeNumber } from "../../../utils/functions";
 import { notify, notifyError } from "../../../utils/notify";
 import { fetchAutorizadores } from "../../TrxParams/utils/fetchRevalAutorizadores";
 
@@ -54,7 +55,7 @@ const TypesTrxs = () => {
   const tableTrxTypes = useMemo(() => {
     return trxTypes.map(({ id_tipo_operacion, Autorizador, Nombre }) => ({
       Id: id_tipo_operacion,
-      "Tipo de transaccion": Nombre,
+      "Tipo de transacción": Nombre,
       Autorizador,
     }));
   }, [trxTypes]);
@@ -182,6 +183,10 @@ const TypesTrxs = () => {
           })
           .catch((err) => console.error(err));
       } else {
+        if (selected?.id_autorizador === "") {
+          notifyError("Se requiere seleccionar autorizador")
+          return
+        }
         fetchData(
           `${url_types}/tipos-operaciones`,
           "POST",
@@ -201,6 +206,8 @@ const TypesTrxs = () => {
             }
           })
           .catch((err) => console.error(err));
+
+
       }
     },
     [selected, handleClose]
@@ -225,14 +232,14 @@ const TypesTrxs = () => {
             });
           }}
         >
-          Crear tipo de transaccion
+          Crear tipo de transacción
         </Button>
       </ButtonBar>
       <TableEnterprise
         title="Tipos de transacciones"
         maxPage={maxPages}
         onChange={onChange}
-        headers={["Id", "Tipo de transaccion", "Autorizador"]}
+        headers={["Id", "Tipo de transacción", "Autorizador"]}
         data={tableTrxTypes}
         onSelectRow={onSelectType}
         onSetPageData={setPageData}
@@ -240,8 +247,9 @@ const TypesTrxs = () => {
         <Input
           id="searchTrxType"
           name="searchTrxType"
-          label={"Buscar tipo de transaccion"}
+          label={"Buscar tipo de transacción"}
           type="search"
+          maxLength={30}
           autoComplete="off"
           defaultValue={searchTrxType}
         />
@@ -249,11 +257,11 @@ const TypesTrxs = () => {
       <Modal show={showModal} handleClose={handleClose}>
         {selected ? (
           <PaymentSummary
-            title="Editar parametros de tipo de transacción"
-            // subtitle="Datos tipo de transaccion"
+            title="Editar parámetros de tipo de transacción"
+            // subtitle="Datos tipo de transacción"
             subtitle=""
             summaryTrx={{
-              "Id tipo de transaccion": selected?.id_tipo_operacion,
+              "Id tipo de transacción": selected?.id_tipo_operacion,
             }}
           >
             <Form onChange={onChangeSelected} onSubmit={onSubmit} grid>
@@ -264,8 +272,10 @@ const TypesTrxs = () => {
                 type="text"
                 autoComplete="off"
                 value={selected?.Nombre || ""}
-                onChange={() => {}}
-                // readOnly={selected?.id_tipo_operacion}
+                onChange={() => { }}
+                maxLength={30}
+                required
+              // readOnly={selected?.id_tipo_operacion}
               />
               <InputSuggestions
                 id="Autorizador"
@@ -280,9 +290,11 @@ const TypesTrxs = () => {
                 }}
                 onSelectSuggestion={onSelectSuggestion}
                 value={selected?.Autorizador || ""}
-                onChange={() => {}}
+                onChange={() => { }}
+                maxLength={30}
+                required
                 disabled={selected?.id_tipo_operacion ? true : false}
-                // readOnly={selected?.id_tipo_operacion}
+              // readOnly={selected?.id_tipo_operacion}
               />
               <Fieldset legend={"Parametros"}>
                 {Object.entries(selected?.Parametros || {}).map(
@@ -299,8 +311,9 @@ const TypesTrxs = () => {
                           type="text"
                           autoComplete="off"
                           value={key}
-                          onInput={() => {}}
-                          onChange={() => {}}
+                          onInput={() => { }}
+                          onChange={() => { }}
+                          maxLength={20}
                         />
                         <Input
                           id={`${index}_value`}
@@ -308,9 +321,10 @@ const TypesTrxs = () => {
                           label={"Valor"}
                           type="text"
                           autoComplete="off"
+                          maxLength={8}
+                          onChange={() => { }}
+                          onInput={(ev) => (ev.target.value = onChangeNumber(ev))}
                           value={val}
-                          onInput={() => {}}
-                          onChange={() => {}}
                         />
                         <ButtonBar className={"lg:col-span-2"}>
                           <Button
@@ -354,14 +368,14 @@ const TypesTrxs = () => {
               </Fieldset>
               {!selected?.id_tipo_operacion ? (
                 <ButtonBar>
-                  <Button type="submit">Crear tipo de transaccion</Button>
+                  <Button type="submit">Crear tipo de transacción</Button>
                   <Button type="button" onClick={handleClose}>
                     Cancelar
                   </Button>
                 </ButtonBar>
               ) : (
                 <ButtonBar>
-                  <Button type="submit">Editar tipo de transaccion</Button>
+                  <Button type="submit">Editar tipo de transacción</Button>
                   <Button type="button" onClick={handleClose}>
                     Cancelar
                   </Button>

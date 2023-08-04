@@ -361,6 +361,7 @@ const GruposComercios = () => {
                 return { ...old, nombre_grupo_comercios: e.target.value };
               })
             }
+            maxLength={50}
             required
           />
           <Select

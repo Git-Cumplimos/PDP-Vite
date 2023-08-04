@@ -7,6 +7,7 @@ import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import useQuery from "../../../hooks/useQuery";
 import MultipleSelect from "../../../components/Base/MultipleSelect";
+import { onChangeNumber } from "../../../utils/functions";
 import { notify, notifyError } from "../../../utils/notify";
 import {
   fetchTiposContratosComisiones,
@@ -226,7 +227,7 @@ const TipoContratoComisiones = () => {
         </Button> */}
       </ButtonBar>
       <TableEnterprise
-        title='Convenios'
+        title='Contrato comisiones'
         maxPage={maxPages}
         onChange={onChange}
         headers={[
@@ -246,6 +247,7 @@ const TipoContratoComisiones = () => {
           type='text'
           autoComplete='off'
           defaultValue={nombre_contrato}
+          maxLength={50}
         />
       </TableEnterprise>
 
@@ -258,6 +260,7 @@ const TipoContratoComisiones = () => {
             type='text'
             autoComplete='off'
             defaultValue={selectedTipoContrato?.["Nombre contrato"]}
+            maxLength={10}
             required
           />
           <MultipleSelect
@@ -270,10 +273,12 @@ const TipoContratoComisiones = () => {
               id='IVA'
               name='IVA'
               label={"IVA"}
-              type='number'
-              autoComplete='off'
+              type='tel'
               step='any'
+              autoComplete='off'
               defaultValue={selectedTipoContrato?.["IVA"]}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
+              maxLength={10}
               required
             />
           )}
@@ -282,10 +287,12 @@ const TipoContratoComisiones = () => {
               id='Rete Fuente'
               name='Rete Fuente'
               label={"Rete Fuente"}
-              type='number'
+              type='tel'
               step='any'
               autoComplete='off'
               defaultValue={selectedTipoContrato?.["Rete Fuente"]}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
+              maxLength={10}
               required
             />
           )}
@@ -294,10 +301,12 @@ const TipoContratoComisiones = () => {
               id='Rete ICA'
               name='Rete ICA'
               label={"Rete ICA"}
-              type='number'
+              type='tel'
               step='any'
               autoComplete='off'
               defaultValue={selectedTipoContrato?.["Rete ICA"]}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
+              maxLength={10}
               required
             />
           )}

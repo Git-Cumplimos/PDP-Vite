@@ -19,6 +19,7 @@ import {
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosAval,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 
 const RecaudoServiciosPublicosPrivadosAval = () => {
   const { state } = useLocation();
@@ -276,18 +277,6 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     });
     setDatosConsulta({});
   }, [roleInfo]);
-  const onChangeMoneyLocal = (ev, valor) => {
-    if (!isNaN(valor)) {
-      const num = valor;
-      setDatosTrans((old) => {
-        return { ...old, valor: onChangeMoney(ev) };
-      });
-    }
-  };
-  const onChangeMoney = useMoney({
-    limits: [1, 9999999],
-    decimalDigits: 2,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -327,7 +316,17 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             autoComplete='off'
             maxLength={"12"}
             value={datosTrans.valor ?? ""}
-            onInput={onChangeMoneyLocal}
+            onInput={(ev,val)=>{
+              setDatosTrans((old) => {
+                return { ...old, 
+                  valor: val
+                };
+              });
+            }}
+            min = {enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
+            max = {enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
+            equalError = {false}
+            equalErrorMin = {false}
             required></MoneyInput>
         )}
         <ButtonBar>
@@ -360,36 +359,22 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     id='valCashOut'
                     name='valCashOut'
                     label='Valor a pagar'
+                    min = {enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
+                    max = {enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
                     type='text'
                     autoComplete='off'
                     maxLength={"12"}
                     value={datosTrans.valorConst ?? ""}
-                    onInput={(ev) =>
+                    onInput={(ev,valMoney) =>
                       setDatosTrans((old) => ({
                         ...old,
-                        valorConst: onChangeMoney(ev),
-                        valorVar: onChangeMoney(ev),
+                        valorConst: valMoney,
+                        valorVar: valMoney,
                       }))
                     }
+                    equalError = {false}
+                    equalErrorMin = {false}
                     required></MoneyInput>
-                  {/* <Input
-                    id='valor'
-                    name='valor'
-                    label='Valor a pagar'
-                    autoComplete='off'
-                    type='tel'
-                    minLength={"2"}
-                    maxLength={"12"}
-                    defaultValue={datosTrans.valorConst ?? ""}
-                    onInput={(ev) =>
-                      setDatosTrans((old) => ({
-                        ...old,
-                        valorConst: onChangeMoney(ev),
-                        valorVar: onChangeMoney(ev),
-                      }))
-                    }
-                    required
-                  /> */}
                   <ButtonBar>
                     <Button
                       onClick={() => {

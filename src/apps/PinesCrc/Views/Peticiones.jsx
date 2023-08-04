@@ -298,7 +298,7 @@ const Peticiones = () => {
                 onClick={() => {
                   setShowModalPeticion(false)
                   setMotivoPeticion("")
-                  notify("Petición cancelada por el usuario", 5000, {toastId: "notify-lot"})
+                  notifyError("Petición cancelada por el usuario", 5000, {toastId: "notify-lot"})
                 }}
               >
                 Cancelar
