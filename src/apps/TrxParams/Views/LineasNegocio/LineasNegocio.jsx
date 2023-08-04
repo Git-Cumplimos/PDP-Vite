@@ -1,7 +1,8 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-unreachable */
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { notify, notifyError } from "../../../../utils/notify";
 
 import Button from "../../../../components/Base/Button";
@@ -9,18 +10,20 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Error404 from "../../../../pages/Error404";
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input";
-import InputSuggestions from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal/Modal";
 import TableEnterprise from "./components/LineaNegocio.table";
 
-import { getAuthorizers, getBusinessLines, getDetailedLines, getTransactionTypes } from "./utils/LineasNegocio.fetch";
+import { getBusinessLines, getDetailedLines, getTransactionTypes, putBusinessLine } from "./utils/LineasNegocio.fetch";
 
 import "./utils/LineasNegocio.style.css";
 import * as BusinessLineCons from "./utils/LineasNegocio.cons";
 
+const paginator = (data, page, limit) => {
+  return data.slice((page - 1) * limit, page * limit);
+};
 
 const LineasNegocio = () => {
-  try {
+  try {    
     const [authorizerList, setAuthorizerList] = useState([]);
     const [businessLinesFilterList, setBusinessLinesFilterList] = useState([]);
     const [businessLinesList, setBusinessLinesList] = useState([]);
@@ -30,18 +33,9 @@ const LineasNegocio = () => {
     const [loadScreen, setLoadScreen] = useState(false);
     const [maxPages, setMaxPages] = useState(0);
     const [openModal, setOpenModal] = useState(false);
-    const [{ page, limit }, setPageData] = useState({
-      page: 1,
-      limit: 10,
-    });
-    const [selectedBusinessLine, setSelectedBusinessLine] = useState({
-      idLineaDetalle: 0,
-      idTipoTransaccion: 0,
-      lineaNegocio: "",
-      lineaDetalle: "",
-      autorizador: "",
-      tipoTransaccion: ""
-    });
+    const [validateAuthorizer, setValidateAuthorizer] = useState(true);
+    const [{ page, limit }, setPageData] = useState(BusinessLineCons.OBJECT_PAGE_DATA);
+    const [selectedBusinessLine, setSelectedBusinessLine] = useState(BusinessLineCons.OBJECT_BUSINESS_LINE);
     const [transactionTypeList, setTransactionTypeList] = useState([]);
     
     useEffect(() => {
@@ -51,53 +45,61 @@ const LineasNegocio = () => {
     const getBusinessLineData = async () => {
       setLoadScreen(true);
       try {
+        clearSelectedBusinessLine();
         const businessLineData = await getBusinessLines();
-        console.log("1. ", businessLineData)
         if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && businessLineData.object.length > 0) {
           setBusinessLinesList(businessLineData.object);
-          setBusinessLinesFilterList(businessLineData.object);
-          // console.log("1.1. ", businessLineData.object.length);
-          setMaxPages(getMaxPageValue(businessLineData.object.length/10));
-          const authorizerData = await getAuthorizers();
-          // console.log("2. ", authorizerData)
-          if (authorizerData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && authorizerData.object.length > 0) {
-            setAuthorizerList(authorizerData.object);
-          } else if (authorizerData.code === BusinessLineCons.RESPONSE_CODE_FAILURE) {
-            setAuthorizerList([]);
-            notify(BusinessLineCons.MESSAGE_AUTHORIZER_EMPTY);
-          }
-          const transactionTypeData = await getTransactionTypes();
-          // console.log("3. ", transactionTypeData)
-          if (transactionTypeData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && transactionTypeData.object.length > 0) {
-            setTransactionTypeList(transactionTypeData.object);
-          } else if (transactionTypeData.code === BusinessLineCons.RESPONSE_CODE_FAILURE) {
-            setTransactionTypeList([]);
-            notify(BusinessLineCons.MESSAGE_TRANSACTION_TYPES_EMPTY);
-          }
+          setBusinessLinesFilterList(paginator(businessLineData.object, page, limit));
+          setMaxPages(getMaxPageValue(businessLineData.object.length/limit));
           const detailedLinesData = await getDetailedLines();
-          console.log("4. ", detailedLinesData)
           if (detailedLinesData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && detailedLinesData.object.length > 0) {
-            let detailedLineRowNames = [];
-            detailedLinesData.object.map(detailedLineRow => {
-              detailedLineRow.lineaDetalle.map(detailedLineRowName => {
-                if (!detailedLineRowNames.includes(detailedLineRowName)) detailedLineRowNames.push(detailedLineRowName);
-              })
-            })
-            setDetailedLineFilterList(detailedLineRowNames);
             setDetailedLineList(detailedLinesData.object);
+            const detailedLineDataList = [];
+            detailedLinesData.object.map(businessLineFilterRow => {
+              if (businessLineFilterRow.lineaDetalle !== null) {
+                if (businessLineFilterRow.lineaDetalle.length > 0) {
+                  businessLineFilterRow.lineaDetalle.map(detailedLineFilterRow => {
+                    if (!detailedLineDataList.includes(detailedLineFilterRow)) detailedLineDataList.push(detailedLineFilterRow);
+                  })
+                }
+              }
+            });
+            setDetailedLineFilterList(detailedLineDataList);
           } else if (detailedLinesData.code === BusinessLineCons.RESPONSE_CODE_FAILURE) {
             setDetailedLineList([]);
+            setDetailedLineFilterList([]);
             notify(BusinessLineCons.MESSAGE_DETAILED_LINES_EMPTY);
+          }
+          const transactionTypeData = await getTransactionTypes();
+          if (transactionTypeData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && transactionTypeData.object.length > 0) {
+            setAuthorizerList(transactionTypeData.object);
+            setTransactionTypeList(transactionTypeData.object);
+          } else if (transactionTypeData.code === BusinessLineCons.RESPONSE_CODE_FAILURE) {
+            setAuthorizerList([]);
+            setTransactionTypeList([]);
+            notify(BusinessLineCons.MESSAGE_TRANSACTION_TYPES_EMPTY);
           }
         } else if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_FAILURE) {
           notify(BusinessLineCons.MESSAGE_BUSINESS_LINES_EMPTY);
         } else {
           notifyError(BusinessLineCons.MESSAGE_ERROR);
         }
+        setDetailedLine("");
       } catch (error) {
         notifyError(BusinessLineCons.MESSAGE_ERROR);
       }
       setLoadScreen(false);
+    }
+    
+    useEffect(() => {
+      if (businessLinesFilterList.length > 0) {
+        setFoundTrxTypes();
+      }
+    }, [page, limit]);
+    
+    const setFoundTrxTypes = () => {
+      setBusinessLinesFilterList(paginator(businessLinesList, page, limit));
+      setMaxPages(getMaxPageValue(businessLinesList.length/limit));
     }
 
     const getMaxPageValue = (maxPageValue) => {
@@ -113,6 +115,7 @@ const LineasNegocio = () => {
           ({
             idLineaDetalle,
             idTipoTransaccion,
+            idLineaNegocio,
             lineaNegocio,
             lineaDetalle,
             autorizador,
@@ -121,6 +124,7 @@ const LineasNegocio = () => {
             return {
               "idLineaDetalle": idLineaDetalle,
               "idTipoTransaccion": idTipoTransaccion,
+              "idLineaNegocio": idLineaNegocio,
               "lineaNegocio": lineaNegocio,
               "lineaDetalle": lineaDetalle,
               "autorizador": autorizador,
@@ -134,64 +138,114 @@ const LineasNegocio = () => {
     const onChangeFilter = async (e) => {
       setDetailedLine(e);
       if (e !== "") {
-        setBusinessLinesFilterList(businessLinesList.filter(
+        setBusinessLinesFilterList(paginator(businessLinesList.filter(
           businessLinesValue => 
             (
               businessLinesValue.lineaDetalle.toLowerCase().includes(e.toLowerCase())) || businessLinesValue.lineaDetalle.toLowerCase() === e.toLowerCase()
-        ));
+        ), page, limit));
         setMaxPages(getMaxPageValue(businessLinesList.filter(
           businessLinesValue => 
             (
               businessLinesValue.lineaDetalle.toLowerCase().includes(e.toLowerCase())) || businessLinesValue.lineaDetalle.toLowerCase() === e.toLowerCase()
-        ).length/10));
+        ).length/limit));
       } else {
-        setBusinessLinesFilterList(businessLinesList);
-        setMaxPages(getMaxPageValue(businessLinesList.length/10));
+        setBusinessLinesFilterList(paginator(businessLinesList, page, limit));
+        setMaxPages(getMaxPageValue(businessLinesList.length/limit));
       }
     }
 
-    const editBusinessLineData = useCallback((e, i) => {
-      // console.log("EDIT", i, tableParameters[i]);
+    const editBusinessLineData = async (e, i) => {
       setOpenModal(true);
+      setValidateAuthorizer(false);
       setSelectedBusinessLine({
         idLineaDetalle: tableParameters[i]?.[BusinessLineCons.TAG_DETAILED_LINE_ID],
         idTipoTransaccion: tableParameters[i]?.[BusinessLineCons.TAG_TRANSACTION_TYPE_ID],
+        idLineaNegocio: tableParameters[i]?.[BusinessLineCons.TAG_BUSINESS_LINE_ID],
         lineaNegocio: tableParameters[i]?.[BusinessLineCons.TAG_BUSINESS_LINE],
         lineaDetalle: tableParameters[i]?.[BusinessLineCons.TAG_DETAILED_LINE],
         autorizador:tableParameters[i]?.[BusinessLineCons.TAG_AUTHORIZER],
         tipoTransaccion:tableParameters[i]?.[BusinessLineCons.TAG_TRANSACTION_TYPE],
       });
-    }, [tableParameters]);
-
-    const clearSelectedBusinessLine = async () => {
-      setSelectedBusinessLine({
-        idLineaDetalle: 0,
-        idTipoTransaccion: 0,
-        lineaNegocio: "",
-        lineaDetalle: "",
-        autorizador: "",
-        tipoTransaccion: "",
-      });
     }
 
-    const handleShowModal = useCallback((showModal) => {
+    const clearSelectedBusinessLine = async () => {
+      setDetailedLine("");
+      setValidateAuthorizer(true);
+      setSelectedBusinessLine(BusinessLineCons.OBJECT_BUSINESS_LINE);
+    }
+
+    const handleShowModal = async (showModal) => {
       setOpenModal(showModal);
       clearSelectedBusinessLine();
-    }, []);
+    }
 
-    const onChangeFormat = useCallback((e) => {
+    const onChangeFormat = async (e) => {
       setSelectedBusinessLine((old) => {
         return { ...old, [e.target.name]: e.target.value };
       });
-    }, []);
+      if (e.target.name === BusinessLineCons.TAG_AUTHORIZER) {
+        if (authorizerList.filter(authorizerRow => authorizerRow.nombreAutorizador.toLowerCase() === e.target.value.toLowerCase()).length > 0) {
+          setValidateAuthorizer(false);
+        } else {          
+          setValidateAuthorizer(true);
+          setSelectedBusinessLine((old) => {
+            return { ...old, [BusinessLineCons.TAG_TRANSACTION_TYPE]: "" };
+          });
+        }
+      }
+    }
 
-    const onSubmit = useCallback(
-      (e) => {
-        console.log("SAVE");
-        console.log(e);
-      },
-      [selectedBusinessLine]
-    );
+    const onSubmit = async () => {
+      setLoadScreen(true);
+      try {
+        let businessLineValidated = selectedBusinessLine?.[BusinessLineCons.TAG_BUSINESS_LINE_ID];
+        let detailedLineValidated = selectedBusinessLine?.[BusinessLineCons.TAG_DETAILED_LINE_ID];
+        let transactionTypeValidated = selectedBusinessLine?.[BusinessLineCons.TAG_TRANSACTION_TYPE_ID];
+        let transactionTypeOld = selectedBusinessLine?.[BusinessLineCons.TAG_TRANSACTION_TYPE_ID];
+        if (selectedBusinessLine?.lineaNegocio === "" || selectedBusinessLine?.lineaDetalle === "" || selectedBusinessLine?.autorizador === "" || selectedBusinessLine?.tipoTransaccion === "") {
+          notify(BusinessLineCons.MESSAGE_VALIDATE);
+          return;
+        }
+        if (authorizerList.filter(authorizerRow => authorizerRow.nombreAutorizador.toLowerCase() === selectedBusinessLine?.autorizador.toLowerCase()).length > 0) {
+          const transactionTypeDataList = authorizerList.filter(authorizerRow => authorizerRow.nombreAutorizador.toLowerCase() === selectedBusinessLine?.autorizador.toLowerCase());
+          const transactionTypeDataRow = transactionTypeDataList[0].transacciones.filter(transactionTypeRow => transactionTypeRow.nombre.toLowerCase() === selectedBusinessLine?.tipoTransaccion.toLowerCase());
+          transactionTypeValidated = transactionTypeDataRow[0].id;
+        } else {
+          notify(BusinessLineCons.MESSAGE_VALIDATE_AUTHORIZER);
+          return;
+        }
+        if (businessLinesList.filter(businessLineRow => businessLineRow.lineaNegocio.toLowerCase() === selectedBusinessLine?.lineaNegocio.toLowerCase()).length > 0) {
+          const businessLinesDataList = businessLinesList.filter(businessLineRow => businessLineRow.lineaNegocio.toLowerCase() === selectedBusinessLine?.lineaNegocio.toLowerCase());
+          businessLineValidated = businessLinesDataList[0].idLineaNegocio;
+        }
+        if (businessLinesList.filter(detailedLineRow => detailedLineRow.lineaDetalle.toLowerCase() === selectedBusinessLine?.lineaDetalle.toLowerCase()).length > 0) {
+          const detailedLinesDataList = businessLinesList.filter(detailedLineRow => detailedLineRow.lineaDetalle.toLowerCase() === selectedBusinessLine?.lineaDetalle.toLowerCase());
+          detailedLineValidated = detailedLinesDataList[0].idLineaDetalle;
+        }
+        const body = {
+          nombreLineaNegocio: selectedBusinessLine?.lineaNegocio.toString(),
+          nombreLineaDetallada: selectedBusinessLine?.lineaDetalle.toString(),
+          idLineaNegocio: Number(businessLineValidated),
+          idLineaDetallada: Number(detailedLineValidated),
+          idTipoTransaccion: Number(transactionTypeOld),
+          idTipoTransaccionNuevo: Number(transactionTypeValidated),
+        };
+        const businessLineData = await putBusinessLine(body);
+        if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && businessLineData.message === BusinessLineCons.RESPONSE_MESSAGE_SUCCES) {          
+          getBusinessLineData();
+          clearSelectedBusinessLine();
+          notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED.replace("{}",selectedBusinessLine?.lineaNegocio.toString()));
+          handleShowModal(false);
+        } else if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_EMPTY) {
+          notify(BusinessLineCons.MESSAGE_VALIDATE_EMPTY_PARAMS);
+        } else {
+          notifyError(BusinessLineCons.MESSAGE_ERROR);
+        }
+      } catch (error) {
+        notifyError(BusinessLineCons.MESSAGE_ERROR);
+      }
+      setLoadScreen(false);
+    }
 
     try {
       return (
@@ -237,20 +291,22 @@ const LineasNegocio = () => {
               type="search"              
             />
             <datalist id={BusinessLineCons.TAG_DETAILED_FILTER_LINE_LIST}>
-              {detailedLineFilterList.map(detailedLineFilterRow => {
-                return(
-                  <option 
-                    key={detailedLineFilterRow.idLineaDetalle}
-                    value={detailedLineFilterRow.nombreLineaDetalle}
-                  >
-                    {detailedLineFilterRow.nombreLineaDetalle}
-                  </option>
-                )
-              })}
+              {detailedLineFilterList.map(
+                detailedLineFilterRow => {
+                  return(
+                    <option
+                      key={detailedLineFilterRow.idLineaDetalle}
+                      value={detailedLineFilterRow.nombreLineaDetalle}
+                    >
+                      {detailedLineFilterRow.nombreLineaDetalle}
+                    </option>
+                  )
+                })
+              }
             </datalist>
           </TableEnterprise>
           <Modal show={openModal} handleClose={() => {handleShowModal(false)}}>
-            <Form onSubmit={onSubmit} onChange={onChangeFormat} grid>
+            <Form onChange={onChangeFormat} grid>
               <Input
                 autoComplete="off"
                 id={BusinessLineCons.TAG_BUSINESS_LINE}
@@ -274,22 +330,28 @@ const LineasNegocio = () => {
                   value={selectedBusinessLine?.lineaDetalle}
                 />
                 <datalist id={BusinessLineCons.TAG_DETAILED_LINE_LIST}>
-                  {detailedLineFilterList.map(detailedLineFilterRow => {
-                    return(
-                      <option 
-                        key={detailedLineFilterRow.idLineaDetalle} 
-                        value={detailedLineFilterRow.nombreLineaDetalle}
-                      >
-                        {detailedLineFilterRow.nombreLineaDetalle}
-                      </option>
-                    )
-                  })}
+                  {detailedLineList.map(
+                    businessLineFilterRow => {
+                      if (businessLineFilterRow.nombreLineaNegocio.toLowerCase() === selectedBusinessLine?.lineaNegocio.toLowerCase()) {
+                        const businessLineFilterList =  businessLineFilterRow.lineaDetalle.map(detailedLineFilterRow => {
+                          return(
+                            <option
+                              key={detailedLineFilterRow.idLineaDetalle}
+                              value={detailedLineFilterRow.nombreLineaDetalle}
+                            >
+                              {detailedLineFilterRow.nombreLineaDetalle}
+                            </option>
+                          )
+                        });
+                        return businessLineFilterList;
+                      }
+                    })
+                  }
                 </datalist>
               </>
               <>
                 <Input
                   autoComplete="off"
-                  disabled={selectedBusinessLine?.lineaDetalle === ""}
                   id={BusinessLineCons.TAG_AUTHORIZER}
                   label={BusinessLineCons.LABEL_AUTHORIZER}
                   list={BusinessLineCons.TAG_AUTHORIZER_LIST}
@@ -303,10 +365,10 @@ const LineasNegocio = () => {
                   {authorizerList.map(authorizerRow => {
                     return(
                       <option 
-                        key={authorizerRow.id} 
-                        value={authorizerRow.nombre}
+                        key={authorizerRow.idAutorizador} 
+                        value={authorizerRow.nombreAutorizador}
                       >
-                        {authorizerRow.nombre}
+                        {authorizerRow.nombreAutorizador}
                       </option>
                     )
                   })}
@@ -315,7 +377,7 @@ const LineasNegocio = () => {
               <>
                 <Input
                   autoComplete="off"
-                  disabled={selectedBusinessLine?.lineaDetalle === ""}
+                  disabled={validateAuthorizer}
                   id={BusinessLineCons.TAG_TRANSACTION_TYPE}
                   label={BusinessLineCons.LABEL_TRANSACTION_TYPE}
                   list={BusinessLineCons.TAG_TRANSACTION_TYPE_LIST}
@@ -326,32 +388,38 @@ const LineasNegocio = () => {
                   value={selectedBusinessLine?.tipoTransaccion}
                 />
                 <datalist id={BusinessLineCons.TAG_TRANSACTION_TYPE_LIST}>
-                  {detailedLineFilterList.map(detailedLineFilterRow => {
-                    return(
-                      <option 
-                        key={detailedLineFilterRow.idLineaDetalle} 
-                        value={detailedLineFilterRow.nombreLineaDetalle}
-                      >
-                        {detailedLineFilterRow.nombreLineaDetalle}
-                      </option>
-                    )
+                  {transactionTypeList.map(authorizerRow => {
+                    if (authorizerRow.nombreAutorizador.toLowerCase() === selectedBusinessLine?.autorizador.toLowerCase()) {
+                      const transactionTypeFilterList =  authorizerRow.transacciones.map(transactionTypeFilterRow => {
+                        return(
+                          <option 
+                            key={transactionTypeFilterRow.id} 
+                            value={transactionTypeFilterRow.nombre}
+                          >
+                            {transactionTypeFilterRow.nombre}
+                          </option>
+                        )
+                      });
+                      return transactionTypeFilterList;
+                    }
                   })}
                 </datalist>
               </>
-              <ButtonBar>
-                <Button
-                  onClick={() => {handleShowModal(false)}}
-                  type="button"
-                >
-                  {BusinessLineCons.LABEL_CANCEL}
-                </Button>
-                <Button 
-                  type="submit"
-                >
-                  {BusinessLineCons.LABEL_SAVE}
-                </Button>
-              </ButtonBar>
             </Form>
+            <ButtonBar>
+              <Button
+                onClick={() => {handleShowModal(false)}}
+                type="button"
+              >
+                {BusinessLineCons.LABEL_CANCEL}
+              </Button>
+              <Button
+                onClick={onSubmit}
+                type="submit"
+              >
+                {BusinessLineCons.LABEL_SAVE}
+              </Button>
+            </ButtonBar>
           </Modal>
         </Fragment>
       );

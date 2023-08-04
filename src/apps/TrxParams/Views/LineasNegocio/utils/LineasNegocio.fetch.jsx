@@ -59,14 +59,6 @@ export const petitions = {
   },
 };
 
-/* GETS */
-export const getAuthorizers = async () => {
-  const response = await petitions.get({
-    uri: BusinessLineCons.PATH_AUTHORIZER,
-  });
-  return response;
-};
-
 export const getBusinessLines = async () => {
   const response = await petitions.get({
     uri: BusinessLineCons.PATH_BUSINESS_LINES,

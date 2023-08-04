@@ -40,7 +40,7 @@ const TableEnterprise = ({
     data.forEach((val) => {
       const objtemp = Array.isArray(val) ? val : Object.entries(val);
       try {
-        if (headers.length+2 !== objtemp.length) {
+        if (headers.length+3 !== objtemp.length) {
           console.error(headers, objtemp);
           throw new Error(BusinessLineCons.MESSAGE_BAD_FORMAT_TABLE);
         }
@@ -156,7 +156,7 @@ const TableEnterprise = ({
                   onClick={onSelectRow ? (e) => onSelectRow(e, index) : null}
                 >
                   {obj.map(([key, value], idx) => {
-                    if (key !== BusinessLineCons.TAG_DETAILED_LINE_ID && key !== BusinessLineCons.TAG_TRANSACTION_TYPE_ID) {
+                    if (key !== BusinessLineCons.TAG_DETAILED_LINE_ID && key !== BusinessLineCons.TAG_TRANSACTION_TYPE_ID && key !== BusinessLineCons.TAG_BUSINESS_LINE_ID) {
                       return (
                         <td
                           key={`${key}_${index}`}
