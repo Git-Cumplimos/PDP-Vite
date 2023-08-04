@@ -73,6 +73,7 @@ const GestionPermisosBroker = () => {
       setSearchType(null);
       setShowModal(false);
       setSelected(null);
+      setPermisos({})
     }
   }, []);
 
