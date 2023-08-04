@@ -87,6 +87,7 @@ const ParamsOperations = lazy(() =>
   import("../ParamsOperations/ParamsOperations")
 );
 const TypesTrxs = lazy(() => import("../ParamsOperations/Views/TypesTrxs"));
+const LineasNegocio = lazy(() => import("./Views/LineasNegocio/LineasNegocio"));
 
 const listPermissions = Object.values(enumPermisosTrx);
 export const listPermissionsTrx = listPermissions.splice(
@@ -115,6 +116,12 @@ const rutasConfiguraciones = {
       label: <AppIcons Logo={"RECAUDO"} name={"Tipos de transacciones"} />,
       component: TypesTrxs,
       permission: [enumPermisosTrx.tipos_transacciones],
+    },
+    {
+      link: "/params-operations/lineas-negocio",
+      label: <AppIcons Logo={"RECAUDO"} name={"L\u00edneas de Negocios"} />,
+      component: LineasNegocio,
+      permission: [enumPermisosTrx.lineas_negocio],
     },
     {
       link: "/params-operations/comisiones",
