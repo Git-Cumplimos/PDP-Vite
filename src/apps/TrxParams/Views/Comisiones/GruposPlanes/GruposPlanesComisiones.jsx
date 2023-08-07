@@ -264,6 +264,7 @@ const GruposPlanesComisiones = () => {
                 return { ...old, nombre_grupo_plan: e.target.value };
               })
             }
+            maxLength={50}
             required
           />
 

@@ -33,7 +33,7 @@ const PaginationAuth = ({
   return (
     <Form onLazyChange={{ callback: onChange, timeOut: 300 }} grid>
       {Object.entries(filters).map(
-        ([key, { type, label, options = {}, ...rest }]) => {
+        ([key, { type, label, maxLength = 60, options = {}, ...rest }]) => {
           if (options && Object.entries(options).length > 0) {
             return (
               <Select
@@ -63,6 +63,7 @@ const PaginationAuth = ({
               id={`${key}_filter`}
               name={key}
               label={label}
+              maxLength={maxLength}
               type={type || "search"}
               autoComplete="off"
               {...rest}

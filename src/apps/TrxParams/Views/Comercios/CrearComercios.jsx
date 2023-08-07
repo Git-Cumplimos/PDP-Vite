@@ -479,7 +479,7 @@ const CrearComercios = () => {
           />
           <Input
             id="telefono_fijo_comercio"
-            label="Telefono fijo"
+            label="Teléfono fijo"
             type="text"
             name="telefono_fijo_comercio"
             minLength="1"
@@ -658,7 +658,7 @@ const CrearComercios = () => {
           />
           <Input
             id="dane_pais"
-            label="Número Dane pais"
+            label="Número Dane país"
             type="text"
             name="dane_pais"
             minLength="1"
@@ -703,7 +703,7 @@ const CrearComercios = () => {
           />
           <Input
             id="tel_contacto1_comercio"
-            label="Telefono"
+            label="Teléfono"
             type="text"
             name="tel_contacto1_comercio"
             minLength="1"
@@ -746,7 +746,7 @@ const CrearComercios = () => {
           />
           <Input
             id="tel_contacto2_comercio"
-            label="Telefono"
+            label="Teléfono"
             type="text"
             name="tel_contacto2_comercio"
             minLength="1"
@@ -763,7 +763,7 @@ const CrearComercios = () => {
             autoComplete="off"
           />
         </Fieldset>
-        <Fieldset legend="Actividades economicas" className="lg:col-span-2">
+        <Fieldset legend="Actividades económicas" className="lg:col-span-2">
           <InputSuggestions
             id="actividades_ec2"
             label={"Buscar"}

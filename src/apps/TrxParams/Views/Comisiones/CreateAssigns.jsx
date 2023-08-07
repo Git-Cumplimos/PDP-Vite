@@ -192,6 +192,7 @@ const CreateAssigns = () => {
                 nombre_asignacion_comision: ev.target.value,
               }));
             }}
+            maxLength={100}
             required
           />
           <Fieldset legend='Plan de comisión' className='lg:col-span-2'>

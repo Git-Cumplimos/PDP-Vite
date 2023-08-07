@@ -9,6 +9,7 @@ import Modal from "../../../../components/Base/Modal";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import useQuery from "../../../../hooks/useQuery";
+import { onChangeNumber } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
   fetchConveniosMany,
@@ -435,6 +436,7 @@ const Convenios = () => {
             autoComplete='off'
             defaultValue={selectedConvenio?.["Nombre de convenio"]}
             onChange={() => {}}
+            maxLength={30}
             required
           />
           <Input
@@ -463,6 +465,7 @@ const Convenios = () => {
             onSelectSuggestion={onSelectSuggestion}
             value={selectedConvenio?.tiposConvenios || ""}
             onChange={() => {}}
+            maxLength={30}
             // disabled={selected?.id_tipo_operacion ? true : false}
             // readOnly={selected?.id_tipo_operacion}
           />
@@ -478,6 +481,7 @@ const Convenios = () => {
                     autoComplete='off'
                     value={val}
                     onChange={() => {}}
+                    maxLength={20}
                     required
                   />
                   {selectedConvenio?.Tags.length > 1 && (
@@ -525,10 +529,11 @@ const Convenios = () => {
                         id={`${key}_${index}`}
                         name={key}
                         label={key}
-                        type={`${key.includes("Longitud") ? "number" : "text"}`}
+                        type={"text"}
+                        maxLength={`${key.includes("Longitud") ? "10" : "50"}`}
                         autoComplete='off'
                         value={valRef}
-                        onChange={() => {}}
+                        onChange={(ev) => key.includes("Longitud") ? (ev.target.value = onChangeNumber(ev)) : ev.target.value}
                         required
                       />
                     );
