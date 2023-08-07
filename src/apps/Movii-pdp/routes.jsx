@@ -25,7 +25,7 @@ const rutasMovii = {
     },
     {
       link: "/movii-pdp/deposito",
-      label: <AppIcons Logo={"MOVII_REVERSO_RETIRO"} name='Deposito' />,
+      label: <AppIcons Logo={"MOVII_RETIRO"} name='Depósito' />,
       component: MoviiPDPCashIn,
       permission: [enumPermisosMovii.MOVII_DEPOSITOS],
     },

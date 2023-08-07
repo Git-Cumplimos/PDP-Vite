@@ -20,6 +20,44 @@ export const postRealizarCashout = async (bodyObj) => {
     throw err;
   }
 };
+export const consultaValidateUserMoviiCashIn = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${url}corresponsal-movii/consulta-deposito-movii`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+export const trxDepositoMoviiCashIn = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${url}corresponsal-movii/deposito-corresponsal-movii`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
 export const postRealizarReversoCashout = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
