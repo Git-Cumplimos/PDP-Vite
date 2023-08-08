@@ -1,328 +1,309 @@
-import { useCallback, useState, useRef, useMemo, useEffect } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import Select from "../../../components/Base/Select";
-import Table from "../../../components/Base/Table";
-import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
-import { useMujer } from "../utils/mujerHooks";
-import { toast } from "react-toastify";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput/MoneyInput";
 import { useReactToPrint } from "react-to-print";
-import { notifyError } from "../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
-import { useAuth, infoTicket } from "../../../hooks/AuthHooks";
+import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
-import { enumParametrosFundacion } from "../utils/enumParametrosFundacion";
 import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
+import { fetchCustom, consultaValorCuota } from "../utils/fetchFDLM";
+import { useFetch } from "../../../hooks/useFetch";
+import  useMoney from "../../../hooks/useMoney";
+import { useFetchFDLM } from "../hooks/fetchFDLM";
 
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
+const URL_MOSTRAR_CREDITO= `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`
+const URL_INGRESAR_RECIBO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`
+const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
 
 const Recaudo = () => {
-  const {
-    infoLoto: {},
-    mostrarcredito,
-    ingresorecibo,
-    valorcuota,
-  } = useMujer();
-
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
   const navigate = useNavigate();
-
   const [label, setLabel] = useState("");
-  const [tipobusqueda, setTiposBusqueda] = useState("");
-  const [disabledBtn, setDisabledBtn] = useState(false);
-  const [stop, setStop] = useState("");
-  const [number, setNumber] = useState("");
-  const [info, setInfo] = useState("");
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 0,
+    min: 0,
+  });
+  const [datosTrx, setDatosTrx] = useState({
+    tipobusqueda: "",
+    number: "",
+    info: "",
+    cuota: "",
+    formatMon: "",
+    permiteCambio: "",
+    valueValor: false,
+    ticket: false,
+  });
+  const [uuid, setUuid] = useState(v4());
   const [table, setTable] = useState("");
-  const [cuota, setCuota] = useState("");
-  const [creditStatus, setCreditStatus] = useState(false);
-  const [formatMon, setFormatMon] = useState("");
-  const [referencia, setReferencia] = useState("");
-  const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
-  const [response, setResponse] = useState("");
-  const { roleInfo } = useAuth();
-  const [permiteCambio, setPermiteCambio] = useState("");
-  const [paraMax, setParaMax] = useState(null);
-  const [paraMin, setParaMin] = useState(null);
+  const { roleInfo, pdpUser } = useAuth();
   const [tickets, setTickets] = useState("");
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
-  const pageStyle = `
-  @page {
-    size: 80mm 50mm;
-  }
-
-  @media all {
-    .pagebreak {
-      display: none;
-    }
-  }
-
-  @media print {
-    .pagebreak {
-      page-break-before: always;
-    }
-  }
-`;
-
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de pago(Recaudo)",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      ["Id Trx", ""],
-      ["Id Aut", ""],
-      /*ciudad*/
-      ["Comercio", roleInfo?.["nombre comercio"]],
-      ["", ""],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
-      ["", ""],
-    ],
-    commerceName: "FUNDACIÓN DE LA MUJER",
-    trxInfo: [],
-    disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-  });
-  // const tickets = useMemo(() => {
-  //   return {
-  //     title: "Recibo de pago(Recaudo)",
-  //     timeInfo: {
-  //       "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-  //         year: "numeric",
-  //         month: "numeric",
-  //         day: "numeric",
-  //       }).format(new Date()),
-  //       Hora: Intl.DateTimeFormat("es-CO", {
-  //         hour: "numeric",
-  //         minute: "numeric",
-  //         second: "numeric",
-  //         hour12: false,
-  //       }).format(new Date()),
-  //     },
-  //     commerceInfo: Object.entries({
-  //       "Id Comercio": roleInfo?.id_comercio,
-  //       "No. terminal": roleInfo?.id_dispositivo,
-  //       Municipio: roleInfo?.ciudad,
-  //       Dirección: roleInfo?.direccion,
-  //       "Id Trx": response.id_trx,
-  //       "Id Confirmación": response.Confirmacion,
-  //     }),
-  //     commerceName: "FUNDACIÓN DE LA MUJER",
-  //     trxInfo: [
-  //       ["CRÉDITO", selected?.Credito],
-  //       ["VALOR", formatMoney.format(formatMon)],
-  //       ["Cliente", selected?.Cliente],
-  //       ["", ""],
-  //       ["Cédula", selected?.Cedula],
-  //       ["", ""],
-  //     ],
-  //     disclamer:
-  //       "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-  //   };
-  // }, [
-  //   roleInfo?.ciudad,
-  //   roleInfo?.direccion,
-  //   roleInfo?.id_comercio,
-  //   roleInfo?.id_dispositivo,
-  //   response,
-  //   formatMon,
-  //   table,
-  // ]);
-
-  // const { infoTicket } = useAuth();
-
-  const params = useCallback(async () => {
-    const queries = { tipo_op: 5 };
-    try {
-      const res = await fetchData(url_params, "GET", queries);
-      if ("Parametros" in res?.obj?.[0]) {
-        setParaMax(res?.obj?.[0].Parametros.monto_maximo);
-        setParaMin(res?.obj?.[0].Parametros.monto_minimo);
-      } else {
-        setParaMax(10000000);
-        setParaMin(0);
-      }
-
-      return res;
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-  useEffect(() => {
-    params();
-  }, [info]);
-
-  // useEffect(() => {
-  //   infoTicket(response?.id_trx, 5, tickets);
-  // }, [infoTicket, response]);
-
   const printDiv = useRef();
 
+  useEffect(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      navigate("/");
+    } else {
+      let hasKeys = true;
+      const keys = [
+        "id_comercio",
+        "id_usuario",
+        "tipo_comercio",
+        "id_dispositivo",
+        "ciudad",
+        "direccion",
+      ];
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+      if (!hasKeys) {
+        notifyError(
+          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        );
+        navigate("/");
+      }
+    }
+  }, [roleInfo, navigate]);
+  
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
-    pageStyle: pageStyle,
   });
 
-  const closeModal = useCallback(async () => {
+  const handleClose = useCallback(() => {
     setShowModal(false);
-    setDisabledBtn(false);
-    setFormatMon("");
-    setCreditStatus(false);
-    setInfo("");
-    setTicket(false);
-    setReferencia("");
+    setUuid(v4());
+    setLimitesMontos({
+      max: 0,
+      min: 0,
+    });
+    setDatosTrx({
+      tipobusqueda: "",
+      number: "",
+      info: "",
+      cuota: "",
+      formatMon: "",
+      permiteCambio: "",
+      valueValor: false,
+      ticket: false,
+    });
   }, []);
 
-  const bankCollection = (e) => {
-    e.preventDefault();
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    let objTicket = {};
-    objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"] = [];
-    objTicket["trxInfo"].push(["CRÉDITO", selected?.Credito]);
-    objTicket["trxInfo"].push(["VALOR", formatMoney.format(formatMon)]);
-    objTicket["trxInfo"].push(["Cliente", selected?.Cliente]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Cédula", selected?.Cedula]);
-    objTicket["trxInfo"].push(["", ""]);
-
-    setStop(true);
-    let tipo_comercio = roleInfo?.tipo_comercio;
-    if (roleInfo?.tipo_comercio === "KIOSCO") {
-      tipo_comercio = "OFICINAS PROPIAS";
-    }
-
-    const body = {
-      Tipo: tipo_comercio,
-      Usuario: roleInfo?.id_usuario,
-      Dispositivo: roleInfo?.id_dispositivo,
-      Comercio: roleInfo?.id_comercio,
-      Credito: selected?.Credito,
-      Depto: roleInfo?.codigo_dane.slice(0, 2),
-      Municipio: roleInfo?.codigo_dane.slice(2),
-      Valor: parseFloat(formatMon),
-      referenciaPago: referencia,
-      cliente: selected?.Cliente,
-      cedula: selected?.Cedula,
-      nombre_comercio: roleInfo?.["nombre comercio"],
-      ticket: objTicket,
-    };
-    ingresorecibo(body)
-      .then((res) => {
-        if (res?.status === true) {
-          setResponse(res?.obj);
-          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
-          objTicket["commerceInfo"][3] = ["Id Aut", res?.obj?.Confirmacion];
-          setTickets(objTicket);
-          setTicket(true);
-          setStop(false);
-        } else {
-          closeModal();
-          notifyError(res?.msg);
-          setStop(false);
-        }
-      })
-      .catch((err) => {
-        notifyError("Se ha presentado un error, intente mas tarde", err);
-      });
-  };
-
-  //////////////////////
-  const onSubmit = (e) => {
-    e.preventDefault();
-    setDisabledBtn(true);
-    setCreditStatus(false);
-    setInfo("");
-    const user = {
-      Usuario: roleInfo?.id_usuario,
-      Dispositivo: roleInfo?.id_dispositivo,
-      Comercio: roleInfo?.id_comercio,
-      Depto: roleInfo?.codigo_dane?.slice(0, 2),
-      Municipio: roleInfo?.codigo_dane?.slice(2),
-    };
-    if (tipobusqueda === "2") {
-      valorcuota(String(number), user)
-        .then((res) => {
-          setPermiteCambio(res?.obj?.PermiteCambio);
-          [res?.obj].map((row) => {
-            setCuota([
-              {
-                min: formatMoney.format(row.ValorMin),
-                max: formatMoney.format(row.ValorMaximo),
-                cuota: formatMoney.format(row.ValorPagar),
-              },
-            ]);
-            if (row.ValorPagar !== 0) {
-              setCreditStatus(true);
+  const [loadingPeticionMostrarCredito, peticionMostrarCredito] = useFetch(
+    fetchCustom(URL_MOSTRAR_CREDITO, "POST", "Mostrar Credito")
+  );
+  const [loadingPeticionIngresarRecibo, peticionIngresarRecibo] = 
+    useFetchFDLM(
+      URL_INGRESAR_RECIBO,
+      URL_CONSULTAR_ESTADO_TRX,
+      "Ingresar recibo"
+    );
+    
+  const bankCollection = useCallback(
+    (e) => {
+      e.preventDefault();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        id_uuid_trx: uuid,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        id_trx: datosTrx?.info?.obj?.id_trx,
+        valor_total_trx: parseFloat(datosTrx?.formatMon),
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+        Datos: {
+          Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
+          Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
+          nroBusqueda: selected?.Credito,
+          Direccion: roleInfo?.direccion ? roleInfo?.direccion : "No hay datos",
+          Cliente: selected?.Cliente,
+          Cedula: selected?.Cedula,
+        },
+      };
+      const dataAditional = {
+        id_uuid_trx: uuid,
+      };
+      notifyPending(
+        peticionIngresarRecibo(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando transacción";
+          },
+        },
+        {
+          render: ({data: res }) =>{
+            setTickets(res?.obj?.ticket);
+            setDatosTrx((old) => ({
+              ...old,
+              ticket: true,
+            }));
+            return "Transaccion satisfactoria";
+          },
+        },
+        {
+          render({ data: err }) {
+            handleClose();
+            navigate("/funmujer");
+            if (err?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
-          });
-        })
-        .catch((err) => {});
-    }
-    mostrarcredito(String(number), tipobusqueda, user)
-      .then((res) => {
-        setInfo(res);
-        setDisabledBtn(false);
-        if (res?.status === false) {
-          notifyError(
-            "Consulte soporte, servicio de Fundación de la mujer presenta fallas"
-          );
+            console.error(err?.message);
+            return err?.message ?? "Transacción fallida";
+          },
         }
-        [res?.obj].map((row) => {
-          setTable([
-            {
-              Cedula: row?.Cedula,
-              Mensaje: row?.Mensaje,
-              Cliente: row?.NombreCliente,
-              Producto: row?.NombreProducto,
-              Credito: row?.Nrocredito,
-              Valor: formatMoney.format(row?.ValorPagar),
-            },
-          ]);
-          setFormatMon(row?.ValorPagar);
+      );
+    },
+    [roleInfo,
+      selected, 
+      datosTrx?.info, 
+      pdpUser, 
+      datosTrx?.formatMon,
+    ]);
+  
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      setDatosTrx((old) => ({
+        ...old,
+        info: "",
+      }));
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        Datos: {
+          Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
+          Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
+          nroBusqueda: parseFloat(datosTrx?.number),
+          ParametroBusqueda: datosTrx?.tipobusqueda,
+        },
+      };
+      notifyPending(
+        peticionMostrarCredito({}, data),
+        {
+          render: () => {
+            return "Procesando consulta";
+          },
+        },
+        {
+          render: ({data: res }) =>{
+            setDatosTrx((old) => ({
+              ...old,
+              info: res,
+            }));
+            if (datosTrx?.tipobusqueda === "2" && res?.obj?.Cedula !== 0) {
+              const body = {
+                comercio: {
+                  id_comercio: roleInfo?.id_comercio,
+                  id_usuario: roleInfo?.id_usuario,
+                  id_terminal: roleInfo?.id_dispositivo,
+                },
+                nombre_comercio: roleInfo?.["nombre comercio"],
+                nombre_usuario: pdpUser?.uname ?? "",
+                id_trx: res?.obj?.id_trx,
+                Datos: {
+                  Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
+                  Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
+                  nroBusqueda: parseFloat(datosTrx?.number),
+                },
+              };
+              consultaValorCuota(body)
+                .then((res) => {
+                  const maximo = parseFloat(res?.obj?.ValorPagarMaximo) + 1
+                  const minimo = parseFloat(res?.obj?.ValorPagarMin) - 1
+                  setLimitesMontos({
+                    max: maximo,
+                    min: minimo,
+                  });
+                  setDatosTrx((old) => ({
+                    ...old,
+                    formatMon: res?.obj?.ValorPagar,
+                    cuota: res?.obj,
+                    valueValor: true,
+                    permiteCambio: res?.obj?.PermiteCambio,
+                  }));
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+            }
+            [res?.obj].map((row) => {
+              setTable([
+                {
+                  Cedula: row?.Cedula,
+                  Mensaje: row?.Mensaje,
+                  Cliente: row?.NombreCLiente1,
+                  Producto: row?.NombreProducto,
+                  Credito: row?.Nrocredito,
+                  Valor: formatMoney.format(row?.ValorPagar1),
+                },
+              ]);
+              setDatosTrx((old) => ({
+                ...old,
+                formatMon: row?.ValorPagar1,
+              }));
+            });
+            return "Consulta satisfactoria";
+          },
+        },
+        {
+          render: ( { data: error}) => {
+            return "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
+          },
+        }
+      );
+    },
+    [roleInfo, pdpUser, datosTrx?.tipobusqueda, datosTrx?.number]
+  );
+
+  const goToRecaudo = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+const params = useCallback(async () => {
+  const queries = { tipo_op: 5 };
+  try {
+    if (datosTrx?.tipobusqueda !== "2"){
+      const res = await fetchData(url_params, "GET", queries);
+      if ("Parametros" in res?.obj?.[0]) {
+        setLimitesMontos({
+          max: res?.obj?.[0].Parametros.monto_maximo + 1,
+          min: res?.obj?.[0].Parametros.monto_minimo - 1,
         });
-      })
-      .catch((err) => console.log("error", err));
-  };
+      } else {
+        setLimitesMontos({
+          max: 10000000,
+          min: 0,
+        });
+      }
+      return res;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}, []);
+  
+  useEffect(() => {
+    params();
+  }, [datosTrx?.info]);
 
   return (
     <>
@@ -343,18 +324,21 @@ const Recaudo = () => {
                 label: `Nº credito`,
               },
             ]}
-            value={tipobusqueda}
+            value={datosTrx?.tipobusqueda}
             onChange={(e) => {
-              setTiposBusqueda(e.target.value);
-              if (e.target.value == 1) {
+              setDatosTrx(prevState => ({
+                ...prevState,
+                tipobusqueda: e.target.value
+              }));
+              if (e.target.value === 1) {
                 setLabel("Documento");
               }
-              if (e.target.value == 2) {
+              if (e.target.value === 2) {
                 setLabel("Número crédito");
               }
             }}
           />
-          {tipobusqueda?.length > 0 && (
+          {datosTrx?.tipobusqueda?.length > 0 && (
             <Input
               id='numpin'
               label={label}
@@ -362,37 +346,28 @@ const Recaudo = () => {
               minLength='5'
               maxLength='12'
               autoComplete='off'
-              value={number}
+              value={datosTrx?.number}
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
-                setNumber(num);
+                setDatosTrx(prevState => ({
+                ...prevState,
+                number: num
+              }));
               }}
             />
           )}
           <ButtonBar className='col-auto md:col-span-2'>
-            <Button type='submit' disabled={disabledBtn}>
+            <Button type='submit' disabled={loadingPeticionMostrarCredito}>
               Consultar recaudos
             </Button>
           </ButtonBar>
         </Form>
       </>
-      {info?.status && (
+      {datosTrx?.info?.status && (
         <>
-          {creditStatus && (
-            <TableEnterprise
-              title='Parametros'
-              // maxPage={maxPages}
-              // onChange={onChange}
-              headers={["Valor mínimo", "Valor máximo", "Valor a pagar"]}
-              data={cuota || []}
-              // onSetPageData={setPageData}
-            ></TableEnterprise>
-          )}
           <br />
           <TableEnterprise
             title='Información de credito'
-            // maxPage={maxPages}
-            // onChange={onChange}
             headers={[
               "Cédula",
               "Mensaje",
@@ -404,83 +379,89 @@ const Recaudo = () => {
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              if (info?.obj?.NroMensaje === 1) {
+              if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.tipobusqueda !== "2")){
                 setShowModal(true);
               }
+              else if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.valueValor)){
+                setShowModal(true);
+              }
+              else if(datosTrx?.info?.obj?.Nromensaje1 === 1) {
+                notify("Procesando Consulta Valor Cuota")
+              }
             }}
-            // onSetPageData={setPageData}
           ></TableEnterprise>
         </>
       )}
-      {info?.obj?.NroMensaje === 1 && (
-        <Modal show={showModal} handleClose={() => closeModal()}>
-          {ticket !== true && (
-            <>
-              <h1 className='xl:text-center font-semibold'>
-                Resumen de la transacción
-              </h1>
-              <h2 className='sm:text-center font-semibold'>
-                Crédito # {table[0]?.Credito}
-              </h2>
-            </>
-          )}
+      {datosTrx?.info?.obj?.Nromensaje1 === 1 && (
+        <Modal show={showModal} handleClose={datosTrx?.ticket || loadingPeticionIngresarRecibo ? () => {} : handleClose}>
           <>
-            {ticket !== false ? (
+            {datosTrx?.ticket !== false ? (
               <div className='flex flex-col justify-center items-center'>
                 <Tickets refPrint={printDiv} ticket={tickets} />
                 <ButtonBar>
-                  <Button
-                    onClick={() => {
-                      handlePrint();
-                    }}>
-                    Imprimir
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      closeModal();
-                      setTicket(false);
-                    }}>
-                    Cerrar
-                  </Button>
+                  <Button onClick={handlePrint}>Imprimir</Button>
+                  <Button onClick={goToRecaudo}>Cerrar</Button>
                 </ButtonBar>
               </div>
             ) : (
-              <Form onSubmit={bankCollection}>
+              <Form grid onSubmit={bankCollection} style={{ textAlign: 'center' }}>
+                <>
+                <h1 className='text-2xl font-semibold'>
+                  Resumen de la transacción
+                </h1>
+                <h2 className='sm:text-center font-semibold'>
+                  Crédito # {table[0]?.Credito}
+                </h2>
+                <h2>{`Nombre del Cliente: ${
+                  datosTrx?.info?.obj?.NombreCLiente1 ?? ""
+                }`}
+                </h2>
+                <h2>{`Documento del Cliente: ${
+                  datosTrx?.info?.obj?.Cedula ?? ""
+                }`}
+                </h2>
+                </>
+                {datosTrx?.valueValor !== false ? (
+                  <>
+                    <h2>{`Valor de pago mínimo: ${formatMoney.format(
+                      datosTrx?.cuota?.ValorPagarMin
+                    )}`}</h2>
+                    <h2>{`Valor de pago máximo: ${formatMoney.format(
+                      datosTrx?.cuota?.ValorPagarMaximo
+                    )}`}</h2>
+                  </>
+                ): ""}
                 <MoneyInput
                   id='numPago'
+                  name='numPago'
                   label='Valor a pagar'
                   type='number'
                   autoComplete='off'
-                  max={paraMax}
-                  min={paraMin}
-                  required
-                  value={formatMon}
-                  disabled={permiteCambio == "N"}
+                  max={limitesMontos?.max}
+                  min={limitesMontos?.min}
+                  value={datosTrx?.formatMon}
+                  disabled={datosTrx?.permiteCambio === "N" || loadingPeticionIngresarRecibo}
                   onInput={(e, valor) => {
-                    const num = valor || "";
-                    if (num > paraMax || num < paraMin) {
-                      setStop(true);
-                    } else {
-                      setStop(false);
+                    if (!isNaN(valor)) {
+                      const num = valor;
+                      setDatosTrx((old) => {
+                        return { ...old, formatMon: num };
+                      });
                     }
-                    setFormatMon(num);
                   }}
-                />
-                {/* <Input
-                  id="refPago"
-                  label="Referencia pago"
-                  type="text"
-                  maxLength="15"
-                  autoComplete="off"
-                  value={referencia}
-                  onInput={(e) => {
-                    const ref = String(e.target.value) || "";
-                    setReferencia(ref);
-                  }}
-                /> */}
+                  required>
+                </MoneyInput>
                 <ButtonBar>
-                  <Button type='submit' disabled={stop}>
+                  <Button type='submit' disabled={loadingPeticionIngresarRecibo}>
                     Realizar pago
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleClose();
+                      notifyError("Transacción cancelada por el usuario");
+                    }}
+                    disabled={loadingPeticionIngresarRecibo}>
+                    Cancelar
                   </Button>
                 </ButtonBar>
               </Form>

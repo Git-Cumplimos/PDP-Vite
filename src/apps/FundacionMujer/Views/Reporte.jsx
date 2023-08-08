@@ -243,11 +243,11 @@ const Reporte = () => {
     setDownload(null);
     setFechaInicialDownload("");
     setFechaFinalDownload("");
-  });
+  },[]);
 
   const closeModal = useCallback(() => {
     setShowModal(false);
-  });
+  }, []);
 
   return (
     <div className='w-full flex flex-col justify-center items-center my-8'>
