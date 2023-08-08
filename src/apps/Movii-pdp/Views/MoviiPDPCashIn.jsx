@@ -9,11 +9,16 @@ import { notify, notifyError, notifyPending } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { postRealizarCashout, consultaValidateUserMoviiCashIn, trxDepositoMoviiCashIn } from "../utils/fetchMoviiRed";
+import { v4 } from "uuid";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
+import { enumParametrosMovii } from "../utils/enumParametrosMovii";
+import { useFetchMovii } from "../hooks/fetchMovii";
+const URL_CONSULTA_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}corresponsal-movii/check-estado-deposito-movii`;
+const URL_REALIZAR_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}corresponsal-movii/deposito-corresponsal-movii`;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -26,13 +31,13 @@ const MoviiPDPCashIn = () => {
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: 20000000,
-    inferior: 100,
+    superior: enumParametrosMovii.MAXCASHINMOVII,
+    inferior: enumParametrosMovii.MINCASHINMOVII,
   });
+  const uniqueId = v4();
   const [loadingPinPago, setLoadingPinPago] = useState(false);
   const [peticion, setPeticion] = useState(false);
   const [banderaConsulta, setBanderaConsulta] = useState(false);
-  const [msgConsulta, setMsgConsulta] = useState("");
   const [botonAceptar, setBotonAceptar] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
@@ -43,6 +48,7 @@ const MoviiPDPCashIn = () => {
     nombreUsuario: "",
     ciudad: "",
     genero: "",
+    id_trx: "",
   });
   const [isUploading, setIsUploading] = useState(false);
   useEffect(() => {
@@ -156,8 +162,15 @@ const MoviiPDPCashIn = () => {
     content: () => printDiv.current,
   });
 
+  const [loadingPeticionCashoutMovii, peticionCashInMovii] = useFetchMovii(
+    URL_REALIZAR_DEPOSITO_MOVII,
+    URL_CONSULTA_DEPOSITO_MOVII,    
+    "Realizar depósito Movii"
+  );
+
   const peticionCashIn = useCallback(
     (ev) => {
+      ev.preventDefault();
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -170,9 +183,10 @@ const MoviiPDPCashIn = () => {
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         // Ticket: objTicket,
-        subscriberNum: datosTrans.numeroTelefono,
+        subscriberNum: datosTrans?.numeroTelefono,
         // otp: datosTrans.otp,
         issuerName: infoUsers.nombreUsuario,
+        id_trx: parseInt(infoUsers?.id_trx),
         direccion: roleInfo?.direccion,
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -180,55 +194,52 @@ const MoviiPDPCashIn = () => {
             ? true
             : false,
       };
+      const dataAditional = {
+        id_uuid_trx: uniqueId,
+      };
       notifyPending(
-        trxDepositoMoviiCashIn(data),
+        peticionCashInMovii(data, dataAditional),
         {
-          render() {
-            setLoadingPinPago(true);
-            setBotonAceptar(true)
+          render: () => {
             return "Procesando transacción";
           },
         },
         {
-          render({ data: res }) {
+          render: ({ data: res }) => {
             setLoadingPinPago(false);
-            if (res?.status) {
+            setBotonAceptar(false)
+            const result = { data: res };
+            const msg = result.data.msg;
+            if (res?.obj?.ticket) {
+              // Haz algo si 'ticket' existe
               setObjTicketActual(res?.obj?.ticket);
+
+            } else {
+              // Haz algo más si 'ticket' no existe
+            }
+            if (res?.status) {
               setPeticion(true);
               setShowModal2(!showModal2);
+              setInfoUsers((old) => {
+                return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender};
+              });
+              return (`${msg} Exitosa`);
             } else {
-              setIsUploading(false);
-              notifyError(res?.msg);
               hideModal();
-              navigate(-1)
+              navigate(-1);
+              return (`${msg} Fallida`);
             }
-            setBotonAceptar(false)
-            return "Pago Deposito Movii Exitoso";
           },
         },
         {
-          render({ data: err }) {
-            setLoadingPinPago(false);
-            if (err?.cause === "custom") {
-              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
-            }
-            setIsUploading(false);
-            // notifyError("No se ha podido conectar al servidor");
-            setBanderaConsulta(false)
-            console.error(err);
-            navigate(-1)
-            return "Transacción fallida";
+          render: ({ data: error }) => {
+            navigate(-1);
+            return error?.message ?? "Transacción fallida";
           },
         }
       );
     },
-    [
-      datosTrans,
-      roleInfo,
-      pdpUser?.uname,
-      pdpUser,
-      navigate,
-    ]
+    [datosTrans, pdpUser, roleInfo, uniqueId]
   );
 
   const peticionConsulta = useCallback(
@@ -247,6 +258,7 @@ const MoviiPDPCashIn = () => {
         // Ticket: objTicket,
         subscriberNum: datosTrans.numeroTelefono,
         // otp: datosTrans.otp,
+        direccion: roleInfo?.direccion,
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
             roleInfo?.tipo_comercio === "KIOSCO"
@@ -271,28 +283,19 @@ const MoviiPDPCashIn = () => {
             if (res?.status) {
               setShowModal2(!showModal2);
               setInfoUsers((old) => {
-                return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender };
+                return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender, id_trx: res?.obj?.id_trx };
               });
-              return (`${msg} Exitosa`);
             } else {
+              navigate(-1);
               hideModal();
-              return (`${msg} Fallida`);
             }
+            return (`${msg} Exitosa`);
           },
         },
         {
-          render({ data: err }) {
-            setLoadingPinPago(false);
-            if (err?.cause === "custom") {
-              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
-            }
-            console.error("esto es errorn message",err?.message);
-            console.error("esto es error",err);
-            setIsUploading(false);
-            setBanderaConsulta(false)
-            console.error(err);
-            navigate(-1)
-            return "Transacción fallida";
+          render: ({ data: error }) => {
+            navigate(-1);
+            return error?.message ?? "Transacción fallida";
           },
         }
       );
@@ -305,7 +308,6 @@ const MoviiPDPCashIn = () => {
       navigate,
     ]
   );
-
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -332,24 +334,6 @@ const MoviiPDPCashIn = () => {
               });
             }
           }}></Input>
-        {/* <Input
-          id='otp'
-          label='Número OTP'
-          type='text'
-          name='otp'
-          minLength='2'
-          maxLength='6'
-          required
-          autoComplete='off'
-          value={datosTrans.otp}
-          onInput={(e) => {
-            if (!isNaN(e.target.value)) {
-              const num = e.target.value;
-              setDatosTrans((old) => {
-                return { ...old, otp: num };
-              });
-            }
-          }}></Input> */}
         <MoneyInput
           id='valCashOut'
           name='valCashOut'
@@ -410,7 +394,7 @@ const MoviiPDPCashIn = () => {
                 </h2>
 
                 <ButtonBar>
-                    <Button disabled={botonAceptar}  onClick={() => setShowModal(false)}>Cancelar</Button>
+                    <Button disabled={loadingPeticionCashoutMovii}  onClick={() => setShowModal(false)}>Cancelar</Button>
                 </ButtonBar>
               </>
             )
@@ -418,8 +402,8 @@ const MoviiPDPCashIn = () => {
             ""
           )}
           {peticion && (
-            <>
-              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
+            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={objTicketActual}></Tickets>
               <h2>
                 <ButtonBar>
                   <Button
@@ -432,7 +416,7 @@ const MoviiPDPCashIn = () => {
                   <Button onClick={handlePrint}>Imprimir</Button>
                 </ButtonBar>
               </h2>
-            </>
+            </div>
           )}
         </div>
       </Modal>
@@ -455,7 +439,6 @@ const MoviiPDPCashIn = () => {
                   )} COP`}
                 </h2>
                 <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
-                {/* <h2>{`Número OTP: ${datosTrans.otp}`}</h2> */}
                   <h2>{`Ciudad: ${infoUsers.ciudad.toLowerCase() === 'bogota' ? 'Bogotá D.C' : infoUsers.ciudad}`
                   }</h2>
                 <h2>{`Género: ${infoUsers.genero.toLowerCase() === 'male' ? 'Masculino' : 'Femenino'}`}</h2>
@@ -463,12 +446,12 @@ const MoviiPDPCashIn = () => {
 
                 <ButtonBar>
                   <Button
-                    disabled={botonAceptar}
+                      disabled={loadingPeticionCashoutMovii}
                     type='submit'
                     onClick={peticionCashIn}>
                       Aceptar
                   </Button>
-                    <Button disabled={botonAceptar} onClick={hideModalUsuario}>Cancelar</Button>
+                    <Button disabled={loadingPeticionCashoutMovii} onClick={hideModalUsuario}>Cancelar</Button>
                 </ButtonBar>
               </>
             ) : (
@@ -491,67 +474,8 @@ const MoviiPDPCashIn = () => {
           ) : (
             ""
           )}
-          {peticion && (
-            <>
-              <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
-              <h2>
-                <ButtonBar>
-                  <Button
-                    type='submit'
-                    onClick={() => {
-                      hideModal();
-                    }}>
-                    Aceptar
-                  </Button>
-                  <Button onClick={handlePrint}>Imprimir</Button>
-                </ButtonBar>
-              </h2>
-            </>
-          )}
         </div>
       </Modal>
-
-      {/*peticion de autorizacion y confirmacion */}
-      {/* <Modal
-        show={showModal2}
-        handleClose={() => {
-          setShowModal2(false);
-        }}
-      >
-        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
-          {peticion && (
-            <>
-              <Tickets></Tickets>
-              <h2>
-                <ButtonBar>
-                  <Button
-                    type="submit"
-                    onClick={() => {
-                      // setPeticion(false);
-                      setShowModal2(false);
-                      // peticionRecarga();
-                    }}
-                  >
-                    Aceptar
-                  </Button>
-                </ButtonBar>
-              </h2>
-            </>
-          )}
-        </div>
-      </Modal> */}
-
-      {/* Manejo de errores con el servidor */}
-      {/* <Modal
-        show={showModal3}
-        handleClose={() => {
-          setShowModal3(false);
-        }}
-      >
-        <h1>
-          {"ERROR, hubo un problema con la peticion al servidor " + dataCard}
-        </h1>
-      </Modal> */}
     </>
   );
 };

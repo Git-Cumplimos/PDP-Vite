@@ -10,7 +10,6 @@ export const useFetchMovii = (
   name_ = ""
 ) => {
   const [state, setState] = useState(false);
-
   const fetchMoviiTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(

@@ -33,11 +33,18 @@ export const consultaValidateUserMoviiCashIn = async (bodyObj) => {
       bodyObj
     );
     if (!res?.status) {
+      if (res?.msg) { 
+        throw new Error(res?.msg, { cause: "custom" });
+      }
       console.error(res?.msg);
+      throw new Error(res, {cause:"custom"})
     }
     return res;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    if (error.name === "ErrorCustomTimeout") {
+    } else {
+      throw error;
+    }
   }
 };
 export const trxDepositoMoviiCashIn = async (bodyObj) => {
@@ -55,8 +62,11 @@ export const trxDepositoMoviiCashIn = async (bodyObj) => {
       console.error(res?.msg);
     }
     return res;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    if (error.name === "ErrorCustomTimeout") {
+    } else {
+      throw error;
+    }
   }
 };
 export const postRealizarReversoCashout = async (bodyObj) => {

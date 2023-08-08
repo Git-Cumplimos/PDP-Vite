@@ -1,4 +1,7 @@
 export const enumParametrosMovii = Object.freeze({
   MAXCASHOUTMOVII: 20000000,
   MINCASHOUTMOVII: 100,
+  
+  MAXCASHINMOVII: 20000000,
+  MINCASHINMOVII: 100,
 });
