@@ -17,39 +17,38 @@ import { v4 } from "uuid";
 import { fetchCustom, consultaValorCuota } from "../utils/fetchFDLM";
 import { useFetch } from "../../../hooks/useFetch";
 import  useMoney from "../../../hooks/useMoney";
+import { useFetchFDLM } from "../hooks/fetchFDLM";
 
 const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 const URL_MOSTRAR_CREDITO= `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`
 const URL_INGRESAR_RECIBO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`
+const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
 
 
 const Recaudo = () => {
-  // const formatMoney = new Intl.NumberFormat("es-CO", {
-  //   style: "currency",
-  //   currency: "COP",
-  //   maximumFractionDigits: 0,
-  // });
   const navigate = useNavigate();
 
   const [label, setLabel] = useState("");
-  const [tipobusqueda, setTiposBusqueda] = useState("");
-  const [number, setNumber] = useState("");
-  const [info, setInfo] = useState("");
+  const [limitesMontos, setLimitesMontos] = useState({
+    max: 0,
+    min: 0,
+  });
+  const [datosTrx, setDatosTrx] = useState({
+    tipobusqueda: "",
+    number: "",
+    info: "",
+    cuota: "",
+    formatMon: "",
+    permiteCambio: "",
+    valueValor: false,
+    ticket: false,
+  });
+  const [uuid, setUuid] = useState(v4());
   const [table, setTable] = useState("");
-  const [cuota, setCuota] = useState("");
-  const [formatMon, setFormatMon] = useState("");
-  const [ticket, setTicket] = useState(false);
   const [selected, setSelected] = useState(true);
   const [showModal, setShowModal] = useState("");
-  const [response, setResponse] = useState("");
   const { roleInfo, pdpUser } = useAuth();
-  const [permiteCambio, setPermiteCambio] = useState("");
-  const [paraMax, setParaMax] = useState(null);
-  const [paraMin, setParaMin] = useState(null);
   const [tickets, setTickets] = useState("");
-  const [valueValor, setValueValor] = useState(false);
-  const [uuid, setUuid] = useState(v4());
-
   const printDiv = useRef();
 
   useEffect(() => {
@@ -86,26 +85,33 @@ const Recaudo = () => {
 
   const handleClose = useCallback(() => {
     setShowModal(false);
-    setFormatMon("");
-    setInfo("");
-    setTicket(false);
-    setValueValor(false);
-    setPermiteCambio("");
-    setCuota("");
-    setValueValor(false);
     setUuid(v4());
-    setParaMax(null);
-    setParaMin(null);
+    setLimitesMontos({
+      max: 0,
+      min: 0,
+    });
+    setDatosTrx({
+      tipobusqueda: "",
+      number: "",
+      info: "",
+      cuota: "",
+      formatMon: "",
+      permiteCambio: "",
+      valueValor: false,
+      ticket: false,
+    });
   }, []);
 
   const [loadingPeticionMostrarCredito, peticionMostrarCredito] = useFetch(
     fetchCustom(URL_MOSTRAR_CREDITO, "POST", "Mostrar Credito")
   );
-  const [loadingPeticionIngresarRecibo, peticionIngresarRecibo] = useFetch(
-    fetchCustom(URL_INGRESAR_RECIBO, "POST", "Ingreso Recibo")
-  );
- 
-
+  const [loadingPeticionIngresarRecibo, peticionIngresarRecibo] = 
+    useFetchFDLM(
+      URL_INGRESAR_RECIBO,
+      URL_CONSULTAR_ESTADO_TRX,
+      "Ingresar recibo"
+    );
+    
   const bankCollection = useCallback(
     (e) => {
       e.preventDefault();
@@ -118,8 +124,8 @@ const Recaudo = () => {
         id_uuid_trx: uuid,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
-        id_trx: info?.obj?.id_trx,
-        valor_total_trx: parseFloat(formatMon),
+        id_trx: datosTrx?.info?.obj?.id_trx,
+        valor_total_trx: parseFloat(datosTrx?.formatMon),
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
         Datos: {
           Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
@@ -130,8 +136,11 @@ const Recaudo = () => {
           Cedula: selected?.Cedula,
         },
       };
+      const dataAditional = {
+        id_uuid_trx: uuid,
+      };
       notifyPending(
-        peticionIngresarRecibo({}, data),
+        peticionIngresarRecibo(data, dataAditional),
         {
           render: () => {
             return "Procesando transacción";
@@ -139,9 +148,11 @@ const Recaudo = () => {
         },
         {
           render: ({data: res }) =>{
-            setResponse(res?.obj);
             setTickets(res?.obj?.ticket);
-            setTicket(true);
+            setDatosTrx((old) => ({
+              ...old,
+              ticket: true,
+            }));
             return "Transaccion satisfactoria";
           },
         },
@@ -160,15 +171,18 @@ const Recaudo = () => {
     },
     [roleInfo,
       selected, 
-      info, 
+      datosTrx?.info, 
       pdpUser, 
-      formatMon,
+      datosTrx?.formatMon,
     ]);
   
   const onSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      setInfo("");
+      setDatosTrx((old) => ({
+        ...old,
+        info: "",
+      }));
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -180,8 +194,8 @@ const Recaudo = () => {
         Datos: {
           Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
           Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
-          nroBusqueda: parseFloat(number),
-          ParametroBusqueda: tipobusqueda,
+          nroBusqueda: parseFloat(datosTrx?.number),
+          ParametroBusqueda: datosTrx?.tipobusqueda,
         },
       };
       notifyPending(
@@ -193,8 +207,11 @@ const Recaudo = () => {
         },
         {
           render: ({data: res }) =>{
-            setInfo(res);
-            if (tipobusqueda === "2" && res?.obj?.Cedula !== 0) {
+            setDatosTrx((old) => ({
+              ...old,
+              info: res,
+            }));
+            if (datosTrx?.tipobusqueda === "2" && res?.obj?.Cedula !== 0) {
               const body = {
                 comercio: {
                   id_comercio: roleInfo?.id_comercio,
@@ -207,19 +224,24 @@ const Recaudo = () => {
                 Datos: {
                   Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
                   Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
-                  nroBusqueda: parseFloat(number),
+                  nroBusqueda: parseFloat(datosTrx?.number),
                 },
               };
               consultaValorCuota(body)
                 .then((res) => {
-                  setPermiteCambio(res?.obj?.PermiteCambio);
-                  const max = parseFloat(res?.obj?.ValorPagarMaximo) + 1
-                  const min = parseFloat(res?.obj?.ValorPagarMin)
-                  setParaMax(max);
-                  setParaMin(min);
-                  setFormatMon(res?.obj?.ValorPagar);
-                  setCuota(res?.obj);
-                  setValueValor(true);
+                  const maximo = parseFloat(res?.obj?.ValorPagarMaximo) + 1
+                  const minimo = parseFloat(res?.obj?.ValorPagarMin) - 1
+                  setLimitesMontos({
+                    max: maximo,
+                    min: minimo,
+                  });
+                  setDatosTrx((old) => ({
+                    ...old,
+                    formatMon: res?.obj?.ValorPagar,
+                    cuota: res?.obj,
+                    valueValor: true,
+                    permiteCambio: res?.obj?.PermiteCambio,
+                  }));
                 })
                 .catch((err) => {
                   console.log(err);
@@ -236,7 +258,10 @@ const Recaudo = () => {
                   Valor: formatMoney.format(row?.ValorPagar1),
                 },
               ]);
-              setFormatMon(row?.ValorPagar1);
+              setDatosTrx((old) => ({
+                ...old,
+                formatMon: row?.ValorPagar1,
+              }));
             });
             return "Consulta satisfactoria";
           },
@@ -248,7 +273,7 @@ const Recaudo = () => {
         }
       );
     },
-    [roleInfo, pdpUser, tipobusqueda, number]
+    [roleInfo, pdpUser, datosTrx?.tipobusqueda, datosTrx?.number]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -258,14 +283,19 @@ const Recaudo = () => {
 const params = useCallback(async () => {
   const queries = { tipo_op: 5 };
   try {
-    if (!setValueValor){
+    if (datosTrx?.tipobusqueda !== "2"){
       const res = await fetchData(url_params, "GET", queries);
+      console.log(res)
       if ("Parametros" in res?.obj?.[0]) {
-        setParaMax(res?.obj?.[0].Parametros.monto_maximo);
-        setParaMin(res?.obj?.[0].Parametros.monto_minimo);
+        setLimitesMontos({
+          max: res?.obj?.[0].Parametros.monto_maximo,
+          min: res?.obj?.[0].Parametros.monto_minimo,
+        });
       } else {
-        setParaMax(10000000);
-        setParaMin(0);
+        setLimitesMontos({
+          max: 10000000,
+          min: 0,
+        });
       }
       return res;
     }
@@ -275,12 +305,12 @@ const params = useCallback(async () => {
 }, []);
 
 const onChangeMoney = useMoney({
-  limits: [paraMin, paraMax]
+  limits: [limitesMontos?.min, limitesMontos?.max]
 });
   
   useEffect(() => {
     params();
-  }, [info]);
+  }, [datosTrx?.info]);
 
   return (
     <>
@@ -301,9 +331,12 @@ const onChangeMoney = useMoney({
                 label: `Nº credito`,
               },
             ]}
-            value={tipobusqueda}
+            value={datosTrx?.tipobusqueda}
             onChange={(e) => {
-              setTiposBusqueda(e.target.value);
+              setDatosTrx(prevState => ({
+                ...prevState,
+                tipobusqueda: e.target.value
+              }));
               if (e.target.value === 1) {
                 setLabel("Documento");
               }
@@ -312,7 +345,7 @@ const onChangeMoney = useMoney({
               }
             }}
           />
-          {tipobusqueda?.length > 0 && (
+          {datosTrx?.tipobusqueda?.length > 0 && (
             <Input
               id='numpin'
               label={label}
@@ -320,10 +353,13 @@ const onChangeMoney = useMoney({
               minLength='5'
               maxLength='12'
               autoComplete='off'
-              value={number}
+              value={datosTrx?.number}
               onInput={(e) => {
                 const num = parseInt(e.target.value) || "";
-                setNumber(num);
+                setDatosTrx(prevState => ({
+                ...prevState,
+                number: num
+              }));
               }}
             />
           )}
@@ -334,7 +370,7 @@ const onChangeMoney = useMoney({
           </ButtonBar>
         </Form>
       </>
-      {info?.status && (
+      {datosTrx?.info?.status && (
         <>
           <br />
           <TableEnterprise
@@ -350,22 +386,22 @@ const onChangeMoney = useMoney({
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              if ((info?.obj?.Nromensaje1 === 1) && (tipobusqueda !== "2")){
+              if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.tipobusqueda !== "2")){
                 setShowModal(true);
               }
-              else if ((info?.obj?.Nromensaje1 === 1) && (valueValor)){
+              else if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.valueValor)){
                 setShowModal(true);
               }
-              else if(info?.obj?.Nromensaje1 === 1) {
+              else if(datosTrx?.info?.obj?.Nromensaje1 === 1) {
                 notify("Procesando Consulta Valor Cuota")
               }
             }}
           ></TableEnterprise>
         </>
       )}
-      {info?.obj?.Nromensaje1 === 1 && (
-        <Modal show={showModal} handleClose={ticket || loadingPeticionIngresarRecibo ? () => {} : handleClose}>
-          {ticket !== true && (
+      {datosTrx?.info?.obj?.Nromensaje1 === 1 && (
+        <Modal show={showModal} handleClose={datosTrx?.ticket || loadingPeticionIngresarRecibo ? () => {} : handleClose}>
+          {datosTrx?.ticket !== true && (
             <>
               <h1 className='xl:text-center font-semibold'>
                 Resumen de la transacción
@@ -376,7 +412,7 @@ const onChangeMoney = useMoney({
             </>
           )}
           <>
-            {ticket !== false ? (
+            {datosTrx?.ticket !== false ? (
               <div className='flex flex-col justify-center items-center'>
                 <Tickets refPrint={printDiv} ticket={tickets} />
                 <ButtonBar>
@@ -388,40 +424,64 @@ const onChangeMoney = useMoney({
               <Form grid onSubmit={bankCollection}>
                 <>
                 <h2>{`Nombre del Cliente: ${
-                  info?.obj?.NombreCLiente1 ?? ""
+                  datosTrx?.info?.obj?.NombreCLiente1 ?? ""
                 }`}
                 </h2>
                 <h2>{`Documento del Cliente: ${
-                  info?.obj?.Cedula ?? ""
+                  datosTrx?.info?.obj?.Cedula ?? ""
                 }`}
                 </h2>
                 </>
-                {valueValor !== false ? (
+                {datosTrx?.valueValor !== false ? (
                   <>
                     <h2>{`Valor de pago mínimo: ${formatMoney.format(
-                      cuota?.ValorPagarMin
+                      datosTrx?.cuota?.ValorPagarMin
                     )}`}</h2>
                     <h2>{`Valor de pago máximo: ${formatMoney.format(
-                      cuota?.ValorPagarMaximo
+                      datosTrx?.cuota?.ValorPagarMaximo
                     )}`}</h2>
                     <h2>{`Valor a pagar: ${formatMoney.format(
-                      cuota?.ValorPagar
+                      datosTrx?.cuota?.ValorPagar
                     )}`}</h2>
                   </>
                 ): ""}
                 <MoneyInput
                   id='numPago'
+                  name='numPago'
                   label='Valor a pagar'
                   type='number'
                   autoComplete='off'
-                  max={paraMax}
-                  min={paraMin}
+                  max={limitesMontos?.max}
+                  min={limitesMontos?.min}
+                  value={datosTrx?.formatMon}
+                  disabled={datosTrx?.permiteCambio === "N" || loadingPeticionIngresarRecibo}
+                  onInput={(e, valor) => {
+                    if (!isNaN(valor)) {
+                      const num = valor;
+                      setDatosTrx((old) => {
+                        return { ...old, formatMon: num };
+                      });
+                    }
+                  }}
+                  required>
+                </MoneyInput>
+                {/* <MoneyInput
+                  id='numPago'
+                  label='Valor a pagar'
+                  type='number'
+                  autoComplete='off'
+                  max={limitesMontos?.max}
+                  min={limitesMontos?.min}
                   required
-                  value={formatMon}
-                  disabled={permiteCambio === "N" || loadingPeticionIngresarRecibo}
+                  value={datosTrx?.formatMon}
+                  disabled={datosTrx?.permiteCambio === "N" || loadingPeticionIngresarRecibo}
                   onInput={(ev) => 
-                    setFormatMon(onChangeMoney(ev))}
-                />
+                    setDatosTrx((old) => ({
+                      ...old,
+                      formatMon: onChangeMoney(ev),
+                    }))
+                  }
+                /> */}
                 <ButtonBar>
                   <Button type='submit' disabled={loadingPeticionIngresarRecibo}>
                     Realizar pago
