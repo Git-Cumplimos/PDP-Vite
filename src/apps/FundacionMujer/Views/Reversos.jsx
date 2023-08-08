@@ -93,7 +93,6 @@ const Reversos = () => {
       fetchData(`${url_USERS}/users`, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            console.log(res)
             setUsuariosDB(res?.obj?.results);
             setMaxPageUsers(res?.obj?.maxpages);
           }
@@ -305,7 +304,6 @@ const Reversos = () => {
               <h1 className='sm:text-center font-semibold'>
                 ¿Esta seguro del reverso de la obligación?
               </h1>
-              {console.log(selected)}
               <Form onSubmit={reverse} grid>
                 <Input
                   id='idTrx'

@@ -24,10 +24,8 @@ const URL_MOSTRAR_CREDITO= `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcredito
 const URL_INGRESAR_RECIBO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`
 const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
 
-
 const Recaudo = () => {
   const navigate = useNavigate();
-
   const [label, setLabel] = useState("");
   const [limitesMontos, setLimitesMontos] = useState({
     max: 0,
@@ -244,7 +242,7 @@ const Recaudo = () => {
                   }));
                 })
                 .catch((err) => {
-                  console.log(err);
+                  console.error(err);
                 });
             }
             [res?.obj].map((row) => {
@@ -285,11 +283,10 @@ const params = useCallback(async () => {
   try {
     if (datosTrx?.tipobusqueda !== "2"){
       const res = await fetchData(url_params, "GET", queries);
-      console.log(res)
       if ("Parametros" in res?.obj?.[0]) {
         setLimitesMontos({
-          max: res?.obj?.[0].Parametros.monto_maximo,
-          min: res?.obj?.[0].Parametros.monto_minimo,
+          max: res?.obj?.[0].Parametros.monto_maximo + 1,
+          min: res?.obj?.[0].Parametros.monto_minimo - 1,
         });
       } else {
         setLimitesMontos({
@@ -303,10 +300,6 @@ const params = useCallback(async () => {
     console.error(err);
   }
 }, []);
-
-const onChangeMoney = useMoney({
-  limits: [limitesMontos?.min, limitesMontos?.max]
-});
   
   useEffect(() => {
     params();
@@ -401,16 +394,6 @@ const onChangeMoney = useMoney({
       )}
       {datosTrx?.info?.obj?.Nromensaje1 === 1 && (
         <Modal show={showModal} handleClose={datosTrx?.ticket || loadingPeticionIngresarRecibo ? () => {} : handleClose}>
-          {datosTrx?.ticket !== true && (
-            <>
-              <h1 className='xl:text-center font-semibold'>
-                Resumen de la transacción
-              </h1>
-              <h2 className='sm:text-center font-semibold'>
-                Crédito # {table[0]?.Credito}
-              </h2>
-            </>
-          )}
           <>
             {datosTrx?.ticket !== false ? (
               <div className='flex flex-col justify-center items-center'>
@@ -421,8 +404,14 @@ const onChangeMoney = useMoney({
                 </ButtonBar>
               </div>
             ) : (
-              <Form grid onSubmit={bankCollection}>
+              <Form grid onSubmit={bankCollection} style={{ textAlign: 'center' }}>
                 <>
+                <h1 className='text-2xl font-semibold'>
+                  Resumen de la transacción
+                </h1>
+                <h2 className='sm:text-center font-semibold'>
+                  Crédito # {table[0]?.Credito}
+                </h2>
                 <h2>{`Nombre del Cliente: ${
                   datosTrx?.info?.obj?.NombreCLiente1 ?? ""
                 }`}
@@ -439,9 +428,6 @@ const onChangeMoney = useMoney({
                     )}`}</h2>
                     <h2>{`Valor de pago máximo: ${formatMoney.format(
                       datosTrx?.cuota?.ValorPagarMaximo
-                    )}`}</h2>
-                    <h2>{`Valor a pagar: ${formatMoney.format(
-                      datosTrx?.cuota?.ValorPagar
                     )}`}</h2>
                   </>
                 ): ""}
@@ -465,26 +451,17 @@ const onChangeMoney = useMoney({
                   }}
                   required>
                 </MoneyInput>
-                {/* <MoneyInput
-                  id='numPago'
-                  label='Valor a pagar'
-                  type='number'
-                  autoComplete='off'
-                  max={limitesMontos?.max}
-                  min={limitesMontos?.min}
-                  required
-                  value={datosTrx?.formatMon}
-                  disabled={datosTrx?.permiteCambio === "N" || loadingPeticionIngresarRecibo}
-                  onInput={(ev) => 
-                    setDatosTrx((old) => ({
-                      ...old,
-                      formatMon: onChangeMoney(ev),
-                    }))
-                  }
-                /> */}
                 <ButtonBar>
                   <Button type='submit' disabled={loadingPeticionIngresarRecibo}>
                     Realizar pago
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      handleClose();
+                      notifyError("Transacción cancelada por el usuario");
+                    }}
+                    disabled={loadingPeticionIngresarRecibo}>
+                    Cancelar
                   </Button>
                 </ButtonBar>
               </Form>
