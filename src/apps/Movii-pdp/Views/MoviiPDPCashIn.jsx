@@ -29,8 +29,10 @@ const MoviiPDPCashIn = () => {
     superior: 20000000,
     inferior: 100,
   });
+  const [loadingPinPago, setLoadingPinPago] = useState(false);
   const [peticion, setPeticion] = useState(false);
   const [banderaConsulta, setBanderaConsulta] = useState(false);
+  const [msgConsulta, setMsgConsulta] = useState("");
   const [botonAceptar, setBotonAceptar] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
@@ -108,6 +110,7 @@ const MoviiPDPCashIn = () => {
   };
 
   const hideModal = () => {
+    setBanderaConsulta(false)
     setShowModal(false);
     setShowModal2(false);
     setDatosTrans({
@@ -153,220 +156,154 @@ const MoviiPDPCashIn = () => {
     content: () => printDiv.current,
   });
 
-  const peticionCashOut = () => {
-    setBanderaConsulta(false)
-    const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
-    /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Numero de telefono",
-      datosTrans.numeroTelefono,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(datosTrans.valorCashOut),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    setIsUploading(true);
-    trxDepositoMoviiCashIn({
-      comercio: {
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_terminal: roleInfo?.id_dispositivo,
-      },
-      amount: datosTrans?.valorCashOut,
-      issuer_id_dane: roleInfo?.codigo_dane,
-      nombre_comercio: roleInfo?.["nombre comercio"],
-      nombre_usuario: pdpUser?.uname ?? "",
-      // Ticket: objTicket,
-      subscriberNum: datosTrans.numeroTelefono,
-      // otp: datosTrans.otp,
-      issuerName: infoUsers.nombreUsuario,
-      oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO"
-          ? true
-          : false,
-    })
-      .then((res) => {
-        if (res?.status) {
-          // notifyPending(
-          //   // makePagoGiro(data),
-          //   {
-          //     render() {
-          //       // setLoadingPinPago(true);
-          //       return "Procesando transacción";
-          //     },
-          //   },
-          //   {
-          //     render({ data: res }) {
-          //       // setLoadingPinPago(false);
-          //       // setPaymentStatus(res?.obj?.ticket ?? {});
-          //       return "Transacción satisfactoria";
-          //     },
-          //   },
-          //   {
-          //     render({ data: err }) {
-          //       // setLoadingPinPago(false);
-          //       navigate("/corresponsalia/colpatria");
-          //       if (err?.cause === "custom") {
-          //         return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
-          //       }
-          //       console.error(err?.message);
-          //       return "Transacción fallida";
-          //     },
-          //   }
-          // );
-          setIsUploading(false);
-          // notify(res?.msg);
-          notify(`${res?.msg} Exitosa`);
-          // hideModal();
-          objTicket["trxInfo"].push([
-            "Id cash out",
-            res?.obj?.respuesta_movii?.cashOutId,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Id transacción",
-            res?.obj?.respuesta_movii?.transactionId,
-            // res?.obj?.respuesta_movii?.correlationId,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-
-          setObjTicketActual(objTicket);
-          // setPeticion(true);
-          setShowModal2(!showModal2);
-          // setInfoUsers((old) => {
-          //   return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender };
-          // });
-        } else {
-          setIsUploading(false);
-          notifyError(res?.msg);
-          hideModal();
+  const peticionCashOut = useCallback(
+    (ev) => {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        amount: datosTrans?.valorCashOut,
+        valor_total_trx: datosTrans?.valorCashOut,
+        issuer_id_dane: roleInfo?.codigo_dane,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        // Ticket: objTicket,
+        subscriberNum: datosTrans.numeroTelefono,
+        // otp: datosTrans.otp,
+        issuerName: infoUsers.nombreUsuario,
+        direccion: roleInfo?.direccion,
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+            roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+      };
+      notifyPending(
+        trxDepositoMoviiCashIn(data),
+        {
+          render() {
+            setLoadingPinPago(true);
+            setBotonAceptar(true)
+            return "Procesando transacción";
+          },
+        },
+        {
+          render({ data: res }) {
+            setLoadingPinPago(false);
+            if (res?.status) {
+              setObjTicketActual(res?.obj?.ticket);
+              setPeticion(true);
+              setShowModal2(!showModal2);
+            } else {
+              setIsUploading(false);
+              notifyError(res?.msg);
+              hideModal();
+              navigate(-1)
+            }
+            setBotonAceptar(false)
+            return "Pago Deposito Movii Exitoso";
+          },
+        },
+        {
+          render({ data: err }) {
+            setLoadingPinPago(false);
+            if (err?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
+            }
+            setIsUploading(false);
+            // notifyError("No se ha podido conectar al servidor");
+            setBanderaConsulta(false)
+            console.error(err);
+            navigate(-1)
+            return "Transacción fallida";
+          },
         }
-      })
-      .catch((err) => {
-        setIsUploading(false);
-        notifyError("No se ha podido conectar al servidor");
-        console.error(err);
-      });
-  };
-  
-  const peticionConsulta = () => {
-    setBanderaConsulta(true)
-    const hoy = new Date();
-    const fecha =
-      hoy.getDate() + "-" + (hoy.getMonth() + 1) + "-" + hoy.getFullYear();
-    /*hora actual */
-    const hora =
-      hoy.getHours() + ":" + hoy.getMinutes() + ":" + hoy.getSeconds();
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Numero de telefono",
-      datosTrans.numeroTelefono,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Numero OTP", datosTrans.otp]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(datosTrans.valorCashOut),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    setIsUploading(true);
-    consultaValidateUserMoviiCashIn({
-      comercio: {
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_terminal: roleInfo?.id_dispositivo,
-      },
-      amount: datosTrans?.valorCashOut,
-      issuer_id_dane: roleInfo?.codigo_dane,
-      nombre_comercio: roleInfo?.["nombre comercio"],
-      nombre_usuario: pdpUser?.uname ?? "",
-      // Ticket: objTicket,
-      subscriberNum: datosTrans.numeroTelefono,
-      // otp: datosTrans.otp,
-      oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO"
-          ? true
-          : false,
-    })
-      .then((res) => {
-        if (res?.status) {
-          // notifyPending(
-          //   // makePagoGiro(data),
-          //   {
-          //     render() {
-          //       // setLoadingPinPago(true);
-          //       return "Procesando transacción";
-          //     },
-          //   },
-          //   {
-          //     render({ data: res }) {
-          //       // setLoadingPinPago(false);
-          //       // setPaymentStatus(res?.obj?.ticket ?? {});
-          //       return "Transacción satisfactoria";
-          //     },
-          //   },
-          //   {
-          //     render({ data: err }) {
-          //       // setLoadingPinPago(false);
-          //       navigate("/corresponsalia/colpatria");
-          //       if (err?.cause === "custom") {
-          //         return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
-          //       }
-          //       console.error(err?.message);
-          //       return "Transacción fallida";
-          //     },
-          //   }
-          // );
-          setIsUploading(false);
-          // notify(res?.msg);
-          notify(`${res?.msg} Exitosa`);
-          // hideModal();
-          objTicket["trxInfo"].push([
-            "Id cash out",
-            res?.obj?.respuesta_movii?.cashOutId,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Id transacción",
-            res?.obj?.respuesta_movii?.transactionId,
-            // res?.obj?.respuesta_movii?.correlationId,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
+      );
+    },
+    [
+      datosTrans,
+      roleInfo,
+      pdpUser?.uname,
+      pdpUser,
+      navigate,
+    ]
+  );
 
-          setObjTicketActual(objTicket);
-          // setPeticion(true);
-          setShowModal2(!showModal2);
-          setInfoUsers((old) => {
-            return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender };
-          });
-        } else {
-          setIsUploading(false);
-          notifyError(res?.msg);
-          hideModal();
+  const peticionConsulta = useCallback(
+    (ev) => {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        amount: datosTrans?.valorCashOut,
+        valor_total_trx: datosTrans?.valorCashOut,
+        issuer_id_dane: roleInfo?.codigo_dane,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        // Ticket: objTicket,
+        subscriberNum: datosTrans.numeroTelefono,
+        // otp: datosTrans.otp,
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+            roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+      };
+      notifyPending(
+        consultaValidateUserMoviiCashIn(data),
+        {
+          render() {
+            setLoadingPinPago(true);
+            setBotonAceptar(true)
+            return "Procesando transacción";
+          },
+        },
+        {
+          render({ data: res }) {
+            setLoadingPinPago(false);
+            if (res?.status) {
+              setShowModal2(!showModal2);
+              setInfoUsers((old) => {
+                return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender };
+              });
+            } else {
+              hideModal();
+              navigate(-1)
+            }
+            setBotonAceptar(false)
+            return "Consulta Deposito Movii Exitosa";
+          },
+        },
+        {
+          render({ data: err }) {
+            setLoadingPinPago(false);
+            if (err?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
+            }
+            console.error("esto es errorn message",err?.message);
+            console.error("esto es error",err);
+            setIsUploading(false);
+            setBanderaConsulta(false)
+            console.error(err);
+            navigate(-1)
+            return "Transacción fallida";
+          },
         }
-      })
-      .catch((err) => {
-        setIsUploading(false);
-        notifyError("No se ha podido conectar al servidor");
-        console.error(err);
-      });
-  };
+      );
+    },
+    [
+      datosTrans,
+      roleInfo,
+      pdpUser?.uname,
+      pdpUser,
+      navigate,
+    ]
+  );
+
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -432,9 +369,9 @@ const MoviiPDPCashIn = () => {
           <Button type='submit'>Aceptar</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={hideModal}>
+      <Modal show={showModal} handleClose={loadingPinPago ? () => { } : hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion && !banderaConsulta ? (
+          {!peticion ? (
             datosTrans.valorCashOut < limiteRecarga.superior &&
             datosTrans.valorCashOut > limiteRecarga.inferior ? (
               <>
@@ -455,7 +392,7 @@ const MoviiPDPCashIn = () => {
                       onClick={peticionConsulta}>
                       Realizar consulta
                   </Button>
-                    <Button onClick={hideModalUsuario}>Cancelar</Button>
+                    <Button disabled={botonAceptar}  onClick={hideModalUsuario}>Cancelar</Button>
                 </ButtonBar>
               </>
             ) : (
@@ -471,7 +408,7 @@ const MoviiPDPCashIn = () => {
                 </h2>
 
                 <ButtonBar>
-                  <Button onClick={() => setShowModal(false)}>Cancelar</Button>
+                    <Button disabled={botonAceptar}  onClick={() => setShowModal(false)}>Cancelar</Button>
                 </ButtonBar>
               </>
             )
@@ -497,7 +434,7 @@ const MoviiPDPCashIn = () => {
           )}
         </div>
       </Modal>
-      <Modal show={showModal2} handleClose={hideModal}>
+      <Modal show={showModal2} handleClose={loadingPinPago ? () => { } : hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
           {!peticion ? (
             datosTrans.valorCashOut < limiteRecarga.superior &&
@@ -526,7 +463,7 @@ const MoviiPDPCashIn = () => {
                     onClick={peticionCashOut}>
                       Aceptar
                   </Button>
-                    <Button onClick={hideModalUsuario}>Cancelar</Button>
+                    <Button disabled={botonAceptar} onClick={hideModalUsuario}>Cancelar</Button>
                 </ButtonBar>
               </>
             ) : (
