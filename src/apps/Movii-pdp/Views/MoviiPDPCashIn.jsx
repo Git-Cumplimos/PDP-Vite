@@ -156,7 +156,7 @@ const MoviiPDPCashIn = () => {
     content: () => printDiv.current,
   });
 
-  const peticionCashOut = useCallback(
+  const peticionCashIn = useCallback(
     (ev) => {
       const data = {
         comercio: {
@@ -265,17 +265,19 @@ const MoviiPDPCashIn = () => {
         {
           render({ data: res }) {
             setLoadingPinPago(false);
+            setBotonAceptar(false)
+            const result = { data: res }; 
+            const msg = result.data.msg;
             if (res?.status) {
               setShowModal2(!showModal2);
               setInfoUsers((old) => {
                 return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender };
               });
+              return (`${msg} Exitosa`);
             } else {
               hideModal();
-              navigate(-1)
+              return (`${msg} Fallida`);
             }
-            setBotonAceptar(false)
-            return "Consulta Deposito Movii Exitosa";
           },
         },
         {
@@ -376,10 +378,10 @@ const MoviiPDPCashIn = () => {
             datosTrans.valorCashOut > limiteRecarga.inferior ? (
               <>
                 <h1 className='text-2xl font-semibold'>
-                  ¿Está seguro de realizar la consulta para el Depósito Movii?
+                  ¿Está seguro de realizar la transaccion?
                 </h1>
                 <h2 className='text-base'>
-                  {`Valor de transacción: ${formatMoney.format(
+                  {`Valor a depositar: ${formatMoney.format(
                     datosTrans.valorCashOut
                   )} COP`}
                 </h2>
@@ -439,13 +441,16 @@ const MoviiPDPCashIn = () => {
           {!peticion ? (
             datosTrans.valorCashOut < limiteRecarga.superior &&
             datosTrans.valorCashOut > limiteRecarga.inferior ? (
-              <>
-                <h1 className='text-2xl font-semibold'>
-                  ¿Está seguro de realizar el Depósito Movii?
-                </h1>
-                <h2>{`Nombre del usuario: ${infoUsers.nombreUsuario}`}</h2>
+                <>
+                  <h1 className='text-2xl font-bold'>
+                    Respuesta de consulta Movii
+                  </h1>
+                <h4 className='text-2xl font-semibold'>
+                    Resumen de la transacción
+                </h4>
+                <h2>{`Nombre usuario: ${infoUsers.nombreUsuario}`}</h2>
                 <h2 className='text-base'>
-                  {`Valor de transacción: ${formatMoney.format(
+                  {`Valor a depositar: ${formatMoney.format(
                     datosTrans.valorCashOut
                   )} COP`}
                 </h2>
@@ -460,7 +465,7 @@ const MoviiPDPCashIn = () => {
                   <Button
                     disabled={botonAceptar}
                     type='submit'
-                    onClick={peticionCashOut}>
+                    onClick={peticionCashIn}>
                       Aceptar
                   </Button>
                     <Button disabled={botonAceptar} onClick={hideModalUsuario}>Cancelar</Button>
