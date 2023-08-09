@@ -12,7 +12,6 @@ import {
   postTiposContratosComisiones,
 } from "../utils/fetchTiposContratosComisiones";
 import TiposContratosTable from "../components/Commerce/TiposContratosTable";
-import { onChangeNumber } from "../../../utils/functions";
 
 const TipoContratoComisiones = () => {
   const [showModal, setShowModal] = useState(false);
