@@ -1,6 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `http://localhost:4500`;
 
 export const postConsultaTipoNivelComercio = async (bodyObj) => {
   if (!bodyObj) {
