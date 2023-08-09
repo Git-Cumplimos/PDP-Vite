@@ -5,6 +5,7 @@ import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import MultipleSelect from "../../../components/Base/MultipleSelect";
+import { onChangeNumber } from "../../../utils/functions";
 import { notify, notifyError } from "../../../utils/notify";
 import {
   putTiposContratosComisiones,

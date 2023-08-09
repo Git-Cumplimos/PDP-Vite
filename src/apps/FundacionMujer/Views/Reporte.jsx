@@ -202,11 +202,9 @@ const Reporte = () => {
       if (limit) {
         queries.limit = limit;
       }
-      console.log(queries);
       if (Tipo_operacion) {
         try {
           const res = await fetchData(url, "GET", queries);
-          console.log(res);
           if (!res?.status) {
             notifyError(res.msg);
           } else {
@@ -228,7 +226,6 @@ const Reporte = () => {
     query.fecha_fin = fecha_fin;
     try {
       const res = await fetchData(url_Download, "GET", query);
-      console.log(res);
       return res;
     } catch (err) {
       console.error(err);
@@ -246,21 +243,21 @@ const Reporte = () => {
     setDownload(null);
     setFechaInicialDownload("");
     setFechaFinalDownload("");
-  });
+  },[]);
 
   const closeModal = useCallback(() => {
     setShowModal(false);
-  });
+  }, []);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center my-8">
-      <h1 className="text-3xl">Reporte</h1>
+    <div className='w-full flex flex-col justify-center items-center my-8'>
+      <h1 className='text-3xl'>Reporte</h1>
       <Form onSubmit={onSubmit} grid>
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(28) ? (
-          <ButtonBar className="col-span-1 md:col-span-2">
-            <Button type="submit" onClick={() => {}}>
+          <ButtonBar className='col-span-1 md:col-span-2'>
+            <Button type='submit' onClick={() => {}}>
               Descargar reporte
             </Button>
           </ButtonBar>
@@ -269,9 +266,9 @@ const Reporte = () => {
         )}
 
         <Input
-          id="dateInit"
-          label="Fecha inicial"
-          type="date"
+          id='dateInit'
+          label='Fecha inicial'
+          type='date'
           value={fechaInicial}
           onInput={(e) => {
             // setPage(1);
@@ -293,9 +290,9 @@ const Reporte = () => {
           }}
         />
         <Input
-          id="dateEnd"
-          label="Fecha final"
-          type="date"
+          id='dateEnd'
+          label='Fecha final'
+          type='date'
           value={fechaFinal}
           onInput={(e) => {
             // setPage(1);
@@ -317,8 +314,8 @@ const Reporte = () => {
         />
 
         <Select
-          id="searchBySorteo"
-          label="Tipo de busqueda"
+          id='searchBySorteo'
+          label='Tipo de busqueda'
           options={options}
           value={tipoOp}
           onChange={(e) => {
@@ -342,9 +339,9 @@ const Reporte = () => {
           .includes(28) ? (
           <>
             <Input
-              id="id_comercio"
-              label="Id comercio"
-              type="numeric"
+              id='id_comercio'
+              label='Id comercio'
+              type='numeric'
               value={comercio}
               onChange={(e) => {
                 setComercio(e.target.value);
@@ -368,9 +365,9 @@ const Reporte = () => {
               }}
             />
             <Input
-              id="id_usuario"
-              label="Id usuario"
-              type="numeric"
+              id='id_usuario'
+              label='Id usuario'
+              type='numeric'
               value={usuario}
               onChange={(e) => {
                 setUsuario(e.target.value);
@@ -400,7 +397,7 @@ const Reporte = () => {
       </Form>
       {Array.isArray(trxs) && trxs.length > 0 ? (
         <TableEnterprise
-          title="Reportes"
+          title='Reportes'
           maxPage={maxPages}
           // onChange={onChangeRecaudos}
           headers={[
@@ -438,18 +435,17 @@ const Reporte = () => {
             setSelected(trxs[index]);
             setShowModal(true);
           }}
-          onSetPageData={setPageData}
-        ></TableEnterprise>
+          onSetPageData={setPageData}></TableEnterprise>
       ) : (
         ""
       )}
 
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket ? (
-          <div className="flex flex-col justify-center items-center">
+          <div className='flex flex-col justify-center items-center'>
             <Tickets
               refPrint={printDiv}
-              type="Reimpresión"
+              type='Reimpresión'
               ticket={selected?.ticket}
             />
             <ButtonBar>
@@ -458,30 +454,29 @@ const Reporte = () => {
                 onClick={() => {
                   closeModal();
                   setSelected(null);
-                }}
-              >
+                }}>
                 Cerrar
               </Button>
             </ButtonBar>
           </div>
         ) : (
-          <div className="flex flex-col justify-center items-center mx-auto container">
-            <h1 className="text-3xl mt-6 text-aling">
+          <div className='flex flex-col justify-center items-center mx-auto container'>
+            <h1 className='text-3xl mt-6 text-aling'>
               No hay ticket registrado
             </h1>
           </div>
         )}
       </Modal>
       <Modal show={showModal2} handleClose={closeModal2}>
-        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
-          <h1 className="text-2xl font-semibold">
+        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+          <h1 className='text-2xl font-semibold'>
             Seleccione el rango de fechas para realizar la descarga
           </h1>
           <Form onSubmit={exportdata}>
             <Input
-              id="dateInit"
-              label="Fecha inicial"
-              type="date"
+              id='dateInit'
+              label='Fecha inicial'
+              type='date'
               value={fechaInicialDownload}
               onInput={(e) => {
                 // setPage(1);
@@ -501,9 +496,9 @@ const Reporte = () => {
               }}
             />
             <Input
-              id="dateEnd"
-              label="Fecha final"
-              type="date"
+              id='dateEnd'
+              label='Fecha final'
+              type='date'
               value={fechaFinalDownload}
               onInput={(e) => {
                 // setPage(1);
@@ -523,15 +518,14 @@ const Reporte = () => {
             />
 
             <ButtonBar>
-              <Button type="submit" disabled={disabledBtn}>
+              <Button type='submit' disabled={disabledBtn}>
                 Descargar
               </Button>
               <Button
-                type="button"
+                type='button'
                 onClick={() => {
                   closeModal2();
-                }}
-              >
+                }}>
                 Cancelar
               </Button>
             </ButtonBar>

@@ -242,7 +242,7 @@ const AdminConveniosPDP = () => {
               type="tel"
               autoComplete="off"
               minLength="1"
-              maxLength="30"
+              maxLength="8"
               defaultValue={selectedConvenio?.pk_id_convenio}
               disabled
             />
@@ -261,6 +261,7 @@ const AdminConveniosPDP = () => {
                 return { ...copy };
               })
             }
+            maxLength={30}
             required
           />
           <TextArea
@@ -276,6 +277,7 @@ const AdminConveniosPDP = () => {
                 return { ...copy };
               })
             }
+            maxLength={120}
             required
           />
           {!isCreate && (
@@ -309,6 +311,7 @@ const AdminConveniosPDP = () => {
                   type="text"
                   autoComplete="off"
                   value={val}
+                  maxLength={20}
                   onChange={(ev) =>
                     setSelectedConvenio((old) => {
                       const copy = { ...old };
@@ -465,10 +468,12 @@ const AdminConveniosPDP = () => {
                     onChange={(ev) =>
                       setSelectedConvenio((old) => {
                         const copy = { ...old };
-                        copy.relaciones[relIndex] = [key, ev.target.value];
+                        const temp_value =  onChangeNumber(ev)
+                        copy.relaciones[relIndex] = [key, temp_value];
                         return { ...copy };
                       })
                     }
+                    maxLength={8}
                     required
                   />
                   <ButtonBar>

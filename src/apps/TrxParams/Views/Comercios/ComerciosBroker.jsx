@@ -78,7 +78,7 @@ const ComerciosBroker = () => {
 
   const onSelectGroup = useCallback(
     (selectedGroup) => {
-      let type = selectedGroup?.tipo_trx;
+      let type = selectedGroup?.nombre_grupo;
       let pk_permission = selectedGroup?.pk_permiso_broker.toString();
       setPermisos((old) => {
         const copy = structuredClone(old);
@@ -179,7 +179,7 @@ const ComerciosBroker = () => {
       >
         <Input
           id={"pk_comercio"}
-          label={"Código de convenio"}
+          label={"Id comercio"}
           name={"pk_comercio"}
           type="tel"
           maxLength={"6"}
@@ -246,6 +246,7 @@ const ComerciosBroker = () => {
         {searchType && (
           <SearchTables
             onSelectItem={searchSelectFunction}
+            type_search = {searchType} 
           />
         )}
       </Modal>

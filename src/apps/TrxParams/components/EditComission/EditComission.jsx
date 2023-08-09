@@ -453,6 +453,7 @@ const EditComission = () => {
                   };
                 })
               }
+              maxLength={50}
             />
             <Input
               id='fecha_inicio'

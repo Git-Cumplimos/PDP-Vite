@@ -337,6 +337,7 @@ const GruposConvenios = () => {
                 return { ...old, nombre_grupo_convenios: e.target.value };
               })
             }
+            maxLength={30}
             required
           />
           {selectedGruposConvenios?.pk_tbl_grupo_convenios !== "" && (
@@ -347,6 +348,7 @@ const GruposConvenios = () => {
               type='number'
               autoComplete='off'
               value={selectedGruposConvenios?.id_convenio}
+              maxLength={8}
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
                   const num = e.target.value;
