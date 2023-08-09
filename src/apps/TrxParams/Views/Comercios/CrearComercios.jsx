@@ -36,8 +36,7 @@ const vectorCodigosInstitucionales = [
   ),
 ];
 
-// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const urlComercios = `http://localhost:4500`;
+const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 const urlParametrizacion =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;

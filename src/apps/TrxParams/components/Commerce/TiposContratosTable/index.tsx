@@ -22,8 +22,7 @@ type Props = {
   setReloadCallback?: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
-// const urlContratos = `${process.env.REACT_APP_URL_COMISIONES}`;
-const urlContratos = `http://localhost:5000`;
+const urlContratos = `${process.env.REACT_APP_URL_COMISIONES}`;
 
 const TiposContratosTable = ({
   onSelectContract,
