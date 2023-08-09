@@ -5,27 +5,25 @@ import Input from "../../../components/Base/Input/Input";
 import { notify, notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 
-import Select from "../../../components/Base/Select/Select";
-import classes from "./NotificacionPago.module.css";
-import Form from "../../../components/Base/Form/Form";
-import BarcodeReader from "../../../components/Base/BarcodeReader/BarcodeReader";
-
-//Constantes Style
-const { styleComponents } = classes;
+import {
+    useFetchEmcali,
+    TypeServicesBackendEmcali,
+    ErrorFetchEmcali,
+  } from "../hooks/useFetchEmcali";
 
 //Typing
-type TypingInputData = {
-  numcupon: string;
-};
+
 //Constantes
-const inputDataInitial: TypingInputData = {
-  numcupon: "",
-};
+const url_consulta = `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/reporte-en-caja`;
 
 const ReporteCaja = () => {    
     const [fecha, setFecha] = useState("");
+    const [loadingPeticionGeneracionReporte, peticionGeneracionReporte] = useFetchEmcali(
+        url_consulta,
+        "generacion reporte de caja",
+        "POST"
+      );
     
-    const [inputData, setInputData] = useState<TypingInputData>(inputDataInitial);
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
 
@@ -33,6 +31,27 @@ const ReporteCaja = () => {
         e.preventDefault();
         if (fecha === ""){
             notifyError("Seleccione una fecha para generar el reporte")
+        }
+        else {
+            peticionGeneracionReporte({},{'fecha_reporte':fecha})
+                .then((res: TypeServicesBackendEmcali)=>{
+                    console.log("res-->",res)
+                })
+                .catch((error: any) => {
+                    console.log("CATCH")
+                    if (!(error instanceof ErrorFetchEmcali)) {
+                        notifyError(
+                            `Error respuesta Frontend PDP: Fallo al consumir el servicio (Emcali - generacion reporte de caja) [0010002]`
+                        );
+                        console.error({
+                            "Error PDP":
+                            "Fallo al consumir el servicio (Emcali - generacion reporte de caja) [0010002]",
+                            "Error Sequence":
+                            "ConsultaGeneracionPin - Error en fetch del modulo directamente",
+                            "Error Console": `${error.message}`,
+                        });
+                    }
+                })
         }
     };
 
