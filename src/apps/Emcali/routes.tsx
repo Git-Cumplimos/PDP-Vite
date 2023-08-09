@@ -5,6 +5,7 @@ import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import { TypingRoutes } from "../../utils/TypingUtils";
 
 const NotificacionPago = lazy(() => import("./views/NotificacionPago"));
+const ReporteCaja = lazy(()=> import("./views/ReporteCaja") )
 
 const routesEmcali = {
   link: "/Emcali",
@@ -18,6 +19,13 @@ const routesEmcali = {
       link: "/emcali/notificacion-pago",
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Pago cupón" />,
       component: NotificacionPago,
+      permission: [1],
+      subRoutes: [],
+    },
+    {
+      link: "/emcali/reporte-caja",
+      label: <AppIcons Logo={"REPORTE"} name="Reporte de caja" />,
+      component: ReporteCaja,
       permission: [1],
       subRoutes: [],
     },
