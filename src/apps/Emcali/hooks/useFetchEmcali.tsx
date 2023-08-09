@@ -24,6 +24,7 @@ type TypeServicesBackendEmcaliObj = {
   error_status: boolean;
   error_msg: { [key: string]: any } | {};
   result: any;
+  valor_total: any;
 };
 
 export type TypeServicesBackendEmcali = {

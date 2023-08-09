@@ -1,7 +1,9 @@
-import React, { Fragment, useCallback, useRef, useState } from "react";
+import React, { Fragment, useCallback, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button/Button";
 import Input from "../../../components/Base/Input/Input";
+import TableEnterprise from "../../../components/Base/TableEnterprise/TableEnterprise";
+import Table from "../../../components/Base/Table/Table";
 import { notify, notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 
@@ -14,6 +16,7 @@ import {
 //Typing
 
 //Constantes
+const dataInitial: number[] = [];
 const url_consulta = `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/reporte-en-caja`;
 
 const ReporteCaja = () => {    
@@ -22,8 +25,9 @@ const ReporteCaja = () => {
         url_consulta,
         "generacion reporte de caja",
         "POST"
-      );
-    
+    );
+    const [showTable,setShowTable] = useState(false)
+    const [data, setData] = useState(dataInitial);
     const validNavigate = useNavigate();
     const { roleInfo, pdpUser } = useAuth();
 
@@ -35,10 +39,27 @@ const ReporteCaja = () => {
         else {
             peticionGeneracionReporte({},{'fecha_reporte':fecha})
                 .then((res: TypeServicesBackendEmcali)=>{
-                    console.log("res-->",res)
+                    if (res.obj.result.length !== 0) {
+                        var respuesta = [];
+                        var result = res.obj.result;
+                        for (let i = 0; i < result.length; i++) {
+                            respuesta.push(result[i]);
+                        }
+                        respuesta.push([
+                            "Totalizado de cupones",
+                            result.length,
+                            res.obj.valor_total,
+                        ]);
+                      
+                        setShowTable(true);
+                        setData(respuesta);
+                    }
+                    else {
+                        notifyError(res.msg); 
+                        setShowTable(false);
+                    }
                 })
                 .catch((error: any) => {
-                    console.log("CATCH")
                     if (!(error instanceof ErrorFetchEmcali)) {
                         notifyError(
                             `Error respuesta Frontend PDP: Fallo al consumir el servicio (Emcali - generacion reporte de caja) [0010002]`
@@ -69,6 +90,18 @@ const ReporteCaja = () => {
                 type={"submit"}
                 onClick={onSubmitConsult}
             >Descargar reporte</Button>       
+            { showTable ? (                
+                <Table
+                    title="Reporte general"
+                    headers={[
+                    "Cupón",
+                    "Fecha y hora",
+                    "Valor",
+                    ]}
+                    data={data}
+                    onSelectRow={() => {}}x
+                ></Table>                
+            ):(" ")}
         </Fragment>
     );
 };
