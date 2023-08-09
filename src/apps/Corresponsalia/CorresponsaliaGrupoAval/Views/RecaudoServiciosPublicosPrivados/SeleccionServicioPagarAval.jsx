@@ -4,6 +4,7 @@ import Input from "../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 
 const SeleccionServicioPagarAval = () => {
   const navigate = useNavigate();
@@ -17,19 +18,23 @@ const SeleccionServicioPagarAval = () => {
     convenio: "",
     idConvenio: "",
     idEAN: "",
+    nit: "",
   });
   const [convenios, setConvenios] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(({ pk_convenios_recaudo_aval, nura, convenio, ean }) => {
-        return {
-          "Id convenio": nura,
-          Convenio: convenio !== "" ? convenio : "N/A",
-          EAN: ean !== "" ? ean : "N/A",
-        };
-      }),
+      ...convenios.map(
+        ({ pk_convenios_recaudo_aval, nura, convenio, ean, nit }) => {
+          return {
+            "Id convenio": nura,
+            Convenio: convenio !== "" ? convenio : "N/A",
+            NIT: nit !== "" ? nit : "N/A",
+            EAN: ean !== "" ? ean : "N/A",
+          };
+        }
+      ),
     ];
   }, [convenios]);
 
@@ -51,20 +56,24 @@ const SeleccionServicioPagarAval = () => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
 
-  const fecthTablaConveniosPaginadoFunc = () => {
-    postConsultaTablaConveniosPaginado({
-      convenio: datosTrans.convenio,
-      nura: datosTrans.idConvenio,
-      ean: datosTrans.ean,
-      page,
-      limit,
-    })
-      .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results ?? []);
+  const fecthTablaConveniosPaginadoFunc = useDelayedCallback(
+    useCallback(() => {
+      postConsultaTablaConveniosPaginado({
+        convenio: datosTrans.convenio,
+        nura: datosTrans.idConvenio,
+        ean: datosTrans.ean,
+        nit: datosTrans.nit,
+        page,
+        limit,
       })
-      .catch((err) => console.error(err));
-  };
+        .then((autoArr) => {
+          setMaxPages(autoArr?.maxPages);
+          setConvenios(autoArr?.results ?? []);
+        })
+        .catch((err) => console.error(err));
+    }, [datosTrans, page, limit]),
+    500
+  );
   return (
     <>
       <h1 className='text-3xl text-center'>
@@ -73,7 +82,7 @@ const SeleccionServicioPagarAval = () => {
       <TableEnterprise
         title='Tabla convenios AVAL corresponsal bancario'
         maxPage={maxPages}
-        headers={["Id", "Convenio", "EAN"]}
+        headers={["Id", "Convenio", "NIT", "EAN"]}
         data={tableConvenios}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
@@ -107,6 +116,23 @@ const SeleccionServicioPagarAval = () => {
               const num = e.target.value;
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
+              });
+            }
+          }}></Input>
+        <Input
+          id='nit'
+          label='NIT'
+          type='text'
+          name='nit'
+          minLength='1'
+          maxLength='13'
+          required
+          value={datosTrans.nit}
+          onInput={(e) => {
+            if (!isNaN(e.target.value)) {
+              const num = e.target.value;
+              setDatosTrans((old) => {
+                return { ...old, nit: num };
               });
             }
           }}></Input>
