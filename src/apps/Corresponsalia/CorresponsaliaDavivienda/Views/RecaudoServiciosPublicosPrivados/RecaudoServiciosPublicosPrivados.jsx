@@ -27,6 +27,7 @@ import {
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const RecaudoServiciosPublicosPrivados = () => {
   const { state } = useLocation();
@@ -474,18 +475,6 @@ const RecaudoServiciosPublicosPrivados = () => {
     });
     setDatosConsulta({});
   }, []);
-  const onChangeMoneyLocal = (ev, valor) => {
-    if (!isNaN(valor)) {
-      const num = valor;
-      setDatosTrans((old) => {
-        return { ...old, valor: onChangeMoney(ev) };
-      });
-    }
-  };
-  const onChangeMoney = useMoney({
-    limits: [0, 9900001],
-    decimalDigits: 2,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -555,26 +544,17 @@ const RecaudoServiciosPublicosPrivados = () => {
             autoComplete='off'
             maxLength={"12"}
             value={datosTrans.valor ?? ""}
-            onInput={onChangeMoneyLocal}
-            required></MoneyInput>
-
-          // <Input
-          //   id='valor'
-          //   name='valor'
-          //   label='Valor'
-          //   autoComplete='off'
-          //   type='tel'
-          //   minLength={"0"}
-          //   maxLength={"20"}
-          //   value={datosTrans.valor ?? ""}
-          //   onInput={(ev) =>
-          //     setDatosTrans((old) => ({
-          //       ...old,
-          //       valor: onChangeMoney(ev),
-          //     }))
-          //   }
-          //   required
-          // />
+            onInput={(ev, val) => {
+              setDatosTrans((old) => {
+                return { ...old, valor: val };
+              });
+            }}
+            required
+            min={enumParametrosDavivienda.MINRECAUDO}
+            max={enumParametrosDavivienda.MAXRECAUDO}
+            equalError={false}
+            equalErrorMin={false}
+          />
         )}
         <ButtonBar
           className={
@@ -643,7 +623,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                 {dataConveniosPagar.includes(
                   convenio?.num_ind_consulta_cnb
                 ) && (
-                  <Input
+                  <MoneyInput
                     id='valor'
                     name='valor'
                     label='Valor a pagar'
@@ -651,14 +631,18 @@ const RecaudoServiciosPublicosPrivados = () => {
                     type='tel'
                     minLength={"0"}
                     maxLength={"12"}
-                    defaultValue={datosTransValidacion.valor ?? ""}
-                    onInput={(ev) =>
+                    value={datosTransValidacion.valor ?? ""}
+                    onInput={(ev, val) => {
                       setDatosTransValidacion((old) => ({
                         ...old,
-                        valor: onChangeMoney(ev),
-                      }))
-                    }
+                        valor: val,
+                      }));
+                    }}
                     required
+                    min={enumParametrosDavivienda.MINRECAUDO}
+                    max={enumParametrosDavivienda.MAXRECAUDO}
+                    equalError={false}
+                    equalErrorMin={false}
                   />
                 )}
                 <ButtonBar>
@@ -704,14 +688,18 @@ const RecaudoServiciosPublicosPrivados = () => {
                     type='tel'
                     minLength={"2"}
                     maxLength={"20"}
-                    defaultValue={datosTransValidacion.valor ?? ""}
-                    onInput={(ev) =>
+                    value={datosTransValidacion.valor ?? ""}
+                    onInput={(ev, val) => {
                       setDatosTransValidacion((old) => ({
                         ...old,
-                        valor: onChangeMoney(ev),
-                      }))
-                    }
+                        valor: val,
+                      }));
+                    }}
                     required
+                    min={enumParametrosDavivienda.MINRECAUDO}
+                    max={enumParametrosDavivienda.MAXRECAUDO}
+                    equalError={false}
+                    equalErrorMin={false}
                   />
                   <ButtonBar>
                     <Button onClick={handleClose}>Cancelar</Button>
