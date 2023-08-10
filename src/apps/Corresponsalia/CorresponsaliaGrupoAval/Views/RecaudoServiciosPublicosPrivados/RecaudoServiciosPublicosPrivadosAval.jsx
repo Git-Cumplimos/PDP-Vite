@@ -294,7 +294,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           type='text'
           name='ref1'
           minLength='1'
-          maxLength='20'
+          maxLength='25'
           required
           value={datosTrans.ref1}
           autoComplete='off'
