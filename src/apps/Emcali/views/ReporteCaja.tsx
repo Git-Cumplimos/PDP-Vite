@@ -1,11 +1,9 @@
-import React, { Fragment, useCallback, useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { Fragment, useState, useEffect } from "react";
 import Button from "../../../components/Base/Button/Button";
 import Input from "../../../components/Base/Input/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise/TableEnterprise";
 import Table from "../../../components/Base/Table/Table";
 import { notify, notifyError } from "../../../utils/notify";
-import { useAuth } from "../../../hooks/AuthHooks";
 
 import {
     useFetchEmcali,
@@ -14,22 +12,58 @@ import {
   } from "../hooks/useFetchEmcali";
 
 //Typing
-
+type TypeDataInput = {
+    filename: string;
+  };
 //Constantes
 const dataInitial: number[] = [];
+const dataInputInitial = {
+    filename: "",
+  };
 const url_consulta = `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/reporte-en-caja`;
+const url_descarga = `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/read-reporte-caja-s3`;
+// const url_descarga = `http://emcali-servicios-pdp-bk-cert.us-east-2.elasticbeanstalk.com/backend_emcali/read-reporte-caja-s3?filename=reporteCaja_2023-08-07.xlsx`;
 
 const ReporteCaja = () => {    
     const [fecha, setFecha] = useState("");
-    const [loadingPeticionGeneracionReporte, peticionGeneracionReporte] = useFetchEmcali(
+    const [dataInput, setDataInput] = useState<TypeDataInput>(dataInputInitial);
+    const [loadingPeticionGeneracionReporte,peticionGeneracionReporte] = useFetchEmcali(
         url_consulta,
         "generacion reporte de caja",
         "POST"
     );
+    const [loadingPeticionDescargaReporte,peticionDescargaReporte] = useFetchEmcali(
+        url_descarga,
+        "descarga reporte de caja",
+        "GET"
+    );
     const [showTable,setShowTable] = useState(false)
     const [data, setData] = useState(dataInitial);
-    const validNavigate = useNavigate();
-    const { roleInfo, pdpUser } = useAuth();
+    
+    const descargarReporte = (()=>{
+        console.log("dataInput-->",dataInput)
+        peticionDescargaReporte(dataInput,{})
+            .then((res:any)=>{
+                if (!res.status) {
+                    notifyError(res?.msg);
+                }
+                window.open(res?.obj,"_blank");
+            })
+            .catch((error: any) => {
+                if (!(error instanceof ErrorFetchEmcali)) {
+                    notifyError(
+                        `Error respuesta Frontend PDP: Fallo al consumir el servicio (Emcali - descarga reporte de caja) [0010002]`
+                    );
+                    console.error({
+                        "Error PDP":
+                        "Fallo al consumir el servicio (Emcali - descarga reporte de caja) [0010002]",
+                        "Error Sequence":
+                        "ConsultaGeneracionPin - Error en fetch del modulo directamente",
+                        "Error Console": `${error.message}`,
+                    });
+                }
+            })
+    })
 
     const onSubmitConsult = (e: any) => {
         e.preventDefault();
@@ -49,10 +83,10 @@ const ReporteCaja = () => {
                             "Totalizado de cupones",
                             result.length,
                             res.obj.valor_total,
-                        ]);
-                      
+                        ]);                      
                         setShowTable(true);
                         setData(respuesta);
+                        descargarReporte();
                     }
                     else {
                         notifyError(res.msg); 
@@ -75,6 +109,14 @@ const ReporteCaja = () => {
                 })
         }
     };
+
+    useEffect(()=>{
+        const filename_= `reporteCaja_${fecha}.xlsx`;
+        setDataInput((old) => ({
+            ...old,
+            filename: filename_,
+          }));
+    },[fecha])
 
     return (
         <Fragment>
