@@ -417,6 +417,7 @@ const CrearComercios = () => {
               maxLength="32"
               value={comercio?.pk_comercio}
               onInput={onChangeFormat}
+              autoComplete="off"
             />
           )}
           <Input

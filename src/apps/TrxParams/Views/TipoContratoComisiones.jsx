@@ -121,6 +121,7 @@ const TipoContratoComisiones = () => {
             name="nombre_contrato"
             label={"Nombre de contrato"}
             type="text"
+            maxLength={50}
             autoComplete="off"
             defaultValue={selectedTipoContrato?.nombre_contrato}
             required
@@ -143,6 +144,7 @@ const TipoContratoComisiones = () => {
               name="iva"
               label={"IVA"}
               type="tel"
+              maxLength={10}
               autoComplete="off"
               defaultValue={selectedTipoContrato?.iva}
               required
@@ -154,6 +156,7 @@ const TipoContratoComisiones = () => {
               name="rete_fuente"
               label={"Rete Fuente"}
               type="tel"
+              maxLength={10}
               autoComplete="off"
               defaultValue={selectedTipoContrato?.rete_fuente}
               required
@@ -165,6 +168,7 @@ const TipoContratoComisiones = () => {
               name="rete_ica"
               label={"Rete ICA"}
               type="tel"
+              maxLength={10}
               autoComplete="off"
               defaultValue={selectedTipoContrato?.rete_ica}
               required
