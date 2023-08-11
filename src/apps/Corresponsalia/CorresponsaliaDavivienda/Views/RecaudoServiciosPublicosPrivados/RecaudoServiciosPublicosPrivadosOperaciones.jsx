@@ -128,7 +128,9 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
           return notifyError("Los datos ingresados son diferentes");
       }
       if (dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)) {
-        if (datosTrans.valor !== datosTransValidacion.valor) {
+        if (
+          parseInt(datosTrans.valor) !== parseInt(datosTransValidacion.valor)
+        ) {
           return notifyError("El valor ingresado es diferente");
         }
       }
@@ -443,13 +445,13 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
       ...old,
       ref1: "",
       ref2: "",
-      valor: "",
+      valor: "0",
     }));
     setDatosTrans((old) => ({
       ...old,
       ref1: "",
       ref2: "",
-      valor: "",
+      valor: "0",
     }));
     setObjTicketActual((old) => {
       return {
