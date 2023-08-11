@@ -52,6 +52,7 @@ import rutasRecaudoMultiple, {
 } from "../apps/Corresponsalia/RecaudoMultiple/routes";
 import rutasRecargasTullave from "../apps/RecargasTuLlave/routes";
 import rutasPowwi from "../apps/Powwi/routes";
+import rutasMoviliza from "../apps/Moviliza/routes";
 
 /**
 
@@ -1215,6 +1216,7 @@ const allUrlsPrivateApps = [
   rutasRecaudoDirecto,
   rutasRecargasTullave,
   rutasPowwi,
+  rutasMoviliza
 ];
 
 export { allUrlsPrivateApps };
