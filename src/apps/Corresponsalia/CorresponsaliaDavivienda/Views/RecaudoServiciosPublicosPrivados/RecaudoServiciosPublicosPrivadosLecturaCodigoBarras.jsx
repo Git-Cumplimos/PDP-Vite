@@ -865,6 +865,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       datosTransaccion.valorSinModificar2
                     )} `}
                   </h2>
+                  {console.log(
+                    datosEnvio?.datosConvenio,
+                    datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" &&
+                      (datosEnvio?.datosConvenio?.ind_valor_ceros_cnb !== "0" ||
+                        datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
+                        datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0")
+                  )}
                   {datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" &&
                   (datosEnvio?.datosConvenio?.ind_valor_ceros_cnb !== "0" ||
                     datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
@@ -878,7 +885,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         type='tel'
                         minLength={"5"}
                         maxLength={"12"}
-                        value={datosTrans.valor ?? ""}
+                        value={datosTransaccion.valor ?? ""}
                         onInput={(ev, val) => {
                           setDatosTransaccion((old) => ({
                             ...old,
