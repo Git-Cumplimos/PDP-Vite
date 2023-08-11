@@ -40,12 +40,12 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
   const [datosTrans, setDatosTrans] = useState({
     ref1: "",
     ref2: "",
-    valor: "",
+    valor: "0",
   });
   const [datosTransValidacion, setDatosTransValidacion] = useState({
     ref1: "",
     ref2: "",
-    valor: "",
+    valor: "0",
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago de Recaudo de Facturas",
