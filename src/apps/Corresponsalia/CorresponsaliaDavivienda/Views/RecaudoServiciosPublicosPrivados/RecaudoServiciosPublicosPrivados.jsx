@@ -680,7 +680,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                 convenio?.ind_menor_vlr_cnb !== "0" ||
                 convenio?.ind_mayor_vlr_cnb !== "0") ? (
                 <Form grid onSubmit={onSubmitValidacion}>
-                  <Input
+                  <MoneyInput
                     id='valor'
                     name='valor'
                     label='Valor a pagar'
