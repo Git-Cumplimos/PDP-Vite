@@ -233,11 +233,15 @@ const LineasNegocio = () => {
           idTipoTransaccionNuevo: Number(transactionTypeValidated),
         };
         const businessLineData = await putBusinessLine(body);
-        if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && businessLineData.message === BusinessLineCons.RESPONSE_MESSAGE_SUCCES) {          
-          getBusinessLineData();
-          clearSelectedBusinessLine();
-          notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED.replace("{}",selectedBusinessLine?.lineaNegocio.toString()));
-          handleShowModal(false);
+        if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS) {
+          if (businessLineData.message === BusinessLineCons.RESPONSE_MESSAGE_SUCCESS) {
+            getBusinessLineData();
+            clearSelectedBusinessLine();
+            notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED);
+            handleShowModal(false);
+          } else {
+            notifyError(BusinessLineCons.MESSAGE_FAILURE_CREATED);
+          }
         } else if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_EMPTY) {
           notifyError(BusinessLineCons.MESSAGE_VALIDATE_EMPTY_PARAMS);
         } else {
