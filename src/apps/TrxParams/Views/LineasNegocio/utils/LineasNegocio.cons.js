@@ -8,7 +8,7 @@ export const LABEL_ITEMS_PER_PAGE = "items por p\u00e1gina";
 export const LABEL_LOADING = "Cargando";
 export const LABEL_SAVE = "Guardar";
 export const LABEL_UPDATE = "Actualizar";
-export const LABEL_TRANSACTION_TYPE = "Tipo de Transacción";
+export const LABEL_TRANSACTION_TYPE = "Tipo de Transacci\u00f3n";
 
 // Messages
 export const MESSAGE_BAD_FORMAT_TABLE = `Bad "data" format, wrong count columns in data row`;
