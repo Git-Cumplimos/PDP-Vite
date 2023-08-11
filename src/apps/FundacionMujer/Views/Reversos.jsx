@@ -373,8 +373,8 @@ const Reversos = () => {
             headers={[
               "ID transacción",
               "Fecha",
-              "Cedula",
-              "Credito",
+              "Cédula",
+              "Crédito",
               "Referencia",
               "Monto",
             ]}

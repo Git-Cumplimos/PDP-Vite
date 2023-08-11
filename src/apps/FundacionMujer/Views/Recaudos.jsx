@@ -312,7 +312,7 @@ const params = useCallback(async () => {
         <Form onSubmit={onSubmit} grid>
           <Select
             id='searchBySorteo'
-            label='Tipo de busqueda'
+            label='Tipo de búsqueda'
             options={[
               { value: "", label: "" },
               {
@@ -321,7 +321,7 @@ const params = useCallback(async () => {
               },
               {
                 value: 2,
-                label: `Nº credito`,
+                label: `Nº crédito`,
               },
             ]}
             value={datosTrx?.tipobusqueda}
@@ -367,7 +367,7 @@ const params = useCallback(async () => {
         <>
           <br />
           <TableEnterprise
-            title='Información de credito'
+            title='Información de crédito'
             headers={[
               "Cédula",
               "Mensaje",
