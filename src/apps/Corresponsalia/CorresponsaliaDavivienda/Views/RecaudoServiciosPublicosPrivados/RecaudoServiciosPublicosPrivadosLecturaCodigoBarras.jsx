@@ -267,12 +267,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
           if (
             datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
-            datosTransaccion.valor > datosTransaccion.valorSinModificar
+            datosTransaccion.valor > datosTransaccion.valorSinModificar2
           )
             return notifyError("No esta permitido el pago mayor al original");
           if (
             datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
-            datosTransaccion.valor < datosTransaccion.valorSinModificar
+            datosTransaccion.valor < datosTransaccion.valorSinModificar2
           ) {
             if (
               !(
