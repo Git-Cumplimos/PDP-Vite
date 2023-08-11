@@ -237,7 +237,7 @@ const LineasNegocio = () => {
           if (businessLineData.message === BusinessLineCons.RESPONSE_MESSAGE_SUCCESS) {
             getBusinessLineData();
             clearSelectedBusinessLine();
-            notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED);
+            notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED.replace("{}",selectedBusinessLine?.lineaNegocio.toString()));
             handleShowModal(false);
           } else {
             notifyError(BusinessLineCons.MESSAGE_FAILURE_CREATED);
