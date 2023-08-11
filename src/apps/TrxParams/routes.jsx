@@ -334,12 +334,6 @@ const rutasConfiguraciones = {
       permission: [enumPermisosTrx.autorizadores],
     },
     {
-      link: "/params-operations/configuracion_comercios",
-      label: <AppIcons Logo={"RECAUDO"} name={"Configuración comercios"} />,
-      component: ConfiguracionComercios,
-      permission: [enumPermisosTrx.configuracion_comercios],
-    },
-    {
       link: "/params-operations/tipo_contrato_comisiones",
       label: <AppIcons Logo={"RECAUDO"} name={"Contratos comisiones"} />,
       component: TipoContratoComisiones,
