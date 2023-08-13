@@ -315,7 +315,7 @@ const Reporte = () => {
 
         <Select
           id='searchBySorteo'
-          label='Tipo de busqueda'
+          label='Tipo de búsqueda'
           options={options}
           value={tipoOp}
           onChange={(e) => {
@@ -402,9 +402,9 @@ const Reporte = () => {
           // onChange={onChangeRecaudos}
           headers={[
             "Fecha",
-            "Id transaccion",
+            "Id transacción",
             "Mensaje",
-            "Credito",
+            "Crédito",
             "Motivo",
             "Monto",
           ]}
