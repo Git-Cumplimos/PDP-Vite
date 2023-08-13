@@ -13,20 +13,20 @@ const routesEmcali = {
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
-  permission: [1],
+  permission: [200, 201, 202],
   subRoutes: [
     {
       link: "/emcali/recaudo",
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recaudo" />,
       component: Recaudo,
-      permission: [1],
+      permission: [200],
       subRoutes: [],
     },
     {
       link: "/emcali/reporte-caja",
       label: <AppIcons Logo={"REPORTE"} name="Reporte de caja" />,
       component: ReporteCaja,
-      permission: [1],
+      permission: [201],
       subRoutes: [],
     },
   ],
