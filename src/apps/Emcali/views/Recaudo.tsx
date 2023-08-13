@@ -157,12 +157,7 @@ const Recaudo = () => {
       const data = {
         codigo_barras: info,
       };
-      if (info === "") {
-        notifyError(
-          "El campo del código de barras está vacío, por favor scanee o dijite el código"
-        );
-        return;
-      }
+
       PeticionBarcode(data)
         .then((res: TypeServicesBackendEmcali) => {
           setPaso("LecturaEmcali");
@@ -287,11 +282,12 @@ const Recaudo = () => {
     content: () => printDiv.current,
   });
 
+  //*********************HTML*************************************
   return (
     <Fragment>
       <SimpleLoading show={loadingPeticion}></SimpleLoading>
       <h1 className="text-3xl mt-6">Recaudo Emcali</h1>
-      <Form grid={false}>
+      <Form grid={false} className=" flex flex-col content-center items-center">
         <div className={styleComponents}>
           <Select
             id="opciones"
@@ -301,22 +297,15 @@ const Recaudo = () => {
             value={procedimiento}
           />
         </div>
-        <ButtonBar>
-          <></>
-        </ButtonBar>
+
         {/******************************Lectura Barcode*******************************************************/}
         {paso === "LecturaBarcode" && (
           <Fragment>
-            <ButtonBar>
-              <></>
-            </ButtonBar>
             <BarcodeReader
               onSearchCodigo={onSubmitBarcode}
               disabled={loadingPeticion}
             />
-            <ButtonBar>
-              <></>
-            </ButtonBar>
+
             <div className={formItem} ref={buttonDelate}>
               <button type="reset">Volver a ingresar código de barras</button>
             </div>
@@ -327,55 +316,27 @@ const Recaudo = () => {
         {/******************************Lectura Emcali*******************************************************/}
         {paso === "LecturaEmcali" && (
           <Fragment>
-            {procedimiento === option_barcode && (
-              <Fragment>
-                <h1>Número de referencia</h1>
-                <ButtonBar>
-                  <></>
-                </ButtonBar>
-                <Input
-                  label=""
-                  required
-                  // className={styleComponentsInput}
-                  type="text"
-                  autoComplete="off"
-                  maxLength={30}
-                  value={inputData.numcupon}
-                  disabled={true}
-                />
-                <ButtonBar>
-                  <></>
-                </ButtonBar>
-              </Fragment>
-            )}
-            {procedimiento === option_manual && (
-              <Fragment>
-                <h1>Número de referencia</h1>
-                <ButtonBar>
-                  <></>
-                </ButtonBar>
-                <Input
-                  label=""
-                  required
-                  // className={styleComponentsInput}
-                  type="text"
-                  autoComplete="off"
-                  maxLength={30}
-                  value={inputData.numcupon}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setInputData((old) => ({
-                      ...old,
-                      numcupon: (
-                        (e.target.value ?? "").match(/\d/g) ?? []
-                      ).join(""),
-                    }))
-                  }
-                />
-                <ButtonBar>
-                  <></>
-                </ButtonBar>
-              </Fragment>
-            )}
+            <h1>Número de referencia</h1>
+
+            <Input
+              label=""
+              required
+              className={styleComponentsInput}
+              type="text"
+              autoComplete="off"
+              maxLength={30}
+              value={inputData.numcupon}
+              disabled={procedimiento === option_barcode ? true : false}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setInputData((old) => ({
+                  ...old,
+                  numcupon: ((e.target.value ?? "").match(/\d/g) ?? []).join(
+                    ""
+                  ),
+                }))
+              }
+            />
+
             <ButtonBar className="flex justify-center py-6">
               <Button
                 type={"submit"}
@@ -401,17 +362,17 @@ const Recaudo = () => {
         {/******************************Resumen de trx*******************************************************/}
         {paso === "ResumenTrx" && consultData !== null && (
           <PaymentSummary
-            title="¿Está seguro de realizar la transacción?"
+            title="Respuesta de consulta Emcali"
             subtitle="Resumen de transacción"
             summaryTrx={{
               "Número de referencia": inputData.numcupon,
               Nombre: consultData.nombre,
-              Valor: formatMoney.format(consultData.valorcupon),
+              "Total a pagar": formatMoney.format(consultData.valorcupon),
             }}
           >
             <ButtonBar>
               <Button type="submit" onClick={onSubmitPay}>
-                Aceptar
+                Realizar Pago
               </Button>
               <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
             </ButtonBar>

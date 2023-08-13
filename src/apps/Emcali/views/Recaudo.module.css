@@ -9,20 +9,6 @@
   width: 280px;
 }
 
-.formItem {
-  @apply flex flex-col justify-center content-center max-w-xs text-center my-4 mx-auto md:mx-4;
-}
-
 .formItem > button {
   @apply px-4 py-2 bg-secondary-dark text-white rounded-full transition-opacity duration-300;
-}
-
-.formItem > button[type="submit"] {
-  @apply bg-primary text-white;
-}
-.formItem > button[type=""] {
-  @apply bg-primary text-white;
-}
-.formItem > button:disabled {
-  @apply opacity-40 cursor-default;
 }
