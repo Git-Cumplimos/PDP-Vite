@@ -83,6 +83,7 @@ const Reporte = () => {
   const [Download, setDownload] = useState(null);
   const [showModal2, setShowModal2] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(true);
+  const [showTable, setShowTable] = useState(false);
 
   const [{ page, limit }, setPageData] = useState({
     page: 1,
@@ -234,7 +235,31 @@ const Reporte = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setShowModal2(true);
+    if (fechaFinal !== ""){
+      if (fechaFinal > fechaInicial){
+        report(comercio,
+          usuario,
+          tipoOp,
+          1,
+          fechaInicial,
+          fechaFinal,
+          limit);
+        setShowTable(true);
+      }
+      else{
+        notifyError("Fecha Final debe ser superior a Fecha Inicial");
+        setFechaFinal("");
+      }
+    } else {
+      report(comercio,
+        usuario,
+        tipoOp,
+        1,
+        fechaInicial,
+        fechaFinal,
+        limit);
+      setShowTable(true);
+    }
   };
 
   const closeModal2 = useCallback(() => {
@@ -252,19 +277,20 @@ const Reporte = () => {
   return (
     <div className='w-full flex flex-col justify-center items-center my-8'>
       <h1 className='text-3xl'>Reporte</h1>
-      <Form onSubmit={onSubmit} grid>
-        {userPermissions
+      {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(28) ? (
           <ButtonBar className='col-span-1 md:col-span-2'>
-            <Button type='submit' onClick={() => {}}>
+            <Button type="submit" onClick={() => {
+              setShowModal2(true);
+            }}>
               Descargar reporte
             </Button>
           </ButtonBar>
         ) : (
           ""
         )}
-
+      <Form onSubmit={onSubmit} grid>
         <Input
           id='dateInit'
           label='Fecha inicial'
@@ -274,19 +300,20 @@ const Reporte = () => {
             // setPage(1);
             setMaxPages(1);
             setFechaInicial(e.target.value);
-            if (fechaFinal !== "") {
-              if (tipoOp !== "") {
-                report(
-                  comercio,
-                  usuario,
-                  tipoOp,
-                  1,
-                  e.target.value,
-                  fechaFinal,
-                  limit
-                );
-              }
-            }
+            setShowTable(false);
+            // if (fechaFinal !== "") {
+            //   if (tipoOp !== "") {
+            //     report(
+            //       comercio,
+            //       usuario,
+            //       tipoOp,
+            //       1,
+            //       e.target.value,
+            //       fechaFinal,
+            //       limit
+            //     );
+            //   }
+            // }
           }}
         />
         <Input
@@ -297,41 +324,43 @@ const Reporte = () => {
           onInput={(e) => {
             // setPage(1);
             setFechaFinal(e.target.value);
-            if (fechaInicial !== "") {
-              if (tipoOp !== "") {
-                report(
-                  comercio,
-                  usuario,
-                  tipoOp,
-                  1,
-                  fechaInicial,
-                  e.target.value,
-                  limit
-                );
-              }
-            }
+            setShowTable(false);
+            // if (fechaInicial !== "") {
+            //   if (tipoOp !== "") {
+            //     report(
+            //       comercio,
+            //       usuario,
+            //       tipoOp,
+            //       1,
+            //       fechaInicial,
+            //       e.target.value,
+            //       limit
+            //     );
+            //   }
+            // }
           }}
         />
-
         <Select
           id='searchBySorteo'
           label='Tipo de búsqueda'
           options={options}
           value={tipoOp}
+          required
           onChange={(e) => {
             // setPage(1);
             setTipoOp(parseInt(e.target.value));
-            if (!(e.target.value === null || e.target.value === "")) {
-              report(
-                comercio,
-                usuario,
-                e.target.value,
-                1,
-                fechaInicial,
-                fechaFinal,
-                limit
-              );
-            }
+            setShowTable(false);
+            // if (!(e.target.value === null || e.target.value === "")) {
+            //   report(
+            //     comercio,
+            //     usuario,
+            //     e.target.value,
+            //     1,
+            //     fechaInicial,
+            //     fechaFinal,
+            //     limit
+            //   );
+            // }
           }}
         />
         {userPermissions
@@ -345,21 +374,23 @@ const Reporte = () => {
               value={comercio}
               onChange={(e) => {
                 setComercio(e.target.value);
+                setShowTable(false);
               }}
+              required
               onLazyInput={{
                 callback: (e) => {
                   // setPage(1);
-                  if (tipoOp !== "") {
-                    report(
-                      e.target.value,
-                      usuario,
-                      tipoOp,
-                      1,
-                      fechaInicial,
-                      fechaFinal,
-                      limit
-                    );
-                  }
+                  // if (tipoOp !== "") {
+                  //   report(
+                  //     e.target.value,
+                  //     usuario,
+                  //     tipoOp,
+                  //     1,
+                  //     fechaInicial,
+                  //     fechaFinal,
+                  //     limit
+                  //   );
+                  // }
                 },
                 timeOut: 500,
               }}
@@ -371,21 +402,23 @@ const Reporte = () => {
               value={usuario}
               onChange={(e) => {
                 setUsuario(e.target.value);
+                setShowTable(false);
               }}
+              required
               onLazyInput={{
                 callback: (e) => {
                   // setPage(1);
-                  if (tipoOp !== "") {
-                    report(
-                      comercio,
-                      e.target.value,
-                      tipoOp,
-                      1,
-                      fechaInicial,
-                      fechaFinal,
-                      limit
-                    );
-                  }
+                  // if (tipoOp !== "") {
+                  //   report(
+                  //     comercio,
+                  //     e.target.value,
+                  //     tipoOp,
+                  //     1,
+                  //     fechaInicial,
+                  //     fechaFinal,
+                  //     limit
+                  //   );
+                  // }
                 },
                 timeOut: 500,
               }}
@@ -394,8 +427,14 @@ const Reporte = () => {
         ) : (
           ""
         )}
+        
+      <ButtonBar className='col-span-1 md:col-span-2'>
+            <Button type="submit" onClick={() => {}}>
+              Realizar búsqueda
+            </Button>
+          </ButtonBar>
       </Form>
-      {Array.isArray(trxs) && trxs.length > 0 ? (
+      {showTable && Array.isArray(trxs) && trxs.length > 0 ? (
         <TableEnterprise
           title='Reportes'
           maxPage={maxPages}
