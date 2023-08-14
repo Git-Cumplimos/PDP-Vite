@@ -235,14 +235,31 @@ const Reporte = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    report(comercio,
-      usuario,
-      tipoOp,
-      1,
-      fechaInicial,
-      fechaFinal,
-      limit);
-    setShowTable(true);
+    if (fechaFinal !== ""){
+      if (fechaFinal > fechaInicial){
+        report(comercio,
+          usuario,
+          tipoOp,
+          1,
+          fechaInicial,
+          fechaFinal,
+          limit);
+        setShowTable(true);
+      }
+      else{
+        notifyError("Fecha Final debe ser superior a Fecha Inicial");
+        setFechaFinal("");
+      }
+    } else {
+      report(comercio,
+        usuario,
+        tipoOp,
+        1,
+        fechaInicial,
+        fechaFinal,
+        limit);
+      setShowTable(true);
+    }
   };
 
   const closeModal2 = useCallback(() => {
