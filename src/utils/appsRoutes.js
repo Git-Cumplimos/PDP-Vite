@@ -19,6 +19,9 @@ import rutasDaviviendaCB, {
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
+//Rutas Emcali
+import routesEmcali from "../apps/Emcali/routes";
+
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
   rutasRecargas,
@@ -38,7 +41,6 @@ import rutasPinesCrc, {
  * * Providers
  */
 import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
-import ProvideFundamujer from "../apps/FundacionMujer/components/Providefundamujer";
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
 import rutasAvalCB, {
   listPermissionsAval,
@@ -53,7 +55,7 @@ import rutasRecaudoMultiple, {
 import rutasRecargasTullave from "../apps/RecargasTuLlave/routes";
 import rutasPowwi from "../apps/Powwi/routes";
 import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
-import rutasMovii from "../apps/Movii-pdp/routes";
+import rutasFundacionMujer from "../apps/FundacionMujer/routes";
 
 /**
 
@@ -121,10 +123,10 @@ const ReportInventario = lazy(() =>
 /**
  * ColCard
  */
-const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
-const RecargarColCard = lazy(() =>
-  import("../apps/ColCard/Views/RecargarColCard")
-);
+// const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
+// const RecargarColCard = lazy(() =>
+//   import("../apps/ColCard/Views/RecargarColCard")
+// );
 /**
  * Cupo
  */
@@ -142,23 +144,18 @@ const TipoMovimientoCupo = lazy(() =>
 const DetalleModificacionCupo = lazy(() =>
   import("../apps/Cupo/Views/DtlModifiCupo")
 );
-
+/**
+ * Movii
+ */
+const MoviiPDP = lazy(() => import("../apps/Movii-pdp/MoviiPDP"));
+const MoviiPDPCashOut = lazy(() =>
+  import("../apps/Movii-pdp/Views/MoviiPDPCashOut")
+);
 /**
  * Marketplace
  */
 const MarketPlace = lazy(() => import("../apps/MarketPlace/MarketPlace"));
 const ReporteGral = lazy(() => import("../apps/MarketPlace/Records/Crossval"));
-
-/**
- * Fundacion de la mujer
- */
-const FunMujer = lazy(() => import("../apps/FundacionMujer/FunMujer"));
-const recMujer = lazy(() => import("../apps/FundacionMujer/Views/Recaudos"));
-const revMujer = lazy(() => import("../apps/FundacionMujer/Views/Reversos"));
-const reportFDLM = lazy(() => import("../apps/FundacionMujer/Views/Reporte"));
-const DesembolsoFDLM = lazy(() =>
-  import("../apps/FundacionMujer/Views/Desembolsos")
-);
 
 /**
  * Pines Vus
@@ -647,44 +644,7 @@ const allUrlsPrivateApps = [
     component: ReporteGral,
     permission: [37],
   },
-  {
-    link: "/funmujer",
-    label: <AppIcons Logo={"FUNDACION_MUJER"} name='Fundación de la mujer' />,
-    component: FunMujer,
-    permission: [17, 27, 28],
-    provider: ProvideFundamujer,
-    subRoutes: [
-      {
-        link: "/funmujer/recaudo",
-        label: <AppIcons Logo={"FUNDACION_MUJER_RECAUDO"} name={"Recaudo"} />,
-        component: recMujer,
-        permission: [17],
-      },
-      {
-        link: "/funmujer/desembolso",
-        label: (
-          <AppIcons Logo={"FUNDACION_MUJER_DESEMBOLSO"} name={"Desembolso"} />
-        ),
-        component: DesembolsoFDLM,
-        permission: [28, 17],
-      },
-      {
-        link: "/funmujer/reversorecaudo",
-        label: (
-          <AppIcons Logo={"FUNDACION_MUJER_REVERSO"} name={"Reverso Manual"} />
-        ),
-        component: revMujer,
-        permission: [27],
-      },
-      {
-        link: "/funmujer/reporte",
-        label: <AppIcons Logo={"FUNDACION_MUJER_REPORTE"} name={"Reporte"} />,
-        component: reportFDLM,
-        permission: [28, 17],
-      },
-    ],
-  },
-
+  rutasFundacionMujer,
   {
     link: "/Pines",
     label: <AppIcons Logo={"PINES"} name='Pines' />,
@@ -1030,7 +990,21 @@ const allUrlsPrivateApps = [
   },
   rutasConfiguraciones,
   rutasRecargas,
-  rutasMovii,
+  {
+    link: "/movii-pdp",
+    label: <AppIcons Logo={"MOVII"} name="MOVII PDP" />,
+    // label: <AppIcons Logo={"MARKETPLACE"} name="MOVII PDP" />,
+    component: MoviiPDP,
+    permission: [48],
+    subRoutes: [
+      {
+        link: "/movii-pdp/retiro",
+        label: <AppIcons Logo={"MOVII_RETIRO"} name="Retiro" />,
+        component: MoviiPDPCashOut,
+        permission: [49],
+      },
+    ],
+  },
   {
     link: "/colpensiones",
     label: <AppIcons Logo={"COLPENSIONES"} name={"Colpensiones"} />,
@@ -1153,30 +1127,6 @@ const allUrlsPrivateApps = [
   //     },
   //   ],
   // },
-
-  // {
-  //   link: "/runt",
-  //   label: <AppIcons Logo={"IMPUESTO"} name={"Runt"} />,
-  //   component: ContenedorRunt,
-  //   permission: [55, 56, 57],
-  //   subRoutes: [
-  //     {
-  //       link: "/runt/pagar-runt",
-  //       label: <AppIcons Logo={"RETIRO"} name={"Pagar Runt"} />,
-  //       component: PagarRunt,
-  //       permission: [56, 57],
-  //       /*   subRoutes: [
-  //         {
-  //           link: "/recaudo-integrado/davivienda/cargar",
-  //           label: <AppIcons Logo={"IMPUESTO"} name={"Cargar Archivos"} />,
-  //           component: cargarArchivos,
-  //           permission: [55],
-  //         },
-  //       ], */
-  //     },
-  //   ],
-  // },
-
   // {
   //   link: "/pagos-ifood",
   //   label: <AppIcons Logo={"RECAUDO"} name={"Aportes en Linea iFood"} />,
@@ -1191,6 +1141,8 @@ const allUrlsPrivateApps = [
 
   //Modulo Almaseg
   routesAlmaseg,
+  //Modulo Emcali
+  routesEmcali,
 ];
 
 export { allUrlsPrivateApps };

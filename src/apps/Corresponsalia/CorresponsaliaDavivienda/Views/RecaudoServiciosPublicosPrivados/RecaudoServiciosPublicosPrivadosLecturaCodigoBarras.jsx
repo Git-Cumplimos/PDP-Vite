@@ -22,6 +22,8 @@ import {
   postConsultaConveniosDavivienda,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
+import MoneyInput from "../../../../../components/Base/MoneyInput/MoneyInput";
 
 const valor_maximo_recaudo = 9900000;
 
@@ -265,12 +267,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
           if (
             datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
-            datosTransaccion.valor > datosTransaccion.valorSinModificar
+            datosTransaccion.valor > datosTransaccion.valorSinModificar2
           )
             return notifyError("No esta permitido el pago mayor al original");
           if (
             datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
-            datosTransaccion.valor < datosTransaccion.valorSinModificar
+            datosTransaccion.valor < datosTransaccion.valorSinModificar2
           ) {
             if (
               !(
@@ -588,10 +590,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     }
   };
-  const onChangeMoney = useMoney({
-    limits: [0, 9900001],
-    decimalDigits: 2,
-  });
   const printDiv = useRef();
   const isAlt = useRef("");
   const isAltCR = useRef({ data: "", state: false });
@@ -752,7 +750,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             {dataConveniosPagar.includes(
               datosEnvio?.datosConvenio?.num_ind_consulta_cnb
             ) && datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" ? (
-              <Input
+              <MoneyInput
                 id='valor'
                 name='valor'
                 label='Valor a pagar'
@@ -760,15 +758,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 type='tel'
                 minLength={"5"}
                 maxLength={"12"}
-                defaultValue={datosTransaccion.showValor ?? ""}
-                onInput={(ev) =>
+                value={datosTransaccion.showValor ?? ""}
+                onInput={(ev, val) => {
                   setDatosTransaccion((old) => ({
                     ...old,
-                    valor: onChangeMoney(ev),
-                    showValor: onChangeMoney(ev),
-                  }))
-                }
+                    valor: val,
+                    showValor: val,
+                  }));
+                }}
                 required
+                min={enumParametrosDavivienda.MINRECAUDO}
+                max={enumParametrosDavivienda.MAXRECAUDO}
+                equalError={false}
+                equalErrorMin={false}
               />
             ) : (
               <></>
@@ -868,7 +870,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
                     datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") ? (
                     <Form grid onSubmit={onSubmitPago}>
-                      <Input
+                      <MoneyInput
                         id='valor'
                         name='valor'
                         label='Valor a pagar'
@@ -876,15 +878,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         type='tel'
                         minLength={"5"}
                         maxLength={"12"}
-                        defaultValue={datosTransaccion.showValor2 ?? ""}
-                        onInput={(ev) =>
+                        value={datosTransaccion.valor ?? ""}
+                        onInput={(ev, val) => {
                           setDatosTransaccion((old) => ({
                             ...old,
-                            valor: onChangeMoney(ev),
-                            showValor2: onChangeMoney(ev),
-                          }))
-                        }
+                            valor: val,
+                            showValor2: val,
+                          }));
+                        }}
                         required
+                        min={enumParametrosDavivienda.MINRECAUDO}
+                        max={enumParametrosDavivienda.MAXRECAUDO}
+                        equalError={false}
+                        equalErrorMin={false}
                       />
                       <ButtonBar>
                         <Button onClick={hideModalReset}>Cancelar</Button>
