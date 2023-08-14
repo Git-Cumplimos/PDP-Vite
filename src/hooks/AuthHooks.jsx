@@ -135,22 +135,14 @@ export const AuthContext = createContext({
   handleChangePass: () => {},
   forgotPassword: () => {},
   forgotPasswordSubmit: () => {},
+  resetTopt: () => {},
   parameters: null,
   qr: null,
   ...initialUser,
 });
 
 export const useAuth = () => {
-  return useContext(AuthContext)
-  // let authContextCopy = {...useContext(AuthContext)};
-  // try{    
-  //   authContextCopy.roleInfo.tipo_comercio += "-";
-  //   return authContextCopy;
-  // }
-  // catch{
-  //   return authContextCopy
-  // }
-  
+  return useContext(AuthContext);
 };
 
 export const useProvideAuth = () => {
@@ -285,7 +277,9 @@ export const useProvideAuth = () => {
   const forgotPassword = useCallback(async (email) => {
     try {
       await Auth.forgotPassword(email);
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }, []);
 
   const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
@@ -327,7 +321,7 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0, sobregiro : 0 };
+      const tempRole = { quota: 0, comision: 0, sobregiro: 0 };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
       tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
@@ -336,7 +330,7 @@ export const useProvideAuth = () => {
     onError: useCallback((error) => {
       dispatchAuth({
         type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0, sobregiro : 0 } },
+        payload: { quota: { quota: 0, comision: 0, sobregiro: 0 } },
       });
       if (error?.cause === "custom") {
         notifyError(error.message);
@@ -345,6 +339,7 @@ export const useProvideAuth = () => {
       }
     }, []),
   });
+
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
       let _roleinfo = {};
@@ -371,6 +366,7 @@ export const useProvideAuth = () => {
       }
     }, []),
   });
+
   const [getLoginPdp] = useFetchDispatchDebounce({
     onSuccess: useCallback(
       (res) => {
@@ -432,6 +428,7 @@ export const useProvideAuth = () => {
       );
     }
   }, [pathname, id_comercio, id_dispositivo, getQuota]);
+
   useEffect(() => {
     const email = userState?.userInfo?.attributes?.email;
     if (email) {
@@ -467,30 +464,6 @@ export const useProvideAuth = () => {
       }
     };
     validate();
-  }, [cognitoUser, signOut]);
-
-  useEffect(() => {
-    const temp = async () => {
-      if (cognitoUser?.challengeName === "MFA_SETUP") {
-        setTimer(
-          setTimeout(() => {
-            signOut();
-          }, 90000)
-        );
-        try {
-          const validartoken = await Auth.setupTOTP(cognitoUser);
-          const str =
-            "otpauth://totp/AWSCognito:" +
-            "Punto de Pago Token" +
-            "?secret=" +
-            validartoken +
-            "&issuer=" +
-            "Punto de Pago Multibanco";
-          setQr(str);
-        } catch (err) {}
-      }
-    };
-    temp();
   }, [cognitoUser, signOut]);
 
   return {

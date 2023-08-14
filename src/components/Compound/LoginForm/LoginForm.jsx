@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { useAuth } from "../../../hooks/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
-import { notify, notifyError, notifyPending } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 
 const LoginForm = () => {
   const { contain, card, field } = classes;
@@ -32,7 +32,6 @@ const LoginForm = () => {
     auth
       .signIn(username, password)
       .then(() => {})
-
       .catch((err) => {
         if (err.code === "NotAuthorizedException") {
           notifyError("Usuario o contraseña incorrectos.");
@@ -140,6 +139,7 @@ const LoginForm = () => {
       notifyError("Las contraseñas no coinciden");
     }
   };
+
   const handleForgotPassword = (event) => {
     event.preventDefault();
     auth
@@ -148,17 +148,28 @@ const LoginForm = () => {
         notify("Validando usuario en base de datos");
         setDisabled(true);
         if (res?.Status === true) {
-          notify(
-            "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
-          );
+          notify("Usuario valido");
           setDisabled(false);
           setPassword("");
           setForgotPass(false);
-          setForgotPassSubmit(true);
           auth
             .forgotPassword(username)
-            .then()
-            .catch(() => {});
+            .then(() => {
+              notify(
+                "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
+              );
+              setForgotPassSubmit(true);
+            })
+            .catch((err) => {
+              setForgotPassSubmit(false);
+              if (err.code === "LimitExceededException") {
+                notifyError(
+                  "Se ha alcanzado el limite de intentos de restablecer contraseña."
+                );
+                return;
+              }
+              console.error(err);
+            });
         } else {
           notifyError("El usuario no existe");
           setDisabled(false);
@@ -230,92 +241,51 @@ const LoginForm = () => {
   };
 
   return auth.cognitoUser?.challengeName === "SOFTWARE_TOKEN_MFA" ? (
-    <>
-      <div className="container flex flex-row justify-center items-center">
-        <RightArrow xlarge />
-        <div className={card}>
-          <h1 className="uppercase text-2xl font-medium text-center">
-            Validación usuario
-          </h1>
-          <hr />
-          <form onSubmit={handleTOTP}>
-            <div className={field}>
-              <label htmlFor="totp">Código de seguridad:</label>
-              <input
-                id="totp"
-                type="text"
-                maxLength="6"
-                autoFocus
-                autoComplete="off"
-                value={totp}
-                onChange={(e) => {
-                  if (!isNaN(e.target.value)) {
-                    setTotp(e.target.value);
-                  }
-                }}
-              />
-            </div>
-            <div className={field}>
-              <button type="submit">Validar codigo</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
-  ) : auth.cognitoUser?.challengeName === "NEW_PASSWORD_REQUIRED" ? (
-    auth.parameters.name !== "" ? (
-      <>
-        <div className="container flex flex-row justify-center items-center">
-          <RightArrow xlarge />
-          <div className={card}>
-            <h1 className="uppercase text-2xl font-medium text-center">
-              Cambio de contraseña nuevo usuario
-            </h1>
-            <hr />
-            <form onSubmit={handleChangeExisting}>
-              <div className={field}>
-                <label htmlFor="newPassword">Nueva contraseña:</label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  autoComplete="off"
-                  value={newPass}
-                  onChange={(e) => {
-                    setNewPass(e.target.value);
-                  }}
-                />
-              </div>
-              <div className={field}>
-                <label htmlFor="confirmNewPassword">
-                  Confirmar contraseña:
-                </label>
-                <input
-                  id="confirmNewPassword"
-                  type="password"
-                  autoComplete="off"
-                  value={confirmPass}
-                  onChange={(e) => {
-                    setConfirmPass(e.target.value);
-                  }}
-                />
-              </div>
-              <div className={field}>
-                <button type="submit">Actualizar contraseña</button>
-              </div>
-            </form>
+    <div className="container flex flex-row justify-center items-center">
+      <RightArrow xlarge />
+      <div className={card}>
+        <h1 className="uppercase text-2xl font-medium text-center">
+          Validación usuario
+        </h1>
+        <hr />
+        <form onSubmit={handleTOTP}>
+          <div className={field}>
+            <label htmlFor="totp">Código de seguridad:</label>
+            <input
+              id="totp"
+              type="text"
+              maxLength="6"
+              autoFocus
+              autoComplete="off"
+              value={totp}
+              onChange={(e) => {
+                if (!isNaN(e.target.value)) {
+                  setTotp(e.target.value);
+                }
+              }}
+            />
           </div>
-        </div>
-      </>
-    ) : (
-      <>
-        <div className="container flex flex-row justify-center items-center">
-          <RightArrow xlarge />
-          <div className={card}>
-            <h1 className="uppercase text-2xl font-medium text-center">
-              Cambio de contraseña nuevo usuario
-            </h1>
-            <hr />
-            <form onSubmit={handleChangePW}>
+          <div className={field}>
+            <button type="submit">Validar codigo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  ) : auth.cognitoUser?.challengeName === "NEW_PASSWORD_REQUIRED" ? (
+    <div className="container flex flex-row justify-center items-center">
+      <RightArrow xlarge />
+      <div className={card}>
+        <h1 className="uppercase text-2xl font-medium text-center">
+          Cambio de contraseña nuevo usuario
+        </h1>
+        <hr />
+        <form
+          onSubmit={
+            auth.parameters.name === "" ? handleChangePW : handleChangeExisting
+          }
+        >
+          {auth.parameters.name === "" && (
+            <Fragment>
               <div className={field}>
                 <label htmlFor="names">Nombres:</label>
                 <input
@@ -369,178 +339,170 @@ const LoginForm = () => {
                   }}
                 />
               </div>
-              <div className={field}>
-                <label htmlFor="newPassword">Nueva contraseña:</label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  autoComplete="off"
-                  value={newPass}
-                  onChange={(e) => {
-                    setNewPass(e.target.value);
-                  }}
-                />
-              </div>
-              <div className={field}>
-                <label htmlFor="confirmNewPassword">
-                  Confirmar contraseña:
-                </label>
-                <input
-                  id="confirmNewPassword"
-                  type="password"
-                  autoComplete="off"
-                  value={confirmPass}
-                  onChange={(e) => {
-                    setConfirmPass(e.target.value);
-                  }}
-                />
-              </div>
-              <div className={field}>
-                <button type="submit">Actualizar contraseña</button>
-              </div>
-            </form>
+            </Fragment>
+          )}
+          <div className={field}>
+            <label htmlFor="newPassword">Nueva contraseña:</label>
+            <input
+              id="newPassword"
+              type="password"
+              autoComplete="off"
+              value={newPass}
+              onChange={(e) => {
+                setNewPass(e.target.value);
+              }}
+            />
           </div>
-        </div>
-      </>
-    )
+          <div className={field}>
+            <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
+            <input
+              id="confirmNewPassword"
+              type="password"
+              autoComplete="off"
+              value={confirmPass}
+              onChange={(e) => {
+                setConfirmPass(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <button type="submit">Actualizar contraseña</button>
+          </div>
+        </form>
+      </div>
+    </div>
   ) : auth.cognitoUser?.challengeName === "MFA_SETUP" ? (
-    <>
-      <div className="container flex flex-row justify-center items-center">
-        <RightArrow xlarge />
-        <div className={card}>
-          <h1 className="uppercase text-2xl font-medium text-center">
-            TOKEN DE SEGURIDAD
-          </h1>
-          <hr />
-          <form onSubmit={handleTOTPconfirm}>
-            <h2>Escanee el siguiente código QR con Google Authenticator</h2>
-            <div className={field}>
-              <QRCode value={auth.qr}></QRCode>
-            </div>
-            <div className={field}>
-              <label htmlFor="validateToken">Validar Token:</label>
-              <input
-                required
-                id="validateToken"
-                type="text"
-                maxLength="255"
-                autoFocus
-                autoComplete="off"
-                value={totp}
-                onChange={(e) => {
-                  setTotp(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <button type="submit">Finalizar</button>
-            </div>
-          </form>
-        </div>
+    <div className="container flex flex-row justify-center items-center">
+      <RightArrow xlarge />
+      <div className={card}>
+        <h1 className="uppercase text-2xl font-medium text-center">
+          TOKEN DE SEGURIDAD
+        </h1>
+        <hr />
+        <form onSubmit={handleTOTPconfirm}>
+          <h2>Escanee el siguiente código QR con Google Authenticator</h2>
+          <div className={field}>
+            <QRCode value={auth.qr}></QRCode>
+          </div>
+          <div className={field}>
+            <label htmlFor="validateToken">Validar Token:</label>
+            <input
+              required
+              id="validateToken"
+              type="text"
+              maxLength="255"
+              autoFocus
+              autoComplete="off"
+              value={totp}
+              onChange={(e) => {
+                setTotp(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <button type="submit">Finalizar</button>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   ) : forgotPassSubmit ? (
-    <>
-      <div className="container flex flex-row justify-center items-center">
-        <RightArrow xlarge />
-        <div className={card}>
-          <h1 className="uppercase text-2xl font-medium text-center">
-            Modificación de contraseña
-          </h1>
-          <hr />
-          <form onSubmit={handleForgotPasswordSubmit}>
-            <div className={field}>
-              <label htmlFor="names">Correo:</label>
-              <input
-                id="email"
-                type="email"
-                autoFocus
-                autoComplete="off"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="names">Código:</label>
-              <input
-                id="email"
-                type="text"
-                autoFocus
-                maxLength="6"
-                autoComplete="off"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="names">Contraseña:</label>
-              <input
-                id="newpass"
-                type="password"
-                autoFocus
-                autoComplete="off"
-                value={newPass}
-                onChange={(e) => {
-                  setNewPass(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <label htmlFor="names">Confirmar contraseña:</label>
-              <input
-                id="confirmpass"
-                type="password"
-                autoFocus
-                autoComplete="off"
-                value={confirmPass}
-                onChange={(e) => {
-                  setConfirmPass(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <button type="submit">Modificar contraseña</button>
-            </div>
-          </form>
-        </div>
+    <div className="container flex flex-row justify-center items-center">
+      <RightArrow xlarge />
+      <div className={card}>
+        <h1 className="uppercase text-2xl font-medium text-center">
+          Modificación de contraseña
+        </h1>
+        <hr />
+        <form onSubmit={handleForgotPasswordSubmit}>
+          <div className={field}>
+            <label htmlFor="names">Correo:</label>
+            <input
+              id="email"
+              type="email"
+              autoFocus
+              autoComplete="off"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <label htmlFor="names">Código:</label>
+            <input
+              id="email"
+              type="text"
+              autoFocus
+              maxLength="6"
+              autoComplete="off"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <label htmlFor="names">Contraseña:</label>
+            <input
+              id="newpass"
+              type="password"
+              autoFocus
+              autoComplete="off"
+              value={newPass}
+              onChange={(e) => {
+                setNewPass(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <label htmlFor="names">Confirmar contraseña:</label>
+            <input
+              id="confirmpass"
+              type="password"
+              autoFocus
+              autoComplete="off"
+              value={confirmPass}
+              onChange={(e) => {
+                setConfirmPass(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <button type="submit">Modificar contraseña</button>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   ) : forgotPass ? (
-    <>
-      <div className="container flex flex-row justify-center items-center">
-        <RightArrow xlarge />
-        <div className={card}>
-          <h1 className="uppercase text-2xl font-medium text-center">
-            ¿Olvido su contraseña?
-          </h1>
-          <hr />
-          <form onSubmit={handleForgotPassword}>
-            <div className={field}>
-              <label htmlFor="names">Correo:</label>
-              <input
-                id="email"
-                type="email"
-                autoFocus
-                autoComplete="off"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                }}
-              />
-            </div>
-            <div className={field}>
-              <button type="submit" disabled={disabled}>
-                Solicitar código
-              </button>
-            </div>
-          </form>
-        </div>
+    <div className="container flex flex-row justify-center items-center">
+      <RightArrow xlarge />
+      <div className={card}>
+        <h1 className="uppercase text-2xl font-medium text-center">
+          ¿Olvido su contraseña?
+        </h1>
+        <hr />
+        <form onSubmit={handleForgotPassword}>
+          <div className={field}>
+            <label htmlFor="names">Correo:</label>
+            <input
+              id="email"
+              type="email"
+              autoFocus
+              autoComplete="off"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+            />
+          </div>
+          <div className={field}>
+            <button type="submit" disabled={disabled}>
+              Solicitar código
+            </button>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   ) : (
     <div className={contain}>
       <form onSubmit={handleCognito}>
