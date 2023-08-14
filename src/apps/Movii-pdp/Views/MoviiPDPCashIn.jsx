@@ -385,10 +385,10 @@ const MoviiPDPCashIn = () => {
               <>
                 <h2 className='text-2xl font-semibold'>
                   {datosTrans.valorCashOut <= limiteRecarga.inferior
-                    ? `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
+                    ? `ERROR el valor de cash In debe ser mayor a ${formatMoney.format(
                         limiteRecarga.inferior
                       )}`
-                    : "ERROR El valor de cash out debe ser menor a " +
+                    : "ERROR El valor de cash In debe ser menor a " +
                       formatMoney.format(limiteRecarga.superior) +
                       " COP"}
                 </h2>

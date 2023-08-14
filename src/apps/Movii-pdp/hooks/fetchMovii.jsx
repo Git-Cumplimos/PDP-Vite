@@ -43,7 +43,6 @@ export const useFetchMovii = (
           throw error;
         }
       }
-
       //SECUENCIA ---------------Paso 2-------------------------------
       if (banderaConsulta) {
         try {
