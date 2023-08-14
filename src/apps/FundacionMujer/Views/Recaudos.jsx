@@ -266,7 +266,7 @@ const Recaudo = () => {
         },
         {
           render: ( { data: error}) => {
-            return "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
+            return error?.message ?? "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
           },
         }
       );
@@ -338,10 +338,11 @@ const params = useCallback(async () => {
               }
             }}
           />
+          
           {datosTrx?.tipobusqueda?.length > 0 && (
             <Input
               id='numpin'
-              label={label}
+              label= {datosTrx?.tipobusqueda === "2" ? "Número de obligación" : "Número identificación"}
               type='text'
               minLength='5'
               maxLength='12'
@@ -354,6 +355,7 @@ const params = useCallback(async () => {
                 number: num
               }));
               }}
+              required
             />
           )}
           <ButtonBar className='col-auto md:col-span-2'>
