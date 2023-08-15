@@ -310,6 +310,7 @@ const FormComission = ({
                           : true
                       }
                       disabled={disabledState}
+                      negativeValues
                     />
                   ) : (
                     ""
