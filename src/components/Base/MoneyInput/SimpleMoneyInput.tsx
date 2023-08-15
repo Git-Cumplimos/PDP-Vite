@@ -17,13 +17,20 @@ interface Props
   decimalDigits?: number;
   equalError?: boolean;
   equalErrorMin?: boolean;
+  negativeValues?: boolean;
   onInput?: (_: FormEvent<HTMLInputElement>, __: number) => void;
   onChange?: (_: ChangeEvent<HTMLInputElement>, __: number) => void;
 }
 
 const SimpleMoneyInput = forwardRef<HTMLInputElement, Props>(
   (
-    { decimalDigits = 0, equalError = true, equalErrorMin = true, ...input },
+    {
+      decimalDigits = 0,
+      equalError = true,
+      equalErrorMin = true,
+      negativeValues = false,
+      ...input
+    },
     ref
   ) => {
     const inptRef = useRef<HTMLInputElement | null>(null);
@@ -144,7 +151,7 @@ const SimpleMoneyInput = forwardRef<HTMLInputElement, Props>(
         autoComplete="off"
         onInput={onInput}
         onChange={onChange}
-        onKeyDown={onHandleNegativeNumbers}
+        onKeyDown={negativeValues ? onHandleNegativeNumbers : () => {}}
       />
     );
   }

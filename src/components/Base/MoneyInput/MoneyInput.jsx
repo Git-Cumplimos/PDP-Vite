@@ -13,6 +13,7 @@ const MoneyInput = ({
   decimalDigits = 0,
   equalError = true,
   equalErrorMin = true,
+  negativeValues = false,
   ...input
 }) => {
   const inptRef = useRef(null);
@@ -120,7 +121,7 @@ const MoneyInput = ({
       {...dynamicProps}
       ref={inptRef}
       onInput={onInput}
-      onKeyDown={onHandleNegativeNumbers}
+      onKeyDown={negativeValues ? onHandleNegativeNumbers : () => {}}
     />
   );
 };
