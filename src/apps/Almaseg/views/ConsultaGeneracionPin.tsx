@@ -16,10 +16,10 @@ type TypeDataInput = {
   numero_factura: string;
 };
 type TypeDataOutput = null | {
-  CompanyID: string;
-  IdentificationType: string;
-  Name: string;
-  PayableAmount: string;
+  numero_identificacion: string;
+  tipo_identificacion: string;
+  nombres: string;
+  valor_total: string;
   numero_factura: string;
 };
 
@@ -110,13 +110,13 @@ const ConsultaGeneracionPin = (): JSX.Element => {
             <h2 className="font-semibold">Número de factura: </h2>
             <h2>{dataOutput?.numero_factura ?? ""}</h2>
             <h2 className="font-semibold">Tipo de identificación: </h2>
-            <h2>{dataOutput?.IdentificationType ?? ""} </h2>
+            <h2>{dataOutput?.tipo_identificacion ?? ""} </h2>
             <h2 className="font-semibold">Número de identificación: </h2>
-            <h2>{dataOutput?.CompanyID ?? ""} </h2>
+            <h2>{dataOutput?.numero_identificacion ?? ""} </h2>
             <h2 className="font-semibold">Nombres y Apellidos: </h2>
-            <h2>{dataOutput?.Name ?? ""} </h2>
+            <h2>{dataOutput?.nombres ?? ""} </h2>
             <h2 className="font-semibold">Valor del PIN: </h2>
-            <h2>{`$ ${dataOutput?.PayableAmount ?? ""}`} </h2>
+            <h2>{`$ ${dataOutput?.valor_total ?? ""}`} </h2>
           </div>
         ) : (
           <></>
