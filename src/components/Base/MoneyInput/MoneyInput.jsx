@@ -9,6 +9,13 @@ import Input from "../Input";
 
 export const formatMoney = makeMoneyFormatter(2);
 
+const handleBlockNegativeSign = (ev) => {
+  if (ev.keyCode === 189) {
+    ev.preventDefault();
+    return;
+  }
+};
+
 const MoneyInput = ({
   decimalDigits = 0,
   equalError = true,
@@ -121,7 +128,9 @@ const MoneyInput = ({
       {...dynamicProps}
       ref={inptRef}
       onInput={onInput}
-      onKeyDown={negativeValues ? onHandleNegativeNumbers : () => {}}
+      onKeyDown={
+        negativeValues ? onHandleNegativeNumbers : handleBlockNegativeSign
+      }
     />
   );
 };
