@@ -276,6 +276,8 @@ const Reversos = () => {
           name='email'
           label={"email"}
           type='text'
+          minLength={5}
+          maxLength={100}
           autoComplete='off'
           defaultValue={email}
         />
@@ -283,6 +285,8 @@ const Reversos = () => {
           id='nombre'
           name='nombre'
           label={"nombre"}
+          minLength={1}
+          maxLength={40}
           type='text'
           autoComplete='off'
           defaultValue={nombre}
@@ -338,6 +342,8 @@ const Reversos = () => {
                   name='reference'
                   label='Referencia'
                   type='text'
+                  min={1}
+                  maxLength={32}
                   autoComplete='off'
                   value={data?.reference ?? ""}
                   onInput={handleChange}></Input>
@@ -345,6 +351,8 @@ const Reversos = () => {
                   id='motivo'
                   label='Motivo'
                   type='text'
+                  minLength= {1}
+                  maxLength= {40}
                   autoComplete='off'
                   value={motivo}
                   required
