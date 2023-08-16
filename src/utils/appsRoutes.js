@@ -56,6 +56,7 @@ import rutasRecargasTullave from "../apps/RecargasTuLlave/routes";
 import rutasPowwi from "../apps/Powwi/routes";
 import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
 import rutasFundacionMujer from "../apps/FundacionMujer/routes";
+import rutasMovii from "../apps/Movii-pdp/routes";
 
 /**
 
@@ -147,10 +148,7 @@ const DetalleModificacionCupo = lazy(() =>
 /**
  * Movii
  */
-const MoviiPDP = lazy(() => import("../apps/Movii-pdp/MoviiPDP"));
-const MoviiPDPCashOut = lazy(() =>
-  import("../apps/Movii-pdp/Views/MoviiPDPCashOut")
-);
+// const rutasMovii = lazy(() => import("../apps/Movii-pdp/routes"));
 /**
  * Marketplace
  */
@@ -990,21 +988,7 @@ const allUrlsPrivateApps = [
   },
   rutasConfiguraciones,
   rutasRecargas,
-  {
-    link: "/movii-pdp",
-    label: <AppIcons Logo={"MOVII"} name="MOVII PDP" />,
-    // label: <AppIcons Logo={"MARKETPLACE"} name="MOVII PDP" />,
-    component: MoviiPDP,
-    permission: [48],
-    subRoutes: [
-      {
-        link: "/movii-pdp/retiro",
-        label: <AppIcons Logo={"MOVII_RETIRO"} name="Retiro" />,
-        component: MoviiPDPCashOut,
-        permission: [49],
-      },
-    ],
-  },
+  rutasMovii,
   {
     link: "/colpensiones",
     label: <AppIcons Logo={"COLPENSIONES"} name={"Colpensiones"} />,

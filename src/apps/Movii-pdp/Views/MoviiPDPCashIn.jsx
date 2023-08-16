@@ -8,7 +8,12 @@ import Form from "../../../components/Base/Form";
 import { notify, notifyError, notifyPending } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
-import { postRealizarCashout, consultaValidateUserMoviiCashIn, trxDepositoMoviiCashIn } from "../utils/fetchMoviiRed";
+import {
+  postRealizarCashout,
+  consultaValidateUserMoviiCashIn,
+  trxDepositoMoviiCashIn,
+  fetchCustom,
+} from "../utils/fetchMoviiRed";
 import { v4 } from "uuid";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
@@ -17,8 +22,10 @@ import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
 import { enumParametrosMovii } from "../utils/enumParametrosMovii";
 import { useFetchMovii } from "../hooks/fetchMovii";
-const URL_CONSULTA_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}corresponsal-movii/check-estado-deposito-movii`;
-const URL_REALIZAR_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}corresponsal-movii/deposito-corresponsal-movii`;
+import { useFetch } from "../../../hooks/useFetch";
+const URL_CONSULTA_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/check-estado-deposito-movii`;
+const URL_CONSULTAR_USUARIO_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/consulta-deposito-movii`;
+const URL_REALIZAR_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/deposito-corresponsal-movii`;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -36,7 +43,7 @@ const MoviiPDPCashIn = () => {
   });
   const uniqueId = v4();
   const [loadingPinPago, setLoadingPinPago] = useState(false);
-  const [peticion, setPeticion] = useState(false);
+  const [peticion, setPeticion] = useState(0);
   const [banderaConsulta, setBanderaConsulta] = useState(false);
   const [botonAceptar, setBotonAceptar] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
@@ -76,33 +83,7 @@ const MoviiPDPCashIn = () => {
       })
       .catch((err) => console.error(err));
   }, []);
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de cash-out Movii",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
-      /*direccion*/
-      [
-        "Dirección",
-        roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
-      ],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "prod",
-    trxInfo: [],
-    disclamer:
-      "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-  });
+  const [objTicketActual, setObjTicketActual] = useState({});
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   const onSubmit = (e) => {
@@ -112,11 +93,11 @@ const MoviiPDPCashIn = () => {
 
   /*Funcion para habilitar el modal*/
   const habilitarModal = () => {
-    setShowModal(!showModal);    
+    setShowModal(!showModal);
   };
 
   const hideModal = () => {
-    setBanderaConsulta(false)
+    setBanderaConsulta(false);
     setShowModal(false);
     setShowModal2(false);
     setDatosTrans({
@@ -132,8 +113,8 @@ const MoviiPDPCashIn = () => {
     setObjTicketActual((old) => {
       return { ...old, trxInfo: [] };
     });
-    setPeticion(false);
-    navigate(-1)
+    setPeticion(0);
+    navigate(-1);
   };
   const hideModalUsuario = () => {
     setShowModal(false);
@@ -151,9 +132,9 @@ const MoviiPDPCashIn = () => {
     setObjTicketActual((old) => {
       return { ...old, trxInfo: [] };
     });
-    setPeticion(false);
-    notifyError("Transacción cancelada por el usuario")
-    navigate(-1)
+    setPeticion(0);
+    notifyError("Transacción cancelada por el usuario");
+    navigate(-1);
   };
 
   const printDiv = useRef();
@@ -162,12 +143,19 @@ const MoviiPDPCashIn = () => {
     content: () => printDiv.current,
   });
 
-  const [loadingPeticionCashoutMovii, peticionCashInMovii] = useFetchMovii(
+  const [loadingPeticionCashinMovii, peticionCashInMovii] = useFetchMovii(
     URL_REALIZAR_DEPOSITO_MOVII,
-    URL_CONSULTA_DEPOSITO_MOVII,    
+    URL_CONSULTA_DEPOSITO_MOVII,
     "Realizar depósito Movii"
   );
-
+  const [loadingPeticionConsultaDepositoMovii, peticionConsultaDepositoMovii] =
+    useFetch(
+      fetchCustom(
+        URL_CONSULTAR_USUARIO_DEPOSITO_MOVII,
+        "POST",
+        "Consultar Deposito"
+      )
+    );
   const peticionCashIn = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -190,7 +178,7 @@ const MoviiPDPCashIn = () => {
         direccion: roleInfo?.direccion,
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-            roleInfo?.tipo_comercio === "KIOSCO"
+          roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
       };
@@ -207,27 +195,26 @@ const MoviiPDPCashIn = () => {
         {
           render: ({ data: res }) => {
             setLoadingPinPago(false);
-            setBotonAceptar(false)
+            setBotonAceptar(false);
             const result = { data: res };
             const msg = result.data.msg;
-            if (res?.obj?.ticket) {
-              // Haz algo si 'ticket' existe
-              setObjTicketActual(res?.obj?.ticket);
-
-            } else {
-              // Haz algo más si 'ticket' no existe
-            }
+            if (res?.obj?.ticket) setObjTicketActual(res?.obj?.ticket);
             if (res?.status) {
-              setPeticion(true);
+              setPeticion(2);
               setShowModal2(!showModal2);
               setInfoUsers((old) => {
-                return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender};
+                return {
+                  ...old,
+                  nombreUsuario: res?.obj?.userName,
+                  ciudad: res?.obj?.city,
+                  genero: res?.obj?.gender,
+                };
               });
-              return (`${msg} Exitosa`);
+              return `${msg} Exitosa`;
             } else {
               hideModal();
               navigate(-1);
-              return (`${msg} Fallida`);
+              return `${msg} Fallida`;
             }
           },
         },
@@ -239,7 +226,7 @@ const MoviiPDPCashIn = () => {
         }
       );
     },
-    [datosTrans, pdpUser, roleInfo, uniqueId]
+    [datosTrans, pdpUser, roleInfo, uniqueId, infoUsers]
   );
 
   const peticionConsulta = useCallback(
@@ -255,41 +242,46 @@ const MoviiPDPCashIn = () => {
         issuer_id_dane: roleInfo?.codigo_dane,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
-        // Ticket: objTicket,
         subscriberNum: datosTrans.numeroTelefono,
-        // otp: datosTrans.otp,
         direccion: roleInfo?.direccion,
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-            roleInfo?.tipo_comercio === "KIOSCO"
+          roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
       };
       notifyPending(
-        consultaValidateUserMoviiCashIn(data),
+        peticionConsultaDepositoMovii({}, data),
         {
           render() {
             setLoadingPinPago(true);
-            setBotonAceptar(true)
+            setBotonAceptar(true);
             return "Procesando transacción";
           },
         },
         {
           render({ data: res }) {
             setLoadingPinPago(false);
-            setBotonAceptar(false)
-            const result = { data: res }; 
+            setBotonAceptar(false);
+            const result = { data: res };
             const msg = result.data.msg;
             if (res?.status) {
+              setPeticion(1);
               setShowModal2(!showModal2);
               setInfoUsers((old) => {
-                return { ...old, nombreUsuario: res?.obj?.userName, ciudad: res?.obj?.city, genero: res?.obj?.gender, id_trx: res?.obj?.id_trx };
+                return {
+                  ...old,
+                  nombreUsuario: res?.obj?.userName,
+                  ciudad: res?.obj?.city,
+                  genero: res?.obj?.gender,
+                  id_trx: res?.obj?.id_trx,
+                };
               });
             } else {
               navigate(-1);
               hideModal();
             }
-            return (`${msg} Exitosa`);
+            return `${msg} Exitosa`;
           },
         },
         {
@@ -300,13 +292,7 @@ const MoviiPDPCashIn = () => {
         }
       );
     },
-    [
-      datosTrans,
-      roleInfo,
-      pdpUser?.uname,
-      pdpUser,
-      navigate,
-    ]
+    [datosTrans, roleInfo, pdpUser?.uname, pdpUser, navigate]
   );
   return (
     <>
@@ -352,127 +338,119 @@ const MoviiPDPCashIn = () => {
           }}
           required></MoneyInput>
         <ButtonBar className='lg:col-span-2'>
-          <Button type='submit'>Aceptar</Button>
+          <Button
+            type='submit'
+            disabled={
+              loadingPeticionConsultaDepositoMovii || loadingPeticionCashinMovii
+            }>
+            Aceptar
+          </Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={loadingPinPago ? () => { } : hideModal}>
+      <Modal
+        show={showModal}
+        handleClose={loadingPinPago ? () => {} : hideModal}>
         <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion ? (
-            datosTrans.valorCashOut < limiteRecarga.superior &&
-            datosTrans.valorCashOut > limiteRecarga.inferior ? (
-              <>
-                <h1 className='text-2xl font-semibold'>
-                  ¿Está seguro de realizar la transaccion?
-                </h1>
-                <h2 className='text-base'>
-                  {`Valor a depositar: ${formatMoney.format(
-                    datosTrans.valorCashOut
-                  )} COP`}
-                </h2>
-                <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
-                {/* <h2>{`Número OTP: ${datosTrans.otp}`}</h2> */}
-                <ButtonBar>
-                  <Button
-                    disabled={botonAceptar}
-                    type='submit'
-                      onClick={peticionConsulta}>
-                      Realizar consulta
-                  </Button>
-                    <Button disabled={botonAceptar}  onClick={hideModalUsuario}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            ) : (
-              <>
-                <h2 className='text-2xl font-semibold'>
-                  {datosTrans.valorCashOut <= limiteRecarga.inferior
-                    ? `ERROR el valor de cash In debe ser mayor a ${formatMoney.format(
-                        limiteRecarga.inferior
-                      )}`
-                    : "ERROR El valor de cash In debe ser menor a " +
-                      formatMoney.format(limiteRecarga.superior) +
-                      " COP"}
-                </h2>
-
-                <ButtonBar>
-                    <Button disabled={loadingPeticionCashoutMovii}  onClick={() => setShowModal(false)}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            )
-          ) : (
-            ""
-          )}
-          {peticion && (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          {peticion === 0 ? (
+            <>
+              <h1 className='text-2xl font-semibold'>
+                ¿Está seguro de realizar la transacción?
+              </h1>
+              <h2 className='text-base'>
+                {`Valor a depositar: ${formatMoney.format(
+                  datosTrans.valorCashOut
+                )} COP`}
+              </h2>
+              <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
+              <ButtonBar>
+                <Button
+                  disabled={
+                    loadingPeticionCashinMovii ||
+                    loadingPeticionConsultaDepositoMovii
+                  }
+                  onClick={hideModalUsuario}>
+                  Cancelar
+                </Button>
+                <Button
+                  disabled={
+                    loadingPeticionCashinMovii ||
+                    loadingPeticionConsultaDepositoMovii
+                  }
+                  type='submit'
+                  onClick={peticionConsulta}>
+                  Realizar consulta
+                </Button>
+              </ButtonBar>
+            </>
+          ) : peticion === 1 ? (
+            <>
+              <h1 className='text-2xl font-bold'>
+                Respuesta de consulta Movii
+              </h1>
+              <h4 className='text-2xl font-semibold'>
+                Resumen de la transacción
+              </h4>
+              <h2>{`Nombre usuario: ${infoUsers.nombreUsuario}`}</h2>
+              <h2 className='text-base'>
+                {`Valor a depositar: ${formatMoney.format(
+                  datosTrans.valorCashOut
+                )} COP`}
+              </h2>
+              <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
+              <h2>{`Ciudad: ${
+                infoUsers.ciudad.toLowerCase() === "bogota"
+                  ? "Bogotá D.C"
+                  : infoUsers.ciudad
+              }`}</h2>
+              <ButtonBar>
+                <Button
+                  disabled={
+                    loadingPeticionCashinMovii ||
+                    loadingPeticionConsultaDepositoMovii
+                  }
+                  onClick={hideModalUsuario}>
+                  Cancelar
+                </Button>
+                <Button
+                  disabled={
+                    loadingPeticionCashinMovii ||
+                    loadingPeticionConsultaDepositoMovii
+                  }
+                  type='submit'
+                  onClick={peticionCashIn}>
+                  Aceptar
+                </Button>
+              </ButtonBar>
+            </>
+          ) : peticion === 2 ? (
+            <>
               <Tickets refPrint={printDiv} ticket={objTicketActual}></Tickets>
               <h2>
                 <ButtonBar>
                   <Button
                     type='submit'
+                    disabled={
+                      loadingPeticionCashinMovii ||
+                      loadingPeticionConsultaDepositoMovii
+                    }
                     onClick={() => {
                       hideModal();
                     }}>
                     Aceptar
                   </Button>
-                  <Button onClick={handlePrint}>Imprimir</Button>
+                  <Button
+                    onClick={handlePrint}
+                    disabled={
+                      loadingPeticionCashinMovii ||
+                      loadingPeticionConsultaDepositoMovii
+                    }>
+                    Imprimir
+                  </Button>
                 </ButtonBar>
               </h2>
-            </div>
-          )}
-        </div>
-      </Modal>
-      <Modal show={showModal2} handleClose={loadingPinPago ? () => { } : hideModal}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {!peticion ? (
-            datosTrans.valorCashOut < limiteRecarga.superior &&
-            datosTrans.valorCashOut > limiteRecarga.inferior ? (
-                <>
-                  <h1 className='text-2xl font-bold'>
-                    Respuesta de consulta Movii
-                  </h1>
-                <h4 className='text-2xl font-semibold'>
-                    Resumen de la transacción
-                </h4>
-                <h2>{`Nombre usuario: ${infoUsers.nombreUsuario}`}</h2>
-                <h2 className='text-base'>
-                  {`Valor a depositar: ${formatMoney.format(
-                    datosTrans.valorCashOut
-                  )} COP`}
-                </h2>
-                <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
-                  <h2>{`Ciudad: ${infoUsers.ciudad.toLowerCase() === 'bogota' ? 'Bogotá D.C' : infoUsers.ciudad}`
-                  }</h2>
-                <h2>{`Género: ${infoUsers.genero.toLowerCase() === 'male' ? 'Masculino' : 'Femenino'}`}</h2>
-
-
-                <ButtonBar>
-                  <Button
-                      disabled={loadingPeticionCashoutMovii}
-                    type='submit'
-                    onClick={peticionCashIn}>
-                      Aceptar
-                  </Button>
-                    <Button disabled={loadingPeticionCashoutMovii} onClick={hideModalUsuario}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            ) : (
-              <>
-                <h2 className='text-2xl font-semibold'>
-                  {datosTrans.valorCashOut <= limiteRecarga.inferior
-                    ? `ERROR el valor de cash out debe ser mayor a ${formatMoney.format(
-                        limiteRecarga.inferior
-                      )}`
-                    : "ERROR El valor de cash out debe ser menor a " +
-                      formatMoney.format(limiteRecarga.superior) +
-                      " COP"}
-                </h2>
-
-                <ButtonBar>
-                  <Button onClick={() => setShowModal(false)}>Cancelar</Button>
-                </ButtonBar>
-              </>
-            )
+            </>
           ) : (
-            ""
+            <></>
           )}
         </div>
       </Modal>
