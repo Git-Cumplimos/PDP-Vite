@@ -113,7 +113,9 @@ const SeleccionServicioPagarAval = () => {
           value={datosTrans.idConvenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              let num = e.target.value;
+              num = Math.abs(num)
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
               });

@@ -422,7 +422,9 @@ const Retiro = () => {
             maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              // const num = e.target.value.replace(/[\s\.]/g, "");
+              let num = e.target.value.replace(/[\s\.]/g, "");
+              num = Math.abs(num)
               if (!isNaN(num)) {
                 setUserDoc(num);
               }

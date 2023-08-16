@@ -148,6 +148,7 @@ const TransaccionRecargaTarjeta = () => {
     (ev) => {
       const valor = ev.target.value;
       let num = valor.replace(/[\s\.]/g, "");
+      num = Math.abs(num)
       if (!isNaN(num)) {
         if (ev.target.name === "telefonoCliente") {
           if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {

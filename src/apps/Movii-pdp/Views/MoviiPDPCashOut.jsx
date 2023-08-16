@@ -150,6 +150,10 @@ const MoviiPDPCashOut = () => {
             return notifyError("El número de teléfono debe comenzar por 3");
           }
         }
+        num = Math.abs(num)
+        if (num == 0){
+          num=""
+        }
         setDatosTrans((old) => {
           return { ...old, [ev.target.name]: num };
         });

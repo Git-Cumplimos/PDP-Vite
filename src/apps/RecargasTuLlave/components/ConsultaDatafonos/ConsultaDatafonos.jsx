@@ -138,7 +138,9 @@ const ConsultaDatafonos = ({
           value={dataDatafonos.pos_id}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              let num = e.target.value;
+              num = Math.abs(num)
               setDataDatafonos((old) => {
                 return { ...old, pos_id: num };
               });
@@ -157,7 +159,9 @@ const ConsultaDatafonos = ({
               value={dataDatafonos.fk_comercio_asociado}
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
-                  const num = e.target.value;
+                  // const num = e.target.value;
+                  let num = e.target.value;
+                  num = Math.abs(num)
                   setDataDatafonos((old) => {
                     return { ...old, fk_comercio_asociado: num };
                   });
