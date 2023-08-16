@@ -143,16 +143,12 @@ const MoviiPDPCashOut = () => {
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      let num = valor.replace(/[\s\.]/g, "");
+      const num = valor.replace(/[\s\.-]/g, "");
       if (!isNaN(num)) {
         if (ev.target.name === "numeroTelefono") {
           if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
             return notifyError("El número de teléfono debe comenzar por 3");
           }
-        }
-        num = Math.abs(num)
-        if (num == 0){
-          num=""
         }
         setDatosTrans((old) => {
           return { ...old, [ev.target.name]: num };

@@ -453,8 +453,7 @@ const ConveniosRecaudoAgrario = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               // const num = e.target.value;
-              let num = e.target.value;
-              num = Math.abs(num)
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
               });
@@ -470,7 +469,8 @@ const ConveniosRecaudoAgrario = () => {
           value={datosTrans.ean}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               setDatosTrans((old) => {
                 return { ...old, ean: num };
               });

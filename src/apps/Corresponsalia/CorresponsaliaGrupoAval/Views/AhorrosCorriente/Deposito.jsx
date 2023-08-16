@@ -423,8 +423,7 @@ const Deposito = () => {
             value={numCuenta}
             onInput={(e) => {
               // const num = e.target.value.replace(/[\s\.]/g, "");
-              let num = e.target.value.replace(/[\s\.]/g, "");
-              num = Math.abs(num)
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 setNumCuenta(num);
               }
@@ -441,7 +440,8 @@ const Deposito = () => {
             maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              // const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }

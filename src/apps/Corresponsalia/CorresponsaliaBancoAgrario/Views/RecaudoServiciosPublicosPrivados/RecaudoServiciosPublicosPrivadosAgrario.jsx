@@ -274,8 +274,9 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   }, [roleInfo]);
   const onChangeFormat = useCallback(
     (ev) => {
-      let valor = ev.target.value;
-      valor = valor.replace(/[\s\.]/g, "");
+      // let valor = ev.target.value;
+      // valor = valor.replace(/[\s\.]/g, "");
+      let valor = ev.target.value.replace(/[\s\.-]/g, "");
       if (ev.target.name === "ref1") {
         if (convenio?.algoritmo_ref1?.match(/(N 010)|(Q 108)/g)) {
           if (isNaN(valor)) {
