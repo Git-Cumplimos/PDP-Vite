@@ -311,7 +311,9 @@ const MoviiPDPCashIn = () => {
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              const valor = e.target.value;
+              const num = valor.replace(/[\s\.-]/g, "");
               if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
                 return notifyError("El número Movii debe comenzar por 3");
               }
