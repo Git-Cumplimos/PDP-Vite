@@ -218,7 +218,7 @@ const Reversos = () => {
       nombre_comercio: roleInfo?.["nombre comercio"],
       nombre_usuario: pdpUser?.uname ?? "",
       id_trx: selected?.id_trx,
-      valor_total_trx: parseFloat(value),
+      // valor_total_trx: parseFloat(value),
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       Datos: {
         nroBusqueda: data_request?.nroBusqueda,
