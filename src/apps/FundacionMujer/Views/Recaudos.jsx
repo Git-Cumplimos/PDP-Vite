@@ -313,9 +313,6 @@ const Recaudo = () => {
   return (
     <>
       <>
-      {
-        console.log(selected)
-      }
         <h1 className='text-3xl mt-6'>Recaudo Fundación de la mujer</h1>
         <Form onSubmit={onSubmit} grid>
           <Select
