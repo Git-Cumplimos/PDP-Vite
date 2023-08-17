@@ -23,6 +23,7 @@ const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 const URL_MOSTRAR_CREDITO= `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`
 const URL_INGRESAR_RECIBO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`
 const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
+const URL_VALOR_CUOTA = `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`
 
 const Recaudo = () => {
   const navigate = useNavigate();
@@ -49,37 +50,6 @@ const Recaudo = () => {
   const [tickets, setTickets] = useState("");
   const printDiv = useRef();
 
-  useEffect(() => {
-    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
-      navigate("/");
-    } else {
-      let hasKeys = true;
-      const keys = [
-        "id_comercio",
-        "id_usuario",
-        "tipo_comercio",
-        "id_dispositivo",
-        "ciudad",
-        "direccion",
-      ];
-      for (const key of keys) {
-        if (!(key in roleInfo)) {
-          hasKeys = false;
-          break;
-        }
-      }
-      if (!hasKeys) {
-        notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
-        );
-        navigate("/");
-      }
-    }
-    if (selected !== true){
-      postValorCuota();
-    }
-  }, [roleInfo, navigate, selected]);
-  
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
@@ -107,13 +77,16 @@ const Recaudo = () => {
   const [loadingPeticionMostrarCredito, peticionMostrarCredito] = useFetch(
     fetchCustom(URL_MOSTRAR_CREDITO, "POST", "Mostrar Credito")
   );
+  const [loadingPeticionValorCuota, peticionValorCuota] = useFetch(
+    fetchCustom(URL_VALOR_CUOTA, "POST", "Mostrar Valor Cuota")
+  );
   const [loadingPeticionIngresarRecibo, peticionIngresarRecibo] = 
     useFetchFDLM(
       URL_INGRESAR_RECIBO,
       URL_CONSULTAR_ESTADO_TRX,
       "Ingresar recibo"
     );
-    
+
   const bankCollection = useCallback(
     (e) => {
       e.preventDefault();
@@ -292,37 +265,41 @@ const Recaudo = () => {
     },
     [roleInfo, pdpUser, selected?.Credito, datosTrx?.info]
   );
-  
+
+  useEffect(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      navigate("/");
+    } else {
+      let hasKeys = true;
+      const keys = [
+        "id_comercio",
+        "id_usuario",
+        "tipo_comercio",
+        "id_dispositivo",
+        "ciudad",
+        "direccion",
+      ];
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+      if (!hasKeys) {
+        notifyError(
+          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        );
+        navigate("/");
+      }
+    }
+    if (selected !== true){
+      postValorCuota();
+    }
+  }, [roleInfo, navigate, selected]);
+
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
-
-// const params = useCallback(async () => {
-//   const queries = { tipo_op: 5 };
-//   try {
-//     if (datosTrx?.tipobusqueda !== "2"){
-//       const res = await fetchData(url_params, "GET", queries);
-//       if ("Parametros" in res?.obj?.[0]) {
-//         setLimitesMontos({
-//           max: res?.obj?.[0].Parametros.monto_maximo + 1,
-//           min: res?.obj?.[0].Parametros.monto_minimo - 1,
-//         });
-//       } else {
-//         setLimitesMontos({
-//           max: 10000000,
-//           min: 0,
-//         });
-//       }
-//       return res;
-//     }
-//   } catch (err) {
-//     console.error(err);
-//   }
-// }, []);
-  
-  // useEffect(() => {
-  //   params();
-  // }, [datosTrx?.info]);
 
   return (
     <>
@@ -369,11 +346,13 @@ const Recaudo = () => {
               autoComplete='off'
               value={datosTrx?.number}
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setDatosTrx(prevState => ({
-                ...prevState,
-                number: num
-              }));
+                const num = e.target.value.replace(/[\s\.-]/g, "");;
+                if (!isNaN(num)) {
+                  setDatosTrx(prevState => ({
+                  ...prevState,
+                  number: num
+                }));
+                }
               }}
               required
             />
@@ -401,23 +380,8 @@ const Recaudo = () => {
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              // setShowModal(true);
-              if(datosTrx?.valueValor === false) {
-                  notify("Procesando consulta valor cuota, intente de nuevo")
-              }
-              else {
-                setShowModal(true);
-              }
-              // if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.tipobusqueda !== "2")){
-              //   setShowModal(true);
-              // }
-              // else if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.valueValor)){
-              //   setShowModal(true);
-              // }
-              // else if(datosTrx?.info?.obj?.Nromensaje1 === 1) {
-              //   notify("Procesando Consulta Valor Cuota")
-              // }
             }}
+            disabled={loadingPeticionValorCuota || selected !== true}
           ></TableEnterprise>
         </>
       )}

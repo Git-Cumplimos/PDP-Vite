@@ -1,8 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
-const URL_MOSTRAR_VALOR = `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`
-
 export const fetchCustom = (
   url_,
   metodo_,
@@ -109,31 +107,6 @@ export const fetchCustom = (
       throw error;
     }
   };
-};
-
-export const consultaValorCuota = async (bodyObj) => {
-  if (!bodyObj) {
-    return new Promise((resolve, reject) => {
-      resolve("Sin datos body");
-    });
-  }
-  try {
-    const res = await fetchData(
-      URL_MOSTRAR_VALOR,
-      "POST",
-      {},
-      bodyObj,
-      {},
-      {},
-      40000
-    );
-    if (!res?.status) {
-      console.error(res?.msg);
-    }
-    return res;
-  } catch (err) {
-    throw err;
-  }
 };
 
 export const EvaluateResponse = (res, name_ = "") => {
