@@ -21,7 +21,6 @@ import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
 import HideInput from "../../../../components/Base/HideInput";
-import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { cifrarAES } from "../../../../utils/cryptoUtils"
 import { v4 } from "uuid";
@@ -36,10 +35,6 @@ const Retiro = () => {
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosPowwi.maxRetiroCuentas,
     min: enumParametrosPowwi.minRetiroCuentas,
-  });
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
   });
   const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
@@ -286,7 +281,7 @@ const Retiro = () => {
             value={datosTrx.numeroTelefono}
             onInput={(e) => {
               let valor = e.target.value;
-              let num = valor.replace(/[\s\.]/g, "");
+              let num = valor.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                   return notifyError("El número debe comenzar por 3");
@@ -320,7 +315,7 @@ const Retiro = () => {
             maxLength={"15"}
             value={datosTrx.userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 setDatosTrx(prevState => ({
                   ...prevState,
@@ -359,8 +354,15 @@ const Retiro = () => {
             maxLength={"11"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
+            equalError={false}
+            equalErrorMin={false}
             value={valor}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            onInput={(e, valor) => {
+              if (!isNaN(valor)){
+                const num = valor;
+                setValor(num)
+              }
+            }}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>

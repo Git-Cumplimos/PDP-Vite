@@ -507,7 +507,7 @@ const RecaudoServiciosPublicosPrivados = () => {
               autoComplete='off'
               onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.-]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, ref1: num };
@@ -529,7 +529,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             value={datosTrans.ref2}
             onInput={(e) => {
               let valor = e.target.value;
-              let num = valor.replace(/[\s\.]/g, "");
+              let num = valor.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 setDatosTrans((old) => {
                   return { ...old, ref2: num };
@@ -593,7 +593,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     value={datosTransValidacion.ref1}
                     onInput={(e) => {
                       let valor = e.target.value;
-                      let num = valor.replace(/[\s\.]/g, "");
+                      let num = valor.replace(/[\s\.-]/g, "");
                       if (!isNaN(num)) {
                         setDatosTransValidacion((old) => {
                           return { ...old, ref1: num };
@@ -614,7 +614,7 @@ const RecaudoServiciosPublicosPrivados = () => {
                     value={datosTransValidacion.ref2}
                     onInput={(e) => {
                       let valor = e.target.value;
-                      let num = valor.replace(/[\s\.]/g, "");
+                      let num = valor.replace(/[\s\.-]/g, "");
                       if (!isNaN(num)) {
                         setDatosTransValidacion((old) => {
                           return { ...old, ref2: num };
