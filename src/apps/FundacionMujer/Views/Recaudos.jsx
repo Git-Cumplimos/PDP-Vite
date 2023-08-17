@@ -241,7 +241,7 @@ const Recaudo = () => {
 
   const postValorCuota = useCallback(
     (e) => {
-      const body = {
+      const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
@@ -256,25 +256,39 @@ const Recaudo = () => {
           nroBusqueda: parseFloat(selected?.Cedula),
         },
       };
-      consultaValorCuota(body)
-      .then((res) => {
-        const maximo = parseFloat(res?.obj?.ValorPagarMaximo)
-        const minimo = parseFloat(res?.obj?.ValorPagarMin)
-        setLimitesMontos({
-          max: maximo,
-          min: minimo,
-        });
-        setDatosTrx((old) => ({
-          ...old,
-          formatMon: res?.obj?.ValorPagar,
-          cuota: res?.obj,
-          valueValor: true,
-          permiteCambio: res?.obj?.PermiteCambio,
-        }));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+      notifyPending(
+        peticionValorCuota({}, data),
+        {
+          render: () => {
+            return "Procesando consulta valor cuota";
+          },
+        },
+        {
+          render: ({data: res }) =>{
+            const maximo = parseFloat(res?.obj?.ValorPagarMaximo) + 1
+            const minimo = parseFloat(res?.obj?.ValorPagarMin) - 1
+            setLimitesMontos({
+              max: maximo,
+              min: minimo,
+            });
+            setDatosTrx((old) => ({
+              ...old,
+              formatMon: res?.obj?.ValorPagar,
+              cuota: res?.obj,
+              valueValor: true,
+              permiteCambio: res?.obj?.PermiteCambio,
+            }));
+            setShowModal(true);
+            return "Consulta valor cuota satisfactoria";
+          },
+        },
+        {
+          render: ( { data: error}) => {
+            handleClose();
+            return error?.message ?? "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
+          },
+        }
+      );
     },
     [roleInfo, pdpUser, selected?.Credito, datosTrx?.info]
   );
