@@ -238,8 +238,8 @@ const Recaudo = () => {
         },
         {
           render: ({data: res }) =>{
-            const maximo = parseFloat(res?.obj?.ValorPagarMaximo) + 1
-            const minimo = parseFloat(res?.obj?.ValorPagarMin) - 1
+            const maximo = parseFloat(res?.obj?.ValorPagarMaximo)
+            const minimo = parseFloat(res?.obj?.ValorPagarMin)
             setLimitesMontos({
               max: maximo,
               min: minimo,
