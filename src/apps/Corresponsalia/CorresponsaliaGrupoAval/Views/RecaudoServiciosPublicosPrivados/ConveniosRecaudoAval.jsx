@@ -487,6 +487,9 @@ const ConveniosRecaudoAval = () => {
                 autoComplete='off'
                 maxLength={"30"}
                 defaultValue={convenio?.nit ?? ""}
+                onChange={(ev) => {
+                  ev.target.value = onChangeNumber(ev);
+                }}
                 required
               />
               <ToggleInput

@@ -170,7 +170,8 @@ const CreateDatafono = () => {
   );
   const onChangeFormatNumber = useCallback((ev) => {
     const valor = ev.target.value;
-    let num = valor.replace(/[\s\.]/g, "");
+    // let num = valor.replace(/[\s\.]/g, "");
+    let num = valor.replace(/[\s\.-]/g, "");
     if (!isNaN(num)) {
       setDataDatafono((old) => {
         return { ...old, [ev.target.name]: num };

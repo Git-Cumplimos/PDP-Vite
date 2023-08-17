@@ -205,7 +205,8 @@ const ConveniosRecaudoAgrario = () => {
   }, []);
   const onChangeFormatNumber = useCallback((ev) => {
     const valor = ev.target.value;
-    let num = valor.replace(/[\s\.]/g, "");
+    // let num = valor.replace(/[\s\.]/g, "");
+    let num = valor.replace(/[\s\.-]/g, "");
     if (!isNaN(num)) {
       setDataConvenios((old) => {
         return { ...old, [ev.target.name]: num };
@@ -223,7 +224,7 @@ const ConveniosRecaudoAgrario = () => {
   const onChangeFormatNumberVect = useCallback(
     (i) => (ev) => {
       const valor = ev.target.value;
-      let num = valor === "" ? 0 : valor.replace(/[\s\.]/g, "");
+      let num = valor === "" ? 0 : valor.replace(/[\s\.-]/g, "");
       if (!isNaN(num)) {
         const tempData = { ...dataConvenios };
         tempData.referencias[i][ev.target.name] = parseInt(num);

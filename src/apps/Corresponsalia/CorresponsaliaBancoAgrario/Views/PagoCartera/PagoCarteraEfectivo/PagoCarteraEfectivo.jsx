@@ -107,9 +107,12 @@ const PagoCarteraEfectivo = () => {
     }, []);
 
     const onChangeNumeroCartera = useCallback((e) => {
-        setDatosPagoEfectivo((old) => {
-            return { ...old, numeroPagoCartera: e.target.value };
-        });
+        let num = e.target.value.replace(/[\s\.-]/g, "");
+        if (!isNaN(num)) {
+            setDatosPagoEfectivo((old) => {
+                return { ...old, numeroPagoCartera: num };
+            });
+        }
     }, []);
 
     const onChangeSelect = useCallback((e) => {
