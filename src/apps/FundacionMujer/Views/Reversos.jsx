@@ -18,6 +18,7 @@ import { fetchCustom } from "../utils/fetchFDLM";
 import { notifyPending } from "../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "../../../hooks/useFetch";
+import { onChangeNumber } from "../../../utils/functions";
 
 /* URLS para consultar información de oficinas de donde hay que hacer el reverso*/
 const url_USERS = process.env.REACT_APP_URL_IAM_PDP;
@@ -176,7 +177,7 @@ const Reversos = () => {
           if (res?.status) {
             if (res?.obj?.trxs.length < 1) {
               notifyError(
-                "No se encontraron transacciones en el rango de fechas"
+                "No se encontraron transacciones realizadas el día de hoy por el comercio seleccionado"
               );
             }
             setMaxPages(res?.obj?.maxpages);
@@ -276,6 +277,8 @@ const Reversos = () => {
           name='email'
           label={"email"}
           type='text'
+          minLength={5}
+          maxLength={100}
           autoComplete='off'
           defaultValue={email}
         />
@@ -283,6 +286,8 @@ const Reversos = () => {
           id='nombre'
           name='nombre'
           label={"nombre"}
+          minLength={1}
+          maxLength={40}
           type='text'
           autoComplete='off'
           defaultValue={nombre}
@@ -338,13 +343,21 @@ const Reversos = () => {
                   name='reference'
                   label='Referencia'
                   type='text'
+                  min={1}
+                  maxLength={32}
                   autoComplete='off'
-                  value={data?.reference ?? ""}
-                  onInput={handleChange}></Input>
+                  // value={data?.reference ?? ""}
+                  // onInput={handleChange}
+                  onChange={(ev) => {
+                    ev.target.value = onChangeNumber(ev);
+                  }}>
+                </Input>
                 <TextArea
                   id='motivo'
                   label='Motivo'
                   type='text'
+                  minLength= {1}
+                  maxLength= {40}
                   autoComplete='off'
                   value={motivo}
                   required

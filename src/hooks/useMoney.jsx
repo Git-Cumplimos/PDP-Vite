@@ -18,6 +18,7 @@ const useMoney = ({
   equalError = false,
   equalErrorMin = false,
   decimalDigits = 0,
+  negativeValues = false,
 }) => {
   const onChangeMoney = useCallback(
     (ev) => {
@@ -29,7 +30,7 @@ const useMoney = ({
 
       const moneyValue =
         Math.round(
-          moneyValidator(ev.target.value) * Math.pow(10, decimalDigits)
+          moneyValidator(ev.target.value, negativeValues) * Math.pow(10, decimalDigits)
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = limits;
