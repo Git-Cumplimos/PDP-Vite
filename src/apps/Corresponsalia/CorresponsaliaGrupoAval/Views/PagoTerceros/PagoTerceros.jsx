@@ -233,16 +233,19 @@ const PagoTerceros = () => {
           required
         ></HideInput>
         <MoneyInput
+          id="valor_total_trx"
           name="valor_total_trx"
           label="Valor del pago"
           autoComplete="off"
           min={minValor}
           max={maxValor}
-          minLength={"5"}
           maxLength={"10"}
           value={inputData.valor_total_trx}
           onInput={onChangeInputSecond}
           required
+          type='text'
+          equalError={false}
+          equalErrorMin={false}
         />
         <ButtonBar className={"lg:col-span-2"}>
           <Button type={"submit"}>Continuar</Button>
