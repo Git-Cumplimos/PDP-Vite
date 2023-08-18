@@ -411,7 +411,7 @@ const PagoDeProductosPropios = () => {
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
             let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            let num = valor.replace(/[\s\.-]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };
@@ -457,7 +457,7 @@ const PagoDeProductosPropios = () => {
               value={datosTrans.numeroProducto}
               onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.-]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, numeroProducto: num };
@@ -480,7 +480,7 @@ const PagoDeProductosPropios = () => {
               value={datosTrans.binTarjetaCredito}
               onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.-]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, binTarjetaCredito: num };
@@ -499,7 +499,7 @@ const PagoDeProductosPropios = () => {
               value={datosTrans.ultimosTarjetaCredito}
               onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.-]/g, "");
                 if (!isNaN(e.target.value)) {
                   setDatosTrans((old) => {
                     return { ...old, ultimosTarjetaCredito: num };
@@ -605,6 +605,8 @@ const PagoDeProductosPropios = () => {
                   required
                   min={limiteRecarga.inferior}
                   max={limiteRecarga.superior}
+                  equalError={false}
+                  equalErrorMin={false}
                   value={tipoAbono.valorAbono}
                   onInput={(e, valor) => {
                     if (valor.toString().length < 11) {

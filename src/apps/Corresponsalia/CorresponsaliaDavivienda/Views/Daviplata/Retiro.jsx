@@ -262,7 +262,7 @@ const Retiro = () => {
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
             let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            let num = valor.replace(/[\s\.-]/g, "");
             if (!isNaN(num)) {
               if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
                 return notifyError("El número DaviPlata debe comenzar por 3");
