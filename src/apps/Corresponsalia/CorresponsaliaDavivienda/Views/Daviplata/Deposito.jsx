@@ -406,7 +406,7 @@ const Deposito = () => {
                 notifyError("El número de celular debe iniciar por 3");
                 setPhone("");
               } else {
-                const num = e.target.value.replace(/[\s\.-]/g, "");
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                   setPhone(num);
                 }
@@ -437,7 +437,7 @@ const Deposito = () => {
                   notifyError("El número de celular debe iniciar por 3");
                   setVerificacionTel("");
                 } else {
-                  const num = e.target.value.replace(/[\s\.-]/g, "");
+                  const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                   if (!isNaN(num)) {
                     setVerificacionTel(num);
                   }
@@ -467,7 +467,7 @@ const Deposito = () => {
             maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
