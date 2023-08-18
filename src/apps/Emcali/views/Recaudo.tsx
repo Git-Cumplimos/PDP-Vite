@@ -142,6 +142,7 @@ const Recaudo = () => {
 
   //********************Funciones onChange**************************
   const onChangeSelect = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+    setInputData(inputDataInitial);
     if (e.target.value === option_barcode) {
       setPaso("LecturaBarcode");
       setProcedimiento(option_barcode);
@@ -288,6 +289,7 @@ const Recaudo = () => {
       <SimpleLoading show={loadingPeticion}></SimpleLoading>
       <h1 className="text-3xl mt-6">Recaudo Emcali</h1>
       <Form grid={false} className=" flex flex-col content-center items-center">
+        <h1>Tipo de captura</h1>
         <div className={styleComponents}>
           <Select
             id="opciones"
