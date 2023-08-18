@@ -346,7 +346,7 @@ const Recaudo = () => {
               autoComplete='off'
               value={datosTrx?.number}
               onInput={(e) => {
-                const num = e.target.value.replace(/[\s\.-]/g, "");;
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrx(prevState => ({
                   ...prevState,

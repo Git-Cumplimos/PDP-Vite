@@ -130,7 +130,7 @@ const SeleccionServicioPagar = () => {
           required
           value={datosTrans.idConvenio}
           onInput={(e) => {
-            let num = e.target.value.replace(/[\s\.-]/g, "");
+            let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };

@@ -281,7 +281,7 @@ const Retiro = () => {
             value={datosTrx.numeroTelefono}
             onInput={(e) => {
               let valor = e.target.value;
-              let num = valor.replace(/[\s\.-]/g, "");
+              let num = valor.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                   return notifyError("El número debe comenzar por 3");
@@ -315,7 +315,7 @@ const Retiro = () => {
             maxLength={"15"}
             value={datosTrx.userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setDatosTrx(prevState => ({
                   ...prevState,

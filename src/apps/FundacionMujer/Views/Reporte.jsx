@@ -370,10 +370,13 @@ const Reporte = () => {
             <Input
               id='id_comercio'
               label='Id comercio'
-              type='numeric'
+              type='text'
               value={comercio}
-              onChange={(e) => {
-                setComercio(e.target.value);
+              onInput={(e) => {
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+                if (!isNaN(num)) {
+                  setComercio(num);
+                }
                 setShowTable(false);
               }}
               required
@@ -398,10 +401,13 @@ const Reporte = () => {
             <Input
               id='id_usuario'
               label='Id usuario'
-              type='numeric'
+              type='text'
               value={usuario}
-              onChange={(e) => {
-                setUsuario(e.target.value);
+              onInput={(e) => {
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+                if (!isNaN(num)) {
+                  setUsuario(num);
+                }
                 setShowTable(false);
               }}
               required
