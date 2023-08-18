@@ -5,6 +5,7 @@ import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
 import { notify, notifyError } from "../../../utils/notify";
+import SimpleLoading from "../../Base/SimpleLoading";
 
 const LoginForm = () => {
   const { contain, card, field } = classes;
@@ -221,16 +222,20 @@ const LoginForm = () => {
       .then()
       .catch((err) => {
         console.log(err);
+        if (err.cause === "unknown") {
+          notifyError(err.message);
+          return;
+        }
         if (err.code === "EnableSoftwareTokenMFAException") {
           notifyError(
             "Ha ingresado un código antiguo, escanee el QR e intente de nuevo"
           );
-        } else {
-          if (auth.timer) {
-            clearTimeout(auth.timer);
-          }
-          notify("Token y contraseña reestablecidos correctamente");
+          return;
         }
+        if (auth.timer) {
+          clearTimeout(auth.timer);
+        }
+        notify("Token y contraseña reestablecidos correctamente");
       });
 
     setNames("");
@@ -373,6 +378,7 @@ const LoginForm = () => {
     </div>
   ) : auth.cognitoUser?.challengeName === "MFA_SETUP" ? (
     <div className="container flex flex-row justify-center items-center">
+      <SimpleLoading show={!auth.qr} />
       <RightArrow xlarge />
       <div className={card}>
         <h1 className="uppercase text-2xl font-medium text-center">
