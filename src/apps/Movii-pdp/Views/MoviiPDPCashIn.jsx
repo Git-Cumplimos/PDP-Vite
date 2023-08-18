@@ -49,7 +49,7 @@ const MoviiPDPCashIn = () => {
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
     numeroTelefono: "",
-    valorCashOut: "",
+    valorCashIn: "",
   });
   const [infoUsers, setInfoUsers] = useState({
     nombreUsuario: "",
@@ -103,7 +103,7 @@ const MoviiPDPCashIn = () => {
     setDatosTrans({
       otp: "",
       numeroTelefono: "",
-      valorCashOut: "",
+      valorCashIn: "",
     });
     setInfoUsers({
       nombreUsuario: "",
@@ -122,7 +122,7 @@ const MoviiPDPCashIn = () => {
     setDatosTrans({
       otp: "",
       numeroTelefono: "",
-      valorCashOut: "",
+      valorCashIn: "",
     });
     setInfoUsers({
       nombreUsuario: "",
@@ -165,8 +165,8 @@ const MoviiPDPCashIn = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        amount: datosTrans?.valorCashOut,
-        valor_total_trx: datosTrans?.valorCashOut,
+        amount: datosTrans?.valorCashIn,
+        valor_total_trx: datosTrans?.valorCashIn,
         issuer_id_dane: roleInfo?.codigo_dane,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
@@ -237,8 +237,8 @@ const MoviiPDPCashIn = () => {
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        amount: datosTrans?.valorCashOut,
-        valor_total_trx: datosTrans?.valorCashOut,
+        amount: datosTrans?.valorCashIn,
+        valor_total_trx: datosTrans?.valorCashIn,
         issuer_id_dane: roleInfo?.codigo_dane,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
@@ -323,22 +323,26 @@ const MoviiPDPCashIn = () => {
             }
           }}></Input>
         <MoneyInput
-          id='valCashOut'
-          name='valCashOut'
+          id='valCashIn'
+          name='valCashIn'
           label='Valor a depositar'
           type='text'
           autoComplete='off'
           maxLength={"12"}
-          value={datosTrans.valorCashOut ?? ""}
+          value={datosTrans.valorCashIn ?? ""}
           onInput={(e, valor) => {
             if (!isNaN(valor)) {
-              const num = valor;
               setDatosTrans((old) => {
-                return { ...old, valorCashOut: num };
+                return { ...old, valorCashIn: valor };
               });
             }
           }}
-          required></MoneyInput>
+          required
+          min={enumParametrosMovii.MINCASHINMOVII}
+          max={enumParametrosMovii.MAXCASHINMOVII} 
+          equalError={false}
+          equalErrorMin={false}
+          ></MoneyInput>
         <ButtonBar className='lg:col-span-2'>
           <Button
             type='submit'
@@ -360,7 +364,7 @@ const MoviiPDPCashIn = () => {
               </h1>
               <h2 className='text-base'>
                 {`Valor a depositar: ${formatMoney.format(
-                  datosTrans.valorCashOut
+                  datosTrans.valorCashIn
                 )} COP`}
               </h2>
               <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
@@ -395,7 +399,7 @@ const MoviiPDPCashIn = () => {
               <h2>{`Nombre usuario: ${infoUsers.nombreUsuario}`}</h2>
               <h2 className='text-base'>
                 {`Valor a depositar: ${formatMoney.format(
-                  datosTrans.valorCashOut
+                  datosTrans.valorCashIn
                 )} COP`}
               </h2>
               <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>

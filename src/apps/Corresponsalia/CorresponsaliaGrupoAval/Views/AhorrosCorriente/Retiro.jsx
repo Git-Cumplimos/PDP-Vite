@@ -469,19 +469,26 @@ const Retiro = () => {
               }
             }}
             required></HideInput>
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a retirar'
             autoComplete='off'
             type='text'
-            minLength={"5"}
-            maxLength={"10"}
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            maxLength={"9"}
+            // min={limitesMontos?.min}
+            // max={limitesMontos?.max}
             required
+            min={enumParametrosGrupoAval.minRetiroCuentas}
+            max={enumParametrosGrupoAval.maxRetiroCuentas}
+            value={parseInt(valor)}
+            onInput={(e, monto) => {
+              if (!isNaN(monto)) {
+                setValor(monto)
+              }
+            }}
+            equalError={false}
+            equalErrorMin={false}
           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>Continuar</Button>
