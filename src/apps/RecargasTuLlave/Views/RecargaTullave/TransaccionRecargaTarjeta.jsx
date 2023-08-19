@@ -147,7 +147,7 @@ const TransaccionRecargaTarjeta = () => {
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      const num = valor.replace(/[\s\.-]/g, "");
+      const num = valor.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
         if (ev.target.name === "telefonoCliente") {
           if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {

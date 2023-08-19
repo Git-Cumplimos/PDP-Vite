@@ -300,7 +300,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           autoComplete='off'
           onInput={(e) => {
             let valor = e.target.value;
-            let num = valor.replace(/[\s\.-]/g, "");
+            let num = valor.replace(/[\s\.\-+eE]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, ref1: num };

@@ -143,7 +143,7 @@ const MoviiPDPCashOut = () => {
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      const num = valor.replace(/[\s\.-]/g, "");
+      const num = valor.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
         if (ev.target.name === "numeroTelefono") {
           if (datosTrans.numeroTelefono.length === 0 && num !== "3") {

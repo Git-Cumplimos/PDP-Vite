@@ -114,7 +114,7 @@ const SeleccionServicioPagarAval = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               // const num = e.target.value;
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
               });
@@ -132,7 +132,7 @@ const SeleccionServicioPagarAval = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               // const num = e.target.value;
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, nit: num };
               });
@@ -150,7 +150,7 @@ const SeleccionServicioPagarAval = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               // const num = e.target.value;
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, ean: num };
               });

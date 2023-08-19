@@ -91,7 +91,7 @@ const PagarRunt = () => {
   }, []);
 
   const onChangeNumeroRunt = useCallback((e) => {
-    let num = e.target.value.replace(/[\s\.-]/g, "");
+    let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
         setNumeroRunt(num);
       }

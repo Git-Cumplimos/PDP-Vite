@@ -205,8 +205,7 @@ const ConveniosRecaudoAgrario = () => {
   }, []);
   const onChangeFormatNumber = useCallback((ev) => {
     const valor = ev.target.value;
-    // let num = valor.replace(/[\s\.]/g, "");
-    let num = valor.replace(/[\s\.-]/g, "");
+    let num = valor.replace(/[\s\.\-+eE]/g, "");
     if (!isNaN(num)) {
       setDataConvenios((old) => {
         return { ...old, [ev.target.name]: num };
@@ -224,7 +223,7 @@ const ConveniosRecaudoAgrario = () => {
   const onChangeFormatNumberVect = useCallback(
     (i) => (ev) => {
       const valor = ev.target.value;
-      let num = valor === "" ? 0 : valor.replace(/[\s\.-]/g, "");
+      let num = valor === "" ? 0 : valor.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
         const tempData = { ...dataConvenios };
         tempData.referencias[i][ev.target.name] = parseInt(num);
@@ -454,7 +453,7 @@ const ConveniosRecaudoAgrario = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               // const num = e.target.value;
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
               });
@@ -471,7 +470,7 @@ const ConveniosRecaudoAgrario = () => {
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               // const num = e.target.value;
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, ean: num };
               });
