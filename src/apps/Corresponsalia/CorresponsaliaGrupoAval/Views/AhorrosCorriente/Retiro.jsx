@@ -422,8 +422,7 @@ const Retiro = () => {
             maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
-              // const num = e.target.value.replace(/[\s\.]/g, "");
-              const num = e.target.value.replace(/[\s\.-]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
@@ -463,7 +462,7 @@ const Retiro = () => {
             autoComplete='off'
             value={otp}
             onInput={(e, valor) => {
-              let num = valor.replace(/[\s\.]/g, "");
+              let num = valor.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(valor)) {
                 setOtp(num);
               }
