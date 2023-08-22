@@ -662,7 +662,7 @@ const allUrlsPrivateApps = [
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
         component: PinesCombinados,
-        permission: [53],
+        permission: [enumPermisosPinesVus.operarPinesVus],
       },
     ],
   },
