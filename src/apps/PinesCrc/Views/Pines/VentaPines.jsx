@@ -206,9 +206,10 @@ const VentaPines = () => {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
             setInquiryStatus(res?.obj);
-            if (canal==2){
             setValVentaPines(res?.obj?.valor);
-            }
+            // if (canal==2){
+            // setValVentaPines(res?.obj?.valor);
+            // }
             return "Consulta satisfactoria";
           },
         },
