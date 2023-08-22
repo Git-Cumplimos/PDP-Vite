@@ -4,7 +4,7 @@ import Input from "../../../components/Base/Input/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise/TableEnterprise";
 import Table from "../../../components/Base/Table/Table";
 import { notify, notifyError } from "../../../utils/notify";
-
+import { useAuth } from "../../../hooks/AuthHooks";
 import {
     useFetchEmcali,
     TypeServicesBackendEmcali,
@@ -39,9 +39,9 @@ const ReporteCaja = () => {
     );
     const [showTable,setShowTable] = useState(false)
     const [data, setData] = useState(dataInitial);
-    
+    const { roleInfo } = useAuth();
+  
     const descargarReporte = (()=>{
-        console.log("dataInput-->",dataInput)
         peticionDescargaReporte(dataInput,{})
             .then((res:any)=>{
                 if (!res.status) {
@@ -71,7 +71,7 @@ const ReporteCaja = () => {
             notifyError("Seleccione una fecha para generar el reporte")
         }
         else {
-            peticionGeneracionReporte({},{'fecha_reporte':fecha})
+            peticionGeneracionReporte({},{'fecha_reporte':fecha,'comercio':roleInfo?.["nombre_comercio"]})
                 .then((res: TypeServicesBackendEmcali)=>{
                     if (res.obj.result.length !== 0) {
                         var respuesta = [];
@@ -111,11 +111,15 @@ const ReporteCaja = () => {
     };
 
     useEffect(()=>{
-        const filename_= `reporteCaja_${fecha}.xlsx`;
-        setDataInput((old) => ({
-            ...old,
-            filename: filename_,
-          }));
+        if (roleInfo?.["nombre_comercio"] !== undefined){
+            const comercio: string = roleInfo?.["nombre_comercio"];
+            const nombre_comercio = comercio.replace(/[^a-zA-Z0-9]/g, '');
+            const filename_= `reporteCaja_${nombre_comercio}_${fecha}.xlsx`;
+            setDataInput((old) => ({
+                ...old,
+                filename: filename_,
+            }));
+        }
     },[fecha])
 
     return (
