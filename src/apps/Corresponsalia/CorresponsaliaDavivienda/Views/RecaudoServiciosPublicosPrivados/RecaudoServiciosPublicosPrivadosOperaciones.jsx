@@ -27,6 +27,7 @@ import {
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const RecaudoServiciosPublicosPrivadosOperaciones = () => {
   const { state } = useLocation();
@@ -39,12 +40,12 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
   const [datosTrans, setDatosTrans] = useState({
     ref1: "",
     ref2: "",
-    valor: "",
+    valor: "0",
   });
   const [datosTransValidacion, setDatosTransValidacion] = useState({
     ref1: "",
     ref2: "",
-    valor: "",
+    valor: "0",
   });
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de Pago de Recaudo de Facturas",
@@ -127,7 +128,9 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
           return notifyError("Los datos ingresados son diferentes");
       }
       if (dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)) {
-        if (datosTrans.valor !== datosTransValidacion.valor) {
+        if (
+          parseInt(datosTrans.valor) !== parseInt(datosTransValidacion.valor)
+        ) {
           return notifyError("El valor ingresado es diferente");
         }
       }
@@ -442,13 +445,13 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
       ...old,
       ref1: "",
       ref2: "",
-      valor: "",
+      valor: "0",
     }));
     setDatosTrans((old) => ({
       ...old,
       ref1: "",
       ref2: "",
-      valor: "",
+      valor: "0",
     }));
     setObjTicketActual((old) => {
       return {
@@ -474,18 +477,6 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
     });
     setDatosConsulta({});
   }, []);
-  const onChangeMoneyLocal = (ev, valor) => {
-    if (!isNaN(valor)) {
-      const num = valor;
-      setDatosTrans((old) => {
-        return { ...old, valor: onChangeMoney(ev) };
-      });
-    }
-  };
-  const onChangeMoney = useMoney({
-    limits: [1000, 1000000000],
-    decimalDigits: 2,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -516,7 +507,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
               autoComplete='off'
               onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.-]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrans((old) => {
                     return { ...old, ref1: num };
@@ -538,7 +529,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
             value={datosTrans.ref2}
             onInput={(e) => {
               let valor = e.target.value;
-              let num = valor.replace(/[\s\.]/g, "");
+              let num = valor.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 setDatosTrans((old) => {
                   return { ...old, ref2: num };
@@ -555,26 +546,17 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
             autoComplete='off'
             maxLength={"20"}
             value={datosTrans.valor ?? ""}
-            onInput={onChangeMoneyLocal}
-            required></MoneyInput>
-
-          // <Input
-          //   id='valor'
-          //   name='valor'
-          //   label='Valor'
-          //   autoComplete='off'
-          //   type='tel'
-          //   minLength={"0"}
-          //   maxLength={"20"}
-          //   value={datosTrans.valor ?? ""}
-          //   onInput={(ev) =>
-          //     setDatosTrans((old) => ({
-          //       ...old,
-          //       valor: onChangeMoney(ev),
-          //     }))
-          //   }
-          //   required
-          // />
+            onInput={(ev, val) => {
+              setDatosTrans((old) => {
+                return { ...old, valor: val };
+              });
+            }}
+            required
+            min={enumParametrosDavivienda.MINRECAUDOOPERACIONES}
+            max={enumParametrosDavivienda.MAXRECAUDOOPERACIONES}
+            equalError={false}
+            equalErrorMin={false}
+          />
         )}
         <ButtonBar
           className={
@@ -611,7 +593,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                     value={datosTransValidacion.ref1}
                     onInput={(e) => {
                       let valor = e.target.value;
-                      let num = valor.replace(/[\s\.]/g, "");
+                      let num = valor.replace(/[\s\.-]/g, "");
                       if (!isNaN(num)) {
                         setDatosTransValidacion((old) => {
                           return { ...old, ref1: num };
@@ -632,7 +614,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                     value={datosTransValidacion.ref2}
                     onInput={(e) => {
                       let valor = e.target.value;
-                      let num = valor.replace(/[\s\.]/g, "");
+                      let num = valor.replace(/[\s\.-]/g, "");
                       if (!isNaN(num)) {
                         setDatosTransValidacion((old) => {
                           return { ...old, ref2: num };
@@ -643,7 +625,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                 {dataConveniosPagar.includes(
                   convenio?.num_ind_consulta_cnb
                 ) && (
-                  <Input
+                  <MoneyInput
                     id='valor'
                     name='valor'
                     label='Valor a pagar'
@@ -651,14 +633,18 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                     type='tel'
                     minLength={"0"}
                     maxLength={"20"}
-                    defaultValue={datosTransValidacion.valor ?? ""}
-                    onInput={(ev) =>
+                    value={datosTransValidacion.valor ?? ""}
+                    onInput={(ev, val) => {
                       setDatosTransValidacion((old) => ({
                         ...old,
-                        valor: onChangeMoney(ev),
-                      }))
-                    }
+                        valor: val,
+                      }));
+                    }}
                     required
+                    min={enumParametrosDavivienda.MINRECAUDOOPERACIONES}
+                    max={enumParametrosDavivienda.MAXRECAUDOOPERACIONES}
+                    equalError={false}
+                    equalErrorMin={false}
                   />
                 )}
                 <ButtonBar>
@@ -696,7 +682,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                 convenio?.ind_menor_vlr_cnb !== "0" ||
                 convenio?.ind_mayor_vlr_cnb !== "0") ? (
                 <Form grid onSubmit={onSubmitValidacion}>
-                  <Input
+                  <MoneyInput
                     id='valor'
                     name='valor'
                     label='Valor a pagar'
@@ -704,14 +690,18 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                     type='tel'
                     minLength={"2"}
                     maxLength={"20"}
-                    defaultValue={datosTransValidacion.valor ?? ""}
-                    onInput={(ev) =>
+                    value={datosTransValidacion.valor ?? ""}
+                    onInput={(ev, val) => {
                       setDatosTransValidacion((old) => ({
                         ...old,
-                        valor: onChangeMoney(ev),
-                      }))
-                    }
+                        valor: val,
+                      }));
+                    }}
                     required
+                    min={enumParametrosDavivienda.MINRECAUDOOPERACIONES}
+                    max={enumParametrosDavivienda.MAXRECAUDOOPERACIONES}
+                    equalError={false}
+                    equalErrorMin={false}
                   />
                   <ButtonBar>
                     <Button onClick={handleClose}>Cancelar</Button>

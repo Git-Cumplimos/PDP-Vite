@@ -20,6 +20,7 @@ import CommerceTable from "../../components/Commerce/CommerceTable";
 import InputSuggestions from "../../../../components/Base/InputSuggestions/InputSuggestions";
 import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -69,6 +70,7 @@ const emptyCommerce = {
   telefono_fijo_comercio: "",
   pk_tbl_grupo_comercios: init_grupo_comercio,
   ciiu: null,
+  fk_id_tipo_contrato: 0,
 };
 
 const CrearComercios = () => {
@@ -78,6 +80,7 @@ const CrearComercios = () => {
   const [comercio, setComercio] = useState(emptyCommerce);
   // const [selectedCommerce, setSelectedCommerce] = useState(emptyCommerce);
   const [docTypes, setDocTypes] = useState({ "": "" });
+  const [chooseContrato, setChooseContrato] = useState(false);
 
   const [commerceType, setCommerceType] = useState({});
   const [actividad, setActividad] = useState("");
@@ -238,6 +241,17 @@ const CrearComercios = () => {
     },
     [handleClose]
   );
+  const onSelectTipoContrato = useCallback((tipoContrato) => {
+    setComercio((old) => {
+      return {
+        ...old,
+        fk_id_tipo_contrato: tipoContrato.id_tipo_contrato,
+        nombre_contrato: tipoContrato.nombre_contrato,
+      };
+    });
+    setChooseContrato(false);
+  }, []);
+
   const handleShowModal = useCallback(() => {
     setShowModal(true);
   }, []);
@@ -316,15 +330,17 @@ const CrearComercios = () => {
       }
       setIsUploading(true);
       delete dataOrg["comercio_padre"];
+      delete dataOrg["nombre_contrato"];
       delete dataOrg["descripcion_tipo_nivel"];
       delete dataOrg["fecha_actualizacion"];
       delete dataOrg["fecha_registro"];
       delete dataOrg["nombre_grupo_comercios"];
       delete dataOrg["ciiu_list"];
       if (!dataOrg.fk_comercio_padre) delete dataOrg["fk_comercio_padre"];
+      if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
+      if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
       if (pk_comercio_handled) {
-        console.log("Enters", dataOrg);
         // const dataOrg = Object.keys(comercio).map((obj, i) => {
         //   if (obj !== "" || obj) {
         //     return { [obj]: comercio[obj] };
@@ -401,6 +417,7 @@ const CrearComercios = () => {
               maxLength="32"
               value={comercio?.pk_comercio}
               onInput={onChangeFormat}
+              autoComplete="off"
             />
           )}
           <Input
@@ -932,6 +949,53 @@ const CrearComercios = () => {
             )}
           </Fieldset>
         </Fieldset>
+        <Fieldset legend="Contratos comisiones" className="lg:col-span-2">
+          <Input
+            id="check_contrato"
+            name="contrato"
+            label={"Contrato"}
+            className="pointer-events-none"
+            type="text"
+            autoComplete="off"
+            value={comercio?.nombre_contrato ?? ""}
+            title={comercio?.nombre_contrato ?? "Vacio"}
+            onChange={() => {}}
+            actionBtn={{
+              callback: (_) => {
+                if (comercio?.fk_id_tipo_contrato) {
+                  setComercio((old) => ({
+                    ...old,
+                    fk_id_tipo_contrato: null,
+                    nombre_contrato: "",
+                  }));
+                  return;
+                }
+                setChooseContrato(true);
+              },
+              label: comercio?.fk_id_tipo_contrato ? "Eliminar" : "Agregar",
+            }}
+            required
+          />
+          <Select
+            id="Pago comision"
+            name="Pago comision"
+            label="Pago comision cada:"
+            options={{
+              "": "",
+              Transacción: "Transaccion",
+              Mensual: "Mensual",
+              Directo: "Directo",
+            }}
+            value={comercio?.tipo_pago_comision}
+            onChange={(ev) =>
+              setComercio((old) => ({
+                ...old,
+                tipo_pago_comision: ev.target.value,
+              }))
+            }
+            required
+          />
+        </Fieldset>
         <ButtonBar className="lg:col-span-2">
           <Button type="submit">
             {pk_comercio_handled ? "Actualizar comercio" : "Crear comercio"}
@@ -940,6 +1004,9 @@ const CrearComercios = () => {
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
         <CommerceTable onSelectComerce={onSelectComercios} />
+      </Modal>
+      <Modal show={chooseContrato} handleClose={() => setChooseContrato(false)}>
+        <TiposContratosTable onSelectContract={onSelectTipoContrato} />
       </Modal>
     </Fragment>
   );

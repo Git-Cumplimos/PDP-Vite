@@ -147,7 +147,7 @@ const TransaccionRecargaTarjeta = () => {
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      let num = valor.replace(/[\s\.]/g, "");
+      const num = valor.replace(/[\s\.-]/g, "");
       if (!isNaN(num)) {
         if (ev.target.name === "telefonoCliente") {
           if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
@@ -199,15 +199,19 @@ const TransaccionRecargaTarjeta = () => {
             min={enumParametrosTuLlave.MINRECARGATARJETA}
             max={enumParametrosTuLlave.MAXRECARGATARJETA}
             autoComplete='off'
-            maxLength={"11"}
+            maxLength={"9"}
             value={parseInt(dataUsuario?.valorRecarga)}
-            onInput={(ev) => {
-              setDataUsuario((old) => {
-                return { ...old, valorRecarga: onChangeMoney(ev) };
-              });
-            }}
             required
             disabled={loadingPeticionRecargaTarjeta}
+            onInput={(e, monto) => {
+              if (!isNaN(monto)) {
+                setDataUsuario((old) => {
+                  return { ...old, valorRecarga: monto };
+                });
+              }
+            }}
+            equalError={false}
+            equalErrorMin={false}
           />
         </Fieldset>
         <Fieldset legend='Datos opcionales' className='lg:col-span-2'>

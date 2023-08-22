@@ -221,15 +221,19 @@ const TransaccionRecargaDatafono = () => {
             min={enumParametrosTuLlave.MINRECARGADATAFONO}
             max={enumParametrosTuLlave.MAXRECARGADATAFONO}
             autoComplete='off'
-            maxLength={"11"}
+            maxLength={"12"}
             value={parseInt(valor)}
-            onInput={(ev) => {
-              setValor(onChangeMoney(ev));
-            }}
             required
             disabled={
               loadingPeticionConsultaDatafono || loadingPeticionRecargaDatafono
             }
+            onInput={(e, monto) => {
+              if (!isNaN(monto)) {
+                setValor(monto);
+              }
+            }}
+            equalError={false}
+            equalErrorMin={false}
           />
         </Fieldset>
         <ButtonBar className='lg:col-span-2'>

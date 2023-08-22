@@ -104,7 +104,8 @@ const SeleccionServicioPagarAgrario = () => {
           value={datosTrans.idConvenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
               });

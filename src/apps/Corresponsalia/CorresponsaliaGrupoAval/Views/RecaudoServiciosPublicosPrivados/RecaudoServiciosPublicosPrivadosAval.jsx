@@ -294,13 +294,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           type='text'
           name='ref1'
           minLength='1'
-          maxLength='20'
+          maxLength='25'
           required
           value={datosTrans.ref1}
           autoComplete='off'
           onInput={(e) => {
             let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            let num = valor.replace(/[\s\.-]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, ref1: num };
@@ -316,18 +316,16 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             autoComplete='off'
             maxLength={"12"}
             value={datosTrans.valor ?? ""}
-            onInput={(ev,val)=>{
+            onInput={(ev, val) => {
               setDatosTrans((old) => {
-                return { ...old, 
-                  valor: val
-                };
+                return { ...old, valor: val };
               });
             }}
-            min = {enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
-            max = {enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
-            equalError = {false}
-            equalErrorMin = {false}
-            required></MoneyInput>
+            min={0}
+            max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
+            equalError={false}
+            equalErrorMin={false}
+          />
         )}
         <ButtonBar>
           <Button type='submit'>Realizar consulta</Button>
@@ -359,21 +357,22 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     id='valCashOut'
                     name='valCashOut'
                     label='Valor a pagar'
-                    min = {enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
-                    max = {enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
+                    min={enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
+                    max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
                     type='text'
                     autoComplete='off'
                     maxLength={"12"}
                     value={datosTrans.valorConst ?? ""}
-                    onInput={(ev,valMoney) =>
+                    // defaultValue={datosTrans.valorConst ?? ""}
+                    onInput={(ev, valMoney) =>
                       setDatosTrans((old) => ({
                         ...old,
                         valorConst: valMoney,
                         valorVar: valMoney,
                       }))
                     }
-                    equalError = {false}
-                    equalErrorMin = {false}
+                    equalError={false}
+                    equalErrorMin={false}
                     required></MoneyInput>
                   <ButtonBar>
                     <Button

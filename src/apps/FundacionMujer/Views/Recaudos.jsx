@@ -23,6 +23,7 @@ const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
 const URL_MOSTRAR_CREDITO= `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`
 const URL_INGRESAR_RECIBO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`
 const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
+const URL_VALOR_CUOTA = `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`
 
 const Recaudo = () => {
   const navigate = useNavigate();
@@ -49,34 +50,6 @@ const Recaudo = () => {
   const [tickets, setTickets] = useState("");
   const printDiv = useRef();
 
-  useEffect(() => {
-    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
-      navigate("/");
-    } else {
-      let hasKeys = true;
-      const keys = [
-        "id_comercio",
-        "id_usuario",
-        "tipo_comercio",
-        "id_dispositivo",
-        "ciudad",
-        "direccion",
-      ];
-      for (const key of keys) {
-        if (!(key in roleInfo)) {
-          hasKeys = false;
-          break;
-        }
-      }
-      if (!hasKeys) {
-        notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
-        );
-        navigate("/");
-      }
-    }
-  }, [roleInfo, navigate]);
-  
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
@@ -98,10 +71,14 @@ const Recaudo = () => {
       valueValor: false,
       ticket: false,
     });
+    setSelected(true);
   }, []);
 
   const [loadingPeticionMostrarCredito, peticionMostrarCredito] = useFetch(
     fetchCustom(URL_MOSTRAR_CREDITO, "POST", "Mostrar Credito")
+  );
+  const [loadingPeticionValorCuota, peticionValorCuota] = useFetch(
+    fetchCustom(URL_VALOR_CUOTA, "POST", "Mostrar Valor Cuota")
   );
   const [loadingPeticionIngresarRecibo, peticionIngresarRecibo] = 
     useFetchFDLM(
@@ -109,7 +86,7 @@ const Recaudo = () => {
       URL_CONSULTAR_ESTADO_TRX,
       "Ingresar recibo"
     );
-    
+
   const bankCollection = useCallback(
     (e) => {
       e.preventDefault();
@@ -209,64 +186,25 @@ const Recaudo = () => {
               ...old,
               info: res,
             }));
-            if (datosTrx?.tipobusqueda === "2" && res?.obj?.Cedula !== 0) {
-              const body = {
-                comercio: {
-                  id_comercio: roleInfo?.id_comercio,
-                  id_usuario: roleInfo?.id_usuario,
-                  id_terminal: roleInfo?.id_dispositivo,
-                },
-                nombre_comercio: roleInfo?.["nombre comercio"],
-                nombre_usuario: pdpUser?.uname ?? "",
-                id_trx: res?.obj?.id_trx,
-                Datos: {
-                  Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
-                  Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
-                  nroBusqueda: parseFloat(datosTrx?.number),
-                },
-              };
-              consultaValorCuota(body)
-                .then((res) => {
-                  const maximo = parseFloat(res?.obj?.ValorPagarMaximo) + 1
-                  const minimo = parseFloat(res?.obj?.ValorPagarMin) - 1
-                  setLimitesMontos({
-                    max: maximo,
-                    min: minimo,
-                  });
-                  setDatosTrx((old) => ({
-                    ...old,
-                    formatMon: res?.obj?.ValorPagar,
-                    cuota: res?.obj,
-                    valueValor: true,
-                    permiteCambio: res?.obj?.PermiteCambio,
-                  }));
-                })
-                .catch((err) => {
-                  console.error(err);
-                });
-            }
-            [res?.obj].map((row) => {
-              setTable([
-                {
-                  Cedula: row?.Cedula,
-                  Mensaje: row?.Mensaje,
-                  Cliente: row?.NombreCLiente1,
-                  Producto: row?.NombreProducto,
-                  Credito: row?.Nrocredito,
-                  Valor: formatMoney.format(row?.ValorPagar1),
-                },
-              ]);
-              setDatosTrx((old) => ({
+            const formattedData = res?.obj?.response.map(row => ({
+              Cedula: row.Cedula,
+              Mensaje: row.Mensaje,
+              Cliente: row.NombreCLiente1,
+              Producto: row.NombreProducto,
+              Credito: row.Nrocredito,
+              Valor: formatMoney.format(row?.ValorPagar1), // Formatear el valor como número con 2 decimales
+            }));
+            setTable(formattedData);
+            setDatosTrx((old) => ({
                 ...old,
-                formatMon: row?.ValorPagar1,
+                formatMon: selected?.Valor,
               }));
-            });
             return "Consulta satisfactoria";
           },
         },
         {
           render: ( { data: error}) => {
-            return "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
+            return error?.message ?? "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
           },
         }
       );
@@ -274,36 +212,94 @@ const Recaudo = () => {
     [roleInfo, pdpUser, datosTrx?.tipobusqueda, datosTrx?.number]
   );
 
+  const postValorCuota = useCallback(
+    (e) => {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+        },
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        id_trx: datosTrx?.info?.obj?.id_trx,
+        Datos: {
+          Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
+          Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
+          nroBusqueda: parseFloat(selected?.Cedula),
+        },
+      };
+      notifyPending(
+        peticionValorCuota({}, data),
+        {
+          render: () => {
+            return "Procesando consulta valor cuota";
+          },
+        },
+        {
+          render: ({data: res }) =>{
+            const maximo = parseFloat(res?.obj?.ValorPagarMaximo)
+            const minimo = parseFloat(res?.obj?.ValorPagarMin)
+            setLimitesMontos({
+              max: maximo,
+              min: minimo,
+            });
+            setDatosTrx((old) => ({
+              ...old,
+              formatMon: res?.obj?.ValorPagar,
+              cuota: res?.obj,
+              valueValor: true,
+              permiteCambio: res?.obj?.PermiteCambio,
+            }));
+            setShowModal(true);
+            return "Consulta valor cuota satisfactoria";
+          },
+        },
+        {
+          render: ( { data: error}) => {
+            handleClose();
+            return error?.message ?? "Consulte soporte, servicio de Fundación de la mujer presenta fallas";
+          },
+        }
+      );
+    },
+    [roleInfo, pdpUser, selected?.Credito, datosTrx?.info]
+  );
+
+  useEffect(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      navigate("/");
+    } else {
+      let hasKeys = true;
+      const keys = [
+        "id_comercio",
+        "id_usuario",
+        "tipo_comercio",
+        "id_dispositivo",
+        "ciudad",
+        "direccion",
+      ];
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+      if (!hasKeys) {
+        notifyError(
+          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        );
+        navigate("/");
+      }
+    }
+    if (selected !== true){
+      postValorCuota();
+    }
+  }, [roleInfo, navigate, selected]);
+
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
-
-const params = useCallback(async () => {
-  const queries = { tipo_op: 5 };
-  try {
-    if (datosTrx?.tipobusqueda !== "2"){
-      const res = await fetchData(url_params, "GET", queries);
-      if ("Parametros" in res?.obj?.[0]) {
-        setLimitesMontos({
-          max: res?.obj?.[0].Parametros.monto_maximo + 1,
-          min: res?.obj?.[0].Parametros.monto_minimo - 1,
-        });
-      } else {
-        setLimitesMontos({
-          max: 10000000,
-          min: 0,
-        });
-      }
-      return res;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}, []);
-  
-  useEffect(() => {
-    params();
-  }, [datosTrx?.info]);
 
   return (
     <>
@@ -312,7 +308,7 @@ const params = useCallback(async () => {
         <Form onSubmit={onSubmit} grid>
           <Select
             id='searchBySorteo'
-            label='Tipo de busqueda'
+            label='Tipo de búsqueda'
             options={[
               { value: "", label: "" },
               {
@@ -321,9 +317,10 @@ const params = useCallback(async () => {
               },
               {
                 value: 2,
-                label: `Nº credito`,
+                label: `Nº crédito`,
               },
             ]}
+            required
             value={datosTrx?.tipobusqueda}
             onChange={(e) => {
               setDatosTrx(prevState => ({
@@ -338,22 +335,26 @@ const params = useCallback(async () => {
               }
             }}
           />
+          
           {datosTrx?.tipobusqueda?.length > 0 && (
             <Input
               id='numpin'
-              label={label}
+              label= {datosTrx?.tipobusqueda === "2" ? "Número de obligación" : "Número identificación"}
               type='text'
               minLength='5'
               maxLength='12'
               autoComplete='off'
               value={datosTrx?.number}
               onInput={(e) => {
-                const num = parseInt(e.target.value) || "";
-                setDatosTrx(prevState => ({
-                ...prevState,
-                number: num
-              }));
+                const num = e.target.value.replace(/[\s\.-]/g, "");;
+                if (!isNaN(num)) {
+                  setDatosTrx(prevState => ({
+                  ...prevState,
+                  number: num
+                }));
+                }
               }}
+              required
             />
           )}
           <ButtonBar className='col-auto md:col-span-2'>
@@ -367,7 +368,7 @@ const params = useCallback(async () => {
         <>
           <br />
           <TableEnterprise
-            title='Información de credito'
+            title='Información de crédito'
             headers={[
               "Cédula",
               "Mensaje",
@@ -379,20 +380,12 @@ const params = useCallback(async () => {
             data={table || []}
             onSelectRow={(e, index) => {
               setSelected(table[index]);
-              if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.tipobusqueda !== "2")){
-                setShowModal(true);
-              }
-              else if ((datosTrx?.info?.obj?.Nromensaje1 === 1) && (datosTrx?.valueValor)){
-                setShowModal(true);
-              }
-              else if(datosTrx?.info?.obj?.Nromensaje1 === 1) {
-                notify("Procesando Consulta Valor Cuota")
-              }
             }}
+            disabled={loadingPeticionValorCuota || selected !== true}
           ></TableEnterprise>
         </>
       )}
-      {datosTrx?.info?.obj?.Nromensaje1 === 1 && (
+      {(
         <Modal show={showModal} handleClose={datosTrx?.ticket || loadingPeticionIngresarRecibo ? () => {} : handleClose}>
           <>
             {datosTrx?.ticket !== false ? (
@@ -410,27 +403,24 @@ const params = useCallback(async () => {
                   Resumen de la transacción
                 </h1>
                 <h2 className='sm:text-center font-semibold'>
-                  Crédito # {table[0]?.Credito}
+                  Crédito # {selected?.Credito}
                 </h2>
                 <h2>{`Nombre del Cliente: ${
-                  datosTrx?.info?.obj?.NombreCLiente1 ?? ""
+                  selected?.Cliente ?? ""
                 }`}
                 </h2>
                 <h2>{`Documento del Cliente: ${
-                  datosTrx?.info?.obj?.Cedula ?? ""
+                  selected?.Cedula ?? ""
                 }`}
                 </h2>
-                </>
-                {datosTrx?.valueValor !== false ? (
-                  <>
-                    <h2>{`Valor de pago mínimo: ${formatMoney.format(
+                <h2>{`Valor de pago mínimo: ${formatMoney.format(
                       datosTrx?.cuota?.ValorPagarMin
                     )}`}</h2>
                     <h2>{`Valor de pago máximo: ${formatMoney.format(
                       datosTrx?.cuota?.ValorPagarMaximo
-                    )}`}</h2>
-                  </>
-                ): ""}
+                    )}`}
+                </h2>
+                </>
                 <MoneyInput
                   id='numPago'
                   name='numPago'
@@ -439,6 +429,8 @@ const params = useCallback(async () => {
                   autoComplete='off'
                   max={limitesMontos?.max}
                   min={limitesMontos?.min}
+                  equalError={false}
+                  equalErrorMin={false}
                   value={datosTrx?.formatMon}
                   disabled={datosTrx?.permiteCambio === "N" || loadingPeticionIngresarRecibo}
                   onInput={(e, valor) => {

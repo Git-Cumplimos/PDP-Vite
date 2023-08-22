@@ -66,11 +66,6 @@ const Retiro = () => {
     min: enumParametrosDavivienda.minRetiroCuentas,
   });
 
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
-  });
-
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
     useFetch(retiroCorresponsal);
   const [loadingConsultaCostoCB, fetchConsultaCostoCB] =
@@ -434,7 +429,7 @@ const Retiro = () => {
             maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.-]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
@@ -457,7 +452,7 @@ const Retiro = () => {
                 setOtp(num);
               }
             }}></HideInput>
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a retirar'
@@ -467,8 +462,15 @@ const Retiro = () => {
             maxLength={"15"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            equalError={false}
+            equalErrorMin={false}
+            value={parseInt(valor)}
+            onInput={(e, valor) => {
+              if (!isNaN(valor)){
+                const num = valor;
+                setValor(num)
+              }
+            }}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>
