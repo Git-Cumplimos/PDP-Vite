@@ -4,7 +4,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
-import { notify, notifyError, notifyPending } from "../../../utils/notify";
+import { notify, notifyError } from "../../../utils/notify";
 
 const LoginForm = () => {
   const { contain, card, field } = classes;
@@ -142,11 +142,11 @@ const LoginForm = () => {
   };
   const handleForgotPassword = (event) => {
     event.preventDefault();
+    notify("Validando usuario en base de datos");
+    setDisabled(true);
     auth
       .validateUser(username)
       .then((res) => {
-        notify("Validando usuario en base de datos");
-        setDisabled(true);
         if (res?.Status === true) {
           notify(
             "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
