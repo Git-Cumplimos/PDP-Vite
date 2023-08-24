@@ -21,6 +21,7 @@ import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
+import routesOtrasEntidades from "../apps/OtrasEntidades/routes"
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
@@ -1127,6 +1128,7 @@ const allUrlsPrivateApps = [
   routesAlmaseg,
   //Modulo Emcali
   routesEmcali,
+  routesOtrasEntidades,
 ];
 
 export { allUrlsPrivateApps };
