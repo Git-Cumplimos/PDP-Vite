@@ -144,6 +144,7 @@ const LoginForm = () => {
     event.preventDefault();
     notify("Validando usuario en base de datos");
     setDisabled(true);
+
     auth
       .validateUser(username)
       .then((res) => {
