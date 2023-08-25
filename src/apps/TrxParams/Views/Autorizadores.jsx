@@ -17,6 +17,7 @@ import {
   putAutorizadores,
 } from "../utils/fetchRevalAutorizadores";
 import { fetchTiposContratosComisiones } from "../utils/fetchTiposContratosComisiones";
+import TiposContratosTable from "../components/Commerce/TiposContratosTable";
 
 const calcularDigitoVerificacion = (myNit) => {
   let vpri, z;
@@ -47,7 +48,6 @@ const calcularDigitoVerificacion = (myNit) => {
 };
 
 const Autorizadores = () => {
-  const navigate = useNavigate();
   const [{ searchAuto = "", openTipoContrato = false }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
@@ -63,13 +63,12 @@ const Autorizadores = () => {
   });
   const handleClose2 = useCallback(() => {
     setShowModal2(false);
-    setQuery({ ["openTipoContrato"]: false }, { replace: true });
-  }, []);
+    setQuery({ openTipoContrato: false }, { replace: true });
+  }, [setQuery]);
 
   const [autorizadores, setAutorizadores] = useState([]);
   const [selectedAuto, setSelectedAuto] = useState(null);
   const [maxPages, setMaxPages] = useState(0);
-  const [data, setdata] = useState([]);
 
   const tableAutorizadores = useMemo(() => {
     return [
@@ -132,16 +131,16 @@ const Autorizadores = () => {
     [setQuery]
   );
   const onSelectTipoContrato = useCallback(
-    (e, i) => {
+    (contrato, e) => {
       setShowModal2(true);
       setSelectedAuto((old) => ({
         ...old,
-        "Id contrato": data[i]?.["Id contrato"],
-        Contrato: data[i]?.["Contrato"],
+        "Id contrato": contrato?.id_tipo_contrato,
+        Contrato: contrato?.nombre_contrato,
       }));
       handleClose2();
     },
-    [data, handleClose]
+    [handleClose2]
   );
   const formatNit = useCallback((ev) => {
     if (ev.target.name === "Nit") {
@@ -229,45 +228,29 @@ const Autorizadores = () => {
           .catch((err) => console.error(err));
       }
     },
-    [selectedAuto]
+    [selectedAuto, handleClose]
   );
 
-  useEffect(() => {
-    if (!openTipoContrato) {
-      fecthAutorizadoresFunc();
-    } else {
-      fetchTiposContratosComisionesFunc();
-    }
-  }, [searchAuto, page, limit, openTipoContrato]);
-
-  const fecthAutorizadoresFunc = () => {
+  const fecthAutorizadoresFunc = useCallback(() => {
     fetchAutorizadores({ nombre_autorizador: searchAuto, page, limit })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
         setAutorizadores(autoArr?.results);
       })
       .catch((err) => console.error(err));
-  };
-  const fetchTiposContratosComisionesFunc = () => {
-    fetchTiposContratosComisiones({ page })
-      .then((res) => {
-        setdata(
-          [...res?.results].map(({ id_tipo_contrato, nombre_contrato }) => {
-            return {
-              "Id contrato": id_tipo_contrato,
-              Contrato: nombre_contrato,
-            };
-          })
-        );
-        setMaxPages(res?.maxPages);
-      })
-      .catch((err) => console.error(err));
-  };
+  }, [searchAuto, page, limit]);
+
+  useEffect(() => {
+    if (!openTipoContrato) {
+      fecthAutorizadoresFunc();
+    }
+  }, [fecthAutorizadoresFunc, openTipoContrato]);
+
   return (
     <Fragment>
       <ButtonBar>
         <Button
-          type='submit'
+          type="submit"
           onClick={() => {
             setShowModal(true);
             setSelectedAuto({
@@ -275,12 +258,13 @@ const Autorizadores = () => {
               Nit: "",
               Descripcion: "",
             });
-          }}>
+          }}
+        >
           Crear autorizador
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title='Autorizadores'
+        title="Autorizadores"
         maxPage={maxPages}
         headers={[
           "Id autorizador",
@@ -292,13 +276,14 @@ const Autorizadores = () => {
         data={tableAutorizadores}
         onSelectRow={onSelectAutorizador}
         onSetPageData={setPageData}
-        onChange={onChange}>
+        onChange={onChange}
+      >
         <Input
-          id='searchAuto'
-          name='searchAuto'
+          id="searchAuto"
+          name="searchAuto"
           label={"Buscar autorizador"}
-          type='text'
-          autoComplete='off'
+          type="text"
+          autoComplete="off"
           maxLength={30}
           defaultValue={searchAuto}
         />
@@ -315,11 +300,11 @@ const Autorizadores = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={onSubmit} onChange={formatNit} grid>
           <Input
-            id='Autorizador'
-            name='Autorizador'
+            id="Autorizador"
+            name="Autorizador"
             label={"Nombre de autorizador"}
-            type='text'
-            autoComplete='off'
+            type="text"
+            autoComplete="off"
             maxLength={50}
             // value={selectedAuto?.["Nombre de autorizador"]}
             defaultValue={selectedAuto?.["Autorizador"]}
@@ -327,32 +312,32 @@ const Autorizadores = () => {
           />
           {selectedAuto?.["Contrato"] && (
             <Input
-              id='Contrato'
-              name='Contrato'
+              id="Contrato"
+              name="Contrato"
               label={"Contrato"}
-              type='text'
-              autoComplete='off'
+              type="text"
+              autoComplete="off"
               value={selectedAuto?.["Contrato"]}
               // defaultValue={selectedAuto?.["Contrato"]}
               disabled
             />
           )}
           <Input
-            id='nitAuto'
-            name='Nit'
+            id="nitAuto"
+            name="Nit"
             label={"Nit"}
-            type='text'
-            autoComplete='off'
+            type="text"
+            autoComplete="off"
             // value={selectedAuto?.Nit}
             defaultValue={selectedAuto?.Nit}
             required
           />
           <TextArea
-            id='textAuto'
-            name='Descripcion'
+            id="textAuto"
+            name="Descripcion"
             label={"Descripción"}
-            autoCapitalize='sentences'
-            autoComplete='off'
+            autoCapitalize="sentences"
+            autoComplete="off"
             // value={selectedAuto?.Descripcion ?? ""}
             maxLength={100}
             defaultValue={selectedAuto?.Descripcion ?? ""}
@@ -360,38 +345,40 @@ const Autorizadores = () => {
           />
           {!selectedAuto?.["Id autorizador"] ? (
             <ButtonBar>
-              <Button type='button' onClick={handleClose}>
+              <Button type="button" onClick={handleClose}>
                 Cancelar
               </Button>
               <Button
-                type='button'
+                type="button"
                 onClick={() => {
                   setShowModal2(true);
                   setQuery({ ["openTipoContrato"]: true }, { replace: true });
-                }}>
+                }}
+              >
                 {selectedAuto?.["Contrato"]
                   ? "Editar contrato"
                   : "Agregar contrato"}
               </Button>
-              <Button type='submit'>Crear autorizador</Button>
+              <Button type="submit">Crear autorizador</Button>
             </ButtonBar>
           ) : (
             <Fragment>
               <ButtonBar>
-                <Button type='button' onClick={handleClose}>
+                <Button type="button" onClick={handleClose}>
                   Cancelar
                 </Button>
                 <Button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     setShowModal2(true);
                     setQuery({ ["openTipoContrato"]: true }, { replace: true });
-                  }}>
+                  }}
+                >
                   {selectedAuto?.["Contrato"]
                     ? "Editar contrato"
                     : "Agregar contrato"}
                 </Button>
-                <Button type='submit'>Editar autorizador</Button>
+                <Button type="submit">Editar autorizador</Button>
               </ButtonBar>
             </Fragment>
           )}
@@ -399,17 +386,19 @@ const Autorizadores = () => {
         <Modal
           show={showModal2}
           handleClose={handleClose2}
-          className='flex align-middle'>
+          className="flex align-middle"
+        >
           <Fragment>
-            <h1 className='text-3xl'>Seleccionar el contrato</h1>
-            <Pagination maxPage={maxPages} grid></Pagination>
+            <h1 className="text-3xl">Seleccionar el contrato</h1>
+            {/* <Pagination maxPage={maxPages} grid></Pagination>
             {Array.isArray(data) && data.length > 0 && (
               <Table
                 headers={Object.keys(data[0])}
                 data={data}
                 onSelectRow={onSelectTipoContrato}
               />
-            )}
+            )} */}
+            <TiposContratosTable onSelectContract={onSelectTipoContrato} />
           </Fragment>
         </Modal>
       </Modal>
