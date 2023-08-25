@@ -5,10 +5,8 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import { useFetchDale } from "../../hooks/useFetchDale";
 import { useReactToPrint } from "react-to-print";
 import Form from "../../../../../components/Base/Form/Form";
-import Fieldset from "../../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../../components/Base/Input/Input";
 import MoneyInput from "../../../../../components/Base/MoneyInput/MoneyInput";
-import { enumParametrosTuLlave } from "../../../../RecargasTuLlave/utils/enumParametrosTuLlave";
 import ButtonBar from "../../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../../components/Base/Button/Button";
 import Modal from "../../../../../components/Base/Modal/Modal";
@@ -33,6 +31,7 @@ const TransaccionRetiroDale = () => {
     numeroDocumento: "",
     valorRetiro: 0,
     otpDale: "",
+    numCelular: "",
   });
   const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [resConsulta, setResConsulta] = useState({});
@@ -72,6 +71,7 @@ const TransaccionRetiroDale = () => {
             process.env.REACT_APP_PAN_AVAL_RETIRO_OTP
           ),
           id_trx_original: resConsulta?.id_trx,
+          numCelular: dataUsuario?.numCelular,
         },
       };
       const dataAditional = {
@@ -129,6 +129,7 @@ const TransaccionRetiroDale = () => {
             dataUsuario?.otpDale,
             process.env.REACT_APP_PAN_AVAL_RETIRO_OTP
           ),
+          numCelular: dataUsuario?.numCelular,
         },
       };
       notifyPending(
@@ -167,31 +168,33 @@ const TransaccionRetiroDale = () => {
       "Consultar costo retiro"
     )
   );
-  const handleShow = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      // if (valor % 50 !== 0) {
-      //   return notifyError("El valor de la recarga debe ser multiplo de 50");
-      // }
-      setEstadoPeticion(0);
-      setShowModal(true);
-    },
-    [dataUsuario]
-  );
+  const handleShow = useCallback((ev) => {
+    ev.preventDefault();
+    setEstadoPeticion(0);
+    setShowModal(true);
+  }, []);
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const onChangeFormatNumber = useCallback((ev) => {
-    const valor = ev.target.value;
-    const num = valor.replace(/[\s\.\-+eE]/g, "");
-    if (!isNaN(num)) {
-      setDataUsuario((old) => {
-        return { ...old, [ev.target.name]: num };
-      });
-    }
-  }, []);
+  const onChangeFormatNumber = useCallback(
+    (ev) => {
+      const valor = ev.target.value;
+      const num = valor.replace(/[\s\.\-+eE]/g, "");
+      if (!isNaN(num)) {
+        if (ev.target.name === "numCelular") {
+          if (dataUsuario.numCelular.length === 0 && num !== "3") {
+            return notifyError("El número de celular debe comenzar por 3");
+          }
+        }
+        setDataUsuario((old) => {
+          return { ...old, [ev.target.name]: num };
+        });
+      }
+    },
+    [dataUsuario.numCelular]
+  );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
     setDataUsuario((old) => {
@@ -210,6 +213,19 @@ const TransaccionRetiroDale = () => {
           autoComplete='off'
           value={dataUsuario?.["numeroDocumento"]}
           maxLength={12}
+          onChange={onChangeFormatNumber}
+          required
+          disabled={loadingPeticionRetiroDale || loadingPeticionConsultaRetiro}
+        />
+        <Input
+          id='numCelular'
+          name='numCelular'
+          label={"Número de celular"}
+          type='text'
+          autoComplete='off'
+          value={dataUsuario?.["numCelular"]}
+          minLength='10'
+          maxLength='10'
           onChange={onChangeFormatNumber}
           required
           disabled={loadingPeticionRetiroDale || loadingPeticionConsultaRetiro}
@@ -269,7 +285,7 @@ const TransaccionRetiroDale = () => {
             disabled={
               loadingPeticionRetiroDale || loadingPeticionConsultaRetiro
             }>
-            Recargar tarjeta
+            Realizar retiro
           </Button>
         </ButtonBar>
       </Form>
@@ -284,6 +300,7 @@ const TransaccionRetiroDale = () => {
                 ¿Está seguro de realizar el retiro?
               </h1>
               <h2>{`Número de documento: ${dataUsuario?.numeroDocumento}`}</h2>
+              <h2>{`Número de celular: ${dataUsuario?.numCelular}`}</h2>
               <h2 className='text-base'>
                 {`Valor a retirar: ${formatMoney.format(
                   dataUsuario?.valorRetiro
@@ -321,6 +338,7 @@ const TransaccionRetiroDale = () => {
                 Resumen de la transacción
               </h1>
               <h2>{`Número de documento: ${dataUsuario?.numeroDocumento}`}</h2>
+              <h2>{`Número de celular: ${dataUsuario?.numCelular}`}</h2>
               <h2 className='text-base'>
                 {`Valor a retirar: ${formatMoney.format(
                   dataUsuario?.valorRetiro
