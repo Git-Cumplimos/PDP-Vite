@@ -10,7 +10,6 @@ import MoneyInput from "../../../../../components/Base/MoneyInput/MoneyInput";
 import ButtonBar from "../../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../../components/Base/Button/Button";
 import Modal from "../../../../../components/Base/Modal/Modal";
-import Tickets from "../../../../../components/Base/Tickets/Tickets";
 import { notifyError, notifyPending } from "../../../../../utils/notify";
 import { formatMoney } from "../../../../../components/Base/MoneyInputDec";
 import HideInput from "../../../../../components/Base/HideInput/HideInput";
@@ -18,6 +17,7 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchDale";
 import { pinBlock } from "../../utils/pinBlock";
 import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
+import TicketsDale from "../../components/TicketsDale/TicketsDale";
 
 const URL_REALIZAR_RETIRO_DALE = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/transacciones-dale/retiro-otp-dale`;
 const URL_CONSULTAR_COSTO_RETIRO_DALE = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/transacciones-dale/consulta-costo-retiro-dale`;
@@ -372,7 +372,7 @@ const TransaccionRetiroDale = () => {
             </div>
           ) : estadoPeticion === 2 ? (
             <div className='flex flex-col justify-center items-center'>
-              <Tickets ticket={objTicketActual} refPrint={printDiv} />
+              <TicketsDale ticket={objTicketActual} refPrint={printDiv} />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
