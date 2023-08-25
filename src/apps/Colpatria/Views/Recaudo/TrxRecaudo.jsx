@@ -121,7 +121,16 @@ const TrxRecaudo = () => {
   const onMakeInquiry = useCallback(
     (ev) => {
       ev.preventDefault();
-
+      for (const key in userReferences) {
+        if (userReferences.hasOwnProperty(key)) {
+          const valorStr = userReferences[key];
+          const valorNum = parseInt(valorStr, 10);
+          if (!isNaN(valorNum) && valorNum <= 0) {
+            notifyError("La referencia no puede ser 0");
+            return;
+          }
+        }
+      }
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -193,6 +202,16 @@ const TrxRecaudo = () => {
       if (valTrxRecaudo <= 0) {
         notifyError("El valor debe ser mayor a cero");
         return;
+      }
+      for (const key in userReferences) {
+        if (userReferences.hasOwnProperty(key)) {
+          const valorStr = userReferences[key];
+          const valorNum = parseInt(valorStr, 10);
+          if (!isNaN(valorNum) && valorNum <= 0) {
+            notifyError("La referencia no puede ser 0");
+            return;
+          }
+        }
       }
       const data = {
         comercio: {

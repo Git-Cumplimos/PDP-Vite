@@ -257,6 +257,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       peticion === 2
     ) {
       let valorTransaccion = 0;
+      if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
+        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[0]) <= 0){
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
+      if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1"){
+        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[1]) <= 0){
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
       if (peticion === 2) {
         // if (typeof datosTransaccion.valor == "string") {
         //   valorTransaccion = datosTransaccion.valor.replace(/[$ .]/g, "");
@@ -536,6 +546,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       let codBarras = datosTrans.codBarras
         .slice(codBarrasIndex)
         .replace(/[\x1D]/g, "");
+      if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
+        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[0]) <= 0){
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
+      if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1"){
+        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[1]) <= 0){
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
