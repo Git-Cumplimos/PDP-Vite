@@ -134,6 +134,16 @@ const RecaudoServiciosPublicosPrivados = () => {
           return notifyError("El valor ingresado es diferente");
         }
       }
+      if (convenio?.ctrol_ref1_cnb === "1") {
+        if(parseInt(datosTrans?.ref1) <= 0 ) {
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
+      if (convenio?.ctrol_ref2_cnb === "1") {
+        if(parseInt(datosTrans?.ref2) <= 0 ) {
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
     }
     if (
       dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) ||
@@ -387,6 +397,16 @@ const RecaudoServiciosPublicosPrivados = () => {
           handleClose();
         });
     } else {
+      if (convenio?.ctrol_ref1_cnb === "1") {
+        if(parseInt(datosTrans?.ref1) <= 0 ) {
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
+      if (convenio?.ctrol_ref2_cnb === "1") {
+        if(parseInt(datosTrans?.ref2) <= 0 ) {
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
       setIsUploading(true);
       postConsultaConveniosDavivienda({
         tipoTransaccion: "2",
