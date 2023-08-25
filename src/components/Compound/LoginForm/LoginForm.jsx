@@ -84,7 +84,7 @@ const LoginForm = () => {
                 <br />
                 2. Contiene al menos una cáracter especial
                 <br />
-                Contiene al menos una letra mayúscula
+                3. Contiene al menos una letra mayúscula
                 <br />
                 4. Contiene al menos una letra minúscula
               </h6>
@@ -125,7 +125,7 @@ const LoginForm = () => {
                 <br />
                 2. Contiene al menos una cáracter especial
                 <br />
-                Contiene al menos una letra mayúscula
+                3. Contiene al menos una letra mayúscula
                 <br />
                 4. Contiene al menos una letra minúscula
               </h6>
@@ -150,7 +150,7 @@ const LoginForm = () => {
       .then((res) => {
         if (res?.Status === true) {
           notify(
-            "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
+            "Recibirá un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
           );
           setDisabled(false);
           setPassword("");
@@ -191,7 +191,7 @@ const LoginForm = () => {
                 <br />
                 2. Contiene al menos una cáracter especial
                 <br />
-                Contiene al menos una letra mayúscula
+                3. Contiene al menos una letra mayúscula
                 <br />
                 4. Contiene al menos una letra minúscula
               </h6>
@@ -453,6 +453,7 @@ const LoginForm = () => {
             <div className={field}>
               <label htmlFor="names">Correo:</label>
               <input
+                required
                 id="email"
                 type="email"
                 autoFocus
@@ -466,6 +467,7 @@ const LoginForm = () => {
             <div className={field}>
               <label htmlFor="names">Código:</label>
               <input
+                required
                 id="email"
                 type="text"
                 autoFocus
@@ -480,6 +482,7 @@ const LoginForm = () => {
             <div className={field}>
               <label htmlFor="names">Contraseña:</label>
               <input
+                required
                 id="newpass"
                 type="password"
                 autoFocus
@@ -493,6 +496,7 @@ const LoginForm = () => {
             <div className={field}>
               <label htmlFor="names">Confirmar contraseña:</label>
               <input
+                required
                 id="confirmpass"
                 type="password"
                 autoFocus
