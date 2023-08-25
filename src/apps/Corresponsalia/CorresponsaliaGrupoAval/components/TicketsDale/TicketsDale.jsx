@@ -1,14 +1,14 @@
-import Tickets from "../../../../../../components/Base/Tickets/Tickets";
-import { useImgs } from "../../../../../../hooks/ImgsHooks";
+import Tickets from "../../../../../components/Base/Tickets/Tickets";
+import { useImgs } from "../../../../../hooks/ImgsHooks";
 
-const TicketsAgrario = ({
+const TicketsDale = ({
   refPrint,
   type = "ORIGINAL",
   ticket,
   stateTrx = true,
 }) => {
   const {
-    imgs: { LogoAgrario: LogoPng, pdpHorizontal: LogoPdp },
+    imgs: { LogoDale: LogoPng, pdpHorizontal: LogoPdp },
   } = useImgs();
 
   if (!ticket) {
@@ -24,24 +24,21 @@ const TicketsAgrario = ({
       <div className='flex flex-col mx-2 my-1 gap-1'>
         <div className='flex flex-row justify-center items-center w-full'>
           <div className='flex flex-row mx-auto items-center gap-4'>
-            <div className='mx-auto w-25'>
+            <div className='mx-auto w-20'>
               <div className='aspect-w-16 aspect-h-9'>
                 <img src={LogoPdp} alt='Logo punto de pago' />
               </div>
             </div>
-            <div className='mx-auto w-25'>
-              <div className='aspect-w-10 aspect-h-10'>
+            <div className='mx-auto w-20'>
+              <div className='aspect-w-15 aspect-h-10'>
                 <img src={LogoPng} alt='Logo punto de pago' />
               </div>
             </div>
           </div>
         </div>
-        <h1 className='text-xs font-semibold text-center uppercase'>
-          CORRESPONSAL BANCARIO PUNTO DE PAGO
-        </h1>
       </div>
     </Tickets>
   );
 };
 
-export default TicketsAgrario;
+export default TicketsDale;
