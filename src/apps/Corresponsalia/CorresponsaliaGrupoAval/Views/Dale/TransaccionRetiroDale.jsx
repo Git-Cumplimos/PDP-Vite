@@ -195,12 +195,6 @@ const TransaccionRetiroDale = () => {
     },
     [dataUsuario.numCelular]
   );
-  const onChangeFormat = useCallback((ev) => {
-    let value = ev.target.value;
-    setDataUsuario((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
-  }, []);
   return (
     <>
       <h1 className='text-3xl'>Retiro OTP Dale</h1>
