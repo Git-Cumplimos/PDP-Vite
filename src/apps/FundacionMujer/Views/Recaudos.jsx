@@ -128,7 +128,7 @@ const Recaudo = () => {
               ...old,
               ticket: true,
             }));
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
@@ -226,7 +226,7 @@ const Recaudo = () => {
         Datos: {
           Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
           Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
-          nroBusqueda: parseFloat(selected?.Cedula),
+          nroBusqueda: parseFloat(selected?.Credito),
         },
       };
       notifyPending(
@@ -287,7 +287,7 @@ const Recaudo = () => {
       }
       if (!hasKeys) {
         notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+          "El usuario no cuenta con datos de comercio, no se permite la transacción"
         );
         navigate("/");
       }
