@@ -11,6 +11,7 @@ const Tickets = ({
   children = null,
   chunkSizeCommerce = 2,
   chunkSizeTrx = 2,
+  whitespaceDisclaimer = false,
 }) => {
   const {
     imgs: { pdpHorizontal: LogoPng },
@@ -140,7 +141,10 @@ const Tickets = ({
         <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
           ***{type}***
         </h1>
-        <h1 className='text-center my-1 text-xs font-normal whitespace-pre'>
+        <h1
+          className={`text-center my-1 text-xs font-normal ${
+            whitespaceDisclaimer ? "whitespace-pre" : ""
+          }`}>
           {disclamer}
         </h1>
       </div>
