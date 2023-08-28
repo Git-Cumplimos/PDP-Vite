@@ -173,7 +173,7 @@ const MoviiPDPCashOut = () => {
       <Form grid onSubmit={onSubmit}>
         <Input
           id='numeroTelefono'
-          label='Número de télefono'
+          label='Número de teléfono'
           type='text'
           name='numeroTelefono'
           minLength='10'
