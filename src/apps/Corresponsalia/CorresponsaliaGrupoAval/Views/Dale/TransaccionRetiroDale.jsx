@@ -187,6 +187,9 @@ const TransaccionRetiroDale = () => {
           if (dataUsuario.numCelular.length === 0 && num !== "3") {
             return notifyError("El número de celular debe comenzar por 3");
           }
+          if (num.length > 0)
+            if (num[0] !== "3")
+              return notifyError("El número de celular debe comenzar por 3");
         }
         setDataUsuario((old) => {
           return { ...old, [ev.target.name]: num };
