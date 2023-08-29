@@ -20,6 +20,7 @@ const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user = process.env.REACT_APP_URL_COGNITO;
+const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
 
 const validateUser = async (email) => {
   const get = {
@@ -269,7 +270,7 @@ export const useProvideAuth = () => {
       try {
         const semillaAws = await Auth.setupTOTP(user);
         const response = await fetch(
-          `${url_iam_pdp_users}/users-totp/generate`,
+          `${public_urls}/users-totp/generate`,
           {
             method: "POST",
             body: JSON.stringify({
@@ -321,7 +322,7 @@ export const useProvideAuth = () => {
       }
 
       try {
-        const response = await fetch(`${url_iam_pdp_users}/users-totp/verify`, {
+        const response = await fetch(`${public_urls}/users-totp/verify`, {
           method: "POST",
           body: JSON.stringify({
             email: userState?.pdpUser?.email,
