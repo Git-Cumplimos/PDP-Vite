@@ -13,7 +13,7 @@ export const listPermissionsMovii = listPermissions;
 
 const rutasMovii = {
   link: "/movii-pdp",
-  label: <AppIcons Logo={"MOVII"} name='MOVII PDP' />,
+  label: <AppIcons Logo={"MOVII"} name='Movii' />,
   component: MoviiPDP,
   permission: listPermissionsMovii,
   subRoutes: [
