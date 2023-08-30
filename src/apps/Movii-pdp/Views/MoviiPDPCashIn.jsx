@@ -170,6 +170,7 @@ const MoviiPDPCashIn = () => {
         issuer_id_dane: roleInfo?.codigo_dane,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
+        id_uuid_trx: uniqueId,
         // Ticket: objTicket,
         subscriberNum: datosTrans?.numeroTelefono,
         // otp: datosTrans.otp,
