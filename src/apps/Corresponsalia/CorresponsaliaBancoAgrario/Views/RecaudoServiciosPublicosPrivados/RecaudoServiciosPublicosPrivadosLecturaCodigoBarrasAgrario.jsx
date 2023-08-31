@@ -216,14 +216,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-    if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[0]) <= 0 ){
-      return notifyError("La referencia no puede ser 0")
-    }
-    if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[1]) <= 0 ){
-      return notifyError("La referencia no puede ser 0")
-    }
-    if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[2]) <= 0 ){
-      return notifyError("La referencia no puede ser 0")
+    for (let i = 0; i < datosEnvio.datosCodigoBarras.codigosReferencia.length; i++) {
+      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0 ){
+        return notifyError("La referencia no puede ser 0")
+      }
     }
     setPeticion(1);
     setShowModal(true);
