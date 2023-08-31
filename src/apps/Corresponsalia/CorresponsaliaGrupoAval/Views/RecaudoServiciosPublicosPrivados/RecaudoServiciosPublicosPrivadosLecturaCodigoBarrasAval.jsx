@@ -252,6 +252,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
+    if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[0]) <= 0 ){
+      return notifyError("La referencia no puede ser 0")
+    }
+    if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[1]) <= 0 ){
+      return notifyError("La referencia no puede ser 0")
+    }
+    if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[2]) <= 0 ){
+      return notifyError("La referencia no puede ser 0")
+    }
     setIsUploading(true);
     let codBarrasIndex = datosTrans.codBarras.indexOf("415");
     let codBarras = datosTrans.codBarras.slice(codBarrasIndex);
