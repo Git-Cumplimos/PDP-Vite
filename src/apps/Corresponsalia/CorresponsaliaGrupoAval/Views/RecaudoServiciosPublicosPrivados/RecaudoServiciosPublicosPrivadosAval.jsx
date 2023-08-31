@@ -99,6 +99,9 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     // setShowModal((old) => ({ ...old, showModal: true }));
+    if (parseInt(datosTrans.ref1) <= 0){
+      return notifyError("La referencia no puede ser 0")
+    }
     setIsUploading(true);
     postConsultaConveniosAval({
       oficina_propia:
