@@ -143,6 +143,7 @@ const TransaccionRetiroDale = () => {
           render: ({ data: res }) => {
             setResConsulta(res?.obj);
             setEstadoPeticion(1);
+            setShowModal(true);
             return "Consulta satisfactoria";
           },
         },
@@ -201,7 +202,7 @@ const TransaccionRetiroDale = () => {
   return (
     <>
       <h1 className='text-3xl'>Retiro OTP Dale</h1>
-      <Form onSubmit={handleShow} grid>
+      <Form onSubmit={makeConsultCashout} grid>
         <Input
           id='numeroDocumento'
           name='numeroDocumento'
