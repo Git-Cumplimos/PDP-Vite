@@ -12,6 +12,7 @@ const TicketsPowwi = ({
   type = "ORIGINAL",
   ticket,
   stateTrx = true,
+  disclamer_add = "CORRESPONSAL PAGOS GDE S.A. - POWWI.",
 }) => {
   const {
     imgs: { LogoPowwi: LogoPng, pdpHorizontal: LogoPdp },
@@ -27,6 +28,8 @@ const TicketsPowwi = ({
       ticket={ticket}
       stateTrx={stateTrx}
       type={type}
+      whitespaceDisclaimer = {true}
+      disclamer_add = {disclamer_add}
     >
       <div className="flex flex-row mx-2 ">
         <div className="w-30 mx-auto mt-2">

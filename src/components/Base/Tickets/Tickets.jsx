@@ -12,6 +12,7 @@ const Tickets = ({
   chunkSizeCommerce = 2,
   chunkSizeTrx = 2,
   whitespaceDisclaimer = false,
+  disclamer_add = "",
 }) => {
   const {
     imgs: { pdpHorizontal: LogoPng },
@@ -140,6 +141,9 @@ const Tickets = ({
         <hr className='border-gray-400 my-1' />
         <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
           ***{type}***
+        </h1>
+        <h1 className='text-center my-1 text-xs font-semibold'>
+          {disclamer_add ?? ""}
         </h1>
         <h1
           className={`text-center my-1 text-xs font-normal ${
