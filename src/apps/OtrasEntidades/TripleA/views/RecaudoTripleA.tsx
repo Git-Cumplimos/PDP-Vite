@@ -29,6 +29,7 @@ import { ErrorCustomFetch } from "../utils/utils";
 import { TypeServicesBackendTripleA } from "../utils/typing";
 
 import classes from "./Recaudo.module.css";
+import { int } from "aws-sdk/clients/datapipeline";
 
 //Constantes Style
 const { styleComponents, styleComponentsInput, formItem } = classes;
@@ -37,6 +38,7 @@ const { styleComponents, styleComponentsInput, formItem } = classes;
 type TypingPaso =
   | "LecturaBarcode"
   | "LecturaTripleA"
+  | "ResumenConsultaTrx"
   | "ResumenTrx"
   | "TrxExitosa";
 
@@ -46,9 +48,8 @@ type TypingInputData = {
   numeroCliente: string;
 };
 type TypingConsultData = null | {
-  nombre: string;
-  subscriptor: number;
-  valorcupon: number;
+  numeroCupon: string;
+  valorPagado: number;
   id_trx: number;
 };
 
@@ -65,8 +66,13 @@ const infServiceBackend: TypeInf = {
     name: "tripleA - consulta",
     method: "POST",
   },
+  validation: {
+    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/validacion-facturas`,
+    name: "tripleA - validacion",
+    method: "POST",
+  },
   pay: {
-    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/trx-pago-cupon`,
+    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/trx-pago-factura`,
     name: "tripleA - pago",
     method: "POST",
   },
@@ -87,6 +93,7 @@ const RecaudoTripleA = () => {
   // const uniqueId = v4();
   const [paso, setPaso] = useState<TypingPaso>("LecturaBarcode");
   const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [procedimiento, setProcedimiento] =
     useState<TypeProcedimiento>(option_barcode);
   const [inputData, setInputData] = useState<TypingInputData>(inputDataInitial);
@@ -96,7 +103,7 @@ const RecaudoTripleA = () => {
   const buttonDelate = useRef<HTMLInputElement>(null);
   const validNavigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
-  const [loadingPeticion, PeticionBarcode, PeticionConsult, PeticionPay] =
+  const [loadingPeticion, PeticionBarcode, PeticionConsult, PeticionValidation,PeticionPay] =
     useFetchTripleARecaudo(infServiceBackend);
 
   useEffect(() => {
@@ -107,13 +114,14 @@ const RecaudoTripleA = () => {
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
     setShowModal(false);
+    setShowModal2(false);
     if (notify_error_ === true) {
       notifyError("Transacción cancelada", 5000, {
         toastId: "notifyError-HandleCloseTrx",
       });
     }
     setInputData(inputDataInitial);
-    setConsultaData(null);
+    // setConsultaData(null);
     setProcedimiento(option_manual);
     setPaso("LecturaTripleA");
   }, []);
@@ -121,17 +129,20 @@ const RecaudoTripleA = () => {
   const HandleCloseTrxExitosa = useCallback(() => {
     setPaso("LecturaTripleA");
     setShowModal(false);
+    setShowModal2(false);
     setInfTicket(null);
     setInputData(inputDataInitial);
-    setConsultaData(null);
+    // setConsultaData(null);
     setProcedimiento(option_manual);
-    validNavigate("/emcali");
+    validNavigate("/TripleA/recaudos");
   }, [validNavigate]);
 
   const HandleCloseModal = useCallback(() => {
     if (paso === "LecturaBarcode" && !loadingPeticion) {
       HandleCloseTrx(true);
     } else if (paso === "LecturaTripleA" && !loadingPeticion) {
+      HandleCloseTrx(true);
+    } else if (paso === "ResumenConsultaTrx" && !loadingPeticion) {
       HandleCloseTrx(true);
     } else if (paso === "ResumenTrx" && !loadingPeticion) {
       HandleCloseTrx(true);
@@ -196,14 +207,12 @@ const RecaudoTripleA = () => {
         },
         numeroCliente: inputData.numeroCliente,
       };
-
       PeticionConsult(data)
         .then((res: TypeServicesBackendTripleA) => {
-          setPaso("ResumenTrx");
+          setPaso("ResumenConsultaTrx");
           setConsultaData({
-            nombre: res?.obj?.result?.nombre,
-            valorcupon: parseInt(res?.obj?.result?.valorcupon),
-            subscriptor: res?.obj?.result?.suscriptor,
+            numeroCupon: res?.obj?.result?.facturas[0]?.NumeroCupon,
+            valorPagado: parseInt(res?.obj?.result?.facturas[0]?.Valor),
             id_trx: res?.obj?.result?.id_trx,
           });
           setShowModal(true);
@@ -224,6 +233,47 @@ const RecaudoTripleA = () => {
     [PeticionConsult, HandleCloseTrx, inputData.numeroCliente, pdpUser, roleInfo]
   );
 
+  const onSubmitValidation = useCallback(
+    (e: MouseEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.["id_comercio"] ?? "",
+          id_usuario: roleInfo?.["id_usuario"] ?? "",
+          id_terminal: roleInfo?.["id_dispositivo"] ?? "",
+          nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+          nombre_usuario: pdpUser?.["uname"] ?? "",
+        },
+        numeroCupon: consultData?.numeroCupon,
+        ...(consultData?.id_trx ? { id_trx: consultData.id_trx } : {}),
+      };
+      PeticionValidation(data)
+        .then((res: TypeServicesBackendTripleA) => {
+          setPaso("ResumenTrx");
+          setConsultaData({
+            numeroCupon: res?.obj?.result?.cupon,
+            valorPagado: parseInt(res?.obj?.result?.valorcupon),
+            id_trx: res?.obj?.result?.id_trx,
+          });
+          setShowModal(false);
+          setShowModal2(true);
+        })
+        .catch((error: any) => {
+          if (!(error instanceof ErrorCustomFetch)) {
+            const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServiceBackend.validation.name}) [0010002]`;
+            const errorSequence = `${name_componente} - realizar consulta directamente en el modulo`;
+            console.error({
+              "Error PDP": errorPdp,
+              "Error Sequence": errorSequence,
+              "Error Console": `${error.message}`,
+            });
+          }
+          HandleCloseTrx(false);
+        });
+    },
+    [PeticionValidation,HandleCloseTrx,pdpUser,roleInfo,consultData?.numeroCupon,consultData?.id_trx]
+  );
+
   const onSubmitPay = useCallback(
     (e: MouseEvent<HTMLInputElement>) => {
       let tipo__comercio = roleInfo?.["tipo_comercio"] ?? "";
@@ -242,11 +292,9 @@ const RecaudoTripleA = () => {
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
         },
-        numeroCliente: inputData?.numeroCliente,
-        subscriptor: consultData?.subscriptor,
-        valor_total_trx: consultData?.valorcupon,
+        numeroCupon: consultData?.numeroCupon,
         id_trx: consultData?.id_trx,
-        tipo_recaudo: procedimiento === option_manual ? "manual" : "barcode",
+        valorPagado: consultData?.valorPagado,
       };
       PeticionPay(data)
         .then((res: TypeServicesBackendTripleA) => {
@@ -267,15 +315,7 @@ const RecaudoTripleA = () => {
           HandleCloseTrx(false);
         });
     },
-    [
-      pdpUser,
-      roleInfo,
-      inputData?.numeroCliente,
-      procedimiento,
-      consultData,
-      HandleCloseTrx,
-      PeticionPay,
-    ]
+    [pdpUser,roleInfo,consultData,HandleCloseTrx,PeticionPay]
   );
 
   //********************Funciones Demas**************************
@@ -314,8 +354,7 @@ const RecaudoTripleA = () => {
           </Fragment>
         )}
         {/******************************Lectura Barcode*******************************************************/}
-
-        {/******************************Lectura Emcali*******************************************************/}
+        {/******************************Lectura Triple A*******************************************************/}
         {paso === "LecturaTripleA" && (
           <Fragment>
             <h1>Número de póliza o documento</h1>
@@ -357,23 +396,22 @@ const RecaudoTripleA = () => {
           </Fragment>
         )}
 
-        {/******************************Respuesta Lectura runt*******************************************************/}
+        {/******************************Respuesta Lectura Triple A*******************************************************/}
       </Form>
 
       <Modal show={showModal} handleClose={HandleCloseModal}>
         {/******************************Resumen de trx*******************************************************/}
-        {paso === "ResumenTrx" && consultData !== null && (
+        {paso === "ResumenConsultaTrx" && consultData !== null && (
           <PaymentSummary
             title="Respuesta de consulta facturas Triple A"
             subtitle="Resumen de transacción"
             summaryTrx={{
               "Número de documento o póliza": inputData.numeroCliente,
-              Nombre: consultData.nombre,
-              "Valor a pagar": formatMoney.format(consultData.valorcupon),
+              "Valor a pagar": formatMoney.format(consultData.valorPagado),
             }}
           >
             <ButtonBar>
-              <Button type="submit" onClick={onSubmitPay}>
+              <Button type="submit" onClick={onSubmitValidation}>
                 Consultar cupón
               </Button>
               <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
@@ -382,16 +420,15 @@ const RecaudoTripleA = () => {
         )}
         {/*************** Consulta Exitosa **********************/}
       </Modal>
-      <Modal show={false} handleClose={HandleCloseModal}>
-        {/******************************Resumen de trx*******************************************************/}
+      <Modal show={showModal2} handleClose={HandleCloseModal}>
+        {/******************************Resumen de trx validacion*******************************************************/}
         {paso === "ResumenTrx" && consultData !== null && (
           <PaymentSummary
             title="Respuesta de consulta cupón Triple A"
             subtitle="Resumen de transacción"
             summaryTrx={{
               "Número de documento o póliza": inputData.numeroCliente,
-              Nombre: consultData.nombre,
-              "Valor a pagar": formatMoney.format(consultData.valorcupon),
+              "Valor a pagar": formatMoney.format(consultData.valorPagado),
             }}
           >
             <ButtonBar>
