@@ -77,7 +77,7 @@ const PagoCredito = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [datosTrx, setDatosTrx] = useState({
-    tipoDocumento: "02",
+    tipoDocumento: 2,
     documento: "",
     tipoPago: "02",
     credito: formattedData[0].NumeroCredito,
@@ -89,12 +89,12 @@ const PagoCredito = () => {
   const [uuid, setUuid] = useState(v4());
 
   const optionsDocumento = [
-    { value: "02", label: "Cédula de ciudadanía" },
-    { value: "03", label: "NIT" },
+    { value: 2, label: "Cédula de ciudadanía" },
+    { value: 3, label: "NIT" },
   ];
   const optionsTipoPago = [
-    { value: "02", label: "Valor mínimo" },
-    { value: "03", label: "Valor Total" },
+    { value: 2, label: "Valor mínimo" },
+    { value: 3, label: "Valor Total" },
   ];
 
   const printDiv = useRef();
@@ -106,7 +106,7 @@ const PagoCredito = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
     setDatosTrx({
-      tipoDocumento: "1",
+      tipoDocumento: 2,
       documento: "",
       tipoPago: "02",
       credito: formattedData[0].NumeroCredito,
@@ -133,10 +133,10 @@ const PagoCredito = () => {
         nombre_usuario: roleInfo?.["nombre comercio"],
         nombre_comercio: roleInfo?.["nombre comercio"],
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-        valor_total_trx: valor,
+        valor_total_trx: 0,
         Datos: {
           tipo_documento: datosTrx?.tipoDocumento,
-          documento: datosTrx?.documento,
+          num_documento: datosTrx?.documento,
         },
       };
       notifyPending(
@@ -151,7 +151,7 @@ const PagoCredito = () => {
           render: ({data: res }) =>{
             setIsUploading(false);
             setDatosConsulta(res?.obj);
-            const formattedData = aqui.map(row => ({
+            const formattedData = res?.obj.map(row => ({
               NumeroCredito: row.account,
               RolTitular: row.debtorType,
               Nombre: row.firstNames,
@@ -161,10 +161,11 @@ const PagoCredito = () => {
               ValorTotal: formatMoney.format(row?.totalAmount)
             }));
             setDatosCredito(formattedData);
+            const nombre = res?.obj[0]?.firstNames + res?.obj[0]?.firstSurname + res?.obj[0]?.secondLastName
             setDatosTrx((old) => ({
               ...old,
-              nombreCliente: res?.obj?.firstNames + res?.obj?.firstSurname + res?.obj?.secondLastName,
-              credito: formattedData[0].NumeroCredito
+              nombreCliente: nombre,
+              credito: formattedData[0].NumeroCredito,
             }));
             setShowModal(true);
             return "Consulta satisfactoria";
@@ -174,11 +175,11 @@ const PagoCredito = () => {
           render: ( { data: error}) => {
             setIsUploading(false);
             setDatosTrx({
-              tipoDocumento: "1",
-              userDoc: "",
-              userDocDepositante: "",
-              numeroTelefono: "",
-              numeroTelefonoDepositante: ""
+              tipoDocumento: 2,
+              documento: "",
+              tipoPago: "02",
+              credito: formattedData[0].NumeroCredito,
+              nombreCliente:"",
             });
             setValor("");
             return error?.message ?? "Consulta fallida";
@@ -186,7 +187,7 @@ const PagoCredito = () => {
         }
       );
     },
-    [valor, limitesMontos]
+    [datosTrx?.documento, datosTrx?.tipoDocumento, formattedData,roleInfo, peticionConsultaCosto]
   );
   
   const goToRecaudo = useCallback(() => {
@@ -200,7 +201,7 @@ const PagoCredito = () => {
   );
 
   const onMakePayment = useCallback(() => {
-    if (datosTrx?.tipoPago === "02"){
+    if (datosTrx?.tipoPago === 2){
       setValor(formattedData.find(item => item.NumeroCredito === parseInt(datosTrx?.credito))?.ValorMinimo)
     } else{
       setValor(formattedData.find(item => item.NumeroCredito === parseInt(datosTrx?.credito))?.ValorTotal)
@@ -231,7 +232,7 @@ const PagoCredito = () => {
       Datos: {
         tipo_documento: datosTrx?.tipoDocumento,
         num_documento: datosTrx?.documento,
-        tipo_pago: "PCU" ? datosTrx?.tipoPago === "02" : "PTO",
+        tipo_pago: "PCU" ? datosTrx?.tipoPago === 2 : "PTO",
         num_credito: datosTrx?.credito,
         nombre: datosConsulta?.firstNames,
         first_apellido: datosConsulta?.firstSurname,
@@ -291,8 +292,8 @@ const PagoCredito = () => {
               options={optionsDocumento}
               value={datosTrx?.tipoDocumento}
               onChange={(e) => {
-                setDatosTrx(prevState => ({
-                  ...prevState,
+                setDatosTrx(old => ({
+                  ...old,
                   tipoDocumento: e.target.value
                 }));
               }}
@@ -307,13 +308,15 @@ const PagoCredito = () => {
                 maxLength={"15"}
                 value={datosTrx?.documento}
                 onInput={(e) => {
-                    const num = e.target.value.replace(/[\s\.]/g, "");
-                    if (!isNaN(num)) {
-                      setDatosTrx(prevState => ({
-                        ...prevState,
+                  const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+                  if (!isNaN(num)) {
+                    setDatosTrx((old) => {
+                      return {
+                        ...old,
                         documento: num
-                      }));
-                    }
+                      };
+                    })
+                  }
                 }}
                 required
             />
@@ -333,7 +336,7 @@ const PagoCredito = () => {
             </ButtonBar>
         </Form>
         <Modal
-          show={!showModal}
+          show={showModal}
           handleClose={paymentStatus || loadingPeticionPago ? () => {} : handleClose}>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
@@ -348,7 +351,7 @@ const PagoCredito = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de Consulta Crezcamos
               </h1>
-              <h2>{`Tipo Documento: ${datosTrx.tipoDocumento === "1" ? "Cédula de ciudadanía" : "NIT"}`}</h2>
+              <h2>{`Tipo Documento: ${datosTrx.tipoDocumento === 2 ? "Cédula de ciudadanía" : "NIT"}`}</h2>
               <h2>{`Número Documento: ${datosTrx?.documento}`}</h2>
               <h2>{`Nombre cliente: ${datosTrx?.nombreCliente}`}</h2>
               <Select
