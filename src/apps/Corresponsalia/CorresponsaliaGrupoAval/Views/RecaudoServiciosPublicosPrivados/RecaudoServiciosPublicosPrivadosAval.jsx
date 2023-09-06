@@ -99,8 +99,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     // setShowModal((old) => ({ ...old, showModal: true }));
-    if (parseInt(datosTrans.ref1) <= 0){
-      return notifyError("La referencia no puede ser 0")
+    if (parseInt(datosTrans.ref1) <= 0) {
+      return notifyError("La referencia no puede ser 0");
     }
     setIsUploading(true);
     postConsultaConveniosAval({
@@ -344,7 +344,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.nura}`}</h2>
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-              <h2 className='text-base'>
+              <h2 className='text-base font-semibold'>
                 {`Valor consultado: ${formatMoney.format(
                   datosConsulta?.valorTrx ?? "0"
                 )} `}
@@ -418,7 +418,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.nura}`}</h2>
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-              <h2 className='text-base'>
+              <h2 className='text-base font-semibold'>
                 {`Valor a pagar: ${formatMoney.format(
                   datosTrans.valorVar ?? "0"
                 )} `}

@@ -19,12 +19,18 @@ import {
   postConsultaConveniosAval,
   postRecaudoConveniosAval,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import MoneyInput from "../../../../../components/Base/MoneyInput/MoneyInput";
+import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
+  const [validacionPago, setValidacionPago] = useState({
+    validacion: 0,
+    estado: true,
+  });
   const formatMoney = makeMoneyFormatter(2);
   const [objTicketActual, setObjTicketActual] = useState({
     title: "RECIBO DE PAGO",
@@ -252,9 +258,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-    for (let i = 0; i < datosEnvio.datosCodigoBarras.codigosReferencia.length; i++) {
-      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0 ){
-        return notifyError("La referencia no puede ser 0")
+    for (
+      let i = 0;
+      i < datosEnvio.datosCodigoBarras.codigosReferencia.length;
+      i++
+    ) {
+      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0) {
+        return notifyError("La referencia no puede ser 0");
       }
     }
     setIsUploading(true);
@@ -291,11 +301,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           notify(res?.msg);
           setDatosConsulta(res?.obj);
           let valorTrxCons = res?.obj?.valorTrx ?? 0;
+          let valorTrxPago = res?.obj?.valorTrx ?? 0;
+          if (datosEnvio?.datosConvenio?.parciales === "1") {
+            if (datosEnvio.datosCodigoBarras.pago[0])
+              valorTrxPago = datosTransaccion.valorSinModificar;
+            setValidacionPago((old) => ({
+              ...old,
+              estado: false,
+            }));
+            // }
+          }
           setDatosTransaccion((old) => {
             return {
               ...old,
-              showValor2: formatMoney.format(valorTrxCons) ?? "",
-              valor: valorTrxCons ?? "",
+              showValor2: formatMoney.format(valorTrxPago) ?? "",
+              valor: valorTrxPago ?? "",
               valorSinModificar2: valorTrxCons ?? "",
             };
           });
@@ -317,6 +337,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   };
   const onSubmitPago = (e) => {
     e.preventDefault();
+    if (validacionPago.estado) {
+      if (
+        parseInt(datosTransaccion.valorSinModificar2) !==
+        parseInt(validacionPago.validacion)
+      ) {
+        return notifyError(
+          "Error, el valor a pagar es diferente al valor de validación"
+        );
+      }
+    }
     setIsUploading(true);
     const valorTransaccion = parseInt(datosTransaccion.valor) ?? 0;
     const fecha = Intl.DateTimeFormat("es-CO", {
@@ -416,21 +446,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className="text-3xl text-center mb-10 mt-5">
+      <h1 className='text-3xl text-center mb-10 mt-5'>
         Recaudo servicios públicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
           <Form>
             <TextArea
-              id="codBarras"
-              label="Escanee el código de barras"
-              type="text"
-              name="codBarras"
+              id='codBarras'
+              label='Escanee el código de barras'
+              type='text'
+              name='codBarras'
               required
               value={datosTrans.codBarras}
               autoFocus
-              autoComplete="off"
+              autoComplete='off'
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
@@ -472,16 +502,14 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     data: "",
                   };
                 }
-              }}
-            ></TextArea>
+              }}></TextArea>
             {datosTrans.codBarras !== "" && (
               <ButtonBar>
                 <Button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
-                  }}
-                >
+                  }}>
                   Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
@@ -490,7 +518,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         </>
       ) : (
         <>
-          <h1 className="text-3xl text-center  mb-10">{`Convenio: ${
+          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
             datosEnvio?.datosConvenio?.convenio ?? ""
           }`}</h1>
           <Form
@@ -504,51 +532,48 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               (datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
                 datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0) ||
               datosEnvio.datosCodigoBarras.pago[0]
-            }
-          >
+            }>
             <Input
-              id="ref1"
-              label="Referencia 1"
-              type="text"
-              name="ref1"
-              minLength="32"
-              maxLength="32"
+              id='ref1'
+              label='Referencia 1'
+              type='text'
+              name='ref1'
+              minLength='32'
+              maxLength='32'
               disabled={true}
               value={datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""}
               onInput={(e) => {
                 // setDatosTransaccion((old) => {
                 //   return { ...old, ref1: e.target.value };
                 // });
-              }}
-            ></Input>
+              }}></Input>
 
             {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
               <Input
-                id="ref2"
-                label="Fecha de caducidad"
-                type="text"
-                name="ref2"
-                minLength="32"
-                maxLength="32"
+                id='ref2'
+                label='Fecha de caducidad'
+                type='text'
+                name='ref2'
+                minLength='32'
+                maxLength='32'
                 disabled={true}
                 value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
                 onInput={(e) => {
                   // setDatosTransaccion((old) => {
                   //   return { ...old, ref2: e.target.value };
                   // });
-                }}
-              ></Input>
+                }}></Input>
             ) : (
               <></>
             )}
             {datosEnvio.datosCodigoBarras.pago[0] && (
               <MoneyInputDec
-                id="valCashOut"
-                name="valCashOut"
-                label="Valor a pagar original"
-                type="text"
-                autoComplete="off"
+                id='valCashOut'
+                name='valCashOut'
+                label='Valor a pagar original'
+                type='text'
+                autoComplete='off'
                 maxLength={"15"}
                 disabled={true}
                 value={datosTransaccion.valorSinModificar ?? ""}
@@ -560,12 +585,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     // });
                   }
                 }}
-                required
-              ></MoneyInputDec>
+                required></MoneyInputDec>
             )}
-            <ButtonBar className="lg:col-span-2">
+            <ButtonBar className='lg:col-span-2'>
               <Button
-                type="button"
+                type='button'
                 onClick={() => {
                   setDatosEnvio({
                     datosCodigoBarras: {},
@@ -582,20 +606,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                     valorSinModificar: "",
                     data: "",
                   });
-                }}
-              >
+                }}>
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type="submit">Realizar consulta</Button>
+                <Button type='submit'>Realizar consulta</Button>
               )}
             </ButtonBar>
           </Form>
           <Modal show={showModal} handleClose={hideModal}>
-            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
               {peticion === 2 && (
                 <>
-                  <h1 className="text-2xl text-center mb-5 font-semibold">
+                  <h1 className='text-2xl text-center mb-5 font-semibold'>
                     Resultado consulta
                   </h1>
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.convenio}`}</h2>
@@ -603,64 +626,105 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                   <h2>{`Referencia 1: ${
                     datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
                   }`}</h2>
-                  <h2 className="text-base">
-                    {`Valor consultado: ${formatMoney.format(
+                  <h2 className='text-base font-semibold'>
+                    {`${
+                      validacionPago.estado
+                        ? "Valor a pagar:"
+                        : "Valor consultado:"
+                    } ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
                   </h2>
-                  {datosEnvio?.datosConvenio?.parciales === "1" && (
+                  {validacionPago.estado ? (
                     <Form grid onSubmit={onSubmitPago}>
-                      <Input
-                        id="valor"
-                        name="valor"
-                        label="Valor a pagar"
-                        autoComplete="off"
-                        type="tel"
-                        minLength={"5"}
-                        maxLength={"20"}
-                        defaultValue={datosTransaccion.showValor2 ?? ""}
-                        onInput={(ev) =>
+                      <h2 className='text-base font-semibold'>
+                        Por favor ingresar el valor a pagar para confirmar la
+                        transacción
+                      </h2>
+                      <MoneyInput
+                        id='valCashOut'
+                        name='valCashOut'
+                        label='Validación valor'
+                        type='text'
+                        min={0}
+                        max={datosTransaccion.valorSinModificar2}
+                        autoComplete='off'
+                        maxLength={"12"}
+                        value={parseInt(validacionPago.validacion)}
+                        onInput={(e, val) => {
+                          setValidacionPago((old) => {
+                            return { ...old, validacion: val };
+                          });
+                        }}
+                        required
+                        equalError={false}
+                        equalErrorMin={false}
+                      />
+                      <ButtonBar>
+                        <Button
+                          onClick={() => {
+                            notifyError("Transacción cancelada por el usuario");
+                            hideModalReset();
+                          }}>
+                          Cancelar
+                        </Button>
+                        <Button type='submit' onClick={onSubmitPago}>
+                          Realizar pago
+                        </Button>
+                      </ButtonBar>
+                    </Form>
+                  ) : (
+                    <Form grid onSubmit={onSubmitPago}>
+                      <MoneyInput
+                        id='valCashOut'
+                        name='valCashOut'
+                        label='Valor a pagar'
+                        min={enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
+                        max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
+                        type='text'
+                        autoComplete='off'
+                        maxLength={"12"}
+                        value={datosTransaccion.showValor2 ?? ""}
+                        onInput={(ev, valMoney) =>
                           setDatosTransaccion((old) => ({
                             ...old,
-                            valor: onChangeMoney(ev),
-                            showValor2: onChangeMoney(ev),
+                            valor: valMoney,
+                            showValor2: valMoney,
                           }))
                         }
-                        required
-                      />
+                        equalError={false}
+                        equalErrorMin={false}
+                        required></MoneyInput>
+                      <ButtonBar>
+                        <Button
+                          onClick={() => {
+                            notifyError("Transacción cancelada por el usuario");
+                            hideModalReset();
+                          }}>
+                          Cancelar
+                        </Button>
+                        <Button type='submit' onClick={onSubmitPago}>
+                          Realizar pago
+                        </Button>
+                      </ButtonBar>
                     </Form>
                   )}
-                  <ButtonBar>
-                    <Button
-                      onClick={() => {
-                        notifyError("Transacción cancelada por el usuario");
-                        hideModalReset();
-                      }}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button type="submit" onClick={onSubmitPago}>
-                      Realizar pago
-                    </Button>
-                  </ButtonBar>
                 </>
               )}
               {peticion === 4 && (
                 <>
                   <TicketsAval
                     ticket={objTicketActual}
-                    refPrint={printDiv}
-                  ></TicketsAval>
+                    refPrint={printDiv}></TicketsAval>
 
                   <ButtonBar>
                     <Button onClick={handlePrint}>Imprimir</Button>
                     <Button
-                      type="button"
+                      type='button'
                       onClick={() => {
                         hideModalReset();
                         navigate(-1);
-                      }}
-                    >
+                      }}>
                       Cerrar
                     </Button>
                   </ButtonBar>
