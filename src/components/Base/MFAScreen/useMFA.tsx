@@ -65,7 +65,10 @@ export const useProvideMFA = () => {
     },
     []
   );
-  const deactivateTotpWall = useCallback(() => setActiveModal(false), []);
+  const deactivateTotpWall = useCallback(() => {
+    setActiveModal(false);
+    setCurrentTotp(null);
+  }, [setCurrentTotp]);
 
   const submitEventSetter = useCallback(
     (onSubmit: FormEventHandler<HTMLFormElement>) => {
