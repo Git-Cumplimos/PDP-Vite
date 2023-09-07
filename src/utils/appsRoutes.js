@@ -21,13 +21,13 @@ import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
-import routesOtrasEntidades from "../apps/OtrasEntidades/routes"
+import routesOtrasEntidades from "../apps/OtrasEntidades/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
-  rutasRecargas,
+  // rutasRecargas,
   rutasPines,
-  rutasSoat,
+  // rutasSoat,
   rutasApuestas,
 } from "../apps/Practisistemas/routes";
 
@@ -988,7 +988,7 @@ const allUrlsPrivateApps = [
     ],
   },
   rutasConfiguraciones,
-  rutasRecargas,
+  // rutasRecargas,
   rutasMovii,
   {
     link: "/colpensiones",
@@ -1118,7 +1118,7 @@ const allUrlsPrivateApps = [
   //   component: iFoodAportes,
   //   permission: [1],
   // },
-  rutasSoat,
+  // rutasSoat,
   rutasApuestas,
   rutasRecaudoDirecto,
   rutasRecargasTullave,

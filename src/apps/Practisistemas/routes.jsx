@@ -14,26 +14,26 @@ const CompraPin = lazy(() => import("./Views/Pines/CompraPin"));
 /**
  * Venta Soat
  */
-const VentaSoat = lazy(() => import("./Views/Soat/VentaSoat"));
-const FormularioVentaSoat = lazy(() =>
-  import("./Views/Soat/FormularioVentaSoat")
-);
+// const VentaSoat = lazy(() => import("./Views/Soat/VentaSoat"));
+// const FormularioVentaSoat = lazy(() =>
+//   import("./Views/Soat/FormularioVentaSoat")
+// );
 
 /**
  * Recargas
  */
-const RecargasPaquetes = lazy(() =>
-  import("./Views/Recargas/Recargas-Paquetes")
-);
-const SubPaquetesMoviles = lazy(() =>
-  import("./Views/Recargas/SubPaquetesMoviles.jsx")
-);
-const RecargasOperadores = lazy(() =>
-  import("./Views/Recargas/RecargarOperadores.jsx")
-);
-const RecargarPaquetes = lazy(() =>
-  import("./Views/Recargas/RecargarPaquetes.jsx")
-);
+// const RecargasPaquetes = lazy(() =>
+//   import("./Views/Recargas/Recargas-Paquetes")
+// );
+// const SubPaquetesMoviles = lazy(() =>
+//   import("./Views/Recargas/SubPaquetesMoviles.jsx")
+// );
+// const RecargasOperadores = lazy(() =>
+//   import("./Views/Recargas/RecargarOperadores.jsx")
+// );
+// const RecargarPaquetes = lazy(() =>
+//   import("./Views/Recargas/RecargarPaquetes.jsx")
+// );
 
 /**
  * Apuestas
@@ -50,7 +50,7 @@ export const rutasPines = {
   label: (
     <AppIcons
       Logo={"PINES_SERVICIO_CONTENIDO"}
-      name="Pines Servicio y Contenido"
+      name='Pines Servicio y Contenido'
     />
   ),
   component: Pines,
@@ -58,84 +58,84 @@ export const rutasPines = {
   subRoutes: [
     {
       link: "/Pines/PinesContenido/InformacionPin",
-      label: <AppIcons Logo={"RECAUDO"} name="Pin" />,
+      label: <AppIcons Logo={"RECAUDO"} name='Pin' />,
       component: InformacionPin,
       permission: [enumPermisosPractisistemas.practisistemasPines],
     },
     {
       link: "/Pines/PinesContenido/CompraPin",
-      label: <AppIcons Logo={"RECAUDO"} name="Pin" />,
+      label: <AppIcons Logo={"RECAUDO"} name='Pin' />,
       component: CompraPin,
       permission: [enumPermisosPractisistemas.practisistemasPines],
     },
   ],
 };
 
-export const rutasSoat = {
-  link: "/ventaSeguros",
-  label: <AppIcons Logo={"VENTA_SEGUROS"} name="Venta De Seguros" />,
-  component: VentaSoat,
-  permission: [enumPermisosPractisistemas.practisistemasSoat],
-  subRoutes: [
-    {
-      link: "/ventaSeguros/ventaSoat",
-      label: <AppIcons Logo={"VENTA_SEGUROS_SOAT"} name={"Venta Soat"} />,
-      component: FormularioVentaSoat,
-      permission: [enumPermisosPractisistemas.practisistemasSoat],
-    },
-  ],
-};
+// export const rutasSoat = {
+//   link: "/ventaSeguros",
+//   label: <AppIcons Logo={"VENTA_SEGUROS"} name='Venta De Seguros' />,
+//   component: VentaSoat,
+//   permission: [enumPermisosPractisistemas.practisistemasSoat],
+//   subRoutes: [
+//     {
+//       link: "/ventaSeguros/ventaSoat",
+//       label: <AppIcons Logo={"VENTA_SEGUROS_SOAT"} name={"Venta Soat"} />,
+//       component: FormularioVentaSoat,
+//       permission: [enumPermisosPractisistemas.practisistemasSoat],
+//     },
+//   ],
+// };
 
-export const rutasRecargas = {
-  link: "/recargas-paquetes",
-  label: (
-    <AppIcons Logo={"RECARGA_CELULAR"} name="Recargas y Venta de Paquetes" />
-  ),
-  component: RecargasPaquetes,
-  permission: [enumPermisosPractisistemas.practisistemasRecargas],
-  subRoutes: [
-    {
-      link: "/recargas-paquetes/Recargar",
-      label: (
-        <AppIcons
-          Logo={"RECARGA_CELULAR"}
-          name="Recargas y Venta de Paquetes"
-        />
-      ),
-      component: RecargasOperadores,
-      permission: [enumPermisosPractisistemas.practisistemasSoat],
-      show: false,
-    },
-    {
-      link: "/recargas-paquetes/Venta-paquetes",
-      label: (
-        <AppIcons
-          Logo={"RECARGA_CELULAR"}
-          name="Recargas y Venta de Paquetes"
-        />
-      ),
-      component: SubPaquetesMoviles,
-      permission: [enumPermisosPractisistemas.practisistemasRecargas],
-    },
-    {
-      link: "/recargas-paquetes/Recargar-paquete",
-      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Venta de paquetes" />,
-      component: RecargarPaquetes,
-      permission: [enumPermisosPractisistemas.practisistemasRecargas],
-      show: false,
-    },
-  ],
-};
+// export const rutasRecargas = {
+//   link: "/recargas-paquetes",
+//   label: (
+//     <AppIcons Logo={"RECARGA_CELULAR"} name='Recargas y Venta de Paquetes' />
+//   ),
+//   component: RecargasPaquetes,
+//   permission: [enumPermisosPractisistemas.practisistemasRecargas],
+//   subRoutes: [
+//     {
+//       link: "/recargas-paquetes/Recargar",
+//       label: (
+//         <AppIcons
+//           Logo={"RECARGA_CELULAR"}
+//           name='Recargas y Venta de Paquetes'
+//         />
+//       ),
+//       component: RecargasOperadores,
+//       permission: [enumPermisosPractisistemas.practisistemasSoat],
+//       show: false,
+//     },
+//     {
+//       link: "/recargas-paquetes/Venta-paquetes",
+//       label: (
+//         <AppIcons
+//           Logo={"RECARGA_CELULAR"}
+//           name='Recargas y Venta de Paquetes'
+//         />
+//       ),
+//       component: SubPaquetesMoviles,
+//       permission: [enumPermisosPractisistemas.practisistemasRecargas],
+//     },
+//     {
+//       link: "/recargas-paquetes/Recargar-paquete",
+//       label: <AppIcons Logo={"RECARGA_CELULAR"} name='Venta de paquetes' />,
+//       component: RecargarPaquetes,
+//       permission: [enumPermisosPractisistemas.practisistemasRecargas],
+//       show: false,
+//     },
+//   ],
+// };
 
 export const rutasApuestas = {
   link: "/apuestas-deportivas",
-  label: <AppIcons Logo={"RECAUDO"} name="Apuestas Deportivas" />,
+  label: <AppIcons Logo={"RECAUDO"} name='Apuestas Deportivas' />,
   component: ApuestasDeportivas,
   permission: [enumPermisosPractisistemas.practisistemasApuestas],
   subRoutes: [
     {
       link: "/apuestas-deportivas/Recargar",
-      label: <AppIcons Logo={"RECAUDO"} name="Apuestas Deportivas" />,
+      label: <AppIcons Logo={"RECAUDO"} name='Apuestas Deportivas' />,
       component: RecargarCuentaApuestas,
       permission: [enumPermisosPractisistemas.practisistemasApuestas],
       show: false,
