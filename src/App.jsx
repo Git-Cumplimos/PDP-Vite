@@ -9,7 +9,7 @@ import ProvideAuth from "./components/Compound/ProvideAuth";
 import ProvideUrls from "./components/Compound/ProvideUrls";
 import ProvideImgs from "./components/Compound/ProvideImgs";
 import IdleTimeOut from "./components/Compound/IdleTimeOut/IdleTimeOut";
-
+import MFAScreenProvider from "./components/Base/MFAScreen";
 
 Amplify.configure(awsconfig);
 
@@ -17,16 +17,20 @@ function App() {
   return (
     <Router>
       <ProvideAuth>
-        <ProvideImgs>
-          <ProvideUrls>
-            <UrlsContext.Consumer>
-              {({ allRoutes }) => (
-                <Suspense fallback={<SkeletonLoading />}>{allRoutes}</Suspense>
-              )}
-            </UrlsContext.Consumer>
-          </ProvideUrls>
-        </ProvideImgs>
-        <IdleTimeOut />
+        <MFAScreenProvider>
+          <ProvideImgs>
+            <ProvideUrls>
+              <UrlsContext.Consumer>
+                {({ allRoutes }) => (
+                  <Suspense fallback={<SkeletonLoading />}>
+                    {allRoutes}
+                  </Suspense>
+                )}
+              </UrlsContext.Consumer>
+            </ProvideUrls>
+          </ProvideImgs>
+          <IdleTimeOut />
+        </MFAScreenProvider>
       </ProvideAuth>
     </Router>
   );
