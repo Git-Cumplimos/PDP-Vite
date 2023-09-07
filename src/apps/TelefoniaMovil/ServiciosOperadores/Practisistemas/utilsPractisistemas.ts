@@ -35,26 +35,29 @@ export const FuctionEvaluateResponsePractisistemas = (
   name_: string,
   error_: ParamsError
 ) => {
-  // trx exitosa
+  const function_name = "FuctionEvaluateResponsePractisistemas";
+  //trx no exitosa para los errores del backend
   try {
     if (peticion_?.status === true) {
       return peticion_;
     }
   } catch (error: any) {
     throw new ErrorCustomFetchCode(
-      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 7) [0010002]`,
+      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
       error.message,
+      `${function_name} - trx no exitosa para los errores del backend`,
       error_.errorFetchCustomCode?.typeNotify,
       error_.errorFetchCustomCode?.ignoring
     );
   }
-  // trx no exitosa
+  //trx no exitosa para los errores del backend,
 
   try {
     if (peticion_?.status === false && peticion_?.obj?.response) {
       throw new ErrorCustomBackend(
         peticion_?.obj?.response,
         peticion_?.obj?.response,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomBackend?.typeNotify,
         error_.errorFetchCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
@@ -63,6 +66,7 @@ export const FuctionEvaluateResponsePractisistemas = (
       throw new ErrorCustomBackend(
         peticion_?.msg,
         peticion_?.msg,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomBackend?.typeNotify,
         error_.errorFetchCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
@@ -73,8 +77,9 @@ export const FuctionEvaluateResponsePractisistemas = (
       throw error;
     } else {
       throw new ErrorCustomFetchCode(
-        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 8) [0010002]`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );

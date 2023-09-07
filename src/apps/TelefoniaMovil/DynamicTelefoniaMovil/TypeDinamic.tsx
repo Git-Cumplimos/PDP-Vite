@@ -5,6 +5,8 @@ export type TypeInputPromises<TypeDependsModule> = {
   pdpUser: { [key: string]: any };
   moduleInfo: TypeDependsModule;
   id_uuid?: any;
+  parameters_operador?: [key: string | any] | {};
+  parameters_submodule?: [key: string | any] | {};
 };
 
 //------------recargas ------------------------
@@ -73,7 +75,9 @@ export type TypeSubModules<_TypeSubModules_> = {
   recargas: _TypeSubModules_;
   paquetes: _TypeSubModules_;
   cargarPaquetes: _TypeSubModules_;
-};
+  cargarConciliacion: _TypeSubModules_;
+  descargarConciliacion: _TypeSubModules_;
+} & { [key: string]: _TypeSubModules_ };
 
 export type TypeRouteModule = {
   link: string;
@@ -81,4 +85,14 @@ export type TypeRouteModule = {
   component: ReactNode;
   permission: number[];
   subRoutes?: TypeRouteModule[];
+};
+
+export type PropOperadoresComponent = {
+  autorizador: string;
+  name: string;
+  logo: string;
+  backend: TypeBackend;
+  permission: number[];
+  parameters_operador: [key: string | any] | {};
+  parameters_submodule: [key: string | any] | {};
 };

@@ -74,7 +74,8 @@ export const FuctionEvaluateResponse = (
   name_: string,
   error_: ParamsError
 ) => {
-  // trx exitosa
+  const function_name = "FuctionEvaluateResponse";
+  // trx exitosa para el backend
   try {
     if (peticion_?.status === true) {
       return peticion_;
@@ -83,12 +84,12 @@ export const FuctionEvaluateResponse = (
     throw new ErrorCustomFetchCode(
       `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 7) [0010002]`,
       error.message,
+      `${function_name} - trx exitosa para el backend`,
       error_.errorFetchCustomCode?.typeNotify,
       error_.errorFetchCustomCode?.ignoring
     );
   }
-  // trx no exitosa
-  //para los errores  del backend
+  // trx no exitosa para los errores  del backend
   try {
     if (peticion_?.status === false && peticion_?.obj?.error_status === true) {
       let error_msg_console = "";
@@ -104,6 +105,7 @@ export const FuctionEvaluateResponse = (
       throw new ErrorCustomBackend(
         `${peticion_?.msg}`,
         error_msg_console,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomBackend?.typeNotify,
         error_.errorFetchCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
@@ -116,13 +118,14 @@ export const FuctionEvaluateResponse = (
       throw new ErrorCustomFetchCode(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 8) [0010002]`,
         error.message,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );
     }
   }
 
-  // cuando status es false pero no hay errores
+  //trx no exitosa, cuando status es false pero no hay errores
   try {
     if (peticion_?.status === false && peticion_?.obj?.error_status === false) {
       let error_msg_console = "";
@@ -138,6 +141,7 @@ export const FuctionEvaluateResponse = (
       throw new ErrorCustomBackendUser(
         `${peticion_?.msg}`,
         error_msg_console,
+        `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         error_.errorFetchCustomBackend?.typeNotify,
         error_.errorFetchCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
@@ -150,6 +154,7 @@ export const FuctionEvaluateResponse = (
       throw new ErrorCustomFetchCode(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 9) [0010002]`,
         error.message,
+        `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );
@@ -157,15 +162,18 @@ export const FuctionEvaluateResponse = (
   }
 };
 
+export const name_console_error = "Error respuesta Front-end PDP";
+
 export const fetchCustom = async (
   url_: string,
-  metodo_: string,
+  metodo_: "POST" | "PUT" | "GET",
   name_: string,
   params_: { [key: string]: any } = {},
   body_: { [key: string]: any } = {},
   error_: ParamsError = defaultParamsError,
   functionEvaluateResponse_: Function = FuctionEvaluateResponse
 ) => {
+  const function_name = "fetchCustom";
   let urlCompleto = url_;
 
   //armar parametros
@@ -182,14 +190,15 @@ export const fetchCustom = async (
     }
   } catch (error: any) {
     throw new ErrorCustomFetchCode(
-      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 1) [0010002]`,
+      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
       error.message,
+      `${function_name} - armar parametros`,
       error_.errorFetchCustomCode?.typeNotify,
       error_.errorFetchCustomCode?.ignoring
     );
   }
 
-  //Petición
+  //Realizar Petición
   let Peticion;
   try {
     if (metodo_ === "GET") {
@@ -201,8 +210,9 @@ export const fetchCustom = async (
     }
   } catch (error: any) {
     throw new ErrorCustomFetchCode(
-      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 2) [0010002]`,
+      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
       error.message,
+      `${function_name} - Realizar Petición`,
       error_.errorFetchCustomCode?.typeNotify,
       error_.errorFetchCustomCode?.ignoring
     );
@@ -211,8 +221,9 @@ export const fetchCustom = async (
   try {
     if (typeof Peticion !== "object") {
       throw new ErrorCustomFetchCode(
-        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 3) [0010002]`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         "404 not found",
+        `${function_name} - Evaluar si la respuesta es json`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );
@@ -228,15 +239,17 @@ export const fetchCustom = async (
       if (Peticion?.hasOwnProperty("message") === true) {
         if (Peticion.message === "Endpoint request timed out") {
           throw new ErrorCustomApiGatewayTimeout(
-            `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 4) [0010002]`,
+            `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
             Peticion.message,
+            `${function_name} - evaluar respuesta de api gateway`,
             error_.errorFetchCustomApiGatewayTimeout?.typeNotify,
             error_.errorFetchCustomApiGatewayTimeout?.ignoring
           );
         } else {
           throw new ErrorCustomApiGateway(
-            `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 5) [0010002]`,
+            `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
             Peticion.message,
+            `${function_name} - evaluar respuesta de api gateway`,
             error_.errorFetchCustomApiGateway?.typeNotify,
             error_.errorFetchCustomApiGateway?.ignoring
           );
@@ -254,6 +267,7 @@ export const fetchCustom = async (
       throw new ErrorCustomFetchCode(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 6) [0010002]`,
         error.message,
+        `${function_name} - evaluar respuesta de api gateway`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );
@@ -272,12 +286,15 @@ export class ErrorCustomFetch extends Error {
   error_name: string;
   error_msg_front: string;
   error_msg_console: string;
+  error_msg_sequence: string;
   typeNotify: string | undefined;
   ignoring: boolean;
+
   constructor(
     error_name: string,
     error_msg_front: string,
     error_msg_console: string,
+    error_msg_sequence: string,
     typeNotify: string | undefined,
     ignoring: boolean
   ) {
@@ -285,33 +302,76 @@ export class ErrorCustomFetch extends Error {
     this.error_name = error_name;
     this.error_msg_front = error_msg_front;
     this.error_msg_console = error_msg_console;
+    this.error_msg_sequence = error_msg_sequence;
     this.typeNotify = typeNotify;
     this.ignoring = ignoring;
     if (this.ignoring === false && this.typeNotify !== undefined) {
       if (this.typeNotify === "notifyError") {
-        notifyError(this.error_msg_front);
+        notifyError(this.error_msg_front, 5000, { toastId: "notify-lot" });
       } else if (this.typeNotify === "notify") {
         notify(this.error_msg_front);
       }
     }
-
-    console.error(
-      `error_name: ${error_name}\n error_msg_front: ${this.error_msg_front}\n error_msg_console: ${this.error_msg_console}`
-    );
+    console.error(name_console_error, {
+      "Error Name": error_name,
+      "Error PDP": this.error_msg_front,
+      "Error Sequence": this.error_msg_sequence,
+      "Error Console": `${this.error_msg_console}`,
+    });
   }
 }
 
 export class ErrorCustomFetchCode extends ErrorCustomFetch {
   constructor(
-    error_msg_front: string = "desconocido",
-    error_msg_console: string = "desconocido",
-    typeNotify: string | undefined = "notifyError",
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
     ignoring: boolean = false
   ) {
     super(
       "ErrorCustomFetchCode",
       error_msg_front,
       error_msg_console,
+      error_msg_sequence,
+      typeNotify,
+      ignoring
+    );
+  }
+}
+
+export class ErrorCustomUseHookCode extends ErrorCustomFetch {
+  constructor(
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
+    ignoring: boolean = false
+  ) {
+    super(
+      "ErrorCustomUseHookCode",
+      error_msg_front,
+      error_msg_console,
+      error_msg_sequence,
+      typeNotify,
+      ignoring
+    );
+  }
+}
+
+export class ErrorCustomComponenteCode extends ErrorCustomFetch {
+  constructor(
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
+    ignoring: boolean = false
+  ) {
+    super(
+      "ErrorCustomComponenteCode",
+      error_msg_front,
+      error_msg_console,
+      error_msg_sequence,
       typeNotify,
       ignoring
     );
@@ -320,15 +380,17 @@ export class ErrorCustomFetchCode extends ErrorCustomFetch {
 
 export class ErrorCustomApiGateway extends ErrorCustomFetch {
   constructor(
-    error_msg_front: string = "desconocido",
-    error_msg_console: string = "desconocido",
-    typeNotify: string | undefined = "notifyError",
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
     ignoring: boolean = false
   ) {
     super(
       "ErrorCustomApiGateway",
       error_msg_front,
       error_msg_console,
+      error_msg_sequence,
       typeNotify,
       ignoring
     );
@@ -337,15 +399,17 @@ export class ErrorCustomApiGateway extends ErrorCustomFetch {
 
 export class ErrorCustomApiGatewayTimeout extends ErrorCustomFetch {
   constructor(
-    error_msg_front: string = "desconocido",
-    error_msg_console: string = "desconocido",
-    typeNotify: string | undefined = "notifyError",
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
     ignoring: boolean = false
   ) {
     super(
       "ErrorCustomApiGatewayTimeout",
       error_msg_front,
       error_msg_console,
+      error_msg_sequence,
       typeNotify,
       ignoring
     );
@@ -354,9 +418,10 @@ export class ErrorCustomApiGatewayTimeout extends ErrorCustomFetch {
 
 export class ErrorCustomBackend extends ErrorCustomFetch {
   constructor(
-    error_msg_front: string = "desconocido",
-    error_msg_console: string = "desconocido",
-    typeNotify: string | undefined = "notifyError",
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
     ignoring: boolean = false,
     ...additional: any
   ) {
@@ -364,6 +429,7 @@ export class ErrorCustomBackend extends ErrorCustomFetch {
       "ErrorCustomBackend",
       error_msg_front,
       error_msg_console,
+      error_msg_sequence,
       typeNotify,
       ignoring
     );
@@ -374,6 +440,7 @@ export class ErrorCustomBackendUser extends ErrorCustomFetch {
   constructor(
     error_msg_front: string = "desconocido",
     error_msg_console: string = "desconocido",
+    error_msg_sequence: string = "desconocido",
     typeNotify: string | undefined = "notify",
     ignoring: boolean = false,
     ...additional: any
@@ -382,6 +449,7 @@ export class ErrorCustomBackendUser extends ErrorCustomFetch {
       "ErrorCustomBackendUser",
       error_msg_front,
       error_msg_console,
+      error_msg_sequence,
       typeNotify,
       ignoring
     );

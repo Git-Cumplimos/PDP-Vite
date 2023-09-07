@@ -1,5 +1,5 @@
 import React, {
-  Fragment,
+  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -14,7 +14,6 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary/Payme
 import Form from "../../../../components/Base/Form/Form";
 import Input from "../../../../components/Base/Input/Input";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
-import { useImgs } from "../../../../hooks/ImgsHooks";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { ErrorCustomFetch } from "../utils/utils";
@@ -22,16 +21,13 @@ import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
-import { PropsBackendRecargas } from "../utils/TypesSubModulos";
 import {
+  PropOperadoresComponent,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
   TypeTableDataGetPaquetes,
 } from "../TypeDinamic";
 
-type PropsPaquetes = {
-  BackendPaquetes: () => Promise<PropsBackendRecargas>;
-};
 type TypeInfo = "Ninguno" | "Informacion" | "Resumen" | "TrxExitosa";
 type TypeDataInput = {
   celular: string;
@@ -52,7 +48,13 @@ const dataTableInitial = [
   },
 ];
 
-const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
+const Paquetes = ({
+  operadorCurrent,
+  children,
+}: {
+  operadorCurrent: PropOperadoresComponent;
+  children: ReactNode;
+}) => {
   const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
     dataPackageInputInitial
   );
@@ -76,7 +78,6 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
   );
   const validNavigate = useNavigate();
   const id_uuid = v4();
-  const { svgs }: any = useImgs();
   const { roleInfo, pdpUser }: any = useAuth();
 
   useEffect(() => {
@@ -84,6 +85,8 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
       roleInfo: roleInfo,
       pdpUser: pdpUser,
       moduleInfo: { page: pageTable.page, limit: pageTable.limit },
+      parameters_operador: operadorCurrent.parameters_operador,
+      parameters_submodule: operadorCurrent.parameters_submodule
     })
       .then((response: TypeOutputDataGetPaquetes) => {
         setDataGetPackages(response?.results);
@@ -222,15 +225,7 @@ const Paquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
 
   return (
     <div className="py-10 flex items-center flex-col">
-      <img
-        className="w-24  "
-        src={
-          operadorCurrent?.logo?.includes("http")
-            ? operadorCurrent?.logo
-            : svgs?.[operadorCurrent?.logo]
-        }
-      ></img>
-
+      {children}
       <TableEnterprise
         title={"Paquetes"}
         maxPage={maxPages}

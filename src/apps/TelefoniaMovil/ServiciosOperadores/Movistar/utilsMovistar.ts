@@ -33,7 +33,8 @@ export const FuctionEvaluateResponseMovistar = (
   name_: string,
   error_: ParamsError
 ) => {
-  // trx exitosa
+  const function_name = "FuctionEvaluateResponseMovistar";
+  // trx exitosa para el backend
   try {
     if (peticion_?.status === true) {
       return peticion_;
@@ -42,12 +43,12 @@ export const FuctionEvaluateResponseMovistar = (
     throw new ErrorCustomFetchCode(
       `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 7) [0010002]`,
       error.message,
+      `${function_name} - trx exitosa para el backend`,
       error_.errorFetchCustomCode?.typeNotify,
       error_.errorFetchCustomCode?.ignoring
     );
   }
-  // trx no exitosa
-  //para los errores  del backend
+  // trx no exitosa para los errores  del backend
   try {
     if (peticion_?.status === false && peticion_?.obj?.error === true) {
       let error_msg_console = "";
@@ -69,6 +70,7 @@ export const FuctionEvaluateResponseMovistar = (
       throw new ErrorCustomBackend(
         error_msg_front,
         error_msg_console,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomBackend?.typeNotify,
         error_.errorFetchCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
@@ -81,13 +83,14 @@ export const FuctionEvaluateResponseMovistar = (
       throw new ErrorCustomFetchCode(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 8) [0010002]`,
         error.message,
+        `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );
     }
   }
 
-  // cuando status es false pero no hay errores
+  //trx no exitosa, cuando status es false pero no hay errores
   try {
     if (peticion_?.status === false && peticion_?.obj?.error === false) {
       let error_msg_console = "";
@@ -104,7 +107,7 @@ export const FuctionEvaluateResponseMovistar = (
         `${peticion_?.msg}`,
         error_msg_console,
         error_.errorFetchCustomBackend?.typeNotify,
-        error_.errorFetchCustomBackend?.ignoring,
+        `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         peticion_?.obj?.error_msg
       );
     }
@@ -115,6 +118,7 @@ export const FuctionEvaluateResponseMovistar = (
       throw new ErrorCustomFetchCode(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 9) [0010002]`,
         error.message,
+        `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         error_.errorFetchCustomCode?.typeNotify,
         error_.errorFetchCustomCode?.ignoring
       );

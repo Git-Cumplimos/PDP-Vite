@@ -1,17 +1,25 @@
-import React, { FormEvent, useCallback, useRef, useState } from "react";
+import React, {
+  FormEvent,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import Input from "../../../../components/Base/Input/Input";
 import MoneyInput from "../../../../components/Base/MoneyInput/MoneyInput";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
 import Form from "../../../../components/Base/Form/Form";
-import { useImgs } from "../../../../hooks/ImgsHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import Modal from "../../../../components/Base/Modal/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { TypeOutputDataRecargas } from "../TypeDinamic";
+import {
+  PropOperadoresComponent,
+  TypeOutputDataRecargas,
+} from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 import { ErrorCustomFetch } from "../utils/utils";
@@ -36,10 +44,10 @@ const dataRecargaInitial = {
 
 const Recargas = ({
   operadorCurrent,
-  operadorLogoCurrent,
+  children,
 }: {
-  operadorCurrent: any;
-  operadorLogoCurrent: any;
+  operadorCurrent: PropOperadoresComponent;
+  children: ReactNode;
 }) => {
   const [dataRecarga, setDataRecarga] =
     useState<TypeDataRecarga>(dataRecargaInitial);
@@ -51,10 +59,10 @@ const Recargas = ({
 
   const id_uuid = v4();
   const { roleInfo, pdpUser }: any = useAuth();
-  const { svgs }: any = useImgs();
   const useHookDynamic = operadorCurrent?.backend;
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
     operadorCurrent.name,
+    operadorCurrent.autorizador,
     "recargas"
   );
 
@@ -83,12 +91,14 @@ const Recargas = ({
 
   const RealizarTrx = (e: any) => {
     e.preventDefault();
-
+    console.log(operadorCurrent);
     PeticionRecargar({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
       moduleInfo: dataRecarga,
       id_uuid: id_uuid,
+      parameters_operador: operadorCurrent.parameters_operador,
+      parameters_submodule: operadorCurrent.parameters_submodule,
     })
       .then((result: TypeOutputDataRecargas) => {
         if (result?.status === true) {
@@ -158,14 +168,7 @@ const Recargas = ({
 
   return (
     <div className="py-8 mt-6 flex items-center flex-col border-solid border-2 border-slate-600 rounded-2xl">
-      <img
-        className="w-24  "
-        src={
-          operadorCurrent?.logo?.includes("http")
-            ? operadorCurrent?.logo
-            : svgs?.[operadorCurrent?.logo]
-        }
-      ></img>
+      {children}
       <Form onSubmit={onSubmitSummary} grid>
         <div className="col-span-2">
           <div className=" grid grid-cols-4  grid-rows-4">

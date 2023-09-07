@@ -42,6 +42,7 @@ export const useBackendPaquetesPractisistemas = (
     async (
       dataInput: TypeInputDataGetPaquetes
     ): Promise<TypeOutputDataGetPaquetes> => {
+      console.log();
       setLoadingPeticion((old) => ({ ...old, getPaquetes: true }));
       let response: TypeOutputDataGetPaquetes = {
         maxPages: 1,
