@@ -264,6 +264,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         datosEnvio?.datosConvenio?.num_ind_consulta_cnb
       ) ||
       peticion === 2
+      ||
+      peticion === 3
     ) {
       let valorTransaccion = 0;
       if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
@@ -319,6 +321,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             valor_maximo_recaudo
           )}`
         );
+      }
+      if (peticion === 3){
+        if (parseInt(datosTransaccion.valor) !== parseInt(datosTransaccion.valorSinModificar2)){
+          let error = "Error, el valor a pagar es diferente al valor de validación";
+          return notifyError(error);
+        }
       }
       const hoy = new Date();
       const fecha = Intl.DateTimeFormat("es-CO", {
@@ -589,8 +597,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             setDatosTransaccion((old) => {
               return {
                 ...old,
-                showValor2: formatMoney.format(valorTrxCons) ?? "",
-                valor: valorTrxCons ?? "",
+                showValor2: formatMoney.format(datosTransaccion.valorSinModificar) ?? "",
+                valor: datosTransaccion.valorSinModificar ?? "",
                 valorSinModificar2: valorTrxCons ?? "",
               };
             });
@@ -879,7 +887,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
                     }`}</h2>
                   )}
-                  <h2 className='text-base'>
+                  <h2 className='text-base font-semibold'>
                     {`Valor consultado: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
@@ -897,12 +905,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         type='tel'
                         minLength={"5"}
                         maxLength={"12"}
-                        value={datosTransaccion.valor ?? ""}
+                        value={datosTransaccion.valorSinModificar ?? ""}
                         onInput={(ev, val) => {
                           setDatosTransaccion((old) => ({
                             ...old,
                             valor: val,
                             showValor2: val,
+                            valorSinModificar: val,
                           }));
                         }}
                         required
@@ -919,11 +928,63 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   ) : (
                     <ButtonBar>
                       <Button onClick={hideModalReset}>Cancelar</Button>
-                      <Button type='submit' onClick={onSubmitPago}>
+                      <Button type='submit' onClick={() => {
+                        setDatosTransaccion((old) => ({
+                          ...old,
+                          valor: 0,
+                          showValor: 0,
+                        }));
+                        setPeticion(3) }}>
                         Realizar pago
                       </Button>
                     </ButtonBar>
                   )}
+                </>
+              )}
+              {peticion === 3 && (
+                <>
+                  <h1 className='text-2xl text-center mb-2 font-semibold'>
+                    ¿Esta seguro de realizar el pago?
+                  </h1>
+                  <h2 className='text-xl font-semibold'>
+                    {`Valor a pagar: ${formatMoney.format(
+                      datosTransaccion.valorSinModificar2
+                    )} `}
+                  </h2>
+                  <h2 className='text-base font-semibold'>
+                    Por favor ingresar el valor a pagar para confirmar la transacción
+                  </h2>
+                  <Form grid onSubmit={onSubmitPago}>
+                    <MoneyInput
+                      id='valor'
+                      name='valor'
+                      label='Validación valor'
+                      autoComplete='off'
+                      type='tel'
+                      minLength={"5"}
+                      maxLength={"12"}
+                      value={datosTransaccion.valor ?? ""}
+                      onInput={(ev, val) => {
+                        if (!isNaN(val)){
+                          const num = val;
+                          setDatosTransaccion((old) => ({
+                            ...old,
+                            valor: num,
+                            showValor: num,
+                          }));
+                        }
+                      }}
+                      required
+                      min={enumParametrosDavivienda.MINRECAUDO}
+                      max={enumParametrosDavivienda.MAXRECAUDO}
+                      equalError={false}
+                      equalErrorMin={false}
+                    />
+                    <ButtonBar>
+                      <Button onClick={hideModalReset}>Cancelar</Button>
+                      <Button type='submit'>Realizar pago</Button>
+                    </ButtonBar>
+                  </Form>
                 </>
               )}
               {peticion === 4 && (
