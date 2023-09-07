@@ -203,7 +203,8 @@ const LineasNegocio = () => {
         let transactionTypeValidated = selectedBusinessLine?.[BusinessLineCons.TAG_TRANSACTION_TYPE_ID];
         let transactionTypeOld = selectedBusinessLine?.[BusinessLineCons.TAG_TRANSACTION_TYPE_ID];
         if (selectedBusinessLine?.lineaNegocio === "" || selectedBusinessLine?.lineaDetalle === "" || selectedBusinessLine?.autorizador === "" || selectedBusinessLine?.tipoTransaccion === "") {
-          notify(BusinessLineCons.MESSAGE_VALIDATE);
+          notifyError(BusinessLineCons.MESSAGE_VALIDATE);
+          setLoadScreen(false);
           return;
         }
         if (authorizerList.filter(authorizerRow => authorizerRow.nombreAutorizador.toLowerCase() === selectedBusinessLine?.autorizador.toLowerCase()).length > 0) {
@@ -212,6 +213,7 @@ const LineasNegocio = () => {
           transactionTypeValidated = transactionTypeDataRow[0].id;
         } else {
           notify(BusinessLineCons.MESSAGE_VALIDATE_AUTHORIZER);
+          setLoadScreen(false);
           return;
         }
         if (businessLinesList.filter(businessLineRow => businessLineRow.lineaNegocio.toLowerCase() === selectedBusinessLine?.lineaNegocio.toLowerCase()).length > 0) {
@@ -231,13 +233,17 @@ const LineasNegocio = () => {
           idTipoTransaccionNuevo: Number(transactionTypeValidated),
         };
         const businessLineData = await putBusinessLine(body);
-        if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS && businessLineData.message === BusinessLineCons.RESPONSE_MESSAGE_SUCCES) {          
-          getBusinessLineData();
-          clearSelectedBusinessLine();
-          notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED.replace("{}",selectedBusinessLine?.lineaNegocio.toString()));
-          handleShowModal(false);
+        if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_SUCCESS) {
+          if (businessLineData.message === BusinessLineCons.RESPONSE_MESSAGE_SUCCESS) {
+            getBusinessLineData();
+            clearSelectedBusinessLine();
+            notify(BusinessLineCons.MESSAGE_SUCCESS_CREATED.replace("{}",selectedBusinessLine?.lineaNegocio.toString()));
+            handleShowModal(false);
+          } else {
+            notifyError(BusinessLineCons.MESSAGE_FAILURE_CREATED);
+          }
         } else if (businessLineData.code === BusinessLineCons.RESPONSE_CODE_EMPTY) {
-          notify(BusinessLineCons.MESSAGE_VALIDATE_EMPTY_PARAMS);
+          notifyError(BusinessLineCons.MESSAGE_VALIDATE_EMPTY_PARAMS);
         } else {
           notifyError(BusinessLineCons.MESSAGE_ERROR);
         }
@@ -284,8 +290,8 @@ const LineasNegocio = () => {
               id={BusinessLineCons.TAG_DETAILED_FILTER_LINE}
               label={BusinessLineCons.LABEL_DETAILED_LINE}
               list={BusinessLineCons.TAG_DETAILED_FILTER_LINE_LIST}
-              maxLength="50"
-              minLength="1"
+              maxLength={50}
+              minLength={1}
               onChange={(e)=>{onChangeFilter(e.target.value)}}
               name={BusinessLineCons.TAG_DETAILED_FILTER_LINE}
               type="search"              
@@ -311,6 +317,7 @@ const LineasNegocio = () => {
                 autoComplete="off"
                 id={BusinessLineCons.TAG_BUSINESS_LINE}
                 label={BusinessLineCons.LABEL_BUSINESS_LINE}
+                maxLength={50}
                 name={BusinessLineCons.TAG_BUSINESS_LINE}
                 onChange={() => {}}
                 required
@@ -323,6 +330,7 @@ const LineasNegocio = () => {
                   id={BusinessLineCons.TAG_DETAILED_LINE}
                   label={BusinessLineCons.LABEL_DETAILED_LINE}
                   list={BusinessLineCons.TAG_DETAILED_LINE_LIST}
+                  maxLength={50}
                   name={BusinessLineCons.TAG_DETAILED_LINE}
                   onChange={() => {}}
                   required

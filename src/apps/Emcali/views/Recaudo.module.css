@@ -1,0 +1,14 @@
+.styleComponents {
+  display: flex;
+  width: 300px;
+  align-items: center;
+  justify-content: center;
+}
+
+.styleComponentsInput {
+  width: 280px;
+}
+
+.formItem > button {
+  @apply px-4 py-2 bg-secondary-dark text-white rounded-full transition-opacity duration-300;
+}

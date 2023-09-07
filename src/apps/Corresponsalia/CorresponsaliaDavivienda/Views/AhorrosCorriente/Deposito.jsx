@@ -22,7 +22,6 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
-import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 
 const Deposito = () => {
@@ -370,7 +369,7 @@ const Deposito = () => {
             maxLength={"16"}
             value={numCuenta}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setNumCuenta(num);
               }
@@ -397,7 +396,7 @@ const Deposito = () => {
             maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
@@ -432,7 +431,7 @@ const Deposito = () => {
             onInput={onMoneyChange}
             required
           /> */}
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a depositar'
@@ -442,8 +441,15 @@ const Deposito = () => {
             maxLength={"15"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            equalError={false}
+            equalErrorMin={false}
+            value={parseInt(valor)}
+            onInput={(e, valor) => {
+              if (!isNaN(valor)){
+                const num = valor;
+                setValor(num)
+              }
+            }}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>

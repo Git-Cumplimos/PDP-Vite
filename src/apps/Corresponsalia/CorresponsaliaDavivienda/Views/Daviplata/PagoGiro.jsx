@@ -335,8 +335,7 @@ const PagoGiro = () => {
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };

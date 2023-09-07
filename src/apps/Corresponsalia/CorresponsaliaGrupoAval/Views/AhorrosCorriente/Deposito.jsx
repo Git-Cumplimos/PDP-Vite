@@ -422,7 +422,7 @@ const Deposito = () => {
             maxLength={"14"}
             value={numCuenta}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setNumCuenta(num);
               }
@@ -439,7 +439,7 @@ const Deposito = () => {
             maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
@@ -469,19 +469,26 @@ const Deposito = () => {
             }}
             required
           />
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a depositar'
             autoComplete='off'
             type='text'
-            minLength={"15"}
-            maxLength={"15"}
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            maxLength={"10"}
+            // value={makeMoneyFormatter(0).format(valor)}
+            // onInput={(ev) => setValor(onChangeMoney(ev))}
             required
+            min={enumParametrosGrupoAval.minDepositoCuentas}
+            max={enumParametrosGrupoAval.maxDepositoCuentas}
+            value={parseInt(valor)}
+            onInput={(e, monto) => {
+              if (!isNaN(monto)) {
+                setValor(monto)
+              }
+            }}
+            equalError={false}
+            equalErrorMin={false}
           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} disabled={loadingConsultaCostoGrupoAval}>

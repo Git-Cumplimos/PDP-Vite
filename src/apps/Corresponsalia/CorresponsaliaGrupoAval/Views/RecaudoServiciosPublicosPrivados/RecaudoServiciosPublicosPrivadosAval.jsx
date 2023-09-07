@@ -99,6 +99,9 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     // setShowModal((old) => ({ ...old, showModal: true }));
+    if (parseInt(datosTrans.ref1) <= 0) {
+      return notifyError("La referencia no puede ser 0");
+    }
     setIsUploading(true);
     postConsultaConveniosAval({
       oficina_propia:
@@ -294,13 +297,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           type='text'
           name='ref1'
           minLength='1'
-          maxLength='20'
+          maxLength='25'
           required
           value={datosTrans.ref1}
           autoComplete='off'
           onInput={(e) => {
             let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            let num = valor.replace(/[\s\.\-+eE]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, ref1: num };
@@ -341,7 +344,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.nura}`}</h2>
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-              <h2 className='text-base'>
+              <h2 className='text-base font-semibold'>
                 {`Valor consultado: ${formatMoney.format(
                   datosConsulta?.valorTrx ?? "0"
                 )} `}
@@ -415,7 +418,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.nura}`}</h2>
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-              <h2 className='text-base'>
+              <h2 className='text-base font-semibold'>
                 {`Valor a pagar: ${formatMoney.format(
                   datosTrans.valorVar ?? "0"
                 )} `}

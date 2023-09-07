@@ -84,7 +84,7 @@ const LoginForm = () => {
                 <br />
                 2. Contiene al menos una cáracter especial
                 <br />
-                Contiene al menos una letra mayúscula
+                3. Contiene al menos una letra mayúscula
                 <br />
                 4. Contiene al menos una letra minúscula
               </h6>
@@ -125,7 +125,7 @@ const LoginForm = () => {
                 <br />
                 2. Contiene al menos una cáracter especial
                 <br />
-                Contiene al menos una letra mayúscula
+                3. Contiene al menos una letra mayúscula
                 <br />
                 4. Contiene al menos una letra minúscula
               </h6>
@@ -143,11 +143,12 @@ const LoginForm = () => {
 
   const handleForgotPassword = (event) => {
     event.preventDefault();
+    notify("Validando usuario en base de datos");
+    setDisabled(true);
+
     auth
       .validateUser(username)
       .then((res) => {
-        notify("Validando usuario en base de datos");
-        setDisabled(true);
         if (res?.Status === true) {
           notify("Usuario valido");
           setDisabled(false);
@@ -202,7 +203,7 @@ const LoginForm = () => {
                 <br />
                 2. Contiene al menos una cáracter especial
                 <br />
-                Contiene al menos una letra mayúscula
+                3. Contiene al menos una letra mayúscula
                 <br />
                 4. Contiene al menos una letra minúscula
               </h6>

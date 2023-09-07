@@ -70,7 +70,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
         let body = {
           valor_afectacion : valor,
           fk_id_comercio: idComercio,
-          usuario: roleInfo.id_usuario,
+          usuario: roleInfo.id_usuario ?? -1,
           fk_tipo_de_movimiento: 2,
           motivo_afectacion: razonAjuste,
         }

@@ -97,6 +97,11 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   });
   const onSubmit = (e) => {
     e.preventDefault();
+
+    if (parseInt(datosTrans?.ref1) <= 0 || parseInt(datosTrans?.ref2) <= 0 || parseInt(datosTrans?.ref3) <= 0){
+      return notifyError("La referencia no puede ser 0")
+    }
+
     //Valdicacion de luhm
     if (convenio?.algoritmo_ref1?.match(/(Q 108)/g)) {
       if (!checkLuhn(datosTrans?.ref1))
@@ -274,8 +279,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   }, [roleInfo]);
   const onChangeFormat = useCallback(
     (ev) => {
-      let valor = ev.target.value;
-      valor = valor.replace(/[\s\.]/g, "");
+      let valor = ev.target.value.replace(/[\s\.\-+eE]/g, "");
       if (ev.target.name === "ref1") {
         if (convenio?.algoritmo_ref1?.match(/(N 010)|(Q 108)/g)) {
           if (isNaN(valor)) {
