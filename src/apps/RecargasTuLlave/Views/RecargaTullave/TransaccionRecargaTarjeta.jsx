@@ -17,7 +17,6 @@ import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
-import useMoney from "../../../../hooks/useMoney";
 
 const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
 const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
@@ -131,9 +130,9 @@ const TransaccionRecargaTarjeta = () => {
   const handleShow = useCallback(
     (ev) => {
       ev.preventDefault();
-      // if (valor % 50 !== 0) {
-      //   return notifyError("El valor de la recarga debe ser multiplo de 50");
-      // }
+      if (dataUsuario.valorRecarga % 50 !== 0) {
+        return notifyError("El valor de la recarga debe ser múltiplo de 50");
+      }
       setEstadoPeticion(0);
       setShowModal(true);
     },
@@ -167,16 +166,9 @@ const TransaccionRecargaTarjeta = () => {
       return { ...old, [ev.target.name]: value };
     });
   }, []);
-  const onChangeMoney = useMoney({
-    limits: [
-      enumParametrosTuLlave.MINRECARGATARJETA,
-      enumParametrosTuLlave.MAXRECARGATARJETA,
-    ],
-    equalError: false,
-  });
   return (
     <>
-      <h1 className='text-3xl'>Recargar tarjeta Tu Llave</h1>
+      <h1 className='text-3xl'>Recargar Tarjeta Tu Llave</h1>
       <Form onSubmit={handleShow} grid>
         <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
           <Input
@@ -255,7 +247,7 @@ const TransaccionRecargaTarjeta = () => {
             type='email'
             autoComplete='off'
             value={dataUsuario?.["emailCliente"]}
-            maxLength={50}
+            maxLength={70}
             onChange={onChangeFormat}
             disabled={loadingPeticionRecargaTarjeta}
           />
