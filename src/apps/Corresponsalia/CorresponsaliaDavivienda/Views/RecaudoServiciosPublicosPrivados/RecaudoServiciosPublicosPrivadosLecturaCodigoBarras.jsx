@@ -887,7 +887,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
                     }`}</h2>
                   )}
-                  <h2 className='text-base'>
+                  <h2 className='text-base font-semibold'>
                     {`Valor consultado: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
