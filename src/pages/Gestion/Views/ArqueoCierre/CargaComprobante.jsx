@@ -37,12 +37,13 @@ const CargaComprobante = () => {
   const [movementType, setMovementType] = useState("");
   const [foundEntities, setFoundEntities] = useState([]);
   const [selectedEntity, setSelectedEntity] = useState("");
+  const [EntityIndex, setEntityIndex] = useState([]);
   const [file, setFile] = useState(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [comprobanteNumber, setComprobanteNumber] = useState("");
   const [valorComprobante, setValorComprobante] = useState(0.0);
   const [observaciones, setObservaciones] = useState("");
-
+  let NumCuentas = [];
   const [limitesMontos, setLimitesMontos] = useState({
     max: 9999999,
     min: 5000,
@@ -67,6 +68,16 @@ const CargaComprobante = () => {
     })
       .then((res) => {
         if (Array.isArray(res?.obj?.results)) {
+          for (const element of res?.obj?.results) {
+            if (element.pk_numero_cuenta !== null) {
+                NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1]
+              if(element.pk_numero_cuenta.pk_numero_cuenta2 != undefined)
+                NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2)
+              if(element.pk_numero_cuenta.pk_numero_cuenta3 != undefined)
+                NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3)
+              element.pk_numero_cuenta=NumCuentas
+            }
+          }
           setFoundEntities(res?.obj?.results);
           if (res?.obj?.results?.length === 0) {
             notifyError("No se encontradon datos de entidades");
@@ -223,7 +234,6 @@ const CargaComprobante = () => {
       });
   }, []);
 
-  console.log(formRef);
 
   return (
     <Fragment>
@@ -283,6 +293,9 @@ const CargaComprobante = () => {
                     parametros,
                   ])
                 );
+                if (foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta != null) {
+                  setEntityIndex(foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta)
+                }else{setEntityIndex([])}
                 setSelectedEntity(e.target.value);
                 setLimitesMontos((old) => ({
                   min: tempMap.get(e.target.value)?.monto_minimo ?? old.min,
@@ -292,16 +305,23 @@ const CargaComprobante = () => {
               required
             />
             {movementType === "Consignación Bancaría" && (
-              <Input
+                <Select
                 id="accountNum"
                 name="accountNum"
                 label="Número de cuenta"
-                type="tel"
-                autoComplete="off"
-                minLength={"19"}
-                maxLength={"19"}
-                onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
+                options={[
+                  { value: "", label: "" },
+                  ...EntityIndex.map((pk_numero_cuenta) => ({
+                    value: pk_numero_cuenta,
+                    label: pk_numero_cuenta,
+                  })),
+                ]}
+                value={accountNumber}
+                onChange={(ev) => {
+                  setAccountNumber(ev.target.value)
+                }}
                 required
+                type="tel"
               />
             )}
             <Input

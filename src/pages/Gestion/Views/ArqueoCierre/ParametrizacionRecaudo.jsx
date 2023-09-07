@@ -13,6 +13,11 @@ import {
 } from "../../utils/fetchCaja";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
+import _ from 'lodash';
+
+let Num = 1;
+let valor = 0;
+
 
 const ParametrizacionRecaudo = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
@@ -22,6 +27,11 @@ const ParametrizacionRecaudo = () => {
   const [data, setData] = useState([]);
   const [searchFilters, setSearchFilters] = useState({ pk_nombre_entidad: "" });
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [Count, setCount] = useState(1);
+  const originalState= {pk_numero_cuenta1: undefined, pk_numero_cuenta2: undefined, pk_numero_cuenta3: undefined};
+  const [NumCountjson, setNumCountjson] = useState(originalState) //PREGUNTAR
+  const keysToExclude = ["pk_numero_cuenta1", "pk_numero_cuenta2", "pk_numero_cuenta3"];
+  let NumCuentas = [];
 
   const closeModal = useCallback(() => {
     setShowModal(false);
@@ -33,6 +43,16 @@ const ParametrizacionRecaudo = () => {
     buscarEntidades({ ...pageData, ...searchFilters })
       .then((res) => {
         setMaxPages(res?.obj?.maxPages);
+        for (const element of res?.obj?.results) {
+          if (element.pk_numero_cuenta !== null) {
+              NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
+            if(element.pk_numero_cuenta.pk_numero_cuenta2 != undefined)
+              NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2+"\n")
+            if(element.pk_numero_cuenta.pk_numero_cuenta3 != undefined)
+              NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3+"\n")
+            element.pk_numero_cuenta=NumCuentas
+          }
+        }
         setData(res?.obj?.results);
       })
       .catch((error) => {
@@ -50,14 +70,17 @@ const ParametrizacionRecaudo = () => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
       const body = Object.fromEntries(
-        Object.entries(Object.fromEntries(formData)).map(([key, val]) => [
-          key,
-          key === "pk_is_transportadora"
-            ? val === "2"
-            : key === "pk_nombre_entidad"
-            ? val.trim()
-            : val,
-        ])
+        Object.entries(Object.fromEntries(formData)).map(([key, val]) => {
+          if (keysToExclude.includes(key)) {return ["pk_numero_cuenta",NumCountjson];}
+          return [
+            key,
+            key === "pk_is_transportadora"
+              ? val === "2"
+              : key === "pk_nombre_entidad"
+              ? val.trim()
+              : val,
+          ];
+        })
       );
       notifyPending(
         crearEntidad(body),
@@ -128,6 +151,34 @@ const ParametrizacionRecaudo = () => {
     buscarEnt();
   }, [buscarEnt]);
 
+  const handleChangeCount = (Nun) => {
+    if(Num >= 1 ){ if(Num <= 2 || Nun < 0){Num = Num + Nun
+        valor=Num+1
+        if (valor < 4) {NumCountjson['pk_numero_cuenta'+(valor).toString()] = undefined}
+        setCount(Num) 
+      }
+    }if (Num === 0){ Num=1  
+      setCount(Num)}
+  };
+
+  const handleInput = (e) => {
+    NumCountjson[e.target.name]=e.target.value
+  }
+
+  const range = _.range(1, Count+1);
+  const listNumCuenta = range.map((number) => 
+    <Input
+      id={"pk_numero_cuenta"+number}
+      name={"pk_numero_cuenta"+number}
+      label={`Numero de Cuenta`}
+      type="number"
+      onChange={(e) => handleInput(e)
+      }
+      autoComplete="off"
+      max="99999999999999999999"
+      required
+    />);
+
   return (
     <Fragment>
       <ButtonBar>
@@ -137,15 +188,17 @@ const ParametrizacionRecaudo = () => {
       </ButtonBar>
       <TableEnterprise
         title="Bancos/Transportadoras"
-        headers={["Nombre entidad", "Tipo entidad"]}
+        headers={["Nombre entidad", "Tipo entidad","Numero de Cuentas"]}
         maxPage={maxpages}
         onSetPageData={setPageData}
         data={
-          data?.map(({ pk_nombre_entidad, pk_is_transportadora }) => ({
+          data?.map(({ pk_nombre_entidad, pk_is_transportadora, pk_numero_cuenta}) => ({
             pk_nombre_entidad,
-            pk_is_transportadora: pk_is_transportadora
-              ? "TRANSPORTADORA"
-              : "BANCO",
+            pk_is_transportadora: pk_is_transportadora ? "TRANSPORTADORA" : "BANCO",
+            pk_numero_cuenta,
+            // pk_numero_cuenta: pk_numero_cuenta ? pk_numero_cuenta.pk_numero_cuenta1 : null,
+            // pk_numero_cuenta: pk_numero_cuenta ? pk_numero_cuenta.pk_numero_cuenta2 : null,
+            // pk_numero_cuenta: pk_numero_cuenta ? pk_numero_cuenta.pk_numero_cuenta3 : null,
           })) ?? []
         }
         onChange={(ev) =>
@@ -168,6 +221,7 @@ const ParametrizacionRecaudo = () => {
         />
         <ButtonBar />
       </TableEnterprise>
+
       <Modal show={showModal || selectedEntity} handleClose={closeModal}>
         {!selectedEntity ? (
           <Form onSubmit={handleSubmit} grid>
@@ -204,10 +258,19 @@ const ParametrizacionRecaudo = () => {
                   maxLength={"20"}
                   required
                 />
+                {type === false ?(<>
+                  {listNumCuenta}
+                </>):null}
                 <ButtonBar>
                   <Button type="button" onClick={closeModal}>
                     Cancelar
                   </Button>
+                  {type === false ?( <Button type="button" onClick={() =>handleChangeCount(1)}>
+                    Añadir cuenta
+                  </Button>):null}
+                  {type === false ?(
+                     Count > 1 ?(<Button type="button" onClick={() =>handleChangeCount(-1)}>Eliminar Cuenta</Button>):null
+                  ):null}
                   <Button type="submit">
                     Crear {type ? "transportadora" : "banco"}
                   </Button>
