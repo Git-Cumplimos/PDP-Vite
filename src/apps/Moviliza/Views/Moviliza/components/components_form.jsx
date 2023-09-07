@@ -59,7 +59,8 @@ const { styleComponentsInput, formItem , ocultar} = classes;
     numeroMoviliza,
     onSubmitBarcode,
     bloqueoInput,
-    resetConsultaBarcode
+    resetConsultaBarcode,
+    token
   }) => {
     return (
       <Fragment>
@@ -130,8 +131,8 @@ const { styleComponentsInput, formItem , ocultar} = classes;
       )}
 
       <ButtonBar className="flex justify-center py-1">
-          <Button className={formItem} type={"submit"}  onClick={onSubmit} disabled={numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 300 ? !loadingPeticion : loadingPeticion }>
-          Realizar consulta
+          <Button className={formItem} type={"submit"}  onClick={onSubmit} disabled={token === "" || numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 300 ? !loadingPeticion : loadingPeticion }>
+           Realizar consulta
           </Button>
           <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
             Cancelar
@@ -153,6 +154,7 @@ export const LecturaMoviliza = ({
   option_barcode,
   option_manual,
   numeroMoviliza,
+  token
 }) => {
   return (
     <Fragment>
@@ -194,7 +196,7 @@ export const LecturaMoviliza = ({
       )}
 
       <ButtonBar className="flex justify-center py-6">
-        <Button type={"submit"}  onClick={onSubmit} disabled={numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 30 ? !loadingPeticion : loadingPeticion }>
+        <Button type={"submit"}  onClick={onSubmit} disabled={ token === "" || numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 30 ? !loadingPeticion : loadingPeticion }>
         Realizar consulta
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>

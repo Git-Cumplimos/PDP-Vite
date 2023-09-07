@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment, useRef } from "react";
+import { useState, useCallback, Fragment, useRef, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
@@ -33,6 +33,7 @@ const url_get_barcode = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/codigo_b
 const url_consult_moviliza = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/consultar`;
 const url_pagar_moviliza= `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/pagar_tramites`;
 const urlreintentos = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/reintento-moviliza`;
+const url_autenticar = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/autenticar`;
 const option_manual = "Manual";
 const option_barcode = "Código de barras";
 const options_select = [
@@ -64,7 +65,34 @@ const PagarMoviliza = () => {
   const [loadingPeticionConsultMoviliza, peticionConsultMoviliza] = useFetch(
     fetchCustom(url_consult_moviliza, "POST", "Consultar moviliza")
   );
+  const [loadingPeticionJwt, peticionJwt] = useFetch(
+    fetchCustom(url_autenticar, "POST", "Obtener token")
+  );
+  const [token, setToken] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(loadingPeticionJwt)
+    const data = {
+      id_comercio: roleInfo.id_comercio,
+      id_terminal: roleInfo.id_dispositivo,
+      id_usuario: roleInfo.id_usuario,
+      nombre_usuario: pdpUser["uname"]
+    };
+    peticionJwt({}, data)
+    .then((response) => {
+      console.log(loadingPeticionJwt)
+      console.log ("Datos de respuesta Moviliza>>>>>>> ", response)
+      if (response?.status === true) {
+        setToken(response?.obj?.object)
+        console.log ("Datos de respuesta Moviliza>>>>>>> ", response)
+      }
+    })
+    .catch((error) => {
+      CallErrorPeticion(error);
+    });
+  }, []);
+
 
   const CallErrorPeticion = useCallback((error) => {
     let msg = "Pago Moviliza no exitoso";
@@ -100,8 +128,13 @@ const PagarMoviliza = () => {
 
   const onChangeNumeroMoviliza = useCallback((e) => {
 
-      const num = parseInt(e.target.value) || "";
-      setNumeroMoviliza(num)
+      // let num = parseInt(e.target.value) || "";
+      let num =e.target.value;
+      let number = parseInt(num.replace(/[\s\.\-+eE]/g, ""));
+      if (!isNaN(number)) {
+        setNumeroMoviliza(number)
+      }
+      // setNumeroMoviliza(num)
 
   }, []);
 
@@ -180,6 +213,7 @@ const PagarMoviliza = () => {
       nombre_usuario: pdpUser["uname"],
       tipoRecaudo: 1,
       idLiquidacion: numeroMoviliza,
+      token: token
     };
 
     // const response= {obj: {result: "quemado"}}
@@ -187,17 +221,7 @@ const PagarMoviliza = () => {
     // setPaso("ResumenTrx");
     // setShowModal(true);
 
-    peticionConsultMoviliza({}, data)
-      .then((response) => {
-        if (response?.status === true) {
-          setResConsultMoviliza(response?.obj);
-          setPaso("ResumenTrx");
-          setShowModal(true);
-        }
-      })
-      .catch((error) => {
-        CallErrorPeticion(error);
-      });
+
 
 
       // const data3 = {
@@ -240,33 +264,55 @@ const PagarMoviliza = () => {
       //   },
       // };
 
-      // notifyPending(
-      //   makeSellRecaudo(data3),
-      //   {
-      //     render: () => {
-
-      //       return "Procesando transacción";
-      //     },
-      //   },
-      //   {
-      //     render: ({ data: res }) => {
-
-      //       // setPaymentStatus(res?.obj?.ticket ?? {});
-      //       return "Transacción satisfactoria";
-      //     },
-      //   },
-      //   {
-      //     render: ({ data: error }) => {
-
-      //       navigate("/corresponsalia/colpatria", { replace: true });
-      //       if (error?.cause === "custom") {
-      //         return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-      //       }
-      //       console.error(error?.message);
-      //       return "Transacción fallida";
-      //     },
-      //   }
-      // );
+      notifyPending(
+        (peticionConsultMoviliza({}, data)
+        // .then((response) => {
+        //   notify(response.status);
+        //   if (response?.status === true) {
+        //     setResConsultMoviliza(response?.obj);
+        //     setPaso("ResumenTrx");
+        //     setShowModal(true);
+        //     notify("Consulta realizada");
+        //   }
+        //   else{
+        //     notifyError("Consulta realizada: "+ toString(response.status));
+        //   }return response
+        // }
+        // )
+        // .catch((error) => {
+        //   CallErrorPeticion(error);
+        // })
+        ),
+        {
+          render: () => {
+            return "Realizando consulta";
+          },
+        },
+        {
+          render: ({ data: response}) => {
+            // setPaymentStatus(res?.obj?.ticket ?? {});
+          if (response?.status === true) {
+            setResConsultMoviliza(response?.obj);
+            setPaso("ResumenTrx");
+            setShowModal(true);
+            return "Consulta realizada";
+          }
+          else{
+            return "Error en consulta realizada";
+          }
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            navigate("/moviliza");
+            // if (error?.cause === "custom") {
+            //   return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+            // }
+            console.error(error?.message);
+            return "Consulta fallida";
+          },
+        }
+      );
   };
 
   const onSubmitPayMoviliza = useCallback(
@@ -285,16 +331,23 @@ const PagarMoviliza = () => {
         nombre_usuario: pdpUser["uname"],
         nombre_comercio: roleInfo?.["nombre comercio"],
         numero_moviliza: numeroMoviliza,
-        valor_total_trx: resConsultMoviliza.valor_total_trx,
-        ciudad: roleInfo.ciudad,
+        valor_total_trx: resConsultMoviliza.object?.valor,  //valor_total_trx,
+        cuota: resConsultMoviliza.object?.cuota,
+        ciudad: roleInfo.ciudad,          
         direccion: roleInfo.direccion,
         telefono: roleInfo?.telefono,
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
         idLiquidacion: numeroMoviliza,
-        medioPago: "Efectivo",
-        nroAutorizacion: 12345,
-        id_trx: resConsultMoviliza?.["id_trx"]
+        medioPago: "PSE",
+        // medioPago: {
+        //   descripcion: "Ventanilla de efectivo",
+        //   id: 1,
+        //   requiereAut: "null"
+        //   },
+        nroAutorizacion: resConsultMoviliza?.["id_trx"],
+        id_trx: resConsultMoviliza?.["id_trx"],
+        token: token
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
@@ -466,7 +519,8 @@ const PagarMoviliza = () => {
             procedimiento={procedimiento}
             option_barcode={option_barcode}
             option_manual={option_manual}
-            numeroMoviliza={numeroMoviliza}></LecturaMoviliza>
+            numeroMoviliza={numeroMoviliza}
+            token={token}></LecturaMoviliza>
         )}
         {/******************************Respuesta Lectura runt*******************************************************/}
 
@@ -494,6 +548,7 @@ const PagarMoviliza = () => {
             onSubmitBarcode={onSubmitBarcode}
             bloqueoInput={bloqueoInput}
             resetConsultaBarcode={resetConsultaBarcode}
+            token={token}
           ></LecturaBarcode>
         )}
 

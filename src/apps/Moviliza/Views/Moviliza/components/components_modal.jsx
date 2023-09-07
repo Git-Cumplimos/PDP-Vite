@@ -21,7 +21,7 @@ export const ComponentsModalSummaryTrx = ({
           // "Fecha de pago": summary.fecha_vencimiento,
           // "Total derechos RUNT": formatMoney.format(summary.valor_runt),
           // "Total derechos MT": formatMoney.format(summary.valor_mt),
-          "Total a pagar": formatMoney.format(summary.valor_total_trx),
+          "Total a pagar": formatMoney.format(summary.object?.valor),
         }}
       >
         {!loadingPeticion ? (
