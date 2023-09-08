@@ -51,32 +51,7 @@ const PagoDeProductosPropios = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [datosConsulta, setDatosConsulta] = useState({});
 
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago de Productos de Crédito",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Pago de Productos de Crédito"],
-      ["", ""],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
-    trxInfo: [],
-    disclamer:
-      "Línea de atención Bogotá:338 38 38\nResto del país:01 8000 123 838",
-  });
+  const [objTicketActual, setObjTicketActual] = useState(null);
 
   // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
   useEffect(() => {
@@ -139,31 +114,6 @@ const PagoDeProductosPropios = () => {
       tipoAbonoId: "0001",
       tipoAbonoNombre: "Valor mínimo",
       valorAbono: "",
-    });
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-          /*id_dispositivo*/
-          [
-            "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1,
-          ],
-          /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Bogota"],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Calle 13 # 233 - 2",
-          ],
-          ["Tipo de operación", "Pago de Productos de Crédito"],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
     });
     setPeticion(0);
   };
@@ -258,36 +208,6 @@ const PagoDeProductosPropios = () => {
     setPeticion(3);
   };
   const peticionPagoPropios = () => {
-    const hoy = new Date();
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    let numeroProducto =
-      datosTrans.tipoProducto === "01"
-        ? datosTrans.binTarjetaCredito
-        : datosTrans.numeroProducto.slice(datosTrans.numeroProducto.length - 4);
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    // objTicket["trxInfo"].push(["Tipo de producto", datosTrans.nombreProducto]);
-    objTicket["trxInfo"].push([
-      "Tipo de producto",
-      "Crédito o Tarjeta crédito",
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Número de producto",
-      `*******${numeroProducto}`,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
     let valorPagar = 0;
     if (tipoAbono.tipoAbonoId === "0001") {
       valorPagar = datosConsulta?.valPagoMinimo;
@@ -311,7 +231,6 @@ const PagoDeProductosPropios = () => {
       idTerminal: roleInfo?.id_dispositivo,
       issuerIdDane: roleInfo?.codigo_dane,
       nombreComercio: roleInfo?.["nombre comercio"],
-      ticket: objTicket,
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -325,37 +244,7 @@ const PagoDeProductosPropios = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          // hideModal();
-          objTicket["commerceInfo"][1] = [
-            "No. terminal",
-            res?.obj?.codigoTotal,
-          ];
-          objTicket["commerceInfo"].push([
-            "No. de aprobación Banco",
-            res?.obj?.respuestaDavivienda?.numTalon,
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["commerceInfo"].push([
-            "No. de aprobación Aliado",
-            res?.obj?.idTrx,
-          ]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Valor",
-            formatMoney.format(res?.obj?.respuestaDavivienda?.numValorPago),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(res?.obj?.respuestaDavivienda?.numValorCobro),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Total",
-            formatMoney.format(res?.obj?.respuestaDavivienda?.numValorPago),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setPeticion(4);
         } else {
           setIsUploading(false);

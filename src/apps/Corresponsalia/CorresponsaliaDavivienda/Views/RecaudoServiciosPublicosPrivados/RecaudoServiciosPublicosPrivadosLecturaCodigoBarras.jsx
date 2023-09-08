@@ -34,31 +34,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
   const dataConveniosPagar = ["3", "0"];
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago de Recaudo de Facturas",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Recaudo de facturas"],
-      ["", ""],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
-    trxInfo: [],
-    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-  });
+  const [objTicketActual, setObjTicketActual] = useState(null);
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
   });
@@ -184,28 +160,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     });
     setShowModal(false);
     setPeticion(0);
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : ""],
-          /*id_dispositivo*/
-          [
-            "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : "",
-          ],
-          /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : ""],
-          /*direccion*/
-          ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : ""],
-          ["Tipo de operación", "Recaudo de facturas"],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
@@ -320,41 +274,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           )}`
         );
       }
-      const hoy = new Date();
-      const fecha = Intl.DateTimeFormat("es-CO", {
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date());
-      /*hora actual */
-      const hora = Intl.DateTimeFormat("es-CO", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }).format(new Date());
-      const objTicket = { ...objTicketActual };
-      objTicket["timeInfo"]["Fecha de venta"] = fecha;
-      objTicket["timeInfo"]["Hora"] = hora;
-      objTicket["trxInfo"].push([
-        "Convenio",
-        datosEnvio?.datosConvenio?.nom_convenio_cnb,
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Código convenio",
-        datosEnvio?.datosConvenio?.cod_convenio_cnb,
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Referencia 1",
-        datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Referencia 2",
-        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
       setIsUploading(true);
       postRecaudoConveniosDavivienda({
         valTipoConsultaConvenio: "1",
@@ -378,7 +297,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         nomConvenio: datosEnvio?.datosConvenio?.nom_convenio_cnb,
-        ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
         valCodigoDeBarras: valorTransaccion,
@@ -402,60 +320,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
-            objTicket["commerceInfo"][1] = [
-              "No. terminal",
-              res?.obj?.codigoTotal,
-            ];
-            objTicket["commerceInfo"].push([
-              "No. de aprobación Banco",
-              res?.obj?.respuestaDavivienda?.valTalonOut,
-            ]);
-            objTicket["commerceInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Valor",
-              formatMoney.format(res?.obj?.valor),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Costo transacción",
-              formatMoney.format(0),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Total",
-              formatMoney.format(res?.obj?.valor),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            setObjTicketActual(objTicket);
+            setObjTicketActual(res?.obj?.ticket);
             setPeticion(4);
           } else {
             // notifyError(res?.msg ?? res?.message ?? "");
             if (res?.message === "Endpoint request timed out") {
-              const formatDate = Intl.DateTimeFormat("es-CO", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(hoy);
-              const formatDateTimeIni = Intl.DateTimeFormat("es-CO", {
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: false,
-              }).format(hoy);
-              const newDate = new Date(hoy.getTime() + 2 * 60000);
-              const formatDateTimeFin = Intl.DateTimeFormat("es-CO", {
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: false,
-              }).format(newDate);
               for (let i = 0; i < 5; i++) {
                 try {
                   const prom = await new Promise((resolve, reject) =>
                     setTimeout(() => {
                       postCheckReintentoRecaudoConveniosDavivienda({
-                        dateIni: `${formatDate} ${formatDateTimeIni}`,
-                        dateEnd: `${formatDate} ${formatDateTimeFin}`,
 
                         idComercio: roleInfo?.id_comercio,
                         idUsuario: roleInfo?.id_usuario,
@@ -478,32 +352,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                             if (res?.status) {
                               setIsUploading(false);
                               notify(res?.msg);
-                              objTicket["commerceInfo"][1] = [
-                                "No. terminal",
-                                res?.obj?.codigoTotal,
-                              ];
-                              objTicket["commerceInfo"].push([
-                                "No. de aprobación Banco",
-                                res?.obj?.respuestaDavivienda?.valTalonOut ??
-                                  res?.obj?.idTrx,
-                              ]);
-                              objTicket["commerceInfo"].push(["", ""]);
-                              objTicket["trxInfo"].push([
-                                "Valor",
-                                formatMoney.format(res?.obj?.valor),
-                              ]);
-                              objTicket["trxInfo"].push(["", ""]);
-                              objTicket["trxInfo"].push([
-                                "Costo transacción",
-                                formatMoney.format(0),
-                              ]);
-                              objTicket["trxInfo"].push(["", ""]);
-                              objTicket["trxInfo"].push([
-                                "Total",
-                                formatMoney.format(res?.obj?.valor),
-                              ]);
-                              objTicket["trxInfo"].push(["", ""]);
-                              setObjTicketActual(objTicket);
+                              setObjTicketActual(res?.obj?.ticket);
                               setShowModal((old) => ({
                                 ...old,
                                 estadoPeticion: 3,
@@ -514,7 +363,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                               resolve(true);
                             }
                           } else {
-                            // notifyError(res?.msg ?? res?.message ?? "");
                             setIsUploading(false);
                             hideModalReset();
                             resolve(false);
@@ -522,7 +370,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         })
                         .catch((err) => {
                           setIsUploading(false);
-                          // notifyError("No se ha podido conectar al servidor");
                           console.error(err);
                         });
                     }, 15000)
