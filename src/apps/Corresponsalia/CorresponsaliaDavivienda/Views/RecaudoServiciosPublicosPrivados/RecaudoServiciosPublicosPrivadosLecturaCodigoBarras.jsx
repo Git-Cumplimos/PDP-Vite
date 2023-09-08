@@ -324,7 +324,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       }
       if (peticion === 3){
         if (parseInt(datosTransaccion.valor) !== parseInt(datosTransaccion.valorSinModificar2)){
-          let error = "Error, el valor a pagar es diferente al valor de validación";
+          let error = "El valor a pagar es diferente al valor ingresado";
           return notifyError(error);
         }
       }

@@ -343,7 +343,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         parseInt(validacionPago.validacion)
       ) {
         return notifyError(
-          "Error, el valor a pagar es diferente al valor de validación"
+          "El valor a pagar es diferente al valor ingresado"
         );
       }
     }
