@@ -38,17 +38,16 @@ const { styleComponents, styleComponentsInput, formItem } = classes;
 type TypingPaso =
   | "LecturaBarcode"
   | "LecturaTripleA"
-  | "ResumenConsultaTrx"
   | "ResumenTrx"
   | "TrxExitosa";
 
 type TypeProcedimiento = "Manual" | "Código de barras";
 
 type TypingInputData = {
-  numeroCliente: string;
+  numeroCupon: string;
 };
 type TypingConsultData = null | {
-  numeroCupon: string;
+  numeroCupon: number;
   valorPagado: number;
   id_trx: number;
 };
@@ -59,11 +58,6 @@ const infServiceBackend: TypeInf = {
   barcode: {
     url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/get-codigo-barras`,
     name: "tripleA - Lectura código de barras",
-    method: "POST",
-  },
-  consult: {
-    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/consulta-facturas`,
-    name: "tripleA - consulta",
     method: "POST",
   },
   validation: {
@@ -85,14 +79,13 @@ const options_select = [
   { value: option_manual, label: option_manual },
 ];
 const inputDataInitial: TypingInputData = {
-  numeroCliente: "",
+  numeroCupon: "",
 };
 
 //---------------------------Componente-----------------------------------------------
 const RecaudoTripleA = () => {
   // const uniqueId = v4();
   const [paso, setPaso] = useState<TypingPaso>("LecturaBarcode");
-  const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [procedimiento, setProcedimiento] =
     useState<TypeProcedimiento>(option_barcode);
@@ -103,7 +96,7 @@ const RecaudoTripleA = () => {
   const buttonDelate = useRef<HTMLInputElement>(null);
   const validNavigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
-  const [loadingPeticion, PeticionBarcode, PeticionConsult, PeticionValidation,PeticionPay] =
+  const [loadingPeticion, PeticionBarcode, PeticionValidation,PeticionPay] =
     useFetchTripleARecaudo(infServiceBackend);
 
   useEffect(() => {
@@ -113,7 +106,6 @@ const RecaudoTripleA = () => {
 
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
-    setShowModal(false);
     setShowModal2(false);
     if (notify_error_ === true) {
       notifyError("Transacción cancelada", 5000, {
@@ -128,7 +120,6 @@ const RecaudoTripleA = () => {
 
   const HandleCloseTrxExitosa = useCallback(() => {
     setPaso("LecturaTripleA");
-    setShowModal(false);
     setShowModal2(false);
     setInfTicket(null);
     setInputData(inputDataInitial);
@@ -142,9 +133,7 @@ const RecaudoTripleA = () => {
       HandleCloseTrx(true);
     } else if (paso === "LecturaTripleA" && !loadingPeticion) {
       HandleCloseTrx(true);
-    } else if (paso === "ResumenConsultaTrx" && !loadingPeticion) {
-      HandleCloseTrx(true);
-    } else if (paso === "ResumenTrx" && !loadingPeticion) {
+    }  else if (paso === "ResumenTrx" && !loadingPeticion) {
       HandleCloseTrx(true);
     } else if (paso === "TrxExitosa") {
       HandleCloseTrxExitosa();
@@ -169,13 +158,12 @@ const RecaudoTripleA = () => {
       const data = {
         codigo_barras: info,
       };
-
       PeticionBarcode(data)
         .then((res: TypeServicesBackendTripleA) => {
           setPaso("LecturaTripleA");
           setInputData((old) => ({
             ...old,
-            numeroCliente: res?.obj?.result?.numeroCliente,
+            numeroCupon: res?.obj?.result?.numcupon,
           }));
         })
         .catch((error: any) => {
@@ -194,45 +182,6 @@ const RecaudoTripleA = () => {
     [PeticionBarcode]
   );
 
-  const onSubmitConsult = useCallback(
-    (e: MouseEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const data = {
-        comercio: {
-          id_comercio: roleInfo?.["id_comercio"] ?? "",
-          id_usuario: roleInfo?.["id_usuario"] ?? "",
-          id_terminal: roleInfo?.["id_dispositivo"] ?? "",
-          nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
-          nombre_usuario: pdpUser?.["uname"] ?? "",
-        },
-        numeroCliente: inputData.numeroCliente,
-      };
-      PeticionConsult(data)
-        .then((res: TypeServicesBackendTripleA) => {
-          setPaso("ResumenConsultaTrx");
-          setConsultaData({
-            numeroCupon: res?.obj?.result?.facturas[0]?.NumeroCupon,
-            valorPagado: parseInt(res?.obj?.result?.facturas[0]?.Valor),
-            id_trx: res?.obj?.result?.id_trx,
-          });
-          setShowModal(true);
-        })
-        .catch((error: any) => {
-          if (!(error instanceof ErrorCustomFetch)) {
-            const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServiceBackend.consult.name}) [0010002]`;
-            const errorSequence = `${name_componente} - realizar consulta directamente en el modulo`;
-            console.error({
-              "Error PDP": errorPdp,
-              "Error Sequence": errorSequence,
-              "Error Console": `${error.message}`,
-            });
-          }
-          HandleCloseTrx(false);
-        });
-    },
-    [PeticionConsult, HandleCloseTrx, inputData.numeroCliente, pdpUser, roleInfo]
-  );
-
   const onSubmitValidation = useCallback(
     (e: MouseEvent<HTMLInputElement>) => {
       e.preventDefault();
@@ -244,18 +193,16 @@ const RecaudoTripleA = () => {
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
         },
-        numeroCupon: consultData?.numeroCupon,
-        ...(consultData?.id_trx ? { id_trx: consultData.id_trx } : {}),
+        numeroCupon: inputData.numeroCupon,
       };
       PeticionValidation(data)
         .then((res: TypeServicesBackendTripleA) => {
           setPaso("ResumenTrx");
           setConsultaData({
             numeroCupon: res?.obj?.result?.cupon,
-            valorPagado: parseInt(res?.obj?.result?.valorcupon),
+            valorPagado: res?.obj?.result?.valorcupon,
             id_trx: res?.obj?.result?.id_trx,
           });
-          setShowModal(false);
           setShowModal2(true);
         })
         .catch((error: any) => {
@@ -271,7 +218,7 @@ const RecaudoTripleA = () => {
           HandleCloseTrx(false);
         });
     },
-    [PeticionValidation,HandleCloseTrx,pdpUser,roleInfo,consultData?.numeroCupon,consultData?.id_trx]
+    [PeticionValidation,HandleCloseTrx,inputData.numeroCupon,pdpUser,roleInfo]
   );
 
   const onSubmitPay = useCallback(
@@ -357,7 +304,7 @@ const RecaudoTripleA = () => {
         {/******************************Lectura Triple A*******************************************************/}
         {paso === "LecturaTripleA" && (
           <Fragment>
-            <h1>Número de póliza o documento</h1>
+            <h1>Número de cupón</h1>
 
             <Input
               label=""
@@ -366,13 +313,14 @@ const RecaudoTripleA = () => {
               type="text"
               autoComplete="off"
               maxLength={30}
-              value={inputData.numeroCliente}
+              value={inputData.numeroCupon}
               disabled={procedimiento === option_barcode ? true : false}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setInputData((old) => ({
                   ...old,
-                  numeroCliente: ((e.target.value ?? "").match(/\d/g) ?? []).join(
+                  numeroCupon: ((e.target.value ?? "").match(/\d/g) ?? []).join(
                     ""
+
                   ),
                 }))
               }
@@ -381,10 +329,10 @@ const RecaudoTripleA = () => {
             <ButtonBar className="flex justify-center py-6">
               <Button
                 type={"submit"}
-                onClick={onSubmitConsult}
+                onClick={onSubmitValidation}
                 disabled={loadingPeticion}
               >
-                Consultar Facturas
+                Consultar cupón
               </Button>
               <Button
                 onClick={() => HandleCloseTrx(true)}
@@ -398,28 +346,6 @@ const RecaudoTripleA = () => {
 
         {/******************************Respuesta Lectura Triple A*******************************************************/}
       </Form>
-
-      <Modal show={showModal} handleClose={HandleCloseModal}>
-        {/******************************Resumen de trx*******************************************************/}
-        {paso === "ResumenConsultaTrx" && consultData !== null && (
-          <PaymentSummary
-            title="Respuesta de consulta facturas Triple A"
-            subtitle="Resumen de transacción"
-            summaryTrx={{
-              "Número de documento o póliza": inputData.numeroCliente,
-              "Valor a pagar": formatMoney.format(consultData.valorPagado),
-            }}
-          >
-            <ButtonBar>
-              <Button type="submit" onClick={onSubmitValidation}>
-                Consultar cupón
-              </Button>
-              <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
-            </ButtonBar>
-          </PaymentSummary>
-        )}
-        {/*************** Consulta Exitosa **********************/}
-      </Modal>
       <Modal show={showModal2} handleClose={HandleCloseModal}>
         {/******************************Resumen de trx validacion*******************************************************/}
         {paso === "ResumenTrx" && consultData !== null && (
@@ -427,7 +353,7 @@ const RecaudoTripleA = () => {
             title="Respuesta de consulta cupón Triple A"
             subtitle="Resumen de transacción"
             summaryTrx={{
-              "Número de documento o póliza": inputData.numeroCliente,
+              "Número de cupón": inputData.numeroCupon,
               "Valor a pagar": formatMoney.format(consultData.valorPagado),
             }}
           >

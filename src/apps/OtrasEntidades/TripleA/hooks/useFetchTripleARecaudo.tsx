@@ -18,7 +18,6 @@ type TypeSubInf = {
 
 export type TypeInf = {
   barcode: TypeSubInf;
-  consult: TypeSubInf;
   validation: TypeSubInf;
   pay: TypeSubInf;
 };
@@ -63,44 +62,6 @@ export const useFetchTripleARecaudo = (infServices: TypeInf) => {
       return peticion;
     },
     [infServices.barcode]
-  );
-
-  const PeticionConsult = useCallback(
-    async (body: { [key: string]: any }): Promise<any> => {
-      setLoadingPeticion(true);
-      let peticion;
-      //SECUENCIA - realizar fetch custom
-      try {
-        peticion = await fetchCustom(
-          infServices.consult.url,
-          infServices.consult.method,
-          infServices.consult.name,
-          {},
-          body
-        );
-      } catch (error: any) {
-        setLoadingPeticion(false);
-        if (!(error instanceof ErrorCustomFetch)) {
-          const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServices.consult.name}) [0010002]`;
-          const errorSequence = `${name_hook} - realizar fetch custom`;
-          console.error({
-            "Error PDP": errorPdp,
-            "Error Sequence": errorSequence,
-            "Error Console": `${error.message}`,
-          });
-          throw new ErrorCustomUseHookCode(
-            errorPdp,
-            `${error.message}`,
-            errorSequence
-          );
-        } else {
-          throw error;
-        }
-      }
-      setLoadingPeticion(false);
-      return peticion;
-    },
-    [infServices.consult]
   );
 
   const PeticionValidation = useCallback(
@@ -184,7 +145,6 @@ export const useFetchTripleARecaudo = (infServices: TypeInf) => {
   return [
     loadingPeticion,
     PeticionBarcode,
-    PeticionConsult,
     PeticionValidation,
     PeticionPay,
   ] as const;
