@@ -37,39 +37,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     valorConst: "",
     valorVar: "",
   });
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "RECIBO DE PAGO",
-    timeInfo: {
-      "Fecha de pago": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*Id trx*/
-      ["Id Trx", ""],
-      /*Id Aut*/
-      ["Id Aut", ""],
-      /*comercio*/
-      [
-        "Comercio",
-        roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "Sin datos",
-      ],
-      ["", ""],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["", ""],
-    ],
-    commerceName: "Recaudo de facturas",
-    trxInfo: [],
-    disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
-  });
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
@@ -154,32 +122,6 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   const onSubmitValidacion = (e) => {
     e.preventDefault();
     let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
-    objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
-    // objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     postRecaudoConveniosAval({
       oficina_propia:
@@ -190,13 +132,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
       nombre_usuario: pdpUser?.uname ?? "",
-      ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
       },
       recaudoAval: {
+        nombreConvenio: convenio.convenio,
         numeroConvenio: convenio.nura,
         valReferencia1: datosTrans.ref1,
         pila: datosConsulta?.["pila"] ?? "",
@@ -215,12 +157,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
-          objTicket["commerceInfo"][3] = [
-            "Id Aut",
-            res?.obj?.codigo_autorizacion,
-          ];
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
         } else {
           setIsUploading(false);
@@ -244,40 +181,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       valorConst: "",
       valorVar: "",
     });
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-          /*id_dispositivo*/
-          [
-            "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
-          /*Id trx*/
-          ["Id Trx", ""],
-          /*Id Aut*/
-          ["Id Aut", ""],
-          /*comercio*/
-          [
-            "Comercio",
-            roleInfo?.["nombre comercio"]
-              ? roleInfo?.["nombre comercio"]
-              : "Sin datos",
-          ],
-          ["", ""],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
-          ],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
+    setObjTicketActual({});
     setDatosConsulta({});
   }, [roleInfo]);
   return (
