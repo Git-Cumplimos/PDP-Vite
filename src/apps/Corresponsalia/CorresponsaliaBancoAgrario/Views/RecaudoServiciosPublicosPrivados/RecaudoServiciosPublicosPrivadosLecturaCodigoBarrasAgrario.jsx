@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
@@ -10,7 +10,6 @@ import MoneyInputDec from "../../../../../components/Base/MoneyInputDec";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import TextArea from "../../../../../components/Base/TextArea";
 import { useAuth } from "../../../../../hooks/AuthHooks";
-import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notify, notifyError } from "../../../../../utils/notify";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
@@ -25,41 +24,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
-    timeInfo: {
-      "Fecha de pago": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*comercio*/
-      [
-        "Id comercio",
-        roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
-      ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      // id trx
-      ["Id Trx", ""],
-      /*id autorizacion*/
-      ["Id Aut", ""],
-      /*comercio*/
-      [
-        "Comercio",
-        roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "Sin datos",
-      ],
-      ["", ""],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["", ""],
-    ],
-    commerceName: "Recaudo de facturas",
-    trxInfo: [],
-    disclamer:
-      "POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO",
-  });
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
   });
@@ -177,48 +142,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     });
     setShowModal(false);
     setPeticion(0);
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*comercio*/
-          [
-            "Id comercio",
-            roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
-          ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
-          // id trx
-          ["Id Trx", ""],
-          /*id autorizacion*/
-          ["Id Aut", ""],
-          /*comercio*/
-          [
-            "Comercio",
-            roleInfo?.["nombre comercio"]
-              ? roleInfo?.["nombre comercio"]
-              : "Sin datos",
-          ],
-          ["", ""],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
-          ],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
+    setObjTicketActual({});
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-    for (let i = 0; i < datosEnvio.datosCodigoBarras.codigosReferencia.length; i++) {
-      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0 ){
-        return notifyError("La referencia no puede ser 0")
+    for (
+      let i = 0;
+      i < datosEnvio.datosCodigoBarras.codigosReferencia.length;
+      i++
+    ) {
+      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0) {
+        return notifyError("La referencia no puede ser 0");
       }
     }
     setPeticion(1);
@@ -228,53 +162,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     e.preventDefault();
     setIsUploading(true);
     const valorTransaccion = parseInt(datosTransaccion.valorSinModificar) ?? 0;
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hourCycle: "h23",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
     let objRecaudo = {
       nombreConvenio: datosEnvio?.datosConvenio?.nombre_convenio,
       codigoConvenio: datosEnvio?.datosConvenio?.codigo,
       referencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0],
     };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Código convenio",
-      datosEnvio?.datosConvenio?.codigo,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Nombre del convenio",
-      datosEnvio?.datosConvenio?.nombre_convenio,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Referencia 1",
-      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
     if (
       datosEnvio?.datosConvenio?.nombre_ref2 &&
       datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
       !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push(["Referencia 2", datosTransaccion?.ref2 ?? ""]);
-      objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia2"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "";
     }
@@ -283,8 +180,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
       !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push(["Referencia 3", datosTransaccion?.ref3 ?? ""]);
-      objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] =
         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";
     }
@@ -298,7 +193,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
       nombre_usuario: pdpUser?.uname ?? "",
-      ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -317,17 +211,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
-          objTicket["commerceInfo"][3] = [
-            "Id Aut",
-            res?.obj?.codigo_autorizacion,
-          ];
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(res?.obj?.costoTrx, 0),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setPeticion(2);
         } else {
           setIsUploading(false);
@@ -342,10 +226,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         hideModalReset();
       });
   };
-  const onChangeMoney = useMoney({
-    limits: [0, 20000000],
-    decimalDigits: 2,
-  });
   const printDiv = useRef();
   const isAlt = useRef("");
   const isAltCR = useRef({ data: "", state: false });
