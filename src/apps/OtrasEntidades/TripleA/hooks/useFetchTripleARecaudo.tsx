@@ -30,7 +30,7 @@ export const useFetchTripleARecaudo = (infServices: TypeInf) => {
     async (body: { [key: string]: any }): Promise<any> => {
       setLoadingPeticion(true);
       let peticion;
-      //SECUENCIA - realizar fetch custom
+      //SECUENCIA - realizar fetch
       try {
         peticion = await fetchCustom(
           infServices.barcode.url,
