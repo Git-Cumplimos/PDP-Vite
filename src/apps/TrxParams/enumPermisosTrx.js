@@ -9,6 +9,8 @@ export const enumPermisosTrx = Object.freeze({
   contratos_comisiones: 20,  
   tipo_nivel_comercio: 21,
   comercios: 21,
+  gestion_permisos_comercios_broker: 17001,
+  gestion_permisos_broker: 17000,
   mensajes_publicitarios: 21,
   grupos_comercios:21,
   grupos_convenios:21
