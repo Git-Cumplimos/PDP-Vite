@@ -7,7 +7,7 @@ import Modal from "../../../../components/Base/Modal";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import Tickets from "../../components/TicketsCrezcamos";
+import Tickets from "../../../../components/Base/Tickets/Tickets"
 import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -22,70 +22,27 @@ const URL_PAGO_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CREZCAMOS}
 const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_CORRESPONSALIA_CREZCAMOS}/crezcamos/check_estado_pagocredito_crezcamos`;
 
 const PagoCredito = () => {
-  
-  const aqui = [
-    {
-      "account": 44156151,
-      "debtorType": "Titular",
-      "firstNames": "Paola",
-      "firstSurname": "Garcia",
-      "secondLastName": "Guerrero",
-      "amount": 21553,
-      "totalAmount": 15965500
-    },
-    {
-      "account": 4155345,
-      "debtorType": "Titular",
-      "firstNames": "Paola",
-      "firstSurname": "Garcia",
-      "secondLastName": "Guerrero",
-      "amount": 64646,
-      "totalAmount": 54643
-    },
-    {
-      "account": 4534536,
-      "debtorType": "Titular",
-      "firstNames": "Paola",
-      "firstSurname": "Garcia",
-      "secondLastName": "Guerrero",
-      "amount": 64365543,
-      "totalAmount": 643634
-    }
-  ];
-  const formattedData = aqui.map(row => ({
-    NumeroCredito: row.account,
-    RolTitular: row.debtorType,
-    Nombre: row.firstNames,
-    PrimerApellido: row.firstSurname,
-    SegundoApellido: row.secondLastName,
-    ValorMinimo: row?.amount, // Formatear el valor como número con 2 decimales
-    ValorTotal: row?.totalAmount
-  }));
-  
-  const [datosCredito, setDatosCredito] = useState(formattedData);
-
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosCrezcamos.maxPagoCreditos,
     min: enumParametrosCrezcamos.minPagoCreditos,
   });
-  // const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [datosCredito, setDatosCredito] = useState([]);
 
   const [datosTrx, setDatosTrx] = useState({
     tipoDocumento: 2,
     documento: "",
-    tipoPago: "02",
-    credito: formattedData[0].NumeroCredito,
+    tipoPago: 2,
+    credito: "",
     nombreCliente:"",
   });
   
   const [valor, setValor] = useState("");
-  // const [datosCredito, setDatosCredito] = useState("");
   const [uuid, setUuid] = useState(v4());
 
   const optionsDocumento = [
@@ -108,10 +65,11 @@ const PagoCredito = () => {
     setDatosTrx({
       tipoDocumento: 2,
       documento: "",
-      tipoPago: "02",
-      credito: formattedData[0].NumeroCredito,
+      tipoPago: 2,
+      credito: "",
       nombreCliente:"",
     });
+    setDatosCredito([]);
     setValor("");
     setUuid(v4());
   }, []);
@@ -151,21 +109,21 @@ const PagoCredito = () => {
           render: ({data: res }) =>{
             setIsUploading(false);
             setDatosConsulta(res?.obj);
-            const formattedData = res?.obj.map(row => ({
+            const formattedData = res?.obj?.products?.map(row => ({
               NumeroCredito: row.account,
               RolTitular: row.debtorType,
               Nombre: row.firstNames,
               PrimerApellido: row.firstSurname,
               SegundoApellido: row.secondLastName,
-              ValorMinimo: formatMoney.format(row?.amount), // Formatear el valor como número con 2 decimales
-              ValorTotal: formatMoney.format(row?.totalAmount)
+              ValorMinimo: row?.amount, // Formatear el valor como número con 2 decimales
+              ValorTotal: row?.totalAmount
             }));
             setDatosCredito(formattedData);
-            const nombre = res?.obj[0]?.firstNames + res?.obj[0]?.firstSurname + res?.obj[0]?.secondLastName
+            const nombre = res?.obj?.products[0]?.firstNames + " " + res?.obj?.products[0]?.firstSurname + " " + res?.obj?.products[0]?.secondLastName
             setDatosTrx((old) => ({
               ...old,
               nombreCliente: nombre,
-              credito: formattedData[0].NumeroCredito,
+              credito: formattedData[0]?.NumeroCredito,
             }));
             setShowModal(true);
             return "Consulta satisfactoria";
@@ -177,8 +135,8 @@ const PagoCredito = () => {
             setDatosTrx({
               tipoDocumento: 2,
               documento: "",
-              tipoPago: "02",
-              credito: formattedData[0].NumeroCredito,
+              tipoPago: 2,
+              credito: "",
               nombreCliente:"",
             });
             setValor("");
@@ -187,7 +145,7 @@ const PagoCredito = () => {
         }
       );
     },
-    [datosTrx?.documento, datosTrx?.tipoDocumento, formattedData,roleInfo, peticionConsultaCosto]
+    [datosTrx?.documento, datosTrx?.tipoDocumento,roleInfo, peticionConsultaCosto]
   );
   
   const goToRecaudo = useCallback(() => {
@@ -200,11 +158,18 @@ const PagoCredito = () => {
     "Realizar Pago créditos Crezcamos"
   );
 
-  const onMakePayment = useCallback(() => {
+  const onMakePayment = useCallback((e) => {
+    e.preventDefault();
+    console.log("Esto es tipo de pago", datosTrx?.tipoPago)
+    let valor = 0;
     if (datosTrx?.tipoPago === 2){
-      setValor(formattedData.find(item => item.NumeroCredito === parseInt(datosTrx?.credito))?.ValorMinimo)
+      valor = (datosCredito?.find(item => {
+        return item.NumeroCredito === datosTrx?.credito;
+      })?.ValorMinimo)
     } else{
-      setValor(formattedData.find(item => item.NumeroCredito === parseInt(datosTrx?.credito))?.ValorTotal)
+      valor = (datosCredito?.find(item => {
+        return item.NumeroCredito === datosTrx?.credito;
+      })?.ValorTotal)
     }
     if (valor > limitesMontos.max){
       return notifyError(
@@ -229,18 +194,19 @@ const PagoCredito = () => {
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
+      address: roleInfo?.direccion,
       Datos: {
         tipo_documento: datosTrx?.tipoDocumento,
         num_documento: datosTrx?.documento,
         tipo_pago: "PCU" ? datosTrx?.tipoPago === 2 : "PTO",
         num_credito: datosTrx?.credito,
-        nombre: datosConsulta?.firstNames,
-        first_apellido: datosConsulta?.firstSurname,
-        second_apellido: datosConsulta?.secondLastName,
+        nombre: datosConsulta?.products[0]?.firstNames,
+        first_apellido: datosConsulta?.products[0]?.firstSurname,
+        second_apellido: datosConsulta?.products[0]?.secondLastName,
       },
     };
     notifyPending(
-      peticionPago({}, data),
+      peticionPago(data),
       {
         render: () => {
           return "Procesando transacción";
@@ -266,7 +232,6 @@ const PagoCredito = () => {
       }
     );
   }, [
-    valor,
     peticionPago,
     roleInfo,
     datosConsulta,
@@ -274,7 +239,7 @@ const PagoCredito = () => {
     datosTrx?.documento,
     datosTrx?.tipoPago,
     datosTrx?.tipoDocumento,
-    formattedData,
+    datosCredito,
     uuid,
     navigate,
     limitesMontos.max,
@@ -357,7 +322,7 @@ const PagoCredito = () => {
               <Select
                   id='numPrestamo'
                   label='Número préstamo'
-                  options={formattedData.map(item => ({
+                  options={datosCredito?.map(item => ({
                     label: item.NumeroCredito.toString(),
                     value: item.NumeroCredito
                   }))}
@@ -372,8 +337,8 @@ const PagoCredito = () => {
                   }}
                   required
                 />
-                <h2>{`Pago mínimo: ${formatMoney.format(formattedData.find(item => item.NumeroCredito === parseInt(datosTrx?.credito))?.ValorMinimo)}`}</h2>
-                <h2>{`Pago Total: ${formatMoney.format(formattedData.find(item => item.NumeroCredito === parseInt(datosTrx?.credito))?.ValorTotal)}`}</h2>
+                <h2>{`Pago mínimo: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorMinimo)}`}</h2>
+                <h2>{`Pago Total: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorTotal)}`}</h2>
                 <Select
                   id='valorPago'
                   label='Indique el tipo de pago'
