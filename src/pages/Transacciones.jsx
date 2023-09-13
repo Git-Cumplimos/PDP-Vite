@@ -7,7 +7,7 @@ import Input from "../components/Base/Input";
 import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
-import MoneyInput, { formatMoney } from "../components/Base/MoneyInput";
+import { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import TicketsPines from "../apps/PinesVus/components/TicketsPines";
