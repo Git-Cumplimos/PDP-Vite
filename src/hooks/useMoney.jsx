@@ -25,11 +25,12 @@ const useMoney = ({
 
       let caret_pos = ev.target.selectionStart ?? 0;
 
-      const len = filterExtraDigit(ev.target.value, decimalDigits).length;
+      const filteredValue = filterExtraDigit(ev.target.value, decimalDigits);
+      const len = filteredValue.length;
 
       const moneyValue =
         Math.round(
-          moneyValidator(ev.target.value) * Math.pow(10, decimalDigits)
+          moneyValidator(filteredValue) * Math.pow(10, decimalDigits)
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = limits;
@@ -62,7 +63,7 @@ const useMoney = ({
       }
 
       const toAdd =
-        [",", "."].includes(ev.target.value.at(-1) ?? "") && decimalDigits
+        [",", "."].includes(filteredValue.at(-1) ?? "") && decimalDigits
           ? ","
           : "";
       ev.target.value =

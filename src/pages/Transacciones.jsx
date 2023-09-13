@@ -7,7 +7,7 @@ import Input from "../components/Base/Input";
 import { useAuth } from "../hooks/AuthHooks";
 import Tickets from "../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
-import { formatMoney } from "../components/Base/MoneyInput";
+import MoneyInput, { formatMoney } from "../components/Base/MoneyInput";
 import PaymentSummary from "../components/Compound/PaymentSummary";
 import TicketsDavivienda from "../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import TicketsPines from "../apps/PinesVus/components/TicketsPines";
@@ -334,6 +334,7 @@ const Transacciones = () => {
             />
           </Fragment>
         )}
+        <MoneyInput label="Aver" decimalDigits={2} onChange={(_, val) => {console.log(val);}} />
       </DataTable>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
