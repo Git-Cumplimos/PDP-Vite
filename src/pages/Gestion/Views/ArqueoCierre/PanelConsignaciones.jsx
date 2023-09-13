@@ -100,7 +100,6 @@ const PanelConsignaciones = () => {
   const handleSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
       notifyPending(
         editarComprobante(
           { pk_id_comprobante: "" },

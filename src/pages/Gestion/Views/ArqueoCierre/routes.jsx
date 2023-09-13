@@ -13,6 +13,8 @@ const CierreCaja = lazy(() => import("./CierreCaja/CierreCaja"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
 const Notas = lazy(() => import("./Notas/Notas"));
+const ReporteSobranteFaltantes = lazy(() => import("./ReporteArqueoCaja/ReporteSobranteFaltantes"));
+
 
 /**
  * COMPONENTES ROL ANALISTA
@@ -21,8 +23,8 @@ const PanelHistorico = lazy(() => import("./PanelHistorico"));
 const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
-
 const ReportesCierre = lazy(() => import("./ReportesCierre"));
+const ValidacionSobranteFaltantes = lazy(() => import("./ValidacionSobranteFaltantes"));
 
 export const rutasArqueo = [
   {
@@ -113,6 +115,19 @@ export const rutasArqueo = [
     component: ReportesCierre,
     permission: [PermissionsCaja.VerHistoricoCierresCaja],
   },
+  {
+    link: "/gestion/arqueo/validacion-sobrantes-faltantes",
+    label: <AppIcons Logo={"RECAUDO"} name="Validacion sobrantes y faltantes" />,
+    component: ValidacionSobranteFaltantes,
+    permission: [PermissionsCaja.ReporteSobrantesFaltantes],
+  },
+  {
+    link: "/gestion/arqueo/reporte-sobrantes-faltantes",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte de sobrantes/faltantes" />,
+    component: ReporteSobranteFaltantes,
+    permission: [PermissionsCaja.ReporteSobrantesFaltantes],
+  },
+
 ];
 
 const listPermissions = Object.values(PermissionsCaja);

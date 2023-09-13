@@ -51,8 +51,7 @@ const ParametrizacionRecaudo = () => {
             if(element.pk_numero_cuenta.pk_numero_cuenta3 != undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3+"\n")
             element.pk_numero_cuenta=NumCuentas
-          }
-        }
+        }}
         setData(res?.obj?.results);
       })
       .catch((error) => {
@@ -196,9 +195,6 @@ const ParametrizacionRecaudo = () => {
             pk_nombre_entidad,
             pk_is_transportadora: pk_is_transportadora ? "TRANSPORTADORA" : "BANCO",
             pk_numero_cuenta,
-            // pk_numero_cuenta: pk_numero_cuenta ? pk_numero_cuenta.pk_numero_cuenta1 : null,
-            // pk_numero_cuenta: pk_numero_cuenta ? pk_numero_cuenta.pk_numero_cuenta2 : null,
-            // pk_numero_cuenta: pk_numero_cuenta ? pk_numero_cuenta.pk_numero_cuenta3 : null,
           })) ?? []
         }
         onChange={(ev) =>
