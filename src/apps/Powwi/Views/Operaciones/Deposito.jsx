@@ -284,7 +284,7 @@ const Deposito = () => {
                 value={datosTrx.numeroTelefono}
                 onInput={(e) => {
                   let valor = e.target.value;
-                  let num = valor.replace(/[\s\.]/g, "");
+                  let num = valor.replace(/[\s\.\-+eE]/g, "");
                   if (!isNaN(num)) {
                     if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                         return notifyError("El número debe comenzar por 3");
@@ -319,7 +319,7 @@ const Deposito = () => {
                 maxLength={"15"}
                 value={datosTrx.userDoc}
                 onInput={(e) => {
-                    const num = e.target.value.replace(/[\s\.]/g, "");
+                    const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                     if (!isNaN(num)) {
                       setDatosTrx(prevState => ({
                         ...prevState,
@@ -341,7 +341,7 @@ const Deposito = () => {
                 value={datosTrx.numeroTelefonoDepositante}
                 onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                     if (datosTrx.numeroTelefonoDepositante.length === 0 && num !== "3") {
                     return notifyError("El número debe comenzar por 3");
@@ -363,7 +363,7 @@ const Deposito = () => {
                 maxLength={"15"}
                 value={datosTrx.userDocDepositante}
                 onInput={(e) => {
-                const num = e.target.value.replace(/[\s\.]/g, "");
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrx(prevState => ({
                     ...prevState,
@@ -383,8 +383,15 @@ const Deposito = () => {
                 maxLength={"11"}
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
+                equalError={false}
+                equalErrorMin={false}
                 value={valor}
-                onInput={(ev) => setValor(onChangeMoney(ev))}
+                onInput={(e, valor) => {
+                  if (!isNaN(valor)){
+                    const num = valor;
+                    setValor(num)
+                  }
+                }}
                 required
             />
             <ButtonBar className={"lg:col-span-2"}>

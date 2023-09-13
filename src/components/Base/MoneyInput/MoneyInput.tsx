@@ -17,6 +17,13 @@ import Input, { CustomInputProps } from "../Input";
 
 export const formatMoney = makeMoneyFormatter(2);
 
+const handleBlockNegativeSign = (ev) => {
+  if (ev.keyCode === 189) {
+    ev.preventDefault();
+    return;
+  }
+};
+
 export interface CustomProps {
   decimalDigits?: number;
   equalError?: boolean;
@@ -59,6 +66,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       decimalDigits,
       equalError,
       equalErrorMin,
+      negativeValues,
     });
 
     const localFormatMoney = useMemo(
@@ -85,29 +93,37 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
     const dynamicProps = useMemo(() => {
       const _props = new Map([["type", "tel"]]);
       if (input?.value !== undefined) {
-        const moneyValue = moneyValidator(`${input?.value ?? ""}`);
+        const moneyValue = moneyValidator(
+          `${input?.value ?? ""}`,
+          negativeValues
+        );
         _props.set(
           "value",
           !moneyValue ? "$ " : localFormatMoney.format(moneyValue)
         );
       }
       if (input?.defaultValue !== undefined) {
-        const moneyValue = moneyValidator(`${input?.value ?? ""}`);
+        const moneyValue = moneyValidator(
+          `${input?.value ?? ""}`,
+          negativeValues
+        );
         _props.set(
           "value",
           !moneyValue ? "$ " : localFormatMoney.format(moneyValue)
         );
       }
       return Object.fromEntries(_props);
-    }, [input?.value, input?.defaultValue, localFormatMoney]);
+    }, [input?.value, input?.defaultValue, localFormatMoney, negativeValues]);
 
     useEffect(() => {
       if (inptRef.current) {
         const moneyFormatter = makeMoneyFormatter(decimalDigits);
         const moneyValue =
           Math.round(
-            moneyValidator(dynamicProps?.value ?? inptRef.current.value) *
-              Math.pow(10, decimalDigits)
+            moneyValidator(
+              dynamicProps?.value ?? inptRef.current.value,
+              negativeValues
+            ) * Math.pow(10, decimalDigits)
           ) / Math.pow(10, decimalDigits);
 
         const [min, max] = inputLimits;
@@ -144,6 +160,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       equalError,
       inputLimits,
       equalErrorMin,
+      negativeValues,
       dynamicProps?.value,
     ]);
 
@@ -163,7 +180,9 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
         }}
         onInput={onInput}
         onChange={onChange}
-        onKeyDown={negativeValues ? onHandleNegativeNumbers : () => {}}
+        onKeyDown={
+          negativeValues ? onHandleNegativeNumbers : handleBlockNegativeSign
+        }
       />
     );
   }

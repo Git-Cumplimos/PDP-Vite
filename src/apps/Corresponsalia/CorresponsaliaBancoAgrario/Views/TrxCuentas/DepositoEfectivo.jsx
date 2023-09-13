@@ -35,7 +35,7 @@ const Deposito = () => {
     max: enumParametrosBancoAgrario.maxDepositoCuentas,
     min: enumParametrosBancoAgrario.minDepositoCuentas,
   });
-  
+
   const onChangeMoney = useMoney({
     limits: [limitesMontos.min, limitesMontos.max],
     equalError: false,
@@ -56,31 +56,7 @@ const Deposito = () => {
   const [numCuenta, setNumCuenta] = useState("");
   const [valor, setValor] = useState("");
   const [summary, setSummary] = useState([]);
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
-    timeInfo: {
-      "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date()),
-      Hora: Intl.DateTimeFormat("es-CO", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }).format(new Date()),
-    },
-    commerceInfo: [
-      ["Id comercio", roleInfo.id_comercio],
-      ["Comercio", roleInfo?.["nombre comercio"]],
-      ["No. Terminal", roleInfo?.id_dispositivo],
-      ["Dirección", roleInfo?.direccion],
-      ["Teléfono", roleInfo?.telefono],
-    ],
-    commerceName: "Depósito",
-    trxInfo: [],
-    disclamer: `POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO  `,
-  });
+  const [objTicketActual, setObjTicketActual] = useState({});
 
   const options = [
     { value: "01", label: "Ahorros" },
@@ -169,36 +145,6 @@ const Deposito = () => {
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hourCycle: "h23",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push([
-      "Tipo de cuenta",
-      tipoCuenta === "01" ? "Ahorros" : "Corriente",
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Número Cuenta",
-      `****${String(numCuenta)?.slice(-4) ?? ""}`,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(valor ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
     const body = {
       comercio: {
         id_comercio: roleInfo?.id_comercio,
@@ -208,7 +154,7 @@ const Deposito = () => {
 
       oficina_propia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO"
+        roleInfo?.tipo_comercio === "KIOSCO"
           ? true
           : false,
       nombre_comercio: roleInfo?.["nombre comercio"],
@@ -226,7 +172,6 @@ const Deposito = () => {
           direccion: roleInfo?.direccion,
         },
       },
-      ticket: objTicket,
     };
 
     fetchDepositoCorresponsalBancoAgrario(body)
@@ -238,27 +183,8 @@ const Deposito = () => {
           return;
         } else {
           notify("Transacción satisfactoria");
-          const comercio = objTicket["commerceInfo"];
-          delete objTicket["commerceInfo"];
-          objTicket["commerceInfo"] = [];
-          objTicket["commerceInfo"].push(comercio[0]);
-          objTicket["commerceInfo"].push(comercio[2]);
-          objTicket["commerceInfo"].push(["Id Trx", res?.obj?.id_trx]);
-          objTicket["commerceInfo"].push([
-            "Id Aut",
-            res?.obj?.codigo_autorizacion,
-          ]);
-          objTicket["commerceInfo"].push(comercio[1]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["commerceInfo"].push(comercio[3]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(res?.obj?.costoTrx, 0),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          setObjTicketActual(objTicket);
-          setPaymentStatus(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
+          setPaymentStatus(res?.obj?.ticket);
         }
       })
       .catch((err) => {
@@ -266,13 +192,7 @@ const Deposito = () => {
         console.error(err);
         notifyError("No se ha podido conectar al servidor");
       });
-  }, [
-    numCuenta,
-    valor,
-    tipoCuenta,
-    fetchDepositoCorresponsalBancoAgrario,
-    roleInfo,
-  ]);
+  }, [numCuenta, valor, tipoCuenta, roleInfo, pdpUser?.uname]);
 
   const HandleCloseModal = useCallback(() => {
     setShowModal(false);
@@ -311,7 +231,7 @@ const Deposito = () => {
             maxLength={"12"}
             value={numCuenta}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setNumCuenta(num);
               }
@@ -350,7 +270,9 @@ const Deposito = () => {
               <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
-                <Button type={"submit"} onClick={goToRecaudo}>Cerrar</Button>
+                <Button type={"submit"} onClick={goToRecaudo}>
+                  Cerrar
+                </Button>
               </ButtonBar>
             </div>
           ) : (
@@ -360,7 +282,7 @@ const Deposito = () => {
                   type='submit'
                   onClick={onMakePayment}
                   disabled={loadingDepositoCorresponsalBancoAgrario}>
-                    Realizar Depósito
+                  Realizar Depósito
                 </Button>
                 <Button
                   onClick={HandleCloseModal}

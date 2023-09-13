@@ -38,35 +38,9 @@ const PagoGiro = () => {
     idTrx: "",
     valor: "",
   });
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de pago por giro Davivienda CB",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Pago por giro"],
-      ["", ""],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
-    trxInfo: [],
-    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-  });
-
-  // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
-  const onSubmit = (e) => {
+  const [objTicketActual, setObjTicketActual] = useState(null);
+  
+ const onSubmit = (e) => {
     e.preventDefault();
     setPeticion(1);
     habilitarModal();
@@ -79,10 +53,9 @@ const PagoGiro = () => {
 
   const hideModal = () => {
     if (peticion === 3 || peticion === 2) {
-      const objTicket = { ...objTicketActual };
       setIsUploading(true);
       postModificarTicketPagoPorGiroDavivienda({
-        ticket: objTicket,
+        ticket: objTicketActual,
         idTrx: datosConsultaIdTrx.idTrx,
       })
         .then((res) => {
@@ -113,31 +86,6 @@ const PagoGiro = () => {
       idTrx: "",
       valor: "",
     });
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-          /*id_dispositivo*/
-          [
-            "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
-          /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
-          ],
-          ["Tipo de operación", "Pago por giro"],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
     setPeticion(0);
   };
 
@@ -147,26 +95,6 @@ const PagoGiro = () => {
     content: () => printDiv.current,
   });
   const peticionConsulta = () => {
-    const hoy = new Date();
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["commerceInfo"].push([
-      "No. de aprobación",
-      "Consulta Transacción",
-    ]);
-    objTicket["commerceInfo"].push(["", ""]);
     setIsUploading(true);
     postConsultaPagoPorGiroDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -177,6 +105,7 @@ const PagoGiro = () => {
       idUsuario: roleInfo?.id_usuario,
       idTerminal: roleInfo?.id_dispositivo,
       issuerIdDane: roleInfo?.codigo_dane,
+      direccion: roleInfo?.direccion,
       nombreComercio: roleInfo?.["nombre comercio"],
       municipio: roleInfo?.["ciudad"],
       oficinaPropia:
@@ -184,38 +113,19 @@ const PagoGiro = () => {
         roleInfo?.tipo_comercio === "KIOSCO"
           ? true
           : false,
-      ticket: objTicket,
     })
       .then((res) => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          // hideModal();
-          objTicket["commerceInfo"][1] = [
-            "No. terminal",
-            res?.obj?.codigoTotal,
-          ];
-          objTicket["commerceInfo"][6] = [
-            "No. de aprobación",
-            "<strong>Transacción Rechazada por el cliente",
-          ];
-          objTicket["trxInfo"].push(["Valor", formatMoney.format(0)]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(0),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Total",
-            formatMoney.format(res?.obj?.respuesta_davivienda[0].valorPago),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
           setDatosConsultaIdTrx((old) => ({
             ...old,
             idTrx: res?.obj?.idTrx,
             valor: res?.valorTransaccion,
           }));
+          let ticket_consulta = res?.obj?.ticket
+          ticket_consulta["commerceInfo"][6][1] = "<strong>Transacción Rechazada por el cliente"
+          setObjTicketActual(ticket_consulta);
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);
           setPeticion(2);
         } else {
@@ -232,22 +142,6 @@ const PagoGiro = () => {
       });
   };
   const peticionPagoPorGiro = () => {
-    const hoy = new Date();
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "2-digit",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-
     setIsUploading(true);
     postPagoPorGiroDavivienda({
       tipoIdentificacion: datosTrans.tipoIdentificacion,
@@ -265,7 +159,6 @@ const PagoGiro = () => {
         roleInfo?.tipo_comercio === "KIOSCO"
           ? true
           : false,
-      ticket: objTicket,
       direccion: roleInfo?.direccion,
       idTrx: datosConsultaIdTrx.idTrx,
       valor: datosConsultaIdTrx.valor,
@@ -280,41 +173,22 @@ const PagoGiro = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          // hideModal();
-          objTicket["commerceInfo"][6] = [
-            "No. de aprobación",
-            res?.obj?.referencia,
-          ];
-          objTicket["trxInfo"][0] = [
-            "Valor",
-            formatMoney.format(res?.obj?.valor),
-          ];
-          objTicket["trxInfo"][4] = [
-            "Total",
-            formatMoney.format(res?.obj?.valor),
-          ];
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setPeticion(4);
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
-          objTicket["commerceInfo"][6] = [
-            "No. de aprobación",
-            "Transacción Declinada",
-          ];
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setPeticion(4);
           // hideModal();
         }
       })
       .catch((err) => {
         setIsUploading(false);
+        let ticket_ = objTicketActual
+        ticket_["commerceInfo"][6][1] = "Transacción declinada"
+        setObjTicketActual(ticket_);
         notifyError("No se ha podido conectar al servidor");
-        objTicket["commerceInfo"][6] = [
-          "No. de aprobación",
-          "Transacción Declinada",
-        ];
-        setObjTicketActual(objTicket);
         setPeticion(4);
         console.error(err);
       });
@@ -335,8 +209,7 @@ const PagoGiro = () => {
           autoComplete='off'
           value={datosTrans.numeroIdentificacion}
           onInput={(e) => {
-            let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, numeroIdentificacion: num };

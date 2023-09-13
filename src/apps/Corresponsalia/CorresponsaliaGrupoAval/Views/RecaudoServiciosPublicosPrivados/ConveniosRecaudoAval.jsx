@@ -355,7 +355,8 @@ const ConveniosRecaudoAval = () => {
           value={datosTrans.idConvenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, idConvenio: num };
               });
@@ -371,7 +372,8 @@ const ConveniosRecaudoAval = () => {
           value={datosTrans.nit}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, nit: num };
               });
@@ -387,7 +389,8 @@ const ConveniosRecaudoAval = () => {
           value={datosTrans.ean}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              const num = e.target.value;
+              // const num = e.target.value;
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               setDatosTrans((old) => {
                 return { ...old, ean: num };
               });
@@ -484,6 +487,9 @@ const ConveniosRecaudoAval = () => {
                 autoComplete='off'
                 maxLength={"30"}
                 defaultValue={convenio?.nit ?? ""}
+                onChange={(ev) => {
+                  ev.target.value = onChangeNumber(ev);
+                }}
                 required
               />
               <ToggleInput
@@ -533,7 +539,7 @@ const ConveniosRecaudoAval = () => {
                           maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
-                            let num = valor.replace(/[\s.-]/g, "");
+                            let num = valor.replace(/[\s\.\-+eE]/g, "");
                             if (!isNaN(num)) {
                               let copy = [...restriccionReferencias];
                               copy[i]["limiteMenor"] = !isNaN(parseInt(num))
@@ -553,7 +559,7 @@ const ConveniosRecaudoAval = () => {
                           maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
-                            let num = valor.replace(/[\s.-]/g, "");
+                            let num = valor.replace(/[\s\.\-+eE]/g, "");
                             if (!isNaN(num)) {
                               let copy = [...restriccionReferencias];
                               copy[i]["limiteMayor"] = !isNaN(parseInt(num))

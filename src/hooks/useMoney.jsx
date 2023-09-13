@@ -18,6 +18,7 @@ const useMoney = ({
   equalError = false,
   equalErrorMin = false,
   decimalDigits = 0,
+  negativeValues = false,
 }) => {
   const onChangeMoney = useCallback(
     (ev) => {
@@ -30,15 +31,14 @@ const useMoney = ({
 
       const moneyValue =
         Math.round(
-          moneyValidator(filteredValue) * Math.pow(10, decimalDigits)
+          moneyValidator(filteredValue, negativeValues) *
+            Math.pow(10, decimalDigits)
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = limits;
       if (moneyValue === min && equalErrorMin) {
         ev.target.setCustomValidity(
-          `El valor debe ser mayor a ${moneyFormatter.format(
-            min
-          )}`
+          `El valor debe ser mayor a ${moneyFormatter.format(min)}`
         );
       } else if (moneyValue < min) {
         ev.target.setCustomValidity(
@@ -54,9 +54,7 @@ const useMoney = ({
         );
       } else if (moneyValue === max && equalError) {
         ev.target.setCustomValidity(
-          `El valor debe ser menor a ${moneyFormatter.format(
-            max
-          )}`
+          `El valor debe ser menor a ${moneyFormatter.format(max)}`
         );
       } else {
         ev.target.setCustomValidity("");
@@ -75,7 +73,7 @@ const useMoney = ({
 
       return moneyValue;
     },
-    [limits, decimalDigits, equalError, equalErrorMin]
+    [limits, decimalDigits, equalError, equalErrorMin, negativeValues]
   );
   return onChangeMoney;
 };

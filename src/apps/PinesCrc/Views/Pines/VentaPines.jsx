@@ -206,9 +206,10 @@ const VentaPines = () => {
           render: ({ data: res }) => {
             setLoadingInquiry(false);
             setInquiryStatus(res?.obj);
-            if (canal==2){
             setValVentaPines(res?.obj?.valor);
-            }
+            // if (canal==2){
+            // setValVentaPines(res?.obj?.valor);
+            // }
             return "Consulta satisfactoria";
           },
         },
@@ -620,7 +621,7 @@ const VentaPines = () => {
     if (canal == "1") {
       return{
     "codigo_pin": "0807", 
-    "fk_id_convenio": 2310,//2041, 
+    "fk_id_convenio": 1313,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CRC", 
     "permite_modificar": true, 
@@ -633,7 +634,7 @@ const VentaPines = () => {
   };}
   else{ return{
     "codigo_pin": "0043", 
-    "fk_id_convenio": 2310,//2041, 
+    "fk_id_convenio": 1313,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CRC", 
     "permite_modificar": false, 
