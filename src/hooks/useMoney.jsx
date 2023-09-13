@@ -26,19 +26,19 @@ const useMoney = ({
 
       let caret_pos = ev.target.selectionStart ?? 0;
 
-      const len = filterExtraDigit(ev.target.value, decimalDigits).length;
+      const filteredValue = filterExtraDigit(ev.target.value, decimalDigits);
+      const len = filteredValue.length;
 
       const moneyValue =
         Math.round(
-          moneyValidator(ev.target.value, negativeValues) * Math.pow(10, decimalDigits)
+          moneyValidator(filteredValue, negativeValues) *
+            Math.pow(10, decimalDigits)
         ) / Math.pow(10, decimalDigits);
 
       const [min, max] = limits;
       if (moneyValue === min && equalErrorMin) {
         ev.target.setCustomValidity(
-          `El valor debe ser mayor a ${moneyFormatter.format(
-            min
-          )}`
+          `El valor debe ser mayor a ${moneyFormatter.format(min)}`
         );
       } else if (moneyValue < min) {
         ev.target.setCustomValidity(
@@ -54,16 +54,14 @@ const useMoney = ({
         );
       } else if (moneyValue === max && equalError) {
         ev.target.setCustomValidity(
-          `El valor debe ser menor a ${moneyFormatter.format(
-            max
-          )}`
+          `El valor debe ser menor a ${moneyFormatter.format(max)}`
         );
       } else {
         ev.target.setCustomValidity("");
       }
 
       const toAdd =
-        [",", "."].includes(ev.target.value.at(-1) ?? "") && decimalDigits
+        [",", "."].includes(filteredValue.at(-1) ?? "") && decimalDigits
           ? ","
           : "";
       ev.target.value =
@@ -75,7 +73,7 @@ const useMoney = ({
 
       return moneyValue;
     },
-    [limits, decimalDigits, equalError, equalErrorMin]
+    [limits, decimalDigits, equalError, equalErrorMin, negativeValues]
   );
   return onChangeMoney;
 };

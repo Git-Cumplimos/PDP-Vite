@@ -247,7 +247,7 @@ const TrxRecaudo = () => {
         return;
       }
       if ((parseInt(valTrxRecaudo) !== parseInt(validacionPago?.valorSinModificar)) && datosConvenio?.fk_tipo_valor !== 3 && validacionPago?.trueCodbarras) {
-        let error = `Error, el valor a pagar es diferente al valor de validación`;
+        let error = `El valor a pagar es diferente al valor ingresado`;
         return notifyError(error);
       }
       for (const key in userReferences) {

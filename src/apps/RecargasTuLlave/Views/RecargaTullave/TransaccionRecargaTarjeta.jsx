@@ -179,6 +179,7 @@ const TransaccionRecargaTarjeta = () => {
             autoComplete='off'
             value={dataUsuario?.["NTargeta"]}
             maxLength={16}
+            minLength={16}
             onChange={onChangeFormatNumber}
             required
             disabled={loadingPeticionRecargaTarjeta}
@@ -236,7 +237,7 @@ const TransaccionRecargaTarjeta = () => {
             type='text'
             autoComplete='off'
             value={dataUsuario?.["telefonoCliente"]}
-            maxLength={15}
+            maxLength={10}
             onChange={onChangeFormatNumber}
             disabled={loadingPeticionRecargaTarjeta}
           />
@@ -258,7 +259,7 @@ const TransaccionRecargaTarjeta = () => {
             type='text'
             autoComplete='off'
             value={dataUsuario?.["documento"]}
-            maxLength={50}
+            maxLength={12}
             onChange={onChangeFormatNumber}
             disabled={loadingPeticionRecargaTarjeta}
           />

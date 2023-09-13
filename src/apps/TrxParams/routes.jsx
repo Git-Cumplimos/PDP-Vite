@@ -378,13 +378,13 @@ const rutasConfiguraciones = {
           link: "/params-operations/comercios-params/gestion-permisos-broker",
           label: <AppIcons Logo={"RECAUDO"} name={"Gestión Permisos Broker"} />,
           component: GestionPermisosBroker,
-          permission: [enumPermisosTrx.comercios],
+          permission: [enumPermisosTrx.gestion_permisos_broker],
         },
         {
           link: "/params-operations/comercios-params/permisos-broker",
           label: <AppIcons Logo={"RECAUDO"} name={"Permisos Comercios Broker"} />,
           component: ComerciosBroker,
-          permission: [enumPermisosTrx.comercios],
+          permission: [enumPermisosTrx.gestion_permisos_comercios_broker],
         },
         {
           link: "/params-operations/comercios-params/grupos-comercio",
