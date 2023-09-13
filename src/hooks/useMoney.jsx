@@ -10,7 +10,10 @@ const filterExtraDigit = (data, digits = 0) => {
     return data;
   }
 
-  return `${arr[0]},${arr[1].substring(0, digits)}`;
+  return `${arr[0]},${arr[1].substring(
+    0,
+    digits + arr[1].replace(/\d/g, "").length
+  )}`;
 };
 
 const useMoney = ({

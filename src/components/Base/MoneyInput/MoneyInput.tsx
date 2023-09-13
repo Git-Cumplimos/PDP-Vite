@@ -19,7 +19,7 @@ import Input, { CustomInputProps } from "../Input";
 export const formatMoney = makeMoneyFormatter(2);
 
 const handleBlockNegativeSign = (ev: KeyboardEvent<HTMLInputElement>) => {
-  if (ev.keyCode === 189) {
+  if (ev.key === "-") {
     ev.preventDefault();
     return;
   }
@@ -43,6 +43,8 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       equalError = true,
       equalErrorMin = true,
       negativeValues = false,
+      value: origValue,
+      defaultValue: origdefaultValue,
       ...input
     },
     ref
@@ -91,30 +93,24 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       [input?.onChange, onChangeMoney]
     );
 
-    const dynamicProps = useMemo(() => {
-      const _props = new Map([["type", "tel"]]);
-      if (input?.value !== undefined) {
+    const value = useMemo(() => {
+      if (origValue !== undefined) {
+        const moneyValue = moneyValidator(`${origValue ?? ""}`, negativeValues);
+        return !moneyValue ? "$ " : localFormatMoney.format(moneyValue);
+      }
+      return origValue;
+    }, [origValue, localFormatMoney, negativeValues]);
+
+    const defaultValue = useMemo(() => {
+      if (origdefaultValue !== undefined) {
         const moneyValue = moneyValidator(
-          `${input?.value ?? ""}`,
+          `${origdefaultValue ?? ""}`,
           negativeValues
         );
-        _props.set(
-          "value",
-          !moneyValue ? "$ " : localFormatMoney.format(moneyValue)
-        );
+        return !moneyValue ? "$ " : localFormatMoney.format(moneyValue);
       }
-      if (input?.defaultValue !== undefined) {
-        const moneyValue = moneyValidator(
-          `${input?.value ?? ""}`,
-          negativeValues
-        );
-        _props.set(
-          "value",
-          !moneyValue ? "$ " : localFormatMoney.format(moneyValue)
-        );
-      }
-      return Object.fromEntries(_props);
-    }, [input?.value, input?.defaultValue, localFormatMoney, negativeValues]);
+      return origdefaultValue;
+    }, [origdefaultValue, localFormatMoney, negativeValues]);
 
     useEffect(() => {
       if (inptRef.current) {
@@ -122,7 +118,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
         const moneyValue =
           Math.round(
             moneyValidator(
-              dynamicProps?.value ?? inptRef.current.value,
+              (value || defaultValue) ?? inptRef.current.value,
               negativeValues
             ) * Math.pow(10, decimalDigits)
           ) / Math.pow(10, decimalDigits);
@@ -162,13 +158,15 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       inputLimits,
       equalErrorMin,
       negativeValues,
-      dynamicProps?.value,
+      value,
+      defaultValue,
     ]);
 
     return (
       <Input
         {...input}
-        {...dynamicProps}
+        value={value}
+        defaultValue={defaultValue}
         ref={(realInput) => {
           inptRef.current = realInput;
           if (ref) {
