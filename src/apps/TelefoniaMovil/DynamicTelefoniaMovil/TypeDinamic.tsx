@@ -5,8 +5,8 @@ export type TypeInputPromises<TypeDependsModule> = {
   pdpUser: { [key: string]: any };
   moduleInfo: TypeDependsModule;
   id_uuid?: any;
-  parameters_operador?: [key: string | any] | {};
-  parameters_submodule?: [key: string | any] | {};
+  parameters_operador?: { [key: string]: any };
+  parameters_submodule?: { [key: string]: any };
 };
 
 //------------recargas ------------------------
