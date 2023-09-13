@@ -6,6 +6,7 @@ import {
   forwardRef,
   FormEvent,
   ChangeEvent,
+  KeyboardEvent,
 } from "react";
 import useMoney from "../../../hooks/useMoney";
 import {
@@ -17,7 +18,7 @@ import Input, { CustomInputProps } from "../Input";
 
 export const formatMoney = makeMoneyFormatter(2);
 
-const handleBlockNegativeSign = (ev) => {
+const handleBlockNegativeSign = (ev: KeyboardEvent<HTMLInputElement>) => {
   if (ev.keyCode === 189) {
     ev.preventDefault();
     return;

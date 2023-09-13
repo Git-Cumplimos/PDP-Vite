@@ -334,7 +334,6 @@ const Transacciones = () => {
             />
           </Fragment>
         )}
-        <MoneyInput label="Aver" decimalDigits={2} onChange={(_, val) => {console.log(val);}} />
       </DataTable>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
