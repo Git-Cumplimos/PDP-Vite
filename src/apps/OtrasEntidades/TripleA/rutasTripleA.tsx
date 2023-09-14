@@ -11,13 +11,13 @@ const rutasTripleA = {
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
-  permission: [1],
+  permission: [158],
   subRoutes: [
     {
       link: "/TripleA/recaudos",
       label: <AppIcons Logo={"RECAUDO"} name="Recuado Triple A" />,
       component: RecaudoTripleA,
-      permission: [1],
+      permission: [158],
       subRoutes: [],
     },
   ],
