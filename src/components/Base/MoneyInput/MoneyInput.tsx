@@ -165,6 +165,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
     return (
       <Input
         {...input}
+        type="tel"
         value={value}
         defaultValue={defaultValue}
         ref={(realInput) => {
