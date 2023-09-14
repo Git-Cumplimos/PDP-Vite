@@ -52,28 +52,29 @@ const RecargarApuestas = () => {
     { value: "4", label: "NIT" },
     { value: "5", label: "Pasaporte"},
   ];
+  const [infTicket, setInfTicket] = useState("");
   
-  const [infTicket, setInfTicket] = useState({
-    title: "Recibo de pago",
-    timeInfo: {
-      "Fecha de pago":"",
-      "Hora": "",
-    },
-    commerceInfo: [
-      ["Id comercio", roleInfo.id_comercio],
-      ["No. Terminal", roleInfo.id_dispositivo],
-      ["Comercio", roleInfo["nombre comercio"]],
-      ["", ""],
-      // ["Municipio", roleInfo.ciudad],
-      // ["", ""],
-      ["Dirección", roleInfo.direccion],
-      ["", ""],
-    ],
-    commerceName: "RECARGA APUESTAS DEPORTIVAS",
-    trxInfo: [],
-    disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-  });
+  // const [infTicket, setInfTicket] = useState({
+  //   title: "Recibo de pago",
+  //   timeInfo: {
+  //     "Fecha de pago":"",
+  //     "Hora": "",
+  //   },
+  //   commerceInfo: [
+  //     ["Id comercio", roleInfo.id_comercio],
+  //     ["No. Terminal", roleInfo.id_dispositivo],
+  //     ["Comercio", roleInfo["nombre comercio"]],
+  //     ["", ""],
+  //     // ["Municipio", roleInfo.ciudad],
+  //     // ["", ""],
+  //     ["Dirección", roleInfo.direccion],
+  //     ["", ""],
+  //   ],
+  //   commerceName: "RECARGA APUESTAS DEPORTIVAS",
+  //   trxInfo: [],
+  //   disclamer:
+  //     "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
+  // });
   const onChangeMoney = useMoney({
     limits: [minValor,maxValor],
     equalError: false
@@ -92,26 +93,26 @@ const RecargarApuestas = () => {
   
   const fecthEnvioTransaccion = () => {
     setRespuesta(true)
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "numeric",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const infTicketFinal = { ...infTicket }; 
-    infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
-    infTicketFinal["timeInfo"]["Hora"] = hora;
-    infTicketFinal["trxInfo"].push(["Operador", state?.casaApuesta ?? " "]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(inputValor) ?? "0"]);
-    infTicketFinal["trxInfo"].push(["", ""]);
+    // const fecha = Intl.DateTimeFormat("es-CO", {
+    //   year: "numeric",
+    //   month: "2-digit",
+    //   day: "numeric",
+    // }).format(new Date());
+    // /*hora actual */
+    // const hora = Intl.DateTimeFormat("es-CO", {
+    //   hour: "2-digit",
+    //   minute: "2-digit",
+    //   second: "2-digit",
+    // }).format(new Date());
+    // const infTicketFinal = { ...infTicket }; 
+    // infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
+    // infTicketFinal["timeInfo"]["Hora"] = hora;
+    // infTicketFinal["trxInfo"].push(["Operador", state?.casaApuesta ?? " "]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
+    // infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
+    // infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(inputValor) ?? "0"]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
     postEnvioTrans({
       comercio: {
         id_comercio:roleInfo.id_comercio,
@@ -122,12 +123,13 @@ const RecargarApuestas = () => {
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(inputValor),
-      ticket: infTicketFinal,
-
+      // ticket: infTicketFinal,
+      address: roleInfo?.direccion,
       datosRecargas: {
         celular: datosCuenta?.documento,
         operador: state?.producto,
         valor: parseInt(inputValor),
+        documento: datosCuenta?.documento ?? " ",
         jsonAdicional: {
           "nombre_usuario": pdpUser?.uname ?? "",
           "operador": state?.casaApuesta
@@ -140,7 +142,7 @@ const RecargarApuestas = () => {
         // infTicketFinal["commerceInfo"].push(["Id Transacción", res?.obj?.response?.["idtrans"]]);
         // infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);  
         // setInfTicket(infTicketFinal)
-        setInfTicket(res?.request?.ticket)
+        setInfTicket(res?.obj?.ticket)
         setRespuesta(false);
         setTypeInfo("RecargaExitosa");
       }
@@ -174,7 +176,7 @@ const RecargarApuestas = () => {
                     // infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
                     // infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
                     // setInfTicket(infTicketFinal)
-                    setInfTicket(res?.request?.ticket)
+                    setInfTicket(res?.obj?.ticket);
                     setRespuesta(false);
                     setTypeInfo("RecargaExitosa");
                   }
@@ -233,23 +235,24 @@ const RecargarApuestas = () => {
       };
     });
     setInputValor("");
-    setInfTicket((old)=>{
-      return {
-        ...old,
-        commerceInfo: [
-          ["Id Comercio", roleInfo.id_comercio],
-          ["No. terminal", roleInfo.id_dispositivo],
-          ["Comercio", roleInfo["nombre comercio"]],
-          ["", ""],
-          ["Municipio", roleInfo.ciudad],
-          ["", ""],
-          ["Dirección", roleInfo.direccion],
-          ["", ""],
-        ],
-        commerceName: "RECARGA APUESTAS DEPORTIVAS",
-        trxInfo: [],
-      };
-    });
+    setInfTicket("");
+    // setInfTicket((old)=>{
+    //   return {
+    //     ...old,
+    //     commerceInfo: [
+    //       ["Id Comercio", roleInfo.id_comercio],
+    //       ["No. terminal", roleInfo.id_dispositivo],
+    //       ["Comercio", roleInfo["nombre comercio"]],
+    //       ["", ""],
+    //       ["Municipio", roleInfo.ciudad],
+    //       ["", ""],
+    //       ["Dirección", roleInfo.direccion],
+    //       ["", ""],
+    //     ],
+    //     commerceName: "RECARGA APUESTAS DEPORTIVAS",
+    //     trxInfo: [],
+    //   };
+    // });
     validNavigate("/apuestas-deportivas")
   }, []);
 
@@ -305,19 +308,6 @@ const RecargarApuestas = () => {
               });
             }
           }}
-        />
-
-        <Select
-          id="tipoDocumento"
-          label="Tipo de Documento"
-          options={optionsDocumento}
-          value={datosCuenta?.tipoDocumento}
-          onChange={(e) => {
-            setDatosCuenta((old) => {
-              return { ...old, tipoDocumento: e.target.value };
-            });
-          }}
-          required
         />
         <MoneyInput
           name="valor"

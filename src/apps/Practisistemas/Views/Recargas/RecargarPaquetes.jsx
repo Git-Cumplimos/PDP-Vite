@@ -36,30 +36,31 @@ const RecargarPaquetes = () => {
   const { state } = useLocation();
   const validNavigate = useNavigate();
   const id_uuid = v4();
-  const [infTicket, setInfTicket] = useState({
-    title: "Recibo de pago",
-    timeInfo: {
-      "Fecha de pago": "fecha",
-      Hora: "",
-    },
-    commerceInfo: [
-      ["Id Comercio", roleInfo.id_comercio],
-      ["No. terminal", roleInfo.id_dispositivo],
-      ["Comercio", roleInfo["nombre comercio"]],
-      ["", ""],
-      ["Dirección", roleInfo.direccion],
-      ["", ""],
-    ],
-    commerceName: "RECARGA",
-    trxInfo: [
-      ["Operador", state?.operadorPaquete],
-      ["", ""],
-      ["Tipo paquete", state?.operador_recargar],
-      ["", ""],
-    ],
-    disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-  });
+  const [infTicket, setInfTicket] = useState("");
+  // const [infTicket, setInfTicket] = useState({
+  //   title: "Recibo de pago",
+  //   timeInfo: {
+  //     "Fecha de pago": "fecha",
+  //     Hora: "",
+  //   },
+  //   commerceInfo: [
+  //     ["Id Comercio", roleInfo.id_comercio],
+  //     ["No. terminal", roleInfo.id_dispositivo],
+  //     ["Comercio", roleInfo["nombre comercio"]],
+  //     ["", ""],
+  //     ["Dirección", roleInfo.direccion],
+  //     ["", ""],
+  //   ],
+  //   commerceName: "RECARGA",
+  //   trxInfo: [
+  //     ["Operador", state?.operadorPaquete],
+  //     ["", ""],
+  //     ["Tipo paquete", state?.operador_recargar],
+  //     ["", ""],
+  //   ],
+  //   disclamer:
+  //     "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
+  // });
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
 
@@ -87,32 +88,32 @@ const RecargarPaquetes = () => {
   };
   const fecthEnvioTransaccion = () => {
     setRespuesta(true);
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const infTicketFinal = { ...infTicket };
-    infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
-    infTicketFinal["timeInfo"]["Hora"] = hora;
-    infTicketFinal["trxInfo"].push([
-      "Número celular",
-      toPhoneNumber(inputCelular) ?? "0",
-    ]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push([
-      "Valor paquete",
-      formatMoney.format(state?.valor_paquete) ?? "0",
-    ]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Descripción", state?.descripcion ?? ""]);
-    infTicketFinal["trxInfo"].push(["", ""]);
+    // const fecha = Intl.DateTimeFormat("es-CO", {
+    //   year: "numeric",
+    //   month: "2-digit",
+    //   day: "2-digit",
+    // }).format(new Date());
+    // /*hora actual */
+    // const hora = Intl.DateTimeFormat(undefined, {
+    //   hour: "2-digit",
+    //   minute: "2-digit",
+    //   second: "2-digit",
+    // }).format(new Date());
+    // const infTicketFinal = { ...infTicket };
+    // infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
+    // infTicketFinal["timeInfo"]["Hora"] = hora;
+    // infTicketFinal["trxInfo"].push([
+    //   "Número celular",
+    //   toPhoneNumber(inputCelular) ?? "0",
+    // ]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
+    // infTicketFinal["trxInfo"].push([
+    //   "Valor paquete",
+    //   formatMoney.format(state?.valor_paquete) ?? "0",
+    // ]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
+    // infTicketFinal["trxInfo"].push(["Descripción", state?.descripcion ?? ""]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
     postEnvioTrans({
       comercio: {
         id_comercio: roleInfo.id_comercio,
@@ -124,7 +125,8 @@ const RecargarPaquetes = () => {
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(state?.valor_paquete),
-      ticket: infTicketFinal,
+      address: roleInfo?.direccion,
+      // ticket: infTicketFinal,
 
       datosRecargas: {
         celular: inputCelular,
@@ -133,15 +135,16 @@ const RecargarPaquetes = () => {
         jsonAdicional: {
           "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
+          operador_paquete: state?.operador_paquete,
         },
       },
     })
       .then(async (res) => {
         if (res?.status === true) {
           notify("Compra de paquete exitosa");
-          infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
-          infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
-          setInfTicket(infTicketFinal);
+          // infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+          // infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
+          setInfTicket(res?.obj?.ticket);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
         } else {
@@ -163,9 +166,9 @@ const RecargarPaquetes = () => {
                             res?.status === true ||
                             res?.obj?.response?.estado == "00"
                           ) {
-                            infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
-                            infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
-                            setInfTicket(infTicketFinal);
+                            // infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+                            // infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
+                            setInfTicket(res?.obj?.ticket);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
@@ -236,23 +239,24 @@ const RecargarPaquetes = () => {
     setShowModal(false);
     setTypeInfo("Ninguno");
     setInputCelular("");
-    setInfTicket((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          ["Id Comercio", roleInfo.id_comercio],
-          ["No. terminal", roleInfo.id_dispositivo],
-          ["Comercio", roleInfo["nombre comercio"]],
-          ["", ""],
-          ["Municipio", roleInfo.ciudad],
-          ["", ""],
-          ["Dirección", roleInfo.direccion],
-          ["", ""],
-        ],
-        commerceName: state?.operador_recargar,
-        trxInfo: [],
-      };
-    });
+    setInfTicket("");
+    // setInfTicket((old) => {
+    //   return {
+    //     ...old,
+    //     commerceInfo: [
+    //       ["Id Comercio", roleInfo.id_comercio],
+    //       ["No. terminal", roleInfo.id_dispositivo],
+    //       ["Comercio", roleInfo["nombre comercio"]],
+    //       ["", ""],
+    //       ["Municipio", roleInfo.ciudad],
+    //       ["", ""],
+    //       ["Dirección", roleInfo.direccion],
+    //       ["", ""],
+    //     ],
+    //     commerceName: state?.operador_recargar,
+    //     trxInfo: [],
+    //   };
+    // });
   }, []);
 
   const handleCloseRecarga = useCallback(() => {

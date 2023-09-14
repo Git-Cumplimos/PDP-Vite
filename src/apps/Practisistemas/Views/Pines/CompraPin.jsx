@@ -156,29 +156,29 @@ const CompraPin = () => {
         });
     }
   };
-  const [infTicket, setInfTicket] = useState({
-    title: "Recibo de pago",
-    timeInfo: {
-      "Fecha de pago": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      ["Id Comercio", roleInfo.id_comercio],
-      ["No. terminal", roleInfo.id_dispositivo],
-      ["Comercio", roleInfo["nombre comercio"]],
-      ["", ""],
-      ["Dirección", roleInfo.direccion],
-      ["", ""],
-    ],
-    commerceName:
-      state?.op == "em" || state?.op == "hv" || state?.op == "cb"
-        ? "VENTA PINES DE SERVICIO"
-        : "VENTA PINES DE CONTENIDO",
-    trxInfo: [],
-    disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-  });
-
+  // const [infTicket, setInfTicket] = useState({
+  //   title: "Recibo de pago",
+  //   timeInfo: {
+  //     "Fecha de pago": "",
+  //     Hora: "",
+  //   },
+  //   commerceInfo: [
+  //     ["Id Comercio", roleInfo.id_comercio],
+  //     ["No. terminal", roleInfo.id_dispositivo],
+  //     ["Comercio", roleInfo["nombre comercio"]],
+  //     ["", ""],
+  //     ["Dirección", roleInfo.direccion],
+  //     ["", ""],
+  //   ],
+  //   commerceName:
+  //     state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+  //       ? "VENTA PINES DE SERVICIO"
+  //       : "VENTA PINES DE CONTENIDO",
+  //   trxInfo: [],
+  //   disclamer:
+  //     "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
+  // });
+  const [infTicket, setInfTicket] = useState("");
   const onChangeMoney = useMoney({
     limits: [minValor, maxValor],
     equalError: false,
@@ -270,56 +270,56 @@ const CompraPin = () => {
   const compraPines = () => {
     setShowLoading(true);
     const uniqueId = v4();
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const newVoucher = { ...infTicket };
+    // const fecha = Intl.DateTimeFormat("es-CO", {
+    //   year: "numeric",
+    //   month: "2-digit",
+    //   day: "2-digit",
+    // }).format(new Date());
+    // /*hora actual */
+    // const hora = Intl.DateTimeFormat(undefined, {
+    //   hour: "2-digit",
+    //   minute: "2-digit",
+    //   second: "2-digit",
+    // }).format(new Date());
+    // const newVoucher = { ...infTicket };
 
-    newVoucher["timeInfo"]["Fecha de pago"] = fecha;
+    // newVoucher["timeInfo"]["Fecha de pago"] = fecha;
 
-    newVoucher["timeInfo"]["Hora"] = hora;
+    // newVoucher["timeInfo"]["Hora"] = hora;
 
-    newVoucher["trxInfo"][0] = ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc];
+    // newVoucher["trxInfo"][0] = ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc];
 
-    if (state?.op == "cb") {
-      newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
-      newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(consultaDatosSNR?.valorPin),];
-      newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
-      newVoucher["trxInfo"][7] = ["", ""];
-    } else if (state?.op == "em") {
-      newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
-      newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
-      newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Contador", inputContador];
-      newVoucher["trxInfo"][7] = ["", ""];
-    } else if (state?.op == "hv") {
-      newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
-      newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Placa", inputPlaca];
-      newVoucher["trxInfo"][5] = ["", ""];
-      newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
-      newVoucher["trxInfo"][7] = ["", ""];
-    } else {
-      newVoucher["trxInfo"][1] = ["", ""];
-      newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
-      newVoucher["trxInfo"][3] = ["", ""];
-      newVoucher["trxInfo"][4] = ["Valor", formatMoney.format(state.sell ? state.sell : inputValor),];
-      newVoucher["trxInfo"][5] = ["", ""];
-    }
+    // if (state?.op == "cb") {
+    //   newVoucher["trxInfo"][1] = ["", ""];
+    //   newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
+    //   newVoucher["trxInfo"][3] = ["", ""];
+    //   newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(consultaDatosSNR?.valorPin),];
+    //   newVoucher["trxInfo"][5] = ["", ""];
+    //   newVoucher["trxInfo"][4] = ["Matrícula", inputMatricula];
+    //   newVoucher["trxInfo"][7] = ["", ""];
+    // } else if (state?.op == "em") {
+    //   newVoucher["trxInfo"][1] = ["", ""];
+    //   newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
+    //   newVoucher["trxInfo"][3] = ["", ""];
+    //   newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
+    //   newVoucher["trxInfo"][5] = ["", ""];
+    //   newVoucher["trxInfo"][4] = ["Contador", inputContador];
+    //   newVoucher["trxInfo"][7] = ["", ""];
+    // } else if (state?.op == "hv") {
+    //   newVoucher["trxInfo"][1] = ["", ""];
+    //   newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
+    //   newVoucher["trxInfo"][3] = ["", ""];
+    //   newVoucher["trxInfo"][4] = ["Placa", inputPlaca];
+    //   newVoucher["trxInfo"][5] = ["", ""];
+    //   newVoucher["trxInfo"][6] = ["Valor", formatMoney.format(inputValor),];
+    //   newVoucher["trxInfo"][7] = ["", ""];
+    // } else {
+    //   newVoucher["trxInfo"][1] = ["", ""];
+    //   newVoucher["trxInfo"][2] = ["No. Celular", toPhoneNumber(inputCelular),];
+    //   newVoucher["trxInfo"][3] = ["", ""];
+    //   newVoucher["trxInfo"][4] = ["Valor", formatMoney.format(state.sell ? state.sell : inputValor),];
+    //   newVoucher["trxInfo"][5] = ["", ""];
+    // }
     fetchData(
       `${url_compra_pines}/transacciones`,
       "POST",
@@ -342,6 +342,7 @@ const CompraPin = () => {
               : inputValor,
         celular: state?.op == "em" ? inputContador.toString() : inputCelular,
         operador: state?.op,
+        address: roleInfo?.direccion,
         valor:
           state?.op == "cb"
             ? consultaDatosSNR?.valorPin
@@ -361,7 +362,13 @@ const CompraPin = () => {
         } : {
                 "nombre_usuario": pdpUser?.uname ?? "",
         },
-        ticket: newVoucher,
+        // ticket: newVoucher,
+        convenio: state?.desc,
+        num_celular_original: inputCelular,
+        trx_inf_ticket: state?.op === "hv" ? inputPlaca
+         : state?.op === "em" ? inputCelular
+         : state?.op === "cb" ? inputMatricula
+        : ""
       },
       {},
       true,
@@ -371,7 +378,8 @@ const CompraPin = () => {
         if (res?.status == true) {
           notify("Venta exitosa");
           setShowLoading(false);
-          VentaExitosa(res?.obj?.response, fecha, hora);
+          setInfTicket(res?.obj?.ticket);
+          // VentaExitosa(res?.obj?.response, fecha, hora);
         } else if (res?.obj?.response?.respuesta == "Error respuesta practisistemas: No se recibi\u00f3 respuesta del autorizador en el tiempo esperado [0010003]") {
           notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
           setShowLoading(false)
@@ -408,7 +416,8 @@ const CompraPin = () => {
                             res?.obj?.response?.estado == "00"
                           ) {
                             notify("Venta exitosa");
-                            VentaExitosa(res?.obj?.response, fecha, hora);
+                            setInfTicket(res?.obj?.ticket);
+                            // VentaExitosa(res?.obj?.response, fecha, hora);
                             setShowLoading(false);
                           } else {
                             notifyError(
@@ -505,79 +514,79 @@ const CompraPin = () => {
       });
   };
 
-  const VentaExitosa = (result_, fecha, hora) => {
-    // if (result_?.jsonAdicional?.info) {
+  // const VentaExitosa = (result_, fecha, hora) => {
+  //   // if (result_?.jsonAdicional?.info) {
 
-    //   const pin = result_?.jsonAdicional?.info;
-    //   var hiddenPin = '******' + pin.substring(6);
-    // }
-    const voucher = {
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de pago": fecha,
-        Hora: hora,
-      },
-      commerceInfo: [
-        ["Id Comercio", roleInfo.id_comercio],
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Id trx", result_.idtrans],
-        ["Id Aut", result_.codigoauth],
-        ["Comercio", roleInfo["nombre comercio"]],
-        ["", ""],
-        ["Dirección", roleInfo.direccion],
-        ["", ""],
-      ],
-      commerceName:
-        state?.op == "em" || state?.op == "hv" || state?.op == "cb"
-          ? "VENTA PINES DE SERVICIO"
-          : "VENTA PINES DE CONTENIDO",
-      trxInfo: [
-        ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc],
-        ["", ""],
-        state?.op == "em"
-          ? ["No. PIN", result_?.jsonAdicional?.["Numero Pin"]]
-          : state?.op == "hv"
-            ? ["No. PIN", result_?.jsonAdicional?.Url2]
-            : state?.op == "nx"
-              ? ["No. PIN", result_?.jsonAdicional?.info]
-              : state?.op == "cb"
-                ? ["No. PIN", result_?.jsonAdicional?.Url]
-                : ["", ""],
-        ["", ""],
-        ["No. Celular", toPhoneNumber(inputCelular)],
-        ["", ""],
-        state?.op == "cb"
-          ? ["Matrícula", inputMatricula]
-          : state?.op == "hv"
-            ? ["Placa", inputPlaca]
-            : state?.op == "em"
-              ? ["Contador", inputContador]
-              : [],
-        ["", ""],
-        ["Valor",
-          formatMoney.format(
-            state.sell
-              ? state.sell
-              : consultaDatosSNR.valorPin
-                ? consultaDatosSNR.valorPin
-                : inputValor
-          ),],
-        ["", ""],
-      ],
-      disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-    };
-    setTypeInfo("VentaExitosa");
-    setInfTicket(voucher);
+  //   //   const pin = result_?.jsonAdicional?.info;
+  //   //   var hiddenPin = '******' + pin.substring(6);
+  //   // }
+  //   const voucher = {
+  //     title: "Recibo de pago",
+  //     timeInfo: {
+  //       "Fecha de pago": fecha,
+  //       Hora: hora,
+  //     },
+  //     commerceInfo: [
+  //       ["Id Comercio", roleInfo.id_comercio],
+  //       ["No. terminal", roleInfo.id_dispositivo],
+  //       ["Id trx", result_.idtrans],
+  //       ["Id Aut", result_.codigoauth],
+  //       ["Comercio", roleInfo["nombre comercio"]],
+  //       ["", ""],
+  //       ["Dirección", roleInfo.direccion],
+  //       ["", ""],
+  //     ],
+  //     commerceName:
+  //       state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+  //         ? "VENTA PINES DE SERVICIO"
+  //         : "VENTA PINES DE CONTENIDO",
+  //     trxInfo: [
+  //       ["Convenio", state.desc == "Certificado TL" ? "Certificado (SNR)" : state.desc],
+  //       ["", ""],
+  //       state?.op == "em"
+  //         ? ["No. PIN", result_?.jsonAdicional?.["Numero Pin"]]
+  //         : state?.op == "hv"
+  //           ? ["No. PIN", result_?.jsonAdicional?.Url2]
+  //           : state?.op == "nx"
+  //             ? ["No. PIN", result_?.jsonAdicional?.info]
+  //             : state?.op == "cb"
+  //               ? ["No. PIN", result_?.jsonAdicional?.Url]
+  //               : ["", ""],
+  //       ["", ""],
+  //       ["No. Celular", toPhoneNumber(inputCelular)],
+  //       ["", ""],
+  //       state?.op == "cb"
+  //         ? ["Matrícula", inputMatricula]
+  //         : state?.op == "hv"
+  //           ? ["Placa", inputPlaca]
+  //           : state?.op == "em"
+  //             ? ["Contador", inputContador]
+  //             : [],
+  //       ["", ""],
+  //       ["Valor",
+  //         formatMoney.format(
+  //           state.sell
+  //             ? state.sell
+  //             : consultaDatosSNR.valorPin
+  //               ? consultaDatosSNR.valorPin
+  //               : inputValor
+  //         ),],
+  //       ["", ""],
+  //     ],
+  //     disclamer:
+  //       "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
+  //   };
+  //   setTypeInfo("VentaExitosa");
+  //   setInfTicket(voucher);
 
-    // infoTicket(result_.idtrans, tipo_operacion, voucher)
-    //   .then((resTicket) => {
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //     notifyError("Error respuesta PDP: Fallo en la inserción en tabla de transacciones [0040001]");
-    //   });
-  };
+  //   // infoTicket(result_.idtrans, tipo_operacion, voucher)
+  //   //   .then((resTicket) => {
+  //   //   })
+  //   //   .catch((err) => {
+  //   //     console.error(err);
+  //   //     notifyError("Error respuesta PDP: Fallo en la inserción en tabla de transacciones [0040001]");
+  //   //   });
+  // };
 
   const handleClosePin = useCallback(() => {
     setShowModal(false);
@@ -594,28 +603,29 @@ const CompraPin = () => {
     setInputContador("");
     setInputPlaca("");
     setInputMatricula("");
-    setInfTicket({
-      title: "Recibo de pago",
-      timeInfo: {
-        "Fecha de pago": "",
-        Hora: "",
-      },
-      commerceInfo: [
-        ["Id Comercio", roleInfo.id_comercio],
-        ["No. terminal", roleInfo.id_dispositivo],
-        ["Comercio", roleInfo["nombre comercio"]],
-        ["", ""],
-        ["Dirección", roleInfo.direccion],
-        ["", ""],
-      ],
-      commerceName:
-        state?.op == "em" || state?.op == "hv" || state?.op == "cb"
-          ? "VENTA PINES DE SERVICIO"
-          : "VENTA PINES DE CONTENIDO",
-      trxInfo: [],
-      disclamer:
-        "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-    });
+    // setInfTicket({
+    //   title: "Recibo de pago",
+    //   timeInfo: {
+    //     "Fecha de pago": "",
+    //     Hora: "",
+    //   },
+    //   commerceInfo: [
+    //     ["Id Comercio", roleInfo.id_comercio],
+    //     ["No. terminal", roleInfo.id_dispositivo],
+    //     ["Comercio", roleInfo["nombre comercio"]],
+    //     ["", ""],
+    //     ["Dirección", roleInfo.direccion],
+    //     ["", ""],
+    //   ],
+    //   commerceName:
+    //     state?.op == "em" || state?.op == "hv" || state?.op == "cb"
+    //       ? "VENTA PINES DE SERVICIO"
+    //       : "VENTA PINES DE CONTENIDO",
+    //   trxInfo: [],
+    //   disclamer:
+    //     "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
+    // });
+    setInfTicket("");
     validNavigate("/Pines/PinesContenido");
   }, []);
 
@@ -629,7 +639,8 @@ const CompraPin = () => {
     setInputContador("");
     setInputPlaca("");
     setInputMatricula("");
-    setInfTicket(null);
+    // setInfTicket(null);
+    setInfTicket("");
     showModalDatosEPM(false);
     showModalDatosSNR(false);
   }, []);
@@ -1093,7 +1104,7 @@ const CompraPin = () => {
         {/**************** Resumen de la venta del Pin **********************/}
 
         {/**************** Venta del Pin Exitosa **********************/}
-        {infTicket && typeInfo == "VentaExitosa" && (
+        {infTicket && ( //&& typeInfo == "VentaExitosa"
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>

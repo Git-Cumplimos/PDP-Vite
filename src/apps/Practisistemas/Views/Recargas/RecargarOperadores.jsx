@@ -42,28 +42,29 @@ const RecargasOperadores = () => {
   const printDiv = useRef();
   const validNavigate = useNavigate();
   const id_uuid = v4();
-  const [infTicket, setInfTicket] = useState({
-    title: "Recibo de pago",
-    timeInfo: {
-      "Fecha de pago": "fecha",
-      Hora: "",
-    },
-    commerceInfo: [
-      ["Id Comercio", roleInfo.id_comercio],
-      ["No. terminal", roleInfo.id_dispositivo],
-      ["Comercio", roleInfo["nombre comercio"]],
-      ["", ""],
-      ["Dirección", roleInfo.direccion],
-      ["", ""],
-    ],
-    commerceName: "RECARGA",
-    trxInfo: [
-      ["Operador", state?.operador_recargar],
-      ["", ""],
-    ],
-    disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-  });
+  const [infTicket, setInfTicket] = useState("");
+  // const [infTicket, setInfTicket] = useState({
+  //   title: "Recibo de pago",
+  //   timeInfo: {
+  //     "Fecha de pago": "fecha",
+  //     Hora: "",
+  //   },
+  //   commerceInfo: [
+  //     ["Id Comercio", roleInfo.id_comercio],
+  //     ["No. terminal", roleInfo.id_dispositivo],
+  //     ["Comercio", roleInfo["nombre comercio"]],
+  //     ["", ""],
+  //     ["Dirección", roleInfo.direccion],
+  //     ["", ""],
+  //   ],
+  //   commerceName: "RECARGA",
+  //   trxInfo: [
+  //     ["Operador", state?.operador_recargar],
+  //     ["", ""],
+  //   ],
+  //   disclamer:
+  //     "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
+  // });
 
   const onChangeMoney = useMoney({
     limits: [minValor, maxValor],
@@ -106,30 +107,30 @@ const RecargasOperadores = () => {
 
   const fecthEnvioTransaccion = () => {
     setRespuesta(true);
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const infTicketFinal = { ...infTicket };
-    infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
-    infTicketFinal["timeInfo"]["Hora"] = hora;
-    infTicketFinal["trxInfo"].push([
-      "Número celular",
-      toPhoneNumber(inputCelular) ?? "0",
-    ]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push([
-      "Valor recarga",
-      formatMoney.format(inputValor) ?? "0",
-    ]);
-    infTicketFinal["trxInfo"].push(["", ""]);
+    // const fecha = Intl.DateTimeFormat("es-CO", {
+    //   year: "numeric",
+    //   month: "2-digit",
+    //   day: "2-digit",
+    // }).format(new Date());
+    // /*hora actual */
+    // const hora = Intl.DateTimeFormat(undefined, {
+    //   hour: "2-digit",
+    //   minute: "2-digit",
+    //   second: "2-digit",
+    // }).format(new Date());
+    // const infTicketFinal = { ...infTicket };
+    // infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
+    // infTicketFinal["timeInfo"]["Hora"] = hora;
+    // infTicketFinal["trxInfo"].push([
+    //   "Número celular",
+    //   toPhoneNumber(inputCelular) ?? "0",
+    // ]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
+    // infTicketFinal["trxInfo"].push([
+    //   "Valor recarga",
+    //   formatMoney.format(inputValor) ?? "0",
+    // ]);
+    // infTicketFinal["trxInfo"].push(["", ""]);
     postEnvioTrans({
       comercio: {
         id_comercio: roleInfo.id_comercio,
@@ -141,7 +142,8 @@ const RecargasOperadores = () => {
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(inputValor),
-      ticket: infTicketFinal,
+      // ticket: infTicketFinal,
+      address: roleInfo?.direccion,
 
       datosRecargas: {
         celular: inputCelular,
@@ -156,9 +158,9 @@ const RecargasOperadores = () => {
       .then(async (res) => {
         if (res?.status === true) {
           notify("Recarga exitosa");
-          infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
-          infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
-          setInfTicket(infTicketFinal);
+          // infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+          // infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
+          setInfTicket(res?.obj?.ticket);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
         } else {
@@ -180,9 +182,9 @@ const RecargasOperadores = () => {
                             res?.obj?.response?.estado == "00"
                           ) {
                             notify("Recarga exitosa");
-                            infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
-                            infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
-                            setInfTicket(infTicketFinal);
+                            // infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
+                            // infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
+                            setInfTicket(res?.obj?.ticket);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
                           } else {
@@ -255,21 +257,22 @@ const RecargasOperadores = () => {
     setTypeInfo("Ninguno");
     setInputCelular("");
     setInputValor("");
-    setInfTicket((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          ["Id Comercio", roleInfo.id_comercio],
-          ["No. terminal", roleInfo.id_dispositivo],
-          ["Comercio", roleInfo["nombre comercio"]],
-          ["", ""],
-          ["Dirección", roleInfo.direccion],
-          ["", ""],
-        ],
-        commerceName: "RECARGA",
-        trxInfo: [],
-      };
-    });
+    setInfTicket("");
+    // setInfTicket((old) => {
+    //   return {
+    //     ...old,
+    //     commerceInfo: [
+    //       ["Id Comercio", roleInfo.id_comercio],
+    //       ["No. terminal", roleInfo.id_dispositivo],
+    //       ["Comercio", roleInfo["nombre comercio"]],
+    //       ["", ""],
+    //       ["Dirección", roleInfo.direccion],
+    //       ["", ""],
+    //     ],
+    //     commerceName: "RECARGA",
+    //     trxInfo: [],
+    //   };
+    // });
     validNavigate("/recargas-paquetes");
   }, []);
 
