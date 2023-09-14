@@ -127,13 +127,11 @@ const RecargarPaquetes = () => {
       valor_total_trx: parseInt(state?.valor_paquete),
       address: roleInfo?.direccion,
       // ticket: infTicketFinal,
-
-      datosRecargas: {
+      nombre_usuario: pdpUser?.uname ?? "",
+      datos_recargas: {
         celular: inputCelular,
         operador: state?.operador,
-        valor: parseInt(state?.codigo_paq),
         jsonAdicional: {
-          "nombre_usuario": pdpUser?.uname ?? "",
           operador: state?.operador_recargar,
           operador_paquete: state?.operador_paquete,
         },
@@ -157,8 +155,8 @@ const RecargarPaquetes = () => {
                   setTimeout(() => {
                     postCheckReintentoRecargas({
                       id_uuid_trx: id_uuid,
-                      idComercio: roleInfo?.id_comercio,
-                      idDispositivo: roleInfo?.id_dispositivo,
+                      id_comercio: roleInfo?.id_comercio,
+                      id_terminal: roleInfo?.id_dispositivo,
                     })
                       .then((res) => {
                         if (res?.msg !== "No ha terminado el reintento") {
@@ -190,7 +188,7 @@ const RecargarPaquetes = () => {
                         setRespuesta(false);
                         console.error(err);
                       });
-                  }, 9000)
+                  }, 15000)
                 );
                 if (prom === true) {
                   setRespuesta(false);

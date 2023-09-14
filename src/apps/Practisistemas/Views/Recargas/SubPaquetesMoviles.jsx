@@ -97,6 +97,7 @@ const SubPaquetesMoviles = ({ subRoutes }) => {
       limit,
     };
     setShowLoading(true);
+    console.log(postData)
     postConsultaPaquetes(postData)
       .then((autoArr) => {
         setShowLoading(false);
