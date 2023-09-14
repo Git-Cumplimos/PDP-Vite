@@ -39,6 +39,7 @@ export const fetchCustom = (url_, metodo_, name_,evaluate=true,notificacion=true
         error.message
       );
     }
+
     //Evaluar si la respuesta es json
     try {
       if (typeof Peticion !== "object") {
@@ -51,56 +52,68 @@ export const fetchCustom = (url_, metodo_, name_,evaluate=true,notificacion=true
       console.log("error", error)
       throw error;
     }
-    //evaluar respuesta de api gateway
-    try {
-      if (Peticion?.hasOwnProperty("status") === false) {
-        //No es una respuesta directamente del servicio sino del api gateway
-        if (Peticion?.hasOwnProperty("message") === true) {
-          if (Peticion.message === "Endpoint request timed out") {
-            if (notificacion === true) {
-              
-              throw new ErrorCustomTimeout(
-                `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
-                "Timeout"
-              );
-            } else { 
-              throw new ErrorCustomTimeout(
-                `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
-                "Timeout",null
-              );
 
-            }
-          } else {
-            throw new ErrorCustomFetch(
-              `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
-              Peticion.message
-            );
-          }
-        }
-      }
-    } catch (error) {
-      if (error instanceof ErrorCustomTimeout) {
-        throw error;
-      } else if (error instanceof ErrorCustomFetch) {
-        throw error;
-      } else {
-        throw new ErrorCustomFetch(
-          `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
-          error.message
-        );
-      }
-    }
 
-    //evaluar la respuesta que llega del backend
     try {
       if (evaluate === true) {
-        return EvaluateResponse(Peticion, name_);
+        return Peticion
       } else { 
         return Peticion
       }
     } catch (error) {
       throw error;
     }
+
+    //evaluar respuesta de api gateway
+    // try {
+    //   if (Peticion?.hasOwnProperty("status") === false) {
+    //     //No es una respuesta directamente del servicio sino del api gateway
+    //     if (Peticion?.hasOwnProperty("message") === true) {
+    //       if (Peticion.message === "Endpoint request timed out") {
+    //         if (notificacion === true) {
+              
+    //           throw new ErrorCustomTimeout(
+    //             `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+    //             "Timeout"
+    //           );
+    //         } else { 
+    //           throw new ErrorCustomTimeout(
+    //             `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+    //             "Timeout",null
+    //           );
+
+    //         }
+    //       } else {
+    //         throw new ErrorCustomFetch(
+    //           `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+    //           Peticion.message
+    //         );
+    //       }
+    //     }
+    //   }
+    // } catch (error) {
+    //   if (error instanceof ErrorCustomTimeout) {
+    //     throw error;
+    //   } else if (error instanceof ErrorCustomFetch) {
+    //     throw error;
+    //   } else {
+    //     throw new ErrorCustomFetch(
+    //       `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
+    //       error.message
+    //     );
+    //   }
+    // }
+
+    //evaluar la respuesta que llega del backend
+    // try {
+    //   if (evaluate === true) {
+    //     return EvaluateResponse(Peticion, name_);
+    //   } else { 
+    //     return Peticion
+    //   }
+    // } catch (error) {
+    //   throw error;
+    // }
   };
 };
 

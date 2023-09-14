@@ -70,6 +70,7 @@ const PagarMoviliza = () => {
   );
   const [token, setToken] = useState("");
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     console.log(loadingPeticionJwt)
@@ -145,7 +146,7 @@ const PagarMoviliza = () => {
       if ((e.target.value).length==0){
         setNumeroMoviliza("")
       }
-}, []);
+   }, []);
 
   const onChangeSelect = useCallback((e) => {
     if (e.target.value === option_barcode) {
@@ -264,55 +265,83 @@ const PagarMoviliza = () => {
       //   },
       // };
 
-      notifyPending(
-        (peticionConsultMoviliza({}, data)
+
+
+
+
+        // peticionConsultMoviliza({}, data)
         // .then((response) => {
-        //   notify(response.status);
-        //   if (response?.status === true) {
+        //   // notify(response.status);
+        //   if (response?.status == true) {
+        //     if (response?.obj?.object?.estado != "PAGADO"){
         //     setResConsultMoviliza(response?.obj);
         //     setPaso("ResumenTrx");
         //     setShowModal(true);
         //     notify("Consulta realizada");
         //   }
         //   else{
-        //     notifyError("Consulta realizada: "+ toString(response.status));
-        //   }return response
+        //     notify("Liquidación se encuentra en estado PAGADO");
+        //   }
+        // }
+        // if (response?.status == false){
+        //     notify("Consulta realizada: "+ toString("response.status"));
+        //   }
+        //   //return response
         // }
         // )
         // .catch((error) => {
         //   CallErrorPeticion(error);
+        //   console.log(error.message)
+        //   notifyError("Consulta realizada: "+ toString(resConsultMoviliza.mensaje));
         // })
-        ),
+
+        notifyPending(
+          ( peticionConsultMoviliza({}, data)),
         {
           render: () => {
             return "Realizando consulta";
           },
         },
         {
-          render: ({ data: response}) => {
+          render: ({data: response}) => {
+            console.log("prueba2",response, data)
             // setPaymentStatus(res?.obj?.ticket ?? {});
           if (response?.status === true) {
+            if (response?.obj?.object?.estado != "PAGADO"){
             setResConsultMoviliza(response?.obj);
             setPaso("ResumenTrx");
             setShowModal(true);
             return "Consulta realizada";
+            }
+            else{
+              return "Liquidación se encuentra en estado PAGADO";
+            }
           }
-          else{
-            return "Error en consulta realizada";
+          else if (response?.status === false){ 
+                if (response?.obj?.mensaje != null){
+                  if (response?.obj?.mensaje=="Error autenticando adminot "){
+                    return "Consulta fallida"
+                  }
+                  else{
+                    return response?.obj?.mensaje
+                  }
+          }
+              else{
+                return "Consulta fallida";
+              }
           }
           },
         },
         {
           render: ({ data: error }) => {
             navigate("/moviliza");
-            // if (error?.cause === "custom") {
-            //   return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-            // }
-            console.error(error?.message);
-            return "Consulta fallida";
+            if (error?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+            }
+            return "Error al realizar consulta";
           },
         }
-      );
+      )
   };
 
   const onSubmitPayMoviliza = useCallback(
@@ -331,14 +360,13 @@ const PagarMoviliza = () => {
         nombre_usuario: pdpUser["uname"],
         nombre_comercio: roleInfo?.["nombre comercio"],
         numero_moviliza: numeroMoviliza,
-        valor_total_trx: resConsultMoviliza.object?.valor,  //valor_total_trx,
-        cuota: resConsultMoviliza.object?.cuota,
+        valor_total_trx: resConsultMoviliza.object?.totalLiquidacion,  //valor_total_trx,
         ciudad: roleInfo.ciudad,          
         direccion: roleInfo.direccion,
         telefono: roleInfo?.telefono,
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
-        idLiquidacion: numeroMoviliza,
+        idLiquidacion: resConsultMoviliza.numero_moviliza,
         medioPago: "PSE",
         // medioPago: {
         //   descripcion: "Ventanilla de efectivo",
@@ -347,7 +375,8 @@ const PagarMoviliza = () => {
         //   },
         nroAutorizacion: resConsultMoviliza?.["id_trx"],
         id_trx: resConsultMoviliza?.["id_trx"],
-        token: token
+        token: token,
+        obj_consulta: resConsultMoviliza.object
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
@@ -366,7 +395,6 @@ const PagarMoviliza = () => {
               : response?.obj?.ticket
               ? response?.obj?.ticket
               : {};
-            console.log("hasta aca bien vocucher", voucher)
             setInfTicket(voucher);
             setPaso("TransaccionExitosa");
             notify("Pago Moviliza exitoso");
