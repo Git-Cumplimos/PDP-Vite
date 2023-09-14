@@ -28,7 +28,7 @@ import { v4 } from "uuid";
 const RecargarPaquetes = () => {
   //Variables
   const printDiv = useRef();
-  const { roleInfo, userInfo, pdpUser } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
@@ -37,30 +37,6 @@ const RecargarPaquetes = () => {
   const validNavigate = useNavigate();
   const id_uuid = v4();
   const [infTicket, setInfTicket] = useState("");
-  // const [infTicket, setInfTicket] = useState({
-  //   title: "Recibo de pago",
-  //   timeInfo: {
-  //     "Fecha de pago": "fecha",
-  //     Hora: "",
-  //   },
-  //   commerceInfo: [
-  //     ["Id Comercio", roleInfo.id_comercio],
-  //     ["No. terminal", roleInfo.id_dispositivo],
-  //     ["Comercio", roleInfo["nombre comercio"]],
-  //     ["", ""],
-  //     ["Dirección", roleInfo.direccion],
-  //     ["", ""],
-  //   ],
-  //   commerceName: "RECARGA",
-  //   trxInfo: [
-  //     ["Operador", state?.operadorPaquete],
-  //     ["", ""],
-  //     ["Tipo paquete", state?.operador_recargar],
-  //     ["", ""],
-  //   ],
-  //   disclamer:
-  //     "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-  // });
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
 
@@ -88,32 +64,6 @@ const RecargarPaquetes = () => {
   };
   const fecthEnvioTransaccion = () => {
     setRespuesta(true);
-    // const fecha = Intl.DateTimeFormat("es-CO", {
-    //   year: "numeric",
-    //   month: "2-digit",
-    //   day: "2-digit",
-    // }).format(new Date());
-    // /*hora actual */
-    // const hora = Intl.DateTimeFormat(undefined, {
-    //   hour: "2-digit",
-    //   minute: "2-digit",
-    //   second: "2-digit",
-    // }).format(new Date());
-    // const infTicketFinal = { ...infTicket };
-    // infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
-    // infTicketFinal["timeInfo"]["Hora"] = hora;
-    // infTicketFinal["trxInfo"].push([
-    //   "Número celular",
-    //   toPhoneNumber(inputCelular) ?? "0",
-    // ]);
-    // infTicketFinal["trxInfo"].push(["", ""]);
-    // infTicketFinal["trxInfo"].push([
-    //   "Valor paquete",
-    //   formatMoney.format(state?.valor_paquete) ?? "0",
-    // ]);
-    // infTicketFinal["trxInfo"].push(["", ""]);
-    // infTicketFinal["trxInfo"].push(["Descripción", state?.descripcion ?? ""]);
-    // infTicketFinal["trxInfo"].push(["", ""]);
     postEnvioTrans({
       comercio: {
         id_comercio: roleInfo.id_comercio,
@@ -126,22 +76,20 @@ const RecargarPaquetes = () => {
       nombre_comercio: roleInfo["nombre comercio"],
       valor_total_trx: parseInt(state?.valor_paquete),
       address: roleInfo?.direccion,
-      // ticket: infTicketFinal,
       nombre_usuario: pdpUser?.uname ?? "",
       datos_recargas: {
         celular: inputCelular,
         operador: state?.operador,
         jsonAdicional: {
-          operador: state?.operador_recargar,
-          operador_paquete: state?.operador_paquete,
+          operador: state?.operadorPaquete,
+          operador_paquete: state?.operador_recargar,
+          descripcion: state?.descripcion,
         },
       },
     })
       .then(async (res) => {
         if (res?.status === true) {
           notify("Compra de paquete exitosa");
-          // infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
-          // infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
           setInfTicket(res?.obj?.ticket);
           setRespuesta(false);
           setTypeInfo("RecargaExitosa");
@@ -159,13 +107,11 @@ const RecargarPaquetes = () => {
                       id_terminal: roleInfo?.id_dispositivo,
                     })
                       .then((res) => {
-                        if (res?.msg !== "No ha terminado el reintento") {
+                        if (res?.msg !== "Error respuesta PDP: (No ha terminado la transacción)") {
                           if (
                             res?.status === true ||
-                            res?.obj?.response?.estado == "00"
+                            res?.obj?.response?.estado === "00"
                           ) {
-                            // infTicketFinal["commerceInfo"].splice(2, 0, ["Id Trx", res?.obj?.response?.["idtrans"],]);
-                            // infTicketFinal["commerceInfo"].splice(3, 0, ["Id Aut", res?.obj?.response?.["codigoauth"],]);
                             setInfTicket(res?.obj?.ticket);
                             setRespuesta(false);
                             setTypeInfo("RecargaExitosa");
@@ -173,7 +119,7 @@ const RecargarPaquetes = () => {
                             notifyError(
                               typeof res?.msg == typeof {}
                                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
+                                : res?.msg === "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg === "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
                             );
                             setRespuesta(true);
                             handleClose();
@@ -212,13 +158,12 @@ const RecargarPaquetes = () => {
                 );
               }
             }
-            // notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
             validNavigate("/recargas-paquetes");
           } else {
             notifyError(
               typeof res?.msg == typeof {}
                 ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
+                : res?.msg === "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
             );
             setRespuesta(false);
             handleClose();
@@ -238,23 +183,6 @@ const RecargarPaquetes = () => {
     setTypeInfo("Ninguno");
     setInputCelular("");
     setInfTicket("");
-    // setInfTicket((old) => {
-    //   return {
-    //     ...old,
-    //     commerceInfo: [
-    //       ["Id Comercio", roleInfo.id_comercio],
-    //       ["No. terminal", roleInfo.id_dispositivo],
-    //       ["Comercio", roleInfo["nombre comercio"]],
-    //       ["", ""],
-    //       ["Municipio", roleInfo.ciudad],
-    //       ["", ""],
-    //       ["Dirección", roleInfo.direccion],
-    //       ["", ""],
-    //     ],
-    //     commerceName: state?.operador_recargar,
-    //     trxInfo: [],
-    //   };
-    // });
   }, []);
 
   const handleCloseRecarga = useCallback(() => {

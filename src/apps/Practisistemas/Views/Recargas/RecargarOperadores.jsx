@@ -52,8 +52,8 @@ const RecargasOperadores = () => {
   const onCelChange = (e) => {
     const valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
 
-    if (valueInput[0] !== 3) {
-      if (valueInput.length === 1 && inputCelular === "") {
+    if (valueInput[0] != 3) {
+      if (valueInput.length == 1 && inputCelular == "") {
         notifyError(
           "Número inválido, el No. de celular debe comenzar con el número 3"
         );
@@ -65,7 +65,7 @@ const RecargasOperadores = () => {
 
   const onSubmitCheck = (e) => {
     e.preventDefault();
-    if (inputValor !== 0) {
+    if (inputValor != 0) {
       setShowModal(true);
       setTypeInfo("ResumenRecarga");
     } else {
@@ -75,7 +75,7 @@ const RecargasOperadores = () => {
         )}`
       );
     }
-    if (inputCelular[0] !== 3) {
+    if (inputCelular[0] != 3) {
       notifyError(
         "Número inválido, el No. de celular debe comenzar con el número 3"
       );
