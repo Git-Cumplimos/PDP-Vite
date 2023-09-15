@@ -7,7 +7,10 @@ import { fetchSecure } from "../../../utils/functions";
 // const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
 // const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
 // const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
-const urlCierreCaja = `${process.env.REACT_APP_URL_CAJA}/transacciones`;
+
+// const urlCierreCaja = `${process.env.REACT_APP_URL_CAJA}/transacciones`;
+
+const urlCierreCaja = `http://localhost:5000/transacciones`;
 
 const urlArqueo = `http://localhost:5000/arqueo`;
 const urlCaja = `http://localhost:5000/caja`;

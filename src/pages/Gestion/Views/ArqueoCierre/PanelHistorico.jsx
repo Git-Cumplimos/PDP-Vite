@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment } from "react";
+import { useState, useEffect, useCallback, Fragment, useRef } from "react";
 import Input from "../../../../components/Base/Input";
 import { searchHistorico } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
@@ -8,6 +8,11 @@ import {
   onChangeNumber,
 } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
+import Modal from "../../../../components/Base/Modal";
+import Tickets from "../../../../components/Base/Tickets";
+import Button from "../../../../components/Base/Button";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import { useReactToPrint } from "react-to-print";
 
 const formatMoney = makeMoneyFormatter(0);
 
@@ -17,12 +22,18 @@ const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
   const [pageData, setPageData] = useState({});
   const [maxPages, setMaxPages] = useState(1);
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [searchInfo, setSearchInfo] = useState({
     id_usuario: "",
     id_comercio: "",
     date_ini: "",
     date_end: "",
   });
+
+  const CloseModal = useCallback(() => {
+    setSelected(null);
+  }, []);
 
   const buscarConsignaciones = useCallback(() => {
     searchHistorico({
@@ -49,6 +60,13 @@ const PanelHistorico = () => {
     buscarConsignaciones();
   }, [buscarConsignaciones]);
 
+  const printDiv = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printDiv.current,
+  });
+
+  console.log(selected)
   return (
     <Fragment>
       <TableEnterprise
@@ -118,6 +136,9 @@ const PanelHistorico = () => {
           })
         )}
         onSetPageData={setPageData}
+        onSelectRow={(_e, index) => {
+          setSelected(receipt[index]);
+        }}
       >
         <Input
           id="dateInit"
@@ -168,6 +189,22 @@ const PanelHistorico = () => {
           }
         />
       </TableEnterprise>
+      <Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
+        {/* {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? ( */}
+          <div className='flex flex-col justify-center items-center'>
+              <Tickets
+                refPrint={printDiv}
+                type='Reimpresión'
+                ticket={selected}
+                // stateTrx={selected?.status_trx}
+              />
+            <ButtonBar>
+              <Button onClick={handlePrint}>Imprimir</Button>
+              <Button onClick={CloseModal}>Cerrar</Button>
+            </ButtonBar>
+          </div>
+        {/* ) : null} */}
+      </Modal>
     </Fragment>
   );
 };
