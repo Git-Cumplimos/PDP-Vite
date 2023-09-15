@@ -64,30 +64,19 @@ const ApuestasDeportivas = ({ subRoutes }) => {
         !loadingPeticionConsultaCasasPractisistemas &&
         !loadingPeticionConsultaCasas
       ) {
-        notifyPending(
-          peticionConsultaCasas(data, {}),
-          {
-            render: () => {
-              return "Procesando consulta";
-            },
-          },
-          {
-            render: ({ data: res }) => {
-              if (res.obj.length === 2) {
-                setCasas(res?.obj[0] ?? []);
-                setMaxPages(res?.obj[1] ?? 1);
-                return "Consulta satisfactoria";
-              } else {
-                return "Error al procesar los datos";
-              }
-            },
-          },
-          {
-            render: ({ data: error }) => {
-              return error?.message ?? "Consulta fallida";
-            },
-          }
-        );
+        peticionConsultaCasas(data, {})
+          .then((res) => {
+            if (res.obj.length === 2) {
+              setCasas(res?.obj[0] ?? []);
+              setMaxPages(res?.obj[1] ?? 1);
+              return "Consulta satisfactoria";
+            } else {
+              return "Error al procesar los datos";
+            }
+          })
+          .catch((error) => {
+            return error?.message ?? "Consulta fallida";
+          });
       }
     }, [
       limit,
