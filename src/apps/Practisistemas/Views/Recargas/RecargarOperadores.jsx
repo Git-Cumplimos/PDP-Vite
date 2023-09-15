@@ -44,7 +44,7 @@ const RecargasOperadores = () => {
   const printDiv = useRef();
   const validNavigate = useNavigate();
   const id_uuid = v4();
-  const [infTicket, setInfTicket] = useState("");
+  const [infTicket, setInfTicket] = useState({});
 
   const onChangeMoney = useMoney({
     limits: [minValor, maxValor],
@@ -148,7 +148,7 @@ const RecargasOperadores = () => {
     setTypeInfo("Ninguno");
     setInputCelular("");
     setInputValor("");
-    setInfTicket("");
+    setInfTicket({});
     validNavigate("/recargas-paquetes");
   }, []);
 
