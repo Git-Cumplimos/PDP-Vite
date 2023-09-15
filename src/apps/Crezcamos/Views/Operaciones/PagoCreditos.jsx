@@ -115,8 +115,8 @@ const PagoCredito = () => {
               Nombre: row.firstNames,
               PrimerApellido: row.firstSurname,
               SegundoApellido: row.secondLastName,
-              ValorMinimo: row?.amount, // Formatear el valor como número con 2 decimales
-              ValorTotal: row?.totalAmount
+              ValorMinimo: Math.floor(row?.amount / 100), // Formatear el valor como número con 2 decimales
+              ValorTotal: Math.floor(row?.totalAmount / 100)
             }));
             setDatosCredito(formattedData);
             const nombre = res?.obj?.products[0]?.firstNames + " " + res?.obj?.products[0]?.firstSurname + " " + res?.obj?.products[0]?.secondLastName
@@ -195,10 +195,11 @@ const PagoCredito = () => {
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
       address: roleInfo?.direccion,
+      city: roleInfo?.ciudad.substring(0, 7),
       Datos: {
         tipo_documento: datosTrx?.tipoDocumento,
         num_documento: datosTrx?.documento,
-        tipo_pago: "PCU" ? datosTrx?.tipoPago === 2 : "PTO",
+        tipo_pago: datosTrx?.tipoPago === 2 ? "PCU" : "PTO",
         num_credito: datosTrx?.credito,
         nombre: datosConsulta?.products[0]?.firstNames,
         first_apellido: datosConsulta?.products[0]?.firstSurname,
