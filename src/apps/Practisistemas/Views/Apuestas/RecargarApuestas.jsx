@@ -19,7 +19,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyPending } from "../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { v4 } from "uuid";
 import { enumLimiteApuestas } from "../enumLimiteApuestas";
 import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
@@ -146,7 +146,7 @@ const RecargarApuestas = () => {
   const handleCloseCancelada = useCallback(() => {
     setShowModal(false);
     setTypeInfo("Ninguno");
-    notify("Recarga cancelada");
+    notifyError("Transacción cancelada por el usuario");
     validNavigate("/apuestas-deportivas");
     handleClose();
   }, []);
