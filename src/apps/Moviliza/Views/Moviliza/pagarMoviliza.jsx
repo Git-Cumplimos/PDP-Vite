@@ -238,7 +238,7 @@ const PagarMoviliza = () => {
       //   //   list.push(elem);
       //   //   if ((i + 1) % 1 === 0) list.push(["", ""]);
       //   //   return list;
-      //   // }, []),
+      //   // }, []),         
 
       //   id_trx: 223023,//inquiryStatus?.id_trx,
       //   // Datos trx colpatria
