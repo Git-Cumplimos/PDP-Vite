@@ -1,3 +1,4 @@
+import { fetchDataTotp } from "../../../utils/MFA";
 import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
@@ -12,7 +13,7 @@ export const makeDeposit = async (bodyDep) => {
   }
 
   try {
-    const res = await fetchData(
+    const res = await fetchDataTotp(
       `${urlColpatriaTrx}/deposito`,
       "POST",
       {},
