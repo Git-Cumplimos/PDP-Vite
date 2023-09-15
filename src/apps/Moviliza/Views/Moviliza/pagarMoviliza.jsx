@@ -73,7 +73,6 @@ const PagarMoviliza = () => {
   
 
   useEffect(() => {
-    console.log(loadingPeticionJwt)
     const data = {
       id_comercio: roleInfo.id_comercio,
       id_terminal: roleInfo.id_dispositivo,
@@ -82,11 +81,8 @@ const PagarMoviliza = () => {
     };
     peticionJwt({}, data)
     .then((response) => {
-      console.log(loadingPeticionJwt)
-      console.log ("Datos de respuesta Moviliza>>>>>>> ", response)
       if (response?.status === true) {
         setToken(response?.obj?.object)
-        console.log ("Datos de respuesta Moviliza>>>>>>> ", response)
       }
     })
     .catch((error) => {
@@ -161,10 +157,6 @@ const PagarMoviliza = () => {
   }, []);
 
 
-  // const onSubmitBarcode = (e) => {
-  //   e.preventDefault();
-  //   console.log("entro al medico")
-
   const onSubmitBarcode = useCallback(
     (info) => {
       // const data = {
@@ -173,8 +165,6 @@ const PagarMoviliza = () => {
       const data = {
         codigo_barras: numeroMoviliza,
       };
-
-      console.log(data)
       if (numeroMoviliza === "") {
         notifyError(
           "El campo del código de barras está vacío, por favor scanee o dijite el código"
@@ -304,7 +294,6 @@ const PagarMoviliza = () => {
         },
         {
           render: ({data: response}) => {
-            console.log("prueba2",response, data)
             // setPaymentStatus(res?.obj?.ticket ?? {});
           if (response?.status === true) {
             if (response?.obj?.object?.estado != "PAGADO"){
@@ -598,7 +587,6 @@ const PagarMoviliza = () => {
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TransaccionExitosa" && (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-            {console.log(printDiv, infTicket)}
             <TicketColpatria refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>

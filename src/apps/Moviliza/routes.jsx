@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { enumPermisosColpatria } from "./enumPermisosColpatria";
+import { enumPermisosMoviliza } from "./enumPermisosMoviliza";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -10,15 +10,15 @@ const Moviliza = lazy(() =>
 
 const pagarMoviliza = lazy(() => import("./Views/Moviliza/pagarMoviliza"));
 
-const listPermissions = Object.values(enumPermisosColpatria);
-export const listPermissionsColpatria = listPermissions;
+const listPermissions = Object.values(enumPermisosMoviliza);
+export const listPermissionsMoviliza = listPermissions;
 
 const rutasMoviliza = {
 
   link: "/moviliza",
   label: <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name={"Moviliza"} />,
   component: pagarMoviliza,
-  permission: [...listPermissionsColpatria],
+  permission: [...listPermissionsMoviliza],
   subRoutes: [ 
 
 ]

@@ -12,7 +12,6 @@ export const ComponentsModalSummaryTrx = ({
 }) => {
   return (
     <Fragment>
-      {console.log(summary)}
       <PaymentSummary
         title="Respuesta de consulta Moviliza"
         subtitle="Resumen de la transacción"
