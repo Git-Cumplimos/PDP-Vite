@@ -1,7 +1,7 @@
 import { useImgs } from "../../../../hooks/ImgsHooks";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 
-const TicketColpatria = ({
+const TicketMoviliza = ({
   refPrint,
   type = "ORIGINAL",
   ticket,
@@ -42,4 +42,4 @@ const TicketColpatria = ({
   );
 };
 
-export default TicketColpatria;
+export default TicketMoviliza;

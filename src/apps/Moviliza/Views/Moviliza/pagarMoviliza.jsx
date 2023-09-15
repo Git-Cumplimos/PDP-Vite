@@ -16,7 +16,7 @@ import {
   LecturaMoviliza,
 } from "./components/components_form";
 import classes from "./pagarMoviliza.module.css";
-import TicketColpatria from "../../components/TicketsBancoColpatria/TicketColpatria";
+import TicketMoviliza from "../../components/TicketsMoviliza/TicketMoviliza";
 import { v4 } from "uuid";
 import { useFetchMoviliza } from "../../hooks/hookMoviliza";
 import {
@@ -587,7 +587,7 @@ const PagarMoviliza = () => {
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TransaccionExitosa" && (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
-            <TicketColpatria refPrint={printDiv} ticket={infTicket} />
+            <TicketMoviliza refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>
