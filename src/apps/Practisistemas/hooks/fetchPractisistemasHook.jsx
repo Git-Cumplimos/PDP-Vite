@@ -53,7 +53,7 @@ export const useFetchPractisistemas = (
             id_terminal: data_?.comercio?.id_terminal,
             id_uuid_trx: data_additional_?.id_uuid_trx,
           };
-          for (let i = 0; i <= 4; i++) {
+          for (let i = 0; i <= 6; i++) {
             PeticionConsulta = await fetchConsulta({}, data_consulta);
             if (PeticionConsulta?.msg.includes("No ha terminado")) {
               notify(
