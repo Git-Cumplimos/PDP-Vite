@@ -276,7 +276,7 @@ const RecaudoTripleA = () => {
       <SimpleLoading show={loadingPeticion}></SimpleLoading>
       <h1 className="text-3xl mt-6">Recaudo Triple A</h1>
       <Form grid={false} className=" flex flex-col content-center items-center">
-        <h1>Tipo de captura</h1>
+        <h1 className={"text-xl"}>Tipo de captura</h1>
         <div className={styleComponents}>
           <Select
             id="opciones"
@@ -284,6 +284,7 @@ const RecaudoTripleA = () => {
             options={options_select}
             onChange={onChangeSelect}
             value={procedimiento}
+            className={"text-xl"}
           />
         </div>
 
@@ -304,8 +305,7 @@ const RecaudoTripleA = () => {
         {/******************************Lectura Triple A*******************************************************/}
         {paso === "LecturaTripleA" && (
           <Fragment>
-            <h1>Número de cupón</h1>
-
+            <h1 className={"text-xl"}>Número de cupón</h1>
             <Input
               label=""
               required
