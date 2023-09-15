@@ -58,6 +58,8 @@ import rutasPowwi from "../apps/Powwi/routes";
 import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
 import rutasFundacionMujer from "../apps/FundacionMujer/routes";
 import rutasMovii from "../apps/Movii-pdp/routes";
+import rutasMoviliza from "../apps/Moviliza/routes";
+
 
 /**
 
@@ -1123,12 +1125,14 @@ const allUrlsPrivateApps = [
   rutasRecaudoDirecto,
   rutasRecargasTullave,
   rutasPowwi,
-
   //Modulo Almaseg
   routesAlmaseg,
   //Modulo Emcali
   routesEmcali,
   routesOtrasEntidades,
+  //Modulo Moviliza
+  rutasMoviliza
+
 ];
 
 export { allUrlsPrivateApps };
