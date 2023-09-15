@@ -12,25 +12,28 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Fieldset from "../../../../components/Base/Fieldset";
-import { notify, notifyError } from "../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { toPhoneNumber } from "../../../../utils/functions";
 import classes from "./FormularioVentaPines.module.css";
-import fetchData from "../../../../utils/fetchData";
-import { postCheckReintentoPines, fetchConsultaPinEPM, fetchConsultaPinSNR, } from "../../utils/fetchBackPines";
+import { fetchConsultaPinEPM, fetchConsultaPinSNR } from "../../utils/fetchBackPines";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { v4 } from "uuid";
+import { enumLimiteApuestas } from "../enumLimiteApuestas";
+import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
 
-const minValor = 1000;
-const maxValor = 100000;
-const minValorEPM = `${process.env.MIN_VALOR_EPM}`;
-const maxValorEPM = `${process.env.MAX_VALOR_EPM}`;
-const url_compra_pines = `${process.env.REACT_APP_PRACTISISTEMAS}/pines`;
-const tipo_operacion = 113;
+const minValor = enumLimiteApuestas.minPines;
+const maxValor = enumLimiteApuestas.maxPines;
+const minValorEPM = enumLimiteApuestas.minPinesEPM;
+const maxValorEPM = enumLimiteApuestas.maxPinesEPM;
+
+const URL_PINES = `${process.env.REACT_APP_PRACTISISTEMAS}/pines/transacciones`;
+const URL_CONSULTA_PINES = `${process.env.REACT_APP_PRACTISISTEMAS}/pines/consulta-estado-trx`;
+
 
 const CompraPin = () => {
   const { contenedorbtn, contenedorTitulos } = classes;
-  const { roleInfo, userInfo, pdpUser, infoTicket } = useAuth();
+  const { roleInfo,  pdpUser } = useAuth();
   const [inputCelular, setInputCelular] = useState("");
   const [inputContador, setInputContador] = useState("");
   const [inputPlaca, setInputPlaca] = useState("");
@@ -43,6 +46,7 @@ const CompraPin = () => {
   const validNavigate = useNavigate();
   const { state } = useLocation();
   const printDiv = useRef();
+  const id_uuid = v4();
   //******************* Datos del propietario DatosEPM (Variables) ***************
   const [consultaDatosEPM, setConsultaDatosEPM] = useState({
     nombreClienteEpm: "",
@@ -68,6 +72,7 @@ const CompraPin = () => {
   const [modalDatosSNR, showModalDatosSNR] = useState(false);
   // **************************************************************
   //------------------Funcion Para consultar a practisistemas validarPinEpm -------------------------------
+  
   const ConsultaPinEPM = (e) => {
     e.preventDefault(e);
     if (state?.op == "cb") {
@@ -80,31 +85,36 @@ const CompraPin = () => {
       })
         .then((res) => {
           setShowLoading(false);
-          if (res?.obj?.respuesta == "Consulta con error") {
-            if (res?.obj?.data?.nombre == "Usuario no existe") {
-              notifyError("Error respuesta Practisistemas:(Consulta invalida[Usuario no existe])")
-            } else if (
-              res?.obj?.data?.reply ==
-              "Error consultando Matricula, Posiblemente no existe"
-            ) {
-              notifyError("Error respuesta Practisistemas:(Consulta invalida [Error consultando Matrícula, posiblemente no existe])")
-            } else if (
-              res?.obj?.data?.reply == "Error en el codigo de municipio"
-            ) {
-              notifyError("Error respuesta Practisistemas:(Consulta invalida[Error consultando Círculo, posiblemente no existe])")
+          if (!res?.status) {
+            notifyError(res?.msg);
+            validNavigate("/Pines/PinesContenido");
+          } else{
+            if (res?.obj?.respuesta == "Consulta con error") {
+              if (res?.obj?.data?.nombre == "Usuario no existe") {
+                notifyError("Error respuesta Practisistemas:(Consulta invalida[Usuario no existe])")
+              } else if (
+                res?.obj?.data?.reply ==
+                "Error consultando Matricula, Posiblemente no existe"
+              ) {
+                notifyError("Error respuesta Practisistemas:(Consulta invalida [Error consultando Matrícula, posiblemente no existe])")
+              } else if (
+                res?.obj?.data?.reply == "Error en el codigo de municipio"
+              ) {
+                notifyError("Error respuesta Practisistemas:(Consulta invalida[Error consultando Círculo, posiblemente no existe])")
+                }
+            } else {
+              showModalDatosSNR(true);
+              setConsultaDatosSNR((old) => {
+                return {
+                  ...old,
+                  matricula: inputMatricula,
+                  municipio: res?.obj?.data?.municipio,
+                  direccion: res?.obj?.data?.dir,
+                  valorPin: res?.obj?.data?.valorVenta,
+                  repuesta: res?.obj?.respuesta,
+                };
+              });
             }
-          } else {
-            showModalDatosSNR(true);
-            setConsultaDatosSNR((old) => {
-              return {
-                ...old,
-                matricula: inputMatricula,
-                municipio: res?.obj?.data?.municipio,
-                direccion: res?.obj?.data?.dir,
-                valorPin: res?.obj?.data?.valorVenta,
-                repuesta: res?.obj?.respuesta,
-              };
-            });
           }
         })
         .catch((err) => {
@@ -121,27 +131,31 @@ const CompraPin = () => {
       })
         .then((res) => {
           setShowLoading(false);
-          if (res?.obj?.respuesta == "Consulta con error") {
-            if (res?.obj?.data?.nombre == "Usuario no existe") {
-              notifyError("Error respuesta Practisistemas:(Consulta invalida[Usuario no existe])")
-            } else if (res?.obj?.data?.reply) {
-              notifyError("Cantidad no puede ser menor de 5000");
-            }
-          } else {
-            showModalDatosEPM(true);
-            showModalDatosSNR(true);
-            setConsultaDatosEPM((old) => {
-              return {
-                ...old,
-                nombreClienteEpm: res?.obj?.data?.nombreClienteEpm,
-                dniClienteEpm: res?.obj?.data?.dniClienteEpm,
-                direccionClienteEpm: res?.obj?.data?.direccionClienteEpm,
-                localidadEpm: res?.obj?.data?.localidadEpm,
-                departamentoEpm: res?.obj?.data?.departamentoEpm,
-                respuesta: res?.obj?.respuesta,
-              };
-            });
-          }
+          if (!res?.status) {
+            notifyError(res?.msg);
+            validNavigate("/Pines/PinesContenido");
+          } else{
+            if (res?.obj?.respuesta == "Consulta con error") {
+              if (res?.obj?.data?.nombre == "Usuario no existe") {
+                notifyError("Error respuesta Practisistemas:(Consulta invalida[Usuario no existe])");
+              } else if (res?.obj?.data?.reply) {
+                notifyError("Cantidad no puede ser menor de 5000");
+              }
+            } else {
+              showModalDatosEPM(true);
+              showModalDatosSNR(true);
+              setConsultaDatosEPM((old) => {
+                return {
+                  ...old,
+                  nombreClienteEpm: res?.obj?.data?.nombreClienteEpm,
+                  dniClienteEpm: res?.obj?.data?.dniClienteEpm,
+                  direccionClienteEpm: res?.obj?.data?.direccionClienteEpm,
+                  localidadEpm: res?.obj?.data?.localidadEpm,
+                  departamentoEpm: res?.obj?.data?.departamentoEpm,
+                  respuesta: res?.obj?.respuesta,
+                };
+              });
+            }}
         })
         .catch((err) => {
           notifyError("Error respuesta PDP:Transaccón declinada", err)
@@ -149,7 +163,7 @@ const CompraPin = () => {
         });
     }
   };
-  const [infTicket, setInfTicket] = useState({});
+ const [infTicket, setInfTicket] = useState({});
   const onChangeMoney = useMoney({
     limits: [minValor, maxValor],
     equalError: false,
@@ -237,19 +251,22 @@ const CompraPin = () => {
     setTypeInfo("ResumenVentaPin");
   };
 
-  const compraPines = () => {
-    setShowLoading(true);
-    const uniqueId = v4();
-    fetchData(
-      `${url_compra_pines}/transacciones`,
-      "POST",
-      {},
-      {
+  const [loadingPeticionPines, peticionPines] = useFetchPractisistemas(
+    URL_PINES,
+    URL_CONSULTA_PINES,
+    "Realizar compra pines practisistemas"
+  );
+
+  const compraPines = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      setShowLoading(true);
+      const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_terminal: roleInfo?.id_dispositivo,
           id_usuario: roleInfo?.id_usuario,
-          id_uuid_trx: uniqueId,
+          id_uuid_trx: id_uuid,
         },
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
@@ -263,166 +280,49 @@ const CompraPin = () => {
         celular: state?.op == "em" ? inputContador.toString() : inputCelular,
         operador: state?.op,
         address: roleInfo?.direccion,
-        valor:
-          state?.op == "cb"
-            ? consultaDatosSNR?.valorPin
-            : state.sell
-              ? state?.cod
-              : inputValor,
-        jsonAdicional: state?.op == "hv" ? {
-          placaVh: inputPlaca,
-          "nombre_usuario": pdpUser?.uname ?? "",
-        } : state?.op == "em" ? {
-            "nombre_usuario": pdpUser?.uname ?? "",
-          telEnvio: inputCelular,
-          } : state?.op == "cb" ? {
-              "nombre_usuario": pdpUser?.uname ?? "",
+        jsonAdicional: 
+        state?.op == "hv" ? {placaVh: inputPlaca} 
+        : state?.op == "em" ? {telEnvio: inputCelular} 
+        : state?.op == "cb" ? {
           circulo: inputCirculo,
           matricula: inputMatricula,
-        } : {
-                "nombre_usuario": pdpUser?.uname ?? "",
-        },
+        } 
+        : {},
         convenio: state?.desc,
         num_celular_original: inputCelular,
         trx_inf_ticket: state?.op === "hv" ? inputPlaca
          : state?.op === "em" ? inputCelular
          : state?.op === "cb" ? inputMatricula
         : ""
-      },
-      {},
-      true,
-      60000
-    )
-      .then(async (res) => {
-        if (res?.status == true) {
-          notify("Venta exitosa");
-          setShowLoading(false);
-          setInfTicket(res?.obj?.ticket);
-        } else if (res?.obj?.response?.respuesta == "Error respuesta practisistemas: No se recibi\u00f3 respuesta del autorizador en el tiempo esperado [0010003]") {
-          notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
-          setShowLoading(false)
-          handleClose()
-        } else if (res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines) [0010002]) -> list index out of range") {
-          notifyError("Error respuesta PDP: (Fallo al consumir el servicio (consulta_compra_pines)[0010002]");
-          setShowLoading(false)
-          handleClose()
-        } else {
-          if (res?.message === "Endpoint request timed out") {
-            notify("Se está procesando la transacción");
-            setShowLoading(true);
-            const today = new Date();
-            const formatDate = Intl.DateTimeFormat("es-CO", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(today);
-
-            for (let i = 0; i <= 7; i++) {
-              try {
-                const promesa = await new Promise((resolve, reject) =>
-                  setTimeout(() => {
-                    postCheckReintentoPines({
-                      idComercio: roleInfo?.id_comercio,
-                      idUsuario: roleInfo?.id_usuario,
-                      idTerminal: roleInfo?.id_dispositivo,
-                      id_uuid_trx: uniqueId,
-                    })
-                      .then((res) => {
-                        if (res?.msg !== "No ha terminado el reintento") {
-                          if (
-                            res?.status === true ||
-                            res?.obj?.response?.estado == "00"
-                          ) {
-                            notify("Venta exitosa");
-                            setInfTicket(res?.obj?.ticket);
-                            setShowLoading(false);
-                          } else {
-                            notifyError(
-                              typeof res?.msg == typeof {}
-                                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg
-                            );
-                            setShowLoading(true);
-                            setShowModal(false);
-                            showModalDatosEPM(false);
-                            showModalDatosSNR(false);
-                            setInputCelular("");
-                            setInputMatricula("")
-                            setInputCirculo("")
-                            setInputPlaca("")
-                            setInputValor(0);
-                            resolve(true);
-                          }
-                        } else {
-                          setShowLoading(true);
-                          resolve(false);
-                        }
-                      })
-                      .catch((err) => {
-                        setShowLoading(false);
-                        console.error(err);
-                      });
-                  }, 9000)
-                );
-                if (promesa === true) {
-                  setShowLoading(false);
-                  handleClose();
-                  break;
-                }
-                if (i >= 3) {
-                  notify(
-                    "Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]"
-                  );
-                  setShowLoading(false);
-                  handleClose();
-                  break;
-                }
-              } catch (error) {
-                console.error(error);
-              }
-              if (i <= 3) { 
-                notify(
-                  "Su transacción esta siendo procesada, no recargue la página"
-                );
-
-              }
-            }
-            validNavigate("/Pines/PinesContenido");
-            } else {
-            notifyError(
-              res?.obj?.response?.respuesta ==
-                ":Error en el numero telefónico, si crees que el número esta correcto comunícalo al distribuidor"
-                ? "Error en el número telefónico, si crees que el número está correcto comunícalo al distribuidor"
-                : typeof res?.msg == typeof {}
-                  ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                  : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])": res?.msg
-            );
+      };
+      const dataAditional = {
+        id_uuid_trx: id_uuid,
+      };
+      notifyPending(
+        peticionPines(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando compra de pin";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setInfTicket(res?.obj?.ticket);
+            setTypeInfo("VentaExitosa");
             setShowLoading(false);
-            showModalDatosEPM(false);
-            showModalDatosSNR(false);
-            setShowModal(false);
-            setInputCelular("");
-            setInputMatricula("")
-            setInputCirculo("")
-            setInputPlaca("")
-            setInputValor(0);
-          }
+            return "Compra de pin satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            validNavigate("/Pines/PinesContenido");
+            return error?.message ?? "Compra de pin fallida";
+          },
         }
-      }).catch(async (err) => {
-        if (err.name === "AbortError") {
-          notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
-        } else if (err.name === "TypeError") {
-          notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
-
-        } else {
-          notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
-
-        }
-        setShowLoading(false);
-        handleClose();
-      });
-  };
-
+      );
+    },
+    [roleInfo, pdpUser, id_uuid, state, inputCelular, inputValor, validNavigate]
+  );
   const handleClosePin = useCallback(() => {
     setShowModal(false);
     validNavigate("/Pines/PinesContenido");
@@ -532,6 +432,8 @@ const CompraPin = () => {
               autoComplete="off"
               min={minValorEPM}
               max={maxValorEPM}
+              equalError={false}
+              equalErrorMin={false}
               minLength={"4"}
               maxLength={"9"}
               value={inputValor}
@@ -572,6 +474,8 @@ const CompraPin = () => {
               autoComplete="off"
               min={minValor}
               max={maxValor}
+              equalError={false}
+              equalErrorMin={false}
               minLength={"4"}
               maxLength={"9"}
               value={inputValor}
@@ -613,6 +517,8 @@ const CompraPin = () => {
               autoComplete="off"
               min={minValor}
               max={maxValor}
+              equalError={false}
+              equalErrorMin={false}
               minLength={"4"}
               maxLength={"9"}
               value={state?.sell ? state?.sell : inputValor}
@@ -726,8 +632,15 @@ const CompraPin = () => {
               }}>
               <>
                 <ButtonBar>
-                  <Button onClick={handleCloseCancelada}>Cancelar</Button>
-                  <Button type={"submit"} onClick={compraPines}>
+                  <Button 
+                    onClick={handleCloseCancelada}
+                    disabled= {loadingPeticionPines}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type={"submit"} 
+                    onClick={compraPines}
+                    disabled= {loadingPeticionPines}>
                     Aceptar
                   </Button>
                 </ButtonBar>
@@ -747,8 +660,15 @@ const CompraPin = () => {
               }}>
               <>
                 <ButtonBar>
-                  <Button onClick={handleCloseCancelada}>Cancelar</Button>
-                  <Button type={"submit"} onClick={compraPines}>
+                  <Button 
+                    onClick={handleCloseCancelada}
+                    disabled= {loadingPeticionPines}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type={"submit"} 
+                    onClick={compraPines}
+                    disabled= {loadingPeticionPines}>
                     Aceptar
                   </Button>
                 </ButtonBar>
@@ -766,8 +686,15 @@ const CompraPin = () => {
               }}>
               <>
                 <ButtonBar>
-                  <Button onClick={handleCloseCancelada}>Cancelar</Button>
-                  <Button type={"submit"} onClick={compraPines}>
+                  <Button 
+                    onClick={handleCloseCancelada}
+                    disabled= {loadingPeticionPines}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type={"submit"} 
+                    onClick={compraPines}
+                    disabled= {loadingPeticionPines}>
                     Aceptar
                   </Button>
                 </ButtonBar>
@@ -787,8 +714,15 @@ const CompraPin = () => {
               }}>
               <>
                 <ButtonBar>
-                  <Button onClick={handleCloseCancelada}>Cancelar</Button>
-                  <Button type={"submit"} onClick={compraPines}>
+                  <Button 
+                    onClick={handleCloseCancelada}
+                    disabled= {loadingPeticionPines}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type={"submit"} 
+                    onClick={compraPines}
+                    disabled= {loadingPeticionPines}>
                     Aceptar
                   </Button>
                 </ButtonBar>
@@ -796,9 +730,8 @@ const CompraPin = () => {
             </PaymentSummary>
           ))}
         {/**************** Resumen de la venta del Pin **********************/}
-
         {/**************** Venta del Pin Exitosa **********************/}
-        {infTicket && ( //&& typeInfo == "VentaExitosa"
+        {infTicket && (typeInfo == "VentaExitosa" &&
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <Tickets refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
