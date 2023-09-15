@@ -77,14 +77,14 @@ const IAMPolicies = () => {
     <>
       <ButtonBar>
         <Button type={"button"} onClick={() => setShowModal(true)}>
-          Nueva politica
+          Nueva política
         </Button>
       </ButtonBar>
-      <h1 className="text-3xl">Buscar politicas</h1>
+      <h1 className="text-3xl">Buscar políticas</h1>
       <PaginationAuth
         filters={{
-          gnameSearch: { label: "Nombre del grupo" },
-          rnameSearch: { label: "Nombre del rol" },
+          gnameSearch: { label: "Nombre del grupo", maxLength: 60 },
+          rnameSearch: { label: "Nombre del rol", maxLength: 60 },
         }}
         onChange={onChange}
       />

@@ -149,3 +149,25 @@ export const postCheckEstadoConveniosAval = async (bodyObj) => {
     throw err;
   }
 };
+
+export const putModificarConvenio = async (pkConvenio, bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlAval}/grupo_aval_cb_recaudo/actualizar_convenio?pk_convenios_recaudo_aval=${pkConvenio}`,
+      "PUT",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

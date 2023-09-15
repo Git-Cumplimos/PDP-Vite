@@ -30,8 +30,8 @@ export const makeDateFormatter = (usetime = false) => {
   });
 };
 
-export const moneyValidator = (value) => {
-  const negative = value.at(0) === "-" ? -1 : 1;
+export const moneyValidator = (value, negativeValues = false) => {
+  const negative = negativeValues && value.at(0) === "-" ? -1 : 1;
   const floatMoney = (value.match(/\d|,/g) || []).join("").replace(/,/i, ".");
   // .replace(/,+/g, ".");
   const val = parseFloat(floatMoney);
@@ -39,13 +39,17 @@ export const moneyValidator = (value) => {
 };
 
 export const onHandleNegativeNumbers = (ev) => {
-  if (ev.keyCode === 189) {
+  if (ev.key === "-") {
     let caret_pos = ev.target.selectionStart ?? 0;
     const len = ev.target.value.length;
     if (ev.target.value.at(0) !== "-") {
       ev.target.value = `-${ev.target.value}`;
     } else {
-      ev.target.value = ev.target.value.slice(1);
+      if (ev.target.value.at(0) === "-") {
+        ev.target.value = ev.target.value.slice(2);
+      } else {
+        ev.target.value = ev.target.value.slice(1);
+      }
     }
     caret_pos += ev.target.value.length - len;
     ev.target.setSelectionRange(caret_pos, caret_pos);

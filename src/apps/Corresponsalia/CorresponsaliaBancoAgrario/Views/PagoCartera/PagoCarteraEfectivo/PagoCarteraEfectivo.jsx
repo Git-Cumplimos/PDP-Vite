@@ -15,8 +15,10 @@ import {
     LecturaNumeroObligacion,
     LecturaNumeroCedula,
 } from "./components/components_form_PagoCartera.jsx";
+import { makeMoneyFormatter } from "../../../../../../utils/functions";
 import classes from "../../Runt/PagarRunt.module.css"
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
+import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
 import { v4 } from 'uuid';
 import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
@@ -105,9 +107,12 @@ const PagoCarteraEfectivo = () => {
     }, []);
 
     const onChangeNumeroCartera = useCallback((e) => {
-        setDatosPagoEfectivo((old) => {
-            return { ...old, numeroPagoCartera: e.target.value };
-        });
+        let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+        if (!isNaN(num)) {
+            setDatosPagoEfectivo((old) => {
+                return { ...old, numeroPagoCartera: num };
+            });
+        }
     }, []);
 
     const onChangeSelect = useCallback((e) => {
@@ -163,6 +168,16 @@ const PagoCarteraEfectivo = () => {
                     setShowModalGenerico((old) => {
                         return { ...old, showModal: true };
                     });
+                } else if (response?.status === false) {
+                    HandleCloseTrxExitosa()
+                    if (response?.msg) {
+                        notifyError(response?.msg);
+                    } else {
+                        notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
+                    }
+                } else if (response === undefined) {
+                    HandleCloseTrxExitosa()
+                    notifyError("Error respuesta PDP: Transacción Pago Cartera no exitosa")
                 }
             })
             .catch((error) => {
@@ -175,7 +190,15 @@ const PagoCarteraEfectivo = () => {
             setLoadingPayCartera(true)
             e.preventDefault(); 
             if (isNaN(pagoTotal)) {
+                setLoadingPayCartera(false)
                 return notifyError("El valor no es un numero")
+            } else if (pagoTotal > enumParametrosPagoCartera.maxPagoCartera) {
+                setLoadingPayCartera(false)
+                return notifyError(`Supera el valor máximo de ${makeMoneyFormatter(0).format(enumParametrosPagoCartera.maxPagoCartera)} para pago cartera.`)
+                
+            } else if (pagoTotal < enumParametrosPagoCartera.minPagoCartera) { 
+                setLoadingPayCartera(false)
+                return notifyError(`El valor mínimo para pago cartera es de ${makeMoneyFormatter(0).format(enumParametrosPagoCartera.minPagoCartera)}.`)
             }
             const data = {
                 oficina_propia:
@@ -298,12 +321,16 @@ const PagoCarteraEfectivo = () => {
             HandleCloseTrx();
         } else if (datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa") {
             HandleCloseTrxExitosa();
+        } else if (datosPagoEfectivo?.confirmacionTicket !== "TransaccionExitosa" && datosPagoEfectivo?.confirmacionTicket !== "ResumenTrx") {
+            notifyError("Transacción cancelada por el usuario");
         }
+        validNavigate(-1);
     }, [
         datosPagoEfectivo,
         HandleCloseTrx,
         HandleCloseTrxExitosa,
         loadingPeticionPayCartera,
+        validNavigate
     ]);
 
     const tableObligacion = useMemo(() => {

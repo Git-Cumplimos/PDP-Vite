@@ -20,7 +20,6 @@ import MoneyInput, {
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { v4 } from "uuid";
@@ -220,16 +219,7 @@ const Deposito = () => {
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
       id_uuid_trx: uuid,
-      ticket_init: [
-        ["Número Powwi", datosTrx.numeroTelefono],
-        ["Valor Depósito", formatMoney.format(valor ?? "0")],
-        ["Costo transacción",formatMoney.format(datosConsulta?.costoTotal),],
-        ["Valor Total",formatMoney.format(valor + datosConsulta?.costoTotal),],
-      ].reduce((list, elem, i) => {
-        list.push(elem);
-        if ((i + 1) % 1 === 0) list.push(["", ""]);
-        return list;
-      }, []),
+      costo_trx: datosConsulta?.costoTotal,
       Datos: {
         tipoIdentificacionCliente: datosTrx.tipoDocumento,
         identificacionCliente: datosTrx.userDoc,
@@ -279,7 +269,6 @@ const Deposito = () => {
 
   return (
     <>
-      <SimpleLoading show={isUploading} />
       <Fragment>
         <h1 className='text-3xl mt-6'>Depósito Powwi</h1>
         <Form onSubmit={onSubmitDeposito} grid>
@@ -295,7 +284,7 @@ const Deposito = () => {
                 value={datosTrx.numeroTelefono}
                 onInput={(e) => {
                   let valor = e.target.value;
-                  let num = valor.replace(/[\s\.]/g, "");
+                  let num = valor.replace(/[\s\.\-+eE]/g, "");
                   if (!isNaN(num)) {
                     if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                         return notifyError("El número debe comenzar por 3");
@@ -330,7 +319,7 @@ const Deposito = () => {
                 maxLength={"15"}
                 value={datosTrx.userDoc}
                 onInput={(e) => {
-                    const num = e.target.value.replace(/[\s\.]/g, "");
+                    const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                     if (!isNaN(num)) {
                       setDatosTrx(prevState => ({
                         ...prevState,
@@ -352,7 +341,7 @@ const Deposito = () => {
                 value={datosTrx.numeroTelefonoDepositante}
                 onInput={(e) => {
                 let valor = e.target.value;
-                let num = valor.replace(/[\s\.]/g, "");
+                let num = valor.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                     if (datosTrx.numeroTelefonoDepositante.length === 0 && num !== "3") {
                     return notifyError("El número debe comenzar por 3");
@@ -374,7 +363,7 @@ const Deposito = () => {
                 maxLength={"15"}
                 value={datosTrx.userDocDepositante}
                 onInput={(e) => {
-                const num = e.target.value.replace(/[\s\.]/g, "");
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrx(prevState => ({
                     ...prevState,
@@ -394,8 +383,15 @@ const Deposito = () => {
                 maxLength={"11"}
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
+                equalError={false}
+                equalErrorMin={false}
                 value={valor}
-                onInput={(ev) => setValor(onChangeMoney(ev))}
+                onInput={(e, valor) => {
+                  if (!isNaN(valor)){
+                    const num = valor;
+                    setValor(num)
+                  }
+                }}
                 required
             />
             <ButtonBar className={"lg:col-span-2"}>

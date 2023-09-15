@@ -8,6 +8,7 @@ import Input from "../../../../components/Base/Input";
 import { fetchComisionesPagar } from "../../utils/fetchComisionesPagar";
 import { fetchComisionesCobrar } from "../../utils/fetchComisionesCobrar";
 import { getComisionesPlanes } from "../../utils/fetchComisionesPlanes";
+import { onChangeNumber } from "../../../../utils/functions";
 import {
   getAssingsCommissions,
   getComisionesPlanesCampanas,
@@ -527,6 +528,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre convenio"}
               name={"convenio"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={convenio}
             />
@@ -535,6 +537,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comision"}
               name={"nombre_comision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={nombre_comision}
             />
@@ -543,6 +546,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Tipo de transacción"}
               name={"tipoComision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={tipoComision}
             />
@@ -550,8 +554,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"id_comision"}
               label={"Id comisión"}
               name={"id_comision"}
-              type='number'
+              type='tel'
               step={"1"}
+              maxLength={30}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
               autoComplete='off'
               defaultValue={id_comision}
             />
@@ -564,6 +570,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre convenio"}
               name={"convenio"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={convenio}
             />
@@ -572,6 +579,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comision"}
               name={"nombre_comision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={nombre_comision}
             />
@@ -580,6 +588,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Tipo de transacción"}
               name={"tipoComision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={tipoComision}
             />
@@ -587,8 +596,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"id_comision"}
               label={"Id comisión"}
               name={"id_comision"}
-              type='number'
+              type='tel'
               step={"1"}
+              maxLength={30}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
               autoComplete='off'
               defaultValue={id_comision}
             />
@@ -601,6 +612,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre comisión"}
               name={"nombre_plan_comision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={nombre_plan_comision}
             />
@@ -619,8 +631,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"pk_planes_comisiones"}
               label={"Id plan"}
               name={"pk_planes_comisiones"}
-              type='number'
+              type='tel'
               step={"1"}
+              maxLength={30}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
               autoComplete='off'
               defaultValue={pk_planes_comisiones}
             />
@@ -633,6 +647,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre plan comisión"}
               name={"nombre_plan_comision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={nombre_plan_comision}
             />
@@ -645,6 +660,7 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               label={"Nombre asignación"}
               name={"nombre_asignacion_comision"}
               type={"text"}
+              maxLength={50}
               autoComplete='off'
               defaultValue={nombre_asignacion_comision}
             />
@@ -652,8 +668,10 @@ const SearchComissions = ({ comissionFace, onSelectItem }) => {
               id={"fk_tipo_op"}
               label={"Tipo de transacción"}
               name={"fk_tipo_op"}
-              type={"number"}
+              type={"tel"}
               autoComplete='off'
+              maxLength={30}
+              onChange={(ev) => ev.target.value = onChangeNumber(ev)}
               defaultValue={fk_tipo_op}
             />
           </>

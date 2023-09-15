@@ -69,26 +69,6 @@ const Retiro = () => {
   const [summary, setSummary] = useState([]);
   const [banco, setBanco] = useState("");
   const [showBTNConsulta, setShowBTNConsulta] = useState(true);
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
-    timeInfo: {
-      "Fecha de pago": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      ["Id comercio", roleInfo?.id_comercio],
-      ["No. Terminal", roleInfo?.id_dispositivo],
-      ["Id trx", ""],
-      ["Id Aut", ""],
-      ["Comercio", roleInfo?.["nombre comercio"]],
-      ["", ""],
-      ["Dirección", roleInfo?.direccion],
-      ["", ""],
-    ],
-    commerceName: "Retiro",
-    trxInfo: [],
-    disclamer: `Corresponsal bancario para Banco Occidente. La impresión de este tiquete implica su aceptación. Verifique la información. Este es el único recibo oficial de pago. Requerimientos 01 8000 514652`,
-  });
 
   const otpEncrip = useMemo(() => {
     let x;
@@ -284,33 +264,6 @@ const Retiro = () => {
 
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"] = [];
-    objTicket["trxInfo"].push(["Número celular", phone]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Entidad financiera", DataBanco?.nombre]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Tipo de cuenta",
-      tipoCuenta === "01" ? "Ahorros" : "Corriente",
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Valor", formatMoney.format(valor ?? "0")]);
-    objTicket["trxInfo"].push(["", ""]);
     const body = {
       comercio: {
         id_comercio: roleInfo?.id_comercio,
@@ -341,7 +294,6 @@ const Retiro = () => {
         },
       },
       nombre_usuario: pdpUser?.uname ?? "",
-      ticket: objTicket,
     };
 
     fetchRetiroCorresponsalGrupoAval(body)
@@ -353,19 +305,7 @@ const Retiro = () => {
           // return;
         } else {
           notify("Transacción satisfactoria");
-          const trx_id = parseInt(res?.obj?.respuesta_grupo_aval["11"]) ?? 0;
-          const id_auth = parseInt(res?.obj?.respuesta_grupo_aval["38"]) ?? 0;
-          // const numCuenta = (res?.obj?.respuesta_grupo_aval["104"]) ?? 0;
-          // const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
-
-          objTicket["commerceInfo"][2] = ["Id trx", trx_id];
-          objTicket["commerceInfo"][3] = ["Id Aut", id_auth];
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(res?.obj?.costoTrx),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          setPaymentStatus(objTicket);
+          setPaymentStatus(res?.obj?.ticket);
         }
       })
       .catch((err) => {
@@ -378,12 +318,12 @@ const Retiro = () => {
     userDoc,
     fetchRetiroCorresponsalGrupoAval,
     roleInfo,
-    ,
     datosConsulta,
     tipoDocumento,
     otpEncrip,
     DataBanco,
     phone,
+    pdpUser?.uname,
   ]);
 
   return (
@@ -422,7 +362,7 @@ const Retiro = () => {
             maxLength={"12"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
@@ -462,25 +402,32 @@ const Retiro = () => {
             autoComplete='off'
             value={otp}
             onInput={(e, valor) => {
-              let num = valor.replace(/[\s\.]/g, "");
+              let num = valor.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(valor)) {
                 setOtp(num);
               }
             }}
             required></HideInput>
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a retirar'
             autoComplete='off'
             type='text'
-            minLength={"5"}
-            maxLength={"10"}
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            maxLength={"9"}
+            // min={limitesMontos?.min}
+            // max={limitesMontos?.max}
             required
+            min={enumParametrosGrupoAval.minRetiroCuentas}
+            max={enumParametrosGrupoAval.maxRetiroCuentas}
+            value={parseInt(valor)}
+            onInput={(e, monto) => {
+              if (!isNaN(monto)) {
+                setValor(monto);
+              }
+            }}
+            equalError={false}
+            equalErrorMin={false}
           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>Continuar</Button>

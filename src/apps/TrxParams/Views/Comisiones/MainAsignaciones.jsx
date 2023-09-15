@@ -53,7 +53,7 @@ const MainAsignaciones = () => {
   }, [dataAsignaciones, page, limit]);
   const onChangeFormat = useCallback((ev) => {
     let valor = ev.target.value;
-    valor = valor.replace(/[\s\.]/g, "");
+    valor = valor.replace(/[^\w\s]/g, "");
     setDataAsignaciones((old) => {
       return { ...old, [ev.target.name]: valor };
     });

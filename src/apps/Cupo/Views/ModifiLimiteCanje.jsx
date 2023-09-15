@@ -68,7 +68,7 @@ const ModifiLimiteCanje = () => {
         valor !== null &&
         valor !== ""
       ) {
-        const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario,};
+        const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario ?? -1,};
         const data = {};
         if (baseCaja && baseCaja !== "") data.base_Caja = baseCaja
         if (diasMaxSobregiro && diasMaxSobregiro !== "") data.dias_max_sobregiro = parseInt(diasMaxSobregiro)

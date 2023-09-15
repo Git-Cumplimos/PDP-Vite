@@ -10,7 +10,7 @@ const MainGestionDatafonos = () => {
     <>
       <ButtonBar>
         <Button onClick={() => navigate("crear")} type='submit'>
-          Crear datafono
+          Crear datáfono
         </Button>
       </ButtonBar>
       <ConsultaDatafonos navigate={navigate} />

@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useCallback, useRef, useState } from "react";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
@@ -126,7 +120,7 @@ const RetiroEfectivo = () => {
     setShowModal(false);
     setTipoModal("ninguno");
     setDataInput(dataInputInitial);
-    notify("Transacción cancelada");
+    notifyError("Transacción cancelada");
   }, []);
 
   const handleCloseTrxRechazada = useCallback(() => {
@@ -237,7 +231,7 @@ const RetiroEfectivo = () => {
             summaryTrx={{
               "Tipo de Cuenta": `Cuenta ${dataInput.tipoCuenta}`,
               Cuenta: dataInput?.cuenta,
-              Token: "*".repeat(dataInput?.OTP.length),
+              OTP: "*".repeat(dataInput?.OTP.length),
               Valor: formatMoney.format(dataInput?.amount),
             }}
           >

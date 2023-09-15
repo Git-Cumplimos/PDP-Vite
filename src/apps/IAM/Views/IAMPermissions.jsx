@@ -66,7 +66,7 @@ const IAMPermissions = () => {
       <h1 className="text-3xl">Buscar permisos</h1>
       <PaginationAuth
         filters={{
-          unameSearch: { label: "Nombre" },
+          unameSearch: { label: "Nombre", maxLength: 60 },
         }}
         maxPage={maxPage}
         onChange={onChange}

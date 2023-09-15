@@ -1,0 +1,40 @@
+.contain {
+  @apply flex flex-col max-w-md my-8 mx-auto;
+}
+
+.card {
+  @apply p-4 max-w-md border-2 border-primary rounded-3xl;
+}
+
+.card > hr {
+  @apply border-t-4 border-secondary mb-8 mx-4;
+}
+
+/* .card > form,
+.contain > form {
+  @apply flex flex-col justify-center;
+} */
+
+form > .field {
+  @apply flex flex-row align-middle text-xl justify-center gap-4;
+}
+
+form > .field > input {
+  @apply my-3 px-4 py-2 bg-secondary-light rounded-lg text-base w-48 sm:w-60 md:w-80;
+}
+
+form > .field > input:focus {
+  @apply outline-none;
+}
+
+form > .field > label {
+  @apply my-auto w-28 text-right;
+}
+
+form > .field > button {
+  @apply py-2 px-8 my-6 rounded-full font-medium bg-secondary-light opacity-100 transition-opacity duration-300;
+}
+
+form > .field > button:active {
+  @apply opacity-70;
+}

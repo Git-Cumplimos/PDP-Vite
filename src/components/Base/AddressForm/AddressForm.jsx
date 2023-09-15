@@ -312,7 +312,7 @@ const AddressForm = ({
           </div>
           <div className="grid grid-cols-6 gap-2">
             <div className="grid grid-rows-2">
-              <label htmlFor="secondaryStreet_number">Numero</label>
+              <label htmlFor="secondaryStreet_number">Número</label>
               <input
                 id="secondaryStreet_number"
                 name={UPDATE_SECONDARY_STREET_NUMBER}
