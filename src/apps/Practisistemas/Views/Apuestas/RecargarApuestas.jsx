@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -19,24 +19,25 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../../utils/notify";
-import { toPhoneNumber } from "../../../../utils/functions";
-import Select from "../../../../components/Base/Select";
-import { postEnvioTrans, postCheckReintentoRecargas } from "../../utils/fetchServicioApuestas";
-import { v4 } from 'uuid';
+import { notify, notifyPending } from "../../../../utils/notify";
+import { v4 } from "uuid";
 import { enumLimiteApuestas } from "../enumLimiteApuestas";
+import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
 
 const minValor = enumLimiteApuestas.minApuestas;
 const maxValor = enumLimiteApuestas.maxApuestas;
-const RecargarApuestas = () => {
 
+const URL_APUESTA = `${process.env.REACT_APP_PRACTISISTEMAS}/apuestas-deportivas/recarga`;
+const URL_CONSULTA_APUESTA = `${process.env.REACT_APP_PRACTISISTEMAS}/apuestas-deportivas/consulta-estado-trx`;
+
+const RecargarApuestas = () => {
   //Variables
-  const [inputValor, setInputValor] = useState("");
+  const [inputValor, setInputValor] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [respuesta, setRespuesta] = useState(false);
   const [typeInfo, setTypeInfo] = useState("Ninguno");
   const { roleInfo, userInfo, pdpUser } = useAuth();
-  const {state} = useLocation();
+  const { state } = useLocation();
   const printDiv = useRef();
   const validNavigate = useNavigate();
   const id_uuid = v4();
@@ -45,183 +46,81 @@ const RecargarApuestas = () => {
     documento: "",
     tipoDocumento: "1",
   });
-  const optionsDocumento = [
-    { value: "1", label: "Cédula Ciudadanía"},
-    { value: "2", label: "Cédula de Extranjería"},
-    // { value: "3", label: "Tarjeta de Identidad"},
-    { value: "4", label: "NIT" },
-    { value: "5", label: "Pasaporte"},
-  ];
-  
-  const [infTicket, setInfTicket] = useState({
-    title: "Recibo de pago",
-    timeInfo: {
-      "Fecha de pago":"",
-      "Hora": "",
-    },
-    commerceInfo: [
-      ["Id comercio", roleInfo.id_comercio],
-      ["No. Terminal", roleInfo.id_dispositivo],
-      ["Comercio", roleInfo["nombre comercio"]],
-      ["", ""],
-      // ["Municipio", roleInfo.ciudad],
-      // ["", ""],
-      ["Dirección", roleInfo.direccion],
-      ["", ""],
-    ],
-    commerceName: "RECARGA APUESTAS DEPORTIVAS",
-    trxInfo: [],
-    disclamer:
-      "Para cualquier reclamo es indispensable presentar este recibo o comunicarse al teléfono en Bogotá 756 0417.",
-  });
-  const onChangeMoney = useMoney({
-    limits: [minValor,maxValor],
-    equalError: false
-  });
+  const [infTicket, setInfTicket] = useState({});
 
   const onSubmitCheck = (e) => {
     e.preventDefault();
-    if (inputValor != 0){
+    if (inputValor != 0) {
       setShowModal(true);
       setTypeInfo("ResumenRecarga");
+    } else {
+      notify(
+        `El valor de la recarga de la cuenta debe ser mayor o igual a ${formatMoney.format(
+          minValor
+        )}`
+      );
     }
-    else{
-      notify(`El valor de la recarga de la cuenta debe ser mayor o igual a ${formatMoney.format(minValor)}`)
-    }  
   };
-  
-  const fecthEnvioTransaccion = () => {
-    setRespuesta(true)
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "numeric",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const infTicketFinal = { ...infTicket }; 
-    infTicketFinal["timeInfo"]["Fecha de pago"] = fecha;
-    infTicketFinal["timeInfo"]["Hora"] = hora;
-    infTicketFinal["trxInfo"].push(["Operador", state?.casaApuesta ?? " "]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Número Documento", datosCuenta?.documento ?? " "]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    infTicketFinal["trxInfo"].push(["Valor recarga", formatMoney.format(inputValor) ?? "0"]);
-    infTicketFinal["trxInfo"].push(["", ""]);
-    postEnvioTrans({
-      comercio: {
-        id_comercio:roleInfo.id_comercio,
-        id_terminal: roleInfo.id_dispositivo,
-        id_usuario: roleInfo.id_usuario,
-        id_uuid_trx: id_uuid
-      },
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-      nombre_comercio: roleInfo["nombre comercio"],
-      valor_total_trx: parseInt(inputValor),
-      ticket: infTicketFinal,
-
-      datosRecargas: {
-        celular: datosCuenta?.documento,
-        operador: state?.producto,
-        valor: parseInt(inputValor),
-        jsonAdicional: {
-          "nombre_usuario": pdpUser?.uname ?? "",
-          "operador": state?.casaApuesta
+  const fecthEnvioTransaccion = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo.id_comercio,
+          id_terminal: roleInfo.id_dispositivo,
+          id_usuario: roleInfo.id_usuario,
+          id_uuid_trx: id_uuid,
+        },
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+        nombre_comercio: roleInfo["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        valor_total_trx: inputValor,
+        datos_recargas: {
+          celular: datosCuenta?.documento,
+          operador: state?.producto,
+          casa_apuesta: state?.casaApuesta,
+        },
+        address: roleInfo?.["direccion"],
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.["ciudad"],
+      };
+      const dataAditional = {
+        id_uuid_trx: id_uuid,
+      };
+      notifyPending(
+        peticionApuesta(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando recarga";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setInfTicket(res?.obj?.ticket);
+            setTypeInfo("RecargaExitosa");
+            return "Recarga satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            validNavigate("/apuestas-deportivas");
+            return error?.message ?? "Recarga fallida";
+          },
         }
-      }
-    })
-    .then((res) => {
-      if (res?.status === true) {
-        notify("Recarga exitosa");
-        // infTicketFinal["commerceInfo"].push(["Id Transacción", res?.obj?.response?.["idtrans"]]);
-        // infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);  
-        // setInfTicket(infTicketFinal)
-        setInfTicket(res?.request?.ticket)
-        setRespuesta(false);
-        setTypeInfo("RecargaExitosa");
-      }
-      else {
-        notifyError(
-          typeof res?.msg == typeof {}
-            ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-            : res?.msg == "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
-        );
-        setRespuesta(false);
-        handleClose();
-      }
-    })
-    .catch(async(err) => {
-      notify("Su transacción esta siendo procesada");
-      setRespuesta(true);
-      console.error(err);
-      for (let i = 0; i <= 7; i++) {
-        try {
-          const prom = await new Promise((resolve, reject) =>
-            setTimeout(() => {
-              postCheckReintentoRecargas({
-                id_uuid_trx: id_uuid,
-                idComercio: roleInfo?.id_comercio,
-                idDispositivo: roleInfo?.id_dispositivo
-              })
-              .then((res) => {
-                if (res?.msg !== "No ha terminado el reintento") {
-                  if (res?.status === true || res?.obj?.response?.estado == "00") {  
-                    notify("Recarga exitosa");      
-                    // infTicketFinal["commerceInfo"].push(["Id Trx", res?.obj?.response?.["idtrans"]]);
-                    // infTicketFinal["commerceInfo"].push(["Id Aut", res?.obj?.response?.["codigoauth"]]);
-                    // setInfTicket(infTicketFinal)
-                    setInfTicket(res?.request?.ticket)
-                    setRespuesta(false);
-                    setTypeInfo("RecargaExitosa");
-                  }
-                  else {
-                    notifyError(res?.obj?.response?.respuesta);
-                    setRespuesta(true);
-                    handleClose();
-                    resolve(true);
-                  }
-                } else {  
-                    setRespuesta(true);
-                    resolve(false);
-                  }             
-              })
-              .catch((err) => {
-                setRespuesta(false);
-                console.error(err);
-              });
-            }, 9000)
-          );
-          if (prom === true) {
-            setRespuesta(false);
-            handleClose();
-            break;
-          }
-          if (i >= 3) {
-            notify(
-              "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
-            );
-            setRespuesta(false);
-            handleClose();
-            break;
-          }
-        } catch (error) {
-          console.error(error);
-        }        
-        if (i <= 3) {
-          notify(
-            "Su transacción esta siendo procesada, no recargue la página"
-          );
+      );
+    },
+    [roleInfo, pdpUser, state, datosCuenta, id_uuid, inputValor, validNavigate]
+  );
+  const [loadingPeticionApuesta, peticionApuesta] = useFetchPractisistemas(
+    URL_APUESTA,
+    URL_CONSULTA_APUESTA,
+    "Realizar apuesta practisistemas"
+  );
 
-        }
-      }
-      notifyError("Error respuesta practisistemas: No se recibió respuesta del autorizador en el tiempo esperado [0010003]");
-    });
-  };
-     
   const handleClose = useCallback(() => {
     setShowModal(false);
     setTypeInfo("Ninguno");
@@ -233,24 +132,8 @@ const RecargarApuestas = () => {
       };
     });
     setInputValor("");
-    setInfTicket((old)=>{
-      return {
-        ...old,
-        commerceInfo: [
-          ["Id Comercio", roleInfo.id_comercio],
-          ["No. terminal", roleInfo.id_dispositivo],
-          ["Comercio", roleInfo["nombre comercio"]],
-          ["", ""],
-          ["Municipio", roleInfo.ciudad],
-          ["", ""],
-          ["Dirección", roleInfo.direccion],
-          ["", ""],
-        ],
-        commerceName: "RECARGA APUESTAS DEPORTIVAS",
-        trxInfo: [],
-      };
-    });
-    validNavigate("/apuestas-deportivas")
+    setInfTicket({});
+    validNavigate("/apuestas-deportivas");
   }, []);
 
   const handleCloseRecarga = useCallback(() => {
@@ -265,7 +148,7 @@ const RecargarApuestas = () => {
     setTypeInfo("Ninguno");
     notify("Recarga cancelada");
     validNavigate("/apuestas-deportivas");
-    handleClose(); 
+    handleClose();
   }, []);
 
   const handlePrint = useReactToPrint({
@@ -274,62 +157,51 @@ const RecargarApuestas = () => {
 
   useEffect(() => {
     if (!state?.casaApuesta) {
-      validNavigate("../apuestas-deportivas");
-    } 
+      validNavigate("/apuestas-deportivas");
+    }
   }, [state?.casaApuesta]);
 
+  const onChangeFormatNumber = useCallback((ev) => {
+    const valor = ev.target.value;
+    const num = valor.replace(/[\s\.\-+eE]/g, "");
+    if (!isNaN(num)) {
+      setDatosCuenta((old) => {
+        return { ...old, [ev.target.name]: num };
+      });
+    }
+  }, []);
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Recarga Cuenta Apuesta Deportiva {state?.casaApuesta}</h1>
+      <h1 className='text-3xl mt-6'>
+        Recarga Cuenta Apuesta Deportiva {state?.casaApuesta}
+      </h1>
       <Form onSubmit={onSubmitCheck} grid>
         <Input
-          id="numDocumento"
-          label="Número de Documento"
-          type="text"
+          id='documento'
+          name='documento'
+          label='Número de Documento'
+          type='text'
           required
-          minLength="5"
-          maxLength="12"
-          autoComplete="off"
+          minLength='5'
+          maxLength='12'
+          autoComplete='off'
           value={datosCuenta?.documento}
-          onInput={(e) => {
-            const inputValue = e.target.value;
-            const parsedValue = parseInt(inputValue);
-
-            if (!isNaN(parsedValue)) {
-              setDatosCuenta((old) => {
-                return { ...old, documento: parsedValue };
-              });
-            } else if (inputValue === "") {
-              setDatosCuenta((old) => {
-                return { ...old, documento: "" };
-              });
-            }
-          }}
-        />
-
-        <Select
-          id="tipoDocumento"
-          label="Tipo de Documento"
-          options={optionsDocumento}
-          value={datosCuenta?.tipoDocumento}
-          onChange={(e) => {
-            setDatosCuenta((old) => {
-              return { ...old, tipoDocumento: e.target.value };
-            });
-          }}
-          required
+          onInput={onChangeFormatNumber}
+          disabled={loadingPeticionApuesta}
         />
         <MoneyInput
-          name="valor"
-          label="Valor Recarga Cuenta"
-          type="number"
-          autoComplete="off"
+          name='valor'
+          label='Valor Recarga Cuenta'
+          autoComplete='off'
           min={minValor}
           max={maxValor}
           minLength={"4"}
           maxLength={"10"}
           value={inputValor}
-          onInput={(ev) => setInputValor(onChangeMoney(ev))}
+          onInput={(ev, val) => setInputValor(val)}
+          disabled={loadingPeticionApuesta}
+          equalError={false}
+          equalErrorMin={false}
           required
         />
         <ButtonBar className={"lg:col-span-2"}>
@@ -337,34 +209,40 @@ const RecargarApuestas = () => {
         </ButtonBar>
       </Form>
 
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal}>
         {/**************** Resumen de la recarga **********************/}
         {typeInfo === "ResumenRecarga" && (
           <PaymentSummary
-            title="¿Está seguro de realizar la recarga a la cuenta?"
-            subtitle="Resumen de transacción"
+            title='¿Está seguro de realizar la recarga a la cuenta?'
+            subtitle='Resumen de transacción'
             summaryTrx={{
               Documento: datosCuenta?.documento,
               Producto: state?.casaApuesta,
               Valor: formatMoney.format(inputValor),
               // "Valor Recarga Cuenta": formatMoney.format(inputValor),
-            }}
-          >  
+            }}>
             <>
               <ButtonBar>
-                <Button type={"submit"} onClick={fecthEnvioTransaccion}>
+                <Button
+                  type={"submit"}
+                  onClick={fecthEnvioTransaccion}
+                  disabled={loadingPeticionApuesta}>
                   Aceptar
                 </Button>
-                <Button onClick={handleCloseCancelada}>Cancelar</Button>
+                <Button
+                  onClick={handleCloseCancelada}
+                  disabled={loadingPeticionApuesta}>
+                  Cancelar
+                </Button>
               </ButtonBar>
             </>
-            <SimpleLoading show={respuesta}/>
+            <SimpleLoading show={respuesta} />
           </PaymentSummary>
         )}
         {/**************** Recarga Exitosa **********************/}
         {infTicket && typeInfo === "RecargaExitosa" && (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={infTicket}/>
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <Tickets refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleCloseRecarga}>Cerrar</Button>
@@ -378,5 +256,3 @@ const RecargarApuestas = () => {
 };
 
 export default RecargarApuestas;
-
-
