@@ -142,7 +142,7 @@ const RecargarPaquetes = () => {
   const handleCloseCancelada = useCallback(() => {
     setShowModal(false);
     setTypeInfo("Ninguno");
-    notify("Recarga cancelada");
+    notifyError("Transacción cancelada por el usuario");
     validNavigate("/recargas-paquetes");
     handleClose();
 

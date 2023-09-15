@@ -345,7 +345,7 @@ const CompraPin = () => {
   const handleCloseCancelada = useCallback(() => {
     setShowModal(false);
     setTypeInfo("Ninguno");
-    notify("Venta cancelada");
+    notifyError("Transacción cancelada por el usuario");
     setInputCelular("");
     setInputValor("");
     setInputCirculo("");
