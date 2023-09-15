@@ -17,13 +17,14 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { toPhoneNumber } from "../../../../utils/functions";
-import {
-  postEnvioTrans,
-  postCheckReintentoRecargas,
-} from "../../utils/fetchServicioRecargas";
 import { v4 } from "uuid";
+import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
+
+const URL_RECARGA = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/recarga`;
+const URL_CONSULTA_RECARGA = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/consulta-estado-trx`;
+
 
 const RecargarPaquetes = () => {
   //Variables
@@ -62,121 +63,67 @@ const RecargarPaquetes = () => {
       handleClose();
     }
   };
-  const fecthEnvioTransaccion = () => {
-    setRespuesta(true);
-    postEnvioTrans({
-      comercio: {
-        id_comercio: roleInfo.id_comercio,
-        id_terminal: roleInfo.id_dispositivo,
-        id_usuario: roleInfo.id_usuario,
-        id_uuid_trx: id_uuid,
-      },
-      oficina_propia:
-        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-      nombre_comercio: roleInfo["nombre comercio"],
-      valor_total_trx: parseInt(state?.valor_paquete),
-      address: roleInfo?.direccion,
-      nombre_usuario: pdpUser?.uname ?? "",
-      datos_recargas: {
-        celular: inputCelular,
-        operador: state?.operador,
-        jsonAdicional: {
-          operador: state?.operadorPaquete,
-          operador_paquete: state?.operador_recargar,
-          descripcion: state?.descripcion,
+  
+  const [loadingPeticionRecargaPaquetes, peticionRecargaPaquetes] = useFetchPractisistemas(
+    URL_RECARGA,
+    URL_CONSULTA_RECARGA,
+    "Realizar recarga practisistemas"
+  );
+
+  const fecthEnvioTransaccion = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      setRespuesta(true);
+      const data = {
+        comercio: {
+          id_comercio: roleInfo.id_comercio,
+          id_terminal: roleInfo.id_dispositivo,
+          id_usuario: roleInfo.id_usuario,
+          id_uuid_trx: id_uuid,
         },
-      },
-    })
-      .then(async (res) => {
-        if (res?.status === true) {
-          notify("Compra de paquete exitosa");
-          setInfTicket(res?.obj?.ticket);
-          setRespuesta(false);
-          setTypeInfo("RecargaExitosa");
-        } else {
-          if (res?.message === "Endpoint request timed out") {
-            notify("Su transacción esta siendo procesada");
-            setRespuesta(true);
-            for (let i = 0; i <= 7; i++) {
-              try {
-                const prom = await new Promise((resolve, reject) =>
-                  setTimeout(() => {
-                    postCheckReintentoRecargas({
-                      id_uuid_trx: id_uuid,
-                      id_comercio: roleInfo?.id_comercio,
-                      id_terminal: roleInfo?.id_dispositivo,
-                    })
-                      .then((res) => {
-                        if (res?.msg !== "Error respuesta PDP: (No ha terminado la transacción)") {
-                          if (
-                            res?.status === true ||
-                            res?.obj?.response?.estado === "00"
-                          ) {
-                            setInfTicket(res?.obj?.ticket);
-                            setRespuesta(false);
-                            setTypeInfo("RecargaExitosa");
-                          } else {
-                            notifyError(
-                              typeof res?.msg == typeof {}
-                                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                                : res?.msg === "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg === "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
-                            );
-                            setRespuesta(true);
-                            handleClose();
-                            resolve(true);
-                          }
-                        } else {
-                          setRespuesta(true);
-                          resolve(false);
-                        }
-                      })
-                      .catch((err) => {
-                        setRespuesta(false);
-                        console.error(err);
-                      });
-                  }, 15000)
-                );
-                if (prom === true) {
-                  setRespuesta(false);
-                  handleClose();
-                  break;
-                }
-                if (i >= 3) {
-                  notify(
-                    "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto"
-                  );
-                  setRespuesta(false);
-                  handleClose();
-                  break;
-                }
-              } catch (error) {
-                console.error(error);
-              }
-              if (i <= 3) {
-                notify(
-                  "Su transacción esta siendo procesada, no recargue la página"
-                );
-              }
-            }
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+        nombre_comercio: roleInfo["nombre comercio"],
+        valor_total_trx: parseInt(state?.valor_paquete),
+        address: roleInfo?.direccion,
+        nombre_usuario: pdpUser?.uname ?? "",
+        datos_recargas: {
+          celular: inputCelular,
+          operador: state?.operador,
+          jsonAdicional: {
+            operador: state?.operadorPaquete,
+            operador_paquete: state?.operador_recargar,
+            descripcion: state?.descripcion,
+          },
+        },
+      };
+      const dataAditional = {
+        id_uuid_trx: id_uuid,
+      };
+      notifyPending(
+        peticionRecargaPaquetes(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando compra de paquete";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setInfTicket(res?.obj?.ticket);
+            setTypeInfo("RecargaExitosa");
+            return "Compra de paquete exitosa";
+          },
+        },
+        {
+          render: ({ data: error }) => {
             validNavigate("/recargas-paquetes");
-          } else {
-            notifyError(
-              typeof res?.msg == typeof {}
-                ? "Error respuesta Practisistemas:(Transacción invalida [" + res?.msg?.estado + "])"
-                : res?.msg === "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002]) -> list index out of range" ? "Error respuesta PDP: (Fallo al consumir el servicio (recarga) [0010002])" : res?.msg == "Error respuesta PDP: (Fallo en aplicaci\u00f3n del cupo [0020001]) -> <<Exception>> El servicio respondio con un codigo: 404, 404 Not Found" ? "Error respuesta PDP: (Fallo en aplicación del cupo [0020001])" : res?.msg
-            );
-            setRespuesta(false);
-            handleClose();
-          }
+            return error?.message ?? "Compra paquete fallida";
+          },
         }
-      })
-      .catch(async (err) => {
-        setRespuesta(false);
-        notifyError("Error respuesta PDP: Fallo de conexión con autorizador [0010004]");
-        console.error(err);
-        handleClose();
-      });
-  };
+      );
+    },
+    [roleInfo, id_uuid, pdpUser, state, inputCelular, validNavigate]
+  );
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -227,6 +174,7 @@ const RecargarPaquetes = () => {
           value={inputCelular}
           onChange={onCelChange}
           required
+          disabled={loadingPeticionRecargaPaquetes}
         />
 
         <ButtonBar className={"lg:col-span-2"}>
@@ -249,11 +197,18 @@ const RecargarPaquetes = () => {
             }}>
             <>
               <ButtonBar>
-                <Button onClick={handleCloseCancelada}>Cancelar</Button>
-                <Button type={"submit"} onClick={fecthEnvioTransaccion}>
+                <Button 
+                  onClick={handleCloseCancelada}
+                  disabled={loadingPeticionRecargaPaquetes}>
+                  Cancelar
+                </Button>
+                <Button 
+                  type={"submit"} 
+                  onClick={fecthEnvioTransaccion}
+                  disabled= {loadingPeticionRecargaPaquetes}>
                   Aceptar
                 </Button>
-              </ButtonBar>
+                </ButtonBar>
             </>
             <SimpleLoading show={respuesta} />
           </PaymentSummary>
