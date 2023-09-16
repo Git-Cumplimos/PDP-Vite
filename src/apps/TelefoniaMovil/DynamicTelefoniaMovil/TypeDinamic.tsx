@@ -5,6 +5,8 @@ export type TypeInputPromises<TypeDependsModule> = {
   pdpUser: { [key: string]: any };
   moduleInfo: TypeDependsModule;
   id_uuid?: any;
+  parameters_operador?: { [key: string]: any };
+  parameters_submodule?: { [key: string]: any };
 };
 
 //------------recargas ------------------------
@@ -14,7 +16,8 @@ export type TypeInputDataRecargas = {
 };
 export type TypeOutputDataRecargas = {
   status: boolean;
-  ticket: any;
+  id_trx: number | null;
+  ticket: { [key: string]: any } | null;
 };
 
 export type TypeInputPromisesRecargas =
@@ -31,10 +34,11 @@ export type TypeInputDataGetPaquetes =
 
 export type TypeTableDataGetPaquetes = {
   codigo: number;
+  nombre: string;
   tipo: string;
-  descripcion: string;
+  descripcion_corta: string;
+  descripcion_completa: string;
   valor: number;
-  additional: { [key: string]: any };
 };
 
 export type TypeOutputDataGetPaquetes = {
@@ -42,20 +46,23 @@ export type TypeOutputDataGetPaquetes = {
   results: TypeTableDataGetPaquetes[];
 };
 
-export type TypeInputDataTrxPaquetesInsert = {
-  celular: number;
-  codigo: number;
-  tipo: string;
-  descripcion: string;
-  valor: number;
-  additional: { [key: string]: any };
+export type TypeInputDataPaquetes = {
+  celular: string;
+  valor_total_trx: number;
+  paquete: {
+    codigo: number;
+    nombre: string;
+    tipo: string;
+    descripcion_corta: string;
+  };
 };
 
-export type TypeInputTrxPaquetes =
-  TypeInputPromises<TypeInputDataTrxPaquetesInsert>;
+export type TypeInputTrxPaquetes = TypeInputPromises<TypeInputDataPaquetes>;
+
 export type TypeOutputTrxPaquetes = {
   status: boolean;
-  ticket: { [key: string]: any };
+  id_trx: number | null;
+  ticket: { [key: string]: any } | null;
 };
 
 export type TypeBackendPaquetes = any;
@@ -73,7 +80,9 @@ export type TypeSubModules<_TypeSubModules_> = {
   recargas: _TypeSubModules_;
   paquetes: _TypeSubModules_;
   cargarPaquetes: _TypeSubModules_;
-};
+  cargarConciliacion: _TypeSubModules_;
+  descargarConciliacion: _TypeSubModules_;
+} & { [key: string]: _TypeSubModules_ };
 
 export type TypeRouteModule = {
   link: string;
@@ -81,4 +90,14 @@ export type TypeRouteModule = {
   component: ReactNode;
   permission: number[];
   subRoutes?: TypeRouteModule[];
+};
+
+export type PropOperadoresComponent = {
+  autorizador: string;
+  name: string;
+  logo: string;
+  backend: TypeBackend;
+  permission: number[];
+  parameters_operador: [key: string | any] | {};
+  parameters_submodule: [key: string | any] | {};
 };

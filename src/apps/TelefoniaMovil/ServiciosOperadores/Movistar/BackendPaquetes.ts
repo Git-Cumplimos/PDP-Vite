@@ -115,7 +115,8 @@ export const useBackendPaquetesMovistar = (
       let id_movistar = null;
       let response = {
         status: false,
-        ticket: {},
+        id_trx: null,
+        ticket: null,
       };
       setLoadingPeticion((old) => ({ ...old, trx: true }));
       //?-----Iniciar intervalo para la alertas del usuario debido a la demora de la transaccion
@@ -146,8 +147,8 @@ export const useBackendPaquetesMovistar = (
         const tipo_comercio = dataInput.roleInfo.tipo_comercio;
         let bodyPaso1 = {
           celular: dataInput.moduleInfo.celular,
-          valor: dataInput.moduleInfo.valor,
-          codigodelaoferta: dataInput.moduleInfo.codigo,
+          valor: dataInput.moduleInfo.valor_total_trx,
+          codigodelaoferta: dataInput.moduleInfo.paquete.codigo,
           id_comercio: dataInput.roleInfo.id_comercio,
           tipo_comercio:
             tipo_comercio.search("KIOSCO") >= 0
@@ -188,8 +189,8 @@ export const useBackendPaquetesMovistar = (
           id_movistar = fetchPaso1Result?.obj?.result?.id_movistar;
           let bodyPaso2 = {
             celular: dataInput.moduleInfo.celular,
-            valor: dataInput.moduleInfo.valor,
-            codigodelaoferta: dataInput.moduleInfo.codigo,
+            valor: dataInput.moduleInfo.valor_total_trx,
+            codigodelaoferta: dataInput.moduleInfo.paquete,
             id_comercio: dataInput.roleInfo.id_comercio,
             id_terminal: dataInput.roleInfo.id_dispositivo,
             id_usuario: dataInput.roleInfo.id_usuario,
@@ -210,6 +211,7 @@ export const useBackendPaquetesMovistar = (
           );
           response = {
             status: fetchPaso2Result?.status,
+            id_trx: null,
             ticket: JSON.parse(fetchPaso2Result?.obj?.result?.ticket),
           };
         } catch (error: any) {
@@ -267,6 +269,7 @@ export const useBackendPaquetesMovistar = (
           );
           response = {
             status: analysis?.status,
+            id_trx: null,
             ticket: analysis?.obj?.result?.ticket,
           };
         } catch (error) {

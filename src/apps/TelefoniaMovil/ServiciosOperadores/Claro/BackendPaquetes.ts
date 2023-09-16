@@ -101,7 +101,8 @@ export const useBackendPaquetesClaro = (
     async (dataInput: TypeInputTrxPaquetes): Promise<TypeOutputTrxPaquetes> => {
       const response = {
         status: true,
-        ticket: {},
+        id_trx: null,
+        ticket: null,
       };
 
       return response;

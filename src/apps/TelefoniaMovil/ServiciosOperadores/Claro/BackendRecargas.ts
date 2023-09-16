@@ -15,7 +15,8 @@ export const useBackendRecargasClaro = (name_operador: string) => {
   ): Promise<TypeOutputDataRecargas> => {
     return {
       status: false,
-      ticket: {},
+      id_trx: null,
+      ticket: null,
     };
   };
   // const PeticionRecargar = useCallback(

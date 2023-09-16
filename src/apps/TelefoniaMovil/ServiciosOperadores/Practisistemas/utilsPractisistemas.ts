@@ -35,36 +35,40 @@ export const FuctionEvaluateResponsePractisistemas = (
   name_: string,
   error_: ParamsError
 ) => {
-  // trx exitosa
+  const function_name = "FuctionEvaluateResponsePractisistemas";
+  //trx no exitosa para los errores del backend
   try {
     if (peticion_?.status === true) {
       return peticion_;
     }
   } catch (error: any) {
     throw new ErrorCustomFetchCode(
-      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 7) [0010002]`,
+      `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
       error.message,
-      error_.errorFetchCustomCode?.typeNotify,
-      error_.errorFetchCustomCode?.ignoring
+      `${function_name} - trx no exitosa para los errores del backend`,
+      error_.errorCustomFetchCode?.typeNotify,
+      error_.errorCustomFetchCode?.ignoring
     );
   }
-  // trx no exitosa
+  //trx no exitosa para los errores del backend,
 
   try {
     if (peticion_?.status === false && peticion_?.obj?.response) {
       throw new ErrorCustomBackend(
         peticion_?.obj?.response,
         peticion_?.obj?.response,
-        error_.errorFetchCustomBackend?.typeNotify,
-        error_.errorFetchCustomBackend?.ignoring,
+        `${function_name} - trx no exitosa para los errores del backend`,
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
       );
     } else if (peticion_?.status === false) {
       throw new ErrorCustomBackend(
         peticion_?.msg,
         peticion_?.msg,
-        error_.errorFetchCustomBackend?.typeNotify,
-        error_.errorFetchCustomBackend?.ignoring,
+        `${function_name} - trx no exitosa para los errores del backend`,
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
       );
     }
@@ -73,10 +77,11 @@ export const FuctionEvaluateResponsePractisistemas = (
       throw error;
     } else {
       throw new ErrorCustomFetchCode(
-        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 8) [0010002]`,
+        `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message,
-        error_.errorFetchCustomCode?.typeNotify,
-        error_.errorFetchCustomCode?.ignoring
+        `${function_name} - trx no exitosa para los errores del backend`,
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring
       );
     }
   }
