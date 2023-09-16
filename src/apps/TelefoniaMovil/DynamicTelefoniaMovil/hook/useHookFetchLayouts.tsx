@@ -11,9 +11,8 @@ import {
   serviciosBackendAutorizadoresDefault,
 } from "../../routes";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import { urlConsultarConfiguracionOperadores } from "../urls";
 
-const url_servicio =
-  " http://127.0.0.1:5000/backend-telefonia-movil_broker/servicios_configuracion/consultar-configuracion-operadores";
 const name_servicio =
   "Telefonia Movil broker - consultar configuracion operadores";
 export const errorFront_servicio = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${name_servicio}) [0010002]"`;
@@ -34,7 +33,7 @@ const useHookFetchLayouts = (nameSubModule: string) => {
       //SECUENCIA Realizar petición al backend en el hook
       try {
         fetchResponse = await fetchCustom(
-          url_servicio,
+          urlConsultarConfiguracionOperadores,
           "GET",
           name_servicio,
           { submodule: nameSubModule },
