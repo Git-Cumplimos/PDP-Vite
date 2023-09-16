@@ -28,9 +28,9 @@ const WithTelefoniaMovil = (ComponectBody: FunctionComponent<any>) => {
   const { svgs }: any = useImgs();
 
   useEffect(() => {
+    console.log("rrrrrrrr", ComponectBody.name);
     peticionOperadores()
       .then((resPromise: PropOperadoresComponent[]) => {
-        console.log("rrrrrrrr", ComponectBody.name);
         if (resPromise?.length === 0) {
           notifyError(
             `En el modulo ${ComponectBody.name.toLowerCase()} ningún operador tiene permisos para este usuario`,
