@@ -38,7 +38,7 @@ export const useBackendRecargasDefault = (
   autorizador: string,
   module_: string
 ) => {
-  const hook_name = useBackendRecargasDefault.name;
+  const hook_name = "useBackendRecargasDefault";
   const [statePeticion, setStatePeticion] = useState<boolean>(false);
   const [startTimer, stopTimer] = useTimerCustom();
 
@@ -52,7 +52,7 @@ export const useBackendRecargasDefault = (
       seconds: number,
       cant: number
     ): Promise<any> => {
-      const function_name = CyclePeticionConsultaTimeout.name;
+      const function_name = "CyclePeticionConsultaTimeout";
       try {
         let response;
         let countTimerInterval = 0;

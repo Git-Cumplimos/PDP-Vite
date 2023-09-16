@@ -41,7 +41,7 @@ export const useBackendPaquetesDefault = (
   autorizador: string,
   module_: string
 ) => {
-  const hook_name = useBackendPaquetesDefault.name;
+  const hook_name = "useBackendPaquetesDefaul";
   const name_service: string = `Telefonia movil - ${autorizador} - ${module_}`;
   const [loadingPeticionGetPaquetes, setLoadingPeticionGetPaquetes] =
     useState<boolean>(false);
@@ -104,7 +104,7 @@ export const useBackendPaquetesDefault = (
       seconds: number,
       cant: number
     ): Promise<any> => {
-      const function_name = CyclePeticionConsultaTimeout.name;
+      const function_name = "CyclePeticionConsultaTimeout";
       try {
         let response;
         let countTimerInterval = 0;
@@ -348,7 +348,15 @@ export const useBackendPaquetesDefault = (
       stopTimer();
       return response;
     },
-    [autorizador, module_, name_operador, startTimer, stopTimer, CyclePeticion]
+    [
+      autorizador,
+      module_,
+      name_operador,
+      startTimer,
+      stopTimer,
+      CyclePeticion,
+      name_service,
+    ]
   );
 
   return [
