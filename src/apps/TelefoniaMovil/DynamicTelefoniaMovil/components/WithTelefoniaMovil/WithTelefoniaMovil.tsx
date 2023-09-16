@@ -26,7 +26,6 @@ const WithTelefoniaMovil = (
     componectName.toLowerCase()
   );
 
-  console.log(WithTelefoniaMovil.name);
   const validNavigate = useNavigate();
 
   const { svgs }: any = useImgs();
@@ -36,7 +35,7 @@ const WithTelefoniaMovil = (
       .then((resPromise: PropOperadoresComponent[]) => {
         if (resPromise?.length === 0) {
           notifyError(
-            `En el modulo ${ComponectBody.name.toLowerCase()} ningún operador tiene permisos para este usuario`,
+            `En el modulo ${componectName.toLowerCase()} ningún operador tiene permisos para este usuario`,
             5000,
             { toastId: "notify-not-permission" }
           );
@@ -58,7 +57,7 @@ const WithTelefoniaMovil = (
         }
         validNavigate("/telefonia-movil");
       });
-  }, [peticionOperadores, ComponectBody.name, validNavigate]);
+  }, [peticionOperadores, componectName, validNavigate]);
 
   return (
     <div>

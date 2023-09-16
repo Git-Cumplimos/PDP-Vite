@@ -56,7 +56,7 @@ const Paquetes = ({
   operadorCurrent: PropOperadoresComponent;
   children: ReactNode;
 }) => {
-  const component_name: string = Paquetes.name;
+  const component_name = "Paquetes";
   const msg = descriptionErrorFront.replace(
     "%s",
     `Telefonia movil - ${operadorCurrent.autorizador} - ${component_name}`
@@ -109,7 +109,7 @@ const Paquetes = ({
           notifyError(msg);
           console.error("Error respuesta Front-end PDP", {
             "Error PDP": msg,
-            "Error Sequence": `Views ${component_name} - ${PeticionGetPaquetes.name} -> error sin controlar`,
+            "Error Sequence": `Views ${component_name} - PeticionGetPaquetes -> error sin controlar`,
             "Error Console": `${error.message}`,
           });
         }

@@ -54,7 +54,7 @@ const Recargas = ({
   operadorCurrent: PropOperadoresComponent;
   children: ReactNode;
 }) => {
-  const component_name: string = Recargas.name;
+  const component_name = "Recargas";
   const [dataRecarga, setDataRecarga] =
     useState<TypeDataRecarga>(dataRecargaInitial);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -96,6 +96,7 @@ const Recargas = ({
   };
 
   const RealizarTrx = (e: any) => {
+    const function_name = "RealizarTrx";
     e.preventDefault();
     const msg = descriptionErrorFront.replace(
       "%s",
@@ -129,7 +130,7 @@ const Recargas = ({
           throw new ErrorCustomComponentCode(
             msg,
             "el valor de status en la peticion dentro del componente es false",
-            `Views ${component_name} - ${RealizarTrx.name} -> status false`,
+            `Views ${component_name} - ${function_name} -> status false`,
             "notifyError",
             false
           );
@@ -150,7 +151,7 @@ const Recargas = ({
           notifyError(msg);
           console.error("Error respuesta Front-end PDP", {
             "Error PDP": msg,
-            "Error Sequence": `Views ${component_name} - ${RealizarTrx.name} -> error sin controlar`,
+            "Error Sequence": `Views ${component_name} - ${function_name} -> error sin controlar`,
             "Error Console": `${error.message}`,
           });
         }
