@@ -15,20 +15,23 @@ import { ErrorCustomFetch } from "../../utils/utils";
 
 const { Lineadivisora, Mensaje } = classes;
 
-const WithTelefoniaMovil = (ComponectBody: FunctionComponent<any>) => {
+const WithTelefoniaMovil = (
+  ComponectBody: FunctionComponent<any>,
+  componectName: string
+) => {
   const [operadores, setOperadores] = useState<PropOperadoresComponent[]>([]);
   const [operadorCurrent, setOperadorCurrent] =
     useState<PropOperadoresComponent | null>(null);
   const [loadingPeticionOperadores, peticionOperadores] = useHookFetchLayouts(
-    ComponectBody.name.toLowerCase()
+    componectName.toLowerCase()
   );
 
+  console.log(WithTelefoniaMovil.name);
   const validNavigate = useNavigate();
 
   const { svgs }: any = useImgs();
 
   useEffect(() => {
-    console.log("rrrrrrrr", ComponectBody.name);
     peticionOperadores()
       .then((resPromise: PropOperadoresComponent[]) => {
         if (resPromise?.length === 0) {

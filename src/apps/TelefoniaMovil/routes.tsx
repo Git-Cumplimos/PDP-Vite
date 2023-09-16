@@ -61,14 +61,14 @@ const RoutesTelefoniaMovil = {
     {
       link: "/telefonia-movil/recargas",
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargas" />,
-      component: () => WithTelefoniaMovil(Recargas),
+      component: () => WithTelefoniaMovil(Recargas, "Recargas"),
       permission: [...permissionAutorizadoresDefault?.recargas],
       subRoutes: [],
     },
     {
       link: "/telefonia-movil/paquetes",
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Paquetes" />,
-      component: () => WithTelefoniaMovil(Paquetes),
+      component: () => WithTelefoniaMovil(Paquetes, "Paquetes"),
       permission: [...permissionAutorizadoresDefault?.paquetes],
       subRoutes: [],
     },
