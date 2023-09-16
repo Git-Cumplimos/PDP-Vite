@@ -23,7 +23,6 @@ const LayoutTelefoniaMovil = ({
   setOperadorCurrent: any;
 }) => {
   const { svgs }: any = useImgs();
-
   return (
     <div className={contenedorLayoutTelefoniaMovil}>
       {operadores.map((operadorInd) => (

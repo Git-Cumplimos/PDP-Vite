@@ -22,6 +22,7 @@ const WithTelefoniaMovil = (ComponectBody: FunctionComponent<any>) => {
   const [loadingPeticionOperadores, peticionOperadores] = useHookFetchLayouts(
     ComponectBody.name.toLowerCase()
   );
+
   const validNavigate = useNavigate();
 
   const { svgs }: any = useImgs();
@@ -29,6 +30,7 @@ const WithTelefoniaMovil = (ComponectBody: FunctionComponent<any>) => {
   useEffect(() => {
     peticionOperadores()
       .then((resPromise: PropOperadoresComponent[]) => {
+        console.log("rrrrrrrr", ComponectBody.name);
         if (resPromise?.length === 0) {
           notifyError(
             `En el modulo ${ComponectBody.name.toLowerCase()} ningún operador tiene permisos para este usuario`,
