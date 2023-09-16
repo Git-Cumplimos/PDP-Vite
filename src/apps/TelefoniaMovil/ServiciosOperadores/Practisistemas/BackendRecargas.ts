@@ -25,7 +25,8 @@ export const useBackendRecargasPractisistemas = (
     setStatePeticion(true);
     let response = {
       status: false,
-      ticket: {},
+      id_trx: null,
+      ticket: null,
     };
     let fetchResult;
     //SECUENCIA ---------------trx-------------------------------

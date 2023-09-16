@@ -22,7 +22,12 @@ import {
 } from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
-import { ErrorCustomFetch } from "../utils/utils";
+import {
+  ErrorCustomBackend,
+  ErrorCustomComponentCode,
+  ErrorCustomFetch,
+  descriptionErrorFront,
+} from "../utils/utils";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 
@@ -49,6 +54,7 @@ const Recargas = ({
   operadorCurrent: PropOperadoresComponent;
   children: ReactNode;
 }) => {
+  const component_name: string = Recargas.name;
   const [dataRecarga, setDataRecarga] =
     useState<TypeDataRecarga>(dataRecargaInitial);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -63,7 +69,7 @@ const Recargas = ({
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
     operadorCurrent.name,
     operadorCurrent.autorizador,
-    "recargas"
+    component_name.toLowerCase()
   );
 
   const onCelChange = (e: any) => {
@@ -91,7 +97,10 @@ const Recargas = ({
 
   const RealizarTrx = (e: any) => {
     e.preventDefault();
-    console.log(operadorCurrent);
+    const msg = descriptionErrorFront.replace(
+      "%s",
+      `Telefonia movil - ${operadorCurrent.autorizador} - ${component_name}`
+    );
     PeticionRecargar({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
@@ -102,24 +111,48 @@ const Recargas = ({
     })
       .then((result: TypeOutputDataRecargas) => {
         if (result?.status === true) {
-          if (result?.ticket) {
-            setInfTicket(result?.ticket);
-          }
           notify(`Recarga ${operadorCurrent.name} exitosa`);
-          setTypeInfo("TrxExitosa");
+          if (result?.ticket !== null) {
+            setInfTicket(result?.ticket);
+            setTypeInfo("TrxExitosa");
+          } else if (result?.id_trx !== null) {
+            handleCloseError();
+            notify(
+              `Buscar el ticket en el modulo de transacciones con id_trx = ${result?.id_trx}`
+            );
+            validNavigate("/transacciones");
+          } else {
+            handleCloseError();
+            notify("Buscar el ticket en el modulo de transacciones");
+          }
         } else {
-          notifyError(
-            `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - status) [0010002]`
+          throw new ErrorCustomComponentCode(
+            msg,
+            "el valor de status en la peticion dentro del componente es false",
+            `Views ${component_name} - ${RealizarTrx.name} -> status false`,
+            "notifyError",
+            false
           );
-          handleCloseError();
         }
       })
       .catch((error: any) => {
         handleCloseError();
-        let msg = `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - catch) [0010002]`;
-        if (error instanceof ErrorCustomFetch) {
-        } else {
+        if (error instanceof ErrorCustomBackend) {
+          if (error.res_error_msg !== undefined) {
+            if (
+              Object.keys(error.res_error_msg).includes("error_pending_trx")
+            ) {
+              // validNavigate("/transacciones");
+            }
+          }
+        }
+        if (!(error instanceof ErrorCustomFetch)) {
           notifyError(msg);
+          console.error("Error respuesta Front-end PDP", {
+            "Error PDP": msg,
+            "Error Sequence": `Views ${component_name} - ${RealizarTrx.name} -> error sin controlar`,
+            "Error Console": `${error.message}`,
+          });
         }
       });
   };

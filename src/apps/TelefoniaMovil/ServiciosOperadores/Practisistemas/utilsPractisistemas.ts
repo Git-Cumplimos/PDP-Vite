@@ -46,8 +46,8 @@ export const FuctionEvaluateResponsePractisistemas = (
       `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
       error.message,
       `${function_name} - trx no exitosa para los errores del backend`,
-      error_.errorFetchCustomCode?.typeNotify,
-      error_.errorFetchCustomCode?.ignoring
+      error_.errorCustomFetchCode?.typeNotify,
+      error_.errorCustomFetchCode?.ignoring
     );
   }
   //trx no exitosa para los errores del backend,
@@ -58,8 +58,8 @@ export const FuctionEvaluateResponsePractisistemas = (
         peticion_?.obj?.response,
         peticion_?.obj?.response,
         `${function_name} - trx no exitosa para los errores del backend`,
-        error_.errorFetchCustomBackend?.typeNotify,
-        error_.errorFetchCustomBackend?.ignoring,
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
       );
     } else if (peticion_?.status === false) {
@@ -67,8 +67,8 @@ export const FuctionEvaluateResponsePractisistemas = (
         peticion_?.msg,
         peticion_?.msg,
         `${function_name} - trx no exitosa para los errores del backend`,
-        error_.errorFetchCustomBackend?.typeNotify,
-        error_.errorFetchCustomBackend?.ignoring,
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
       );
     }
@@ -80,8 +80,8 @@ export const FuctionEvaluateResponsePractisistemas = (
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message,
         `${function_name} - trx no exitosa para los errores del backend`,
-        error_.errorFetchCustomCode?.typeNotify,
-        error_.errorFetchCustomCode?.ignoring
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring
       );
     }
   }

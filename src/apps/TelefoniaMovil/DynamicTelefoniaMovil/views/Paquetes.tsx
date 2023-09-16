@@ -16,13 +16,14 @@ import Input from "../../../../components/Base/Input/Input";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
-import { ErrorCustomFetch } from "../utils/utils";
+import { ErrorCustomFetch, descriptionErrorFront } from "../utils/utils";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
 import {
   PropOperadoresComponent,
+  TypeInputDataPaquetes,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
   TypeTableDataGetPaquetes,
@@ -55,6 +56,11 @@ const Paquetes = ({
   operadorCurrent: PropOperadoresComponent;
   children: ReactNode;
 }) => {
+  const component_name: string = Paquetes.name;
+  const msg = descriptionErrorFront.replace(
+    "%s",
+    `Telefonia movil - ${operadorCurrent.autorizador} - ${component_name}`
+  );
   const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
     dataPackageInputInitial
   );
@@ -72,9 +78,15 @@ const Paquetes = ({
   const printDiv = useRef(null);
   const useHookDynamic = operadorCurrent?.backend;
 
-  const [loadingPeticion, PeticionGetPaquetes, PeticionTrx] = useHookDynamic(
+  const [
+    loadingPeticionGetPaquetes,
+    PeticionGetPaquetes,
+    loadingPeticionTrx,
+    PeticionTrx,
+  ] = useHookDynamic(
     operadorCurrent.name,
-    "paquetes"
+    operadorCurrent.autorizador,
+    component_name.toLowerCase()
   );
   const validNavigate = useNavigate();
   const id_uuid = v4();
@@ -86,27 +98,32 @@ const Paquetes = ({
       pdpUser: pdpUser,
       moduleInfo: { page: pageTable.page, limit: pageTable.limit },
       parameters_operador: operadorCurrent.parameters_operador,
-      parameters_submodule: operadorCurrent.parameters_submodule
+      parameters_submodule: operadorCurrent.parameters_submodule,
     })
       .then((response: TypeOutputDataGetPaquetes) => {
         setDataGetPackages(response?.results);
         setMaxPages(response?.maxPages);
       })
       .catch((error: any) => {
-        let msg = `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - catch) [0010002]`;
-        if (error instanceof ErrorCustomFetch) {
-        } else {
+        if (!(error instanceof ErrorCustomFetch)) {
           notifyError(msg);
+          console.error("Error respuesta Front-end PDP", {
+            "Error PDP": msg,
+            "Error Sequence": `Views ${component_name} - ${PeticionGetPaquetes.name} -> error sin controlar`,
+            "Error Console": `${error.message}`,
+          });
         }
         setDataGetPackages([]);
       });
   }, [
-    operadorCurrent.name,
+    operadorCurrent,
     roleInfo,
     pdpUser,
     PeticionGetPaquetes,
     pageTable.limit,
     pageTable.page,
+    component_name,
+    msg,
   ]);
 
   const HandleCloseInformacion = useCallback(() => {
@@ -135,16 +152,16 @@ const Paquetes = ({
   const handleCloseModal = useCallback(() => {
     if (typeInfo === "Informacion") {
       HandleCloseInformacion();
-    } else if (typeInfo === "Resumen" && !loadingPeticion?.trx) {
+    } else if (typeInfo === "Resumen" && !loadingPeticionTrx) {
       HandleCloseResumen();
     } else if (typeInfo === "TrxExitosa") {
       HandleCloseTrxExitosa();
-    } else if (loadingPeticion?.trx) {
+    } else if (loadingPeticionTrx) {
       notify("Se está procesando la transacción, por favor esperar");
     }
   }, [
     typeInfo,
-    loadingPeticion?.trx,
+    loadingPeticionTrx,
     HandleCloseInformacion,
     HandleCloseResumen,
     HandleCloseTrxExitosa,
@@ -180,10 +197,20 @@ const Paquetes = ({
   }, []);
 
   const RealizarTrx = useCallback(() => {
+    const moduleInfo = {
+      celular: dataPackageInput?.celular,
+      valor_total_trx: dataPackage?.valor,
+      paquete: {
+        codigo: dataPackage?.codigo,
+        nombre: dataPackage?.nombre,
+        tipo: dataPackage?.tipo,
+        descripcion_corta: dataPackage?.descripcion_corta,
+      },
+    };
     PeticionTrx({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
-      moduleInfo: { ...dataPackageInput, ...dataPackage },
+      moduleInfo: moduleInfo,
       id_uuid: id_uuid,
     })
       .then((result: TypeOutputTrxPaquetes) => {
@@ -231,13 +258,13 @@ const Paquetes = ({
         maxPage={maxPages}
         headers={["Código", "Tipo", "Descripción", "Valor"]}
         data={
-          loadingPeticion?.getPaquetes
+          loadingPeticionGetPaquetes
             ? dataTableInitial
             : dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
                 return {
                   Código: inf.codigo,
                   Tipo: inf.tipo,
-                  Descripción: inf.descripcion,
+                  Descripción: inf.descripcion_corta,
                   Valor: inf.valor,
                 };
               })
@@ -258,7 +285,7 @@ const Paquetes = ({
             subtitle={dataPackage?.tipo ?? ""}
           >
             <label className="whitespace-pre-line">
-              {dataPackage?.descripcion}
+              {dataPackage?.descripcion_completa}
             </label>
             <label>
               {`Valor: ${formatMoney.format(dataPackage?.valor ?? 0)}`}
@@ -295,11 +322,11 @@ const Paquetes = ({
               Celular: toPhoneNumber(dataPackageInput.celular),
               Valor: formatMoney.format(dataPackage?.valor ?? 0),
               "Tipo de Oferta": dataPackage?.tipo,
-              "Descripción Corta": dataPackage?.descripcion,
+              "Descripción Corta": dataPackage?.descripcion_corta,
               "Código de la Oferta": dataPackage?.codigo,
             }}
           >
-            {!loadingPeticion.trx ? (
+            {!loadingPeticionTrx ? (
               <>
                 <ButtonBar>
                   <Button type={"submit"} onClick={RealizarTrx}>

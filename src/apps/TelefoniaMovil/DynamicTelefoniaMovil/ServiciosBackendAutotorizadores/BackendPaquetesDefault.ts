@@ -1,19 +1,22 @@
 import { useCallback, useState } from "react";
 import {
-  TypeInputPromisesRecargas,
-  TypeOutputDataRecargas,
-} from "../TypeDinamic";
+  TypeInputDataGetPaquetes,
+  TypeInputTrxPaquetes,
+  TypeOutputDataGetPaquetes,
+  TypeOutputTrxPaquetes,
+  TypeTableDataGetPaquetes,
+} from "../../DynamicTelefoniaMovil/TypeDinamic";
 import {
   ErrorCustomApiGatewayTimeout,
+  ErrorCustomBackend,
   ErrorCustomFetch,
   ErrorCustomUseHookCode,
   ParamsError,
-  fetchCustom,
   descriptionErrorFront,
-  ErrorCustomBackend,
+  fetchCustom,
 } from "../utils/utils";
 import { sleep, useTimerCustom } from "./utils";
-import { urlRecargasDefault } from "../urls";
+import { urlPaquetesDefault } from "../urls";
 
 const customParamsErrorCyclePeticion: ParamsError = {
   errorCustomApiGatewayTimeout: {
@@ -33,14 +36,63 @@ const customParamsErrorConsultaTimeout: ParamsError = {
   },
 };
 
-export const useBackendRecargasDefault = (
+export const useBackendPaquetesDefault = (
   name_operador: string,
   autorizador: string,
   module_: string
 ) => {
-  const hook_name = useBackendRecargasDefault.name;
-  const [statePeticion, setStatePeticion] = useState<boolean>(false);
+  const hook_name = useBackendPaquetesDefault.name;
+  const name_service: string = `Telefonia movil - ${autorizador} - ${module_}`;
+  const [loadingPeticionGetPaquetes, setLoadingPeticionGetPaquetes] =
+    useState<boolean>(false);
+  const [loadingPeticionTrx, setLoadingPeticionTrx] = useState<boolean>(false);
   const [startTimer, stopTimer] = useTimerCustom();
+
+  const PeticionGetPaquetes = useCallback(
+    async (
+      dataInputPromises: TypeInputDataGetPaquetes
+    ): Promise<TypeOutputDataGetPaquetes> => {
+      setLoadingPeticionGetPaquetes(true);
+      let response: TypeOutputDataGetPaquetes = {
+        maxPages: 1,
+        results: [],
+      };
+      try {
+        const params = {
+          operador: name_operador,
+        };
+        const body = {
+          comercio: {
+            id_comercio: dataInputPromises.roleInfo?.id_comercio ?? 0,
+          },
+          module_info: {
+            limit: dataInputPromises.moduleInfo.limit,
+            page: dataInputPromises.moduleInfo.page,
+          },
+          parameters_operador: dataInputPromises.parameters_operador,
+          parameters_submodule: dataInputPromises.parameters_submodule,
+        };
+        const responseFetch = await fetchCustom(
+          `${urlPaquetesDefault}/${autorizador}/${module_}/get_paquetes`,
+          "PUT",
+          name_service,
+          params,
+          body
+        );
+        response = {
+          maxPages: responseFetch?.obj?.result?.maxPages ?? 1,
+          results: responseFetch?.obj?.result?.paquetes ?? [],
+        };
+        console.log(responseFetch);
+      } catch (error: any) {
+        setLoadingPeticionGetPaquetes(false);
+        throw error;
+      }
+      setLoadingPeticionGetPaquetes(false);
+      return response;
+    },
+    [name_operador, autorizador, module_, name_service]
+  );
 
   const CyclePeticionConsultaTimeout = useCallback(
     async (
@@ -203,36 +255,30 @@ export const useBackendRecargasDefault = (
             error.res_error_msg
           );
         }
-        console.log(error);
         throw error;
       }
     },
     [CyclePeticionConsultaTimeout]
   );
 
-  const PeticionRecargar = useCallback(
+  const PeticionTrx = useCallback(
     async (
-      dataInputPromises: TypeInputPromisesRecargas
-    ): Promise<TypeOutputDataRecargas> => {
-      let response: TypeOutputDataRecargas = {
+      dataInputPromises: TypeInputTrxPaquetes
+    ): Promise<TypeOutputTrxPaquetes> => {
+      let response: TypeOutputTrxPaquetes = {
         status: false,
         id_trx: null,
         ticket: null,
       };
       let fetchResult;
-      const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
-
-      setStatePeticion(true);
-
-      // //?-----Iniciar intervalo para la alertas del usuario debido a la demora de la transaccion
-      startTimer();
-      // //?--------------------------------------------------------------------
+      setLoadingPeticionTrx(true);
+      startTimer(); //Iniciar intervalo para la alertas del usuario debido a la demora de la transaccion
 
       try {
         const params = {
           operador: name_operador,
         };
-        const tipo_comercio = dataInputPromises.roleInfo?.tipo_comercio ?? "h";
+        const tipo_comercio = dataInputPromises.roleInfo?.tipo_comercio ?? "";
         const body = {
           ids: {
             autorizador: {
@@ -240,11 +286,11 @@ export const useBackendRecargasDefault = (
             },
           },
           comercio: {
-            id_comercio: dataInputPromises.roleInfo?.id_comercio ?? 123,
-            id_terminal: dataInputPromises.roleInfo?.id_dispositivo ?? 1,
-            id_usuario: dataInputPromises.roleInfo?.id_usuario ?? 1,
+            id_comercio: dataInputPromises.roleInfo?.id_comercio ?? 0,
+            id_terminal: dataInputPromises.roleInfo?.id_dispositivo ?? 0,
+            id_usuario: dataInputPromises.roleInfo?.id_usuario ?? 0,
             nombre_comercio:
-              dataInputPromises.roleInfo?.["nombre comercio"] ?? "rr",
+              dataInputPromises.roleInfo?.["nombre comercio"] ?? "r",
             nombre_usuario: dataInputPromises.pdpUser?.uname ?? "",
             oficina_propia:
               tipo_comercio.search("KIOSCO") >= 0 ||
@@ -254,19 +300,26 @@ export const useBackendRecargasDefault = (
             location: {
               address: dataInputPromises.roleInfo.direccion ?? "",
               city: dataInputPromises.roleInfo.ciudad ?? "",
-              code_dane: dataInputPromises.roleInfo.codigo_dane ?? 1,
+              code_dane: dataInputPromises.roleInfo.codigo_dane ?? 0,
             },
           },
           module_info: {
             celular: dataInputPromises.moduleInfo.celular,
             valor_total_trx: dataInputPromises.moduleInfo.valor_total_trx,
+            paquete: {
+              codigo: dataInputPromises.moduleInfo.paquete.codigo,
+              nombre: dataInputPromises.moduleInfo.paquete.nombre,
+              tipo: dataInputPromises.moduleInfo.paquete.tipo,
+              descripcion_corta:
+                dataInputPromises.moduleInfo.paquete.descripcion_corta,
+            },
           },
-          parameters_operador: dataInputPromises.parameters_operador,
-          parameters_submodule: dataInputPromises.parameters_submodule,
+          parameters_operador: dataInputPromises.parameters_operador ?? {},
+          parameters_submodule: dataInputPromises.parameters_submodule ?? {},
         };
 
         fetchResult = await CyclePeticion(
-          `${urlRecargasDefault}/${autorizador}/${module_}`,
+          `${urlPaquetesDefault}/${autorizador}/${module_}`,
           "default",
           name_service,
           params,
@@ -280,7 +333,7 @@ export const useBackendRecargasDefault = (
           ticket: fetchResult?.obj?.result?.ticket ?? null,
         };
       } catch (error: any) {
-        setStatePeticion(false);
+        setLoadingPeticionTrx(false);
         stopTimer();
         if (!(error instanceof ErrorCustomFetch)) {
           throw new ErrorCustomUseHookCode(
@@ -291,12 +344,17 @@ export const useBackendRecargasDefault = (
         }
         throw error;
       }
-      setStatePeticion(false);
+      setLoadingPeticionTrx(false);
       stopTimer();
       return response;
     },
     [autorizador, module_, name_operador, startTimer, stopTimer, CyclePeticion]
   );
 
-  return [statePeticion, PeticionRecargar] as const;
+  return [
+    loadingPeticionGetPaquetes,
+    PeticionGetPaquetes,
+    loadingPeticionTrx,
+    PeticionTrx,
+  ] as const;
 };

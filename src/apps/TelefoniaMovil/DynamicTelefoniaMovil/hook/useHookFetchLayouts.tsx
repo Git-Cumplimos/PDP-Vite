@@ -1,11 +1,8 @@
 import { useCallback, useState } from "react";
-import { notifyError } from "../../../../utils/notify";
 import {
   ErrorCustomFetch,
-  ErrorCustomFetchCode,
   ErrorCustomUseHookCode,
   fetchCustom,
-  name_console_error,
 } from "../utils/utils";
 import { PropOperadoresComponent } from "../TypeDinamic";
 import DictServiciosBackendAurorizadores from "../../ServiciosOperadores/DictServiciosBackendAurorizadores";
@@ -108,7 +105,7 @@ const useHookFetchLayouts = (nameSubModule: string) => {
           }
 
           if (permissionsAccess !== undefined && backend_validate === false) {
-            console.error(name_console_error, {
+            console.error("Error respuesta Front-end PDP", {
               "Error PDP": errorFront_servicio,
               "Error Sequence": "El autorizador no coincide con el backend",
               "Error Console": `Custom - El autorizador ${operador.autorizador} no coincide con el backend asignado ${backend_default.name}`,

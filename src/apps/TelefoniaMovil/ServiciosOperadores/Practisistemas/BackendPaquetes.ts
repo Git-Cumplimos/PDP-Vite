@@ -118,7 +118,8 @@ export const useBackendPaquetesPractisistemas = (
     async (dataInput: TypeInputTrxPaquetes): Promise<TypeOutputTrxPaquetes> => {
       let response = {
         status: false,
-        ticket: {},
+        id_trx: null,
+        ticket: null,
       };
       let fetchResult;
       //SECUENCIA ---------------trx-------------------------------
@@ -148,9 +149,12 @@ export const useBackendPaquetesPractisistemas = (
               toPhoneNumber(dataInput.moduleInfo.celular.toString()),
             ],
             ["", ""],
-            ["Valor paquete", formatMoney.format(dataInput.moduleInfo.valor)],
+            [
+              "Valor paquete",
+              formatMoney.format(dataInput.moduleInfo.valor_total_trx),
+            ],
             ["", ""],
-            ["Descripción", dataInput.moduleInfo.descripcion],
+            ["Descripción", dataInput.moduleInfo.paquete.descripcion_corta],
             ["", ""],
           ],
           disclamer:
@@ -170,16 +174,16 @@ export const useBackendPaquetesPractisistemas = (
               ? true
               : false,
           nombre_comercio: dataInput.roleInfo["nombre comercio"],
-          valor_total_trx: dataInput.moduleInfo.valor,
+          valor_total_trx: dataInput.moduleInfo.valor_total_trx,
           ticket: infTicket,
           datosRecargas: {
             celular: dataInput.moduleInfo.celular,
-            valor: dataInput.moduleInfo.codigo,
+            valor: dataInput.moduleInfo.valor_total_trx,
             jsonAdicional: {
               nombre_usuario: dataInput.pdpUser.uname,
-              operador: dataInput.moduleInfo.tipo,
+              operador: dataInput.moduleInfo.paquete.tipo,
             },
-            operador: dataInput.moduleInfo.additional.categoryId,
+            operador: dataInput.moduleInfo.paquete.codigo,
           },
         };
 

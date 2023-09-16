@@ -6,23 +6,23 @@ import {
 } from "../../DynamicTelefoniaMovil/utils/utils";
 
 export const trxParamsError: ParamsError = {
-  errorFetchCustomCode: {
+  errorCustomFetchCode: {
     typeNotify: "notifyError",
     ignoring: false,
   },
-  errorFetchCustomApiGateway: {
+  errorCustomApiGateway: {
     typeNotify: "notifyError",
     ignoring: false,
   },
-  errorFetchCustomApiGatewayTimeout: {
-    typeNotify: undefined,
-    ignoring: true,
-  },
-  errorFetchCustomBackend: {
+  errorCustomApiGatewayTimeout: {
     typeNotify: "notifyError",
     ignoring: false,
   },
-  errorFetchCustomBackendUser: {
+  errorCustomBackend: {
+    typeNotify: "notifyError",
+    ignoring: false,
+  },
+  errorCustomBackendUser: {
     typeNotify: "notify",
     ignoring: true,
   },
@@ -44,8 +44,8 @@ export const FuctionEvaluateResponseMovistar = (
       `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 7) [0010002]`,
       error.message,
       `${function_name} - trx exitosa para el backend`,
-      error_.errorFetchCustomCode?.typeNotify,
-      error_.errorFetchCustomCode?.ignoring
+      error_.errorCustomFetchCode?.typeNotify,
+      error_.errorCustomFetchCode?.ignoring
     );
   }
   // trx no exitosa para los errores  del backend
@@ -71,8 +71,8 @@ export const FuctionEvaluateResponseMovistar = (
         error_msg_front,
         error_msg_console,
         `${function_name} - trx no exitosa para los errores del backend`,
-        error_.errorFetchCustomBackend?.typeNotify,
-        error_.errorFetchCustomBackend?.ignoring,
+        error_.errorCustomBackend?.typeNotify,
+        error_.errorCustomBackend?.ignoring,
         peticion_?.obj?.error_msg
       );
     }
@@ -84,8 +84,8 @@ export const FuctionEvaluateResponseMovistar = (
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 8) [0010002]`,
         error.message,
         `${function_name} - trx no exitosa para los errores del backend`,
-        error_.errorFetchCustomCode?.typeNotify,
-        error_.errorFetchCustomCode?.ignoring
+        error_.errorCustomFetchCode?.typeNotify,
+        error_.errorCustomFetchCode?.ignoring
       );
     }
   }
@@ -106,7 +106,7 @@ export const FuctionEvaluateResponseMovistar = (
       throw new ErrorCustomBackendUser(
         `${peticion_?.msg}`,
         error_msg_console,
-        error_.errorFetchCustomBackend?.typeNotify,
+        error_.errorCustomBackendUser?.typeNotify,
         `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         peticion_?.obj?.error_msg
       );
@@ -119,8 +119,8 @@ export const FuctionEvaluateResponseMovistar = (
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_} - 9) [0010002]`,
         error.message,
         `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
-        error_.errorFetchCustomCode?.typeNotify,
-        error_.errorFetchCustomCode?.ignoring
+        error_.errorCustomFetchCode?.typeNotify,
+        error_.errorCustomFetchCode?.ignoring
       );
     }
   }

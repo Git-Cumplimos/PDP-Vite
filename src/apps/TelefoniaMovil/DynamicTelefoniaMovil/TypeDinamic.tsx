@@ -16,7 +16,8 @@ export type TypeInputDataRecargas = {
 };
 export type TypeOutputDataRecargas = {
   status: boolean;
-  ticket: any;
+  id_trx: number | null;
+  ticket: { [key: string]: any } | null;
 };
 
 export type TypeInputPromisesRecargas =
@@ -33,10 +34,11 @@ export type TypeInputDataGetPaquetes =
 
 export type TypeTableDataGetPaquetes = {
   codigo: number;
+  nombre: string;
   tipo: string;
-  descripcion: string;
+  descripcion_corta: string;
+  descripcion_completa: string;
   valor: number;
-  additional: { [key: string]: any };
 };
 
 export type TypeOutputDataGetPaquetes = {
@@ -44,20 +46,23 @@ export type TypeOutputDataGetPaquetes = {
   results: TypeTableDataGetPaquetes[];
 };
 
-export type TypeInputDataTrxPaquetesInsert = {
-  celular: number;
-  codigo: number;
-  tipo: string;
-  descripcion: string;
-  valor: number;
-  additional: { [key: string]: any };
+export type TypeInputDataPaquetes = {
+  celular: string;
+  valor_total_trx: number;
+  paquete: {
+    codigo: number;
+    nombre: string;
+    tipo: string;
+    descripcion_corta: string;
+  };
 };
 
-export type TypeInputTrxPaquetes =
-  TypeInputPromises<TypeInputDataTrxPaquetesInsert>;
+export type TypeInputTrxPaquetes = TypeInputPromises<TypeInputDataPaquetes>;
+
 export type TypeOutputTrxPaquetes = {
   status: boolean;
-  ticket: { [key: string]: any };
+  id_trx: number | null;
+  ticket: { [key: string]: any } | null;
 };
 
 export type TypeBackendPaquetes = any;

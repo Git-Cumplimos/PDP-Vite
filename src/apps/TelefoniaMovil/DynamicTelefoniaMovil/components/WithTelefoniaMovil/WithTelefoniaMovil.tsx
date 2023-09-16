@@ -8,10 +8,10 @@ import { PropOperadoresComponent } from "../../TypeDinamic";
 import useHookFetchLayouts, {
   errorFront_servicio,
 } from "../../hook/useHookFetchLayouts";
-import { ErrorCustomFetch, name_console_error } from "../../utils/utils";
 import LayoutTelefoniaMovil from "../../layouts/LayoutTelefoniaMovil";
 
 import classes from "./WithTelefoniaMovil.module.css";
+import { ErrorCustomFetch } from "../../utils/utils";
 
 const { Lineadivisora, Mensaje } = classes;
 
@@ -44,7 +44,7 @@ const WithTelefoniaMovil = (ComponectBody: FunctionComponent<any>) => {
       .catch((error: any) => {
         if (!(error instanceof ErrorCustomFetch)) {
           notifyError(errorFront_servicio, 5000, { toastId: "notify-module" });
-          console.error(name_console_error, {
+          console.error("Error respuesta Front-end PDP", {
             "Error PDP": errorFront_servicio,
             "Error Sequence":
               "WithTelefoniaMovil - Error en sin controla en el modulo",
