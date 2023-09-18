@@ -294,7 +294,8 @@ const CompraPin = () => {
         trx_inf_ticket: state?.op === "hv" ? inputPlaca
          : state?.op === "em" ? inputCelular
          : state?.op === "cb" ? inputMatricula
-        : ""
+        : "",
+        cod_paquete: state?.cod ?? "",
       };
       const dataAditional = {
         id_uuid_trx: id_uuid,
