@@ -50,7 +50,9 @@ const IdleTimeOut = () => {
 
   const logOut = () => {
     signOut();
-    notifyError("La sesión se cerro por inactividad", false);
+    notifyError("La sesión se cerro por inactividad", false, {
+      toastId: "no-activity-msg",
+    });
     // setIdleModal(false);
     // refModal.current = false;
     // console.log("logging out");

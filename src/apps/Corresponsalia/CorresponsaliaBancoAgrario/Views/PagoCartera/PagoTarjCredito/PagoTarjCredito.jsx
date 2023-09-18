@@ -232,8 +232,9 @@ const PagoTarjCredito = () => {
     function onChangeInput(e) {
         const { name, value } = e.target;
         const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 16)); 
+        const num = numericValue.replace(/[\s\.\-+eE]/g, "");
         setDatosTarjCredito((old) => {
-            return { ...old, inputNumTarCredi: numericValue };
+            return { ...old, inputNumTarCredi: num };
         });
         if (value === "") {
             setDatosTarjCredito((old) => {
@@ -255,11 +256,11 @@ const PagoTarjCredito = () => {
                     <Input
                     name="credito"
                     label="Número tarjeta crédito"
-                    type="number"
+                    type="text"
                     minLength="5"
                     maxLength="16"
                     autoComplete="off"
-                        value={datosTarjCredito?.inputNumTarCredi}
+                    value={datosTarjCredito?.inputNumTarCredi}
                     onChange={onChangeInput}
                     required
                     ></Input>

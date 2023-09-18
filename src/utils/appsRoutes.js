@@ -21,6 +21,7 @@ import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
+import routesOtrasEntidades from "../apps/OtrasEntidades/routes"
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
 import {
@@ -58,6 +59,8 @@ import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
 import rutasFundacionMujer from "../apps/FundacionMujer/routes";
 import rutasMovii from "../apps/Movii-pdp/routes";
 import rutasCrezcamos from "../apps/Crezcamos/routes";
+import rutasMoviliza from "../apps/Moviliza/routes";
+
 
 /**
 
@@ -663,7 +666,7 @@ const allUrlsPrivateApps = [
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
         component: PinesCombinados,
-        permission: [53],
+        permission: [enumPermisosPinesVus.operarPinesVus],
       },
     ],
   },
@@ -1123,12 +1126,19 @@ const allUrlsPrivateApps = [
   rutasRecaudoDirecto,
   rutasRecargasTullave,
   rutasPowwi,
+<<<<<<< HEAD
   rutasCrezcamos,
 
+=======
+>>>>>>> certificacion
   //Modulo Almaseg
   routesAlmaseg,
   //Modulo Emcali
   routesEmcali,
+  routesOtrasEntidades,
+  //Modulo Moviliza
+  rutasMoviliza
+
 ];
 
 export { allUrlsPrivateApps };

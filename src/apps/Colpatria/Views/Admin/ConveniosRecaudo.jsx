@@ -537,7 +537,7 @@ const ConveniosRecaudo = () => {
                           maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
-                            let num = valor.replace(/[\s.-]/g, "");
+                            let num = valor.replace(/[\s\.\-+eE]/g, "");
                             if (!isNaN(num)) {
                               let copy = [...restriccionReferencias];
                               copy[i]["limiteMenor"] = !isNaN(parseInt(num))
@@ -557,7 +557,7 @@ const ConveniosRecaudo = () => {
                           maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
-                            let num = valor.replace(/[\s.-]/g, "");
+                            let num = valor.replace(/[\s\.\-+eE]/g, "");
                             if (!isNaN(num)) {
                               let copy = [...restriccionReferencias];
                               copy[i]["limiteMayor"] = !isNaN(parseInt(num))

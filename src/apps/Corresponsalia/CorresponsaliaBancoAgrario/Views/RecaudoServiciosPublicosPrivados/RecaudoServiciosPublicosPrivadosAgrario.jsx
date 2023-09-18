@@ -35,41 +35,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
     ref3: "",
     valor: 0,
   });
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago",
-    timeInfo: {
-      "Fecha de pago": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*comercio*/
-      [
-        "Id comercio",
-        roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
-      ],
-      /*id_dispositivo*/
-      ["No. Terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      // id trx
-      ["Id Trx", ""],
-      /*id autorizacion*/
-      ["Id Aut", ""],
-      /*comercio*/
-      [
-        "Comercio",
-        roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "Sin datos",
-      ],
-      ["", ""],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["", ""],
-    ],
-    commerceName: "Recaudo de facturas",
-    trxInfo: [],
-    disclamer:
-      "POR FAVOR VALIDE QUE LOS DATOS IMPRESOS EN ESTE COMPROBANTE SEAN CORRECTOS. EN CASO DE CUALQUIER RECLAMO O INQUIETUD POR FAVOR COMUNICARSE EN BOGOTÁ AL 5945500 O GRATIS EN EL RESTO DEL PAÍS AL 01 8000 915000 O EN LA PÁGINA DE INTERNET WWW.BANCOAGRARIO.GOV.CO ",
-  });
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
   useEffect(() => {
@@ -97,6 +63,15 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   });
   const onSubmit = (e) => {
     e.preventDefault();
+
+    if (
+      parseInt(datosTrans?.ref1) <= 0 ||
+      parseInt(datosTrans?.ref2) <= 0 ||
+      parseInt(datosTrans?.ref3) <= 0
+    ) {
+      return notifyError("La referencia no puede ser 0");
+    }
+
     //Valdicacion de luhm
     if (convenio?.algoritmo_ref1?.match(/(Q 108)/g)) {
       if (!checkLuhn(datosTrans?.ref1))
@@ -117,35 +92,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   const onSubmitValidacion = (e) => {
     e.preventDefault();
     let valorTransaccion = parseInt(datosTrans?.valor) ?? 0;
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hourCycle: "h23",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Código convenio", convenio.codigo]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Nombre del convenio",
-      convenio.nombre_convenio,
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor transacción",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia 1", datosTrans?.ref1 ?? ""]);
-    objTicket["trxInfo"].push(["", ""]);
     let objRecaudo = {
       nombreConvenio: convenio?.nombre_convenio,
       codigoConvenio: convenio?.codigo,
@@ -156,8 +102,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       convenio?.nombre_ref2 !== "" &&
       !convenio?.nombre_ref2?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push(["Referencia 2", datosTrans?.ref2 ?? ""]);
-      objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia2"] = datosTrans?.ref2;
     }
     if (
@@ -165,8 +109,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       convenio?.nombre_ref3 !== "" &&
       !convenio?.nombre_ref3?.match(/-/g)
     ) {
-      objTicket["trxInfo"].push(["Referencia 3", datosTrans?.ref3 ?? ""]);
-      objTicket["trxInfo"].push(["", ""]);
       objRecaudo["referencia3"] = datosTrans?.ref3;
     }
 
@@ -181,7 +123,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
       nombre_usuario: pdpUser?.uname ?? "",
-      ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
@@ -200,17 +141,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
-          objTicket["commerceInfo"][3] = [
-            "Id Aut",
-            res?.obj?.codigo_autorizacion,
-          ];
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(res?.obj?.costoTrx, 0),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
         } else {
           setIsUploading(false);
@@ -235,48 +166,11 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       valorConst: "",
       valorVar: "",
     }));
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*comercio*/
-          [
-            "Id comercio",
-            roleInfo?.id_comercio ? roleInfo?.id_comercio : "Sin datos",
-          ],
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
-          // id trx
-          ["Id Trx", ""],
-          /*id autorizacion*/
-          ["Id Aut", ""],
-          /*comercio*/
-          [
-            "Comercio",
-            roleInfo?.["nombre comercio"]
-              ? roleInfo?.["nombre comercio"]
-              : "Sin datos",
-          ],
-          ["", ""],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
-          ],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
+    setObjTicketActual({});
   }, [roleInfo]);
   const onChangeFormat = useCallback(
     (ev) => {
-      // let valor = ev.target.value;
-      // valor = valor.replace(/[\s\.]/g, "");
-      let valor = ev.target.value.replace(/[\s\.-]/g, "");
+      let valor = ev.target.value.replace(/[\s\.\-+eE]/g, "");
       if (ev.target.name === "ref1") {
         if (convenio?.algoritmo_ref1?.match(/(N 010)|(Q 108)/g)) {
           if (isNaN(valor)) {

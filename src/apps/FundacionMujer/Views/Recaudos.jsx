@@ -128,7 +128,7 @@ const Recaudo = () => {
               ...old,
               ticket: true,
             }));
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
@@ -226,7 +226,7 @@ const Recaudo = () => {
         Datos: {
           Depto: parseInt(roleInfo?.codigo_dane?.slice(0, 2)),
           Municipio: parseInt(roleInfo?.codigo_dane?.slice(2)),
-          nroBusqueda: parseFloat(selected?.Cedula),
+          nroBusqueda: parseFloat(selected?.Credito),
         },
       };
       notifyPending(
@@ -238,8 +238,8 @@ const Recaudo = () => {
         },
         {
           render: ({data: res }) =>{
-            const maximo = parseFloat(res?.obj?.ValorPagarMaximo) + 1
-            const minimo = parseFloat(res?.obj?.ValorPagarMin) - 1
+            const maximo = parseFloat(res?.obj?.ValorPagarMaximo)
+            const minimo = parseFloat(res?.obj?.ValorPagarMin)
             setLimitesMontos({
               max: maximo,
               min: minimo,
@@ -287,7 +287,7 @@ const Recaudo = () => {
       }
       if (!hasKeys) {
         notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+          "El usuario no cuenta con datos de comercio, no se permite la transacción"
         );
         navigate("/");
       }
@@ -346,7 +346,7 @@ const Recaudo = () => {
               autoComplete='off'
               value={datosTrx?.number}
               onInput={(e) => {
-                const num = e.target.value.replace(/[\s\.-]/g, "");;
+                const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
                 if (!isNaN(num)) {
                   setDatosTrx(prevState => ({
                   ...prevState,
@@ -429,6 +429,8 @@ const Recaudo = () => {
                   autoComplete='off'
                   max={limitesMontos?.max}
                   min={limitesMontos?.min}
+                  equalError={false}
+                  equalErrorMin={false}
                   value={datosTrx?.formatMon}
                   disabled={datosTrx?.permiteCambio === "N" || loadingPeticionIngresarRecibo}
                   onInput={(e, valor) => {

@@ -50,6 +50,7 @@ const toRoute = (urls, isPrivate = true, SubWrapper) => {
   const routes = allurls
     .filter(({ link }) => !(link === undefined || link === null))
     .filter(({ extern }) => !extern)
+    .filter(({ component }) => component !== undefined && component !== null)
     .map(
       ({
         link_padre,
@@ -64,10 +65,20 @@ const toRoute = (urls, isPrivate = true, SubWrapper) => {
         exact = exact === undefined ? true : exact;
         const pageWrapper = SubWrapper ? (
           <SubWrapper label={label} upperRoute={link_padre}>
-            <Page subRoutes={subRoutes} route={{ label }} upperRoute={link_padre} {...props} />
+            <Page
+              subRoutes={subRoutes}
+              route={{ label }}
+              upperRoute={link_padre}
+              {...props}
+            />
           </SubWrapper>
         ) : (
-          <Page subRoutes={subRoutes} route={{ label }} upperRoute={link_padre} {...props} />
+          <Page
+            subRoutes={subRoutes}
+            route={{ label }}
+            upperRoute={link_padre}
+            {...props}
+          />
         );
         const routeChild = Provider ? (
           <Provider>{pageWrapper}</Provider>

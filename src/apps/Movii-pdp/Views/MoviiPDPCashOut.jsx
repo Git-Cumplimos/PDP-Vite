@@ -143,7 +143,7 @@ const MoviiPDPCashOut = () => {
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      const num = valor.replace(/[\s\.-]/g, "");
+      const num = valor.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
         if (ev.target.name === "numeroTelefono") {
           if (datosTrans.numeroTelefono.length === 0 && num !== "3") {
@@ -173,7 +173,7 @@ const MoviiPDPCashOut = () => {
       <Form grid onSubmit={onSubmit}>
         <Input
           id='numeroTelefono'
-          label='Número de télefono'
+          label='Número de teléfono'
           type='text'
           name='numeroTelefono'
           minLength='10'
@@ -201,16 +201,23 @@ const MoviiPDPCashOut = () => {
           label='Valor'
           type='text'
           autoComplete='off'
-          maxLength={"11"}
-          min={limiteRecarga.inferior}
-          max={limiteRecarga.superior}
+          maxLength={"12"}
+          // min={limiteRecarga.inferior}
+          // max={limiteRecarga.superior}
           value={datosTrans.valorCashOut ?? ""}
-          onInput={(ev) => {
-            setDatosTrans((old) => {
-              return { ...old, valorCashOut: onChangeMoney(ev) };
-            });
+          onInput={(e, valor) => {
+            if (!isNaN(valor)) {
+              setDatosTrans((old) => {
+                return { ...old, valorCashOut: valor };
+              });
+            }
           }}
-          required></MoneyInput>
+          required
+          min={enumParametrosMovii.MINCASHOUTMOVII}
+          max={enumParametrosMovii.MAXCASHOUTMOVII} 
+          equalError={false}
+          equalErrorMin={false}
+          ></MoneyInput>
         <ButtonBar className='lg:col-span-2'>
           <Button type='submit' disabled={loadingPeticionCashoutMovii}>
             Aceptar

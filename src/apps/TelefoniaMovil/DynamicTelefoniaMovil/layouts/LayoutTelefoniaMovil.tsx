@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PropOperadoresComponent } from "../utils/TypesUtils";
+import { PropOperadoresComponent } from "../TypeDinamic";
 import { useImgs } from "../../../../hooks/ImgsHooks";
 
 import classes from "./LayoutTelefoniaMovil.module.css";
@@ -19,11 +19,10 @@ const LayoutTelefoniaMovil = ({
   setOperadorCurrent,
 }: {
   operadores: PropOperadoresComponent[];
-  operadorCurrent: any;
+  operadorCurrent: PropOperadoresComponent;
   setOperadorCurrent: any;
 }) => {
   const { svgs }: any = useImgs();
-
   return (
     <div className={contenedorLayoutTelefoniaMovil}>
       {operadores.map((operadorInd) => (

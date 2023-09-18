@@ -17,7 +17,6 @@ import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
-import useMoney from "../../../../hooks/useMoney";
 
 const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
 const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
@@ -131,9 +130,9 @@ const TransaccionRecargaTarjeta = () => {
   const handleShow = useCallback(
     (ev) => {
       ev.preventDefault();
-      // if (valor % 50 !== 0) {
-      //   return notifyError("El valor de la recarga debe ser multiplo de 50");
-      // }
+      if (dataUsuario.valorRecarga % 50 !== 0) {
+        return notifyError("El valor de la recarga debe ser múltiplo de 50");
+      }
       setEstadoPeticion(0);
       setShowModal(true);
     },
@@ -147,7 +146,7 @@ const TransaccionRecargaTarjeta = () => {
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
-      const num = valor.replace(/[\s\.-]/g, "");
+      const num = valor.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
         if (ev.target.name === "telefonoCliente") {
           if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
@@ -167,16 +166,9 @@ const TransaccionRecargaTarjeta = () => {
       return { ...old, [ev.target.name]: value };
     });
   }, []);
-  const onChangeMoney = useMoney({
-    limits: [
-      enumParametrosTuLlave.MINRECARGATARJETA,
-      enumParametrosTuLlave.MAXRECARGATARJETA,
-    ],
-    equalError: false,
-  });
   return (
     <>
-      <h1 className='text-3xl'>Recargar tarjeta Tu Llave</h1>
+      <h1 className='text-3xl'>Recargar Tarjeta Tu Llave</h1>
       <Form onSubmit={handleShow} grid>
         <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
           <Input
@@ -187,6 +179,7 @@ const TransaccionRecargaTarjeta = () => {
             autoComplete='off'
             value={dataUsuario?.["NTargeta"]}
             maxLength={16}
+            minLength={16}
             onChange={onChangeFormatNumber}
             required
             disabled={loadingPeticionRecargaTarjeta}
@@ -199,15 +192,19 @@ const TransaccionRecargaTarjeta = () => {
             min={enumParametrosTuLlave.MINRECARGATARJETA}
             max={enumParametrosTuLlave.MAXRECARGATARJETA}
             autoComplete='off'
-            maxLength={"11"}
+            maxLength={"9"}
             value={parseInt(dataUsuario?.valorRecarga)}
-            onInput={(ev) => {
-              setDataUsuario((old) => {
-                return { ...old, valorRecarga: onChangeMoney(ev) };
-              });
-            }}
             required
             disabled={loadingPeticionRecargaTarjeta}
+            onInput={(e, monto) => {
+              if (!isNaN(monto)) {
+                setDataUsuario((old) => {
+                  return { ...old, valorRecarga: monto };
+                });
+              }
+            }}
+            equalError={false}
+            equalErrorMin={false}
           />
         </Fieldset>
         <Fieldset legend='Datos opcionales' className='lg:col-span-2'>
@@ -240,7 +237,7 @@ const TransaccionRecargaTarjeta = () => {
             type='text'
             autoComplete='off'
             value={dataUsuario?.["telefonoCliente"]}
-            maxLength={15}
+            maxLength={10}
             onChange={onChangeFormatNumber}
             disabled={loadingPeticionRecargaTarjeta}
           />
@@ -251,7 +248,7 @@ const TransaccionRecargaTarjeta = () => {
             type='email'
             autoComplete='off'
             value={dataUsuario?.["emailCliente"]}
-            maxLength={50}
+            maxLength={70}
             onChange={onChangeFormat}
             disabled={loadingPeticionRecargaTarjeta}
           />
@@ -262,7 +259,7 @@ const TransaccionRecargaTarjeta = () => {
             type='text'
             autoComplete='off'
             value={dataUsuario?.["documento"]}
-            maxLength={50}
+            maxLength={12}
             onChange={onChangeFormatNumber}
             disabled={loadingPeticionRecargaTarjeta}
           />

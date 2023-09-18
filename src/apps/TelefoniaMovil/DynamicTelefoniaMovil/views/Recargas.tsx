@@ -1,20 +1,33 @@
-import React, { FormEvent, useCallback, useRef, useState } from "react";
+import React, {
+  FormEvent,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import Input from "../../../../components/Base/Input/Input";
-import MoneyInput from "../../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
 import Form from "../../../../components/Base/Form/Form";
-import { useImgs } from "../../../../hooks/ImgsHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import Modal from "../../../../components/Base/Modal/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary/PaymentSummary";
 import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { TypeOutputDataRecargas } from "../TypeDinamic";
+import {
+  PropOperadoresComponent,
+  TypeOutputDataRecargas,
+} from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
-import { ErrorCustomFetch } from "../utils/utils";
+import {
+  ErrorCustomBackend,
+  ErrorCustomComponentCode,
+  ErrorCustomFetch,
+  descriptionErrorFront,
+} from "../utils/utils";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 
@@ -36,11 +49,12 @@ const dataRecargaInitial = {
 
 const Recargas = ({
   operadorCurrent,
-  operadorLogoCurrent,
+  children,
 }: {
-  operadorCurrent: any;
-  operadorLogoCurrent: any;
+  operadorCurrent: PropOperadoresComponent;
+  children: ReactNode;
 }) => {
+  const component_name = "Recargas";
   const [dataRecarga, setDataRecarga] =
     useState<TypeDataRecarga>(dataRecargaInitial);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -51,11 +65,11 @@ const Recargas = ({
 
   const id_uuid = v4();
   const { roleInfo, pdpUser }: any = useAuth();
-  const { svgs }: any = useImgs();
   const useHookDynamic = operadorCurrent?.backend;
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
     operadorCurrent.name,
-    "recargas"
+    operadorCurrent.autorizador,
+    component_name.toLowerCase()
   );
 
   const onCelChange = (e: any) => {
@@ -71,7 +85,7 @@ const Recargas = ({
     setDataRecarga((old) => ({ ...old, celular: valueInput }));
   };
 
-  const onMoneyChange = (e: any, valor: any) => {
+  const onMoneyChange = (ev: FormEvent<HTMLInputElement>, valor: number) => {
     setDataRecarga((old) => ({ ...old, valor_total_trx: valor }));
   };
 
@@ -82,34 +96,64 @@ const Recargas = ({
   };
 
   const RealizarTrx = (e: any) => {
+    const function_name = "RealizarTrx";
     e.preventDefault();
-
+    const msg = descriptionErrorFront.replace(
+      "%s",
+      `Telefonia movil - ${operadorCurrent.autorizador} - ${component_name}`
+    );
     PeticionRecargar({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
       moduleInfo: dataRecarga,
       id_uuid: id_uuid,
+      parameters_operador: operadorCurrent.parameters_operador,
+      parameters_submodule: operadorCurrent.parameters_submodule,
     })
       .then((result: TypeOutputDataRecargas) => {
         if (result?.status === true) {
-          if (result?.ticket) {
-            setInfTicket(result?.ticket);
-          }
           notify(`Recarga ${operadorCurrent.name} exitosa`);
-          setTypeInfo("TrxExitosa");
+          if (result?.ticket !== null) {
+            setInfTicket(result?.ticket);
+            setTypeInfo("TrxExitosa");
+          } else if (result?.id_trx !== null) {
+            handleCloseError();
+            notify(
+              `Buscar el ticket en el modulo de transacciones con id_trx = ${result?.id_trx}`
+            );
+            validNavigate("/transacciones");
+          } else {
+            handleCloseError();
+            notify("Buscar el ticket en el modulo de transacciones");
+          }
         } else {
-          notifyError(
-            `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - status) [0010002]`
+          throw new ErrorCustomComponentCode(
+            msg,
+            "el valor de status en la peticion dentro del componente es false",
+            `Views ${component_name} - ${function_name} -> status false`,
+            "notifyError",
+            false
           );
-          handleCloseError();
         }
       })
       .catch((error: any) => {
         handleCloseError();
-        let msg = `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - catch) [0010002]`;
-        if (error instanceof ErrorCustomFetch) {
-        } else {
+        if (error instanceof ErrorCustomBackend) {
+          if (error.res_error_msg !== undefined) {
+            if (
+              Object.keys(error.res_error_msg).includes("error_pending_trx")
+            ) {
+              // validNavigate("/transacciones");
+            }
+          }
+        }
+        if (!(error instanceof ErrorCustomFetch)) {
           notifyError(msg);
+          console.error("Error respuesta Front-end PDP", {
+            "Error PDP": msg,
+            "Error Sequence": `Views ${component_name} - ${function_name} -> error sin controlar`,
+            "Error Console": `${error.message}`,
+          });
         }
       });
   };
@@ -158,14 +202,7 @@ const Recargas = ({
 
   return (
     <div className="py-8 mt-6 flex items-center flex-col border-solid border-2 border-slate-600 rounded-2xl">
-      <img
-        className="w-24  "
-        src={
-          operadorCurrent?.logo?.includes("http")
-            ? operadorCurrent?.logo
-            : svgs?.[operadorCurrent?.logo]
-        }
-      ></img>
+      {children}
       <Form onSubmit={onSubmitSummary} grid>
         <div className="col-span-2">
           <div className=" grid grid-cols-4  grid-rows-4">
@@ -195,8 +232,8 @@ const Recargas = ({
                 autoComplete="off"
                 min={minValor}
                 max={maxValor}
-                minLength={"4"}
-                maxLength={"9"}
+                minLength={4}
+                maxLength={9}
                 value={dataRecarga.valor_total_trx}
                 onInput={onMoneyChange}
                 required
