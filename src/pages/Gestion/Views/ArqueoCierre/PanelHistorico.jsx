@@ -9,10 +9,11 @@ import {
 } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
 import Modal from "../../../../components/Base/Modal";
-import Tickets from "../../../../components/Base/Tickets";
+// import Tickets from "../../../../components/Base/Tickets";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useReactToPrint } from "react-to-print";
+import TicketCierre from "./TicketCierre";
 
 const formatMoney = makeMoneyFormatter(0);
 
@@ -22,8 +23,9 @@ const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
   const [pageData, setPageData] = useState({});
   const [maxPages, setMaxPages] = useState(1);
-  const [selected, setSelected] = useState(null);
+  // const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [resumenCierre, setResumenCierre] = useState(null);
   const [searchInfo, setSearchInfo] = useState({
     id_usuario: "",
     id_comercio: "",
@@ -32,7 +34,8 @@ const PanelHistorico = () => {
   });
 
   const CloseModal = useCallback(() => {
-    setSelected(null);
+    // setSelected(null);
+    setResumenCierre(null)
   }, []);
 
   const buscarConsignaciones = useCallback(() => {
@@ -66,7 +69,60 @@ const PanelHistorico = () => {
     content: () => printDiv.current,
   });
 
-  console.log(selected)
+  const cierreCaja = useCallback((data) => {
+    setLoading(false)
+    const tempTicket = {
+      title: "Cierre de caja",
+      timeInfo: {
+        "Fecha de pago":new Date(data.created).toLocaleDateString(),
+        Hora: new Date(data.created).toLocaleTimeString('en-CO'),
+      },
+      commerceInfo: [
+        ["Id Comercio", data.id_comercio],
+        ["No. Terminal", data.id_terminal],
+        ["Id Cierre", data.pk_id_cierre],
+        ["Comercio", data.nombre_comercio],
+        ["Cajero",data.nombre_usuario],
+        ["", ""],
+      ],
+      cajaInfo: [
+        ["movimientos del día",formatMoney.format(data.total_movimientos)],
+        ["", ""],
+        ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior)],
+        ["", ""],
+        ["Efectivo en caja",formatMoney.format(data.total_efectivo_en_caja)],
+        ["", ""],
+        // ["Efectivo en caja PDP",formatMoney.format('')],
+        // ["", ""],
+        // ["Efectivo en caja PDP + Externos",formatMoney.format('')],
+        // ["", ""],
+      ],
+      trxInfo: [
+        ["Sobrante", formatMoney.format(data.total_sobrante)],
+        ["", ""],
+        ["Faltante", formatMoney.format(data.total_faltante)],
+        ["", ""],
+        ["Estimación faltantes",formatMoney.format(data.total_estimacion_faltante)],
+        ["", ""],
+        ["Consignaciones bancarias",formatMoney.format(data.total_consignaciones)],
+        ["", ""],
+        ["Entregado a transportadora", formatMoney.format(data.total_entregado_transportadora)],
+        ["", ""],
+        ["Recibido de transportadora", formatMoney.format(data.total_recibido_transportadora)],
+        ["", ""],
+        ["Notas débito o crédito",formatMoney.format(data.total_notas)],
+        ["", ""],
+        // ["Nombre plataforma 1",formatMoney.format(''),],
+        // ["", ""],
+        // ["Nombre plataforma 2",formatMoney.format(''),],
+        // ["", ""],
+        // ["Nombre plataforma 3",formatMoney.format(''),],
+        // ["", ""],
+      ],
+    };
+    setResumenCierre(tempTicket);
+  }, []);
+
   return (
     <Fragment>
       <TableEnterprise
@@ -137,7 +193,8 @@ const PanelHistorico = () => {
         )}
         onSetPageData={setPageData}
         onSelectRow={(_e, index) => {
-          setSelected(receipt[index]);
+          // setSelected(receipt[index]);
+          cierreCaja(receipt[index])
         }}
       >
         <Input
@@ -189,21 +246,14 @@ const PanelHistorico = () => {
           }
         />
       </TableEnterprise>
-      <Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
-        {/* {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? ( */}
-          <div className='flex flex-col justify-center items-center'>
-              <Tickets
-                refPrint={printDiv}
-                type='Reimpresión'
-                ticket={selected}
-                // stateTrx={selected?.status_trx}
-              />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={CloseModal}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        {/* ) : null} */}
+      <Modal show={resumenCierre} handleClose={loading ? () => {} : CloseModal}>
+        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <TicketCierre refPrint={printDiv} ticket={resumenCierre} />
+          <ButtonBar>
+            <Button onClick={handlePrint}>Imprimir</Button>
+            <Button onClick={CloseModal}>Cerrar</Button>
+          </ButtonBar>
+        </div>
       </Modal>
     </Fragment>
   );

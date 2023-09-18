@@ -58,6 +58,7 @@ const Panel = () => {
     [denominaciones]
   );
 
+  console.log(roleInfo)
   useEffect(() => {
     const conditions = [
       roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -84,6 +85,7 @@ const Panel = () => {
         },
         {
           render: ({ data: res }) => {
+            console.log(res)
             setLoading(false);
             setTotalCierres(res?.obj);
             return res?.msg;
@@ -252,9 +254,10 @@ const Panel = () => {
     content: () => printDiv.current,
   });
 
+  console.log(roleInfo?.tipo_comercio)
   return (
     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-    (roleInfo?.tipo_comercio === "KIOSCO" && (
+    (roleInfo?.tipo_comercio === "KIOSCO" (
       <Fragment>
         {totalCierres === 2 ? (
           <h1 className='text-3xl mt-6'>
