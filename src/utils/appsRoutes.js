@@ -1126,11 +1126,8 @@ const allUrlsPrivateApps = [
   rutasRecaudoDirecto,
   rutasRecargasTullave,
   rutasPowwi,
-<<<<<<< HEAD
   rutasCrezcamos,
 
-=======
->>>>>>> certificacion
   //Modulo Almaseg
   routesAlmaseg,
   //Modulo Emcali
