@@ -268,6 +268,7 @@ const CompraPin = () => {
           id_usuario: roleInfo?.id_usuario,
           id_uuid_trx: id_uuid,
         },
+        nombre_usuario: pdpUser?.uname ?? "",
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
         nombre_comercio: roleInfo["nombre comercio"],
@@ -293,7 +294,8 @@ const CompraPin = () => {
         trx_inf_ticket: state?.op === "hv" ? inputPlaca
          : state?.op === "em" ? inputCelular
          : state?.op === "cb" ? inputMatricula
-        : ""
+        : "",
+        cod_paquete: state?.cod ?? "",
       };
       const dataAditional = {
         id_uuid_trx: id_uuid,
