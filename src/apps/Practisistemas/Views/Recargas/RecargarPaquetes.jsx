@@ -94,6 +94,7 @@ const RecargarPaquetes = () => {
             operador: state?.operadorPaquete,
             operador_paquete: state?.operador_recargar,
             descripcion: state?.descripcion,
+            cod_paquete: state?.codigo_paq,
           },
         },
       };
