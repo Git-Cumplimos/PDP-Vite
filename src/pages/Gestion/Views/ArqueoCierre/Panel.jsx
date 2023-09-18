@@ -25,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
+const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
+
 const Panel = () => {
   const navigate = useNavigate();
   const { roleInfo, userInfo, signOut } = useAuth();
@@ -58,10 +60,14 @@ const Panel = () => {
     [denominaciones]
   );
 
+  const validTipoComercio = useMemo(
+    () => tiposOficinas.includes(roleInfo?.tipo_comercio),
+    [roleInfo?.tipo_comercio]
+  );
+
   useEffect(() => {
     const conditions = [
-      roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-        roleInfo?.tipo_comercio === "KIOSCO",
+      validTipoComercio,
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
       roleInfo?.id_dispositivo !== undefined,
@@ -102,7 +108,7 @@ const Panel = () => {
         { toastId: "busqueda-cierre-123" }
       );
     }
-  }, [nombreComercio, roleInfo, userInfo?.attributes?.name]);
+  }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio]);
 
   const closeModalFunction = useCallback(() => {
     navigate(-1);
@@ -253,34 +259,33 @@ const Panel = () => {
   });
 
   return (
-    roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-    (roleInfo?.tipo_comercio === "KIOSCO" && (
+    validTipoComercio && (
       <Fragment>
         {totalCierres === 2 ? (
-          <h1 className='text-3xl mt-6'>
+          <h1 className="text-3xl mt-6">
             Señor usuario la caja ya fue cerrada el día de hoy
           </h1>
         ) : totalCierres === 3 || totalCierres === 1 || true ? (
           <ButtonBar>
             <Button
-              type='submit'
+              type="submit"
               onClick={() => setEstado(true)}
-              disabled={loading}>
+              disabled={loading}
+            >
               Arqueo y cierre de caja
             </Button>
           </ButtonBar>
         ) : (
-          <h1 className='text-3xl mt-6'>Cargando...</h1>
+          <h1 className="text-3xl mt-6">Cargando...</h1>
         )}
         <Modal
           show={estado}
-          handleClose={
-            loading || resumenCierre ? () => {} : closeModalFunction
-          }>
+          handleClose={loading || resumenCierre ? () => {} : closeModalFunction}
+        >
           {!resumenCierre ? (
             !confirmarArqueo ? (
               <Fragment>
-                <Fieldset className='col-span-2' legend={"Arqueo de caja"}>
+                <Fieldset className="col-span-2" legend={"Arqueo de caja"}>
                   {denominaciones.map(([key, val]) => (
                     <Input
                       key={key}
@@ -299,16 +304,16 @@ const Panel = () => {
                           return Array.from(copy);
                         })
                       }
-                      type='tel'
-                      maxLength='4'
+                      type="tel"
+                      maxLength="4"
                       info={formatMoney.format(key * val)}
                     />
                   ))}
                 </Fieldset>
                 <Fieldset legend={"Saldos"}>
-                  <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+                  <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
                     <div>
-                      <h1 className='text-2xl font-semibold'>
+                      <h1 className="text-2xl font-semibold">
                         Total arqueo:&nbsp;
                         {formatMoney.format(totalArqueo)}
                       </h1>
@@ -316,8 +321,9 @@ const Panel = () => {
                   </div>
                   <ButtonBar>
                     <Button
-                      type='submit'
-                      onClick={() => setConfirmarArqueo(true)}>
+                      type="submit"
+                      onClick={() => setConfirmarArqueo(true)}
+                    >
                       Confirmar arqueo
                     </Button>
                   </ButtonBar>
@@ -325,26 +331,29 @@ const Panel = () => {
               </Fragment>
             ) : (
               <PaymentSummary
-                title='¿Está seguro de los datos para el arqueo? Una vez confirmados no podrá modificarlos.'
-                subtitle={`Total arqueo: ${formatMoney.format(totalArqueo)}`}>
+                title="¿Está seguro de los datos para el arqueo? Una vez confirmados no podrá modificarlos."
+                subtitle={`Total arqueo: ${formatMoney.format(totalArqueo)}`}
+              >
                 <ButtonBar>
                   <Button
-                    type='submit'
+                    type="submit"
                     onClick={() => cierreCaja()}
-                    disabled={loading}>
+                    disabled={loading}
+                  >
                     Aceptar
                   </Button>
                   <Button
-                    type='button'
+                    type="button"
                     onClick={() => setConfirmarArqueo(false)}
-                    disabled={loading}>
+                    disabled={loading}
+                  >
                     Cancelar
                   </Button>
                 </ButtonBar>
               </PaymentSummary>
             )
           ) : (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketCierre refPrint={printDiv} ticket={resumenCierre} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
@@ -352,7 +361,8 @@ const Panel = () => {
                   onClick={() => {
                     navigate("/");
                     signOut();
-                  }}>
+                  }}
+                >
                   Cerrar sesión
                 </Button>
               </ButtonBar>
@@ -360,7 +370,7 @@ const Panel = () => {
           )}
         </Modal>
       </Fragment>
-    ))
+    )
   );
 };
 
