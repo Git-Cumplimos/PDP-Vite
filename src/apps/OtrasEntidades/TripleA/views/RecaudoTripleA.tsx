@@ -241,7 +241,7 @@ const RecaudoTripleA = () => {
         },
         numeroCupon: consultData?.numeroCupon,
         id_trx: consultData?.id_trx,
-        valorPagado: consultData?.valorPagado,
+        valor_total_trx: consultData?.valorPagado,
       };
       PeticionPay(data)
         .then((res: TypeServicesBackendTripleA) => {
