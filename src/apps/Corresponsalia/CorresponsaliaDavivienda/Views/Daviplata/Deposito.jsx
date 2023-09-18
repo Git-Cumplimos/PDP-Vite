@@ -26,9 +26,6 @@ import { decryptAES } from "../../../../../utils/cryptoUtils";
 
 const Deposito = () => {
   const navigate = useNavigate();
-  // const [{ phone, userDoc, valor, nomDepositante, summary }, setQuery] =
-  //   useQuery();
-
   const [verificacionTel, setVerificacionTel] = useState("");
 
   const [phone, setPhone] = useState("");
@@ -36,39 +33,12 @@ const Deposito = () => {
   const [valor, setValor] = useState("");
   const [nomDepositante, setNomDepositante] = useState("");
   const [summary, setSummary] = useState([]);
-  const { roleInfo, infoTicket, pdpUser } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [loadingCashIn, fetchCashIn] = useFetch(pagoGiroDaviplata);
   const [loadingConsultaCashIn, fetchConsultaCashIn] = useFetch(
     consultaGiroDaviplata
   );
   const [, fetchTypes] = useFetch();
-
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Depósito a Daviplata",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
-      ["Tipo de operación", "Depósito a DaviPlata"],
-      ["", ""],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "No hay datos",
-    trxInfo: [],
-    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-  });
-
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
@@ -225,59 +195,34 @@ const Deposito = () => {
     ]
   );
 
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setValor(valor);
-    },
-    [valor]
-  );
-
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"] = [];
-    objTicket["trxInfo"].push(["Nombre titular", summary["Nombre cliente"]]);
-    objTicket["trxInfo"].push(["", ""]);
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
       idUsuario: roleInfo?.id_usuario,
       idDispositivo: roleInfo?.id_dispositivo,
       nombre_usuario: pdpUser?.uname ?? "",
-      // Tipo: roleInfo?.tipo_comercio,
       oficinaPropia:
         roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
         roleInfo?.tipo_comercio === "KIOSCO"
           ? true
           : false,
       numIdentificacionDepositante: userDoc,
-      nomDepositante: nomDepositante,
+      nomDepositante: summary["Nombre cliente"],
       numDaviplata: phone,
       valGiro: valor,
-      valCodigoConvenioDaviplata:
-        datosConsulta?.Data?.valCodigoConvenioDaviplata,
-      valTipoIdentificacionDepositante: tipoDocumento, /// Tipo de documento
+      nomComercio: roleInfo?.["nombre comercio"] ? roleInfo?.["nombre comercio"]: "No hay datos",
+      nomMunicipio: roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos",
+      valCodigoConvenioDaviplata: datosConsulta?.Data?.valCodigoConvenioDaviplata,
+      valTipoIdentificacionDepositante: tipoDocumento,
       valComisionGiroDaviplata: datosConsulta?.Data?.valComisionGiroDaviplata,
       id_transaccion: datosConsulta?.DataHeader?.idTransaccion,
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
-      ticket: objTicket,
     };
     fetchCashIn(body)
       .then((res) => {
@@ -286,83 +231,9 @@ const Deposito = () => {
           notifyError(res?.msg);
           setIsUploading(false);
           handleClose();
-          // onMakePaymentReintento(res,body)
-          // return;
         } else {
           notify("Transaccion satisfactoria");
-          const trx_id = res?.obj?.respuestaDavivienda?.valTalon ?? 0;
-          const comision =
-            res?.obj?.respuestaDavivienda?.valComisionGiroDaviplata ?? 0;
-          const total = parseInt(comision) + valor;
-          const ter = res?.obj?.codigoTotal;
-          objTicket["commerceInfo"][1] = ["No. terminal", ter];
-          objTicket["commerceInfo"].push(["No. de aprobación", trx_id]);
-          objTicket["commerceInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Número DaviPlata",
-            `****${String(phone)?.slice(-4) ?? ""}`,
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push(["Valor", formatMoney.format(valor)]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push([
-            "Costo transacción",
-            formatMoney.format(comision),
-          ]);
-          objTicket["trxInfo"].push(["", ""]);
-          objTicket["trxInfo"].push(["Total", formatMoney.format(total)]);
-          objTicket["trxInfo"].push(["", ""]);
-          // const tempTicket = {
-          //   title: "Recibo de Depósito a Daviplata",
-          //   timeInfo: {
-          //     "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-          //       year: "2-digit",
-          //       month: "2-digit",
-          //       day: "2-digit",
-          //     }).format(new Date()),
-          //     Hora: Intl.DateTimeFormat("es-CO", {
-          //       hour: "2-digit",
-          //       minute: "2-digit",
-          //       second: "2-digit",
-          //     }).format(new Date()),
-          //   },
-          //   commerceInfo: [
-          //     ["Id Comercio", roleInfo?.id_comercio],
-          //     ["No. terminal", ter],
-          //     ["Municipio", roleInfo?.ciudad],
-          //     ["Dirección", roleInfo?.direccion],
-          //     ["Tipo de operación", "Depósito a DaviPlata"],
-          //     ["", ""],
-          //     ["No. de aprobación", trx_id],
-          //     ["", ""],
-          //   ],
-          //   commerceName: roleInfo?.["nombre comercio"]
-          //     ? roleInfo?.["nombre comercio"]
-          //     : "No hay datos",
-          //   trxInfo: [
-          //     ["Número DaviPlata", `****${String(phone)?.slice(-4) ?? ""}`],
-          //     ["", ""],
-          //     ["Valor", formatMoney.format(valor)],
-          //     ["", ""],
-          //     ["Costo transacción", formatMoney.format(comision)],
-          //     ["", ""],
-          //     ["Total", formatMoney.format(total)],
-          //     ["", ""],
-          //   ],
-          //   disclamer:
-          //     "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-          // };
-
-          setPaymentStatus(objTicket);
-          // infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-          //   .then((resTicket) => {
-          //     console.log(resTicket);
-          //   })
-          //   .catch((err) => {
-          //     setIsUploading(false);
-          //     console.error(err);
-          //     notifyError("Error guardando el ticket");
-          //   });
+          setPaymentStatus(res?.obj?.ticket);
         }
       })
       .catch((err) => {
@@ -376,7 +247,6 @@ const Deposito = () => {
     userDoc,
     fetchCashIn,
     roleInfo,
-    infoTicket,
     summary,
     datosConsulta,
     pdpUser,
@@ -474,34 +344,6 @@ const Deposito = () => {
             }}
             required
           />
-          {/* <Input
-            id='nomDepositante'
-            name='nomDepositante'
-            label='Nombre depositante'
-            type='text'
-            minLength={"1"}
-            maxLength={"50"}
-            autoComplete='off'
-            value={nomDepositante}
-            onInput={(e) => {
-              if (isNaN(e.target.value.slice(-1)) || e.target.value.slice(-1) === "" || e.target.value.slice(-1) === " "){
-              setNomDepositante(e.target.value);
-              }
-            }}
-            required
-          /> */}
-          {/* <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a depósitar'
-            autoComplete='off'
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            minLength={"1"}
-            maxLength={"15"}
-            onInput={onMoneyChange}
-            required
-          /> */}
           <MoneyInput
             id='valor'
             name='valor'

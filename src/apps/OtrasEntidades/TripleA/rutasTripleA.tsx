@@ -3,11 +3,10 @@ import AppIcons from "../../../components/Base/AppIcons/AppIcons";
 import HNavbar from "../../../components/Base/HNavbar/HNavbar";
 import { TypingRoutes } from "../../../utils/TypingUtils";
 
-// const Recaudo = lazy(() => import("./views/Recaudo"));
-// const ReporteCaja = lazy(() => import("./views/ReporteCaja"));
+const RecaudoTripleA = lazy(() => import("./views/RecaudoTripleA"));
 
 const rutasTripleA = {
-  link: "/AAA",
+  link: "/TripleA",
   label: <AppIcons Logo={"RECAUDO"} name="Recuado Triple A" />,
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
@@ -15,9 +14,9 @@ const rutasTripleA = {
   permission: [1],
   subRoutes: [
     {
-      link: "/AAA/recaudos",
+      link: "/TripleA/recaudos",
       label: <AppIcons Logo={"RECAUDO"} name="Recuado Triple A" />,
-      // component: ReporteCaja,
+      component: RecaudoTripleA,
       permission: [1],
       subRoutes: [],
     },

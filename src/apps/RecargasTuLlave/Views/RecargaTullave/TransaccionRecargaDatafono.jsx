@@ -19,7 +19,6 @@ import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
-import useMoney from "../../../../hooks/useMoney";
 
 const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
 const URL_REALIZAR_RECARGA_DATAFONO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-datafono`;
@@ -164,7 +163,7 @@ const TransaccionRecargaDatafono = () => {
     (ev) => {
       ev.preventDefault();
       if (valor % 50 !== 0) {
-        return notifyError("El valor de la recarga debe ser multiplo de 50");
+        return notifyError("El valor de la recarga debe ser múltiplo de 50");
       }
       setEstadoPeticion(0);
       setShowModal(true);
@@ -176,16 +175,9 @@ const TransaccionRecargaDatafono = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const onChangeMoney = useMoney({
-    limits: [
-      enumParametrosTuLlave.MINRECARGADATAFONO,
-      enumParametrosTuLlave.MAXRECARGADATAFONO,
-    ],
-    equalError: false,
-  });
   return (
     <>
-      <h1 className='text-3xl'>Recargar datáfono Tu Llave</h1>
+      <h1 className='text-3xl'>Recargar Datáfono Tu Llave</h1>
       <Form onSubmit={handleShow} grid>
         <Fieldset legend='Datos datáfono' className='lg:col-span-2'>
           <Input

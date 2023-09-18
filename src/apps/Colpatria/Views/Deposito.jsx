@@ -29,6 +29,7 @@ import {
 } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 import TicketColpatria from "../components/TicketColpatria";
+import { useMFA } from "../../../components/Base/MFAScreen";
 
 const accountTypes = {
   10: "Cuenta ahorros",
@@ -41,6 +42,8 @@ const Deposito = () => {
   const navigate = useNavigate();
 
   const { roleInfo, pdpUser } = useAuth();
+
+  const { submitEventSetter } = useMFA();
 
   const [userDocument, setUserDocument] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
@@ -304,7 +307,7 @@ const Deposito = () => {
             <ButtonBar>
               <Button
                 type='submit'
-                onClick={onMakePayment}
+                onClick={submitEventSetter(onMakePayment)}
                 disabled={loadingDeposit}>
                 Aceptar
               </Button>
