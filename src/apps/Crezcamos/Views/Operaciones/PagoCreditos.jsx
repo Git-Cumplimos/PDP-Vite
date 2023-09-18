@@ -61,6 +61,7 @@ const PagoCredito = () => {
   });
 
   const handleClose = useCallback(() => {
+    notifyError("Transacción cancelada por el usuario")
     setShowModal(false);
     setDatosTrx({
       tipoDocumento: 2,
@@ -356,7 +357,7 @@ const PagoCredito = () => {
                   required
                 />
                 <ButtonBar>
-                  <Button type='submit'>Aceptar</Button>
+                  <Button type='submit'>Realizar Pago</Button>
                   <Button onClick={handleClose}>Cancelar</Button>
                 </ButtonBar>
             </Form>
