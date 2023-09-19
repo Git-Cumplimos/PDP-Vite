@@ -1,5 +1,5 @@
 export const enumParametrosCrezcamos = Object.freeze({
-    maxPagoCreditos : 30000000,
+    maxPagoCreditos : 3000000,
     minPagoCreditos : 1,
   });
 
