@@ -97,19 +97,21 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     })
       .then((res) => {
         if (res?.status) {
+          let valorTrxCons = res?.obj?.valorTrx ?? 0;
           setIsUploading(false);
           notify(res?.msg);
-          setShowModal((old) => ({ ...old, showModal: true }));
           setDatosConsulta(res?.obj);
           setDatosTrans((old) => ({
             ...old,
-            valorConst: formatMoney.format(res?.obj?.valorTrx) ?? "",
+            valorConst: formatMoney.format(valorTrxCons) ?? "",
             valorVar: res?.obj?.valorTrx,
           }));
+          setShowModal((old) => ({ ...old, showModal: true }));
         } else {
           setIsUploading(false);
           handleClose();
           notifyError(res?.msg);
+          navigate(-1)
         }
       })
       .catch((err) => {
@@ -117,11 +119,12 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         notifyError("No se ha podido conectar al servidor");
         handleClose();
         console.error(err);
+        navigate(-1)
       });
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
+    let valorTransaccion = parseFloat(datosTrans?.valorVar) ?? 0;
     setIsUploading(true);
     postRecaudoConveniosAval({
       oficina_propia:
@@ -163,6 +166,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           setIsUploading(false);
           notifyError(res?.msg);
           handleClose();
+          navigate(-1)
         }
       })
       .catch((err) => {
@@ -170,6 +174,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         notifyError("No se ha podido conectar al servidor");
         handleClose();
         console.error(err);
+        navigate(-1)
       });
   };
   const handleClose = useCallback(() => {
@@ -183,6 +188,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     });
     setObjTicketActual({});
     setDatosConsulta({});
+    navigate(-1);
   }, [roleInfo]);
   return (
     <>
@@ -222,7 +228,8 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             type='text'
             autoComplete='off'
             maxLength={"12"}
-            value={datosTrans.valor ?? ""}
+            decimalDigits={2}
+            defaultValue={datosTrans.valor ?? ""}
             onInput={(ev, val) => {
               setDatosTrans((old) => {
                 return { ...old, valor: val };
@@ -267,9 +274,10 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     min={enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
                     max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
                     type='text'
+                    decimalDigits={2}
                     autoComplete='off'
                     maxLength={"12"}
-                    value={datosTrans.valorConst ?? ""}
+                    defaultValue={datosTrans.valorConst ?? ""}
                     // defaultValue={datosTrans.valorConst ?? ""}
                     onInput={(ev, valMoney) =>
                       setDatosTrans((old) => ({

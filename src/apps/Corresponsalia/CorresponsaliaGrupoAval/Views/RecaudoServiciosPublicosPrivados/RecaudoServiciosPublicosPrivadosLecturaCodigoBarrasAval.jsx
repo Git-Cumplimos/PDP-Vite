@@ -242,8 +242,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
     e.preventDefault();
     if (validacionPago.estado) {
       if (
-        parseInt(datosTransaccion.valorSinModificar2) !==
-        parseInt(validacionPago.validacion)
+        parseFloat(datosTransaccion.valorSinModificar2) !==
+        parseFloat(validacionPago.validacion)
       ) {
         return notifyError(
           "El valor a pagar es diferente al valor ingresado"
@@ -251,7 +251,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       }
     }
     setIsUploading(true);
-    const valorTransaccion = parseInt(datosTransaccion.valor) ?? 0;
+    const valorTransaccion = parseFloat(datosTransaccion.valor) ?? 0;
     setIsUploading(true);
     postRecaudoConveniosAval({
       oficina_propia:
@@ -518,7 +518,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         max={datosTransaccion.valorSinModificar2}
                         autoComplete='off'
                         maxLength={"12"}
-                        value={parseInt(validacionPago.validacion)}
+                        defaultValue={parseFloat(validacionPago.validacion)}
+                        decimalDigits={2}
                         onInput={(e, val) => {
                           setValidacionPago((old) => {
                             return { ...old, validacion: val };
@@ -550,9 +551,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         min={enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
                         max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
                         type='text'
+                        decimalDigits={2}
                         autoComplete='off'
                         maxLength={"12"}
-                        value={datosTransaccion.showValor2 ?? ""}
+                        defaultValue={datosTransaccion.showValor2 ?? ""}
                         onInput={(ev, valMoney) =>
                           setDatosTransaccion((old) => ({
                             ...old,
