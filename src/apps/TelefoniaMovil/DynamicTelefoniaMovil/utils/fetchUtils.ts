@@ -1,41 +1,10 @@
-import { ReactNode } from "react";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
-
-export type TypeOperadoresLayout = Array<{
-  link: string;
-  label: ReactNode;
-}>;
-
-export type PropsBackendRecargas = {
-  [key: number | string]: ReactNode;
-};
-
-export type PropsBackendPaquetes = {
-  [key: number | string]: ReactNode;
-};
-
-export type PropsBackendOperador = {
-  [key: number | string]: ReactNode;
-};
-
-export type PropPrivateRoute = {
-  link: string;
-  label: ReactNode;
-  component: ReactNode;
-  permission: number[];
-  subRoutes?: PropPrivateRoute[];
-};
-
-export type PropPrivateRouteDefault = {
-  label: ReactNode;
-  permission: number[];
-  subRoutes?: PropPrivateRouteDefault[];
-};
 
 type ParamsSubError = {
   typeNotify?: string | undefined;
   ignoring?: boolean;
+  console_error?: boolean;
 };
 
 export type ParamsError = {
@@ -50,22 +19,27 @@ export const defaultParamsError: ParamsError = {
   errorCustomFetchCode: {
     typeNotify: "notifyError",
     ignoring: false,
+    console_error: true,
   },
   errorCustomApiGateway: {
     typeNotify: "notifyError",
     ignoring: false,
+    console_error: true,
   },
   errorCustomApiGatewayTimeout: {
     typeNotify: "notifyError",
     ignoring: false,
+    console_error: true,
   },
   errorCustomBackend: {
     typeNotify: "notifyError",
     ignoring: false,
+    console_error: true,
   },
   errorCustomBackendUser: {
     typeNotify: "notify",
     ignoring: true,
+    console_error: true,
   },
 };
 
@@ -78,7 +52,7 @@ export const FuctionEvaluateResponse = (
   error_: ParamsError
 ) => {
   const function_name = FuctionEvaluateResponse.name;
-  // trx exitosa para el backend
+  //evaluar el status de la peticion
   try {
     if (peticion_?.status === true) {
       return peticion_;
@@ -87,9 +61,10 @@ export const FuctionEvaluateResponse = (
     throw new ErrorCustomFetchCode(
       descriptionErrorFront.replace("%s", name_),
       error.message,
-      `${function_name} - trx exitosa para el backend`,
+      `${function_name} - evaluar el status de la peticion`,
       error_.errorCustomFetchCode?.typeNotify,
-      error_.errorCustomFetchCode?.ignoring
+      error_.errorCustomFetchCode?.ignoring,
+      error_.errorCustomFetchCode?.console_error
     );
   }
   // trx no exitosa para los errores  del backend
@@ -101,17 +76,19 @@ export const FuctionEvaluateResponse = (
 
         error_msg_console = errorNameKey
           .map((nameKey) => {
-            return `* ${nameKey}= ${peticion_?.obj?.error_msg[nameKey].comment} (${peticion_?.obj?.error_msg[nameKey].blocking})`;
+            return `* ${nameKey}= ${peticion_?.obj?.error_msg[nameKey].error_comment} (${peticion_?.obj?.error_msg[nameKey].blocking})`;
           })
           .join("\n");
       }
+
       throw new ErrorCustomBackend(
         `${peticion_?.msg}`,
         error_msg_console,
         `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorCustomBackend?.typeNotify,
         error_.errorCustomBackend?.ignoring,
-        peticion_?.obj?.error_msg
+        error_.errorCustomBackend?.console_error,
+        peticion_?.obj
       );
     }
   } catch (error: any) {
@@ -123,7 +100,8 @@ export const FuctionEvaluateResponse = (
         error.message,
         `${function_name} - trx no exitosa para los errores del backend`,
         error_.errorCustomFetchCode?.typeNotify,
-        error_.errorCustomFetchCode?.ignoring
+        error_.errorCustomFetchCode?.ignoring,
+        error_.errorCustomFetchCode?.console_error
       );
     }
   }
@@ -137,7 +115,7 @@ export const FuctionEvaluateResponse = (
 
         error_msg_console = errorNameKey
           .map((nameKey) => {
-            return `* ${nameKey}= ${peticion_?.obj?.error_msg[nameKey]}`;
+            return `* ${nameKey}= ${peticion_?.obj?.error_msg[nameKey].error_comment} (${peticion_?.obj?.error_msg[nameKey].blocking})`;
           })
           .join("\n");
       }
@@ -147,7 +125,8 @@ export const FuctionEvaluateResponse = (
         `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         error_.errorCustomBackendUser?.typeNotify,
         error_.errorCustomBackendUser?.ignoring,
-        peticion_?.obj?.error_msg
+        error_.errorCustomBackendUser?.console_error,
+        peticion_?.obj
       );
     }
   } catch (error: any) {
@@ -159,7 +138,8 @@ export const FuctionEvaluateResponse = (
         error.message,
         `${function_name} - trx no exitosa, cuando status es false pero no hay errores`,
         error_.errorCustomFetchCode?.typeNotify,
-        error_.errorCustomFetchCode?.ignoring
+        error_.errorCustomFetchCode?.ignoring,
+        error_.errorCustomFetchCode?.console_error
       );
     }
   }
@@ -192,7 +172,8 @@ export const fetchCustom = async (
       error.message,
       `${function_name} - armar error_`,
       error_.errorCustomFetchCode?.typeNotify,
-      error_.errorCustomFetchCode?.ignoring
+      error_.errorCustomFetchCode?.ignoring,
+      error_.errorCustomFetchCode?.console_error
     );
   }
 
@@ -214,7 +195,8 @@ export const fetchCustom = async (
       error.message,
       `${function_name} - armar parametros`,
       error_.errorCustomFetchCode?.typeNotify,
-      error_.errorCustomFetchCode?.ignoring
+      error_.errorCustomFetchCode?.ignoring,
+      error_.errorCustomFetchCode?.console_error
     );
   }
 
@@ -234,7 +216,8 @@ export const fetchCustom = async (
       error.message,
       `${function_name} - Realizar Petición`,
       error_.errorCustomFetchCode?.typeNotify,
-      error_.errorCustomFetchCode?.ignoring
+      error_.errorCustomFetchCode?.ignoring,
+      error_.errorCustomFetchCode?.console_error
     );
   }
   //Evaluar si la respuesta es json
@@ -245,7 +228,8 @@ export const fetchCustom = async (
         "404 not found",
         `${function_name} - Evaluar si la respuesta es json`,
         error_.errorCustomFetchCode?.typeNotify,
-        error_.errorCustomFetchCode?.ignoring
+        error_.errorCustomFetchCode?.ignoring,
+        error_.errorCustomFetchCode?.console_error
       );
     }
   } catch (error) {
@@ -263,7 +247,8 @@ export const fetchCustom = async (
             Peticion.message,
             `${function_name} - evaluar respuesta de api gateway`,
             error_.errorCustomApiGatewayTimeout?.typeNotify,
-            error_.errorCustomApiGatewayTimeout?.ignoring
+            error_.errorCustomApiGatewayTimeout?.ignoring,
+            error_.errorCustomApiGatewayTimeout?.console_error
           );
         } else {
           throw new ErrorCustomApiGateway(
@@ -271,7 +256,8 @@ export const fetchCustom = async (
             Peticion.message,
             `${function_name} - evaluar respuesta de api gateway`,
             error_.errorCustomApiGateway?.typeNotify,
-            error_.errorCustomApiGateway?.ignoring
+            error_.errorCustomApiGateway?.ignoring,
+            error_.errorCustomApiGateway?.console_error
           );
         }
       }
@@ -288,7 +274,8 @@ export const fetchCustom = async (
         error.message,
         `${function_name} - evaluar respuesta de api gateway`,
         error_.errorCustomFetchCode?.typeNotify,
-        error_.errorCustomFetchCode?.ignoring
+        error_.errorCustomFetchCode?.ignoring,
+        error_.errorCustomFetchCode?.console_error
       );
     }
   }
@@ -308,7 +295,8 @@ export class ErrorCustomFetch extends Error {
   error_msg_sequence: string;
   typeNotify: string | undefined;
   ignoring: boolean;
-  res_error_msg: { [key: string]: any } | undefined;
+  console_error: boolean;
+  res_obj: { [key: string]: any } | undefined;
 
   constructor(
     error_name: string,
@@ -317,7 +305,8 @@ export class ErrorCustomFetch extends Error {
     error_msg_sequence: string,
     typeNotify: string | undefined,
     ignoring: boolean,
-    res_error_msg?: { [key: string]: any }
+    console_error: boolean,
+    res_obj?: { [key: string]: any }
   ) {
     super(error_msg_front);
     this.error_name = error_name;
@@ -326,7 +315,8 @@ export class ErrorCustomFetch extends Error {
     this.error_msg_sequence = error_msg_sequence;
     this.typeNotify = typeNotify;
     this.ignoring = ignoring;
-    this.res_error_msg = res_error_msg;
+    this.console_error = console_error;
+    this.res_obj = res_obj;
     if (this.ignoring === false && this.typeNotify !== undefined) {
       if (this.typeNotify === "notifyError") {
         notifyError(this.error_msg_front, 5000, { toastId: "notify-lot" });
@@ -334,13 +324,15 @@ export class ErrorCustomFetch extends Error {
         notify(this.error_msg_front);
       }
     }
-    const name_console_error = this.error_msg_front.split(":");
-    console.error(name_console_error[0], {
-      "Error Name": error_name,
-      "Error PDP": this.error_msg_front,
-      "Error Sequence": this.error_msg_sequence,
-      "Error Console": `${this.error_msg_console}`,
-    });
+    if (console_error === true) {
+      const name_console_error = this.error_msg_front.split(":");
+      console.error(name_console_error[0], {
+        "Error Name": error_name,
+        "Error PDP": this.error_msg_front,
+        "Error Sequence": this.error_msg_sequence,
+        "Error Console": `${this.error_msg_console}`,
+      });
+    }
   }
 }
 
@@ -350,7 +342,8 @@ export class ErrorCustomFetchCode extends ErrorCustomFetch {
     error_msg_console: string,
     error_msg_sequence: string,
     typeNotify: string = "notifyError",
-    ignoring: boolean = false
+    ignoring: boolean = false,
+    console_error: boolean = true
   ) {
     super(
       "ErrorCustomFetchCode",
@@ -358,7 +351,8 @@ export class ErrorCustomFetchCode extends ErrorCustomFetch {
       error_msg_console,
       error_msg_sequence,
       typeNotify,
-      ignoring
+      ignoring,
+      console_error
     );
   }
 }
@@ -369,7 +363,8 @@ export class ErrorCustomUseHookCode extends ErrorCustomFetch {
     error_msg_console: string,
     error_msg_sequence: string,
     typeNotify: string = "notifyError",
-    ignoring: boolean = false
+    ignoring: boolean = false,
+    console_error: boolean = true
   ) {
     super(
       "ErrorCustomUseHookCode",
@@ -377,7 +372,8 @@ export class ErrorCustomUseHookCode extends ErrorCustomFetch {
       error_msg_console,
       error_msg_sequence,
       typeNotify,
-      ignoring
+      ignoring,
+      console_error
     );
   }
 }
@@ -388,7 +384,8 @@ export class ErrorCustomComponentCode extends ErrorCustomFetch {
     error_msg_console: string,
     error_msg_sequence: string,
     typeNotify: string = "notifyError",
-    ignoring: boolean = false
+    ignoring: boolean = false,
+    console_error: boolean = true
   ) {
     super(
       "ErrorCustomComponenteCode",
@@ -396,7 +393,8 @@ export class ErrorCustomComponentCode extends ErrorCustomFetch {
       error_msg_console,
       error_msg_sequence,
       typeNotify,
-      ignoring
+      ignoring,
+      console_error
     );
   }
 }
@@ -407,7 +405,8 @@ export class ErrorCustomApiGateway extends ErrorCustomFetch {
     error_msg_console: string,
     error_msg_sequence: string,
     typeNotify: string = "notifyError",
-    ignoring: boolean = false
+    ignoring: boolean = false,
+    console_error: boolean = true
   ) {
     super(
       "ErrorCustomApiGateway",
@@ -415,7 +414,8 @@ export class ErrorCustomApiGateway extends ErrorCustomFetch {
       error_msg_console,
       error_msg_sequence,
       typeNotify,
-      ignoring
+      ignoring,
+      console_error
     );
   }
 }
@@ -426,7 +426,8 @@ export class ErrorCustomApiGatewayTimeout extends ErrorCustomFetch {
     error_msg_console: string,
     error_msg_sequence: string,
     typeNotify: string = "notifyError",
-    ignoring: boolean = false
+    ignoring: boolean = false,
+    console_error: boolean = true
   ) {
     super(
       "ErrorCustomApiGatewayTimeout",
@@ -434,7 +435,8 @@ export class ErrorCustomApiGatewayTimeout extends ErrorCustomFetch {
       error_msg_console,
       error_msg_sequence,
       typeNotify,
-      ignoring
+      ignoring,
+      console_error
     );
   }
 }
@@ -446,7 +448,8 @@ export class ErrorCustomBackend extends ErrorCustomFetch {
     error_msg_sequence: string,
     typeNotify: string = "notifyError",
     ignoring: boolean = false,
-    res_error_msg?: { [key: string]: any }
+    console_error: boolean = true,
+    res_obj?: { [key: string]: any }
   ) {
     super(
       "ErrorCustomBackend",
@@ -455,7 +458,8 @@ export class ErrorCustomBackend extends ErrorCustomFetch {
       error_msg_sequence,
       typeNotify,
       ignoring,
-      res_error_msg
+      console_error,
+      res_obj
     );
   }
 }
@@ -467,7 +471,8 @@ export class ErrorCustomBackendUser extends ErrorCustomFetch {
     error_msg_sequence: string = "desconocido",
     typeNotify: string | undefined = "notify",
     ignoring: boolean = false,
-    res_error_msg?: { [key: string]: any }
+    console_error: boolean = true,
+    res_obj?: { [key: string]: any }
   ) {
     super(
       "ErrorCustomBackendUser",
@@ -476,7 +481,30 @@ export class ErrorCustomBackendUser extends ErrorCustomFetch {
       error_msg_sequence,
       typeNotify,
       ignoring,
-      res_error_msg
+      console_error,
+      res_obj
     );
+  }
+}
+
+export class ErrorCustomBackendPendingTrx extends ErrorCustomBackend {
+  constructor(
+    error_msg_sequence: string = "throw - custom",
+    res_obj?: { [key: string]: any },
+    id_trx?: number | null
+  ) {
+    super(
+      "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto en el modulo de transacciones",
+      "En este error no se puede definir el estado de la transaccion",
+      error_msg_sequence,
+      "notifyError",
+      false,
+      true,
+      res_obj
+    );
+    if (id_trx !== undefined && id_trx !== null)
+      notifyError(`id_trx = ${id_trx}`, 5000, {
+        toastId: "notify-lot-ErrorCustomBackendPendingTrx",
+      });
   }
 }

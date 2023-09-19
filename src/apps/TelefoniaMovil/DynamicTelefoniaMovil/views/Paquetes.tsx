@@ -16,7 +16,7 @@ import Input from "../../../../components/Base/Input/Input";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
-import { ErrorCustomFetch, descriptionErrorFront } from "../utils/utils";
+import { ErrorCustomFetch, descriptionErrorFront } from "../utils/fetchUtils";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";

@@ -2,7 +2,7 @@ import {
   ErrorCustomBackend,
   ErrorCustomFetchCode,
   ParamsError,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 
 type TypeAcrominosPractisistemas = {
   [key: string]: { recarga: string; paquetes: { [key: string]: string } };

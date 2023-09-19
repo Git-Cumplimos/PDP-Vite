@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { fetchCustom } from "../../DynamicTelefoniaMovil/utils/utils";
+import { fetchCustom } from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 
 const url_cargar_paquetes = "ggg";
 export const useBackendCargaPaquetes = (name_operador: string) => {

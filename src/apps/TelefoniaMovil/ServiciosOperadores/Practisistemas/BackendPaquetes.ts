@@ -9,7 +9,7 @@ import {
 import {
   defaultParamsError,
   fetchCustom,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 import { FuctionEvaluateResponsePractisistemas } from "./utilsPractisistemas";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { formatMoney } from "../../../../components/Base/MoneyInput";

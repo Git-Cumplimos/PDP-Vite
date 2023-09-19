@@ -4,7 +4,7 @@ import {
   fetchCustom,
   FuctionEvaluateResponse,
   defaultParamsError,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 import {
   TypeInputDataGetPaquetes,
   TypeInputTrxPaquetes,

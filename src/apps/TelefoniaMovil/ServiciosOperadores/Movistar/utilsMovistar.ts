@@ -3,7 +3,7 @@ import {
   ErrorCustomBackendUser,
   ErrorCustomFetchCode,
   ParamsError,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 
 export const trxParamsError: ParamsError = {
   errorCustomFetchCode: {

@@ -37,11 +37,11 @@ export const serviciosBackendAutorizadoresDefault: TypeSubModules<any> = {
 };
 
 export const permissionAutorizadoresDefault: TypeSubModules<number[]> = {
-  recargas: [1],
-  paquetes: [1],
-  cargarPaquetes: [1],
-  cargarConciliacion: [1],
-  descargarConciliacion: [1],
+  recargas: [300],
+  paquetes: [300],
+  cargarPaquetes: [301],
+  cargarConciliacion: [301],
+  descargarConciliacion: [301],
 };
 
 const RoutesTelefoniaMovil = {
@@ -79,18 +79,28 @@ const RoutesTelefoniaMovil = {
       component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
         <HNavbar links={subRoutes} />
       ),
-      permission: [66], //los permisos son la combinacion de todos los modulos
+      permission: [
+        66,
+        ...permissionAutorizadoresDefault?.cargarPaquetes,
+        ...permissionAutorizadoresDefault?.cargarConciliacion,
+        ...permissionAutorizadoresDefault?.descargarConciliacion,
+      ],
       subRoutes: [
         {
-          link: "/movistar",
+          link: "/telefonia-movil/operador-pdp/movistar",
           label: <AppIcons Logo={"MOVISTAR_OPERADOR_PDP"} name="Movistar" />,
           component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
             <HNavbar links={subRoutes} />
           ),
-          permission: [66],
+          permission: [
+            66,
+            ...permissionAutorizadoresDefault?.cargarPaquetes,
+            ...permissionAutorizadoresDefault?.cargarConciliacion,
+            ...permissionAutorizadoresDefault?.descargarConciliacion,
+          ],
           subRoutes: [
             {
-              link: "/movistar/operador-pdp/cargar-paquetes",
+              link: "/telefonia-movil/operador-pdp/movistar/cargar-paquetes",
               label: (
                 <AppIcons
                   Logo={"MOVISTAR_CARGUE_DE_PAQUETES"}
@@ -98,31 +108,44 @@ const RoutesTelefoniaMovil = {
                 />
               ),
               component: CargarPaquetesMovistar,
-              permission: [66],
+              permission: [
+                66,
+                ...permissionAutorizadoresDefault?.cargarPaquetes,
+              ],
             },
             {
-              link: "/movistar/operador-pdp/concilacion",
+              link: "/telefonia-movil/operador-pdp/movistar/concilacion",
               label: (
                 <AppIcons Logo={"MOVISTAR_CONCILIACION"} name="Conciliación" />
               ),
               component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
                 <HNavbar links={subRoutes} />
               ),
-              permission: [66],
+              permission: [
+                66,
+                ...permissionAutorizadoresDefault?.cargarConciliacion,
+                ...permissionAutorizadoresDefault?.descargarConciliacion,
+              ],
               subRoutes: [
                 {
-                  link: "/movistar/operador-pdp/concilacion/descarga",
+                  link: "/telefonia-movil/operador-pdp/movistar/descarga",
                   label: (
                     <AppIcons Logo={"DESCARGAR"} name="Decargar archivos" />
                   ),
                   component: ConcilacionMovistarDescarga,
-                  permission: [66],
+                  permission: [
+                    66,
+                    ...permissionAutorizadoresDefault?.descargarConciliacion,
+                  ],
                 },
                 {
-                  link: "/movistar/operador-pdp/concilacion/carga",
+                  link: "/telefonia-movil/operador-pdp/movistar/carga",
                   label: <AppIcons Logo={"CARGAR"} name="Cargar archivos" />,
                   component: ConciliacionMovistarCarga,
-                  permission: [66],
+                  permission: [
+                    66,
+                    ...permissionAutorizadoresDefault?.cargarConciliacion,
+                  ],
                 },
               ],
             },
