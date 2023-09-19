@@ -46,9 +46,9 @@ const ParametrizacionRecaudo = () => {
         for (const element of res?.obj?.results) {
           if (element.pk_numero_cuenta !== null) {
               NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
-            if(element.pk_numero_cuenta.pk_numero_cuenta2 != undefined)
+            if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2+"\n")
-            if(element.pk_numero_cuenta.pk_numero_cuenta3 != undefined)
+            if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3+"\n")
             element.pk_numero_cuenta=NumCuentas
         }}

@@ -22,6 +22,7 @@ const ReporteSobranteFaltantes = lazy(() => import("./ReporteArqueoCaja/ReporteS
 const PanelHistorico = lazy(() => import("./PanelHistorico"));
 const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
+const PlataformasExternas = lazy(() => import("./PlataformasExternas"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
 const ReportesCierre = lazy(() => import("./ReportesCierre"));
 const ValidacionSobranteFaltantes = lazy(() => import("./ValidacionSobranteFaltantes"));
@@ -75,6 +76,12 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/parametrizar-cuenta",
     label: <AppIcons Logo={"RECAUDO"} name="Parametrizar Transportadoras y Entidades Bancarias" />,
     component: ParametrizacionRecaudo,
+    permission: [PermissionsCaja.AgregarEntidades],
+  },
+  {
+    link: "/gestion/arqueo/plataformas-externas",
+    label: <AppIcons Logo={"RECAUDO"} name="Creación Plataforma Externos" />,
+    component: PlataformasExternas,
     permission: [PermissionsCaja.AgregarEntidades],
   },
   {

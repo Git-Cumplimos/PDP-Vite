@@ -94,6 +94,10 @@ export const crearEntidad = buildPostFunction(`${urlCuentas}/administrar`);
 export const buscarEntidades = buildGetFunction(`${urlCuentas}/administrar`);
 export const editarEntidades = buildPutFunction(`${urlCuentas}/administrar`);
 
+export const editarExterno = buildPutFunction(`${urlCuentas}/crear_externo`);
+export const crearPltExterno = buildPostFunction(`${urlCuentas}/crear_externo`);
+export const buscarPlataformaExt = buildGetFunction(`${urlCuentas}/crear_externo`);
+
 export const buscarTiposComprobantes = buildGetFunction(`${urlComprobantes}/tipos`);
 export const subirComprobante = buildGetFunction(`${urlComprobantes}/upload-file`);
 export const buscarReporteCierreCaja = buildPostFunction(`${urlCierreCaja}/reporte`);
