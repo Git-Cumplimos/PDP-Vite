@@ -35,9 +35,9 @@ const PagoCredito = () => {
   const [datosCredito, setDatosCredito] = useState([]);
 
   const [datosTrx, setDatosTrx] = useState({
-    tipoDocumento: 2,
+    tipoDocumento: "2",
     documento: "",
-    tipoPago: 2,
+    tipoPago: "1",
     credito: "",
     nombreCliente:"",
   });
@@ -46,12 +46,12 @@ const PagoCredito = () => {
   const [uuid, setUuid] = useState(v4());
 
   const optionsDocumento = [
-    { value: 2, label: "Cédula de ciudadanía" },
-    { value: 3, label: "NIT" },
+    { value: "2", label: "Cédula de ciudadanía" },
+    { value: "3", label: "NIT" },
   ];
   const optionsTipoPago = [
-    { value: 2, label: "Valor mínimo" },
-    { value: 3, label: "Valor Total" },
+    { value: "1", label: "Valor mínimo" },
+    { value: "3", label: "Valor Total" },
   ];
 
   const printDiv = useRef();
@@ -64,9 +64,9 @@ const PagoCredito = () => {
     notifyError("Transacción cancelada por el usuario")
     setShowModal(false);
     setDatosTrx({
-      tipoDocumento: 2,
+      tipoDocumento: "2",
       documento: "",
-      tipoPago: 2,
+      tipoPago: "1",
       credito: "",
       nombreCliente:"",
     });
@@ -134,9 +134,9 @@ const PagoCredito = () => {
           render: ( { data: error}) => {
             setIsUploading(false);
             setDatosTrx({
-              tipoDocumento: 2,
+              tipoDocumento: "2",
               documento: "",
-              tipoPago: 2,
+              tipoPago: "1",
               credito: "",
               nombreCliente:"",
             });
@@ -146,7 +146,7 @@ const PagoCredito = () => {
         }
       );
     },
-    [datosTrx?.documento, datosTrx?.tipoDocumento,roleInfo, peticionConsultaCosto]
+    [datosTrx?.documento, roleInfo, peticionConsultaCosto]
   );
   
   const goToRecaudo = useCallback(() => {
@@ -161,9 +161,8 @@ const PagoCredito = () => {
 
   const onMakePayment = useCallback((e) => {
     e.preventDefault();
-    console.log("Esto es tipo de pago", datosTrx?.tipoPago)
     let valor = 0;
-    if (datosTrx?.tipoPago === 2){
+    if (datosTrx?.tipoPago === "1"){
       valor = (datosCredito?.find(item => {
         return item.NumeroCredito === datosTrx?.credito;
       })?.ValorMinimo)
@@ -200,7 +199,7 @@ const PagoCredito = () => {
       Datos: {
         tipo_documento: datosTrx?.tipoDocumento,
         num_documento: datosTrx?.documento,
-        tipo_pago: datosTrx?.tipoPago === 2 ? "PCU" : "PTO",
+        tipo_pago: datosTrx?.tipoPago === "1" ? "PCU" : "PTO",
         num_credito: datosTrx?.credito,
         nombre: datosConsulta?.products[0]?.firstNames,
         first_apellido: datosConsulta?.products[0]?.firstSurname,
@@ -259,12 +258,13 @@ const PagoCredito = () => {
               options={optionsDocumento}
               value={datosTrx?.tipoDocumento}
               onChange={(e) => {
-                setDatosTrx(old => ({
-                  ...old,
+                setDatosTrx(prevState => ({
+                  ...prevState,
                   tipoDocumento: e.target.value
                 }));
               }}
               required
+              disabled={loadingPeticionConsultaCosto}
             />
             <Input
                 id='docCliente'
@@ -285,6 +285,7 @@ const PagoCredito = () => {
                     })
                   }
                 }}
+                disabled={loadingPeticionConsultaCosto}
                 required
             />
             <ButtonBar className={"lg:col-span-2"}>
@@ -297,6 +298,7 @@ const PagoCredito = () => {
                         goToRecaudo();
                         notifyError("Transacción cancelada por el usuario");
                         }}
+                    disabled={loadingPeticionConsultaCosto}
                     >
                     Cancelar
                 </Button>
@@ -318,7 +320,7 @@ const PagoCredito = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de Consulta Crezcamos
               </h1>
-              <h2>{`Tipo Documento: ${datosTrx.tipoDocumento === 2 ? "Cédula de ciudadanía" : "NIT"}`}</h2>
+              <h2>{`Tipo Documento: ${datosTrx?.tipoDocumento === "2" ? "Cédula de ciudadanía" : "NIT"}`}</h2>
               <h2>{`Número Documento: ${datosTrx?.documento}`}</h2>
               <h2>{`Nombre cliente: ${datosTrx?.nombreCliente}`}</h2>
               <Select
@@ -338,27 +340,27 @@ const PagoCredito = () => {
                     })
                   }}
                   required
+                  disabled={loadingPeticionPago}
                 />
                 <h2>{`Pago mínimo: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorMinimo)}`}</h2>
                 <h2>{`Pago Total: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorTotal)}`}</h2>
                 <Select
-                  id='valorPago'
+                  id='tipoPago'
                   label='Indique el tipo de pago'
                   options={optionsTipoPago}
-                  value={datosTrx?.tipoPago}
+                  defaultValue={datosTrx?.tipoPago}
                   onChange={(e) => {
-                    setDatosTrx((old) => {
-                      return {
-                        ...old,
-                        tipoPago: e.target.value
-                      };
-                    })
+                    setDatosTrx(prevState => ({
+                      ...prevState,
+                      tipoPago: e.target.value
+                    }));
                   }}
                   required
+                  disabled={loadingPeticionPago}
                 />
                 <ButtonBar>
-                  <Button type='submit'>Realizar Pago</Button>
-                  <Button onClick={handleClose}>Cancelar</Button>
+                  <Button type='submit' disabled= {loadingPeticionPago}>Realizar Pago</Button>
+                  <Button onClick={handleClose} disabled= {loadingPeticionPago}>Cancelar</Button>
                 </ButtonBar>
             </Form>
           )}
