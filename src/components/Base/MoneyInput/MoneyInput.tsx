@@ -7,11 +7,11 @@ import {
   FormEvent,
   ChangeEvent,
   KeyboardEvent,
+  useState,
 } from "react";
-import useMoney from "../../../hooks/useMoney";
+import useMoney, { moneyValidatorDecimal } from "../../../hooks/useMoney";
 import {
   makeMoneyFormatter,
-  moneyValidator,
   onHandleNegativeNumbers,
 } from "../../../utils/functions";
 import Input, { CustomInputProps } from "../Input";
@@ -50,6 +50,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
     ref
   ) => {
     const inptRef = useRef<HTMLInputElement | null>(null);
+    const [, setDidRun] = useState(false);
 
     const inputLimits = useMemo(() => {
       const minVal =
@@ -80,7 +81,8 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
     const onInput = useCallback(
       (ev: FormEvent<HTMLInputElement>) => {
         const inpFcn = input?.onInput;
-        inpFcn?.(ev, onChangeMoney(ev));
+        const _valor = onChangeMoney(ev);
+        inpFcn?.(ev, _valor);
       },
       [input?.onInput, onChangeMoney]
     );
@@ -88,70 +90,86 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
     const onChange = useCallback(
       (ev: ChangeEvent<HTMLInputElement>) => {
         const chgFcn = input?.onChange;
-        chgFcn?.(ev, onChangeMoney(ev));
+        const _valor = onChangeMoney(ev);
+        chgFcn?.(ev, _valor);
       },
       [input?.onChange, onChangeMoney]
     );
 
     const value = useMemo(() => {
       if (origValue !== undefined) {
-        const moneyValue = moneyValidator(`${origValue ?? ""}`, negativeValues);
+        const moneyValue = moneyValidatorDecimal(
+          `${origValue ?? ""}`.replace(/\./, ","),
+          {
+            negativeValues,
+            decimalDigits,
+          }
+        );
         return !moneyValue ? "$ " : localFormatMoney.format(moneyValue);
       }
       return origValue;
-    }, [origValue, localFormatMoney, negativeValues]);
+    }, [origValue, localFormatMoney, negativeValues, decimalDigits]);
 
     const defaultValue = useMemo(() => {
       if (origdefaultValue !== undefined) {
-        const moneyValue = moneyValidator(
-          `${origdefaultValue ?? ""}`,
-          negativeValues
+        const moneyValue = moneyValidatorDecimal(
+          `${origdefaultValue ?? ""}`.replace(/\./, ","),
+          {
+            negativeValues,
+            decimalDigits,
+          }
         );
         return !moneyValue ? "$ " : localFormatMoney.format(moneyValue);
       }
       return origdefaultValue;
-    }, [origdefaultValue, localFormatMoney, negativeValues]);
+    }, [origdefaultValue, localFormatMoney, negativeValues, decimalDigits]);
 
     useEffect(() => {
-      if (inptRef.current) {
-        const moneyFormatter = makeMoneyFormatter(decimalDigits);
-        const moneyValue =
-          Math.round(
-            moneyValidator(
-              (value || defaultValue) ?? inptRef.current.value,
-              negativeValues
-            ) * Math.pow(10, decimalDigits)
-          ) / Math.pow(10, decimalDigits);
+      setDidRun((old) => {
+        if (old) return old;
+        if (inptRef.current) {
+          const moneyFormatter = makeMoneyFormatter(decimalDigits);
+          console.log(inptRef.current.value);
+          console.log(value || defaultValue);
+          console.log((value || defaultValue) ?? inptRef.current.value);
 
-        const [min, max] = inputLimits;
-        if (moneyValue === min && equalErrorMin) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser mayor ${
-              !equalErrorMin ? " o igual" : ""
-            } a ${moneyFormatter.format(min)}`
+          const moneyValue = moneyValidatorDecimal(
+            (value || defaultValue) ?? inptRef.current.value,
+            { negativeValues, decimalDigits }
           );
-        } else if (moneyValue < min) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser mayor  ${
-              !equalErrorMin ? " o igual" : ""
-            } a ${moneyFormatter.format(min)}`
-          );
-        } else if (moneyValue > max) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser menor${
-              !equalError ? " o igual" : ""
-            } a ${moneyFormatter.format(max)}`
-          );
-        } else if (moneyValue === max && equalError) {
-          inptRef.current.setCustomValidity(
-            `El valor debe ser menor ${
-              !equalError ? " o igual" : ""
-            } a ${moneyFormatter.format(max)}`
-          );
-        } else {
-          inptRef.current.setCustomValidity("");
+
+          const [min, max] = inputLimits;
+          if (moneyValue === min && equalErrorMin) {
+            inptRef.current.setCustomValidity(
+              `El valor debe ser mayor ${
+                !equalErrorMin ? " o igual" : ""
+              } a ${moneyFormatter.format(min)}`
+            );
+          } else if (moneyValue < min) {
+            inptRef.current.setCustomValidity(
+              `El valor debe ser mayor  ${
+                !equalErrorMin ? " o igual" : ""
+              } a ${moneyFormatter.format(min)}`
+            );
+          } else if (moneyValue > max) {
+            inptRef.current.setCustomValidity(
+              `El valor debe ser menor${
+                !equalError ? " o igual" : ""
+              } a ${moneyFormatter.format(max)}`
+            );
+          } else if (moneyValue === max && equalError) {
+            inptRef.current.setCustomValidity(
+              `El valor debe ser menor ${
+                !equalError ? " o igual" : ""
+              } a ${moneyFormatter.format(max)}`
+            );
+          } else {
+            inptRef.current.setCustomValidity("");
+          }
+          return true;
         }
-      }
+        return old;
+      });
     }, [
       decimalDigits,
       equalError,
