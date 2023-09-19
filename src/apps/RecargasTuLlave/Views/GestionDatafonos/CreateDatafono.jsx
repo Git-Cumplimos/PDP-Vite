@@ -184,7 +184,11 @@ const CreateDatafono = () => {
         value = value.toLowerCase() === "false" ? false : true;
       }
     }
-    if (ev.target.name === "tarjeta_sim" || ev.target.name === "numero_serie") {
+    if (
+      ev.target.name === "tarjeta_sim" ||
+      ev.target.name === "numero_serie" ||
+      ev.target.name === "hardware_id"
+    ) {
       value = value.toUpperCase();
     }
     setDataDatafono((old) => {
