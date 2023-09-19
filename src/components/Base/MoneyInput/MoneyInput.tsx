@@ -129,9 +129,6 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
         if (old) return old;
         if (inptRef.current) {
           const moneyFormatter = makeMoneyFormatter(decimalDigits);
-          console.log(inptRef.current.value);
-          console.log(value || defaultValue);
-          console.log((value || defaultValue) ?? inptRef.current.value);
 
           const moneyValue = moneyValidatorDecimal(
             (value || defaultValue) ?? inptRef.current.value,
