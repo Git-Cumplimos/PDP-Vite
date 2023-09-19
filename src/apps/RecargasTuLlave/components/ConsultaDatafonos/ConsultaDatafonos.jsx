@@ -76,7 +76,9 @@ const ConsultaDatafonos = ({
   );
   const fetchDatafonosOnlyCommerceFunc = useDelayedCallback(
     useCallback(() => {
-      let obj = {};
+      let obj = {
+        estado: true,
+      };
       if (dataDatafonos.pos_id) obj["pos_id"] = dataDatafonos.pos_id;
       if (id_comercio) {
         obj["fk_comercio_asociado"] = id_comercio;
