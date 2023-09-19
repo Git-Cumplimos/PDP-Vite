@@ -3,7 +3,7 @@ import {
   ErrorCustomFetch,
   ErrorCustomUseHookCode,
   fetchCustom,
-} from "../utils/utils";
+} from "../utils/fetchUtils";
 import { PropOperadoresComponent } from "../TypeDinamic";
 import DictServiciosBackendAurorizadores from "../../ServiciosOperadores/DictServiciosBackendAurorizadores";
 import {

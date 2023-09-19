@@ -14,7 +14,7 @@ import {
   ParamsError,
   descriptionErrorFront,
   fetchCustom,
-} from "../utils/utils";
+} from "../utils/fetchUtils";
 import { sleep, useTimerCustom } from "./utils";
 import { urlPaquetesDefault } from "../urls";
 
@@ -127,8 +127,8 @@ export const useBackendPaquetesDefault = (
           } catch (error: any) {
             clearInterval(timerInterval); //reiniciar contador
             if (!(error instanceof ErrorCustomBackend)) throw error;
-            if (error.res_error_msg === undefined) throw error;
-            if (!Object.keys(error.res_error_msg).includes("error_pending_trx"))
+            if (error.res_obj === undefined) throw error;
+            if (!Object.keys(error.res_obj).includes("error_pending_trx"))
               throw error;
             if (i >= cant) throw error;
             if (seconds - countTimerInterval > 0) {
@@ -145,7 +145,8 @@ export const useBackendPaquetesDefault = (
             `${hook_name} - ${function_name} - ultima consulta`,
             "notifyError",
             false,
-            error.res_error_msg
+            false,
+            error.res_obj
           );
         }
         if (!(error instanceof ErrorCustomFetch)) {
@@ -221,11 +222,9 @@ export const useBackendPaquetesDefault = (
         if (error instanceof ErrorCustomApiGatewayTimeout) {
           peticionConsultaTimeout = true;
         } else if (error instanceof ErrorCustomBackend) {
-          if (error.res_error_msg !== undefined) {
+          if (error.res_obj !== undefined) {
             if (
-              Object.keys(error.res_error_msg).includes(
-                "error_make_send_timeout"
-              )
+              Object.keys(error.res_obj).includes("error_make_send_timeout")
             ) {
               peticionConsultaTimeout = true;
             }
@@ -252,7 +251,8 @@ export const useBackendPaquetesDefault = (
             error.error_msg_sequence,
             "notifyError",
             false,
-            error.res_error_msg
+            false,
+            error.res_obj
           );
         }
         throw error;

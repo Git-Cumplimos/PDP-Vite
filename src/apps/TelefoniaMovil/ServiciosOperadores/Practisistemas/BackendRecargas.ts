@@ -6,7 +6,7 @@ import {
 import {
   defaultParamsError,
   fetchCustom,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 import {
   FuctionEvaluateResponsePractisistemas,
   AcrominosPractisistemas,

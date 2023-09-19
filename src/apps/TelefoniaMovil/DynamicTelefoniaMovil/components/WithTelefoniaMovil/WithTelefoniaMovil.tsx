@@ -11,7 +11,7 @@ import useHookFetchLayouts, {
 import LayoutTelefoniaMovil from "../../layouts/LayoutTelefoniaMovil";
 
 import classes from "./WithTelefoniaMovil.module.css";
-import { ErrorCustomFetch } from "../../utils/utils";
+import { ErrorCustomFetch } from "../../utils/fetchUtils";
 
 const { Lineadivisora, Mensaje } = classes;
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { fetchCustom } from "../../DynamicTelefoniaMovil/utils/utils";
+import { fetchCustom } from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 import {
   TypeInputPromisesRecargas,
   TypeOutputDataRecargas,

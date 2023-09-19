@@ -11,7 +11,8 @@ import {
   fetchCustom,
   descriptionErrorFront,
   ErrorCustomBackend,
-} from "../utils/utils";
+  ErrorCustomBackendPendingTrx,
+} from "../utils/fetchUtils";
 import { sleep, useTimerCustom } from "./utils";
 import { urlRecargasDefault } from "../urls";
 
@@ -19,10 +20,12 @@ const customParamsErrorCyclePeticion: ParamsError = {
   errorCustomApiGatewayTimeout: {
     typeNotify: "notifyError",
     ignoring: true,
+    console_error: true,
   },
   errorCustomBackend: {
     typeNotify: "notifyError",
     ignoring: true,
+    console_error: false,
   },
 };
 
@@ -30,7 +33,83 @@ const customParamsErrorConsultaTimeout: ParamsError = {
   errorCustomBackend: {
     typeNotify: "notifyError",
     ignoring: true,
+    console_error: true,
   },
+};
+
+type TypingOutputGetStatusCycleConsultTrx = {
+  status: boolean;
+  error: any;
+};
+
+const get_status_cycle_consult_trx = (
+  error_: any,
+  id_trx_: number | null,
+  error_previous_: { [key: string]: boolean } | null
+): TypingOutputGetStatusCycleConsultTrx => {
+  const function_name = "get_status_cycle_consult_trx";
+  const status_cycle_consult_trx = {
+    status: false,
+    error: error_,
+  };
+  let error_msg_equal = undefined;
+  if (error_ instanceof ErrorCustomApiGatewayTimeout) {
+    status_cycle_consult_trx.status = true;
+  } else if (error_ instanceof ErrorCustomBackend) {
+    if (error_.res_obj !== undefined) {
+      if (
+        Object.keys(error_.res_obj?.error_msg ?? {}).includes(
+          "error_make_send_timeout"
+        )
+      ) {
+        status_cycle_consult_trx.status = true;
+      } else {
+        const error_previous: { [key: string]: boolean } =
+          error_previous_ !== null ? error_previous_ : {};
+        error_msg_equal = Object.keys(error_.res_obj?.error_msg ?? {}).find(
+          (error_msg_name: string) =>
+            Object.keys(error_previous).find(
+              (value: string) => value === error_msg_name
+            )
+        );
+        console.log(error_msg_equal);
+        if (error_msg_equal !== undefined) {
+          if (
+            error_.res_obj?.ids?.autorizador?.id_trx !== undefined &&
+            error_.res_obj?.ids?.autorizador?.id_trx !== null
+          ) {
+            id_trx_ = error_.res_obj?.ids?.autorizador?.id_trx;
+          }
+          if (error_previous[error_msg_equal] === true) {
+            status_cycle_consult_trx.status = true;
+          } else {
+            status_cycle_consult_trx.error = new ErrorCustomBackendPendingTrx(
+              `${function_name} - throw custom`,
+              error_.res_obj,
+              id_trx_
+            );
+          }
+        }
+      }
+    }
+  }
+
+  if (
+    status_cycle_consult_trx.status === false &&
+    error_msg_equal === undefined &&
+    error_ instanceof ErrorCustomBackend
+  ) {
+    status_cycle_consult_trx.error = new ErrorCustomBackend(
+      error_.error_msg_front,
+      error_.error_msg_console,
+      error_.error_msg_sequence,
+      "notifyError",
+      false,
+      true,
+      error_.res_obj
+    );
+  }
+  return status_cycle_consult_trx;
 };
 
 export const useBackendRecargasDefault = (
@@ -75,8 +154,12 @@ export const useBackendRecargasDefault = (
           } catch (error: any) {
             clearInterval(timerInterval); //reiniciar contador
             if (!(error instanceof ErrorCustomBackend)) throw error;
-            if (error.res_error_msg === undefined) throw error;
-            if (!Object.keys(error.res_error_msg).includes("error_pending_trx"))
+            if (error.res_obj === undefined) throw error;
+            if (
+              !Object.keys(error.res_obj?.error_msg ?? {}).includes(
+                "error_pending_trx"
+              )
+            )
               throw error;
             if (i >= cant) throw error;
             if (seconds - countTimerInterval > 0) {
@@ -93,7 +176,8 @@ export const useBackendRecargasDefault = (
             `${hook_name} - ${function_name} - ultima consulta`,
             "notifyError",
             false,
-            error.res_error_msg
+            false,
+            error.res_obj
           );
         }
         if (!(error instanceof ErrorCustomFetch)) {
@@ -117,9 +201,12 @@ export const useBackendRecargasDefault = (
       params: { [key: string]: any },
       body: { [key: string]: any },
       seconds: number,
-      cant: number
+      cant: number,
+      id_trx: number | null = null,
+      error_previous: { [key: string]: boolean } | null = null
     ): Promise<any> => {
       let response;
+      let body_ = { ...body };
       try {
         response = await fetchCustom(
           `${suburl}/${referencia}`,
@@ -134,9 +221,19 @@ export const useBackendRecargasDefault = (
           return response;
         }
 
-        let paso_next_input_: any = {
-          inf: response?.obj?.paso_next_output?.inf,
-        };
+        error_previous = response?.obj?.paso_next_output?.error_next ?? null;
+        id_trx = response?.obj?.ids?.autorizador?.id_trx ?? null;
+
+        console.log("ddd", response?.obj?.paso_next_output?.inf);
+        let paso_next_input_ = {};
+        if (
+          response?.obj?.paso_next_output?.inf !== undefined &&
+          response?.obj?.paso_next_output?.inf !== null
+        )
+          paso_next_input_ = {
+            ...paso_next_input_,
+            inf: response?.obj?.paso_next_output?.inf,
+          };
 
         if (
           response?.obj?.paso_next_output?.cant !== undefined &&
@@ -148,12 +245,16 @@ export const useBackendRecargasDefault = (
             time: response?.obj?.paso_next_output?.time,
           };
         }
-        let body_ = {
-          ...body,
-          paso_next_input: paso_next_input_,
+        body_ = {
+          ...body_,
           ids: response?.obj?.ids,
         };
-
+        if (Object.keys(paso_next_input_).length > 0) {
+          body_ = {
+            ...body_,
+            paso_next_input: paso_next_input_,
+          };
+        }
         response = await CyclePeticion(
           suburl,
           response?.obj?.paso_next_output?.referencia,
@@ -161,50 +262,28 @@ export const useBackendRecargasDefault = (
           params,
           body_,
           seconds,
-          cant
+          cant,
+          id_trx,
+          error_previous
         );
         return response;
       } catch (error: any) {
-        let peticionConsultaTimeout = false;
-        if (error instanceof ErrorCustomApiGatewayTimeout) {
-          peticionConsultaTimeout = true;
-        } else if (error instanceof ErrorCustomBackend) {
-          if (error.res_error_msg !== undefined) {
-            if (
-              Object.keys(error.res_error_msg).includes(
-                "error_make_send_timeout"
-              )
-            ) {
-              peticionConsultaTimeout = true;
-            }
-          }
-        }
-        if (peticionConsultaTimeout === true) {
+        const status_cycle_consult_trx: TypingOutputGetStatusCycleConsultTrx =
+          get_status_cycle_consult_trx(error, id_trx, error_previous);
+        console.log(status_cycle_consult_trx);
+        if (status_cycle_consult_trx.status === true) {
           response = await CyclePeticionConsultaTimeout(
             suburl,
             "DEFAULT_CONSULT_TIMEOUT",
             name,
             params,
-            body,
+            body_,
             seconds,
             cant
           );
           return response;
-        } else if (
-          peticionConsultaTimeout === false &&
-          error instanceof ErrorCustomBackend
-        ) {
-          throw new ErrorCustomBackend(
-            error.error_msg_front,
-            error.error_msg_console,
-            error.error_msg_sequence,
-            "notifyError",
-            false,
-            error.res_error_msg
-          );
         }
-        console.log(error);
-        throw error;
+        throw status_cycle_consult_trx.error;
       }
     },
     [CyclePeticionConsultaTimeout]
@@ -223,10 +302,7 @@ export const useBackendRecargasDefault = (
       const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
 
       setStatePeticion(true);
-
-      // //?-----Iniciar intervalo para la alertas del usuario debido a la demora de la transaccion
       startTimer();
-      // //?--------------------------------------------------------------------
 
       try {
         const params = {
@@ -275,7 +351,7 @@ export const useBackendRecargasDefault = (
           dataInputPromises?.parameters_submodule?.cant ?? 5
         );
         response = {
-          status: fetchResult?.status ?? true,
+          status: fetchResult?.status ?? false,
           id_trx: fetchResult?.obj?.ids?.autorizador?.id_trx ?? null,
           ticket: fetchResult?.obj?.result?.ticket ?? null,
         };

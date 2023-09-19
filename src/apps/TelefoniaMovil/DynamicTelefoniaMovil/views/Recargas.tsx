@@ -27,7 +27,7 @@ import {
   ErrorCustomComponentCode,
   ErrorCustomFetch,
   descriptionErrorFront,
-} from "../utils/utils";
+} from "../utils/fetchUtils";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 
@@ -139,10 +139,8 @@ const Recargas = ({
       .catch((error: any) => {
         handleCloseError();
         if (error instanceof ErrorCustomBackend) {
-          if (error.res_error_msg !== undefined) {
-            if (
-              Object.keys(error.res_error_msg).includes("error_pending_trx")
-            ) {
+          if (error.res_obj !== undefined) {
+            if (Object.keys(error.res_obj).includes("error_pending_trx")) {
               // validNavigate("/transacciones");
             }
           }
