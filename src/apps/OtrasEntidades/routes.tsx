@@ -9,7 +9,7 @@ const routesOtrasEntidades = {
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
-  permission: [1],
+  permission: [158],
   subRoutes: [
     rutasTripleA,
   ],
