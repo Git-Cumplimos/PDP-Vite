@@ -335,6 +335,7 @@ const RecaudoTripleA = () => {
                 Consultar cupón
               </Button>
               <Button
+                type="button"
                 onClick={() => HandleCloseTrx(true)}
                 disabled={loadingPeticion}
               >
@@ -361,7 +362,7 @@ const RecaudoTripleA = () => {
               <Button type="submit" onClick={onSubmitPay}>
                 Realizar Pago
               </Button>
-              <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
+              <Button type="button" onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
             </ButtonBar>
           </PaymentSummary>
         )}

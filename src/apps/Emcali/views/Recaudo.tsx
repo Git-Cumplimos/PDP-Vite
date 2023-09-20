@@ -348,6 +348,7 @@ const Recaudo = () => {
                 Realizar Consulta
               </Button>
               <Button
+                type="button"
                 onClick={() => HandleCloseTrx(true)}
                 disabled={loadingPeticion}
               >
@@ -376,7 +377,7 @@ const Recaudo = () => {
               <Button type="submit" onClick={onSubmitPay}>
                 Realizar Pago
               </Button>
-              <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
+              <Button type="button" onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
             </ButtonBar>
           </PaymentSummary>
         )}
