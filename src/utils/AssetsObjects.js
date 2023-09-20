@@ -213,6 +213,11 @@ const svgs = {
   //TULLAVE
   RECARGASTULLAVE: `${urlAssets}/assets/svg/recaudo/TULLAVE/TULLAVE_RECARGAS.svg`,
 
+  //CREZCAMOS
+  CREZCAMOS: `${urlAssets}/assets/svg/recaudo/CREZCAMOS/CREZCAMOS.png`,
+  CREZCAMOS_OTRAS_ENTIDADES: `${urlAssets}/assets/svg/recaudo/CREZCAMOS/CREZCAMOS.png`,
+  CREZCAMOS_PAGO_CREDITOS: `${urlAssets}/assets/svg/recaudo/CREZCAMOS/CREZCAMOS.png`,
+
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
