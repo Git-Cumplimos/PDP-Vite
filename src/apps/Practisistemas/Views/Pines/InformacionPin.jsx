@@ -13,6 +13,7 @@ const InformacionPin = () => {
   const { state } = useLocation();
 
   const [pines, setPines] = useState([]);
+  const [filteredPines, setFilteredPines] = useState([]);
 
   useEffect(() => {
     if (state?.op) {
@@ -30,7 +31,7 @@ const InformacionPin = () => {
 
   const tableTipoPin = useMemo(() => {
     return [
-      ...pines?.map(({ productDesc, sell, validity }) => {
+      ...filteredPines.map(({ productDesc, sell, validity }) => {
         return {
           "Nombre del Pin": productDesc,
           Valor: formatMoney.format(sell),
@@ -38,7 +39,7 @@ const InformacionPin = () => {
         };
       }),
     ];
-  }, [pines]);
+  }, [filteredPines]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
@@ -67,7 +68,11 @@ const InformacionPin = () => {
     })
       .then((autoArr) => {
         setShowLoading(false)
+        const filteredResults = autoArr?.results.filter((pin) =>
+          pin.productDesc.toLowerCase().includes(datosTrans.pin.toLowerCase())
+        ) ?? [];
         setPines(autoArr?.results ?? []);
+        setFilteredPines(filteredResults);
       })
       .catch((err) => console.error(err));
   };
