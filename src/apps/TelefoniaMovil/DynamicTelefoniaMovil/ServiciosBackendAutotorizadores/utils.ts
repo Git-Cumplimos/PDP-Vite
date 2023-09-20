@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { notify } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 export const sleep = (seconds: number) => {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -10,18 +10,10 @@ export const useTimerCustom = () => {
   let timerTimeout: any;
 
   const startTimer = () => {
-    let cantTimerInterval = 0;
     timerInterval = setInterval(() => {
-      cantTimerInterval += 1;
-      if (cantTimerInterval <= 1) {
-        notify(
-          "Estamos procesando la transacción, puede tardar hasta 2 minutos"
-        );
-      } else if (cantTimerInterval > 1 && cantTimerInterval <= 4) {
-        notify("Se prolongó el proceso de la transacción, por favor esperar");
-      } else {
-        notify("Se prolongó el proceso de la transacción, por favor esperar");
-      }
+      notifyError("Estamos procesando la transacción, por favor espere", 5000, {
+        toastId: "notify-lot-esperar",
+      });
     }, 15000);
   };
 

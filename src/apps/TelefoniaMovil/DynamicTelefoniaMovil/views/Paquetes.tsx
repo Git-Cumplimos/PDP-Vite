@@ -157,7 +157,9 @@ const Paquetes = ({
     } else if (typeInfo === "TrxExitosa") {
       HandleCloseTrxExitosa();
     } else if (loadingPeticionTrx) {
-      notify("Se está procesando la transacción, por favor esperar");
+      notifyError("Transacción en proceso", 5000, {
+        toastId: "notify-lot-cerrar",
+      });
     }
   }, [
     typeInfo,
@@ -172,7 +174,11 @@ const Paquetes = ({
     if (valueInput[0] !== "3") {
       if (valueInput !== "") {
         notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3"
+          "Número inválido, el No. de celular debe comenzar con el número 3",
+          5000,
+          {
+            toastId: "notify-lot-celular",
+          }
         );
         valueInput = "";
       }
@@ -228,6 +234,7 @@ const Paquetes = ({
         }
       })
       .catch((error: any) => {
+        validNavigate("/telefonia-movil");
         HandleCloseInformacion();
         let msg = `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - catch) [0010002]`;
         if (error instanceof ErrorCustomFetch) {

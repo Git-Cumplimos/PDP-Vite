@@ -39,5 +39,5 @@
   display: block;
 }
 .operador {
-  @apply absolute hidden  bottom-0  w-80 text-xl text-primary italic py-11;
+  @apply absolute hidden  bottom-0  text-xl text-primary italic py-11;
 }

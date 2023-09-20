@@ -1,5 +1,6 @@
 .Lineadivisora {
-  width: 60rem;
+  /* min-width: 60rem; */
+  width: 100%;
   padding-top: 1.5rem;
   border-bottom-width: 1px;
   border-color: rgb(234 88 12);
