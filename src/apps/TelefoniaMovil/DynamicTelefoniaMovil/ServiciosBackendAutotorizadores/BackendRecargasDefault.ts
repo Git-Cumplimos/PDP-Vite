@@ -118,6 +118,7 @@ export const useBackendRecargasDefault = (
   module_: string
 ) => {
   const hook_name = "useBackendRecargasDefault";
+  const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
   const [statePeticion, setStatePeticion] = useState<boolean>(false);
   const [startTimer, stopTimer] = useTimerCustom();
 
@@ -299,8 +300,6 @@ export const useBackendRecargasDefault = (
         ticket: null,
       };
       let fetchResult;
-      const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
-
       setStatePeticion(true);
       startTimer();
 
