@@ -207,8 +207,11 @@ const PagoCredito = () => {
         second_apellido: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.SegundoApellido),
       },
     };
+    const dataAditional = {
+      id_uuid_trx: uuid,
+    };
     notifyPending(
-      peticionPago(data),
+      peticionPago(data, dataAditional),
       {
         render: () => {
           return "Procesando transacción";
