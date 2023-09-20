@@ -113,6 +113,8 @@ const PagoCredito = () => {
             const formattedData = res?.obj?.products?.map(row => ({
               NumeroCredito: row.account,
               RolTitular: row.debtorType,
+              TipoDocumento: row.documentType,
+              NumeroDocumento: row.documentNumber,
               Nombre: row.firstNames,
               PrimerApellido: row.firstSurname,
               SegundoApellido: row.secondLastName,
@@ -161,8 +163,6 @@ const PagoCredito = () => {
 
   const onMakePayment = useCallback((e) => {
     e.preventDefault();
-    let valor = 0;
-    valor = (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.ValorMinimo);
     // if (datosTrx?.tipoPago === "1"){
     //   valor = (datosCredito?.find(item => {
     //     return item.NumeroCredito === datosTrx?.credito;
@@ -193,18 +193,18 @@ const PagoCredito = () => {
       nombre_usuario: roleInfo?.["nombre comercio"],
       nombre_comercio: roleInfo?.["nombre comercio"],
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-      valor_total_trx: valor,
+      valor_total_trx: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.ValorMinimo),
       id_trx: datosConsulta?.id_trx,
       address: roleInfo?.direccion,
       city: roleInfo?.ciudad.substring(0, 7),
       Datos: {
-        tipo_documento: datosTrx?.tipoDocumento,
-        num_documento: datosTrx?.documento,
+        tipo_documento: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.TipoDocumento),
+        num_documento: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento),
         tipo_pago: "PCU",
         num_credito: datosTrx?.credito,
-        nombre: datosConsulta?.products[0]?.firstNames,
-        first_apellido: datosConsulta?.products[0]?.firstSurname,
-        second_apellido: datosConsulta?.products[0]?.secondLastName,
+        nombre: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.Nombre),
+        first_apellido: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.PrimerApellido),
+        second_apellido: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.SegundoApellido),
       },
     };
     notifyPending(
@@ -218,7 +218,7 @@ const PagoCredito = () => {
         render: ({ data: res }) => {
           setIsUploading(false);
           setPaymentStatus(res?.obj?.ticket ?? {});
-          return "Transaccion satisfactoria";
+          return "Transacción satisfactoria";
         },
       },
       {
@@ -238,8 +238,6 @@ const PagoCredito = () => {
     roleInfo,
     datosConsulta,
     datosTrx?.credito,
-    datosTrx?.documento,
-    datosTrx?.tipoDocumento,
     datosCredito,
     uuid,
     navigate
@@ -318,9 +316,14 @@ const PagoCredito = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de Consulta Crezcamos
               </h1>
-              <h2>{`Tipo Documento: ${datosTrx?.tipoDocumento === "2" ? "Cédula de ciudadanía" : "NIT"}`}</h2>
-              <h2>{`Número Documento: ${datosTrx?.documento}`}</h2>
-              <h2>{`Nombre cliente: ${datosTrx?.nombreCliente}`}</h2>
+              <h2>{`Tipo Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.TipoDocumento) === "2" ? "Cédula de ciudadanía" : "Cédula de ciudadanía"}`}</h2>
+              <h2>{`Número Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento)}`}</h2>
+              <h2>{`Nombre cliente: 
+                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.Nombre)} 
+                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.PrimerApellido)}
+                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.SegundoApellido)}`
+                }
+              </h2>
               <Select
                   id='numPrestamo'
                   label='Número préstamo'
