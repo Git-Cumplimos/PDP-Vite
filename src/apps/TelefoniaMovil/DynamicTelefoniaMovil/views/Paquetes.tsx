@@ -16,7 +16,12 @@ import Input from "../../../../components/Base/Input/Input";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
-import { ErrorCustomFetch, descriptionErrorFront } from "../utils/fetchUtils";
+import {
+  ErrorCustomBackend,
+  ErrorCustomComponentCode,
+  ErrorCustomFetch,
+  descriptionErrorFront,
+} from "../utils/fetchUtils";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
@@ -203,6 +208,7 @@ const Paquetes = ({
   }, []);
 
   const RealizarTrx = useCallback(() => {
+    const function_name = "RealizarTrx";
     const moduleInfo = {
       celular: dataPackageInput?.celular,
       valor_total_trx: dataPackage?.valor,
@@ -221,25 +227,53 @@ const Paquetes = ({
     })
       .then((result: TypeOutputTrxPaquetes) => {
         if (result?.status === true) {
-          if (result?.ticket) {
+          notify(`Recarga ${operadorCurrent.name} exitosa`);
+          if (result?.ticket !== null) {
             setInfTicket(result?.ticket);
+            setTypeInfo("TrxExitosa");
+          } else if (result?.id_trx !== null) {
+            HandleCloseInformacion();
+            notify(
+              `Buscar el ticket en el modulo de transacciones con id_trx = ${result?.id_trx}`
+            );
+            validNavigate("/transacciones");
+          } else {
+            HandleCloseInformacion();
+            notify("Buscar el ticket en el modulo de transacciones");
           }
-          notify(`Compra paquete ${operadorCurrent.name} exitosa`);
-          setTypeInfo("TrxExitosa");
         } else {
-          notifyError(
-            `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - status) [0010002]`
+          throw new ErrorCustomComponentCode(
+            msg,
+            "el valor de status en la peticion dentro del componente es false",
+            `Views ${component_name} - ${function_name} -> status false`,
+            "notifyError",
+            false
           );
-          HandleCloseInformacion();
         }
       })
       .catch((error: any) => {
-        validNavigate("/telefonia-movil");
         HandleCloseInformacion();
-        let msg = `Error respuesta PDP: Fallo al consumir el servicio (${operadorCurrent.name} - catch) [0010002]`;
-        if (error instanceof ErrorCustomFetch) {
+        if (error instanceof ErrorCustomBackend) {
+          if (error.res_obj !== undefined) {
+            if (Object.keys(error.res_obj).includes("error_pending_trx")) {
+              validNavigate("/transacciones");
+            } else {
+              validNavigate("/telefonia-movil");
+            }
+          } else {
+            validNavigate("/telefonia-movil");
+          }
         } else {
+          validNavigate("/telefonia-movil");
+        }
+        if (!(error instanceof ErrorCustomFetch)) {
+          validNavigate("/telefonia-movil");
           notifyError(msg);
+          console.error("Error respuesta Front-end PDP", {
+            "Error PDP": msg,
+            "Error Sequence": `Views ${component_name} - ${function_name} -> error sin controlar`,
+            "Error Console": `${error.message}`,
+          });
         }
       });
   }, [
@@ -251,6 +285,8 @@ const Paquetes = ({
     HandleCloseInformacion,
     PeticionTrx,
     id_uuid,
+    msg,
+    validNavigate,
   ]);
 
   const handlePrint = useReactToPrint({
