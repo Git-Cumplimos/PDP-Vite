@@ -6,6 +6,8 @@ import { postConsultaPin } from "../../utils/fetchBackPines";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
+import useDelayedCallback from "../../../../hooks/useDelayedCallback";
+
 const InformacionPin = () => {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
@@ -59,7 +61,8 @@ const InformacionPin = () => {
     fecthTablaTiposPines();
   }, [datosTrans]);
 
-  const fecthTablaTiposPines = () => {
+  const fecthTablaTiposPines = useDelayedCallback(
+    useCallback (() => {
     setShowLoading(true)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
@@ -75,7 +78,9 @@ const InformacionPin = () => {
         setFilteredPines(filteredResults);
       })
       .catch((err) => console.error(err));
-  };
+    }, [datosTrans, state, roleInfo]),
+    500
+  );
 
   return (
     <>
