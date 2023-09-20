@@ -77,7 +77,11 @@ const Recargas = ({
     if (valueInput[0] != 3) {
       if (valueInput != "") {
         notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3"
+          "Número inválido, el No. de celular debe comenzar con el número 3",
+          5000,
+          {
+            toastId: "notify-lot-celular",
+          }
         );
         valueInput = "";
       }
@@ -141,11 +145,18 @@ const Recargas = ({
         if (error instanceof ErrorCustomBackend) {
           if (error.res_obj !== undefined) {
             if (Object.keys(error.res_obj).includes("error_pending_trx")) {
-              // validNavigate("/transacciones");
+              validNavigate("/transacciones");
+            } else {
+              validNavigate("/telefonia-movil");
             }
+          } else {
+            validNavigate("/telefonia-movil");
           }
+        } else {
+          validNavigate("/telefonia-movil");
         }
         if (!(error instanceof ErrorCustomFetch)) {
+          validNavigate("/telefonia-movil");
           notifyError(msg);
           console.error("Error respuesta Front-end PDP", {
             "Error PDP": msg,
@@ -162,7 +173,7 @@ const Recargas = ({
     setDataRecarga(dataRecargaInitial);
     setInfTicket(null);
     validNavigate("/telefonia-movil");
-  }, []);
+  }, [validNavigate]);
 
   const handleCloseError = useCallback(() => {
     setShowModal(false);
@@ -185,7 +196,9 @@ const Recargas = ({
     } else if (typeInfo === "TrxExitosa") {
       handleCloseRecarga();
     } else if (statePeticionRecargar) {
-      notify("Se está procesando la transacción, por favor esperar");
+      notifyError("Transacción en proceso", 5000, {
+        toastId: "notify-lot-cerrar",
+      });
     }
   }, [
     typeInfo,

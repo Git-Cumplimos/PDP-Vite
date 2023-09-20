@@ -17,10 +17,12 @@ const LayoutTelefoniaMovil = ({
   operadores,
   operadorCurrent,
   setOperadorCurrent,
+  setStateComponectBody,
 }: {
   operadores: PropOperadoresComponent[];
   operadorCurrent: PropOperadoresComponent;
   setOperadorCurrent: any;
+  setStateComponectBody: any;
 }) => {
   const { svgs }: any = useImgs();
   return (
@@ -30,6 +32,7 @@ const LayoutTelefoniaMovil = ({
           className={contenedorImg}
           onClick={() => {
             setOperadorCurrent(operadorInd);
+            setStateComponectBody(true);
           }}
         >
           <nav>

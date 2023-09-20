@@ -25,6 +25,7 @@ const WithTelefoniaMovil = (
   const [loadingPeticionOperadores, peticionOperadores] = useHookFetchLayouts(
     componectName.toLowerCase()
   );
+  const [stateComponectBody, setStateComponectBody] = useState<boolean>(false);
 
   const validNavigate = useNavigate();
 
@@ -66,6 +67,7 @@ const WithTelefoniaMovil = (
           operadores={operadores}
           operadorCurrent={operadorCurrent}
           setOperadorCurrent={setOperadorCurrent}
+          setStateComponectBody={setStateComponectBody}
         />
       ) : (
         <></>
@@ -78,7 +80,9 @@ const WithTelefoniaMovil = (
       )}
 
       <div className={Lineadivisora}></div>
-      {operadores.length > 0 && operadorCurrent !== null ? (
+      {operadores.length > 0 &&
+      operadorCurrent !== null &&
+      stateComponectBody === true ? (
         <ComponectBody operadorCurrent={operadorCurrent}>
           <img
             className="w-24 "
