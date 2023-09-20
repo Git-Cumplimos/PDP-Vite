@@ -125,7 +125,7 @@ const RecaudoTripleA = () => {
     setInputData(inputDataInitial);
     // setConsultaData(null);
     setProcedimiento(option_manual);
-    validNavigate("/TripleA/recaudos");
+    validNavigate("/TripleA");
   }, [validNavigate]);
 
   const HandleCloseModal = useCallback(() => {
