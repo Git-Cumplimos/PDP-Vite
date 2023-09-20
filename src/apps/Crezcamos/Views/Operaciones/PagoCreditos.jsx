@@ -113,6 +113,7 @@ const PagoCredito = () => {
             const formattedData = res?.obj?.products?.map(row => ({
               NumeroCredito: row.account,
               RolTitular: row.debtorType,
+              NumeroDocumento: row.documentNumber,
               Nombre: row.firstNames,
               PrimerApellido: row.firstSurname,
               SegundoApellido: row.secondLastName,
@@ -162,7 +163,9 @@ const PagoCredito = () => {
   const onMakePayment = useCallback((e) => {
     e.preventDefault();
     let valor = 0;
+    let documento = 0;
     valor = (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.ValorMinimo);
+    documento = (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento);
     // if (datosTrx?.tipoPago === "1"){
     //   valor = (datosCredito?.find(item => {
     //     return item.NumeroCredito === datosTrx?.credito;
@@ -199,7 +202,7 @@ const PagoCredito = () => {
       city: roleInfo?.ciudad.substring(0, 7),
       Datos: {
         tipo_documento: datosTrx?.tipoDocumento,
-        num_documento: datosTrx?.documento,
+        num_documento: documento,
         tipo_pago: "PCU",
         num_credito: datosTrx?.credito,
         nombre: datosConsulta?.products[0]?.firstNames,
@@ -319,7 +322,7 @@ const PagoCredito = () => {
                 Respuesta de Consulta Crezcamos
               </h1>
               <h2>{`Tipo Documento: ${datosTrx?.tipoDocumento === "2" ? "Cédula de ciudadanía" : "NIT"}`}</h2>
-              <h2>{`Número Documento: ${datosTrx?.documento}`}</h2>
+              <h2>{`Número Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento)}`}</h2>
               <h2>{`Nombre cliente: ${datosTrx?.nombreCliente}`}</h2>
               <Select
                   id='numPrestamo'
