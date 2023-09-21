@@ -12,10 +12,10 @@ import MoneyInput, { formatMoney } from "../../../../components/Base/MoneyInput"
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
-import { enumParametrosCrezcamos } from "../../utils/enumParametrosCrezcamos";
+import { enumParametrosCrezcamos } from "../utils/enumParametrosCrezcamos";
 import { v4 } from "uuid";
-import { fetchCustom } from "../../utils/fetchCorresponsaliaCrezcamos";
-import { useFetchCrezcamos } from "../../hooks/fetchCrezcamos";
+import { fetchCustom } from "../utils/fetchCorresponsaliaCrezcamos";
+import { useFetchCrezcamos } from "../hooks/fetchCrezcamos";
 
 const URL_CONSULTAR_SALDOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/crezcamos/consultapagocredito`;
 const URL_PAGO_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/crezcamos/pagocredito`;
@@ -227,7 +227,7 @@ const PagoCredito = () => {
       {
         render({ data: err }) {
           setIsUploading(false);
-          navigate("/corresponsaliaCrezcamos");
+          goToRecaudo();
           if (err?.cause === "custom") {
             return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
           }
@@ -243,7 +243,7 @@ const PagoCredito = () => {
     datosTrx?.credito,
     datosCredito,
     uuid,
-    navigate
+    goToRecaudo,
   ]);
 
   return (
