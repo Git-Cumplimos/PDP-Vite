@@ -105,7 +105,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               ...old,
               ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
               ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
-              showValor: formatMoney.format(valorTrx) ?? "",
+              showValor: valorTrx ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
             };
@@ -444,7 +444,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             setDatosTransaccion((old) => {
               return {
                 ...old,
-                showValor2: formatMoney.format(datosTransaccion.valorSinModificar) ?? "",
+                showValor2: datosTransaccion.valorSinModificar ?? "",
                 valor: datosTransaccion.valorSinModificar ?? "",
                 valorSinModificar2: valorTrxCons ?? "",
               };
@@ -600,6 +600,28 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 }}></Input>
             ) : (
               <></>
+            )}
+            {dataConveniosPagar.includes(
+              datosEnvio?.datosConvenio?.num_ind_consulta_cnb
+              ) && (
+              <MoneyInputDec
+                id='valCashOut'
+                name='valCashOut'
+                label='Valor a pagar original'
+                type='text'
+                autoComplete='off'
+                maxLength={"15"}
+                disabled={true}
+                value={datosTransaccion.valorSinModificar ?? ""}
+                onInput={(e, valor) => {
+                  if (!isNaN(valor)) {
+                    const num = valor;
+                    // setDatosTransaccion((old) => {
+                    //   return { ...old, valor: num };
+                    // });
+                  }
+                }}
+                required></MoneyInputDec>
             )}
             {dataConveniosPagar.includes(
               datosEnvio?.datosConvenio?.num_ind_consulta_cnb
