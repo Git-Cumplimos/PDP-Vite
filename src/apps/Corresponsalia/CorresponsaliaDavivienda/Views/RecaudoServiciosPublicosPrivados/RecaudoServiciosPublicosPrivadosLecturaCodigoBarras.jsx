@@ -105,7 +105,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               ...old,
               ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
               ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
-              showValor: formatMoney.format(valorTrx) ?? "",
+              showValor: valorTrx ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
             };
@@ -444,7 +444,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             setDatosTransaccion((old) => {
               return {
                 ...old,
-                showValor2: formatMoney.format(datosTransaccion.valorSinModificar) ?? "",
+                showValor2: datosTransaccion.valorSinModificar ?? "",
                 valor: datosTransaccion.valorSinModificar ?? "",
                 valorSinModificar2: valorTrxCons ?? "",
               };
@@ -601,7 +601,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             ) : (
               <></>
             )}
-            {datosEnvio.datosCodigoBarras.pago.length > 0 && (
+            {datosEnvio?.datosCodigoBarras.pago.length > 0 && dataConveniosPagar.includes(
+              datosEnvio?.datosConvenio?.num_ind_consulta_cnb) && (
               <MoneyInputDec
                 id='valCashOut'
                 name='valCashOut'
