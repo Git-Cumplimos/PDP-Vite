@@ -601,26 +601,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             ) : (
               <></>
             )}
-            {datosEnvio.datosCodigoBarras.pago.length > 0 && (
-              <MoneyInputDec
-                id='valCashOut'
-                name='valCashOut'
-                label='Valor a pagar original'
-                type='text'
-                autoComplete='off'
-                maxLength={"15"}
-                disabled={true}
-                value={datosTransaccion.valorSinModificar ?? ""}
-                onInput={(e, valor) => {
-                  if (!isNaN(valor)) {
-                    const num = valor;
-                    // setDatosTransaccion((old) => {
-                    //   return { ...old, valor: num };
-                    // });
-                  }
-                }}
-                required></MoneyInputDec>
-            )}
             {dataConveniosPagar.includes(
               datosEnvio?.datosConvenio?.num_ind_consulta_cnb
             ) && datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" ? (
