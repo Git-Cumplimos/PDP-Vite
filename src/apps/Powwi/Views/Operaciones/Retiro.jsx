@@ -370,6 +370,7 @@ const Retiro = () => {
               Realizar consulta
             </Button>
             <Button  
+              type='button'
               onClick={() => 
                 {
                   goToRecaudo();
@@ -401,6 +402,7 @@ const Retiro = () => {
                   Aceptar
                 </Button>
                 <Button
+                  type='button'
                   onClick={() => 
                     {
                       handleClose();

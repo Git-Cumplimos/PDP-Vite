@@ -398,7 +398,8 @@ const Deposito = () => {
                 <Button type={"submit"} disabled={loadingPeticionConsultaCosto}>
                     Realizar consulta
                 </Button>
-                <Button  
+                <Button
+                    type='button'
                     onClick={() => 
                         {
                         goToRecaudo();
@@ -430,6 +431,7 @@ const Deposito = () => {
                   Aceptar
                 </Button>
                 <Button
+                  type='button'
                   onClick={() => 
                     {
                       handleClose();
