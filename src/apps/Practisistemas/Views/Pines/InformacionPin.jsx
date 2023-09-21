@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Input from "../../../../components/Base/Input";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
@@ -6,19 +6,13 @@ import { postConsultaPin } from "../../utils/fetchBackPines";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
-import useDelayedCallback from "../../../../hooks/useDelayedCallback";
 
 const InformacionPin = () => {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
-
   const { state } = useLocation();
-
   const [pines, setPines] = useState([]);
   const [filteredPines, setFilteredPines] = useState([]);
-  const [searchFilters, setSearchFilters] = useState({
-    searchPin: "",
-  });
 
   useEffect(() => {
     if (state?.op) {
@@ -28,7 +22,7 @@ const InformacionPin = () => {
     }
   }, [state?.op]);
 
-  const { roleInfo, infoTicket } = useAuth();
+  const { roleInfo} = useAuth();
 
   const [datosTrans, setDatosTrans] = useState({
     pin: "",
@@ -46,23 +40,19 @@ const InformacionPin = () => {
     ];
   }, [filteredPines]);
 
-  const onSelectAutorizador = useCallback(
-    (e, i) => {
+  const onSelectAutorizador = (e, i) => {
+    const selectedPin = filteredPines[i];
+    if (selectedPin) {
       navigate("../Pines/PinesContenido/CompraPin", {
         state: {
-          desc: pines[i]["productDesc"],
-          cod: pines[i]["internalCod"],
-          sell: pines[i]["sell"],
+          desc: selectedPin["productDesc"],
+          cod: selectedPin["internalCod"],
+          sell: selectedPin["sell"],
           op: state.op,
         },
       });
-    },
-    [navigate, pines]
-  );
-
-  // useEffect(() => {
-  //   fecthTablaTiposPines();
-  // }, [datosTrans]);
+    }
+  };
 
   const handleSearchPinChange = (e) => {
     const searchTerm = e.target.value.toLowerCase();
