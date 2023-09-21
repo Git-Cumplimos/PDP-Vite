@@ -292,6 +292,7 @@ const PagoCredito = () => {
                     Consultar
                 </Button>
                 <Button  
+                    type='button'
                     onClick={() => 
                         {
                         goToRecaudo();
@@ -384,7 +385,7 @@ const PagoCredito = () => {
                 /> */}
                 <ButtonBar>
                   <Button type='submit' disabled= {loadingPeticionPago}>Realizar Pago</Button>
-                  <Button onClick={handleClose} disabled= {loadingPeticionPago}>Cancelar</Button>
+                  <Button type='button' onClick={handleClose} disabled= {loadingPeticionPago}>Cancelar</Button>
                 </ButtonBar>
             </Form>
           )}
