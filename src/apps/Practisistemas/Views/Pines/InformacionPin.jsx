@@ -16,6 +16,9 @@ const InformacionPin = () => {
 
   const [pines, setPines] = useState([]);
   const [filteredPines, setFilteredPines] = useState([]);
+  const [searchFilters, setSearchFilters] = useState({
+    searchPin: "",
+  });
 
   useEffect(() => {
     if (state?.op) {
@@ -57,12 +60,19 @@ const InformacionPin = () => {
     [navigate, pines]
   );
 
-  useEffect(() => {
-    fecthTablaTiposPines();
-  }, [datosTrans]);
+  // useEffect(() => {
+  //   fecthTablaTiposPines();
+  // }, [datosTrans]);
 
-  const fecthTablaTiposPines = useDelayedCallback(
-    useCallback (() => {
+  const handleSearchPinChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const filteredResults = pines.filter((pin) =>
+      pin.productDesc.toLowerCase().includes(searchTerm)
+    );
+    setFilteredPines(filteredResults);
+  };
+
+  const fecthTablaTiposPines = () => {
     setShowLoading(true)
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
@@ -78,9 +88,7 @@ const InformacionPin = () => {
         setFilteredPines(filteredResults);
       })
       .catch((err) => console.error(err));
-    }, [datosTrans, state, roleInfo]),
-    500
-  );
+  };
 
   return (
     <>
@@ -100,11 +108,7 @@ const InformacionPin = () => {
           maxLength="30"
           type="text"
           autoComplete="off"
-          onInput={(e) => {
-            setDatosTrans((old) => {
-              return { ...old, pin: e.target.value };
-            });
-          }}
+          onInput={handleSearchPinChange}
         />
       </TableEnterprise>
     </>
