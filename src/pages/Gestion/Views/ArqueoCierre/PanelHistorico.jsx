@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, Fragment, useRef } from "react";
 import Input from "../../../../components/Base/Input";
-import { searchHistorico } from "../../utils/fetchCaja";
+import { searchHistorico,buscarPlataformaExt } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import {
   makeDateFormatter,
@@ -9,7 +9,6 @@ import {
 } from "../../../../utils/functions";
 import { notifyError } from "../../../../utils/notify";
 import Modal from "../../../../components/Base/Modal";
-// import Tickets from "../../../../components/Base/Tickets";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useReactToPrint } from "react-to-print";
@@ -18,12 +17,12 @@ import TicketCierre from "./TicketCierre";
 const formatMoney = makeMoneyFormatter(0);
 
 const dateFormatter = makeDateFormatter(true);
+let Num = 0;
 
 const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
   const [pageData, setPageData] = useState({});
   const [maxPages, setMaxPages] = useState(1);
-  // const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resumenCierre, setResumenCierre] = useState(null);
   const [searchInfo, setSearchInfo] = useState({
@@ -31,14 +30,35 @@ const PanelHistorico = () => {
     id_comercio: "",
     date_ini: "",
     date_end: "",
+    totaldata:"",
   });
+  const [dataPlfExt, setDataPlfExt] = useState(null);
 
   const CloseModal = useCallback(() => {
-    // setSelected(null);
     setResumenCierre(null)
+    Num = 0
   }, []);
 
+  const buscarPlataforma = useCallback(() => {
+    buscarPlataformaExt()
+      .then((res) => {
+        const EntidadesExt=res.obj.results
+        let nomEntidades = ''
+        const concatenados = EntidadesExt.map((elemento) => nomEntidades.concat(elemento.pk_nombre_plataforma))
+        setDataPlfExt(concatenados);
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  },[dataPlfExt]);
+
   const buscarConsignaciones = useCallback(() => {
+    searchInfo.totaldata = 0
     searchHistorico({
       ...Object.fromEntries(
         Object.entries(searchInfo).filter(([, val]) => val)
@@ -61,6 +81,7 @@ const PanelHistorico = () => {
 
   useEffect(() => {
     buscarConsignaciones();
+    buscarPlataforma();
   }, [buscarConsignaciones]);
 
   const printDiv = useRef();
@@ -70,6 +91,7 @@ const PanelHistorico = () => {
   });
 
   const cierreCaja = useCallback((data) => {
+    data?.entidades_externas?.data.map((elemento) => Num=Num+elemento?.valor)
     setLoading(false)
     const tempTicket = {
       title: "Cierre de caja",
@@ -90,12 +112,10 @@ const PanelHistorico = () => {
         ["", ""],
         ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior)],
         ["", ""],
-        ["Efectivo en caja",formatMoney.format(data.total_efectivo_en_caja)],
+        ["Efectivo en caja PDP",formatMoney.format(data.total_efectivo_en_caja)],
         ["", ""],
-        // ["Efectivo en caja PDP",formatMoney.format('')],
-        // ["", ""],
-        // ["Efectivo en caja PDP + Externos",formatMoney.format('')],
-        // ["", ""],
+        ["Efectivo en caja PDP + Externos",formatMoney.format(Num+data.total_efectivo_en_caja)],
+        ["", ""],
       ],
       trxInfo: [
         ["Sobrante", formatMoney.format(data.total_sobrante)],
@@ -112,19 +132,80 @@ const PanelHistorico = () => {
         ["", ""],
         ["Notas débito o crédito",formatMoney.format(data.total_notas)],
         ["", ""],
-        // ["Nombre plataforma 1",formatMoney.format(''),],
-        // ["", ""],
-        // ["Nombre plataforma 2",formatMoney.format(''),],
-        // ["", ""],
-        // ["Nombre plataforma 3",formatMoney.format(''),],
-        // ["", ""],
       ],
     };
+    data?.entidades_externas?.data?.map((elemento) => 
+      tempTicket.trxInfo.push([
+        elemento?.pk_nombre_plataforma,
+        formatMoney.format(elemento?.valor)],["", ""])
+    )
     setResumenCierre(tempTicket);
   }, []);
 
+  const handle = useCallback((entidades) => {
+    searchInfo.totaldata=1
+    searchHistorico({
+      ...Object.fromEntries(
+        Object.entries(searchInfo).filter(([, val]) => val,)
+      ),
+      ...pageData,
+    })
+      .then((res) => {
+        const newData = []
+        res?.obj?.results?.map((itemData)=>{
+          const valJson = {
+            'estimacion': itemData?.total_estimacion_faltante,
+            'Consignaciones': itemData?.total_consignaciones,
+            'outransportadora': itemData?.total_entregado_transportadora,
+            'intransportadora': itemData?.total_recibido_transportadora,
+            'notas': itemData?.total_notas,
+          }
+          entidades.map((val)=>{
+            valJson[val]='0'
+          })
+          if (itemData.hasOwnProperty('entidades_externas')) {
+            itemData?.entidades_externas?.data.map((val)=>{
+              valJson[val.pk_nombre_plataforma]=val.valor
+            })
+          }
+          valJson['Estado Cierre']='Realizado'
+          valJson['Fecha_hora_cierre'] = dateFormatter.format(new Date(itemData.created)).replace(",", "");
+          newData.push(valJson)
+        })
+        const concatenadosParcil = entidades
+        const concatenadosFinal = concatenadosParcil.join(',');
+        const headers = 'Estimación faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas débito o crédito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
+        const main = newData.map((item)=>{
+          return Object.values(item).toString();
+        })
+        const csv = [headers, ...main].join('\n')
+        const blob = new Blob([csv], {type: 'application/csv'})
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        const now = Intl.DateTimeFormat("es-CO", { year: "2-digit",  month: "2-digit", day: "2-digit"}).format(new Date())
+        a.download = 'Reporte Cierre de Caja '+now+'.csv'
+        a.href=url
+        a.style.play = 'none'
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+      })
+      .catch((err) => {
+        if (err?.cause === "custom") {
+          notifyError(err?.message);
+          return;
+        }
+        console.error(err?.message);
+        notifyError("Peticion fallida");
+      });
+  },[searchInfo,pageData]);
+
   return (
     <Fragment>
+      <ButtonBar>
+        <Button type="submit" onClick={() => {handle(dataPlfExt,receipt)}}>Generar Reporte</Button>
+      </ButtonBar>
       <TableEnterprise
         title="Históricos - Cierre de Caja"
         headers={[
@@ -193,7 +274,6 @@ const PanelHistorico = () => {
         )}
         onSetPageData={setPageData}
         onSelectRow={(_e, index) => {
-          // setSelected(receipt[index]);
           cierreCaja(receipt[index])
         }}
       >

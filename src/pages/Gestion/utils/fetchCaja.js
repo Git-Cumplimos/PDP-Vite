@@ -142,7 +142,6 @@ export const buscarReportesArqueo = async (args) => {
     throw err;
   }
 };
-
 export const buscarIdTrx = buildGetFunction(`${urltransacciones}/id_Trx`);
 export const ReportFaltantesSobr = buildPostFunction(`${urltransacciones}/sobrantes_faltantes`);
 export const VldFaltantesSobr = buildGetFunction(`${urltransacciones}/vld_sobrantes_faltantes`);

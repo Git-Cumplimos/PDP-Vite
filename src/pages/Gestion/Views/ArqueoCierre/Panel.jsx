@@ -337,7 +337,7 @@ const Panel = () => {
                   ))}
                 </Fieldset>
                 <ButtonBar>
-                  <Button type="submit" onClick={() => setNext(1)} >
+                  <Button type="submit" onClick={() => setNext(1)} disabled={loading} >
                     Siguiente
                   </Button>
                 </ButtonBar>
@@ -350,7 +350,6 @@ const Panel = () => {
                       key={key}
                       name={key}
                       label={formatMoney.format(key)}
-                      // value={val}
                       onChange={(ev) =>
                         setDenominaciones((old) => {
                           const copy = new Map(old);
