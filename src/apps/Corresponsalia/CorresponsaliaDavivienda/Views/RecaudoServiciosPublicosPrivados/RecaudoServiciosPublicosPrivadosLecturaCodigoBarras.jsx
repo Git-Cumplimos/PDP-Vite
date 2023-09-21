@@ -601,9 +601,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             ) : (
               <></>
             )}
-            {dataConveniosPagar.includes(
-              datosEnvio?.datosConvenio?.num_ind_consulta_cnb
-              ) && (
+            {datosEnvio?.datosCodigoBarras.pago.length > 0 && dataConveniosPagar.includes(
+              datosEnvio?.datosConvenio?.num_ind_consulta_cnb) && (
               <MoneyInputDec
                 id='valCashOut'
                 name='valCashOut'
