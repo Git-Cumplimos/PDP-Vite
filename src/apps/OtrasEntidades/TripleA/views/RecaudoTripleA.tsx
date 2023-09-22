@@ -84,7 +84,7 @@ const inputDataInitial: TypingInputData = {
 
 //---------------------------Componente-----------------------------------------------
 const RecaudoTripleA = () => {
-  // const uniqueId = v4();
+  const uniqueId = v4();
   const [paso, setPaso] = useState<TypingPaso>("LecturaBarcode");
   const [showModal2, setShowModal2] = useState(false);
   const [procedimiento, setProcedimiento] =
@@ -108,7 +108,7 @@ const RecaudoTripleA = () => {
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
     setShowModal2(false);
     if (notify_error_ === true) {
-      notifyError("Transacción cancelada", 5000, {
+      notifyError("Transacción cancelada por el usuario", 5000, {
         toastId: "notifyError-HandleCloseTrx",
       });
     }
@@ -192,6 +192,7 @@ const RecaudoTripleA = () => {
           id_terminal: roleInfo?.["id_dispositivo"] ?? "",
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
+          direccion: roleInfo?.["direccion"] ?? "",
         },
         numeroCupon: inputData.numeroCupon,
       };
@@ -235,10 +236,11 @@ const RecaudoTripleA = () => {
             tipo__comercio.search("oficinas propias") >= 0
               ? true
               : false,
-          // id_uuid_trx: uniqueId,
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
+          direccion: roleInfo?.["direccion"] ?? "",
         },
+        id_uuid_trx: uniqueId,
         numeroCupon: consultData?.numeroCupon,
         id_trx: consultData?.id_trx,
         valor_total_trx: consultData?.valorPagado,
@@ -262,7 +264,7 @@ const RecaudoTripleA = () => {
           HandleCloseTrx(false);
         });
     },
-    [pdpUser,roleInfo,consultData,HandleCloseTrx,PeticionPay]
+    [pdpUser,roleInfo,consultData,uniqueId,HandleCloseTrx,PeticionPay]
   );
 
   //********************Funciones Demas**************************
