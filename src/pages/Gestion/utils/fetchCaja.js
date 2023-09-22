@@ -105,6 +105,7 @@ export const buscarListaComerciosCierreCaja = buildGetFunction(`${urlCierreCaja}
 export const descargarComprobante = buildGetFunction(`${urlComprobantes}/download-file`);
 export const agregarComprobante = buildPostFunction(`${urlComprobantes}/administrar`);
 export const buscarComprobantes = buildGetFunction(`${urlComprobantes}/administrar`);
+export const buscarComprobantesCajero = buildGetFunction(`${urlComprobantes}/comprobantes_cajero`);
 export const editarComprobante = buildPutFunction(`${urlComprobantes}/administrar`);
 
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
