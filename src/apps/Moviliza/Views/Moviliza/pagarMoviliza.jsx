@@ -167,7 +167,7 @@ const PagarMoviliza = () => {
       };
       if (numeroMoviliza === "") {
         notifyError(
-          "Error respuesta PDP: El campo del código de barras está vacío, por favor scanee o dijite el código"
+          "Error respuesta PDP: El campo del código de barras está vacío, por favor scanee o digite el código"
         );
         return;
       }
