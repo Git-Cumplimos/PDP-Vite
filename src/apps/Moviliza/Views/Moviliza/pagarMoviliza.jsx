@@ -92,14 +92,14 @@ const PagarMoviliza = () => {
 
 
   const CallErrorPeticion = useCallback((error) => {
-    let msg = "Pago Moviliza no exitoso";
+    let msg = "Error respuesta PDP: Pago Moviliza no exitoso";
     if (error instanceof ErrorCustom) {
       switch (error.name) {
         case "ErrorCustomBackend":
           notifyError(error.message);
           break;
         case "msgCustomBackend":
-          notify(error.message);
+          notifyError(error.message);
           break;
         default:
           if (error.notificacion == null) {
@@ -127,7 +127,7 @@ const PagarMoviliza = () => {
 
       // let num = parseInt(e.target.value) || "";
       let num =e.target.value;
-      let number = parseInt(num.replace(/[\s\.\-+eE]/g, ""));
+      let number = num.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(number)) {
         setNumeroMoviliza(number)
       }
@@ -167,7 +167,7 @@ const PagarMoviliza = () => {
       };
       if (numeroMoviliza === "") {
         notifyError(
-          "El campo del código de barras está vacío, por favor scanee o dijite el código"
+          "Error respuesta PDP: El campo del código de barras está vacío, por favor scanee o digite el código"
         );
         return;
       }
@@ -175,7 +175,7 @@ const PagarMoviliza = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroMoviliza(response?.obj?.result?.numero_moviliza);
-            notify(response?.msg);
+            notify("Respuesta PDP: "+response?.msg);
             setBloqueoInput(true)
             // setPaso("LecturaMoviliza");
           }
@@ -300,23 +300,23 @@ const PagarMoviliza = () => {
             setResConsultMoviliza(response?.obj);
             setPaso("ResumenTrx");
             setShowModal(true);
-            return "Consulta realizada";
+            return "Respuesta PDP: Consulta realizada";
             }
             else{
-              return "Liquidación se encuentra en estado PAGADO";
+              return "Respuesta PDP: Liquidación se encuentra en estado PAGADO";
             }
           }
           else if (response?.status === false){ 
                 if (response?.obj?.mensaje != null){
                   if (response?.obj?.mensaje=="Error autenticando adminot "){
-                    return "Consulta fallida"
+                    return "Respuesta PDP: Recargar página";
                   }
                   else{
-                    return response?.obj?.mensaje
+                    return "Respuesta Moviliza: "+response?.obj?.mensaje
                   }
           }
               else{
-                return "Consulta fallida";
+                return "Respuesta PDP: Recargar página";
               }
           }
           },
@@ -327,7 +327,7 @@ const PagarMoviliza = () => {
             if (error?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
             }
-            return "Error al realizar consulta";
+            return "Error respuesta PDP: Error al realizar consulta";
           },
         }
       )
@@ -349,6 +349,9 @@ const PagarMoviliza = () => {
         nombre_usuario: pdpUser["uname"],
         nombre_comercio: roleInfo?.["nombre comercio"],
         numero_moviliza: numeroMoviliza,
+        // valor_total_runt: resConsultMoviliza.object?.totalRUNT,
+        // valor_total_mt: resConsultMoviliza.object?.totalMT,
+        // valor_total_local: resConsultMoviliza.object?.totalLocal,
         valor_total_trx: resConsultMoviliza.object?.totalLiquidacion,  //valor_total_trx,
         ciudad: roleInfo.ciudad,          
         direccion: roleInfo.direccion,
@@ -386,7 +389,7 @@ const PagarMoviliza = () => {
               : {};
             setInfTicket(voucher);
             setPaso("TransaccionExitosa");
-            notify("Pago Moviliza exitoso");
+            notify("Respuesta PDP: Pago Moviliza exitoso");
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
             notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
@@ -470,7 +473,7 @@ const PagarMoviliza = () => {
   const HandleCloseTrx = useCallback(() => {
     setPaso("LecturaMoviliza");
     setShowModal(false);
-    notify("Transacción cancelada");
+    notifyError("Respuesta PDP: Transacción cancelada");
     setNumeroMoviliza("");
     setResConsultMoviliza(null);
     setProcedimiento(option_manual);
