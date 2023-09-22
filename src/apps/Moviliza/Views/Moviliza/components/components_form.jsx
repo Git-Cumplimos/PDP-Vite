@@ -65,7 +65,7 @@ const { styleComponentsInput, formItem , ocultar} = classes;
     return (
       <Fragment>
         <ButtonBar></ButtonBar>
-        <h2 className="text-1xl mt-6">Escanee el código de barras</h2>
+        <h2 className="text-xl mt-6">Escanee el código de barras</h2>
         <ButtonBar></ButtonBar>
 
         {procedimiento === option_barcode && (
@@ -131,7 +131,9 @@ const { styleComponentsInput, formItem , ocultar} = classes;
       )}
 
       <ButtonBar className="flex justify-center py-1">
-          <Button className={formItem} type={"submit"}  onClick={onSubmit} disabled={token === "" || numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 300 ? !loadingPeticion : loadingPeticion }>
+          <Button className={formItem} type={"submit"}  onClick={onSubmit} disabled={
+            token === "" || 
+            numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 300 ? !loadingPeticion : loadingPeticion }>
            Realizar consulta
           </Button>
           <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
@@ -159,7 +161,7 @@ export const LecturaMoviliza = ({
   return (
     <Fragment>
       <ButtonBar></ButtonBar>
-      <h2 className="text-1xl mt-6">Número de referencia</h2>
+      <h2 className="text-xl mt-6">Número de referencia</h2>
       <ButtonBar></ButtonBar>
 
       {/* <Form > */}
@@ -196,7 +198,9 @@ export const LecturaMoviliza = ({
       )}
 
       <ButtonBar className="flex justify-center py-6">
-        <Button type={"submit"}  onClick={onSubmit} disabled={ token === "" || numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 30 ? !loadingPeticion : loadingPeticion }>
+        <Button type={"submit"}  onClick={onSubmit} disabled={ 
+          token === "" || 
+          numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 30 ? !loadingPeticion : loadingPeticion }>
         Realizar consulta
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
