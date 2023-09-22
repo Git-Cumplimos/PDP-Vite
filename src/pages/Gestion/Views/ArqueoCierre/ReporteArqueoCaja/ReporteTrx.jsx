@@ -23,6 +23,7 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notifyError,notifyPending } from "../../../../../utils/notify";
 import { buscarReporteTrxArqueo, buscarTicketReporte } from "../../../utils/fetchCaja";
+import { validateDates } from "../../../utils/functions";
 import Input from "../../../../../components/Base/Input/Input";
 
 const formatMoney = makeMoneyFormatter(2);
@@ -93,6 +94,11 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
     ["id_usuario", roleInfo?.id_usuario ?? ""],
     ["type_report", tipo_reporte === 2 ? "Tarjeta": tipo_reporte === 1 ? "Efectivo" : ""],
     ["status", "true"],
+    ["date",  Intl.DateTimeFormat("es-CO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date()).split("/").reverse().join("-")],
   ]);
   const printDiv = useRef();
 
@@ -108,6 +114,14 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter  }] =
     useMap(initialSearchFilters);
+
+  const [fecha, setFecha] = useState(
+    Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+  }).format(new Date()).split("/").reverse().join("-"));
+
 
   const [trxTree, setTrxTree] = useState({});
   const [montoTotal, setMontoTotal] = useState(0.0);
@@ -187,7 +201,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
         notifyError("Error al cargar Datos ");
       }
     }, []),
-  },{delay:1000});
+  },{delay:1100});
   
   const searchTrxs = useCallback(() => {
     setSingleFilter("id_comercio", (old) => roleInfo?.id_comercio ?? old);
@@ -197,6 +211,9 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       const url =buscarReporteTrxArqueo()
       const queries = new URLSearchParams(tempMap.entries()).toString();
       fetchTrxs(`${url}?${queries}`);
+      setTimeout(() => {
+        setLoading(true);
+      }, 1000)
     }
   }, [fetchTrxs,setSingleFilter,searchFilters,roleInfo]
   );
@@ -228,8 +245,28 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
             defaultValue={"true"}
             disabled={loading}
           />
-          <ButtonBar />
-
+          <Input
+            id="id"
+            label="Fecha"
+            name="fecha"
+            type="date"
+            autoComplete="off"
+            onChange={(e) => {
+              let bool = validateDates(e.target.value ); 
+              if (bool && tipoReporte !== "General" ) {
+                setFecha(e.target.value)
+                setSearchFilters((old)=>{
+                  const copy = new Map(old)
+                    .set("date", e.target.value);
+                  return copy;
+                });
+              }
+            }}
+            value={fecha}
+            disabled={tipoReporte === "General" || loading ? true : false}
+            required
+          />
+ 
           <Fieldset
             legend={"Totales"}
             className='lg:col-span-2'>
