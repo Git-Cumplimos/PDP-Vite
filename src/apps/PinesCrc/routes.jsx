@@ -71,7 +71,8 @@ const rutasPinesCrc = {
         />
       ),
       component: PeticionesPines,
-      permission: [63,53]
+      permission: [PermissionsPinesCrc.operarPinesVus,
+        PermissionsPinesCrc.administrarPinesVus]
     },
     // {
     //   link: "/Pines/PinesCrc/Anulaciones",

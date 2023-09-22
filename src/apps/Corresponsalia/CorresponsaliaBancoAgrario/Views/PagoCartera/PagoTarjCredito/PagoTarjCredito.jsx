@@ -90,6 +90,12 @@ const PagoTarjCredito = () => {
             if (isNaN(valor_pagar)) {
                 return notifyError("El valor no es un numero")
             }
+            else if (valor_pagar > enumParametrosPagoCartera.maxPagoCarteraTarjCredito) {
+                return notifyError(`Supera el valor máximo de ${makeMoneyFormatter(0).format(enumParametrosPagoCartera.maxPagoCarteraTarjCredito)} para pago tarjeta.`)
+
+            } else if (valor_pagar < enumParametrosPagoCartera.minPagoCarteraTarjCredito) {
+                return notifyError(`El valor mínimo para pago tarjeta es de ${makeMoneyFormatter(0).format(enumParametrosPagoCartera.minPagoCarteraTarjCredito)}.`)
+            }
             const data = {
                 oficina_propia:
                     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -226,8 +232,9 @@ const PagoTarjCredito = () => {
     function onChangeInput(e) {
         const { name, value } = e.target;
         const numericValue = (value.replace(/[^0-9]/g, '').slice(0, 16)); 
+        const num = numericValue.replace(/[\s\.\-+eE]/g, "");
         setDatosTarjCredito((old) => {
-            return { ...old, inputNumTarCredi: numericValue };
+            return { ...old, inputNumTarCredi: num };
         });
         if (value === "") {
             setDatosTarjCredito((old) => {
@@ -249,11 +256,11 @@ const PagoTarjCredito = () => {
                     <Input
                     name="credito"
                     label="Número tarjeta crédito"
-                    type="number"
+                    type="text"
                     minLength="5"
                     maxLength="16"
                     autoComplete="off"
-                        value={datosTarjCredito?.inputNumTarCredi}
+                    value={datosTarjCredito?.inputNumTarCredi}
                     onChange={onChangeInput}
                     required
                     ></Input>

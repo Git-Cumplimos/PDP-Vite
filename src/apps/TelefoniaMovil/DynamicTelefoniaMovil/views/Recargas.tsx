@@ -1,6 +1,6 @@
 import React, { FormEvent, useCallback, useRef, useState } from "react";
 import Input from "../../../../components/Base/Input/Input";
-import MoneyInput from "../../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
 import Form from "../../../../components/Base/Form/Form";
@@ -71,7 +71,7 @@ const Recargas = ({
     setDataRecarga((old) => ({ ...old, celular: valueInput }));
   };
 
-  const onMoneyChange = (e: any, valor: any) => {
+  const onMoneyChange = (ev: FormEvent<HTMLInputElement>, valor: number) => {
     setDataRecarga((old) => ({ ...old, valor_total_trx: valor }));
   };
 
@@ -195,8 +195,8 @@ const Recargas = ({
                 autoComplete="off"
                 min={minValor}
                 max={maxValor}
-                minLength={"4"}
-                maxLength={"9"}
+                minLength={4}
+                maxLength={9}
                 value={dataRecarga.valor_total_trx}
                 onInput={onMoneyChange}
                 required

@@ -20,9 +20,7 @@ import MoneyInput, {
 import { useFetch } from "../../../../hooks/useFetch";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../components/Base/HideInput";
-import useMoney from "../../../../hooks/useMoney";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { cifrarAES } from "../../../../utils/cryptoUtils"
 import { v4 } from "uuid";
@@ -37,10 +35,6 @@ const Retiro = () => {
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosPowwi.maxRetiroCuentas,
     min: enumParametrosPowwi.minRetiroCuentas,
-  });
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
   });
   const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
@@ -220,16 +214,7 @@ const Retiro = () => {
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
       id_uuid_trx: uuid,
-      ticket_init: [
-        ["Número Powwi", datosTrx.numeroTelefono],
-        ["Valor Retiro", formatMoney.format(valor ?? "0")],
-        ["Costo transacción",formatMoney.format(datosConsulta?.costoTotal),],
-        ["Valor Total",formatMoney.format(valor + datosConsulta?.costoTotal),],
-      ].reduce((list, elem, i) => {
-        list.push(elem);
-        if ((i + 1) % 1 === 0) list.push(["", ""]);
-        return list;
-      }, []),
+      costo_trx: datosConsulta?.costoTotal,
       Datos: {
         tipoIdentificacionCliente: datosTrx.tipoDocumento,
         identificacionCliente: datosTrx.userDoc,
@@ -281,7 +266,6 @@ const Retiro = () => {
 
   return (
     <>
-      <SimpleLoading show={isUploading} />
       <Fragment>
         <h1 className='text-3xl mt-6'>Retiro Powwi</h1>
         <Form onSubmit={onSubmitRetiro} grid>
@@ -297,7 +281,7 @@ const Retiro = () => {
             value={datosTrx.numeroTelefono}
             onInput={(e) => {
               let valor = e.target.value;
-              let num = valor.replace(/[\s\.]/g, "");
+              let num = valor.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                   return notifyError("El número debe comenzar por 3");
@@ -331,7 +315,7 @@ const Retiro = () => {
             maxLength={"15"}
             value={datosTrx.userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setDatosTrx(prevState => ({
                   ...prevState,
@@ -370,8 +354,15 @@ const Retiro = () => {
             maxLength={"11"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
+            equalError={false}
+            equalErrorMin={false}
             value={valor}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            onInput={(e, valor) => {
+              if (!isNaN(valor)){
+                const num = valor;
+                setValor(num)
+              }
+            }}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>

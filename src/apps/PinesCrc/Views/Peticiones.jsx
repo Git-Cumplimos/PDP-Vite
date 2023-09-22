@@ -91,7 +91,7 @@ const Peticiones = () => {
               "No. documento": row?.documento,
               "Valor pin": formatMoney.format(row?.valor_pin),
               "Fecha pago": dateFormatter.format(fecha_pago),
-              "Estado": row?.estado,
+              "Estado": row?.estado === 'Peticion' ? 'Petición' : row?.estado,
               "Fecha anulación": fecha_anulacion !== '' ? dateFormatter.format(fecha_anulacion) : ""
             };})
           )
@@ -101,7 +101,7 @@ const Peticiones = () => {
       .catch((err) => {
         if (err?.cause === "custom") {
           setIsLoading(false)
-          notifyError(err?.message);
+          notifyError(err?.message, 5000, {toastId: "notify-lot"});
           return;
         }
         setIsLoading(false)
@@ -298,7 +298,7 @@ const Peticiones = () => {
                 onClick={() => {
                   setShowModalPeticion(false)
                   setMotivoPeticion("")
-                  notify("Petición cancelada por el usuario")
+                  notifyError("Petición cancelada por el usuario", 5000, {toastId: "notify-lot"})
                 }}
               >
                 Cancelar

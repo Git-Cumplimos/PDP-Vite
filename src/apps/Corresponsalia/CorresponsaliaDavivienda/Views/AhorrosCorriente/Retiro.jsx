@@ -33,42 +33,11 @@ import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 const Retiro = () => {
   const navigate = useNavigate();
 
-  const { roleInfo, infoTicket } = useAuth();
-
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Retiro De Cuentas Davivienda",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 1],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 1],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "No hay datos"],
-      ["Tipo de operación", "Retiro De Cuentas"],
-      ["", ""],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "No hay datos",
-    trxInfo: [],
-    disclamer: "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
-  });
+  const { roleInfo } = useAuth();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosDavivienda.maxRetiroCuentas,
     min: enumParametrosDavivienda.minRetiroCuentas,
-  });
-
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
   });
 
   const [loadingRetiroCorresponsal, fetchRetiroCorresponsal] =
@@ -161,13 +130,10 @@ const Retiro = () => {
               idUsuario: roleInfo?.id_usuario,
               idDispositivo: roleInfo?.id_dispositivo,
               nombre_usuario: roleInfo?.["nombre comercio"],
-              // Tipo: roleInfo?.tipo_comercio,
               numTipoTransaccion: 2130, /// retiro
               numTipoDocumento: tipoDocumento, /// Cedula
               numNumeroDocumento: userDoc,
               numValorTransaccion: valor,
-              //nomDepositante: nomDepositante,
-              // valToken: "valToken", /// De donde viene
             };
             fetchConsultaCostoCB(body)
               .then((res) => {
@@ -201,8 +167,6 @@ const Retiro = () => {
                   setSummary(summary);
                   setShowModal(true);
                 }
-
-                //notify("Transaccion satisfactoria");
               })
               .catch((err) => {
                 setIsUploading(false);
@@ -228,32 +192,11 @@ const Retiro = () => {
     [valor, limitesMontos, otp]
   );
 
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setValor(valor);
-    },
-    [valor]
-  );
-
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
   const onMakePayment = useCallback(() => {
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de venta"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
     setIsUploading(true);
     const body = {
       idComercio: roleInfo?.id_comercio,
@@ -267,13 +210,14 @@ const Retiro = () => {
           ? true
           : false,
       numTipoDocumento: tipoDocumento,
+      nomComercio: roleInfo?.["nombre comercio"] ? roleInfo?.["nombre comercio"]: "No hay datos",
+      nomMunicipio: roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos",
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
       numOtp: otp,
       // valToken: "valToken",
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
-      ticket: objTicket,
       mostrar_costo: process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true' ? true : false,
     };
     
@@ -286,112 +230,7 @@ const Retiro = () => {
           return;
         }
         notify("Transaccion satisfactoria");
-        const trx_id = res?.obj?.DataHeader?.idTransaccion ?? 0;
-        const trx_id2 = res?.obj?.DataHeader?.idTransaccion ?? 0;
-        const ter = res?.obj?.DataHeader?.total ?? res?.obj?.Data?.total;
-        objTicket["commerceInfo"][1] = [
-          "No. terminal",
-          ter,
-        ];
-        objTicket["commerceInfo"].push([
-          "No. de aprobación Banco",
-          trx_id,
-        ]);
-        objTicket["commerceInfo"].push(["", ""]);
-        objTicket["commerceInfo"].push([
-          "No. de aprobación Aliado",
-          trx_id2,
-        ]);
-        objTicket["commerceInfo"].push(["", ""]);
-        objTicket["trxInfo"].push([
-          "Tipo de cuenta",
-          res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
-        ]);
-        objTicket["trxInfo"].push(["", ""]);
-        objTicket["trxInfo"].push([
-            "Nro. Cuenta",
-            `****${String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""}`,
-        ]);
-        objTicket["trxInfo"].push(["", ""]);
-        objTicket["trxInfo"].push([
-          "Valor",
-          formatMoney.format(valor),
-        ]);
-        objTicket["trxInfo"].push(["", ""]);
-        // const tempTicket = {
-        //   title: "Retiro De Cuentas Davivienda",
-        //   timeInfo: {
-        //     "Fecha de venta": Intl.DateTimeFormat("es-CO", {
-        //       year: "2-digit",
-        //       month: "2-digit",
-        //       day: "2-digit",
-        //     }).format(new Date()),
-        //     Hora: Intl.DateTimeFormat("es-CO", {
-        //       hour: "2-digit",
-        //       minute: "2-digit",
-        //       second: "2-digit",
-        //     }).format(new Date()),
-        //   },
-        //   commerceInfo: [
-        //     ["Id Comercio", roleInfo?.id_comercio],
-        //     ["No. terminal", ter],
-        //     ["Municipio", roleInfo?.ciudad],
-        //     ["Dirección", roleInfo?.direccion],
-        //     ["Tipo de operación", "Retiro De Cuentas"],
-        //     ["", ""],
-        //     ["No. de aprobación Banco", trx_id],
-        //     ["", ""],
-        //     ["No. de aprobación Aliado", trx_id2],
-        //     ["", ""],
-        //   ],
-        //   commerceName: roleInfo?.["nombre comercio"]
-        //     ? roleInfo?.["nombre comercio"]
-        //     : "No hay datos",
-        //   trxInfo: [
-        //     [
-        //       "Tipo de cuenta",
-        //       res?.obj?.Data?.numTipoCuenta === 1 ? "Ahorros" : "Corriente",
-        //     ],
-        //     ["", ""],
-        //     [
-        //       "Nro. Cuenta",
-        //       `****${
-        //         String(res?.obj?.Data?.numNumeroDeCuenta)?.slice(-4) ?? ""
-        //       }`,
-        //     ],
-        //     ["", ""],
-        //     ["Valor", formatMoney.format(valor)],
-        //     ["", ""],
-        //     [
-        //       "Costo transacción",
-        //       formatMoney.format(res?.obj?.Data?.numValorCobro),
-        //     ],
-        //     ["", ""],
-        //     ["Total", formatMoney.format(valor)],
-        //     ["", ""],
-
-        //     //["Usuario de venta", "Nombre propietario del punto"],
-        //   ],
-        //   disclamer:
-        //     "Línea de atención Bogotá:338 38 38 \nResto del país:01 8000 123 838",
-        // };
-        if (process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true'){
-          objTicket['trxInfo'].push(["Costo transacción", formatMoney.format(res?.obj?.Data?.numValorCobro)]);
-          objTicket['trxInfo'].push(["", ""]);
-        }
-
-        objTicket['trxInfo'].push(["Total", formatMoney.format(valor)]);
-        objTicket['trxInfo'].push(["", ""]);
-        setPaymentStatus(objTicket);
-        setPaymentStatus(objTicket);
-        // infoTicket(trx_id, res?.obj?.id_tipo_operacion, tempTicket) ////////////////////////////////////
-        //   .then((resTicket) => {
-        //     console.log(resTicket);
-        //   })
-        //   .catch((err) => {
-        //     console.error(err);
-        //     notifyError("Error guardando el ticket");
-        //   });
+        setPaymentStatus(res?.obj?.ticket);
       })
       .catch((err) => {
         setIsUploading(false);
@@ -403,7 +242,6 @@ const Retiro = () => {
     userDoc,
     fetchRetiroCorresponsal,
     roleInfo,
-    infoTicket,
     datosConsulta,
     tipoDocumento,
   ]);
@@ -434,7 +272,7 @@ const Retiro = () => {
             maxLength={"11"}
             value={userDoc}
             onInput={(e) => {
-              const num = e.target.value.replace(/[\s\.]/g, "");
+              const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
                 setUserDoc(num);
               }
@@ -457,7 +295,7 @@ const Retiro = () => {
                 setOtp(num);
               }
             }}></HideInput>
-          <Input
+          <MoneyInput
             id='valor'
             name='valor'
             label='Valor a retirar'
@@ -467,8 +305,15 @@ const Retiro = () => {
             maxLength={"15"}
             min={limitesMontos?.min}
             max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            equalError={false}
+            equalErrorMin={false}
+            value={parseInt(valor)}
+            onInput={(e, valor) => {
+              if (!isNaN(valor)){
+                const num = valor;
+                setValor(num)
+              }
+            }}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>

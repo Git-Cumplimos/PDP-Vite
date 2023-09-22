@@ -11,8 +11,8 @@ import classes from "./Input.module.css";
 
 import classes2 from "../Form/Form.module.css";
 
-interface Props extends ComponentPropsWithRef<"input"> {
-  label: string;
+export interface CustomInputProps extends ComponentPropsWithRef<"input"> {
+  label?: string;
   self?: boolean;
   onLazyInput?: {
     callback: (ev: FormEvent<HTMLInputElement>) => void;
@@ -28,7 +28,7 @@ interface Props extends ComponentPropsWithRef<"input"> {
 
 const { formItem, invalid: invalidCls, btn } = classes;
 const { div_input_form_item } = classes2;
-const Input = forwardRef<HTMLInputElement, Props>(
+const Input = forwardRef<HTMLInputElement, CustomInputProps>(
   (
     {
       label = "",

@@ -1,4 +1,3 @@
-import Table from "../../../../components/Base/Table";
 import { useEffect, useState } from "react";
 import { useLoteria } from "../../utils/LoteriaHooks";
 import { notifyError } from "../../../../utils/notify";
@@ -34,7 +33,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 	const { consultaInventarioReporte } = useLoteria();
 	useEffect(() => {
 		loadDocument(numeroSorteo, pageData);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [numeroSorteo, pageData]);
 
 	const loadDocument = async (numeroSorteo, pageData) => {
@@ -67,7 +65,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 							"Inventario",
 							"Total Asignado",
 							"Total Inventariado",
-							// "inconcistencia",
 							"Comentario",
 						]}
 						data={
@@ -82,7 +79,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 									inventario,
 									total_asignaciones,
 									total_inventario,
-									// inconcistencia,
 									comentario,
 								}) => {
 									const tempDate = new Date(fecha_creacion);
@@ -97,7 +93,6 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 										inventario,
 										total_asignaciones,
 										total_inventario,
-										// inconcistencia,
 										comentario,
 									};
 								}
@@ -105,13 +100,15 @@ const ReporteInventario = ({ subRoutes, route: { label } }) => {
 						}
 					>
 						<Input
-							id="numSorteo"
-							label="Número de sorteo: "
-							type="text"
+							id="numTicket"
+							label="Número de sorteo"
+							type="search"
+							minLength="1"
+							maxLength="4"
+							autoComplete="off"
 							value={numeroSorteo}
 							onInput={(e) => setNumeroSorteo(e.target.value)}
 						/>
-						{/* onSetPageData={setPageData} */}
 					</TableEnterprise>
 				) : (
 					""

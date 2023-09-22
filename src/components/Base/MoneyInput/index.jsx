@@ -1,2 +1,1 @@
-export { default } from "./MoneyInput";
-export { formatMoney } from "./MoneyInput";
+export { default, formatMoney } from "./MoneyInput";

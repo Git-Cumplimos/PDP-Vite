@@ -10,6 +10,7 @@ import {
   reporteTransaccionesRecaudoMultiple,
   postConsultaReferencia,
   postDescargarTickets,
+  checkEstadoDescargaTickets,
 } from "../utils/fetchRecaudoMultiple";
 
 const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
@@ -192,14 +193,59 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
       uuid,
     };
     postDescargarTickets(obj)
-      .then((res) => {
+      .then(async (res) => {
         if (res?.status) {
           notify(res?.msg);
           window.open(res?.obj?.data);
           setEstadoTrx(false);
         } else {
-          notifyError(res?.msg);
-          setEstadoTrx(false);
+          if (res?.message === "Endpoint request timed out") {
+            notify("Se esta procesando la descarga")
+            for (let i = 0; i < 5; i++) {
+              try {
+                const prom = await new Promise((resolve, reject) =>
+                  setTimeout(() => {
+                    let obj = {
+                      uuid,
+                    };
+                    checkEstadoDescargaTickets(obj)
+                      .then((res) => {
+                        if (res?.msg !== "Error respuesta PDP: (No ha terminado la operación)") {
+                          if (res?.status) {
+                            notify(res?.msg);
+                            window.open(res?.obj?.data);
+                            setEstadoTrx(false);
+                            resolve(true);
+                          } else {
+                            notifyError(res?.msg ?? res?.message ?? "");
+                            resolve(true);
+                          }
+                        } else {
+                          // notifyError(res?.msg);
+                          setEstadoTrx(true);
+                          resolve(false);
+                        }
+                      })
+                      .catch((err) => {
+                        notifyError("Error al realizar descarga de ticket");
+                        setEstadoTrx(false);
+                        console.error(err);
+                      });
+                  }, 15000)
+                );
+                if (prom === true) {
+                  setEstadoTrx(false);
+                  break;
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          }
+          else {
+            notifyError(res?.msg);
+            setEstadoTrx(false);
+          }
         }
       })
       .catch((err) => {

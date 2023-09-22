@@ -68,7 +68,7 @@ const FormComission = ({
       if (copy?.ranges.length > 1) {
         if (last?.["Rango maximo"] <= last?.["Rango minimo"]) {
           return notifyError(
-            "El valor del rango mínimo debe ser superior al valor máximo"
+            "El valor del Rango máximo debe ser superior al valor del Rango mínimo"
           );
         }
       }
@@ -142,6 +142,7 @@ const FormComission = ({
                         name={`${key}|${ind}`}
                         type={"text"}
                         value={val}
+                        maxLength={15}
                         onInput={(e) => {
                           let valor = e.target.value;
                           let num = valor.replace(/[\s.-]/g, "");
@@ -265,6 +266,7 @@ const FormComission = ({
                           ? false
                           : true
                       }
+                      maxLength={15}
                       disabled={disabledState}
                     />
                   ) : key === "Comision fija" ? (
@@ -308,6 +310,7 @@ const FormComission = ({
                           : true
                       }
                       disabled={disabledState}
+                      negativeValues
                     />
                   ) : (
                     ""

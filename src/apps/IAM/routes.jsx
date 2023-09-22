@@ -50,7 +50,7 @@ const rutasIAM = {
     },
     {
       link: "/iam/policies",
-      label: <AppIcons Logo={"MARKETPLACE"} name="Politicas" />,
+      label: <AppIcons Logo={"MARKETPLACE"} name="Políticas" />,
       component: IAMPolicies,
       permission: [PermissionsIAM.politicas],
     },

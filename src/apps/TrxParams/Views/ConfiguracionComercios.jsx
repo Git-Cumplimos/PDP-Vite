@@ -236,6 +236,7 @@ const ConfiguracionComercios = () => {
             type='text'
             autoComplete='off'
             value={selectedAuto?.["Id comercio"]}
+            maxLength={12}
             // defaultValue={selectedAuto?.["Id comercio"] ?? ""}
             disabled={selectedAuto?.["Id configuracion"]}
             required
@@ -256,8 +257,8 @@ const ConfiguracionComercios = () => {
           <Select
             id='Pago comision'
             name='Pago comision'
-            label='Pago comision cada:'
-            options={{ "": "", Transacción: "Transaccion", Mensual: "Mensual" }}
+            label='Pago comisión cada:'
+            options={{ "": "", Transacción: "Transaccion", Mensual: "Mensual",Directo: "Directo" }}
             value={selectedAuto?.["Pago comision"]}
             onChange={() => {}}
             required
