@@ -16,6 +16,7 @@ const ReporteSobranteFaltantes = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [ValorNovedad, setValorNovedad] = useState('');
   const [NumId, setNumId] = useState('');
+  const id_comercio=useAuth().roleInfo.id_comercio
   const id_user=useAuth().pdpUser.uuid
 
   const handleSubmit = useCallback(
@@ -25,6 +26,7 @@ const ReporteSobranteFaltantes = () => {
       const body = Object.fromEntries(
         Object.entries(Object.fromEntries(formData)).map(([key, val]) => {
           return [key,val];}));
+      {body['id_comercio']=id_comercio};
       {body['pk_id_cajero']=id_user};
       notifyPending(
         buscarIdTrx(body),
@@ -116,7 +118,7 @@ const ReporteSobranteFaltantes = () => {
           name="pk_observacion_novedad"
           className="w-full place-self-stretch"
           autoComplete="off"
-          maxLength={"300"}
+          maxLength={"500"}
           label="Observación novedades"
           required
         />

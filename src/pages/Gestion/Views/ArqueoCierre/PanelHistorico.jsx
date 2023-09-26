@@ -153,7 +153,20 @@ const PanelHistorico = () => {
       .then((res) => {
         const newData = []
         res?.obj?.results?.map((itemData)=>{
+          var totalvalorEntidades = 0
+          itemData?.entidades_externas?.data.map((val)=>{
+            totalvalorEntidades+=val.valor
+          })
           const valJson = {
+            'Idcierre': itemData?.pk_id_cierre,
+            'Idcomercio': itemData?.id_comercio,
+            'Idusuario': itemData?.id_usuario,
+            'TotalmovimientosDía': itemData?.total_movimientos,
+            'EfectivoCierre': itemData?.total_efectivo_cierre_día_anterior,
+            'EfectivoCajaPDP': itemData?.total_efectivo_en_caja,
+            'EfectivoCajaPDPExt': totalvalorEntidades + itemData?.total_efectivo_en_caja,
+            'Sobrante': itemData?.total_sobrante,
+            'Faltante': itemData?.total_faltante,
             'estimacion': itemData?.total_estimacion_faltante,
             'Consignaciones': itemData?.total_consignaciones,
             'outransportadora': itemData?.total_entregado_transportadora,
@@ -174,7 +187,7 @@ const PanelHistorico = () => {
         })
         const concatenadosParcil = entidades
         const concatenadosFinal = concatenadosParcil.join(',');
-        const headers = 'Estimación faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas débito o crédito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
+        const headers = 'Id cierre,Id comercio,Id usuario,Total movimientos día,Efectivo cierre día anterior,Efectivo en caja PDP,Efectivo en caja PDP + Externos,Sobrante,Faltante,Estimación faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas débito o crédito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
         const main = newData.map((item)=>{
           return Object.values(item).toString();
         })

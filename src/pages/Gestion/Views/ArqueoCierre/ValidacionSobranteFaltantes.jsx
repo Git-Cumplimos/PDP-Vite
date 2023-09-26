@@ -286,7 +286,7 @@ const ValidacionSobranteFaltantes = () => {
             name="pk_observacion_novedad"
             className="w-full place-self-stretch"
             type="text"
-            maxLength={"300"}
+            maxLength={"500"}
             value={selected?.pk_observacion_novedad ?? ""}
             disabled
           />
