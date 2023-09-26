@@ -215,6 +215,7 @@ const PagoCredito = () => {
     const dataAditional = {
       id_uuid_trx: uuid,
     };
+    console.log("esto es data", data)
     notifyPending(
       peticionPago(data, dataAditional),
       {
@@ -325,7 +326,15 @@ const PagoCredito = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de Consulta Crezcamos
               </h1>
-              <h2>{`Tipo Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.TipoDocumento) === "2" ? "Cédula de ciudadanía" : "Cédula de ciudadanía"}`}</h2>
+              {datosCredito?.length > 0 && (
+                <>
+                  {datosCredito
+                    ?.filter(item => item.NumeroCredito === datosTrx?.credito)
+                    .map(item => (
+                      <h2 key={item.NumeroCredito}>{`Tipo Documento: ${optionsDocumento.find(option => option.value === item.TipoDocumento)?.label || "Desconocido"}`}</h2>
+                    ))}
+                </>
+              )}
               <h2>{`Número Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento)}`}</h2>
               <h2>{`Nombre cliente: 
                   ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.Nombre)} 
