@@ -103,7 +103,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           setDatosConsulta(res?.obj);
           setDatosTrans((old) => ({
             ...old,
-            valorConst: formatMoney.format(valorTrxCons) ?? "",
+            valorConst: valorTrxCons ?? "",
             valorVar: res?.obj?.valorTrx,
           }));
           setShowModal((old) => ({ ...old, showModal: true }));
