@@ -46,8 +46,13 @@ const PagoCredito = () => {
   const [uuid, setUuid] = useState(v4());
 
   const optionsDocumento = [
-    { value: "2", label: "Cédula de ciudadanía" },
-    { value: "3", label: "NIT" },
+    { value: "2", label: "Cédula de Ciudadanía" },
+    { value: "3", label: "C Extranjeria" },
+    { value: "4", label: "NIT" },
+    { value: "5", label: "Tarjeta de Identidad" },
+    { value: "6", label: "NUIP" },
+    { value: "7", label: "Permiso Especial de Permanencia" },
+    { value: "8", label: "Permiso por Proteccion Temporal" },
   ];
   // const optionsTipoPago = [
   //   { value: "1", label: "Valor mínimo" },
