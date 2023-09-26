@@ -10,8 +10,8 @@ export const validateDates = (searchDate) => {
     limitMin = `${limitMin.getFullYear()}-${month}-${limitMin.getDate()}`
     limitMax = `${limitMax.getFullYear()}-${month}-${limitMax.getDate()}`
     let error = false
-    if (searchDate >= limitMax){error = true;notifyError("La fecha máxima es el dia actual")}
-    if (searchDate < limitMin) {error = true;notifyError("La fecha mínima es una semana atras")}
+    if (searchDate >= limitMax){error = true;notifyError("La fecha máxima es el día actual")}
+    if (searchDate < limitMin) {error = true;notifyError("La fecha mínima es una semana atrás")}
 
     return error ? false:true
   }
