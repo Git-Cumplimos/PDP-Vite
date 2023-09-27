@@ -196,28 +196,33 @@ const RecaudoTripleA = () => {
         },
         numeroCupon: inputData.numeroCupon,
       };
-      PeticionValidation(data)
-        .then((res: TypeServicesBackendTripleA) => {
-          setPaso("ResumenTrx");
-          setConsultaData({
-            numeroCupon: res?.obj?.result?.cupon,
-            valorPagado: res?.obj?.result?.valorcupon,
-            id_trx: res?.obj?.result?.id_trx,
-          });
-          setShowModal2(true);
-        })
-        .catch((error: any) => {
-          if (!(error instanceof ErrorCustomFetch)) {
-            const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServiceBackend.validation.name}) [0010002]`;
-            const errorSequence = `${name_componente} - realizar consulta directamente en el modulo`;
-            console.error({
-              "Error PDP": errorPdp,
-              "Error Sequence": errorSequence,
-              "Error Console": `${error.message}`,
+      if (inputData.numeroCupon !== '') {
+        PeticionValidation(data)
+          .then((res: TypeServicesBackendTripleA) => {
+            setPaso("ResumenTrx");
+            setConsultaData({
+              numeroCupon: res?.obj?.result?.cupon,
+              valorPagado: res?.obj?.result?.valorcupon,
+              id_trx: res?.obj?.result?.id_trx,
             });
-          }
-          HandleCloseTrx(false);
-        });
+            setShowModal2(true);
+          })
+          .catch((error: any) => {
+            if (!(error instanceof ErrorCustomFetch)) {
+              const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServiceBackend.validation.name}) [0010002]`;
+              const errorSequence = `${name_componente} - realizar consulta directamente en el modulo`;
+              console.error({
+                "Error PDP": errorPdp,
+                "Error Sequence": errorSequence,
+                "Error Console": `${error.message}`,
+              });
+            }
+            HandleCloseTrx(false);
+          });
+      }
+      else {
+        notifyError("Complete el campo número de cupón")
+      }
     },
     [PeticionValidation,HandleCloseTrx,inputData.numeroCupon,pdpUser,roleInfo]
   );
