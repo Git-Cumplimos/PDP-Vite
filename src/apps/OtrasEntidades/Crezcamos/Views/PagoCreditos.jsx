@@ -51,7 +51,7 @@ const PagoCredito = () => {
     { value: "5", label: "Tarjeta de Identidad" },
     { value: "6", label: "NUIP" },
     { value: "7", label: "Permiso Especial de Permanencia" },
-    { value: "8", label: "Permiso por Proteccion Temporal" },
+    { value: "8", label: "Permiso por Protección Temporal" },
   ];
   // const optionsTipoPago = [
   //   { value: "1", label: "Valor mínimo" },
