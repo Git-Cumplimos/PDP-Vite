@@ -39,7 +39,6 @@ const PagoCredito = () => {
     documento: "",
     // tipoPago: "1",
     credito: "",
-    nombreCliente:"",
   });
   
   const [valor, setValor] = useState("");
@@ -73,7 +72,6 @@ const PagoCredito = () => {
       documento: "",
       // tipoPago: "1",
       credito: "",
-      nombreCliente:"",
     });
     setDatosCredito([]);
     setValor("");
@@ -127,10 +125,8 @@ const PagoCredito = () => {
               ValorTotal: Math.floor(row?.totalAmount / 100)
             }));
             setDatosCredito(formattedData);
-            const nombre = res?.obj?.products[0]?.firstNames + " " + res?.obj?.products[0]?.firstSurname + " " + res?.obj?.products[0]?.secondLastName
             setDatosTrx((old) => ({
               ...old,
-              nombreCliente: nombre,
               credito: formattedData[0]?.NumeroCredito,
             }));
             setShowModal(true);
@@ -145,7 +141,6 @@ const PagoCredito = () => {
               documento: "",
               // tipoPago: "1",
               credito: "",
-              nombreCliente:"",
             });
             setValor("");
             return error?.message ?? "Consulta fallida";
@@ -215,7 +210,6 @@ const PagoCredito = () => {
     const dataAditional = {
       id_uuid_trx: uuid,
     };
-    console.log("esto es data", data)
     notifyPending(
       peticionPago(data, dataAditional),
       {
@@ -326,22 +320,6 @@ const PagoCredito = () => {
               <h1 className='text-2xl font-semibold'>
                 Respuesta de Consulta Crezcamos
               </h1>
-              {datosCredito?.length > 0 && (
-                <>
-                  {datosCredito
-                    ?.filter(item => item.NumeroCredito === datosTrx?.credito)
-                    .map(item => (
-                      <h2 key={item.NumeroCredito}>{`Tipo Documento: ${optionsDocumento.find(option => option.value === item.TipoDocumento)?.label || "Desconocido"}`}</h2>
-                    ))}
-                </>
-              )}
-              <h2>{`Número Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento)}`}</h2>
-              <h2>{`Nombre cliente: 
-                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.Nombre)} 
-                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.PrimerApellido)}
-                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.SegundoApellido)}`
-                }
-              </h2>
               <Select
                   id='numPrestamo'
                   label='Número préstamo'
@@ -360,7 +338,23 @@ const PagoCredito = () => {
                   }}
                   required
                   disabled={loadingPeticionPago}
-                />
+              />
+              {datosCredito?.length > 0 && (
+                <>
+                  {datosCredito
+                    ?.filter(item => item.NumeroCredito === datosTrx?.credito)
+                    .map(item => (
+                      <h2 key={item.NumeroCredito}>{`Tipo Documento: ${optionsDocumento.find(option => option.value === item.TipoDocumento)?.label || "Desconocido"}`}</h2>
+                    ))}
+                </>
+              )}
+              <h2>{`Número Documento: ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.NumeroDocumento)}`}</h2>
+              <h2>{`Nombre cliente: 
+                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.Nombre)} 
+                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.PrimerApellido)}
+                  ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.SegundoApellido)}`
+                }
+              </h2>
                 <MoneyInput
                   id='valor'
                   name='valor'
