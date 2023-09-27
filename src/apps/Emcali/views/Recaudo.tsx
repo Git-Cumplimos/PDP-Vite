@@ -21,7 +21,7 @@ import Modal from "../../../components/Base/Modal/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
 import { notify, notifyError } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { formatMoney } from "../../../components/Base/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import { v4 } from "uuid";
 
 import { TypeInf, useFetchEmcaliRecaudo } from "../hooks/useFetchEmcaliRecaudo";
@@ -37,6 +37,7 @@ const { styleComponents, styleComponentsInput, formItem } = classes;
 type TypingPaso =
   | "LecturaBarcode"
   | "LecturaEmcali"
+  | "ResumenConsulta"
   | "ResumenTrx"
   | "TrxExitosa";
 
@@ -44,11 +45,13 @@ type TypeProcedimiento = "Manual" | "Código de barras";
 
 type TypingInputData = {
   numcupon: string;
+  valor_total_trx: number;
 };
 type TypingConsultData = null | {
   nombre: string;
   subscriptor: number;
-  valorcupon: number;
+  valor_cupon: number;
+  valor_faltante: number;
   id_trx: number;
 };
 
@@ -80,11 +83,12 @@ const options_select = [
 ];
 const inputDataInitial: TypingInputData = {
   numcupon: "",
+  valor_total_trx: 0.0,
 };
 
 //---------------------------Componente-----------------------------------------------
 const Recaudo = () => {
-  // const uniqueId = v4();
+  const uniqueId = v4();
   const [paso, setPaso] = useState<TypingPaso>("LecturaBarcode");
   const [showModal, setShowModal] = useState(false);
   const [procedimiento, setProcedimiento] =
@@ -132,6 +136,8 @@ const Recaudo = () => {
     if (paso === "LecturaBarcode" && !loadingPeticion) {
       HandleCloseTrx(true);
     } else if (paso === "LecturaEmcali" && !loadingPeticion) {
+      HandleCloseTrx(true);
+    } else if (paso === "ResumenConsulta") {
       HandleCloseTrx(true);
     } else if (paso === "ResumenTrx" && !loadingPeticion) {
       HandleCloseTrx(true);
@@ -199,10 +205,11 @@ const Recaudo = () => {
 
       PeticionConsult(data)
         .then((res: TypeServicesBackendEmcali) => {
-          setPaso("ResumenTrx");
+          setPaso("ResumenConsulta");
           setConsultaData({
             nombre: res?.obj?.result?.nombre,
-            valorcupon: parseInt(res?.obj?.result?.valorcupon),
+            valor_cupon: parseFloat(res?.obj?.result?.valor_cupon),
+            valor_faltante: parseFloat(res?.obj?.result?.valor_faltante),
             subscriptor: res?.obj?.result?.suscriptor,
             id_trx: res?.obj?.result?.id_trx,
           });
@@ -224,8 +231,14 @@ const Recaudo = () => {
     [PeticionConsult, HandleCloseTrx, inputData.numcupon, pdpUser, roleInfo]
   );
 
+  const onSubmitResumenTrx = useCallback((e: MouseEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPaso("ResumenTrx");
+  }, []);
+
   const onSubmitPay = useCallback(
-    (e: MouseEvent<HTMLInputElement>) => {
+    (e: MouseEvent<HTMLFormElement>) => {
+      e.preventDefault();
       let tipo__comercio = roleInfo?.["tipo_comercio"] ?? "";
       tipo__comercio = tipo__comercio.toLowerCase();
       const data = {
@@ -238,13 +251,13 @@ const Recaudo = () => {
             tipo__comercio.search("oficinas propias") >= 0
               ? true
               : false,
-          // id_uuid_trx: uniqueId,
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
         },
+        id_uuid_trx: uniqueId,
         numcupon: inputData?.numcupon,
         subscriptor: consultData?.subscriptor,
-        valor_total_trx: consultData?.valorcupon,
+        valor_total_trx: inputData?.valor_total_trx ?? 0,
         id_trx: consultData?.id_trx,
         tipo_recaudo: procedimiento === option_manual ? "manual" : "barcode",
       };
@@ -271,10 +284,12 @@ const Recaudo = () => {
       pdpUser,
       roleInfo,
       inputData?.numcupon,
+      inputData?.valor_total_trx,
       procedimiento,
       consultData,
       HandleCloseTrx,
       PeticionPay,
+      uniqueId,
     ]
   );
 
@@ -349,7 +364,7 @@ const Recaudo = () => {
               </Button>
               <Button
                 type="button"
-                onClick={() => HandleCloseTrx(true)}
+                onClick={() => HandleCloseTrx(false)}
                 disabled={loadingPeticion}
               >
                 Cancelar
@@ -362,22 +377,60 @@ const Recaudo = () => {
       </Form>
 
       <Modal show={showModal} handleClose={HandleCloseModal}>
-        {/******************************Resumen de trx*******************************************************/}
-        {paso === "ResumenTrx" && consultData !== null && (
+        {/******************************Resumen Consulta*******************************************************/}
+        {paso === "ResumenConsulta" && consultData !== null && (
           <PaymentSummary
             title="Respuesta de consulta Emcali"
             subtitle="Resumen de transacción"
             summaryTrx={{
               "Número de referencia": inputData.numcupon,
               Nombre: consultData.nombre,
-              "Total a pagar": formatMoney.format(consultData.valorcupon),
+              "Valor maximo a pagar": formatMoney.format(
+                consultData.valor_faltante
+              ),
+            }}
+          >
+            <Form onSubmit={onSubmitResumenTrx} grid>
+              <MoneyInput
+                name="valor_total_trx"
+                // label=""
+                // decimalDigits={2} //No Se usa este por que es con decimales
+                equalError={false}
+                equalErrorMin={true}
+                autoComplete="off"
+                min={0}
+                max={consultData.valor_faltante}
+                // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
+                value={inputData.valor_total_trx} //se usa este por que es con decimales
+                onInput={(e: any, valor: any) => {
+                  setInputData((old) => ({ ...old, valor_total_trx: valor }));
+                }}
+                required
+              />
+              <ButtonBar>
+                <Button type="submit">Realizar Pago</Button>
+                <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
+              </ButtonBar>
+            </Form>
+          </PaymentSummary>
+        )}
+        {/******************************Resumen Consulta*******************************************************/}
+        {/******************************Resumen de trx*******************************************************/}
+        {paso === "ResumenTrx" && consultData !== null && (
+          <PaymentSummary
+            title="¿Está seguro de realizar la transacción?"
+            subtitle="Resumen de transacción"
+            summaryTrx={{
+              "Número de referencia": inputData.numcupon,
+              Nombre: consultData.nombre,
+              "Valor a pagar": formatMoney.format(inputData?.valor_total_trx),
             }}
           >
             <ButtonBar>
               <Button type="submit" onClick={onSubmitPay}>
                 Realizar Pago
               </Button>
-              <Button type="button" onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
+              <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
             </ButtonBar>
           </PaymentSummary>
         )}
