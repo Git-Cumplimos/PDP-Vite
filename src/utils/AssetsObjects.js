@@ -212,6 +212,7 @@ const svgs = {
 
   //TULLAVE
   RECARGASTULLAVE: `${urlAssets}/assets/svg/recaudo/TULLAVE/TULLAVE_RECARGAS.svg`,
+  TULLAVE_GESTION_DATAFONO: `${urlAssets}/assets/svg/recaudo/TULLAVE/TULLAVE_GESTION_DATAFONO.svg`,
 
   //CREZCAMOS
   CREZCAMOS: `${urlAssets}/assets/svg/recaudo/CREZCAMOS/CREZCAMOS.png`,

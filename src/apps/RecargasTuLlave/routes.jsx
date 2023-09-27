@@ -44,7 +44,9 @@ export const rutasGestionRecargasTullave = {
   subRoutes: [
     {
       link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos",
-      label: <AppIcons Logo={"DAVIPLATA"} name="Gestión datáfonos" />,
+      label: (
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Gestión datáfonos" />
+      ),
       component: MainGestionDatafonos,
       permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
       subRoutes: [
@@ -76,7 +78,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/recarga-datafonos",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name="Recarga datáfonos" />
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Recarga datáfonos" />
       ),
       component: MainRecargaDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
@@ -85,7 +87,7 @@ const rutasRecargasTullave = {
           link: "/recargas-tu-llave/recarga-datafonos/transaccion/:id",
           label: (
             <AppIcons
-              Logo={"DAVIVIENDA_PAGO_POR_GIRO"}
+              Logo={"TULLAVE_GESTION_DATAFONO"}
               name={"Recarga datáfonos"}
             />
           ),
@@ -98,7 +100,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/recarga-tarjetas",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name="Recarga tarjetas" />
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Recarga tarjetas" />
       ),
       component: TransaccionRecargaTarjeta,
       permission: [enumPermisosTuLlave.RECARGA_TARJETAS_TULLAVE],
