@@ -46,7 +46,7 @@ const PagoCredito = () => {
 
   const optionsDocumento = [
     { value: "2", label: "Cédula de Ciudadanía" },
-    { value: "3", label: "C Extranjería" },
+    { value: "3", label: "Cédula de Extranjería" },
     { value: "4", label: "NIT" },
     { value: "5", label: "Tarjeta de Identidad" },
     { value: "6", label: "NUIP" },
