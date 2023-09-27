@@ -38,14 +38,17 @@ export const listPermissionsTuLlaveAdmin = Object.values(
 
 export const rutasGestionRecargasTullave = {
   link: "/GestionTransaccional/recargas-tu-llave",
-  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Gestíon Recargas Tu Llave" />,
+  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Gestión Recargas Tullave" />,
   component: AdminRecargasTuLlave,
   permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
   subRoutes: [
     {
       link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos",
       label: (
-        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Gestión datáfonos" />
+        <AppIcons
+          Logo={"TULLAVE_GESTION_DATAFONO"}
+          name="Gestión Datáfonos Tullave"
+        />
       ),
       component: MainGestionDatafonos,
       permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
@@ -71,7 +74,7 @@ export const rutasGestionRecargasTullave = {
 
 const rutasRecargasTullave = {
   link: "/recargas-tu-llave",
-  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Recargas Tu Llave" />,
+  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Recargas Tullave" />,
   component: CorresponsaliaTuLlave,
   permission: listPermissionsTuLlave,
   subRoutes: [
