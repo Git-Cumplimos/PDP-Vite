@@ -16,7 +16,6 @@ import BarcodeReader from "../../../components/Base/BarcodeReader/BarcodeReader"
 import Input from "../../../components/Base/Input/Input";
 import Select from "../../../components/Base/Select/Select";
 import SimpleLoading from "../../../components/Base/SimpleLoading/SimpleLoading";
-import Tickets from "../../../components/Base/Tickets/Tickets";
 import Modal from "../../../components/Base/Modal/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary/PaymentSummary";
 import { notify, notifyError } from "../../../utils/notify";
@@ -29,6 +28,7 @@ import { ErrorCustomFetch } from "../utils/utils";
 import { TypeServicesBackendEmcali } from "../utils/typing";
 
 import classes from "./Recaudo.module.css";
+import TicketsEmcali from "../components/Tickets/TicketsEmcali";
 
 //Constantes Style
 const { styleComponents, styleComponentsInput, formItem } = classes;
@@ -358,7 +358,13 @@ const Recaudo = () => {
               <Button
                 type={"submit"}
                 onClick={onSubmitConsult}
-                disabled={loadingPeticion}
+                disabled={
+                  loadingPeticion
+                    ? true
+                    : inputData.numcupon === ""
+                    ? true
+                    : false
+                }
               >
                 Realizar Consulta
               </Button>
@@ -439,7 +445,7 @@ const Recaudo = () => {
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TrxExitosa" && (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <Tickets refPrint={printDiv} ticket={infTicket} />
+            <TicketsEmcali refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={HandleCloseTrxExitosa}>Cerrar</Button>
