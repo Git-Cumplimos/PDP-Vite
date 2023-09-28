@@ -176,7 +176,6 @@ const PanelConsignaciones = () => {
       searchComprobantesCajero();
   },[searchComprobantes]);
 
-
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Validación de comprobante</h1>

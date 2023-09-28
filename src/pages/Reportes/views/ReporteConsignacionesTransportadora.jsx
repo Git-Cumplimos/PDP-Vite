@@ -1,58 +1,30 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
-
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
+import { Fragment, useEffect, useMemo, useState, useCallback, } from "react";
+import Input from "../../../components/Base/Input";
 // import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
-import TextArea from "../../../components/Base/TextArea";
 import { useAuth } from "../../../hooks/AuthHooks";
-
 import { useFetch } from "../../../hooks/useFetch";
-
 import { notifyError } from "../../../utils/notify";
+import {makeDateFormatter,} from "../../../utils/functions";
 
-// const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-const url = `http://localhost:2000`;
+const url = process.env.REACT_APP_URL_CAJA;
+const dateFormatter = makeDateFormatter(false);
 
-const reportPermisions = {
-  "reporte-general-transacciones/": 41,
-  "reporte-general-transacciones-csv/": 41
-};
-
-const filterPermissions = (permissionList) => {
-  const filteredReports = [
-    ...Object.entries(reportPermisions).filter(([, permission]) => {
-      if (permissionList.includes(permission)) {
-        return true;
-      }
-      return false;
-    }),
-  ].map(([path]) => path);
-  return filteredReports;
-};
-
-const Koncilia = () => {
-  const { userPermissions } = useAuth();
+const ReporteConsignacionesTransportadora = () => {
+  // const { userPermissions } = useAuth();
 
   const [fileList, setFileList] = useState([]);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [maxPages, setMaxPages] = useState(1);
-
-  const [route, setRoute] = useState("");
-
   const [loadingList, fetchList] = useFetch();
   const [loadingFile, fetchFile] = useFetch();
 
-  const mappedPermissions = useMemo(
-    () =>
-      filterPermissions(
-        userPermissions.map(({ id_permission }) => id_permission)
-      ),
-    [userPermissions]
-  );
-
   useEffect(() => {
-    fetchList(`${url}/read-files`, "GET", { path: route, ...pageData })
+    getFile()
+  }, [fetchList, pageData,]);
+
+  const getFile = useCallback(() => {
+    fetchList(`${url}/reportes/read-files-comprobantes`, "GET", { ...pageData })
       .then((res) => {
         if (!res?.status) {
           notifyError(res?.msg);
@@ -67,46 +39,57 @@ const Koncilia = () => {
                   year: "numeric",
                   month: "2-digit",
                   day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  second: "numeric",
                 }).format(new Date(date))
               : "",
           })
         );
-        const filteredFiles = listOfFiles.filter(
-          ({ name }) =>
-            route !== "" || (route === "" && mappedPermissions.includes(name))
-        );
-        setFileList(filteredFiles);
+        setFileList(listOfFiles);
         setMaxPages(res?.obj?.maxpages || 1);
       })
       .catch((err) => console.error(err));
-  }, [route, fetchList, pageData, mappedPermissions]);
+  }, [fetchList, pageData,]);
 
   const isLoading = useMemo(
     () => loadingList || loadingFile,
     [loadingList, loadingFile]
   );
 
+  const searchDate = (ev) => {
+    const datelof = new Date(ev.target.value)
+    datelof.setDate(datelof.getDate() + 1)
+    const datelofend = datelof.toLocaleDateString()
+    const newData = []
+    fileList.map((val)=>{
+      const partesFecha2 = val.date
+      const partesFecha = partesFecha2.split("/");
+      const dia = parseInt(partesFecha[0], 10);
+      const mes = parseInt(partesFecha[1], 10) - 1;
+      const anio = parseInt(partesFecha[2], 10);
+      const fechaObj = new Date(anio, mes, dia).toLocaleDateString();
+      console.log(fechaObj.toString(),datelofend.toString())
+      if (fechaObj.toString() === datelofend.toString()) {
+        newData.push(val)
+      }
+    })
+    console.log(newData.length)
+    if (newData.length !== 0) {
+      setFileList(newData)
+    }else (getFile())
+  };
+
   return (
     <Fragment>
       <h1 className="text-3xl font-medium my-6">Vista de reportes</h1>
       <TableEnterprise
         title="Vista de reportes"
-        maxPage={maxPages}
-        // onChange={onChange}
         headers={["Nombre", "Tipo", "Ultima modificacion"]}
+        maxPage={maxPages}
         data={fileList}
         onSelectRow={(_, i) => {
           if (!isLoading) {
-            if (fileList[i]?.type === "Carpeta") {
-              setRoute((old) => {
-                return `${old}${fileList[i]?.name}`;
-              });
-            } else if (fileList[i]?.type === "Archivo") {
-              fetchFile(`${url}/file-url`, "GET", {
-                filename: `${route}${fileList[i]?.name}`,
+              if (fileList[i]?.type === "Archivo") {
+              fetchFile(`${url}/reportes/file-url-comprobantes`, "GET", {
+                filename: `Reportes/${fileList[i]?.name}`,
               })
                 .then((res) => {
                   if (!res?.status) {
@@ -121,42 +104,16 @@ const Koncilia = () => {
         }}
         onSetPageData={setPageData}
       >
-        {/* <Input
-          id={"date_report_koncilia_1"}
-          name={"date_ini"}
-          label={"Fecha inicial"}
-          type={"date"}
-        />
         <Input
-          id={"date_report_koncilia_2"}
-          name={"date_end"}
-          label={"Fecha Final"}
+          id={"date_report"}
+          name={"date_ini"}
+          label={"Fecha"}
           type={"date"}
-        /> */}
-        <TextArea
-          id={"date_report_koncilia_2"}
-          label={"Ruta"}
-          value={route}
-          readOnly
-          rows={3}
+          onChange={(ev) =>searchDate(ev)}
         />
-        <ButtonBar>
-          <Button
-            disabled={!route}
-            onClick={() =>
-              setRoute((old) => {
-                const splited = old.split("/");
-                splited.splice(splited.length - 2, 1);
-                return `${splited.join("/")}`;
-              })
-            }
-          >
-            Ir una carpeta atras
-          </Button>
-        </ButtonBar>
       </TableEnterprise>
     </Fragment>
   );
 };
 
-export default Koncilia;
+export default ReporteConsignacionesTransportadora;
