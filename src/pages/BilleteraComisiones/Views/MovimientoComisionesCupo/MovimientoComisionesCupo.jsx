@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
@@ -58,6 +58,7 @@ const MovimientoComisionesCupo = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   useEffect(() => {
+    console.log(quotaInfo?.comision);
     setDatosTrans((old) => ({
       ...old,
       saldoComision: quotaInfo?.comision,
@@ -135,7 +136,6 @@ const MovimientoComisionesCupo = () => {
   const transferenciaComision = () => {
     const obj = {};
     if (datosTrans.seleccion === "Parcial") obj["valor"] = datosTrans.valor;
-    const hoy = new Date();
     const fecha = Intl.DateTimeFormat("es-CO", {
       year: "2-digit",
       month: "2-digit",
@@ -192,11 +192,16 @@ const MovimientoComisionesCupo = () => {
         console.error(err);
       });
   };
+
+  if (datosTrans.saldoComision === undefined) {
+    return <Fragment />;
+  }
+
   if (parseInt(datosTrans.saldoComision) <= 0) {
     return (
       <>
         <SimpleLoading show={isUploading} />
-        <h1 className='text-3xl mb-10 text-center'>
+        <h1 className="text-3xl mb-10 text-center">
           No tiene saldo de comisiones suficiente para realizar la transferencia
           a cupo
         </h1>
@@ -207,24 +212,23 @@ const MovimientoComisionesCupo = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl mb-10 text-center'>
+      <h1 className="text-3xl mb-10 text-center">
         Movimiento billetera comisiones al cupo PDP
       </h1>
-      <Form grid onSubmit={onSubmit} autoComplete='off'>
+      <Form grid onSubmit={onSubmit} autoComplete="off">
         <MoneyInput
-          id='comisionActual'
-          name='comisionActual'
-          label='Saldo comisión Actual'
-          type='text'
-          autoComplete='off'
+          id="comisionActual"
+          name="comisionActual"
+          label="Saldo comisión Actual"
+          autoComplete="off"
           maxLength={"15"}
-          value={formatMoney.format(datosTrans.saldoComision ?? 0)}
-          onInput={(e, valor) => {}}
-          disabled></MoneyInput>
+          defaultValue={datosTrans.saldoComision}
+          disabled
+        />
         <Select
-          id='seleccion'
-          name='seleccion'
-          label='Tipo de transferencia'
+          id="seleccion"
+          name="seleccion"
+          label="Tipo de transferencia"
           options={{
             "": "",
             Total: "Total",
@@ -240,11 +244,11 @@ const MovimientoComisionesCupo = () => {
         />
         {datosTrans.seleccion === "Parcial" && (
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a transferir'
-            type='text'
-            autoComplete='off'
+            id="valor"
+            name="valor"
+            label="Valor a transferir"
+            type="text"
+            autoComplete="off"
             maxLength={"15"}
             value={datosTrans.valor ?? ""}
             onInput={(e, valor) => {
@@ -255,27 +259,28 @@ const MovimientoComisionesCupo = () => {
                 });
               }
             }}
-            required></MoneyInput>
+            required
+          ></MoneyInput>
         )}
-        <ButtonBar className='lg:col-span-2'>
-          <Button type='submit'>Aceptar</Button>
+        <ButtonBar className="lg:col-span-2">
+          <Button type="submit">Aceptar</Button>
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={hideModal}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
           {estadoPeticion === 0 ? (
             <>
-              <h1 className='text-2xl font-semibold'>
+              <h1 className="text-2xl font-semibold">
                 ¿Está seguro de realizar la transferencia de comisión?
               </h1>
               {datosTrans.seleccion === "Parcial" ? (
-                <h2 className='text-base'>
+                <h2 className="text-base">
                   {`Valor de transferencia: ${formatMoney.format(
                     datosTrans.valor
                   )} `}
                 </h2>
               ) : (
-                <h2 className='text-base'>
+                <h2 className="text-base">
                   {`Valor de transacción: ${formatMoney.format(
                     datosTrans.saldoComision ?? 0
                   )} `}
@@ -283,7 +288,7 @@ const MovimientoComisionesCupo = () => {
               )}
               <ButtonBar>
                 <Button onClick={hideModal}>Cancelar</Button>
-                <Button type='submit' onClick={transferenciaComision}>
+                <Button type="submit" onClick={transferenciaComision}>
                   Aceptar
                 </Button>
               </ButtonBar>
@@ -294,11 +299,12 @@ const MovimientoComisionesCupo = () => {
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
                   <Button
-                    type='submit'
+                    type="submit"
                     onClick={() => {
                       hideModal();
                       navigate(-1);
-                    }}>
+                    }}
+                  >
                     Aceptar
                   </Button>
                 </ButtonBar>
