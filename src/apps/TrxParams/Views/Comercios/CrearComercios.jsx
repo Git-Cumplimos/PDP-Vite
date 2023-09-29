@@ -21,6 +21,7 @@ import InputSuggestions from "../../../../components/Base/InputSuggestions/Input
 import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -71,6 +72,7 @@ const emptyCommerce = {
   pk_tbl_grupo_comercios: init_grupo_comercio,
   ciiu: null,
   fk_id_tipo_contrato: 0,
+
 };
 
 const CrearComercios = () => {
@@ -85,6 +87,8 @@ const CrearComercios = () => {
   const [commerceType, setCommerceType] = useState({});
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
+  const [alertMonto, setAlertMonto] = useState(undefined);
+  const [alertPorcent, setAlertPorcent] = useState(undefined);
 
   const pk_comercio_handled = useMemo(() => {
     if (pk_comercio === undefined) {
@@ -227,7 +231,6 @@ const CrearComercios = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
-
   const onSelectComercios = useCallback(
     (_comercio) => {
       setComercio((old) => {
@@ -251,11 +254,9 @@ const CrearComercios = () => {
     });
     setChooseContrato(false);
   }, []);
-
   const handleShowModal = useCallback(() => {
     setShowModal(true);
   }, []);
-
   const onChangeFormat = useCallback(
     (ev) => {
       if (ev.target.name === "pk_tbl_grupo_comercios") {
@@ -341,11 +342,6 @@ const CrearComercios = () => {
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
       if (pk_comercio_handled) {
-        // const dataOrg = Object.keys(comercio).map((obj, i) => {
-        //   if (obj !== "" || obj) {
-        //     return { [obj]: comercio[obj] };
-        //   }
-        // });
         delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(structuredClone(dataOrg))
           .then((res) => {
@@ -396,6 +392,15 @@ const CrearComercios = () => {
     <Navigate to={"/params-operations/comercios-params/comercios"} replace />;
   }
 
+  const handleChangeCurrenci = (e,valor) => {
+    console.log(e,valor)
+    setAlertMonto(valor)
+  };
+
+  const handleChangePorcent = (e) => {
+    setAlertPorcent(e.target.value)
+  };
+
   return (
     <Fragment>
       <SimpleLoading show={isUploading} />
@@ -403,8 +408,7 @@ const CrearComercios = () => {
         {pk_comercio_handled ? "Actualizar comercio" : "Crear comercio"}
       </h1>
       <Form grid onSubmit={onSubmit}>
-        <Fieldset
-          legend="Información general comercio"
+        <Fieldset legend="Información general comercio"
           className="lg:col-span-2"
         >
           {!pk_comercio_handled && (
@@ -473,16 +477,6 @@ const CrearComercios = () => {
             }}
             autoComplete="off"
           />
-          {/* <Select
-            className='place-self-stretch'
-            id='fk_tipo_nivel'
-            name='fk_tipo_nivel'
-            label='Tipo nivel'
-            required={true}
-            options={tipoNivelComercio ?? []}
-            onChange={onChangeFormat}
-            value={comercio?.fk_tipo_nivel}
-          /> */}
           <Select
             className="place-self-stretch"
             id="pk_tbl_grupo_comercios"
@@ -580,20 +574,7 @@ const CrearComercios = () => {
               }
             />
           )}
-          <ToggleInput
-            id={`use_totp_edit`}
-            name={`use_totp`}
-            label={"Seguridad con totp"}
-            checked={comercio?.use_totp ?? false}
-            onChange={() =>
-              setComercio((old) => ({
-                ...old,
-                use_totp: !old?.use_totp,
-              }))
-            }
-          />
         </Fieldset>
-
         <Fieldset legend="Ubicación comercio" className="lg:col-span-2">
           <Input
             id="direccion_comercio"
@@ -1008,6 +989,29 @@ const CrearComercios = () => {
             required
           />
         </Fieldset>
+        <Fieldset legend="Parametrización alerta cupo" className="lg:col-span-2">
+          <MoneyInput
+            key="configuración_monto"
+            name="configuración_monto"
+            label="Configuración por monto"
+            onChange={handleChangeCurrenci}
+            placeholder="$0"
+            maxLength={13}
+            autoComplete='off'
+            equalErrorMin = {false}
+            disabled={alertPorcent !== undefined && alertPorcent !== '' ? true : false}
+          />
+          <Input
+            key="configuración_porcentual"
+            name="configuración_porcentual"
+            label="Configuración porcentual"
+            onChange={handleChangePorcent}
+            placeholder="%"
+            maxLength={2}
+            autoComplete='off'
+            disabled={alertMonto !== undefined && alertMonto !== 0 ? true : false}
+          />
+        </Fieldset>
         <ButtonBar className="lg:col-span-2">
           <Button type="submit">
             {pk_comercio_handled ? "Actualizar comercio" : "Crear comercio"}
@@ -1015,7 +1019,8 @@ const CrearComercios = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
-        <CommerceTable onSelectComerce={onSelectComercios} />
+        <CommerceTable 
+          onSelectComerce={onSelectComercios} />
       </Modal>
       <Modal show={chooseContrato} handleClose={() => setChooseContrato(false)}>
         <TiposContratosTable onSelectContract={onSelectTipoContrato} />
