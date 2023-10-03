@@ -38,8 +38,7 @@ const vectorCodigosInstitucionales = [
 ];
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const urlParametrizacion =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlParametrizacion = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
 
 const emptyCommerce = {
@@ -72,7 +71,7 @@ const emptyCommerce = {
   pk_tbl_grupo_comercios: init_grupo_comercio,
   ciiu: null,
   fk_id_tipo_contrato: 0,
-
+  alert_cupo: '',
 };
 
 const CrearComercios = () => {
@@ -87,8 +86,8 @@ const CrearComercios = () => {
   const [commerceType, setCommerceType] = useState({});
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
-  const [alertMonto, setAlertMonto] = useState(undefined);
-  const [alertPorcent, setAlertPorcent] = useState(undefined);
+  const [alertMonto, setAlertMonto] = useState('');
+  const [alertPorcent, setAlertPorcent] = useState('');
 
   const pk_comercio_handled = useMemo(() => {
     if (pk_comercio === undefined) {
@@ -341,6 +340,7 @@ const CrearComercios = () => {
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
+
       if (pk_comercio_handled) {
         delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(structuredClone(dataOrg))
@@ -393,12 +393,13 @@ const CrearComercios = () => {
   }
 
   const handleChangeCurrenci = (e,valor) => {
-    console.log(e,valor)
-    setAlertMonto(valor)
-  };
-
-  const handleChangePorcent = (e) => {
-    setAlertPorcent(e.target.value)
+    if (e.target.name === 'configuración_porcentual') {
+      setAlertPorcent(e.target.value.replace(/[^0-9]/g, '').slice(0, 2))
+      setComercio((old)=>{return {...old,alert_cupo:e.target.value}})
+    }else{
+      setAlertMonto(valor)
+      setComercio((old)=>{return {...old,alert_cupo:valor}})
+    }
   };
 
   return (
@@ -999,17 +1000,18 @@ const CrearComercios = () => {
             maxLength={13}
             autoComplete='off'
             equalErrorMin = {false}
-            disabled={alertPorcent !== undefined && alertPorcent !== '' ? true : false}
+            disabled={alertPorcent !== '' ? true : false}
           />
           <Input
             key="configuración_porcentual"
             name="configuración_porcentual"
             label="Configuración porcentual"
-            onChange={handleChangePorcent}
-            placeholder="%"
-            maxLength={2}
+            onChange={handleChangeCurrenci}
+            type="text"
+            value={alertPorcent + '%'}
+            placeholder="Ingrese el porcentaje"
             autoComplete='off'
-            disabled={alertMonto !== undefined && alertMonto !== 0 ? true : false}
+            disabled={alertMonto !== '' && alertMonto !== 0 ? true : false}
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">

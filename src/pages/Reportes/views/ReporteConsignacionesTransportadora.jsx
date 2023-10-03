@@ -1,20 +1,17 @@
 import { Fragment, useEffect, useMemo, useState, useCallback, } from "react";
 import Input from "../../../components/Base/Input";
-// import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
-import { useAuth } from "../../../hooks/AuthHooks";
+// import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
 import { notifyError } from "../../../utils/notify";
-import {makeDateFormatter,} from "../../../utils/functions";
 
 const url = process.env.REACT_APP_URL_CAJA;
-const dateFormatter = makeDateFormatter(false);
+
 
 const ReporteConsignacionesTransportadora = () => {
   // const { userPermissions } = useAuth();
-
   const [fileList, setFileList] = useState([]);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [pageData, setPageData] = useState({ page: 1, limit: 10, date: undefined});
   const [maxPages, setMaxPages] = useState(1);
   const [loadingList, fetchList] = useFetch();
   const [loadingFile, fetchFile] = useFetch();
@@ -23,7 +20,8 @@ const ReporteConsignacionesTransportadora = () => {
     getFile()
   }, [fetchList, pageData,]);
 
-  const getFile = useCallback(() => {
+  const getFile = useCallback((date) => {
+    pageData.date=date
     fetchList(`${url}/reportes/read-files-comprobantes`, "GET", { ...pageData })
       .then((res) => {
         if (!res?.status) {
@@ -55,26 +53,7 @@ const ReporteConsignacionesTransportadora = () => {
   );
 
   const searchDate = (ev) => {
-    const datelof = new Date(ev.target.value)
-    datelof.setDate(datelof.getDate() + 1)
-    const datelofend = datelof.toLocaleDateString()
-    const newData = []
-    fileList.map((val)=>{
-      const partesFecha2 = val.date
-      const partesFecha = partesFecha2.split("/");
-      const dia = parseInt(partesFecha[0], 10);
-      const mes = parseInt(partesFecha[1], 10) - 1;
-      const anio = parseInt(partesFecha[2], 10);
-      const fechaObj = new Date(anio, mes, dia).toLocaleDateString();
-      console.log(fechaObj.toString(),datelofend.toString())
-      if (fechaObj.toString() === datelofend.toString()) {
-        newData.push(val)
-      }
-    })
-    console.log(newData.length)
-    if (newData.length !== 0) {
-      setFileList(newData)
-    }else (getFile())
+    getFile(ev.target.value)
   };
 
   return (

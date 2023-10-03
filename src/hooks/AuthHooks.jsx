@@ -15,6 +15,7 @@ import { fetchSecure } from "../utils/functions";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
+// const urlQuota = `http://127.0.0.1:5000/cupo`;
 const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/servicio-wallet-comisiones/consulta-wallet-comercio`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
@@ -438,16 +439,17 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0, sobregiro: 0 };
+      const tempRole = { quota: 0, comision: 0, sobregiro: 0, alerta: '' };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
       tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
+      tempRole.alerta = quota["alerta cupo"];
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
     onError: useCallback((error) => {
       dispatchAuth({
         type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0, sobregiro: 0 } },
+        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: '' } },
       });
       if (error?.cause === "custom") {
         notifyError(error.message);
