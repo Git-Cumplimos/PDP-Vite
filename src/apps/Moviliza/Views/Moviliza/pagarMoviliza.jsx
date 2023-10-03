@@ -285,52 +285,89 @@ const PagarMoviliza = () => {
         //   notifyError("Consulta realizada: "+ toString(resConsultMoviliza.mensaje));
         // })
 
-        notifyPending(
-          ( peticionConsultMoviliza({}, data)),
-        {
-          render: () => {
-            return "Realizando consulta";
-          },
-        },
-        {
-          render: ({data: response}) => {
-            // setPaymentStatus(res?.obj?.ticket ?? {});
-          if (response?.status === true) {
-            if (response?.obj?.object?.estado != "PAGADO"){
-            setResConsultMoviliza(response?.obj);
-            setPaso("ResumenTrx");
-            setShowModal(true);
-            return "Respuesta PDP: Consulta realizada";
-            }
-            else{
-              return "Respuesta PDP: Liquidación se encuentra en estado PAGADO";
-            }
-          }
-          else if (response?.status === false){ 
-                if (response?.obj?.mensaje != null){
-                  if (response?.obj?.mensaje=="Error autenticando adminot "){
-                    return "Respuesta PDP: Recargar página";
-                  }
-                  else{
-                    return "Respuesta Moviliza: "+response?.obj?.mensaje
-                  }
-          }
-              else{
-                return "Respuesta PDP: Recargar página";
+        notify("Respuesta PDP: Realizando consulta")
+      peticionConsultMoviliza({}, data)
+        .then((response) => {
+            if (response?.status === true) {
+              if (response?.obj?.object?.estado != "PAGADO"){
+              setResConsultMoviliza(response?.obj);
+              setPaso("ResumenTrx");
+              setShowModal(true);
+              notify ("Respuesta PDP: Consulta realizada");
               }
-          }
-          },
-        },
-        {
-          render: ({ data: error }) => {
-            navigate("/moviliza");
-            if (error?.cause === "custom") {
-              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+              else{
+                notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
+              }
             }
-            return "Error respuesta PDP: Error al realizar consulta";
-          },
-        }
-      )
+            else if (response?.status === false){ 
+                  if (response?.obj?.mensaje != null){
+                    if (response?.obj?.mensaje=="Error autenticando adminot "){
+                      notifyError ("Respuesta PDP: Recargar página");
+                    }
+                    else{
+                      notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
+                    }
+            }
+                else{
+                  notifyError ("Respuesta PDP: Recargar página")
+                }
+            }
+           }
+        )
+        .catch((error) => {
+          navigate("/moviliza");
+          if (error?.cause === "custom") {
+            return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+          }
+          notifyError("Error respuesta PDP: Error al realizar consulta");
+        })
+
+      //   notifyPending(
+      //     ( peticionConsultMoviliza({}, data)),
+      //   {
+      //     render: () => {
+      //       return "Realizando consulta";
+      //     },
+      //   },
+      //   {
+      //     render: ({data: response}) => {
+      //       // setPaymentStatus(res?.obj?.ticket ?? {});
+      //     if (response?.status === true) {
+      //       if (response?.obj?.object?.estado != "PAGADO"){
+      //       setResConsultMoviliza(response?.obj);
+      //       setPaso("ResumenTrx");
+      //       setShowModal(true);
+      //       return "Respuesta PDP: Consulta realizada";
+      //       }
+      //       else{
+      //         return "Respuesta PDP: Liquidación se encuentra en estado PAGADO";
+      //       }
+      //     }
+      //     else if (response?.status === false){ 
+      //           if (response?.obj?.mensaje != null){
+      //             if (response?.obj?.mensaje=="Error autenticando adminot "){
+      //               return "Respuesta PDP: Recargar página";
+      //             }
+      //             else{
+      //               return "Respuesta Moviliza: "+response?.obj?.mensaje
+      //             }
+      //     }
+      //         else{
+      //           return "Respuesta PDP: Recargar página";
+      //         }
+      //     }
+      //     },
+      //   },
+      //   {
+      //     render: ({ data: error }) => {
+      //       navigate("/moviliza");
+      //       if (error?.cause === "custom") {
+      //         return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+      //       }
+      //       return "Error respuesta PDP: Error al realizar consulta";
+      //     },
+      //   }
+      // )
   };
 
   const onSubmitPayMoviliza = useCallback(
