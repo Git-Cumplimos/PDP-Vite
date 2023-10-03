@@ -18,6 +18,7 @@ import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
 import ButtonBar from "../../components/Base/ButtonBar";
+import ModalAlert from "./ModalAlert";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -44,7 +45,7 @@ const AdminLayout = () => {
   const { pathname } = useLocation();
 
   const { urlsPrivate: urls } = useUrls();
- 
+
   const [showModal, setShowModal] = useState(false);
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
   const [cajaState, setCajaState] = useState("");
@@ -171,6 +172,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </div>
+        <ModalAlert/>
         <HNavbar links={urls} isText />
       </header>
       <main className="container">

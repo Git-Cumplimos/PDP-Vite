@@ -1,0 +1,345 @@
+import { useState, useEffect, useCallback, Fragment } from "react";
+import Select from "../../../../components/Base/Select";
+import Input from "../../../../components/Base/Input";
+import Modal from "../../../../components/Base/Modal";
+import {
+  VldFaltantesSobr,
+  editarNovedad,
+} from "../../utils/fetchCaja";
+import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import {
+  onChangeNumber,
+} from "../../../../utils/functions";
+import Form from "../../../../components/Base/Form";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import TextArea from "../../../../components/Base/TextArea";
+import { notifyPending,notifyError } from "../../../../utils/notify";
+
+
+const ValidacionSobranteFaltantes = () => {
+  const [maxPages, setMaxPages] = useState(1);
+  const [pageData, setPageData] = useState({});
+  const [searchInfo, setSearchInfo] = useState({
+    fecha_registro_inicial: "",
+    fecha_registro_final: "",
+    fk_id_comercio: "",
+    uname: "",
+  });
+  const [Validaciones, setValidaciones] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [stateRev, setStateRev] = useState(null);
+  const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
+  const [transaccion, setTransaccion] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [stateDisable, setStateDisable] = useState(true);
+  const [sentData, setSentData] = useState({
+    'pk_id_transaccion': '',
+    'pk_estado': '',
+    'pk_obs_analista': '',
+    'pk_name_analista': '',
+    'pk_id_reporte': '',
+  });
+  const name_user=useAuth().pdpUser.uname
+
+  const CloseModal = useCallback(() => {
+    setStateDisable(true)
+    setSelected(null);
+    setStateRev(null);
+    setObservacionesAnalisis("");
+    setTransaccion("");
+  }, []);
+
+  const searchValidaciones = useCallback(() => {  
+    VldFaltantesSobr({
+      ...Object.fromEntries(
+        Object.entries(searchInfo).filter(([, val]) => val)
+      ),
+      ...pageData,
+    })
+      .then((res) => {
+        setValidaciones(res?.obj?.results);
+        setMaxPages(res?.obj?.maxPages);
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  }, [searchInfo, pageData]);
+
+  const handleSubmit = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      sentData.pk_estado=stateRev
+      sentData.pk_id_transaccion=transaccion.toString()
+      sentData.pk_obs_analista=observacionesAnalisis
+      sentData.pk_name_analista=name_user
+      notifyPending(
+        editarNovedad({ pk_id_transaccion: "" },sentData),
+        {
+          render: () => {
+            setLoading(true);
+            return "Procesando peticion";
+          },
+        },
+        {
+          render: () => {
+            setLoading(false);
+            searchValidaciones();
+            CloseModal();
+            return "Comprobante actualizado exitosamente";
+          },
+        },
+        {
+          render: ({ data: err }) => {
+            setLoading(false);
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return "Peticion fallida";
+          },
+        }
+      );
+    },
+    [
+      CloseModal,
+      searchValidaciones,
+      observacionesAnalisis,
+      transaccion,
+      // selected?.pk_id_comprobante,
+      stateRev,
+    ]
+  );
+
+  useEffect(() => {
+    searchValidaciones();
+  }, [searchValidaciones]);
+
+  const tipoMovi = (pk_valor_novedad,pk_tipo_movimiento) => {
+    if(pk_tipo_movimiento === 'Faltante'){
+      return pk_valor_novedad = '-'+pk_valor_novedad
+    }else{
+      return pk_valor_novedad
+    }
+  };
+
+  const enableState = (state,id) => {
+    if (id !== undefined) {
+      sentData.pk_id_reporte = id
+    }
+    if(state === 'En Análisis'){
+      setStateDisable(false)
+    }else{setStateDisable(true)}  
+  };
+
+  const DisableState= (state) => {
+    if(state === 'Aprobado   ' || state === 'Rechazado  '){
+      return true
+    }else{ return false }  
+  };
+
+  const AlertCancelar= () => {
+    CloseModal()
+    notifyError("Proceso Cancelado");
+  };
+
+  return (
+    <Fragment>
+      <h1 className="text-3xl mt-6">Validación Sobrantes y Faltantes</h1>
+      <TableEnterprise
+        title="Sobrantes y Faltantes"
+        headers={[
+          "Id comercio",
+          "Nombre Cajero",
+          "Id Transacción",
+          "Valor de la novedad",
+          "Fecha de la novedad",
+          "Estado de la solicitud",
+          "Nombre Analista",
+          "Observaciones Analista",
+        ]}
+        maxPage={maxPages}
+        data={Validaciones.map(
+          ({
+            fk_id_comercio,
+            uname,
+            pk_id_transaccion,
+            pk_valor_novedad,
+            fecha_registro_novedad,
+            pk_estado,
+            pk_name_analista,
+            pk_obs_analista,
+            pk_tipo_movimiento,
+          }) => ({
+            fk_id_comercio,
+            uname,
+            pk_id_transaccion,
+            pk_valor_novedad: tipoMovi(pk_valor_novedad,pk_tipo_movimiento),
+            fecha_registro_novedad: fecha_registro_novedad,
+            pk_estado,
+            pk_name_analista,
+            pk_obs_analista,
+          })
+        )}
+        onSelectRow={(_e, index) => {
+          setSelected(Validaciones[index]);
+          setTransaccion(Validaciones[index]?.pk_id_transaccion)
+          setObservacionesAnalisis(Validaciones[index]?.pk_obs_analista)
+        }}
+        onSetPageData={setPageData}
+      >
+        <Input id="fecha_registro_inicial" label="Fecha Inicial" name="fecha_registro_inicial" type="date"
+          onInput={(ev) =>
+            setSearchInfo((old) => ({
+              ...old,
+              [ev.target.name]: ev.target.value,
+            }))
+          } 
+        />
+        <Input id="fecha_registro_final" label="Fecha Final" name="fecha_registro_final" type="date" 
+          onInput={(ev) =>
+            setSearchInfo((old) => ({
+              ...old,
+              [ev.target.name]: ev.target.value,
+            }))
+          } 
+        />
+        <Input 
+          id="fk_id_comercio" 
+          label="Id Comercio" 
+          name="fk_id_comercio" 
+          type="tel" 
+          onInput={(ev) =>
+            setSearchInfo((old) => ({
+              ...old,
+              [ev.target.name]: onChangeNumber(ev),
+            }))
+          }
+        />
+        <Input 
+          id="uname" 
+          label="Nombre Cajero" 
+          name="uname" 
+          type="text" 
+          autoComplete="off"
+          maxLength={"20"}
+          onInput={(ev) =>
+            setSearchInfo((old) => ({
+              ...old,
+              [ev.target.name]: ev.target.value,
+            }))
+          }
+        />
+      </TableEnterprise>
+      <Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
+        <h1 className="text-2xl mb-6 text-center font-semibold">
+          Resumen de la novedad de sobrantes y faltantes
+        </h1>
+        <Form onSubmit={handleSubmit} grid>
+          <Input
+            id="uname"
+            label="Nombre Cajero"
+            type="text"
+            value={selected?.uname ?? ""}
+            disabled
+          />
+          <Input
+            id="fk_id_comercio"
+            label="Id Comercio"
+            type="text"
+            value={selected?.fk_id_comercio ?? ""}
+            disabled
+          />
+          <Input
+            id="pk_id_transaccion"
+            label="Id Transacción"
+            type="text"
+            name="pk_id_transaccion"
+            value={
+              selected?.pk_estado !== 'Pendiente  '
+                ? selected?.pk_id_transaccion
+                : transaccion
+            }
+            onInput={(e) => {
+              setTransaccion(e.target.value.trimLeft());
+              e.target.value = e.target.value.trimLeft();
+            }}
+            disabled={selected?.pk_estado !== 'Pendiente  '}
+            required={selected?.pk_estado === 'Pendiente  '}
+          />
+          <Input
+            id="pk_valor_novedad"
+            label="Valor de la novedad"
+            type="text"
+            value={selected?.pk_tipo_movimiento === "Sobrante"?(selected?.pk_valor_novedad ?? ""):('-'+selected?.pk_valor_novedad ?? "")}
+            disabled
+          />
+          <TextArea
+            id="pk_observacion_novedad"
+            label="Observación novedades"
+            name="pk_observacion_novedad"
+            className="w-full place-self-stretch"
+            type="text"
+            maxLength={"500"}
+            value={selected?.pk_observacion_novedad ?? ""}
+            disabled
+          />
+          <Select
+            id="pk_estado"
+            label="Estado de la novedad"
+            name="pk_estado"
+            options={[
+              { value: "Pendiente  ", label: "Pendiente" },
+              { value: "En Análisis", label: "En Análisis" },
+              { value: "Aprobado   ", label: "Aprobado" },
+              { value: "Rechazado  ", label: "Rechazado" },
+            ]}
+            defaultValue={selected?.pk_estado ?? ""}
+            onChange={(ev) =>
+              (setStateRev(ev.target.value),
+              enableState(ev.target.value,selected?.pk_id_reporte))
+            }
+            required
+            disabled={DisableState(selected?.pk_estado)}
+          />
+          <TextArea
+            id="pk_obs_analista"
+            label="Observación del analista"
+            name="pk_obs_analista"
+            className="w-full place-self-stretch"
+            type="text"
+            autoComplete="off"
+            value={
+              selected?.pk_estado !== 'Pendiente  '
+                ? selected?.pk_obs_analista
+                : observacionesAnalisis
+            }
+            onInput={(e) => {
+              setObservacionesAnalisis(e.target.value.trimLeft());
+              e.target.value = e.target.value.trimLeft();
+            }}
+            disabled={selected?.pk_estado !== 'Pendiente  '}
+            maxLength={"150"}
+            required={selected?.pk_estado === 'Pendiente  '}
+          />
+          <ButtonBar>
+            <Button type="button" onClick={AlertCancelar} disabled={loading}>
+              Salir
+            </Button>
+            <Button type="submit" disabled={stateRev === null || loading}>
+              Aceptar
+            </Button>
+          </ButtonBar>
+        </Form>
+      </Modal>
+    </Fragment>
+  );
+};
+
+export default ValidacionSobranteFaltantes;

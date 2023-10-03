@@ -6,6 +6,7 @@ import {
   buscarComprobantes,
   descargarComprobante,
   editarComprobante,
+  buscarComprobantesCajero,
 } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
@@ -21,17 +22,11 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 import TextArea from "../../../../components/Base/TextArea";
 import { notifyPending } from "../../../../utils/notify";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 const formatMoney = makeMoneyFormatter(0);
 
 const dateFormatter = makeDateFormatter(true);
-// Intl.DateTimeFormat("es-CO", {
-//   year: "numeric",
-//   month: "numeric",
-//   day: "numeric",
-//   hour: "numeric",
-//   minute: "numeric",
-// });
 
 const estadoRevision = new Map([
   [null, "PENDIENTE"],
@@ -51,6 +46,7 @@ const PanelConsignaciones = () => {
   const [searchInfo, setSearchInfo] = useState({
     created: "",
     fk_estado_revision: "1",
+    id_usuario:"",
   });
   const [comprobantes, setComprobantes] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -58,6 +54,8 @@ const PanelConsignaciones = () => {
   const [stateRev, setStateRev] = useState(null);
   const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
   const [loading, setLoading] = useState(false);
+  const { userPermissions,roleInfo } = useAuth();
+  const [rol, setRol] = useState(false);
 
   const CloseModal = useCallback(() => {
     setSelected(null);
@@ -67,6 +65,7 @@ const PanelConsignaciones = () => {
   }, []);
 
   const searchComprobantes = useCallback(() => {
+    setRol(false)
     buscarComprobantes({
       ...Object.fromEntries(
         Object.entries(searchInfo)
@@ -97,10 +96,32 @@ const PanelConsignaciones = () => {
       });
   }, [searchInfo, pageData]);
 
+  const searchComprobantesCajero = useCallback(() => {
+    setRol(true)
+    searchInfo.id_usuario = roleInfo.id_usuario
+    delete searchInfo['fk_estado_revision'];
+    buscarComprobantesCajero({
+      ...Object.fromEntries(
+        Object.entries(searchInfo).filter(([, val]) => val)
+      ),
+      ...pageData,
+    })
+      .then((res) => {
+        setMaxPages(res?.obj?.maxPages ?? 0);
+        setComprobantes(res?.obj?.results ?? []);
+      })
+      .catch((err) => {
+        if (err?.cause === "custom") {
+          return err?.message;
+        }
+        console.error(err?.message);
+        return "Peticion fallida";
+      });
+  }, [searchInfo, pageData]);
+
   const handleSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
       notifyPending(
         editarComprobante(
           { pk_id_comprobante: "" },
@@ -119,7 +140,7 @@ const PanelConsignaciones = () => {
         {
           render: () => {
             setLoading(false);
-            searchComprobantes();
+            searchComprobantes()
             CloseModal();
             return "Comprobante actualizado exitosamente";
           },
@@ -146,8 +167,14 @@ const PanelConsignaciones = () => {
   );
 
   useEffect(() => {
-    searchComprobantes();
-  }, [searchComprobantes]);
+    const id_permission = []
+    userPermissions.forEach(function(val) {
+      id_permission.push(val.id_permission)
+    })
+    id_permission.includes(6110) && id_permission.includes(6111)? 
+      searchComprobantes():
+      searchComprobantesCajero();
+  },[searchComprobantes]);
 
   return (
     <Fragment>
@@ -157,10 +184,12 @@ const PanelConsignaciones = () => {
         headers={[
           "Id",
           "Id comercio",
+          "Id Cajero",
           "Tipo de movimiento",
           "Empresa",
           "Número comprobante",
           "Valor registrado",
+          "Observaciones",
           "Fecha registro",
           "Estado",
         ]}
@@ -169,19 +198,23 @@ const PanelConsignaciones = () => {
           ({
             pk_id_comprobante,
             fk_tipo_comprobante,
+            id_usuario,
             fk_nombre_entidad,
             fk_estado_revision,
             id_comercio,
             nro_comprobante,
             valor_movimiento,
             created,
+            observaciones_analisis,
           }) => ({
             pk_id_comprobante,
             id_comercio,
+            id_usuario,
             fk_tipo_comprobante,
             fk_nombre_entidad,
             nro_comprobante: toAccountNumber(nro_comprobante),
             valor_movimiento: formatMoney.format(valor_movimiento),
+            observaciones_analisis,
             created: dateFormatter.format(new Date(created)),
             fk_estado_revision: estadoRevision.get(fk_estado_revision) ?? "",
           })
@@ -209,6 +242,7 @@ const PanelConsignaciones = () => {
           }))
         }
       >
+      {rol === false?(<>
         <Input id="created" label="Fecha registro" name="created" type="date" />
         <Select
           id="searchByStatus"
@@ -222,14 +256,25 @@ const PanelConsignaciones = () => {
           ]}
           defaultValue={"1"}
         />
-        <Input
-          id="id_comercio"
-          name={"id_comercio"}
-          label="Id comercio"
-          type="tel"
-        />
+          <Input
+            id="id_comercio"
+            name={"id_comercio"}
+            label="Id comercio"
+            type="tel"
+          />
+          <Input
+            id="id_usuario"
+            name={"id_usuario"}
+            label="Id Cajero"
+            type="tel"
+            maxLength={"15"}
+          />
+        </>):<>
+          <Input id="fecha_registro_inicial" label="Fecha inicial" name="fecha_registro_inicial" type="date" />
+          <Input id="fecha_registro_final" label="Fecha Final" name="fecha_registro_final" type="date" />
+        </>}
       </TableEnterprise>
-      <Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
+      {rol === false?(<Modal show={selected} handleClose={loading ? () => {} : CloseModal}>
         <h1 className="text-2xl mb-6 text-center font-semibold">
           Validar comprobante
         </h1>
@@ -349,7 +394,7 @@ const PanelConsignaciones = () => {
             </Button>
           </ButtonBar>
         </Form>
-      </Modal>
+      </Modal>):null}
     </Fragment>
   );
 };

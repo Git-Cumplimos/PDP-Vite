@@ -1,36 +1,27 @@
-import {
-  useState,
-  useEffect,
-  Fragment,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import { useState, useEffect, Fragment, useCallback, useMemo, useRef} from "react";
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { searchCierre, confirmaCierre } from "../../utils/fetchCaja";
-import { notifyPending } from "../../../../utils/notify";
+import { searchCierre, confirmaCierre, buscarPlataformaExt} from "../../utils/fetchCaja";
+import { notifyError,notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
 import Input from "../../../../components/Base/Input";
-import {
-  makeMoneyFormatter,
-  onChangeNumber,
-} from "../../../../utils/functions";
+import { makeMoneyFormatter, onChangeNumber} from "../../../../utils/functions";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import TicketCierre from "./TicketCierre";
 import { useNavigate } from "react-router-dom";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 
 const formatMoney = makeMoneyFormatter(0);
 
 const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
+let Num = 0;
 
 const Panel = () => {
   const navigate = useNavigate();
   const { roleInfo, userInfo, signOut } = useAuth();
-
   const [loading, setLoading] = useState(false);
   const [estado, setEstado] = useState(true);
   const [totalCierres, setTotalCierres] = useState(false);
@@ -49,6 +40,9 @@ const Panel = () => {
   ]);
   const [confirmarArqueo, setConfirmarArqueo] = useState(false);
   const [resumenCierre, setResumenCierre] = useState(null);
+  const [next, setNext] = useState(0);
+  const [dataPlfExt, setDataPlfExt] = useState(null);
+
 
   const nombreComercio = useMemo(
     () => roleInfo?.["nombre comercio"],
@@ -85,6 +79,7 @@ const Panel = () => {
         {
           render: () => {
             setLoading(true);
+            buscarPlataforma()
             return "Consultando cierre de caja";
           },
         },
@@ -110,6 +105,27 @@ const Panel = () => {
     }
   }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio]);
 
+  const buscarPlataforma = useCallback(() => {
+    buscarPlataformaExt()
+      .then((res) => {
+        const listValue = [];
+        res?.obj?.results.map(function(element){
+            const inputValue = element
+            inputValue['valor'] = 0
+            listValue.push(inputValue)
+        })
+      setDataPlfExt(listValue);
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  },[dataPlfExt]);
+
   const closeModalFunction = useCallback(() => {
     navigate(-1);
     setEstado(false);
@@ -128,9 +144,11 @@ const Panel = () => {
       [50, 0],
     ]);
     setConfirmarArqueo(false);
+    Num = 0
   }, [navigate]);
 
-  const cierreCaja = useCallback(() => {
+  const cierreCaja = useCallback((dataPlfExt) => {
+    dataPlfExt.map((elemento) => Num=Num+elemento.valor)
     notifyPending(
       confirmaCierre({
         id_comercio: roleInfo?.id_comercio,
@@ -140,6 +158,7 @@ const Panel = () => {
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
         arqueo: Object.fromEntries(denominaciones),
+        entidades_externas: {'data':dataPlfExt}
       }),
       {
         render: () => {
@@ -189,6 +208,11 @@ const Panel = () => {
                 formatMoney.format(cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
+              [
+                "Total efectivo en caja + externos",
+                formatMoney.format(Num+cierre?.total_efectivo_en_caja),
+              ],
+              ["", ""],
             ],
             trxInfo: [
               ["Total sobrante", formatMoney.format(cierre?.total_sobrante)],
@@ -234,6 +258,11 @@ const Panel = () => {
               ["", ""],
             ],
           };
+          dataPlfExt.map((elemento) => 
+            tempTicket.trxInfo.push([
+              elemento.pk_nombre_plataforma,
+              formatMoney.format(elemento.valor)],["", ""])
+          )
           setResumenCierre(tempTicket);
           return res?.msg;
         },
@@ -257,6 +286,14 @@ const Panel = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+
+  const handleChangeCurrenci = (e,valor) => {
+    dataPlfExt.map(function (elemento, indice) {
+      if(elemento.pk_nombre_plataforma === e.target.name){
+        dataPlfExt[indice]['valor']= valor
+      }
+    })
+  };
 
   return (
     validTipoComercio && (
@@ -284,6 +321,28 @@ const Panel = () => {
         >
           {!resumenCierre ? (
             !confirmarArqueo ? (
+              next === 0 ?(
+              <Fragment>
+                <Fieldset className="col-span-2" legend={"Arqueo de caja"}>
+                  {dataPlfExt?.map((key) => (
+                    <MoneyInput
+                      key={key.pk_nombre_plataforma}
+                      name={key.pk_nombre_plataforma}
+                      label={key.pk_nombre_plataforma}
+                      onChange={handleChangeCurrenci}
+                      placeholder="$0"
+                      maxLength={12}
+                      autoComplete='off'
+                    />
+                  ))}
+                </Fieldset>
+                <ButtonBar>
+                  <Button type="submit" onClick={() => setNext(1)} disabled={loading} >
+                    Siguiente
+                  </Button>
+                </ButtonBar>
+              </Fragment>
+              ):(
               <Fragment>
                 <Fieldset className="col-span-2" legend={"Arqueo de caja"}>
                   {denominaciones.map(([key, val]) => (
@@ -291,7 +350,6 @@ const Panel = () => {
                       key={key}
                       name={key}
                       label={formatMoney.format(key)}
-                      // value={val}
                       onChange={(ev) =>
                         setDenominaciones((old) => {
                           const copy = new Map(old);
@@ -329,6 +387,7 @@ const Panel = () => {
                   </ButtonBar>
                 </Fieldset>
               </Fragment>
+              )
             ) : (
               <PaymentSummary
                 title="¿Está seguro de los datos para el arqueo? Una vez confirmados no podrá modificarlos."
@@ -337,7 +396,7 @@ const Panel = () => {
                 <ButtonBar>
                   <Button
                     type="submit"
-                    onClick={() => cierreCaja()}
+                    onClick={() => cierreCaja(dataPlfExt)}
                     disabled={loading}
                   >
                     Aceptar
