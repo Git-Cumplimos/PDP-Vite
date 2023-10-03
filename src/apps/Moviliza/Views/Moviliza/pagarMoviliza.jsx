@@ -285,7 +285,7 @@ const PagarMoviliza = () => {
         //   notifyError("Consulta realizada: "+ toString(resConsultMoviliza.mensaje));
         // })
 
-        notify("Respuesta PDP: Realizando consulta")
+        // notify("Respuesta PDP: Realizando consulta")
       peticionConsultMoviliza({}, data)
         .then((response) => {
             if (response?.status === true) {
@@ -293,7 +293,7 @@ const PagarMoviliza = () => {
               setResConsultMoviliza(response?.obj);
               setPaso("ResumenTrx");
               setShowModal(true);
-              notify ("Respuesta PDP: Consulta realizada");
+              // notify ("Respuesta PDP: Consulta realizada");
               }
               else{
                 notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
