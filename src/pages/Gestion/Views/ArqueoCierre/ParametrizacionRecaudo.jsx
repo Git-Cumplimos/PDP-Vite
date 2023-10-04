@@ -45,7 +45,7 @@ const ParametrizacionRecaudo = () => {
         setMaxPages(res?.obj?.maxPages);
         for (const element of res?.obj?.results) {
           if (element.pk_numero_cuenta !== null) {
-              NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
+              NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta1+"\n")
             if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2+"\n")
             if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
