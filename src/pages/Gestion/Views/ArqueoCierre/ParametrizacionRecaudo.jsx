@@ -18,6 +18,7 @@ import _ from 'lodash';
 let Num = 1;
 let valor = 0;
 
+const originalState= {pk_numero_cuenta1: undefined, pk_numero_cuenta2: undefined, pk_numero_cuenta3: undefined};
 
 const ParametrizacionRecaudo = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
@@ -28,15 +29,17 @@ const ParametrizacionRecaudo = () => {
   const [searchFilters, setSearchFilters] = useState({ pk_nombre_entidad: "" });
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [Count, setCount] = useState(1);
-  const originalState= {pk_numero_cuenta1: undefined, pk_numero_cuenta2: undefined, pk_numero_cuenta3: undefined};
-  const [NumCountjson, setNumCountjson] = useState(originalState) //PREGUNTAR
+  const [NumCountjson, setNumCountjson] = useState(originalState)
   const keysToExclude = ["pk_numero_cuenta1", "pk_numero_cuenta2", "pk_numero_cuenta3"];
   let NumCuentas = [];
 
   const closeModal = useCallback(() => {
+    setCount(1);
+    Num = 1;
     setShowModal(false);
     setType(null);
     setSelectedEntity(null);
+    setNumCountjson(originalState);
   }, []);
 
   const buscarEnt = useCallback(() => {
@@ -45,7 +48,7 @@ const ParametrizacionRecaudo = () => {
         setMaxPages(res?.obj?.maxPages);
         for (const element of res?.obj?.results) {
           if (element.pk_numero_cuenta !== null) {
-              NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta1+"\n")
+              NumCuentas=[element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
             if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2+"\n")
             if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
@@ -106,7 +109,7 @@ const ParametrizacionRecaudo = () => {
         }
       );
     },
-    [closeModal, buscarEnt]
+    [closeModal, buscarEnt,NumCountjson]
   );
 
   const handleSubmitUpdate = useCallback(
@@ -151,7 +154,8 @@ const ParametrizacionRecaudo = () => {
   }, [buscarEnt]);
 
   const handleChangeCount = (Nun) => {
-    if(Num >= 1 ){ if(Num <= 2 || Nun < 0){Num = Num + Nun
+    if(Num >= 1 ){ if(Num <= 2 || Nun < 0){
+        Num = Num + Nun
         valor=Num+1
         if (valor < 4) {NumCountjson['pk_numero_cuenta'+(valor).toString()] = undefined}
         setCount(Num) 
@@ -161,7 +165,16 @@ const ParametrizacionRecaudo = () => {
   };
 
   const handleInput = (e) => {
-    NumCountjson[e.target.name]=e.target.value
+    let value = e.target.value;
+    if (/^[0-9]*$/.test(value) && value.length <= 20) {
+      if(e.target.name === 'pk_numero_cuenta1'){
+        setNumCountjson((old)=>{return{...old,pk_numero_cuenta1:value}})
+      }else if(e.target.name === 'pk_numero_cuenta2'){
+        setNumCountjson((old)=>{return{...old,pk_numero_cuenta2:value}})
+      }else{
+        setNumCountjson((old)=>{return{...old,pk_numero_cuenta3:value}})
+      }
+    }
   }
 
   const range = _.range(1, Count+1);
@@ -169,12 +182,11 @@ const ParametrizacionRecaudo = () => {
     <Input
       id={"pk_numero_cuenta"+number}
       name={"pk_numero_cuenta"+number}
-      label={`Numero de Cuenta`}
-      type="number"
-      onChange={(e) => handleInput(e)
-      }
+      label={`Número de Cuenta`}
+      type="text"
+      value={NumCountjson['pk_numero_cuenta'+number]}
+      onChange={(e) => handleInput(e)}
       autoComplete="off"
-      max="99999999999999999999"
       required
     />);
 
@@ -187,7 +199,7 @@ const ParametrizacionRecaudo = () => {
       </ButtonBar>
       <TableEnterprise
         title="Bancos/Transportadoras"
-        headers={["Nombre entidad", "Tipo entidad","Numero de Cuentas"]}
+        headers={["Nombre entidad", "Tipo entidad","Número de Cuentas"]}
         maxPage={maxpages}
         onSetPageData={setPageData}
         data={
