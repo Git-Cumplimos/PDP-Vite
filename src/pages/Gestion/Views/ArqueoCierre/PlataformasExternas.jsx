@@ -23,11 +23,6 @@ const ParametrizacionRecaudo = () => {
   const [selectedEntity, setSelectedEntity] = useState(null);
   // const { roleInfo} = useAuth();
 
-  const closeModal = useCallback(() => {
-    setShowModal(false);
-    setSelectedEntity(null);
-  }, []);
-
   const buscarPlataforma = useCallback(() => {
     buscarPlataformaExt({ ...pageData, ...searchFilters })
       .then((res) => {
@@ -44,13 +39,18 @@ const ParametrizacionRecaudo = () => {
       });
   }, [pageData, searchFilters]);
 
+  const closeModal = useCallback(() => {
+    buscarPlataforma();
+    setShowModal(false);
+    setSelectedEntity(null);
+  }, []);
+
   const handleSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
       const body = Object.fromEntries(
         Object.entries(Object.fromEntries(formData)).map(([key, val]) => {return [key,val];}));
-      // body['id_comercio'] = 
       notifyPending(
         crearPltExterno(body),
         {
@@ -123,6 +123,8 @@ const ParametrizacionRecaudo = () => {
   const handleInput = (e) => {
     selectedEntity[e.target.name]=e.target.value
   }
+
+
 
   return (
     <Fragment>

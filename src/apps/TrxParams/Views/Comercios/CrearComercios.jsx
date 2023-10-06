@@ -38,6 +38,7 @@ const vectorCodigosInstitucionales = [
 ];
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const urlComercios = `http://127.0.0.1:5000`;
 const urlParametrizacion = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
 
@@ -105,6 +106,11 @@ const CrearComercios = () => {
         ...structuredClone(old),
         ...structuredClone(res?.obj),
       }));
+      if (res?.obj.alert_cupo.includes('%')) {
+        setAlertPorcent(res?.obj.alert_cupo.replace('%',''))
+      }else{
+        setAlertMonto(res?.obj.alert_cupo)
+      }
       setCommerceType(
         Object.fromEntries(
           (res?.obj?.ciiu_list || []).map(({ id_ae, nombre_actividad }) => [
@@ -998,9 +1004,10 @@ const CrearComercios = () => {
             onChange={handleChangeCurrenci}
             placeholder="$0"
             maxLength={13}
+            value={alertMonto}
             autoComplete='off'
             equalErrorMin = {false}
-            disabled={alertPorcent !== '' ? true : false}
+            disabled={alertPorcent !== ''? true : false}
           />
           <Input
             key="configuración_porcentual"

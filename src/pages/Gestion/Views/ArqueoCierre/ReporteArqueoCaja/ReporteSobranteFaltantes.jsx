@@ -3,7 +3,7 @@ import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
-import { notifyPending } from "../../../../../utils/notify";
+import { notify, notifyPending } from "../../../../../utils/notify";
 import Select from "../../../../../components/Base/Select";
 import TextArea from "../../../../../components/Base/TextArea";
 import { useAuth } from "../../../../../hooks/AuthHooks";
@@ -11,6 +11,7 @@ import {
   buscarIdTrx,
   ReportFaltantesSobr,
 } from "../../../utils/fetchCaja";
+import { Link } from "react-router-dom";
 
 const ReporteSobranteFaltantes = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,26 +29,48 @@ const ReporteSobranteFaltantes = () => {
           return [key,val];}));
       {body['id_comercio']=id_comercio};
       {body['pk_id_cajero']=id_user};
-      notifyPending(
-        buscarIdTrx(body),
-        {
-          render: () => {
-            setIsLoading(true);
-            return "Buscando ID de la transacción";
+      if (body.pk_id_transaccion !== '') {
+        notifyPending(
+          buscarIdTrx(body),
+          {
+            render: () => {
+              setIsLoading(true);
+              return "Buscando ID de la transacción";
+            },
           },
-        },
-        {
-          render: ({ data: response }) => {
-            setIsLoading(false);
-            if (response?.obj !== null) {
-              ReportFaltantesSobr(body)
-              return "Novedad Reportada";
-            }else{
-              return "Número de la transacción ingresado no corresponde a una transacción del comercio";
-            }
+          {
+            render: ({ data: response }) => {
+              setIsLoading(false);
+              if (response?.obj !== null) {
+                ReportFaltantesSobr(body)
+                return "Novedad Reportada";
+              }else{
+                return "Número de la transacción ingresado no corresponde a una transacción del comercio";
+              }
+            },
           },
-        },
-      );
+        );
+      }else{
+        notifyPending(
+          ReportFaltantesSobr(body),
+          {
+            render: () => {
+              setIsLoading(true);
+              return "Reportando Novedad";
+            },
+          },
+          {
+            render: ({ data: response }) => {
+              setIsLoading(false);
+              if (response?.codigo === 200) {
+                return "Novedad Reportada";
+              }else{
+                return "Error al Reportar";
+              }
+            },
+          },
+        );
+      }
     },
     []
   );
@@ -66,7 +89,7 @@ const ReporteSobranteFaltantes = () => {
       setNumId(value);
     }
   };
-  
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-10 mb-8">Reporte de sobrantes/faltantes</h1>
@@ -89,7 +112,6 @@ const ReporteSobranteFaltantes = () => {
           }
           required
         />
-
         <Input
           id='pk_valor_novedad'
           name='pk_valor_novedad'
@@ -102,7 +124,6 @@ const ReporteSobranteFaltantes = () => {
           autoComplete='off'
           required
         />
-
         <Input
           id="pk_id_transaccion"
           name="pk_id_transaccion"
@@ -112,7 +133,6 @@ const ReporteSobranteFaltantes = () => {
           onChange={handleChangeNum}
           placeholder="Id de 20 caracteres numéricos"
         />
-
         <TextArea
           id="pk_observacion_novedad"
           name="pk_observacion_novedad"
@@ -122,11 +142,8 @@ const ReporteSobranteFaltantes = () => {
           label="Observación novedades"
           required
         />
-
         <ButtonBar className="lg:col-span-2">
-          <Button type="button" onClick={() => { setIsLoading(false) }}>
-            Cancelar
-          </Button>
+          <Link to={`/gestion/arqueo`}><Button type="button" onClick={() => { notify("Reporte Cancelado") }}>Cancelar</Button></Link>
           <Button type="submit" disabled={isLoading}>
             Reportar Novedad
             <p className="w-full whitespace-pre-wrap"></p>
