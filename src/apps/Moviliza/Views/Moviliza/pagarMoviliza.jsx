@@ -297,24 +297,33 @@ const PagarMoviliza = () => {
               }
               else{
                 notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
+                navigate("/");
+                navigate("/moviliza");
               }
             }
             else if (response?.status === false){ 
                   if (response?.obj?.mensaje != null){
                     if (response?.obj?.mensaje=="Error autenticando adminot "){
-                      notifyError ("Respuesta PDP: Recargar página");
+                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                      navigate("/");
+                      navigate("/moviliza");
                     }
                     else{
                       notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
+                      navigate("/");
+                      navigate("/moviliza");
                     }
             }
                 else{
-                  notifyError ("Respuesta PDP: Recargar página")
+                  notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                  navigate("/");
+                  navigate("/moviliza");
                 }
             }
            }
         )
         .catch((error) => {
+          navigate("/");
           navigate("/moviliza");
           if (error?.cause === "custom") {
             return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
@@ -430,6 +439,8 @@ const PagarMoviliza = () => {
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
             notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
+            navigate("/");
+            navigate("/moviliza");
           }
         })
         .catch((error) => {

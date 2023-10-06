@@ -16,7 +16,7 @@ export const listPermissionsMoviliza = listPermissions;
 const rutasMoviliza = {
 
   link: "/moviliza",
-  label: <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name={"Moviliza"} />,
+  label: <AppIcons Logo={"MOVILIZA"} name={"Moviliza"} />,
   component: pagarMoviliza,
   permission: [...listPermissionsMoviliza],
   subRoutes: [ 
