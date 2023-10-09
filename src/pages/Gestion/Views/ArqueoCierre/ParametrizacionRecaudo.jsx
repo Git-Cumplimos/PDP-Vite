@@ -114,7 +114,7 @@ const ParametrizacionRecaudo = () => {
           }
         );
       }else{
-        notify('Número de cuentas duplicado')
+        notifyError('Número de cuentas duplicado')
       }
     },
     [closeModal, buscarEnt,NumCountjson]
