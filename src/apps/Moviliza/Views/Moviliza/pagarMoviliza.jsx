@@ -438,7 +438,12 @@ const PagarMoviliza = () => {
             notify("Respuesta PDP: Pago Moviliza exitoso");
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
-            notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
+            if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
+              notifyError("Error respuesta Moviliza: falla en la notificación");
+            }
+            else{
+              notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
+            }
             navigate("/");
             navigate("/moviliza");
           }
