@@ -45,6 +45,9 @@ const TransaccionRetiroDale = lazy(() =>
 const MenuTransaccionesDaleAval = lazy(() =>
   import("./Views/Dale/MenuTransaccionesDaleAval")
 );
+const TransaccionRecaudoPila = lazy(() =>
+  import("./Views/RecaudoPila/TransaccionRecaudoPila")
+);
 
 const listPermissions = Object.values(enumPermisosAval);
 export const listPermissionsAval = listPermissions;
@@ -170,6 +173,14 @@ const rutasAvalCB = {
           permission: [enumPermisosAval.RETIRO_OTP_DALE],
         },
       ],
+    },
+    {
+      link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoPila",
+      label: (
+        <AppIcons Logo={"RECAUDO_PILA"} name='Recaudo Pila' />
+      ),
+      component: TransaccionRecaudoPila,
+      permission: [enumPermisosAval.RECAUDO_PILA],
     },
   ],
 };
