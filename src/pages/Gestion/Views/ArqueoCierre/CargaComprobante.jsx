@@ -71,9 +71,9 @@ const CargaComprobante = () => {
           for (const element of res?.obj?.results) {
             if (element.pk_numero_cuenta !== null) {
                 NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1]
-              if(element.pk_numero_cuenta.pk_numero_cuenta2 != undefined)
+              if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
                 NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2)
-              if(element.pk_numero_cuenta.pk_numero_cuenta3 != undefined)
+              if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
                 NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3)
               element.pk_numero_cuenta=NumCuentas
             }
@@ -142,7 +142,7 @@ const CargaComprobante = () => {
         observaciones: observaciones,
         archivo: filename,
       };
-      if (movementType === "Consignación Bancaría") {
+      if (movementType === "Consignación Bancaria") {
         reqBody["nro_cuenta"] = accountNumber;
       }
       /* const resComprobante =  */ await agregarComprobante(reqBody);
@@ -160,7 +160,6 @@ const CargaComprobante = () => {
 
       console.log(resFile);
       console.log(resUploadFile);
-      // console.log(resComprobante);
     } catch (error) {
       throw error;
     }
@@ -249,7 +248,7 @@ const CargaComprobante = () => {
             formRef.current?.reset?.();
             setSelectedEntity(null);
             setMovementType(val);
-            searchEntities(val !== "Consignación Bancaría");
+            searchEntities(val !== "Consignación Bancaria");
           }}
         />
         <ButtonBar />
@@ -274,7 +273,7 @@ const CargaComprobante = () => {
               id="searchEntities"
               name="tipoComp"
               label={`Buscar ${
-                movementType === "Consignación Bancaría"
+                movementType === "Consignación Bancaria"
                   ? "bancos"
                   : "transportadoras"
               }`}
@@ -304,7 +303,7 @@ const CargaComprobante = () => {
               }}
               required
             />
-            {movementType === "Consignación Bancaría" && (
+            {movementType === "Consignación Bancaria" && (
                 <Select
                 id="accountNum"
                 name="accountNum"
