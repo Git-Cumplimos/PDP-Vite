@@ -2,25 +2,20 @@ import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import Modal from "../../../../../components/Base/Modal";
-import useQuery from "../../../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import {
-  notify,
   notifyError,
   notifyPending,
 } from "../../../../../utils/notify";
 import Tickets from "../../components/TicketsAval/TicketsAval";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
-import MoneyInput, {
-  formatMoney,
-} from "../../../../../components/Base/MoneyInput";
+import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
-import useMoney from "../../../../../hooks/useMoney";
 import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchDale";
@@ -31,9 +26,12 @@ const URL_CONSULTAR_COSTO_DOCUMENTO = `${process.env.REACT_APP_URL_CORRESPONSALI
 const URL_RECAUDO_PILA = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/recaudo`;
 const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/check_bd_estado_trx`;
 
-const Deposito = () => {
+const TransaccionRecaudoPila = () => {
   const navigate = useNavigate();
-  const { roleInfo, infoTicket, pdpUser } = useAuth();
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+  const { roleInfo, pdpUser } = useAuth();
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.MAX_RECAUDO_AVAL,
     min: enumParametrosGrupoAval.MIN_RECAUDO_PILA,
@@ -41,15 +39,15 @@ const Deposito = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
-
   const [datosTrx, setDatosTrx] = useState({
     numeroPlanilla: "",
     numeroDocumento: "",
     tipo: "2",
-    year: "",
-    month: "",
+    year: currentYear,
+    month: currentMonth,
     periodoLiquidacion: "",
     valor: 0,
+    operador: "1",
   });
   const [summary, setSummary] = useState([]);
   const [uuid, setUuid] = useState(v4());
@@ -57,6 +55,15 @@ const Deposito = () => {
   const optionsDocumento = [
     { value: "2", label: "Número de planilla" },
     { value: "3", label: "Número de documento" },
+  ];
+
+  const optionsOperador = [
+    { value: "1", label: "Operador 1" },
+    { value: "2", label: "Operador 2 " },
+    { value: "3", label: "Operador 3 " },
+    { value: "4", label: "Operador 4 " },
+    { value: "5", label: "Operador 5 " },
+    { value: "6", label: "Operador 6 " },
   ];
 
   const printDiv = useRef();
@@ -70,20 +77,22 @@ const Deposito = () => {
       setDatosTrx((old) => ({
         ...old,
         numeroPlanilla: "",
-        year: "",
-        month: "",
+        year: currentYear,
+        month: currentMonth,
         tipo: "2",
+        operador: "1"
       }));
     } else if (e.target.value === "3") {
       setDatosTrx((old) => ({
         ...old,
         tipo: "3",
         numeroDocumento: "",
-        year: "",
-        month: "",        
+        operador: "1",
+        year: currentYear,
+        month: currentMonth,        
       }));
     }
-  }, []);
+  }, [currentMonth, currentYear]);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -91,25 +100,26 @@ const Deposito = () => {
       numeroPlanilla: "",
       numeroDocumento: "",
       tipo: "2",
-      year: "",
-      month: "",
+      year: currentYear,
+      month: currentMonth,
       valor: 0,
       periodoLiquidacion: "",
+      operador: "1",
     });
     setSummary([]);
     setUuid(v4());
-  }, []);
+  }, [currentMonth, currentYear]);
 
   const [loadingPeticionConsultaPlanilla, peticionConsultaPlanilla] = useFetch(
-    fetchCustom(URL_CONSULTAR_COSTO_PLANILLA, "POST", "Consultar costo")
+    fetchCustom(URL_CONSULTAR_COSTO_PLANILLA, "POST", "Consultar planilla")
   );
   const [loadingPeticionConsultaDocumento, peticionConsultaDocumento] = useFetch(
-    fetchCustom(URL_CONSULTAR_COSTO_DOCUMENTO, "POST", "Consultar costo")
+    fetchCustom(URL_CONSULTAR_COSTO_DOCUMENTO, "POST", "Consultar documento")
   );
   const [loadingPeticionRecaudo, peticionRecaudo] = useFetchDale(
     URL_RECAUDO_PILA,
     URL_CONSULTAR_ESTADO_TRX,
-    "Realizar Pago créditos Crezcamos"
+    "Realizar Recaudo Pila"
   );
 
   const onConsultaPlanilla = useCallback(
@@ -163,17 +173,18 @@ const Deposito = () => {
               numeroPlanilla: "",
               numeroDocumento: "",
               tipo: "2",
-              year: "",
-              month: "",
+              year: currentYear,
+              month: currentMonth,
               valor: 0,
               periodoLiquidacion: "",
+              operador: "1",
             });
             return error?.message ?? "Consulta fallida";
           },
         }
       );
     },
-    [datosTrx, pdpUser, roleInfo, peticionConsultaPlanilla]
+    [datosTrx, pdpUser, roleInfo, peticionConsultaPlanilla, currentMonth, currentYear]
   );
 
   const onConsultaDocumento = useCallback(
@@ -190,7 +201,7 @@ const Deposito = () => {
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
         valor_total_trx: datosTrx?.valor,
         recaudoPila:{
-          codOperador: datosTrx?.numeroPlanilla,
+          codOperador: datosTrx?.operador,
           idContribuyente: datosTrx?.numeroDocumento,
           periodoLiquid: datosTrx?.year + datosTrx?.month,
         }
@@ -229,17 +240,18 @@ const Deposito = () => {
               numeroPlanilla: "",
               numeroDocumento: "",
               tipo: "2",
-              year: "",
-              month: "",
+              year: currentYear,
+              month: currentMonth,
               valor: 0,
               periodoLiquidacion: "",
+              operador: "1",
             });
             return error?.message ?? "Consulta fallida";
           },
         }
       );
     },
-    [datosTrx, pdpUser, roleInfo, peticionConsultaDocumento]
+    [datosTrx, pdpUser, roleInfo, peticionConsultaDocumento, currentMonth, currentYear]
   );
   
   const goToRecaudo = useCallback(() => {
@@ -247,63 +259,74 @@ const Deposito = () => {
   }, [navigate]);
   
   const onMakePayment = useCallback(() => {
-    const data = {
-      comercio: {
-        id_comercio: roleInfo?.id_comercio,
-        id_usuario: roleInfo?.id_usuario,
-        id_terminal: roleInfo?.id_dispositivo,
+    let valorTransaccion = datosTrx?.valor;
+    const { min, max } = limitesMontos;
+    if (valorTransaccion >= min && valorTransaccion <= max) {
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+          id_uuid_trx: uuid,
+        },
+        nombre_usuario: pdpUser?.uname ?? "",
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+        valor_total_trx: valorTransaccion,
+        id_trx: datosConsulta?.id_trx,
+        recaudoPila:{
+          numPlanilla: datosTrx?.numeroPlanilla,
+          idContribuyente: datosTrx?.numeroDocumento,
+          periodoLiquid: datosTrx?.periodoLiquidacion,
+          address: roleInfo?.["direccion"],
+        }
+      };
+      const dataAditional = {
         id_uuid_trx: uuid,
-      },
-      nombre_usuario: pdpUser?.uname ?? "",
-      nombre_comercio: roleInfo?.["nombre comercio"],
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-      valor_total_trx: datosTrx?.valor,
-      id_trx: datosConsulta?.id_trx,
-      recaudoPila:{
-        numPlanilla: datosTrx?.numeroPlanilla,
-        idContribuyente: datosTrx?.numeroDocumento,
-        periodoLiquid: datosTrx?.periodoLiquidacion,
-        address: roleInfo?.["direccion"],
-      }
-    };
-    const dataAditional = {
-      id_uuid_trx: uuid,
-    };
-    notifyPending(
-      peticionRecaudo(data, dataAditional),
-      {
-        render: () => {
-          return "Procesando transacción";
+      };
+      notifyPending(
+        peticionRecaudo(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando transacción";
+          },
         },
-      },
-      {
-        render: ({ data: res }) => {
-          setPaymentStatus(res?.obj?.ticket ?? {});
-          return "Transaccion satisfactoria";
+        {
+          render: ({ data: res }) => {
+            setPaymentStatus(res?.obj?.ticket ?? {});
+            return "Transaccion satisfactoria";
+          },
         },
-      },
-      {
-        render({ data: err }) {
-          navigate("/corresponsaliaPowwi");
-          if (err?.cause === "custom") {
-            return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
-          }
-          console.error(err?.message);
-          return err?.message ?? "Transacción fallida";
-        },
-      }
-    );
+        {
+          render({ data: err }) {
+            navigate("/recaudoPila");
+            if (err?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
+            }
+            console.error(err?.message);
+            return err?.message ?? "Transacción fallida";
+          },
+        }
+      );
+    }
+    else {
+      notifyError(
+        `El valor del recaudo debe estar entre ${formatMoney
+          .format(min)
+          .replace(/(\$\s)/g, "$")} y ${formatMoney
+          .format(max)
+          .replace(/(\$\s)/g, "$")}`
+      );
+    }
   }, [
-    datosTrx?.valor,
-    datosTrx.userDoc,
-    datosTrx.userDocDepositante,
-    datosTrx.numeroTelefono,
-    datosTrx.numeroTelefonoDepositante,
+    datosTrx,
     peticionRecaudo,
     roleInfo,
-    infoTicket,
+    pdpUser,
+    uuid,
+    navigate,
     datosConsulta,
-    datosTrx.tipoDocumento,
+    limitesMontos
   ]);
 
   return (
@@ -343,6 +366,19 @@ const Deposito = () => {
             )}
             {datosTrx?.tipo === "3" && (
               <>
+                <Select
+                  id='tipoOperador'
+                  label='Operador'
+                  options={optionsOperador}
+                  value={datosTrx?.operador}
+                  onChange={(e) => {
+                    setDatosTrx(prevState => ({
+                      ...prevState,
+                      operador: e.target.value
+                    }));
+                  }}
+                  required
+                />
                 <Input
                   id='numeroDocumento'
                   name='numeroDocumento'
@@ -417,7 +453,7 @@ const Deposito = () => {
                   type='submit'
                   onClick={onMakePayment}
                   disabled={loadingPeticionRecaudo}>
-                  Aceptar
+                  Realizar pago
                 </Button>
                 <Button
                   type='button'
@@ -438,4 +474,4 @@ const Deposito = () => {
   );
 };
 
-export default Deposito;
+export default TransaccionRecaudoPila;
