@@ -48,9 +48,8 @@ const buildPostFunction = (url) => {
         if (res?.msg) {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
-
         throw new Error("Error interno del servicio", { cause: "custom" });
-      }
+      } 
       return res;
     } catch (err) {
       throw err;

@@ -45,7 +45,7 @@ const CargaComprobante = () => {
   const [observaciones, setObservaciones] = useState("");
   let NumCuentas = [];
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
+    max: 100000000,
     min: 5000,
   });
 

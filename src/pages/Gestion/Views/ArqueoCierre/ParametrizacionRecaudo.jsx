@@ -11,7 +11,7 @@ import {
   buscarEntidades,
   editarEntidades,
 } from "../../utils/fetchCaja";
-import { notify, notifyError, notifyPending } from "../../../../utils/notify";
+import {notifyError, notifyPending} from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
 import _ from 'lodash';
 
@@ -191,7 +191,7 @@ const ParametrizacionRecaudo = () => {
       id={"pk_numero_cuenta"+number}
       name={"pk_numero_cuenta"+number}
       label={`Número de Cuenta`}
-      type="text"
+      type="number"
       value={NumCountjson['pk_numero_cuenta'+number]}
       onChange={(e) => handleInput(e)}
       autoComplete="off"

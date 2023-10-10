@@ -68,9 +68,8 @@ const ParametrizacionRecaudo = () => {
         {
           render: ({ data: err }) => {
             if (err?.cause === "custom") {
-              return err?.message;
+              return 'Plataforma Duplicada';
             }
-            console.error(err?.message);
             return "Peticion fallida";
           },
         }
@@ -167,6 +166,9 @@ const ParametrizacionRecaudo = () => {
       </TableEnterprise>
 
       <Modal show={showModal || selectedEntity} handleClose={closeModal}>
+        <h1 className="text-2xl mb-6 text-center font-semibold">
+          Creación Plataforma Externos
+        </h1>
         {!selectedEntity ? (
           <Form onSubmit={handleSubmit} grid>
             <Fragment>
