@@ -309,11 +309,11 @@ const PagoCredito = () => {
           handleClose={paymentStatus || loadingPeticionPago ? () => {} : handleClose}>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <Form grid onSubmit={onMakePayment} style={{ textAlign: 'center' }}>
