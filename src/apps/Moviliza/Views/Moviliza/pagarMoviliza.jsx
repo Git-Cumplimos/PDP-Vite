@@ -175,7 +175,7 @@ const PagarMoviliza = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroMoviliza(response?.obj?.result?.numero_moviliza);
-            notify("Respuesta PDP: "+response?.msg);
+            // notify("Respuesta PDP: "+response?.msg);
             setBloqueoInput(true)
             // setPaso("LecturaMoviliza");
           }
