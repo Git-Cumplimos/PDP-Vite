@@ -3,7 +3,7 @@ import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 // import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
-import { notifyError } from "../../../utils/notify";
+import { notifyError,notify } from "../../../utils/notify";
 
 const url = process.env.REACT_APP_URL_CAJA;
 
@@ -76,6 +76,7 @@ const ReporteConsignacionesTransportadora = () => {
                     return;
                   }
                   window.open(res?.obj, "_blank");
+                  notify('El reporte de Consignaciones y Transportadora ha sido creado exitosamente')
                 })
                 .catch((err) => console.error(err));
             }

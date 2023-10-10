@@ -319,6 +319,8 @@ const PanelHistorico = () => {
           name={"id_comercio"}
           label="Id comercio"
           type="tel"
+          value={searchInfo.id_comercio}
+          maxLength={15}
           onInput={(ev) =>
             setSearchInfo((old) => ({
               ...old,
@@ -331,6 +333,8 @@ const PanelHistorico = () => {
           name={"id_usuario"}
           label="Id usuario"
           type="tel"
+          value={searchInfo.id_usuario}
+          maxLength={15}
           onInput={(ev) =>
             setSearchInfo((old) => ({
               ...old,
