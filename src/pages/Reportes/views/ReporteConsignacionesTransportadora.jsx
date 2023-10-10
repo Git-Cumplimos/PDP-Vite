@@ -58,10 +58,10 @@ const ReporteConsignacionesTransportadora = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl font-medium my-6">Vista de reportes</h1>
+      <h1 className="text-3xl font-medium my-6">Reporte consignaciones y transportadora</h1>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre", "Tipo", "Ultima modificacion"]}
+        headers={["Nombre", "Tipo", "Última modificacion"]}
         maxPage={maxPages}
         data={fileList}
         onSelectRow={(_, i) => {
