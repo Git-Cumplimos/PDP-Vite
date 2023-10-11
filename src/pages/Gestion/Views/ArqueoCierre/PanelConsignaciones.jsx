@@ -383,9 +383,11 @@ const PanelConsignaciones = () => {
             required={selected?.fk_estado_revision === null}
           />
           {selectedFileUrl && (
-            <div className="my-4 mx-auto md:mx-4 gap-4">
+            <>
+            {/* <div className="my-4 mx-auto md:mx-4 gap-4"> */}
               <img src={selectedFileUrl}/>
-            </div>
+            {/* </div> */}
+            </>
           )}
           <ButtonBar>
             {selected?.fk_estado_revision === null && (

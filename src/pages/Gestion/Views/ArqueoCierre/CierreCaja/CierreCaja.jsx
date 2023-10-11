@@ -173,6 +173,7 @@ const CierreCaja = () => {
     const [dataInicioDia, setDataInicioDia] = useState({});
     const [dataTransacciones, setDataTransacciones] = useState([]);
     const [dataPdp, setDataPdp] = useState();
+    const [dataPdphead, setDataPdpHead] = useState();
 
     const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
     const [comercio, setComercio] = useState("");
@@ -237,6 +238,7 @@ const CierreCaja = () => {
                   setDataInicioDia(dataBack.obj.inicioDia);
                   setDataTransacciones(dataBack.obj.grupoTransacciones);
                   setDataPdp(dataBack.obj.pdP)
+                  setDataPdpHead(dataBack.obj.pdP)
                 } else {
                   setDataCapitalizar({});
                   setDataInicioDia({});
@@ -418,11 +420,11 @@ const CierreCaja = () => {
                 <GridRow
                   cols={[
                     "", 
-                    dataPdp.nombre, 
-                    valoresCalculadosTotales(dataPdp.valores_report,CierreCajaCons.TAG_TRX_SUCCESS),
-                    valoresCalculadosTotales(dataPdp.valores_report,CierreCajaCons.TAG_TRX_FAILURE),
-                    formatMoney.format(Number(valoresCalculadosTotales(dataPdp.valores_report,CierreCajaCons.TAG_AMOUNT))),
-                    dataPdp.comisiones,
+                    dataPdphead.nombre, 
+                    valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_SUCCESS),
+                    valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_FAILURE),
+                    formatMoney.format(Number(valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_AMOUNT))),
+                    dataPdphead.comisiones,
                   ]}
                 />
               }>
@@ -437,13 +439,13 @@ const CierreCaja = () => {
                     cols={[
                       "", 
                       CierreCajaCons.LABEL_COLUMN_BALANCE,
-                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas,
-                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas,
+                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas+valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_SUCCESS),
+                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas+valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_FAILURE),
                       dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? 
                         (
-                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto))
+                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto)+Number(valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_AMOUNT)))
                         ) : (
-                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto))
+                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto)+Number(valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_AMOUNT)))
                         ),
                       formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_COMMISSION))+Number(dataInicioDia.comisiones)+Number(dataCapitalizar.comisiones))
                     ]}
