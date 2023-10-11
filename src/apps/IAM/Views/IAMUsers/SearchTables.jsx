@@ -1,26 +1,26 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import { notifyError } from "../../../../utils/notify";
 import Input from "../../../../components/Base/Input";
 import CommerceTable from "../../../TrxParams/components/Commerce/CommerceTable";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
 const urlIAM = process.env.REACT_APP_URL_IAM_PDP;
 
 const urlComercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const mapGroups = (data) => data;
-const mapCommerce = ({
-  pk_comercio,
-  nombre_comercio,
-  numero_identificacion,
-  comercio_padre,
-}) => ({
-  pk_comercio,
-  nombre_comercio,
-  numero_identificacion,
-  comercio_padre: comercio_padre || "No asociado",
-});
+// const mapCommerce = ({
+//   pk_comercio,
+//   nombre_comercio,
+//   numero_identificacion,
+//   comercio_padre,
+// }) => ({
+//   pk_comercio,
+//   nombre_comercio,
+//   numero_identificacion,
+//   comercio_padre: comercio_padre || "No asociado",
+// });
 
 const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
   const [seachUrl, setSearchUrl] = useState("");
@@ -64,42 +64,33 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
         setFetchOptions({});
         break;
       case "commerce":
-        setSearchUrl(`${urlComercios}/comercios/consultar`);
-        setTableProps({
-          title: "Buscar comercios",
-          headers: ["Id", "Comercio", "Documento", "Comercio padre"],
-        });
-        setUrlSearchFilters("");
-        setFetchOptions({
-          method: "POST",
-          body: JSON.stringify({ ...cleanSearchFilters, ...pageData }),
-          headers: { "Content-Type": "application/json" },
-        });
+        // setSearchUrl(`${urlComercios}/comercios/consultar`);
+        // setTableProps({
+        //   title: "Buscar comercios",
+        //   headers: ["Id", "Comercio", "Documento", "Comercio padre"],
+        // });
+        // setUrlSearchFilters("");
+        // setFetchOptions({
+        //   method: "POST",
+        //   body: JSON.stringify({ ...cleanSearchFilters, ...pageData }),
+        //   headers: { "Content-Type": "application/json" },
+        // });
         break;
       default:
         throw new Error("Type not supported");
     }
   }, [searchType, searchFilters, pageData]);
 
-  useFetchDebounce(
-    {
-      url: useMemo(
-        () => `${seachUrl}${urlSearchFilters}`,
-        [seachUrl, urlSearchFilters]
-      ),
-      options: fetchOptions,
-    },
-    {
-      onSuccess: useCallback((data) => setSearchData(data?.obj), []),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          notifyError(error.message);
-        } else {
-          console.error(error);
-        }
-      }, []),
-    }
-  );
+  const [searchCallback] = useFetchDispatchDebounce({
+    onSuccess: useCallback((data) => setSearchData(data?.obj), []),
+    onError: useCallback((error) => {
+      if (error?.cause === "custom") {
+        notifyError(error.message);
+      } else {
+        console.error(error);
+      }
+    }, []),
+  });
 
   const mappedData = useMemo(() => {
     if (!searchData) {
@@ -109,11 +100,25 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
       case "groups":
         return searchData?.results?.map(mapGroups);
       case "commerce":
-        return searchData?.results?.map(mapCommerce);
+        // return searchData?.results?.map(mapCommerce);
+        return [];
       default:
         throw new Error("Type not supported");
     }
   }, [searchType, searchData]);
+
+  useEffect(() => {
+    switch (searchType) {
+      case "groups":
+        searchCallback(`${seachUrl}${urlSearchFilters}`, fetchOptions);
+        break;
+      case "commerce":
+        // searchCallback(`${seachUrl}${urlSearchFilters}`, fetchOptions);
+        break;
+      default:
+        throw new Error("Type not supported");
+    }
+  }, [fetchOptions, seachUrl, searchCallback, searchType, urlSearchFilters]);
 
   if (searchType === "commerce") {
     return (
@@ -158,7 +163,7 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
             />
           </Fragment>
         )}
-        {searchType === "commerce" && (
+        {/* {searchType === "commerce" && (
           <Fragment>
             <Input
               id="co1.pk_comercio"
@@ -175,7 +180,7 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
               autoComplete="off"
             />
           </Fragment>
-        )}
+        )} */}
       </TableEnterprise>
     </Fragment>
   );

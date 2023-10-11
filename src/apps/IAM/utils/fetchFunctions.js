@@ -1,6 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlIam = process.env.REACT_APP_URL_IAM_PDP;
+// const urlIam = process.env.REACT_APP_URL_IAM_PDP;
+const urlIam = "http://localhost:5000";
 
 const buildPostFunction = (url) => {
   return async (body) => {
