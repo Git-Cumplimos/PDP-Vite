@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import classes from "./Button.module.css";
 
 const Button = ({ self = false, ...button }) => {
   const { formItem } = classes;
   const onClickInitFunc = button.onClick;
+  const myRef = useRef(null);
+  console.log(myRef);
   const [isClicking, setIsClicking] = useState(false);
   const [timerOnSubmit, setTimerOnSubmit] = useState(null);
-  if (onClickInitFunc) {
+  if (onClickInitFunc && button?.type !== "submit") {
     button.onClick = (e) => {
       e.preventDefault();
       try {
@@ -41,10 +43,14 @@ const Button = ({ self = false, ...button }) => {
   }, []);
 
   return self ? (
-    <button {...button} disabled={isClicking || button.disabled} />
+    <button {...button} ref={myRef} disabled={isClicking || button.disabled} />
   ) : (
     <div className={formItem}>
-      <button {...button} disabled={isClicking || button.disabled} />
+      <button
+        {...button}
+        ref={myRef}
+        disabled={isClicking || button.disabled}
+      />
     </div>
   );
 };

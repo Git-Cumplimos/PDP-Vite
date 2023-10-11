@@ -81,9 +81,9 @@ const TrxRecaudo = () => {
     trueCodbarras: false,
     valorCodBarras: 0,
     peticion: 0,
-    valorSinModificar: 0
+    valorSinModificar: 0,
   });
-  
+
   const summary = useMemo(
     () => ({
       ...Object.fromEntries(
@@ -95,13 +95,14 @@ const TrxRecaudo = () => {
       Valor:
         datosConvenio?.fk_tipo_valor !== 3 ? (
           formatMoney.format(valTrxRecaudo)
-        ) : datosConvenio?.fk_tipo_valor === 3 && validacionPago?.trueCodbarras ? (
+        ) : datosConvenio?.fk_tipo_valor === 3 &&
+          validacionPago?.trueCodbarras ? (
           <MoneyInput
-            id='valor'
-            name='valor'
+            id="valor"
+            name="valor"
             // label="Valor a pagar"
-            autoComplete='off'
-            type='tel'
+            autoComplete="off"
+            type="tel"
             minLength={"5"}
             maxLength={"10"}
             value={validacionPago?.valorCodBarras}
@@ -122,11 +123,11 @@ const TrxRecaudo = () => {
           />
         ) : (
           <Input
-            id='valor'
-            name='valor'
+            id="valor"
+            name="valor"
             // label="Valor a pagar"
-            autoComplete='off'
-            type='tel'
+            autoComplete="off"
+            type="tel"
             minLength={"5"}
             maxLength={"10"}
             value={formatMoney.format(valTrxRecaudo)}
@@ -138,7 +139,13 @@ const TrxRecaudo = () => {
       // "Valor de la comision": formatMoney.format(valorComision),
       // "Valor total": formatMoney.format(valor + valorComision),
     }),
-    [userReferences, datosConvenio, valTrxRecaudo, onChangeMoney, validacionPago?.valorCodBarras]
+    [
+      userReferences,
+      datosConvenio,
+      valTrxRecaudo,
+      onChangeMoney,
+      validacionPago?.valorCodBarras,
+    ]
   );
 
   const handleClose = useCallback(() => {
@@ -202,10 +209,12 @@ const TrxRecaudo = () => {
               ...old,
               peticion: 1,
             }));
-            if (datosConvenio?.fk_tipo_valor === 3 && validacionPago?.trueCodbarras){
+            if (
+              datosConvenio?.fk_tipo_valor === 3 &&
+              validacionPago?.trueCodbarras
+            ) {
               setValTrxRecaudo(validacionPago?.valorCodBarras);
-            }
-            else {
+            } else {
               setValidacionPago((old) => ({
                 ...old,
                 valorSinModificar: res?.obj?.valor,
@@ -246,7 +255,12 @@ const TrxRecaudo = () => {
         notifyError("El valor debe ser mayor a cero");
         return;
       }
-      if ((parseInt(valTrxRecaudo) !== parseInt(validacionPago?.valorSinModificar)) && datosConvenio?.fk_tipo_valor !== 3 && validacionPago?.trueCodbarras) {
+      if (
+        parseInt(valTrxRecaudo) !==
+          parseInt(validacionPago?.valorSinModificar) &&
+        datosConvenio?.fk_tipo_valor !== 3 &&
+        validacionPago?.trueCodbarras
+      ) {
         let error = `El valor a pagar es diferente al valor ingresado`;
         return notifyError(error);
       }
@@ -474,8 +488,8 @@ const TrxRecaudo = () => {
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
       <Fragment>
-        <h1 className='text-3xl mt-6'>Recaudo PSP en Efectivo</h1>
-        <h1 className='text-xl mt-6'>
+        <h1 className="text-3xl mt-6">Recaudo PSP en Efectivo</h1>
+        <h1 className="text-xl mt-6">
           {searchingConvData
             ? "Buscando infomacion de convenio ..."
             : "No se ha encontrado informacion del convenio"}
@@ -486,28 +500,29 @@ const TrxRecaudo = () => {
 
   return (
     <Fragment>
-      <h1 className='text-3xl mt-6 mb-10'>Recaudo PSP en Efectivo</h1>
+      <h1 className="text-3xl mt-6 mb-10">Recaudo PSP en Efectivo</h1>
       <Form
         onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
-        grid>
+        grid
+      >
         <Input
-          label='Número de convenio'
-          type='text'
-          autoComplete='off'
+          label="Número de convenio"
+          type="text"
+          autoComplete="off"
           value={datosConvenio.pk_codigo_convenio}
           disabled
         />
         <Input
-          label='Código EAN o IAC'
-          type='text'
-          autoComplete='off'
+          label="Código EAN o IAC"
+          type="text"
+          autoComplete="off"
           value={datosConvenio.codigo_ean_iac}
           disabled
         />
         <Input
-          label='Nombre de convenio'
-          type='text'
-          autoComplete='off'
+          label="Nombre de convenio"
+          type="text"
+          autoComplete="off"
           value={datosConvenio.nombre_convenio}
           disabled
         />
@@ -519,9 +534,9 @@ const TrxRecaudo = () => {
               id={`referencia_${ref}`}
               label={datosConvenio[`referencia_${ref}`]}
               name={`referencia_${ref}`}
-              type='text'
-              maxLength='19'
-              autoComplete='off'
+              type="text"
+              maxLength="19"
+              autoComplete="off"
               value={userReferences?.[`referencia_${ref}`] ?? ""}
               onInput={(ev) =>
                 setUserReferences((old) => ({
@@ -533,13 +548,14 @@ const TrxRecaudo = () => {
               required
             />
           ))}
-        {(datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo) && !validacionPago?.trueCodbarras ? (
+        {(datosConvenio.fk_tipo_valor === 1 || valTrxRecaudo) &&
+        !validacionPago?.trueCodbarras ? (
           <Input
-            id='valor'
-            name='valor'
-            label='Valor a pagar'
-            autoComplete='off'
-            type='tel'
+            id="valor"
+            name="valor"
+            label="Valor a pagar"
+            autoComplete="off"
+            type="tel"
             minLength={"5"}
             maxLength={"10"}
             value={valTrxRecaudo ? formatMoney.format(valTrxRecaudo) : ""}
@@ -559,9 +575,10 @@ const TrxRecaudo = () => {
       <ScreenBlocker show={loadingInquiry} />
       <Modal
         show={inquiryStatus}
-        handleClose={loadingSell ? () => {} : handleClose}>
+        handleClose={loadingSell ? () => {} : handleClose}
+      >
         {validacionPago?.peticion === 2 && (
-          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -569,48 +586,55 @@ const TrxRecaudo = () => {
             </ButtonBar>
           </div>
         )}
-        {validacionPago?.peticion === 1 && ( 
+        {validacionPago?.peticion === 1 && (
           <form onSubmit={onMakePayment}>
-          <PaymentSummary summaryTrx={summary}>
-            <ButtonBar>
-              <Button type='submit' disabled={loadingSell} onClick={(e) => {
-                if (datosConvenio?.fk_tipo_valor !== 3 && validacionPago?.trueCodbarras){
-                  setValTrxRecaudo(0);
-                  setValidacionPago((old) => ({
-                    ...old,
-                    peticion: 3,
-                  }));
-                }
-              }}>
-                Aceptar
-              </Button>
-              <Button onClick={handleClose} disabled={loadingSell}>
-                Cancelar
-              </Button>
-            </ButtonBar>
-          </PaymentSummary>
-        </form>
+            <PaymentSummary summaryTrx={summary}>
+              <ButtonBar>
+                <Button
+                  type="submit"
+                  disabled={loadingSell}
+                  onClick={(e) => {
+                    if (
+                      datosConvenio?.fk_tipo_valor !== 3 &&
+                      validacionPago?.trueCodbarras
+                    ) {
+                      setValTrxRecaudo(0);
+                      setValidacionPago((old) => ({
+                        ...old,
+                        peticion: 3,
+                      }));
+                    }
+                  }}
+                >
+                  Aceptar
+                </Button>
+                <Button onClick={handleClose} disabled={loadingSell}>
+                  Cancelar
+                </Button>
+              </ButtonBar>
+            </PaymentSummary>
+          </form>
         )}
         {validacionPago?.peticion === 3 && (
           <>
-            <h1 className='text-2xl text-center mb-2 font-semibold'>
+            <h1 className="text-2xl text-center mb-2 font-semibold">
               ¿Esta seguro de realizar el pago?
             </h1>
-            <h2 className='text-xl text-center mb-3 font-semibold'>
+            <h2 className="text-xl text-center mb-3 font-semibold">
               {`Valor a pagar: ${formatMoney.format(
-                      validacionPago?.valorSinModificar
-                    )} `}
+                validacionPago?.valorSinModificar
+              )} `}
             </h2>
-            <h2 className='text-base text-center font-semibold'>
+            <h2 className="text-base text-center font-semibold">
               Por favor ingresar el valor a pagar para confirmar la transacción
             </h2>
             <Form grid onSubmit={onMakePayment}>
               <MoneyInput
-                id='valor'
-                name='valor'
-                label='Validación valor'
-                autoComplete='off'
-                type='tel'
+                id="valor"
+                name="valor"
+                label="Validación valor"
+                autoComplete="off"
+                type="tel"
                 minLength={"5"}
                 maxLength={"12"}
                 min={limitesMontos?.min}
@@ -619,7 +643,7 @@ const TrxRecaudo = () => {
                 equalErrorMin={false}
                 value={valTrxRecaudo ?? ""}
                 onInput={(ev, val) => {
-                  if (!isNaN(val)){
+                  if (!isNaN(val)) {
                     const num = val;
                     setValTrxRecaudo(num);
                   }
@@ -627,10 +651,10 @@ const TrxRecaudo = () => {
                 required
               />
               <ButtonBar>
-              <Button onClick={handleClose} disabled={loadingSell}>
+                <Button onClick={handleClose} disabled={loadingSell}>
                   Cancelar
                 </Button>
-                <Button type='submit'>Realizar pago</Button>
+                <Button type="submit">Realizar pago</Button>
               </ButtonBar>
             </Form>
           </>
