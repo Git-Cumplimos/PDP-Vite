@@ -20,6 +20,7 @@ import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchDale";
 import { useFetchDale } from "../../hooks/useFetchDale";
+import { operadoresRecaudoPila } from "../../operadorRecaudoPila";
 
 const URL_CONSULTAR_COSTO_PLANILLA = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/consulta_planilla`;
 const URL_CONSULTAR_COSTO_DOCUMENTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/consulta_pin_unico`;
@@ -47,7 +48,7 @@ const TransaccionRecaudoPila = () => {
     month: currentMonth,
     periodoLiquidacion: "",
     valor: 0,
-    operador: "1",
+    operador: operadoresRecaudoPila["Mi Planilla"],
   });
   const [summary, setSummary] = useState([]);
   const [uuid, setUuid] = useState(v4());
@@ -55,15 +56,6 @@ const TransaccionRecaudoPila = () => {
   const optionsDocumento = [
     { value: "2", label: "Número de planilla" },
     { value: "3", label: "Número de documento" },
-  ];
-
-  const optionsOperador = [
-    { value: "1", label: "Operador 1" },
-    { value: "2", label: "Operador 2 " },
-    { value: "3", label: "Operador 3 " },
-    { value: "4", label: "Operador 4 " },
-    { value: "5", label: "Operador 5 " },
-    { value: "6", label: "Operador 6 " },
   ];
 
   const printDiv = useRef();
@@ -80,14 +72,14 @@ const TransaccionRecaudoPila = () => {
         year: currentYear,
         month: currentMonth,
         tipo: "2",
-        operador: "1"
+        operador: operadoresRecaudoPila["Mi Planilla"]
       }));
     } else if (e.target.value === "3") {
       setDatosTrx((old) => ({
         ...old,
         tipo: "3",
         numeroDocumento: "",
-        operador: "1",
+        operador: operadoresRecaudoPila["Mi Planilla"],
         year: currentYear,
         month: currentMonth,        
       }));
@@ -104,7 +96,7 @@ const TransaccionRecaudoPila = () => {
       month: currentMonth,
       valor: 0,
       periodoLiquidacion: "",
-      operador: "1",
+      operador: operadoresRecaudoPila["Mi Planilla"],
     });
     setSummary([]);
     setUuid(v4());
@@ -115,11 +107,6 @@ const TransaccionRecaudoPila = () => {
   );
   const [loadingPeticionConsultaDocumento, peticionConsultaDocumento] = useFetch(
     fetchCustom(URL_CONSULTAR_COSTO_DOCUMENTO, "POST", "Consultar documento")
-  );
-  const [loadingPeticionRecaudo, peticionRecaudo] = useFetchDale(
-    URL_RECAUDO_PILA,
-    URL_CONSULTAR_ESTADO_TRX,
-    "Realizar Recaudo Pila"
   );
 
   const onConsultaPlanilla = useCallback(
@@ -177,7 +164,7 @@ const TransaccionRecaudoPila = () => {
               month: currentMonth,
               valor: 0,
               periodoLiquidacion: "",
-              operador: "1",
+              operador: operadoresRecaudoPila["Mi Planilla"],
             });
             return error?.message ?? "Consulta fallida";
           },
@@ -244,7 +231,7 @@ const TransaccionRecaudoPila = () => {
               month: currentMonth,
               valor: 0,
               periodoLiquidacion: "",
-              operador: "1",
+              operador: operadoresRecaudoPila["Mi Planilla"],
             });
             return error?.message ?? "Consulta fallida";
           },
@@ -258,6 +245,11 @@ const TransaccionRecaudoPila = () => {
     navigate(-1);
   }, [navigate]);
   
+  const [loadingPeticionRecaudo, peticionRecaudo] = useFetchDale(
+    URL_RECAUDO_PILA,
+    URL_CONSULTAR_ESTADO_TRX,
+    "Realizar Recaudo Pila"
+  );
   const onMakePayment = useCallback(() => {
     let valorTransaccion = datosTrx?.valor;
     const { min, max } = limitesMontos;
@@ -294,12 +286,13 @@ const TransaccionRecaudoPila = () => {
         {
           render: ({ data: res }) => {
             setPaymentStatus(res?.obj?.ticket ?? {});
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
           render({ data: err }) {
-            navigate("/recaudoPila");
+            handleClose();
+            navigate("/corresponsalia/CorresponsaliaGrupoAval");
             if (err?.cause === "custom") {
               return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
@@ -326,7 +319,8 @@ const TransaccionRecaudoPila = () => {
     uuid,
     navigate,
     datosConsulta,
-    limitesMontos
+    limitesMontos,
+    handleClose
   ]);
 
   return (
@@ -349,7 +343,6 @@ const TransaccionRecaudoPila = () => {
                 label='Número de planilla'
                 type='text'
                 autoComplete='off'
-                minLength={"5"}
                 maxLength={"10"}
                 value={datosTrx?.numeroPlanilla}
                 onInput={(e) => {
@@ -366,27 +359,13 @@ const TransaccionRecaudoPila = () => {
             )}
             {datosTrx?.tipo === "3" && (
               <>
-                <Select
-                  id='tipoOperador'
-                  label='Operador'
-                  options={optionsOperador}
-                  value={datosTrx?.operador}
-                  onChange={(e) => {
-                    setDatosTrx(prevState => ({
-                      ...prevState,
-                      operador: e.target.value
-                    }));
-                  }}
-                  required
-                />
                 <Input
                   id='numeroDocumento'
                   name='numeroDocumento'
                   label='Número de documento'
                   type='text'
                   autoComplete='off'
-                  minLength={"5"}
-                  maxLength={"10"}
+                  maxLength={"12"}
                   value={datosTrx?.numeroDocumento}
                   onInput={(e) => {
                       const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
@@ -396,6 +375,19 @@ const TransaccionRecaudoPila = () => {
                           numeroDocumento: num
                         }));
                       }
+                  }}
+                  required
+                />
+                <Select
+                  id='tipoOperador'
+                  label='Nombre operador'
+                  options={operadoresRecaudoPila}
+                  value={datosTrx?.operador}
+                  onChange={(e) => {
+                    setDatosTrx(prevState => ({
+                      ...prevState,
+                      operador: e.target.value
+                    }));
                   }}
                   required
                 />
@@ -430,6 +422,9 @@ const TransaccionRecaudoPila = () => {
                         goToRecaudo();
                         notifyError("Transacción cancelada por el usuario");
                         }}
+                    disabled={
+                      loadingPeticionConsultaDocumento || loadingPeticionConsultaPlanilla || loadingPeticionRecaudo
+                    }
                     >
                     Cancelar
                 </Button>
@@ -440,11 +435,11 @@ const TransaccionRecaudoPila = () => {
           handleClose={paymentStatus || loadingPeticionRecaudo ? () => {} : handleClose}>
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary} title='Respuesta de consulta planilla' subtitle = "Resumen de la transacción">
