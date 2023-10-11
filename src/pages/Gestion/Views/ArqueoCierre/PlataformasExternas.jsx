@@ -68,9 +68,8 @@ const ParametrizacionRecaudo = () => {
         {
           render: ({ data: err }) => {
             if (err?.cause === "custom") {
-              return err?.message;
+              return 'Plataforma Duplicada';
             }
-            console.error(err?.message);
             return "Peticion fallida";
           },
         }
@@ -82,6 +81,10 @@ const ParametrizacionRecaudo = () => {
   const handleSubmitUpdate = useCallback(
     (ev) => {
       ev.preventDefault();
+      const formData = new FormData(ev.currentTarget);
+      const body = Object.fromEntries(
+        Object.entries(Object.fromEntries(formData)).map(([key, val]) => {return [key,val];}));
+      selectedEntity.pk_nombre_plataforma = body.pk_nombre_plataforma
       notifyPending(
         editarExterno(
           {
@@ -120,11 +123,9 @@ const ParametrizacionRecaudo = () => {
     buscarPlataforma();
   }, [buscarPlataforma]);
 
-  const handleInput = (e) => {
-    selectedEntity[e.target.name]=e.target.value
-  }
-
-
+  // const handleInput = (e) => {
+  //   selectedEntity[e.target.name]=e.target.value.toUpperCase()
+  // }
 
   return (
     <Fragment>
@@ -167,6 +168,9 @@ const ParametrizacionRecaudo = () => {
       </TableEnterprise>
 
       <Modal show={showModal || selectedEntity} handleClose={closeModal}>
+        <h1 className="text-2xl mb-6 text-center font-semibold">
+          Creación Plataforma Externos
+        </h1>
         {!selectedEntity ? (
           <Form onSubmit={handleSubmit} grid>
             <Fragment>
@@ -198,9 +202,12 @@ const ParametrizacionRecaudo = () => {
               name="pk_nombre_plataforma"
               label={'Nombre Plataforma'}
               defaultValue={selectedEntity?.pk_nombre_plataforma ?? ""}
-              onInput={(e) => {
-                handleInput(e);
+              onChange={(e) => {
+                 e.target.value = e.target.value.toUpperCase();
               }}
+              // onChange={(e) => {
+              //   handleInput(e);
+              // }}
             />
             <ButtonBar>
               <Button type="submit">Actualizar información</Button>

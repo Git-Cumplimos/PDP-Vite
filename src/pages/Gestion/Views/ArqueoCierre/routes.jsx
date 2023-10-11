@@ -124,7 +124,7 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/validacion-sobrantes-faltantes",
-    label: <AppIcons Logo={"RECAUDO"} name="Validacion sobrantes y faltantes" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Validación sobrantes y faltantes" />,
     component: ValidacionSobranteFaltantes,
     permission: [PermissionsCaja.ValidacionSobrantesFaltantes],
   },

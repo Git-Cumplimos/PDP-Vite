@@ -56,6 +56,8 @@ const PanelConsignaciones = () => {
   const [loading, setLoading] = useState(false);
   const { userPermissions,roleInfo } = useAuth();
   const [rol, setRol] = useState(false);
+  const [idComercio, setIdComercio] = useState('');
+  const [idCajero, setIdCajero] = useState('');
 
   const CloseModal = useCallback(() => {
     setSelected(null);
@@ -176,6 +178,14 @@ const PanelConsignaciones = () => {
       searchComprobantesCajero();
   },[searchComprobantes]);
 
+  const handleChangeNumber = (e) => {
+    if (e.target.name === 'id_comercio') {
+      setIdComercio(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))
+    }else{
+      setIdCajero(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))
+    }
+  };
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Validación de comprobante</h1>
@@ -261,13 +271,16 @@ const PanelConsignaciones = () => {
             name={"id_comercio"}
             label="Id comercio"
             type="tel"
+            onChange={handleChangeNumber}
+            value={idComercio}
           />
           <Input
             id="id_usuario"
             name={"id_usuario"}
             label="Id Cajero"
             type="tel"
-            maxLength={"15"}
+            onChange={handleChangeNumber}
+            value={idCajero}
           />
         </>):<>
           <Input id="fecha_registro_inicial" label="Fecha inicial" name="fecha_registro_inicial" type="date" />
@@ -371,7 +384,7 @@ const PanelConsignaciones = () => {
           />
           {selectedFileUrl && (
             <div className="my-4 mx-auto md:mx-4 gap-4">
-              <Magnifier src={selectedFileUrl} zoomFactor={2} />
+              <img src={selectedFileUrl}/>
             </div>
           )}
           <ButtonBar>

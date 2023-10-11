@@ -7,7 +7,6 @@ const urlComprobantes = `${process.env.REACT_APP_URL_CAJA}/comprobantes`;
 const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
 const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
 const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
-
 const urlCierreCaja = `${process.env.REACT_APP_URL_CAJA}/transacciones`;
 const urltransacciones =`${process.env.REACT_APP_URL_CAJA}/transacciones`;
 
@@ -48,9 +47,8 @@ const buildPostFunction = (url) => {
         if (res?.msg) {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
-
         throw new Error("Error interno del servicio", { cause: "custom" });
-      }
+      } 
       return res;
     } catch (err) {
       throw err;

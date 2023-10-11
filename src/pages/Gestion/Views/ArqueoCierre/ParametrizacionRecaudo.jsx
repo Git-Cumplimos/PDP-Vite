@@ -11,7 +11,7 @@ import {
   buscarEntidades,
   editarEntidades,
 } from "../../utils/fetchCaja";
-import { notifyError, notifyPending } from "../../../../utils/notify";
+import {notifyError, notifyPending} from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
 import _ from 'lodash';
 
@@ -84,30 +84,38 @@ const ParametrizacionRecaudo = () => {
           ];
         })
       );
-      notifyPending(
-        crearEntidad(body),
-        {
-          render: () => {
-            return "Procesando peticion";
+      const validate = verificarValoresDiferentes(
+        body.pk_numero_cuenta.pk_numero_cuenta1,
+        body.pk_numero_cuenta.pk_numero_cuenta2,
+        body.pk_numero_cuenta.pk_numero_cuenta3)
+      if (validate) {
+        notifyPending(
+          crearEntidad(body),
+          {
+            render: () => {
+              return "Procesando peticion";
+            },
           },
-        },
-        {
-          render: ({ data: res }) => {
-            closeModal();
-            buscarEnt();
-            return res?.msg;
+          {
+            render: ({ data: res }) => {
+              closeModal();
+              buscarEnt();
+              return res?.msg;
+            },
           },
-        },
-        {
-          render: ({ data: err }) => {
-            if (err?.cause === "custom") {
-              return err?.message;
-            }
-            console.error(err?.message);
-            return "Peticion fallida";
-          },
-        }
-      );
+          {
+            render: ({ data: err }) => {
+              if (err?.cause === "custom") {
+                return err?.message;
+              }
+              console.error(err?.message);
+              return "Peticion fallida";
+            },
+          }
+        );
+      }else{
+        notifyError('Número de cuentas duplicado')
+      }
     },
     [closeModal, buscarEnt,NumCountjson]
   );
@@ -183,12 +191,23 @@ const ParametrizacionRecaudo = () => {
       id={"pk_numero_cuenta"+number}
       name={"pk_numero_cuenta"+number}
       label={`Número de Cuenta`}
-      type="text"
+      type="number"
       value={NumCountjson['pk_numero_cuenta'+number]}
       onChange={(e) => handleInput(e)}
       autoComplete="off"
       required
     />);
+  
+  function verificarValoresDiferentes(...valores) {
+    let no_cuentas=[]
+    for (const valor of valores) {
+      if (valor !== undefined) {
+        no_cuentas.push(valor);
+      }
+    }
+    const conjunto = new Set(no_cuentas);
+    return conjunto.size === no_cuentas.length;
+  }
 
   return (
     <Fragment>
@@ -273,9 +292,10 @@ const ParametrizacionRecaudo = () => {
                   <Button type="button" onClick={closeModal}>
                     Cancelar
                   </Button>
-                  {type === false ?( <Button type="button" onClick={() =>handleChangeCount(1)}>
-                    Añadir cuenta
-                  </Button>):null}
+                  {type === false ?( 
+                    <Button type="button" onClick={() =>handleChangeCount(1)}>
+                      Añadir cuenta
+                    </Button>):null}
                   {type === false ?(
                      Count > 1 ?(<Button type="button" onClick={() =>handleChangeCount(-1)}>Eliminar Cuenta</Button>):null
                   ):null}

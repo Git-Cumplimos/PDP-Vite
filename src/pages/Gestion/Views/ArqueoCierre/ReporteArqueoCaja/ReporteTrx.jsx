@@ -58,9 +58,9 @@ const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => { } }) =>
       info?.nombre ?? "",
       formatMoney.format(info?.monto) ?? "No data",
       "status" in info ? info?.status === true
-        ? "Transaccion exitosa"
+        ? "Transacción exitosa"
         : info?.status === false
-          ? "Transaccion fallida"
+          ? "Transacción fallida"
           : ""
         : info?.total_trxs,
       info?.date_trx ?? "",

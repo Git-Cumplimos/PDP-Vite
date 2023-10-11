@@ -3,7 +3,7 @@ import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
-import { notify, notifyPending } from "../../../../../utils/notify";
+import { notifyPending,notifyError } from "../../../../../utils/notify";
 import Select from "../../../../../components/Base/Select";
 import TextArea from "../../../../../components/Base/TextArea";
 import { useAuth } from "../../../../../hooks/AuthHooks";
@@ -143,7 +143,7 @@ const ReporteSobranteFaltantes = () => {
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Link to={`/gestion/arqueo`}><Button type="button" onClick={() => { notify("Reporte Cancelado") }}>Cancelar</Button></Link>
+          <Link to={`/gestion/arqueo`}><Button type="button" onClick={() => { notifyError("Reporte Cancelado") }}>Cancelar</Button></Link>
           <Button type="submit" disabled={isLoading}>
             Reportar Novedad
             <p className="w-full whitespace-pre-wrap"></p>

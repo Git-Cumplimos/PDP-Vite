@@ -9,7 +9,7 @@ import {
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import {
-  onChangeNumber,
+  makeDateFormatter,
 } from "../../../../utils/functions";
 import Form from "../../../../components/Base/Form";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -17,34 +17,37 @@ import Button from "../../../../components/Base/Button";
 import TextArea from "../../../../components/Base/TextArea";
 import { notifyPending,notifyError } from "../../../../utils/notify";
 
+const originalState = {
+  pk_id_transaccion: '',
+  pk_estado: '',
+  pk_obs_analista: '',
+  pk_name_analista: '',
+  pk_id_reporte: '',
+};
+
+const originalStateSarch = {
+  fecha_registro_inicial: "",
+  fecha_registro_final: "",
+  fk_id_comercio: "",
+  uname: "",
+};
+
+const dateFormatter = makeDateFormatter(true);
 
 const ValidacionSobranteFaltantes = () => {
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({});
-  const [searchInfo, setSearchInfo] = useState({
-    fecha_registro_inicial: "",
-    fecha_registro_final: "",
-    fk_id_comercio: "",
-    uname: "",
-  });
+  const [searchInfo, setSearchInfo] = useState(originalStateSarch);
   const [Validaciones, setValidaciones] = useState([]);
   const [selected, setSelected] = useState(null);
   const [stateRev, setStateRev] = useState(null);
   const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
   const [transaccion, setTransaccion] = useState("");
   const [loading, setLoading] = useState(false);
-  const [stateDisable, setStateDisable] = useState(true);
-  const [sentData, setSentData] = useState({
-    'pk_id_transaccion': '',
-    'pk_estado': '',
-    'pk_obs_analista': '',
-    'pk_name_analista': '',
-    'pk_id_reporte': '',
-  });
+  const [sentData, setSentData] = useState(originalState);
   const name_user=useAuth().pdpUser.uname
 
   const CloseModal = useCallback(() => {
-    setStateDisable(true)
     setSelected(null);
     setStateRev(null);
     setObservacionesAnalisis("");
@@ -76,7 +79,7 @@ const ValidacionSobranteFaltantes = () => {
     (ev) => {
       ev.preventDefault();
       sentData.pk_estado=stateRev
-      sentData.pk_id_transaccion=transaccion.toString()
+      sentData.pk_id_transaccion=sentData.pk_id_transaccion===null?'':sentData.pk_id_transaccion.toString()
       sentData.pk_obs_analista=observacionesAnalisis
       sentData.pk_name_analista=name_user
       notifyPending(
@@ -112,7 +115,6 @@ const ValidacionSobranteFaltantes = () => {
       searchValidaciones,
       observacionesAnalisis,
       transaccion,
-      // selected?.pk_id_comprobante,
       stateRev,
     ]
   );
@@ -132,10 +134,7 @@ const ValidacionSobranteFaltantes = () => {
   const enableState = (state,id) => {
     if (id !== undefined) {
       sentData.pk_id_reporte = id
-    }
-    if(state === 'En Análisis'){
-      setStateDisable(false)
-    }else{setStateDisable(true)}  
+    }  
   };
 
   const DisableState= (state) => {
@@ -146,7 +145,21 @@ const ValidacionSobranteFaltantes = () => {
 
   const AlertCancelar= () => {
     CloseModal()
-    notifyError("Proceso Cancelado");
+    notifyError("Transacción cancelada por el usuario");
+  };
+
+  const handleChangeNum = (e) => {
+    const value = e.target.value;
+    if (e.target.name==='pk_id_transaccion') {
+      if (/^[0-9]*$/.test(value) && value.length <= 15) {
+        setSentData((old)=>{return{...old,pk_id_transaccion:value.trimLeft()}})
+      }
+    }
+    if (e.target.name==='fk_id_comercio') {
+      if (/^[0-9]*$/.test(value) && value.length <= 15) {
+        setSearchInfo((old) => {return {...old,fk_id_comercio: value}})
+      }
+    }
   };
 
   return (
@@ -181,7 +194,7 @@ const ValidacionSobranteFaltantes = () => {
             uname,
             pk_id_transaccion,
             pk_valor_novedad: tipoMovi(pk_valor_novedad,pk_tipo_movimiento),
-            fecha_registro_novedad: fecha_registro_novedad,
+            fecha_registro_novedad: dateFormatter.format(new Date(fecha_registro_novedad)),
             pk_estado,
             pk_name_analista,
             pk_obs_analista,
@@ -189,8 +202,9 @@ const ValidacionSobranteFaltantes = () => {
         )}
         onSelectRow={(_e, index) => {
           setSelected(Validaciones[index]);
-          setTransaccion(Validaciones[index]?.pk_id_transaccion)
+          setSentData((old)=>{return{...old,pk_id_transaccion:Validaciones[index]?.pk_id_transaccion}})
           setObservacionesAnalisis(Validaciones[index]?.pk_obs_analista)
+          setStateRev(Validaciones[index]?.pk_estado)
         }}
         onSetPageData={setPageData}
       >
@@ -214,13 +228,10 @@ const ValidacionSobranteFaltantes = () => {
           id="fk_id_comercio" 
           label="Id Comercio" 
           name="fk_id_comercio" 
-          type="tel" 
-          onInput={(ev) =>
-            setSearchInfo((old) => ({
-              ...old,
-              [ev.target.name]: onChangeNumber(ev),
-            }))
-          }
+          type="tel"
+          value={searchInfo.fk_id_comercio}
+          onInput={(ev) =>handleChangeNum(ev)}
+          autoComplete="off"
         />
         <Input 
           id="uname" 
@@ -261,17 +272,9 @@ const ValidacionSobranteFaltantes = () => {
             label="Id Transacción"
             type="text"
             name="pk_id_transaccion"
-            value={
-              selected?.pk_estado !== 'Pendiente  '
-                ? selected?.pk_id_transaccion
-                : transaccion
-            }
-            onInput={(e) => {
-              setTransaccion(e.target.value.trimLeft());
-              e.target.value = e.target.value.trimLeft();
-            }}
-            disabled={selected?.pk_estado !== 'Pendiente  '}
-            required={selected?.pk_estado === 'Pendiente  '}
+            value={sentData.pk_id_transaccion}
+            onInput={(e) => {handleChangeNum(e)}}
+            disabled={stateRev !== 'En Análisis'}
           />
           <Input
             id="pk_valor_novedad"
@@ -324,15 +327,15 @@ const ValidacionSobranteFaltantes = () => {
               setObservacionesAnalisis(e.target.value.trimLeft());
               e.target.value = e.target.value.trimLeft();
             }}
-            disabled={selected?.pk_estado !== 'Pendiente  '}
+            // disabled={selected?.pk_estado !== 'Pendiente  '}
             maxLength={"150"}
-            required={selected?.pk_estado === 'Pendiente  '}
+            // required={selected?.pk_estado === 'Pendiente  '}
           />
           <ButtonBar>
             <Button type="button" onClick={AlertCancelar} disabled={loading}>
-              Salir
+              Cancelar
             </Button>
-            <Button type="submit" disabled={stateRev === null || loading}>
+            <Button type="submit" disabled={stateRev === selected?.pk_estado || loading}>
               Aceptar
             </Button>
           </ButtonBar>

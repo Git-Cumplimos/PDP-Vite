@@ -102,7 +102,7 @@ const AdminLayout = () => {
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
       userPermissions?.map(({ id_permission }) => id_permission).includes(6101),
-      false,
+      // false,
     ];
     if (conditions.every((val) => val)) {
       searchCierre({

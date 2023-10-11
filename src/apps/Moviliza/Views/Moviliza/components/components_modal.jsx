@@ -18,8 +18,9 @@ export const ComponentsModalSummaryTrx = ({
         summaryTrx={{
           "Número de referencia": summary.numero_moviliza,
           // "Fecha de pago": summary.fecha_vencimiento,
-          // "Total derechos RUNT": formatMoney.format(summary.valor_runt),
-          // "Total derechos MT": formatMoney.format(summary.valor_mt),
+          "Total derechos RUNT": formatMoney.format(summary.object?.totalRUNT),
+          "Total derechos MT": formatMoney.format(summary.object?.totalMT),
+          "Total derechos locales": formatMoney.format(summary.object?.totalLocal),
           "Total a pagar": formatMoney.format(summary.object?.totalLiquidacion),
         }}
       >
