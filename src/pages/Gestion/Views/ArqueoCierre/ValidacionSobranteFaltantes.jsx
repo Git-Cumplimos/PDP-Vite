@@ -327,9 +327,9 @@ const ValidacionSobranteFaltantes = () => {
               setObservacionesAnalisis(e.target.value.trimLeft());
               e.target.value = e.target.value.trimLeft();
             }}
-            disabled={selected?.pk_estado !== 'Pendiente  '}
+            // disabled={selected?.pk_estado !== 'Pendiente  '}
             maxLength={"150"}
-            required={selected?.pk_estado === 'Pendiente  '}
+            // required={selected?.pk_estado === 'Pendiente  '}
           />
           <ButtonBar>
             <Button type="button" onClick={AlertCancelar} disabled={loading}>
