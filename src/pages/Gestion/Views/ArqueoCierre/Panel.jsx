@@ -43,7 +43,6 @@ const Panel = () => {
   const [next, setNext] = useState(0);
   const [dataPlfExt, setDataPlfExt] = useState(null);
 
-
   const nombreComercio = useMemo(
     () => roleInfo?.["nombre comercio"],
     [roleInfo]
@@ -106,7 +105,7 @@ const Panel = () => {
   }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio]);
 
   const buscarPlataforma = useCallback(() => {
-    buscarPlataformaExt()
+    buscarPlataformaExt({totaldata: '1'})
       .then((res) => {
         const listValue = [];
         res?.obj?.results.map(function(element){
@@ -171,9 +170,9 @@ const Panel = () => {
           setLoading(false);
           const cierre = res?.obj;
           const tempTicket = {
-            title: "Cierre de caja y arqueo",
+            title: "Cierre de caja",
             timeInfo: {
-              "Fecha de cierre": Intl.DateTimeFormat("es-CO", {
+              "Fecha de pago": Intl.DateTimeFormat("es-CO", {
                 year: "2-digit",
                 month: "2-digit",
                 day: "2-digit",
@@ -187,72 +186,60 @@ const Panel = () => {
             commerceInfo: [
               ["Id Comercio", cierre?.id_comercio],
               ["No. terminal", cierre?.id_terminal],
-              ["Id usuario", cierre?.id_usuario],
-              ["", ""],
-              ["Nombre comercio", nombreComercio],
+              ["Id Cierre", cierre?.pk_id_cierre],
+              ["Comercio", nombreComercio],
+              ["Cajero",cierre?.nombre_usuario],
               ["", ""],
             ],
             cajaInfo: [
               [
-                "Total movimientos del día",
+                "Movimientos del día",
                 formatMoney.format(cierre?.total_movimientos),
               ],
               ["", ""],
               [
-                "Total efectivo cierre día anterior",
+                "Efectivo cierre día anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],
               [
-                "Total efectivo en caja",
+                "Efectivo en caja PDP",
                 formatMoney.format(cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
               [
-                "Total efectivo en caja + externos",
+                "Efectivo en caja PDP + Externos",
                 formatMoney.format(Num+cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
             ],
             trxInfo: [
-              ["Total sobrante", formatMoney.format(cierre?.total_sobrante)],
+              ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],
-              ["Total faltante", formatMoney.format(cierre?.total_faltante)],
+              ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Total estimación faltantes",
+                "Estimación faltantes",
                 formatMoney.format(cierre?.total_estimacion_faltante),
               ],
               ["", ""],
               [
-                "Total movimientos pendiente aprobación",
-                formatMoney.format(cierre?.total_comprobantes_pendientes),
-              ],
-              ["", ""],
-              ["Total arqueo", formatMoney.format(cierre?.total_arqueo)],
-              ["", ""],
-              [
-                "Total entrega transportadora",
-                formatMoney.format(cierre?.total_entregado_transportadora),
-              ],
-              ["", ""],
-              [
-                "Total recibido transportadora",
-                formatMoney.format(cierre?.total_recibido_transportadora),
-              ],
-              ["", ""],
-              [
-                "Total consignaciones bancarias",
+                "Consignaciones bancarias",
                 formatMoney.format(cierre?.total_consignaciones),
               ],
               ["", ""],
               [
-                "Total transferencia entre cajeros",
-                formatMoney.format(cierre?.total_transferencias),
+                "Entregado a transportadora",
+                formatMoney.format(cierre?.total_entregado_transportadora),
               ],
               ["", ""],
               [
-                "Total notas débito o crédito",
+                "Recibido de transportadora",
+                formatMoney.format(cierre?.total_recibido_transportadora),
+              ],
+              ["", ""],
+              [
+                "Notas débito o crédito",
                 formatMoney.format(cierre?.total_notas),
               ],
               ["", ""],

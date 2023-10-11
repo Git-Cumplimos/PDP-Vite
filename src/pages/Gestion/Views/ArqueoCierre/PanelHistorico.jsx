@@ -154,7 +154,7 @@ const PanelHistorico = () => {
         const newData = []
         res?.obj?.results?.map((itemData)=>{
           var totalvalorEntidades = 0
-          itemData?.entidades_externas?.data.map((val)=>{
+          itemData?.entidades_externas?.data.map((val) => {
             totalvalorEntidades+=val.valor
           })
           const valJson = {
