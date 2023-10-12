@@ -19,7 +19,7 @@ import { notifyPending,notifyError } from "../../../../utils/notify";
 
 const originalState = {
   pk_id_transaccion: '',
-  pk_estado: '',
+  pk_estado: null,
   pk_obs_analista: '',
   pk_name_analista: '',
   pk_id_reporte: '',
@@ -40,18 +40,14 @@ const ValidacionSobranteFaltantes = () => {
   const [searchInfo, setSearchInfo] = useState(originalStateSarch);
   const [Validaciones, setValidaciones] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [stateRev, setStateRev] = useState(null);
-  const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
-  const [transaccion, setTransaccion] = useState("");
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [sentData, setSentData] = useState(originalState);
   const name_user=useAuth().pdpUser.uname
 
   const CloseModal = useCallback(() => {
     setSelected(null);
-    setStateRev(null);
-    setObservacionesAnalisis("");
-    setTransaccion("");
+    setSentData(originalState)
   }, []);
 
   const searchValidaciones = useCallback(() => {  
@@ -78,9 +74,8 @@ const ValidacionSobranteFaltantes = () => {
   const handleSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-      sentData.pk_estado=stateRev
+      sentData.pk_obs_analista =  sentData.pk_obs_analista===null?'':sentData.pk_obs_analista
       sentData.pk_id_transaccion=sentData.pk_id_transaccion===null?'':sentData.pk_id_transaccion.toString()
-      sentData.pk_obs_analista=observacionesAnalisis
       sentData.pk_name_analista=name_user
       notifyPending(
         editarNovedad({ pk_id_transaccion: "" },sentData),
@@ -113,9 +108,7 @@ const ValidacionSobranteFaltantes = () => {
     [
       CloseModal,
       searchValidaciones,
-      observacionesAnalisis,
-      transaccion,
-      stateRev,
+      sentData,
     ]
   );
 
@@ -129,12 +122,6 @@ const ValidacionSobranteFaltantes = () => {
     }else{
       return pk_valor_novedad
     }
-  };
-
-  const enableState = (state,id) => {
-    if (id !== undefined) {
-      sentData.pk_id_reporte = id
-    }  
   };
 
   const DisableState= (state) => {
@@ -202,9 +189,13 @@ const ValidacionSobranteFaltantes = () => {
         )}
         onSelectRow={(_e, index) => {
           setSelected(Validaciones[index]);
-          setSentData((old)=>{return{...old,pk_id_transaccion:Validaciones[index]?.pk_id_transaccion}})
-          setObservacionesAnalisis(Validaciones[index]?.pk_obs_analista)
-          setStateRev(Validaciones[index]?.pk_estado)
+          setSentData((old)=>{return{
+            ...old,
+            pk_estado:Validaciones[index]?.pk_estado,
+            pk_id_transaccion:Validaciones[index]?.pk_id_transaccion,
+            pk_obs_analista:Validaciones[index]?.pk_obs_analista,
+            pk_id_reporte:Validaciones[index]?.pk_id_reporte,
+          }})
         }}
         onSetPageData={setPageData}
       >
@@ -273,8 +264,11 @@ const ValidacionSobranteFaltantes = () => {
             type="text"
             name="pk_id_transaccion"
             value={sentData.pk_id_transaccion}
-            onInput={(e) => {handleChangeNum(e)}}
-            disabled={stateRev !== 'En Análisis'}
+            onInput={(e) => {
+              handleChangeNum(e)
+              setIsButtonDisabled(false)
+            }}
+            disabled={sentData.pk_estado !== 'En Análisis'}
           />
           <Input
             id="pk_valor_novedad"
@@ -304,10 +298,10 @@ const ValidacionSobranteFaltantes = () => {
               { value: "Rechazado  ", label: "Rechazado" },
             ]}
             defaultValue={selected?.pk_estado ?? ""}
-            onChange={(ev) =>
-              (setStateRev(ev.target.value),
-              enableState(ev.target.value,selected?.pk_id_reporte))
-            }
+            onChange={(ev) => {
+              setSentData((old)=>{return{...old,pk_estado:ev.target.value}})
+              setIsButtonDisabled(false)
+            }}
             required
             disabled={DisableState(selected?.pk_estado)}
           />
@@ -318,24 +312,18 @@ const ValidacionSobranteFaltantes = () => {
             className="w-full place-self-stretch"
             type="text"
             autoComplete="off"
-            value={
-              selected?.pk_estado !== 'Pendiente  '
-                ? selected?.pk_obs_analista
-                : observacionesAnalisis
-            }
+            value={sentData.pk_obs_analista}
             onInput={(e) => {
-              setObservacionesAnalisis(e.target.value.trimLeft());
-              e.target.value = e.target.value.trimLeft();
+              setSentData((old)=>{return{...old,pk_obs_analista:e.target.value.trimLeft()}})
+              setIsButtonDisabled(false)
             }}
-            // disabled={selected?.pk_estado !== 'Pendiente  '}
             maxLength={"150"}
-            // required={selected?.pk_estado === 'Pendiente  '}
           />
           <ButtonBar>
             <Button type="button" onClick={AlertCancelar} disabled={loading}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={stateRev === selected?.pk_estado || loading}>
+            <Button type="submit" disabled={isButtonDisabled}>
               Aceptar
             </Button>
           </ButtonBar>

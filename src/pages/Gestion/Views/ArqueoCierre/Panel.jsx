@@ -19,6 +19,7 @@ const formatMoney = makeMoneyFormatter(0);
 const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
 let Num = 0;
 
+
 const Panel = () => {
   const navigate = useNavigate();
   const { roleInfo, userInfo, signOut } = useAuth();
@@ -173,7 +174,7 @@ const Panel = () => {
             title: "Cierre de caja",
             timeInfo: {
               "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-                year: "2-digit",
+                year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
               }).format(new Date()),
@@ -219,7 +220,7 @@ const Panel = () => {
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Estimación faltantes",
+                "Estimación faltante",
                 formatMoney.format(cierre?.total_estimacion_faltante),
               ],
               ["", ""],

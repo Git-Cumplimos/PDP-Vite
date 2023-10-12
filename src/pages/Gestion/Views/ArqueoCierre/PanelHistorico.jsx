@@ -122,7 +122,7 @@ const PanelHistorico = () => {
         ["", ""],
         ["Faltante", formatMoney.format(data.total_faltante)],
         ["", ""],
-        ["Estimación faltantes",formatMoney.format(data.total_estimacion_faltante)],
+        ["Estimación faltante",formatMoney.format(data.total_estimacion_faltante)],
         ["", ""],
         ["Consignaciones bancarias",formatMoney.format(data.total_consignaciones)],
         ["", ""],

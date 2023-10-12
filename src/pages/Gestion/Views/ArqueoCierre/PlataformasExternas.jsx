@@ -108,7 +108,7 @@ const ParametrizacionRecaudo = () => {
         {
           render: ({ data: err }) => {
             if (err?.cause === "custom") {
-              return err?.message;
+              return 'Plataforma Duplicada';
             }
             console.error(err?.message);
             return "Peticion fallida";
@@ -122,10 +122,6 @@ const ParametrizacionRecaudo = () => {
   useEffect(() => {
     buscarPlataforma();
   }, [buscarPlataforma]);
-
-  // const handleInput = (e) => {
-  //   selectedEntity[e.target.name]=e.target.value.toUpperCase()
-  // }
 
   return (
     <Fragment>
@@ -205,9 +201,6 @@ const ParametrizacionRecaudo = () => {
               onChange={(e) => {
                  e.target.value = e.target.value.toUpperCase();
               }}
-              // onChange={(e) => {
-              //   handleInput(e);
-              // }}
             />
             <ButtonBar>
               <Button type="submit">Actualizar información</Button>
