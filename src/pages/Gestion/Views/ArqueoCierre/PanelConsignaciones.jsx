@@ -384,9 +384,9 @@ const PanelConsignaciones = () => {
           />
           {selectedFileUrl && (
             <>
-            {/* <div className="my-4 mx-auto md:mx-4 gap-4"> */}
-              <img src={selectedFileUrl}/>
-            {/* </div> */}
+            <div className="my-4 mx-auto md:mx-4 gap-4">
+              <Magnifier src={selectedFileUrl}  zoomFactor={2}/>
+            </div>
             </>
           )}
           <ButtonBar>
