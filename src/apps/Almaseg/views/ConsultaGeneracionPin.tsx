@@ -10,10 +10,18 @@ import {
   TypeServicesBackendAlmaseg,
   ErrorFetchAlmaseg,
 } from "../hooks/useFetchAlmaseg";
+import { useAuth } from "../../../hooks/AuthHooks";
 
 //--------- Typing ------------------
 type TypeDataInput = {
   numero_factura: string;
+  comercio: {
+    id_comercio: number | null;
+    id_usuario: number | null;
+    id_terminal: number | null;
+  };
+  oficina_propia: boolean | null;
+  nombre_usuario: string | null;
 };
 type TypeDataOutput = null | {
   numero_identificacion: string;
@@ -31,12 +39,26 @@ const url_consulta = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/cons
 
 //--------- componente ------------------
 const ConsultaGeneracionPin = (): JSX.Element => {
-  const [dataInput, setDataInput] = useState<TypeDataInput>(dataInputInitial);
+  const { roleInfo, pdpUser } = useAuth();
+  const [dataInput, setDataInput] = useState<TypeDataInput>({
+    ...dataInputInitial,
+    comercio: {
+      id_comercio: roleInfo?.id_comercio ?? 0,
+      id_usuario: roleInfo?.id_usuario ?? 0,
+      id_terminal: roleInfo?.id_dispositivo ?? 0,
+    },
+    oficina_propia:
+      roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+      roleInfo?.tipo_comercio === "KIOSCO"
+        ? true
+        : false,
+    nombre_usuario: pdpUser?.uname ?? "",
+  });
   const [dataOutput, setDataOutput] = useState<TypeDataOutput>(null);
   const [loadingPeticionConsultaPin, peticionConsultaPin] = useFetchAlmaseg(
     url_consulta,
-    "consulta generacion pin",
-    "GET"
+    "consulta generación pin",
+    "POST"
   );
 
   const doOnChange = useCallback((ev: ChangeEvent<HTMLFormElement>) => {
@@ -44,7 +66,10 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   }, []);
 
   const doOnReset = useCallback(() => {
-    setDataInput(dataInputInitial);
+    setDataInput((old) => ({
+      ...old,
+      ...dataInputInitial,
+    }));
     setDataOutput(null);
   }, []);
 
