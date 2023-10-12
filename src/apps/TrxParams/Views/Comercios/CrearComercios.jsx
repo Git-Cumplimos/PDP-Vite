@@ -979,7 +979,7 @@ const CrearComercios = () => {
           <Select
             id="Pago comision"
             name="Pago comision"
-            label="Pago comision cada:"
+            label="Pago comisión cada:"
             options={{
               "": "",
               Transacción: "Transaccion",
