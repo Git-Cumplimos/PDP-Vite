@@ -261,7 +261,7 @@ const ValidacionSobranteFaltantes = () => {
           <Input
             id="pk_id_transaccion"
             label="Id Transacción"
-            type="text"
+            type="number"
             name="pk_id_transaccion"
             value={sentData.pk_id_transaccion}
             onInput={(e) => {
