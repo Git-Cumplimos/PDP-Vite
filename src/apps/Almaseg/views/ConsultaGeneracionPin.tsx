@@ -16,7 +16,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 type TypeDataInput = {
   numero_factura: string;
   comercio: {
-    id_comercio: number | null;
+    id_comercio: null | number;
     id_usuario: number | null;
     id_terminal: number | null;
   };
@@ -43,16 +43,16 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   const [dataInput, setDataInput] = useState<TypeDataInput>({
     ...dataInputInitial,
     comercio: {
-      id_comercio: roleInfo?.id_comercio ?? 0,
-      id_usuario: roleInfo?.id_usuario ?? 0,
-      id_terminal: roleInfo?.id_dispositivo ?? 0,
+      id_comercio: roleInfo?.["id_comercio"] ?? 0,
+      id_usuario: roleInfo?.["id_usuario"] ?? 0,
+      id_terminal: roleInfo?.["id_dispositivo"] ?? 0,
     },
     oficina_propia:
-      roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-      roleInfo?.tipo_comercio === "KIOSCO"
+      roleInfo?.["tipo_comercio"] === "OFICINAS PROPIAS" ||
+      roleInfo?.["tipo_comercio"] === "KIOSCO"
         ? true
         : false,
-    nombre_usuario: pdpUser?.uname ?? "",
+    nombre_usuario: pdpUser?.["uname"] ?? "",
   });
   const [dataOutput, setDataOutput] = useState<TypeDataOutput>(null);
   const [loadingPeticionConsultaPin, peticionConsultaPin] = useFetchAlmaseg(
@@ -76,7 +76,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   const doOnSubmit = useCallback(
     (ev: FormEvent<HTMLFormElement>) => {
       ev.preventDefault();
-      peticionConsultaPin(dataInput, {})
+      peticionConsultaPin({}, dataInput)
         .then((res: TypeServicesBackendAlmaseg) => {
           setDataOutput(res?.obj?.result);
           setDataInput((old) => ({
@@ -104,7 +104,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   );
 
   return (
-    <div>
+    <>
       <SimpleLoading show={loadingPeticionConsultaPin}></SimpleLoading>
       <h1 className="text-3xl mt-6">Consulta Para Generación de Pines</h1>
       <div className="px-6 py-8 mt-6 flex items-center flex-col border-solid border-2 border-slate-600 rounded-2xl">
@@ -131,23 +131,30 @@ const ConsultaGeneracionPin = (): JSX.Element => {
           </ButtonBar>
         </Form>
         {dataOutput ? (
-          <div className="px-4 py-8 mt-6  grid gap-4 grid-cols-2 grid-rows-3 justify-items-center border-solid border-2 border-gray-400 rounded-2xl">
-            <h2 className="font-semibold">Número de factura: </h2>
-            <h2>{dataOutput?.numero_factura ?? ""}</h2>
-            <h2 className="font-semibold">Tipo de identificación: </h2>
-            <h2>{dataOutput?.tipo_identificacion ?? ""} </h2>
-            <h2 className="font-semibold">Número de identificación: </h2>
-            <h2>{dataOutput?.numero_identificacion ?? ""} </h2>
-            <h2 className="font-semibold">Nombres y Apellidos: </h2>
-            <h2>{dataOutput?.nombres ?? ""} </h2>
-            <h2 className="font-semibold">Valor del PIN: </h2>
-            <h2>{`$ ${dataOutput?.valor_total ?? ""}`} </h2>
-          </div>
+          <>
+            <div className="px-4 py-8 mt-6  grid gap-4 grid-cols-2 grid-rows-3 justify-items-center border-solid border-2 border-gray-400 rounded-2xl">
+              <h2 className="font-semibold">Número de factura: </h2>
+              <h2>{dataOutput?.numero_factura ?? ""}</h2>
+              <h2 className="font-semibold">Tipo de identificación: </h2>
+              <h2>{dataOutput?.tipo_identificacion ?? ""} </h2>
+              <h2 className="font-semibold">Número de identificación: </h2>
+              <h2>{dataOutput?.numero_identificacion ?? ""} </h2>
+              <h2 className="font-semibold">Nombres y Apellidos: </h2>
+              <h2>{dataOutput?.nombres ?? ""} </h2>
+              <h2 className="font-semibold">Valor del PIN: </h2>
+              <h2>{`$ ${dataOutput?.valor_total ?? ""}`} </h2>
+            </div>
+            <Form grid onSubmit={() => {}}>
+              <ButtonBar className="lg:col-span-2">
+                <Button type="submit">Realizar retiro</Button>
+              </ButtonBar>
+            </Form>
+          </>
         ) : (
           <></>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
