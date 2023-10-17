@@ -39,15 +39,12 @@ const RetiroDirecto = () => {
     "Longitud mínima": "",
     "Longitud máxima": "",
   }])
-  const [res] = useState(
-    [
-      ["REFERENCIA_1", "REFERENCIA_2",
-        "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
-      [332421666, 5645454, "apellido", 50000, "8/06/2023", 125],
-      [332421667, 5456458, "apellido", 865000, "8/06/2023", 125],
-      [332421668, 5456458, "apellido", 20000, "8/06/2023", 125],
-    ]
-  )
+  const [res] = useState([
+    ["REFERENCIA_1", "REFERENCIA_2", "TOTAL_PAGAR","FECHA_VENCIMIENTO"],
+    [332421116, 432422226, 50000, "8/12/2023"],
+    [332421117, 432422227, 80000, "16/10/2023"],
+    [332421118, 432422228, 1250000, "12/11/2023"],
+  ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },

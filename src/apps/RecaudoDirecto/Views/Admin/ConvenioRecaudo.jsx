@@ -42,11 +42,10 @@ const RecaudoDirecto = () => {
   }])
 
   const [res] = useState([
-    ["REFERENCIA_1", "REFERENCIA_2",
-      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR","FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
-    [332421116, "JUAN", "apellido", 50000, "8/06/2023", 125],
-    [332421117, "PEDRO", "apellido", 80000, "16/06/2023", 125],
-    [332421118, "MARIA", "apellido", 1250000, "12/06/2023", 125],
+    ["REFERENCIA_1", "REFERENCIA_2", "TOTAL_PAGAR","FECHA_VENCIMIENTO"],
+    [332421116, 432422226, 50000, "8/12/2023"],
+    [332421117, 432422227, 80000, "16/10/2023"],
+    [332421118, 432422228, 1250000, "12/11/2023"],
   ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
