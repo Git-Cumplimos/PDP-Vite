@@ -136,16 +136,20 @@ const ValidacionSobranteFaltantes = () => {
   };
 
   const handleChangeNum = (e) => {
-    const value = e.target.value;
+    var value = e.target.value;
     if (e.target.name==='pk_id_transaccion') {
-      if (/^[0-9]*$/.test(value) && value.length <= 15) {
-        setSentData((old)=>{return{...old,pk_id_transaccion:value.trimLeft()}})
+      value = value.replace(/[^0-9]/g, '');
+      if (value.length > 15) {
+        value = value.slice(0, 15);
       }
+      setSentData((old)=>{return{...old,pk_id_transaccion:value.trimLeft()}})
     }
     if (e.target.name==='fk_id_comercio') {
-      if (/^[0-9]*$/.test(value) && value.length <= 15) {
-        setSearchInfo((old) => {return {...old,fk_id_comercio: value}})
+      value = value.replace(/[^0-9]/g, '');
+      if (value.length > 15) {
+        value = value.slice(0, 15);
       }
+      setSearchInfo((old) => {return {...old,fk_id_comercio:value}})
     }
   };
 
@@ -261,7 +265,7 @@ const ValidacionSobranteFaltantes = () => {
           <Input
             id="pk_id_transaccion"
             label="Id Transacción"
-            type="number"
+            type="tel"
             name="pk_id_transaccion"
             value={sentData.pk_id_transaccion}
             onInput={(e) => {
