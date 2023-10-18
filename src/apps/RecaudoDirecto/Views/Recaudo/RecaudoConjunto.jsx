@@ -289,6 +289,7 @@ const RecaudoConjunto = () => {
               min={validarLimites(4, 'min')}
               value={valorRecibido.valor_total_trx}
               max={validarLimites(4, 'max')}
+              maxLength={12}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
               }
@@ -336,6 +337,7 @@ const RecaudoConjunto = () => {
                   min={validarLimites(dataRecaudo?.fk_modificar_valor, 'min')}
                   equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
                   max={validarLimites(dataRecaudo?.fk_modificar_valor, 'max')}
+                  maxLength={12}
                   onInput={(e, valor) =>
                     setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
                   }
