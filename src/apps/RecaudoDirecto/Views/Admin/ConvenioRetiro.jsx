@@ -25,6 +25,11 @@ const initialSearchFilters = new Map([
   ["limit", 10],
 ]);
 
+const limitesMontos = {
+  max: 9999999,
+  min: 1,
+};
+
 const RetiroDirecto = () => {
   const [listRetiro, setListRetiro] = useState([]);
   const [selected, setSelected] = useState(false);
@@ -373,7 +378,9 @@ const RetiroDirecto = () => {
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
-                  maxLength={"12"}
+                  maxLength={"11"}
+                  min={limitesMontos.min}
+                  max={limitesMontos.max}
                   value={valLimit ?? 0}
                   equalError={false}
                   onInput={(e, valor) => {

@@ -25,6 +25,11 @@ const initialSearchFilters = new Map([
   ["limit", 10],
 ]);
 
+const limitesMontos = {
+  max: 9999999,
+  min: 1,
+};
+
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
   // const [sinBaseDatos, setSinBaseDatos] = useState(false);
@@ -378,7 +383,9 @@ const RecaudoDirecto = () => {
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
-                  maxLength={"12"}
+                  maxLength={"11"}
+                  min={limitesMontos.min}
+                  max={limitesMontos.max}
                   value={valLimit}
                   equalError={false}
                   onInput={(e, valor) => {
