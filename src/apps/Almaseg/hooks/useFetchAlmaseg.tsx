@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from "react";
-import { notifyError } from "../../../utils/notify";
+import { useCallback, useState } from "react";
 import fetchData from "../../../utils/fetchData";
 
 //--------- Constantes ------------------
@@ -15,11 +14,6 @@ export class ErrorFetchAlmaseg extends Error {
 }
 
 //--------- Typing ------------------
-type TypePeticion = {
-  params?: { [key: string]: any };
-  body?: { [key: string]: any };
-};
-
 type TypeServicesBackendAlmasegObj = {
   error_status: boolean;
   error_msg: { [key: string]: any } | {};
@@ -57,9 +51,6 @@ export const useFetchAlmaseg = (
           }
         }
       } catch (error: any) {
-        notifyError(
-          `Error respuesta Frontend PDP: Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`
-        );
         console.error({
           "Error PDP": `Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`,
           "Error Sequence": `${name_fetch} - Error al armar parametros`,
@@ -80,9 +71,6 @@ export const useFetchAlmaseg = (
           Peticion = await fetchData(urlCompleto, "POST", {}, body, true);
         }
       } catch (error: any) {
-        notifyError(
-          `Error respuesta Frontend PDP: Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`
-        );
         console.error({
           "Error PDP": `Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`,
           "Error Sequence": `${name_fetch} - Error al realizar Peticion`,
@@ -98,9 +86,6 @@ export const useFetchAlmaseg = (
           throw new Error(`Servicio no encontrado (${name})`);
         }
       } catch (error: any) {
-        notifyError(
-          `Error respuesta Frontend PDP: Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`
-        );
         console.error({
           "Error PDP": `Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`,
           "Error Sequence": `${name_fetch} - Error al evaluar si la respuesta es json`,
@@ -123,9 +108,6 @@ export const useFetchAlmaseg = (
           }
         }
       } catch (error: any) {
-        notifyError(
-          `Error respuesta Frontend PDP: Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`
-        );
         console.error({
           "Error PDP": `Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`,
           "Error Sequence": `${name_fetch} - Error al evaluar respuesta de api gateway`,
@@ -176,11 +158,8 @@ export const useFetchAlmaseg = (
         }
       } catch (error: any) {
         if (error instanceof ErrorFetchAlmaseg) {
-          notifyError(`${error.message}`);
+          console.error(`${error.message}`);
         } else {
-          notifyError(
-            `Error respuesta Frontend PDP: Fallo al consumir el servicio (${name_module} - ${name}) [0010002]`
-          );
           console.error({
             "Error PDP":
               "Fallo al consumir el servicio (banco agrario - retiro otp) [0010002]",

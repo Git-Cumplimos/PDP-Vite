@@ -3,21 +3,29 @@ import { notifyError } from "../../../utils/notify";
 
 
 export const descargarCSV = (nombreArchivo, info) => {
+  const headers = info[0];
   const options = {
     fieldSeparator: ";",
-    quoteStrings: '"',
-    decimalSeparator: ",",
+    // quoteStrings: "",
+    // decimalSeparator: "",
     showLabels: true,
-    showTitle: false,
-    title: nombreArchivo,
-    useTextFile: false,
-    useBom: true,
-    useKeysAsHeaders: false,
+    // showTitle: false,
+    // title: nombreArchivo,
+    // useTextFile: false,
+    useBom: false,
+    // useKeysAsHeaders: false,
+    headers: headers,
     filename: nombreArchivo,
   };
   const csvExporter = new ExportToCsv(options);
-  const data = JSON.stringify(info);
-  csvExporter.generateCsv(data);
+  const datosFormateados = info.slice(1).map((fila,i) => {
+    let data = {}
+    fila.forEach((item,index) => {
+      data[headers[index] ?? " "] = item
+    })
+    return data
+  });
+  csvExporter.generateCsv(datosFormateados);
 }
 // export const descargarTXT= (nombreArchivo, info) => {
 //   const blob = new Blob([info]);

@@ -270,6 +270,7 @@ const FormularioRetiro = () => {
               min={dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]}
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
               max={validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')}
+              maxLength={12}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
               }

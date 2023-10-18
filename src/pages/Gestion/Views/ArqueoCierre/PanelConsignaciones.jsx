@@ -232,7 +232,8 @@ const PanelConsignaciones = () => {
         onSelectRow={(_e, index) => {
           setSelected(comprobantes[index]);
           descargarComprobante({ filename: comprobantes[index].archivo })
-            .then((res) => setSelectedFileUrl(res?.obj ?? ""))
+            .then((res) => {console.log(res?.obj);
+              setSelectedFileUrl(res?.obj ?? "")})
             .catch((err) => {
               if (err?.cause === "custom") {
                 return err?.message;
