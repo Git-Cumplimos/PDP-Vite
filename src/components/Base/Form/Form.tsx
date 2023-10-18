@@ -68,6 +68,9 @@ const Form = forwardRef<HTMLFormElement, Props>(
         }
       };
     }
+    formProps.onKeyDown = (e) => {
+      if (e.key === "Enter" || e.code === "Space") e.preventDefault();
+    };
     useEffect(() => {
       return () => {
         if (timerOnSubmit) clearTimeout(timerOnSubmit);

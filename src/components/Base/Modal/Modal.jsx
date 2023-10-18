@@ -23,6 +23,32 @@ const Modal = ({
   useEffect(() => {
     if (show) {
       document.body.style.overflow = "hidden";
+      const modalElement = refModal.current;
+      const focusableElements = modalElement.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      const handleTabKeyPress = (event) => {
+        console.log(event.key)
+        if (event.key === "Tab") {
+          if (event.shiftKey && document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+          } else if (
+            !event.shiftKey &&
+            document.activeElement === lastElement
+          ) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        }
+      };
+      modalElement.addEventListener("keydown", handleTabKeyPress);
+      return () => {
+        modalElement.removeEventListener("keydown", handleTabKeyPress);
+      }
     } else {
       document.body.style.overflow = "auto";
     }
