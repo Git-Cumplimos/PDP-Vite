@@ -31,7 +31,6 @@ const Modal = ({
       const lastElement = focusableElements[focusableElements.length - 1];
 
       const handleTabKeyPress = (event) => {
-        console.log(event.key)
         if (event.key === "Tab") {
           if (event.shiftKey && document.activeElement === firstElement) {
             event.preventDefault();
