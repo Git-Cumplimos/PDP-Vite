@@ -8,6 +8,9 @@ import { notify, notifyError } from "../../../../utils/notify";
 import {
   postConsultaEstadoRecaudoMultiple,
   reporteTransaccionesRecaudoMultiple,
+  postConsultaReferencia,
+  postDescargarTickets,
+  checkEstadoDescargaTickets,
 } from "../utils/fetchRecaudoMultiple";
 
 const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
@@ -19,11 +22,21 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
     exist: false,
   });
   const [intervalId, setIntervalId] = useState(null);
+  const [consultaReferencia, setConsultaReferencia] = useState([]);
+
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   useEffect(() => {
     if (uuid && uuid !== "") {
       firstFecthEstadoRecaudoMultiple();
+      fetchConsultaReferencia();
       const intervalId = setInterval(() => {
         fecthEstadoRecaudoMultiple();
+        fetchConsultaReferencia();
       }, 15000);
       setIntervalId(intervalId);
       return () => clearInterval(intervalId);
@@ -115,6 +128,25 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         console.error(err);
       });
   };
+  
+  const fetchConsultaReferencia = () => {
+    let obj = {
+      uuid
+    };
+    postConsultaReferencia(obj)
+      .then((res) => {
+        if (!res?.status) {
+          return notifyError(res?.msg);
+        }
+        setConsultaReferencia(res?.obj?.data ?? []);
+      })
+      .catch((err) => {
+        notifyError("Error de conexion con el servicio");
+        setEstadoTrx(false);
+        console.error(err);
+      });
+  };
+
   const fecthArchivoEstadoRecaudoMultiple = () => {
     setEstadoTrx(true);
     let obj = {
@@ -154,6 +186,75 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
         console.error(err);
       });
   };
+
+  const fecthDescargarTickets = () => {
+    setEstadoTrx(true);
+    let obj = {
+      uuid,
+    };
+    postDescargarTickets(obj)
+      .then(async (res) => {
+        if (res?.status) {
+          notify(res?.msg);
+          window.open(res?.obj?.data);
+          setEstadoTrx(false);
+        } else {
+          if (res?.message === "Endpoint request timed out") {
+            notify("Se esta procesando la descarga")
+            for (let i = 0; i < 5; i++) {
+              try {
+                const prom = await new Promise((resolve, reject) =>
+                  setTimeout(() => {
+                    let obj = {
+                      uuid,
+                    };
+                    checkEstadoDescargaTickets(obj)
+                      .then((res) => {
+                        if (res?.msg !== "Error respuesta PDP: (No ha terminado la operación)") {
+                          if (res?.status) {
+                            notify(res?.msg);
+                            window.open(res?.obj?.data);
+                            setEstadoTrx(false);
+                            resolve(true);
+                          } else {
+                            notifyError(res?.msg ?? res?.message ?? "");
+                            resolve(true);
+                          }
+                        } else {
+                          // notifyError(res?.msg);
+                          setEstadoTrx(true);
+                          resolve(false);
+                        }
+                      })
+                      .catch((err) => {
+                        notifyError("Error al realizar descarga de ticket");
+                        setEstadoTrx(false);
+                        console.error(err);
+                      });
+                  }, 15000)
+                );
+                if (prom === true) {
+                  setEstadoTrx(false);
+                  break;
+                }
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          }
+          else {
+            notifyError(res?.msg);
+            setEstadoTrx(false);
+          }
+        }
+      })
+      .catch((err) => {
+        notifyError("Error de conexion con el servicio");
+        setEstadoTrx(false);
+        console.error(err);
+      });
+  };
+  
   return (
     <>
       <SimpleLoading show={estadoTrx} />
@@ -179,10 +280,40 @@ const ConsultarRecaudosMultiples = ({ uuid, roleInfo, pdpUser }) => {
             <h1 className='text-xl text-center mb-10 mt-5'>
               {`Cantidad de transacciones realizadas: ${consultaRecaudo?.transacciones_contadas}`}
             </h1>
+            {!consultaRecaudo?.finalizo && consultaReferencia.length > 0? 
+              (
+                <Fieldset legend='Transacciones en proceso'>
+                  <table style={{ border: '1px solid black' }} >
+                  <thead>
+                    <tr style={{ border: '1px solid black' }}>
+                      <th>Número Referencia</th>
+                      <th>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consultaReferencia.map((subArray, index) => (
+                      <tr key={index} >
+                        {subArray.map((element, subIndex) => (
+                          <td key={subIndex}>{subIndex === 1 ? formatMoney.format(element) : element}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </Fieldset>
+              ) : 
+              (<></>)}
             {consultaRecaudo?.transacciones_contadas > 0 && (
               <ButtonBar>
                 <Button onClick={fecthArchivoEstadoRecaudoMultiple}>
                   Descargar extracto de transacciones
+                </Button>
+              </ButtonBar>
+            )}
+            {consultaRecaudo?.finalizo && (
+              <ButtonBar>
+                <Button onClick={fecthDescargarTickets}>
+                  Descargar ticket de transacciones
                 </Button>
               </ButtonBar>
             )}

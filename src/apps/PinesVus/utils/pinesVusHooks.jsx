@@ -48,7 +48,7 @@ export const useProvidePinesVus = () => {
   // Datos consulta y compra
   const { roleInfo, pdpUser} = useAuth();
   const [activarNavigate, setActivarNavigate] = useState(true);
-  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion,ticket) => {
+  const cancelPinVus = useCallback(async (valor, motivo, trx, user, id_pin, valor_tramite, tipCancelacion, infoComercioCreacion,ticket,pagoTarjeta) => {
     let tipo_comercio = user?.tipo_comercio
     if (user?.tipo_comercio === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -67,7 +67,8 @@ export const useProvidePinesVus = () => {
       tipCancelacion: tipCancelacion,
       id_trx: trx,
       comercio_creacion: infoComercioCreacion,
-      ticket: ticket
+      ticket: ticket,
+      pago_tarjeta:pagoTarjeta
     };
     const query = {
       id_pin: id_pin,
@@ -81,7 +82,7 @@ export const useProvidePinesVus = () => {
     }
   }, [roleInfo, pdpUser]);
   
-  const crearPinVus = useCallback(async (documento, tipoPin, tramite, tramite2, user, infoTramite, infoTramite2, infoCliente, olimpia, categoria, categoria2, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2) => {
+  const crearPinVus = useCallback(async (documento, tipoPin, tramite, tramite2, user, infoTramite, infoTramite2, infoCliente, olimpia, categoria, categoria2, idPin, firma, motivoCompra, descripcionTipDocumento, ticket1, ticket2, codigoPago, codigoPago2) => {
     let tipo_comercio = user?.Tipo
     if (user?.Tipo === "KIOSCO"){
       tipo_comercio = "OFICINAS PROPIAS"
@@ -120,7 +121,9 @@ export const useProvidePinesVus = () => {
       motivoCompra: motivoCompra,
       descripcionTipDocumento:descripcionTipDocumento,
       ticket_pin:ticket1,
-      ticket_tramite:ticket2
+      ticket_tramite:ticket2,
+      codigo_datafono:codigoPago,
+      codigo_datafono_2:codigoPago2
     };
   
     if (idPin !== ""){

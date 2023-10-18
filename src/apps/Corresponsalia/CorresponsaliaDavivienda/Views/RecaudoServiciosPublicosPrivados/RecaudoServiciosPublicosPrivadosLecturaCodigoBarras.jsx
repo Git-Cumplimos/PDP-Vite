@@ -22,6 +22,8 @@ import {
   postConsultaConveniosDavivienda,
   postRecaudoConveniosDavivienda,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
+import MoneyInput from "../../../../../components/Base/MoneyInput/MoneyInput";
 
 const valor_maximo_recaudo = 9900000;
 
@@ -32,31 +34,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   const [peticion, setPeticion] = useState(0);
   const formatMoney = makeMoneyFormatter(2);
   const dataConveniosPagar = ["3", "0"];
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "Recibo de Pago de Recaudo de Facturas",
-    timeInfo: {
-      "Fecha de venta": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*ciudad*/
-      ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : "Sin datos"],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["Tipo de operación", "Recaudo de facturas"],
-      ["", ""],
-    ],
-    commerceName: roleInfo?.["nombre comercio"]
-      ? roleInfo?.["nombre comercio"]
-      : "Sin datos",
-    trxInfo: [],
-    disclamer: "Línea de atención personalizada: #688\nMensaje de texto: 85888",
-  });
+  const [objTicketActual, setObjTicketActual] = useState(null);
   const [datosTrans, setDatosTrans] = useState({
     codBarras: "",
   });
@@ -127,7 +105,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
               ...old,
               ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
               ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
-              showValor: formatMoney.format(valorTrx) ?? "",
+              showValor: valorTrx ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
             };
@@ -182,32 +160,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
     });
     setShowModal(false);
     setPeticion(0);
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*id_comercio*/
-          ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : ""],
-          /*id_dispositivo*/
-          [
-            "No. terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : "",
-          ],
-          /*ciudad*/
-          ["Municipio", roleInfo?.ciudad ? roleInfo?.ciudad : ""],
-          /*direccion*/
-          ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : ""],
-          ["Tipo de operación", "Recaudo de facturas"],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-
+    if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
+      if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[0]) <= 0){
+        return notifyError("La referencia no puede ser 0");
+      }
+    }
+    if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1"){
+      if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[1]) <= 0){
+        return notifyError("La referencia no puede ser 0");
+      }
+    }
     if (
       dataConveniosPagar.includes(
         datosEnvio?.datosConvenio?.num_ind_consulta_cnb
@@ -253,8 +218,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         datosEnvio?.datosConvenio?.num_ind_consulta_cnb
       ) ||
       peticion === 2
+      ||
+      peticion === 3
     ) {
       let valorTransaccion = 0;
+      if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
+        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[0]) <= 0){
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
+      if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1"){
+        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[1]) <= 0){
+          return notifyError("La referencia no puede ser 0");
+        }
+      }
       if (peticion === 2) {
         // if (typeof datosTransaccion.valor == "string") {
         //   valorTransaccion = datosTransaccion.valor.replace(/[$ .]/g, "");
@@ -265,12 +242,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         if (datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0") {
           if (
             datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb === "0" &&
-            datosTransaccion.valor > datosTransaccion.valorSinModificar
+            datosTransaccion.valor > datosTransaccion.valorSinModificar2
           )
             return notifyError("No esta permitido el pago mayor al original");
           if (
             datosEnvio?.datosConvenio?.ind_menor_vlr_cnb === "0" &&
-            datosTransaccion.valor < datosTransaccion.valorSinModificar
+            datosTransaccion.valor < datosTransaccion.valorSinModificar2
           ) {
             if (
               !(
@@ -299,41 +276,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           )}`
         );
       }
-      const hoy = new Date();
-      const fecha = Intl.DateTimeFormat("es-CO", {
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date());
-      /*hora actual */
-      const hora = Intl.DateTimeFormat("es-CO", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }).format(new Date());
-      const objTicket = { ...objTicketActual };
-      objTicket["timeInfo"]["Fecha de venta"] = fecha;
-      objTicket["timeInfo"]["Hora"] = hora;
-      objTicket["trxInfo"].push([
-        "Convenio",
-        datosEnvio?.datosConvenio?.nom_convenio_cnb,
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Código convenio",
-        datosEnvio?.datosConvenio?.cod_convenio_cnb,
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Referencia 1",
-        datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
-      objTicket["trxInfo"].push([
-        "Referencia 2",
-        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
-      ]);
-      objTicket["trxInfo"].push(["", ""]);
+      if (peticion === 3){
+        if (parseInt(datosTransaccion.valor) !== parseInt(datosTransaccion.valorSinModificar2)){
+          let error = "El valor a pagar es diferente al valor ingresado";
+          return notifyError(error);
+        }
+      }
       setIsUploading(true);
       postRecaudoConveniosDavivienda({
         valTipoConsultaConvenio: "1",
@@ -357,7 +305,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
         valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
         nomConvenio: datosEnvio?.datosConvenio?.nom_convenio_cnb,
-        ticket: objTicket,
         fecCodigDeBarras:
           datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
         valCodigoDeBarras: valorTransaccion,
@@ -381,60 +328,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           if (res?.status) {
             setIsUploading(false);
             notify(res?.msg);
-            objTicket["commerceInfo"][1] = [
-              "No. terminal",
-              res?.obj?.codigoTotal,
-            ];
-            objTicket["commerceInfo"].push([
-              "No. de aprobación Banco",
-              res?.obj?.respuestaDavivienda?.valTalonOut,
-            ]);
-            objTicket["commerceInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Valor",
-              formatMoney.format(res?.obj?.valor),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Costo transacción",
-              formatMoney.format(0),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            objTicket["trxInfo"].push([
-              "Total",
-              formatMoney.format(res?.obj?.valor),
-            ]);
-            objTicket["trxInfo"].push(["", ""]);
-            setObjTicketActual(objTicket);
+            setObjTicketActual(res?.obj?.ticket);
             setPeticion(4);
           } else {
             // notifyError(res?.msg ?? res?.message ?? "");
             if (res?.message === "Endpoint request timed out") {
-              const formatDate = Intl.DateTimeFormat("es-CO", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(hoy);
-              const formatDateTimeIni = Intl.DateTimeFormat("es-CO", {
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: false,
-              }).format(hoy);
-              const newDate = new Date(hoy.getTime() + 2 * 60000);
-              const formatDateTimeFin = Intl.DateTimeFormat("es-CO", {
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: false,
-              }).format(newDate);
               for (let i = 0; i < 5; i++) {
                 try {
                   const prom = await new Promise((resolve, reject) =>
                     setTimeout(() => {
                       postCheckReintentoRecaudoConveniosDavivienda({
-                        dateIni: `${formatDate} ${formatDateTimeIni}`,
-                        dateEnd: `${formatDate} ${formatDateTimeFin}`,
 
                         idComercio: roleInfo?.id_comercio,
                         idUsuario: roleInfo?.id_usuario,
@@ -457,32 +360,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                             if (res?.status) {
                               setIsUploading(false);
                               notify(res?.msg);
-                              objTicket["commerceInfo"][1] = [
-                                "No. terminal",
-                                res?.obj?.codigoTotal,
-                              ];
-                              objTicket["commerceInfo"].push([
-                                "No. de aprobación Banco",
-                                res?.obj?.respuestaDavivienda?.valTalonOut ??
-                                  res?.obj?.idTrx,
-                              ]);
-                              objTicket["commerceInfo"].push(["", ""]);
-                              objTicket["trxInfo"].push([
-                                "Valor",
-                                formatMoney.format(res?.obj?.valor),
-                              ]);
-                              objTicket["trxInfo"].push(["", ""]);
-                              objTicket["trxInfo"].push([
-                                "Costo transacción",
-                                formatMoney.format(0),
-                              ]);
-                              objTicket["trxInfo"].push(["", ""]);
-                              objTicket["trxInfo"].push([
-                                "Total",
-                                formatMoney.format(res?.obj?.valor),
-                              ]);
-                              objTicket["trxInfo"].push(["", ""]);
-                              setObjTicketActual(objTicket);
+                              setObjTicketActual(res?.obj?.ticket);
                               setShowModal((old) => ({
                                 ...old,
                                 estadoPeticion: 3,
@@ -493,7 +371,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                               resolve(true);
                             }
                           } else {
-                            // notifyError(res?.msg ?? res?.message ?? "");
                             setIsUploading(false);
                             hideModalReset();
                             resolve(false);
@@ -501,7 +378,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         })
                         .catch((err) => {
                           setIsUploading(false);
-                          // notifyError("No se ha podido conectar al servidor");
                           console.error(err);
                         });
                     }, 15000)
@@ -568,8 +444,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             setDatosTransaccion((old) => {
               return {
                 ...old,
-                showValor2: formatMoney.format(valorTrxCons) ?? "",
-                valor: valorTrxCons ?? "",
+                showValor2: datosTransaccion.valorSinModificar ?? "",
+                valor: datosTransaccion.valorSinModificar ?? "",
                 valorSinModificar2: valorTrxCons ?? "",
               };
             });
@@ -588,10 +464,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         });
     }
   };
-  const onChangeMoney = useMoney({
-    limits: [0, 9900001],
-    decimalDigits: 2,
-  });
   const printDiv = useRef();
   const isAlt = useRef("");
   const isAltCR = useRef({ data: "", state: false });
@@ -729,7 +601,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             ) : (
               <></>
             )}
-            {datosEnvio.datosCodigoBarras.pago.length > 0 && (
+            {datosEnvio?.datosCodigoBarras.pago.length > 0 && dataConveniosPagar.includes(
+              datosEnvio?.datosConvenio?.num_ind_consulta_cnb) && (
               <MoneyInputDec
                 id='valCashOut'
                 name='valCashOut'
@@ -752,7 +625,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             {dataConveniosPagar.includes(
               datosEnvio?.datosConvenio?.num_ind_consulta_cnb
             ) && datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" ? (
-              <Input
+              <MoneyInput
                 id='valor'
                 name='valor'
                 label='Valor a pagar'
@@ -760,15 +633,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 type='tel'
                 minLength={"5"}
                 maxLength={"12"}
-                defaultValue={datosTransaccion.showValor ?? ""}
-                onInput={(ev) =>
+                value={datosTransaccion.showValor ?? ""}
+                onInput={(ev, val) => {
                   setDatosTransaccion((old) => ({
                     ...old,
-                    valor: onChangeMoney(ev),
-                    showValor: onChangeMoney(ev),
-                  }))
-                }
+                    valor: val,
+                    showValor: val,
+                  }));
+                }}
                 required
+                min={enumParametrosDavivienda.MINRECAUDO}
+                max={enumParametrosDavivienda.MAXRECAUDO}
+                equalError={false}
+                equalErrorMin={false}
               />
             ) : (
               <></>
@@ -858,7 +735,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
                     }`}</h2>
                   )}
-                  <h2 className='text-base'>
+                  <h2 className='text-base font-semibold'>
                     {`Valor consultado: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
@@ -868,7 +745,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     datosEnvio?.datosConvenio?.ind_menor_vlr_cnb !== "0" ||
                     datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") ? (
                     <Form grid onSubmit={onSubmitPago}>
-                      <Input
+                      <MoneyInput
                         id='valor'
                         name='valor'
                         label='Valor a pagar'
@@ -876,15 +753,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                         type='tel'
                         minLength={"5"}
                         maxLength={"12"}
-                        defaultValue={datosTransaccion.showValor2 ?? ""}
-                        onInput={(ev) =>
+                        value={datosTransaccion.valorSinModificar ?? ""}
+                        onInput={(ev, val) => {
                           setDatosTransaccion((old) => ({
                             ...old,
-                            valor: onChangeMoney(ev),
-                            showValor2: onChangeMoney(ev),
-                          }))
-                        }
+                            valor: val,
+                            showValor2: val,
+                            valorSinModificar: val,
+                          }));
+                        }}
                         required
+                        min={enumParametrosDavivienda.MINRECAUDO}
+                        max={enumParametrosDavivienda.MAXRECAUDO}
+                        equalError={false}
+                        equalErrorMin={false}
                       />
                       <ButtonBar>
                         <Button onClick={hideModalReset}>Cancelar</Button>
@@ -894,11 +776,63 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   ) : (
                     <ButtonBar>
                       <Button onClick={hideModalReset}>Cancelar</Button>
-                      <Button type='submit' onClick={onSubmitPago}>
+                      <Button type='submit' onClick={() => {
+                        setDatosTransaccion((old) => ({
+                          ...old,
+                          valor: 0,
+                          showValor: 0,
+                        }));
+                        setPeticion(3) }}>
                         Realizar pago
                       </Button>
                     </ButtonBar>
                   )}
+                </>
+              )}
+              {peticion === 3 && (
+                <>
+                  <h1 className='text-2xl text-center mb-2 font-semibold'>
+                    ¿Esta seguro de realizar el pago?
+                  </h1>
+                  <h2 className='text-xl font-semibold'>
+                    {`Valor a pagar: ${formatMoney.format(
+                      datosTransaccion.valorSinModificar2
+                    )} `}
+                  </h2>
+                  <h2 className='text-base font-semibold'>
+                    Por favor ingresar el valor a pagar para confirmar la transacción
+                  </h2>
+                  <Form grid onSubmit={onSubmitPago}>
+                    <MoneyInput
+                      id='valor'
+                      name='valor'
+                      label='Validación valor'
+                      autoComplete='off'
+                      type='tel'
+                      minLength={"5"}
+                      maxLength={"12"}
+                      value={datosTransaccion.valor ?? ""}
+                      onInput={(ev, val) => {
+                        if (!isNaN(val)){
+                          const num = val;
+                          setDatosTransaccion((old) => ({
+                            ...old,
+                            valor: num,
+                            showValor: num,
+                          }));
+                        }
+                      }}
+                      required
+                      min={enumParametrosDavivienda.MINRECAUDO}
+                      max={enumParametrosDavivienda.MAXRECAUDO}
+                      equalError={false}
+                      equalErrorMin={false}
+                    />
+                    <ButtonBar>
+                      <Button onClick={hideModalReset}>Cancelar</Button>
+                      <Button type='submit'>Realizar pago</Button>
+                    </ButtonBar>
+                  </Form>
                 </>
               )}
               {peticion === 4 && (

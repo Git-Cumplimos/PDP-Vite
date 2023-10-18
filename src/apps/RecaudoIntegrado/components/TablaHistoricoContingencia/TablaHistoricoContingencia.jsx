@@ -4,7 +4,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../../utils/notify";
 import useMap from "../../../../hooks/useMap";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
-import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../hooks/useFetchDispatchDebounce";
 import { makeDateFormatter } from "../../../../utils/functions";
 
 const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
@@ -43,10 +43,21 @@ const TablaHistoricoContingencia = ({ banco }) => {
   );
 
   const [fetchExcel] = useFetchDispatchDebounce({
-    onSuccess: useCallback((res) => window.open(res?.url, "_self"), []),
+    onSuccess: useCallback((res) => {
+      if (!res?.status){
+        notifyError(res?.msg ?? "El archivo aun se esta procesando")
+        return;
+      }
+      window.open(res?.url, "_self")
+    }, []),
     onError: useCallback((error) => {
-      console.error(error);
-      notifyError("Error al cargar Datos ");
+      if (error instanceof ErrorPDPFetch) {
+        notifyError(error.message);
+      }
+      else if (!(error instanceof DOMException)) {
+        console.error(error);
+        notifyError("Error al cargar Datos ");
+      }
     }, []),
   });
 
@@ -60,6 +71,7 @@ const TablaHistoricoContingencia = ({ banco }) => {
     },
     [fetchExcel]
   );
+
 
   useFetchDebounce(
     useMemo(() => {
@@ -134,17 +146,18 @@ const TablaHistoricoContingencia = ({ banco }) => {
       }
       onSelectRow={(_, i) =>
         downloadExcel({
+          pk_contingencia_recaudo_bancos:datosTablaContingencia[i].pk_contingencia_recaudo_bancos,
           nombre_banco: datosTablaContingencia[i].identificador_banco,
-          fecha_carga: datosTablaContingencia[i].fecha_carga_archivo,
-          total_registros: datosTablaContingencia[i].cantidad_registros,
-          registros_procesados: datosTablaContingencia[i].cantidad_trx_exitosas,
-          registros_fallidos: datosTablaContingencia[i].cantidad_trx_fallidas,
-          respuesta_trx_exitosas: JSON.stringify(
-            datosTablaContingencia[i].respuuestas_trx
-          ),
-          respuesta_trx_fallidas: JSON.stringify(
-            datosTablaContingencia[i].respuestas_trx_fallidas
-          ),
+          // fecha_carga: datosTablaContingencia[i].fecha_carga_archivo,
+          // total_registros: datosTablaContingencia[i].cantidad_registros,
+          // registros_procesados: datosTablaContingencia[i].cantidad_trx_exitosas,
+          // registros_fallidos: datosTablaContingencia[i].cantidad_trx_fallidas,
+          // respuesta_trx_exitosas: JSON.stringify(
+          //   datosTablaContingencia[i].respuuestas_trx
+          // ),
+          // respuesta_trx_fallidas: JSON.stringify(
+          //   datosTablaContingencia[i].respuestas_trx_fallidas
+          // ),
         })
       }
       onSetPageData={setPageData}

@@ -7,6 +7,7 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { notify, notifyError } from "../../../../utils/notify";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import {
   postConsultaRecaudoMultiple,
   postConsultaRecaudoMultipleComercios,
@@ -24,6 +25,8 @@ const MostrarRecaudosPagar = ({
   setUuid,
   type = "Operaciones",
 }) => {
+  const { quotaInfo } = useAuth();
+  const [habilita, setHabilita] = useState(true)
   const [recaudosMultiples, setRecaudosMultiples] = useState({
     valor_total: 0,
     cantidad_transacciones: 0,
@@ -128,6 +131,8 @@ const MostrarRecaudosPagar = ({
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
+        idterminal_punto: roleInfo?.idterminal_punto,
+        serial_dispositivo: roleInfo?.serial_dispositivo,
       },
       ubicacion: {
         address: roleInfo?.direccion,
@@ -209,9 +214,12 @@ const MostrarRecaudosPagar = ({
           console.error(err);
         });
     } else {
+      let cupoLogin = quotaInfo?.["quota"];
+      let valor_trx_total = recaudosMultiples.valor_total ?? "0";
       obj["comercio"]["idterminal_punto"] = roleInfo?.idterminal_punto;
       obj["comercio"]["serial_dispositivo"] = roleInfo?.serial_dispositivo;
-      postInicializacionRecaudoMultipleComercios(obj)
+      if (cupoLogin >= valor_trx_total) {
+        postInicializacionRecaudoMultipleComercios(obj)
         .then((res) => {
           if (res?.message === "Endpoint request timed out") {
             setIsUploading(false);
@@ -235,6 +243,35 @@ const MostrarRecaudosPagar = ({
           setEstadoTrx(0);
           console.error(err);
         });
+      } else {
+          obj["valor_trx_total"] = valor_trx_total;
+          postInicializacionRecaudoMultipleComercios(obj)
+          .then((res) => {
+            if (res?.message === "Endpoint request timed out") {
+              setIsUploading(false);
+              setEstadoTrx(2);
+              setUuid(uniqueId);
+              return notify("Inicializacion de transacción multiple exitosa");
+            }
+            if (!res?.status) {
+              setIsUploading(false);
+              setShowModal(false);
+              // setEstadoTrx(0);
+              setHabilita(false);
+              return notifyError(res?.msg);
+            }
+            setIsUploading(false);
+            notify(res?.msg);
+            setEstadoTrx(2);
+            setUuid(uniqueId);
+          })
+          .catch((err) => {
+            notifyError("Error de conexion con el servicio");
+            setIsUploading(false);
+            setEstadoTrx(0);
+            console.error(err);
+          });
+      }
     }
   };
   return (
@@ -251,6 +288,7 @@ const MostrarRecaudosPagar = ({
           onClick={() => {
             setShowModal(true);
           }}
+          disabled={!habilita}
           type='submit'>
           Realizar transacción
         </Button>

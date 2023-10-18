@@ -418,7 +418,7 @@ const VentaPines = () => {
               onInput={(ev) =>
                 setUserReferences((old) => ({
                   ...old,
-                  [ev.target.name]: onChangeNumber(ev),
+                  [ev.target.name]: ev.target.value.replace(/\W/, ""),
                 }))
               }
               readOnly={inquiryStatus}

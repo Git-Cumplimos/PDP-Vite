@@ -176,16 +176,24 @@ const CargaArchivos = ({ route }) => {
       }
     }
   };
+
+  
   const [disabledBtns, setDisabledBtns] = useState(false);
 
   const onSubmit = (event) => {
+    const regex=/[<>:"\/\\|?*$ -(){}~`#%,;'!@=+]/g;
     event.preventDefault();
-    if (!fileName.includes("-")){
+    if (!regex.test(fileName) && fileName.split('.').length == 2){
       setShowModal(true);
       setDisabledBtns(false);
     }
     else {
-      notifyError("El nombre del archivo no es correcto, no incluir el carácter guion medio")
+      notifyError("El nombre del archivo es incorrecto, puede incluir letras (a-z, A-Z), números (0-9), guiones bajos (_) y únicamente el punto (.) de la extensión.")
+      setShowModal(false);
+      setDisabledBtns(true);
+      setProgress(0);
+      setFile("");
+      setFileName("");
     }
   };
 

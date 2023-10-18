@@ -79,7 +79,7 @@ const RecaudoDirecto = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  },{delay:2000});
+  }, { delay: 2000 });
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);
@@ -165,41 +165,41 @@ const RecaudoDirecto = () => {
     }
     if (body['Valor mínimo'] || body['Valor máximo']) {
       delete body['Valor mínimo']; delete body['Valor máximo'];
-      body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0 }`, `${limites['Valor máximo'] ?? 0}`]
-      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])){
+      body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0}`, `${limites['Valor máximo'] ?? 0}`]
+      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])) {
         notifyError("En la restriccion de valores, el valor máximo debe ser mayor al valor mínima")
         validacion = false
       }
     }
-    if (validacion){
+    if (validacion) {
       notifyPending(
         selected
-        ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
-        : addConveniosRecaudoList(body),
-      {
-        render() {
-          return "Enviando solicitud";
+          ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
+          : addConveniosRecaudoList(body),
+        {
+          render() {
+            return "Enviando solicitud";
+          },
         },
-      },
-      {
-        render({ data: res }) {
-          searchTrxs();
-          handleClose();
-          return `Convenio ${selected ? "modificado" : "agregado"
-        } exitosamente`;
-      },
-      },
-      {
-        render({ data: err }) {
-          if (err?.cause === "custom") {
-            return err?.message;
-          }
-          console.error(err?.message);
-          return `${selected ? "Edicion" : "Creación"} fallida`;
+        {
+          render({ data: res }) {
+            searchTrxs();
+            handleClose();
+            return `Convenio ${selected ? "modificado" : "agregado"
+              } exitosamente`;
+          },
         },
-      }
+        {
+          render({ data: err }) {
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return `${selected ? "Edicion" : "Creación"} fallida`;
+          },
+        }
       )
-    } 
+    }
   }, [handleClose, searchTrxs, selected, referencias, limites])
 
   const descargarPlantilla = useCallback(() => {
@@ -377,7 +377,7 @@ const RecaudoDirecto = () => {
             {Object.entries(limites).map(([keyLimit, valLimit], index) => {
               return (
                 <MoneyInput
-                  key={keyLimit}
+                  key={`${keyLimit}_${index}`}
                   className={"mb-1"}
                   id={`${keyLimit}_${index}`}
                   name={keyLimit}
@@ -386,13 +386,15 @@ const RecaudoDirecto = () => {
                   maxLength={"11"}
                   min={limitesMontos.min}
                   max={limitesMontos.max}
-                  value={valLimit}
-                  equalError={false}
+                  // value={valLimit}
+                  defaultValue={selected ? selected.limite_monto[index] : valLimit}
                   onInput={(e, valor) => {
                     const copyRef = { ...limites };
                     copyRef[keyLimit] = valor;
                     setlimites(copyRef);
                   }}
+                  equalError={false}
+                  equalErrorMin={false}
                   required
                 />
               )
@@ -414,7 +416,7 @@ const RecaudoDirecto = () => {
                         maxLength={`${keyRef.includes("Longitud") ? "2" : "40"}`}
                         autoComplete="off"
                         value={valRef}
-                        onInput={(ev) => { 
+                        onInput={(ev) => {
                           if (keyRef.includes("Longitud")) (ev.target.value = onChangeNumber(ev))
                           const copyRef = [...referencias];
                           copyRef[index][keyRef] = ev.target.value;
@@ -459,14 +461,14 @@ const RecaudoDirecto = () => {
             }
           </Fieldset>
           <Select
-              className="place-self-stretch mb-1"
-              id={"Tipo_archivo"}
-              label={"Tipo archivo Conciliación"}
-              name={"fk_nombre_tipo_archivo"}
-              options={[{ label: "", value: "" }, ...tipoArchivoConciliacion]}
-              defaultValue={selected?.fk_nombre_tipo_archivo ?? ""}
-              required
-            />
+            className="place-self-stretch mb-1"
+            id={"Tipo_archivo"}
+            label={"Tipo archivo Conciliación"}
+            name={"fk_nombre_tipo_archivo"}
+            options={[{ label: "", value: "" }, ...tipoArchivoConciliacion]}
+            defaultValue={selected?.fk_nombre_tipo_archivo ?? ""}
+            required
+          />
           <TextArea
             id={"Observaciones"}
             label={"Observaciones"}

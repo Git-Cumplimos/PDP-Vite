@@ -18,14 +18,17 @@ const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
 const LoginLayout = lazy(() => import("../layouts/LoginLayout"));
 
-const getAllRoutes = (urls) => {
+const getAllRoutes = (urls, link_padre = null) => {
   const allUrls = [];
 
   for (const url of urls) {
     const { subRoutes, provider } = url;
+
+    url.link_padre = link_padre ? (url?.show === false ? -1 : link_padre) : "/";
+
     allUrls.push({ ...url });
     if (subRoutes) {
-      for (const subUrl of getAllRoutes(subRoutes)) {
+      for (const subUrl of getAllRoutes(subRoutes, url.link)) {
         if (provider) {
           allUrls.push({ ...subUrl, provider });
         } else {
@@ -34,7 +37,6 @@ const getAllRoutes = (urls) => {
       }
     }
   }
-
   return allUrls;
 };
 
@@ -48,8 +50,10 @@ const toRoute = (urls, isPrivate = true, SubWrapper) => {
   const routes = allurls
     .filter(({ link }) => !(link === undefined || link === null))
     .filter(({ extern }) => !extern)
+    .filter(({ component }) => component !== undefined && component !== null)
     .map(
       ({
+        link_padre,
         link,
         component: Page,
         props,
@@ -60,11 +64,21 @@ const toRoute = (urls, isPrivate = true, SubWrapper) => {
       }) => {
         exact = exact === undefined ? true : exact;
         const pageWrapper = SubWrapper ? (
-          <SubWrapper label={label}>
-            <Page subRoutes={subRoutes} route={{ label }} {...props} />
+          <SubWrapper label={label} upperRoute={link_padre}>
+            <Page
+              subRoutes={subRoutes}
+              route={{ label }}
+              upperRoute={link_padre}
+              {...props}
+            />
           </SubWrapper>
         ) : (
-          <Page subRoutes={subRoutes} route={{ label }} {...props} />
+          <Page
+            subRoutes={subRoutes}
+            route={{ label }}
+            upperRoute={link_padre}
+            {...props}
+          />
         );
         const routeChild = Provider ? (
           <Provider>{pageWrapper}</Provider>
@@ -176,7 +190,7 @@ export const useProvideUrls = () => {
   const allRoutes = useMemo(() => {
     return (
       <Routes>
-        <Route path='/' element={<AdminLayout />}>
+        <Route path="/" element={<AdminLayout />}>
           {toRoute(privateUrls)}
           {toRoute(urlsPrivateApps, true, SubPage)}
           {toRoute(urlsGestion, true, SubPage)}
@@ -184,10 +198,10 @@ export const useProvideUrls = () => {
           {toRoute(urlsInformacionGeneral, true, SubPage)}
           {toRoute(urlsBilleteraComisiones, true, SubPage)}
         </Route>
-        <Route path='/login' element={<LoginLayout />}>
+        <Route path="/login" element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
         </Route>
-        <Route path='/public' element={<PublicLayout />}>
+        <Route path="/public" element={<PublicLayout />}>
           {toRoute(publicUrls, false)}
         </Route>
       </Routes>

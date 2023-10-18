@@ -8,7 +8,6 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useLoteria } from "../../utils/LoteriaHooks";
-import { useNavigate } from "react-router-dom";
 
 const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTERIAS}/eliminar_asignacion`;
 const url_sorteos = `${process.env.REACT_APP_URL_LOTERIAS}/num_sorteo`;
@@ -19,9 +18,7 @@ const Borrado_billetes = ({ route }) => {
   const [showModal, setShowModal] = useState(false);
   const [optionsDisponibles, setOptionsDisponibles] = useState([]);
   const [num_sorteo, setNum_sorteo] = useState("");
-  const { codigos_lot, setCodigos_lot } = useLoteria();
-
-  const navigate = useNavigate();
+  const {codigos_lot} = useLoteria();
 
 
   const sorteosLOT = useMemo(() => {
@@ -83,43 +80,42 @@ const Borrado_billetes = ({ route }) => {
     e.preventDefault();
     borrar_billetes(cod_distribuidor, cod_sucursal, num_sorteo).then((res) => {
       if (res.status === false) {
-        notifyError(res?.msg);
-        setCod_distribuidor("");
-        setCod_sucursal("");
-        setNum_sorteo("");
+        notifyError(res?.msg);        
       } else {
         notify(res.msg);
-        setCod_distribuidor("");
-        setCod_sucursal("");
-        setNum_sorteo("");
       }
+      setCod_distribuidor("");
+      setCod_sucursal("");
+      setNum_sorteo("");
     });
   };
 
   useEffect(() => {
     sorteos(sorteosLOT).then((res) => {
       if (res.status === false) {
+        notifyError(res)
       } else {
         setOptionsDisponibles(res?.num_sorteos);
         setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
-  }, [sorteosLOT,cod_distribuidor,cod_sucursal]);
+  }, []);
 
   const handleCloseCancelar = useCallback(() => {
-    notifyError("Eliminación de billeteria cancelada por el usuario");
+    notifyError("Eliminación de billetería cancelada por el usuario");
     sorteos(sorteosLOT).then((res) => {
       if (res.status === false) {
+        notifyError(res)
       } else {
         setOptionsDisponibles(res?.num_sorteos);
         setNum_sorteo(res?.num_sorteos[0]['sorteo']);
       }
     });
-  })
+  }, [])
   
   return (
     <>
-      <h1 className="text-3xl mt-6">Eliminar billeteria</h1>
+      <h1 className="text-3xl mt-6">Eliminar billetería</h1>
       <div>
         <Form formDir="col" onSubmit={onSubmit} grid>
           <Select

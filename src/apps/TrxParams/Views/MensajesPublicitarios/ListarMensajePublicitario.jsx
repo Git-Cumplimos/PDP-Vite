@@ -174,6 +174,7 @@ const ListarMensajePublicitario = () => {
             autoComplete='off'
             value={data?.nombreMensaje}
             onChange={onChangeData}
+            maxLength={100}
             required
           />
           <TextArea

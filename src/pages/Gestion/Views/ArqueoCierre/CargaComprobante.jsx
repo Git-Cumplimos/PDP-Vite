@@ -25,6 +25,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Input from "../../../../components/Base/Input";
+import Magnifier from "react-magnifier";
 
 const CargaComprobante = () => {
   const navigate = useNavigate();
@@ -37,14 +38,15 @@ const CargaComprobante = () => {
   const [movementType, setMovementType] = useState("");
   const [foundEntities, setFoundEntities] = useState([]);
   const [selectedEntity, setSelectedEntity] = useState("");
+  const [EntityIndex, setEntityIndex] = useState([]);
   const [file, setFile] = useState(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [comprobanteNumber, setComprobanteNumber] = useState("");
   const [valorComprobante, setValorComprobante] = useState(0.0);
   const [observaciones, setObservaciones] = useState("");
-
+  let NumCuentas = [];
   const [limitesMontos, setLimitesMontos] = useState({
-    max: 9999999,
+    max: 100000000,
     min: 5000,
   });
 
@@ -67,6 +69,16 @@ const CargaComprobante = () => {
     })
       .then((res) => {
         if (Array.isArray(res?.obj?.results)) {
+          for (const element of res?.obj?.results) {
+            if (element.pk_numero_cuenta !== null) {
+                NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1]
+              if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
+                NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2)
+              if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
+                NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3)
+              element.pk_numero_cuenta=NumCuentas
+            }
+          }
           setFoundEntities(res?.obj?.results);
           if (res?.obj?.results?.length === 0) {
             notifyError("No se encontradon datos de entidades");
@@ -131,7 +143,7 @@ const CargaComprobante = () => {
         observaciones: observaciones,
         archivo: filename,
       };
-      if (movementType === "Consignación Bancaría") {
+      if (movementType === "Consignación Bancaria") {
         reqBody["nro_cuenta"] = accountNumber;
       }
       /* const resComprobante =  */ await agregarComprobante(reqBody);
@@ -149,7 +161,6 @@ const CargaComprobante = () => {
 
       console.log(resFile);
       console.log(resUploadFile);
-      // console.log(resComprobante);
     } catch (error) {
       throw error;
     }
@@ -223,8 +234,7 @@ const CargaComprobante = () => {
       });
   }, []);
 
-  console.log(formRef);
-
+  console.log(file)
   return (
     <Fragment>
       <h1 className="text-3xl mt-10 mb-8">Transportadora y Consignaciones</h1>
@@ -239,7 +249,7 @@ const CargaComprobante = () => {
             formRef.current?.reset?.();
             setSelectedEntity(null);
             setMovementType(val);
-            searchEntities(val !== "Consignación Bancaría");
+            searchEntities(val !== "Consignación Bancaria");
           }}
         />
         <ButtonBar />
@@ -264,7 +274,7 @@ const CargaComprobante = () => {
               id="searchEntities"
               name="tipoComp"
               label={`Buscar ${
-                movementType === "Consignación Bancaría"
+                movementType === "Consignación Bancaria"
                   ? "bancos"
                   : "transportadoras"
               }`}
@@ -283,6 +293,9 @@ const CargaComprobante = () => {
                     parametros,
                   ])
                 );
+                if (foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta != null) {
+                  setEntityIndex(foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta)
+                }else{setEntityIndex([])}
                 setSelectedEntity(e.target.value);
                 setLimitesMontos((old) => ({
                   min: tempMap.get(e.target.value)?.monto_minimo ?? old.min,
@@ -291,17 +304,24 @@ const CargaComprobante = () => {
               }}
               required
             />
-            {movementType === "Consignación Bancaría" && (
-              <Input
+            {movementType === "Consignación Bancaria" && (
+                <Select
                 id="accountNum"
                 name="accountNum"
                 label="Número de cuenta"
-                type="tel"
-                autoComplete="off"
-                minLength={"19"}
-                maxLength={"19"}
-                onInput={(ev) => setAccountNumber(onChangeAccountNumber(ev))}
+                options={[
+                  { value: "", label: "" },
+                  ...EntityIndex.map((pk_numero_cuenta) => ({
+                    value: pk_numero_cuenta,
+                    label: pk_numero_cuenta,
+                  })),
+                ]}
+                value={accountNumber}
+                onChange={(ev) => {
+                  setAccountNumber(ev.target.value)
+                }}
                 required
+                type="tel"
               />
             )}
             <Input
@@ -352,7 +372,12 @@ const CargaComprobante = () => {
               <div className="text-center my-4 mx-auto md:mx-4 flex flex-row flex-wrap justify-around">
                 <div className="">
                   <div className="flex flex-row justify-center">
-                    <span className="bi bi-file-earmark-image text-5xl" />
+                    {/* <span className="bi bi-file-earmark-image text-5xl" /> */}
+                    {/* {file && (
+                      <div className="my-4 mx-auto md:mx-4 gap-4">
+                        <Magnifier src={file} zoomFactor={2} />
+                      </div>
+                    )} */}
                     <span
                       className="bi bi-x-lg text-2xl self-center cursor-pointer"
                       onClick={() => setFile(null)}

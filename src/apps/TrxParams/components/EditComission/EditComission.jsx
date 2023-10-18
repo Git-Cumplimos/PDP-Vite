@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 import useQuery from "../../../../hooks/useQuery";
 
@@ -21,6 +21,10 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Select from "../../../../components/Base/Select";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
+function dateIsValid(date) {
+  return !Number.isNaN(new Date(date).getTime());
+}
+
 const EditComission = () => {
   const navigate = useNavigate();
 
@@ -31,7 +35,6 @@ const EditComission = () => {
       id_plan_comision,
       id_plan_comision_campana,
     },
-    setQuery,
   ] = useQuery();
 
   const [editedComission, setEditedComission] = useState({
@@ -58,7 +61,7 @@ const EditComission = () => {
   const [isUploading, setIsUploading] = useState(false);
   useEffect(() => {
     if (id_plan_comision || (id_plan_comision_campana && campaignStatus)) {
-      const date = new Date();
+      // const date = new Date();
       // setDisabledState(!(date.getDate() <= 5));
       setDisabledState(false);
     }
@@ -231,15 +234,7 @@ const EditComission = () => {
     }));
   };
 
-  useEffect(() => {
-    if (id_plan_comision) {
-      fetchPlanesComisiones();
-    } else if (id_plan_comision_campana) {
-      fetchPlanesComisionesCampana();
-    }
-  }, []);
-
-  const fetchPlanesComisiones = () => {
+  const fetchPlanesComisiones = useCallback(() => {
     getComisionesPlanesUnique({ id_plan_comision })
       .then((res) => {
         setComissions(res?.results?.[0]);
@@ -264,9 +259,9 @@ const EditComission = () => {
         }));
       })
       .catch((err) => console.error(err));
-  };
+  }, [id_plan_comision]);
 
-  const fetchPlanesComisionesCampana = () => {
+  const fetchPlanesComisionesCampana = useCallback(() => {
     getComisionesPlanesCampanaUnique({ id_plan_comision_campana })
       .then((res) => {
         setComissions(res?.results?.[0]);
@@ -319,10 +314,15 @@ const EditComission = () => {
         }
       })
       .catch((err) => console.error(err));
-  };
-  function dateIsValid(date) {
-    return !Number.isNaN(new Date(date).getTime());
-  }
+  }, [id_plan_comision_campana]);
+
+  useEffect(() => {
+    if (id_plan_comision) {
+      fetchPlanesComisiones();
+    } else if (id_plan_comision_campana) {
+      fetchPlanesComisionesCampana();
+    }
+  }, [fetchPlanesComisiones, fetchPlanesComisionesCampana, id_plan_comision, id_plan_comision_campana]);
 
   return (
     <Fragment>
@@ -453,6 +453,7 @@ const EditComission = () => {
                   };
                 })
               }
+              maxLength={50}
             />
             <Input
               id='fecha_inicio'

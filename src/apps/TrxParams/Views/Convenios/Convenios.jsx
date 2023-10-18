@@ -9,6 +9,7 @@ import Modal from "../../../../components/Base/Modal";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import useQuery from "../../../../hooks/useQuery";
+import { onChangeNumber } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
   fetchConveniosMany,
@@ -22,6 +23,7 @@ const Convenios = () => {
   const [{ searchConvenio = "", ean13Convenio = "" }, setQuery] = useQuery();
 
   const [showModal, setShowModal] = useState(false);
+
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelectedConvenio({
@@ -41,6 +43,7 @@ const Convenios = () => {
     });
     fetchConveniosUnique();
   }, []);
+
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -71,6 +74,7 @@ const Convenios = () => {
       )),
     [tiposConvenios]
   );
+
   const fecthTiposConveniosFunc = useCallback((e) => {
     fetchTiposConvenios({
       nombre_tipo_convenio: e.target.value ?? "",
@@ -82,6 +86,7 @@ const Convenios = () => {
       })
       .catch((err) => console.error(err));
   }, []);
+
   const onSelectSuggestion = useCallback(
     (i, el) => {
       const copy = { ...selectedConvenio };
@@ -92,6 +97,7 @@ const Convenios = () => {
     },
     [selectedConvenio, tiposConvenios]
   );
+
   const onSelectConvenio = useCallback(
     (e, i) => {
       setShowModal(true);
@@ -147,6 +153,7 @@ const Convenios = () => {
     },
     [convenios]
   );
+
   const onChange = useCallback(
     (ev) => {
       if (ev.target.name === "searchConvenio") {
@@ -307,11 +314,11 @@ const Convenios = () => {
 
   useEffect(() => {
     fetchConveniosUniqueFetch();
-  }, [searchConvenio, page, limit]);
+  }, [searchConvenio, page, limit,ean13Convenio]);
 
   const fetchConveniosUniqueFetch = useCallback(() => {
     setIsUploading(true);
-    fetchConveniosUnique({ tags: searchConvenio, page, limit })
+    fetchConveniosUnique({ tags: searchConvenio, ean13:ean13Convenio , page, limit })
       .then((res) => {
         setIsUploading(false);
         setConvenios(
@@ -329,7 +336,7 @@ const Convenios = () => {
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
       });
-  }, [searchConvenio, page, limit]);
+  }, [searchConvenio, page, limit,ean13Convenio]);
 
   // useEffect(() => {
   //   fetchConveniosUnique(null, ean13Convenio)
@@ -346,6 +353,7 @@ const Convenios = () => {
   //     })
   //     .catch((err) => console.error(err));
   // }, [ean13Convenio]);
+  
   const fetchConveniosManyFunc = () => {
     setIsUploading(true);
     fetchConveniosMany({ tags: searchConvenio, page, limit })
@@ -435,6 +443,7 @@ const Convenios = () => {
             autoComplete='off'
             defaultValue={selectedConvenio?.["Nombre de convenio"]}
             onChange={() => {}}
+            maxLength={30}
             required
           />
           <Input
@@ -463,6 +472,7 @@ const Convenios = () => {
             onSelectSuggestion={onSelectSuggestion}
             value={selectedConvenio?.tiposConvenios || ""}
             onChange={() => {}}
+            maxLength={30}
             // disabled={selected?.id_tipo_operacion ? true : false}
             // readOnly={selected?.id_tipo_operacion}
           />
@@ -478,6 +488,7 @@ const Convenios = () => {
                     autoComplete='off'
                     value={val}
                     onChange={() => {}}
+                    maxLength={20}
                     required
                   />
                   {selectedConvenio?.Tags.length > 1 && (
@@ -525,10 +536,11 @@ const Convenios = () => {
                         id={`${key}_${index}`}
                         name={key}
                         label={key}
-                        type={`${key.includes("Longitud") ? "number" : "text"}`}
+                        type={"text"}
+                        maxLength={`${key.includes("Longitud") ? "10" : "50"}`}
                         autoComplete='off'
                         value={valRef}
-                        onChange={() => {}}
+                        onChange={(ev) => key.includes("Longitud") ? (ev.target.value = onChangeNumber(ev)) : ev.target.value}
                         required
                       />
                     );

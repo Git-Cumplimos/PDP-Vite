@@ -17,7 +17,7 @@ import {
 } from "../Runt/components/components_form";
 import classes from "./PagarRunt.module.css";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 import { useFetchRunt } from "../../hooks/hookRunt";
 //Constantes Style
 const { styleComponents } = classes;
@@ -75,9 +75,11 @@ const PagarRunt = () => {
           break;
       }
     } else {
-      if (error.message === "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagarRunt) [0010002]") {
-      } else { 
-
+      if (
+        error.message ===
+        "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagarRunt) [0010002]"
+      ) {
+      } else {
         notifyError(msg);
       }
     }
@@ -89,7 +91,10 @@ const PagarRunt = () => {
   }, []);
 
   const onChangeNumeroRunt = useCallback((e) => {
-    setNumeroRunt(e.target.value);
+    let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+      if (!isNaN(num)) {
+        setNumeroRunt(num);
+      }
   }, []);
 
   const onChangeSelect = useCallback((e) => {
@@ -108,8 +113,10 @@ const PagarRunt = () => {
       const data = {
         codigo_barras: info,
       };
-      if (info === "") { 
-        notifyError("El campo del código de barras está vacío, por favor scanee o dijite el código");
+      if (info === "") {
+        notifyError(
+          "El campo del código de barras está vacío, por favor scanee o dijite el código"
+        );
         return;
       }
       peticionBarcode({}, data)
@@ -176,26 +183,27 @@ const PagarRunt = () => {
         valor_total_trx: resConsultRunt.valor_total_trx,
         ciudad: roleInfo.ciudad,
         direccion: roleInfo.direccion,
-        idterminal_punto: roleInfo.idterminal_punto,
-        idtipo_dispositivo: roleInfo.idtipo_dispositivo,
-        serial_dispositivo: roleInfo.serial_dispositivo,
         telefono: roleInfo?.telefono,
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
-      }
+      };
       peticionPayRunt(data, dataAditional)
-      .then((response) => {
+        .then((response) => {
           if (response?.status === true) {
-            const voucher = response?.obj?.result?.ticket ? response?.obj?.result?.ticket : response?.obj?.ticket ? response?.obj?.ticket : {};
+            const voucher = response?.obj?.result?.ticket
+              ? response?.obj?.result?.ticket
+              : response?.obj?.ticket
+              ? response?.obj?.ticket
+              : {};
             setInfTicket(voucher);
             setPaso("TransaccionExitosa");
             notify("Pago del RUNT exitoso");
-          } else if (response?.status === false || response === undefined) { 
-            HandleCloseTrxExitosa()
-            notifyError("Error respuesta PDP: Transacción Runt no exitosa")
+          } else if (response?.status === false || response === undefined) {
+            HandleCloseTrxExitosa();
+            notifyError("Error respuesta PDP: Transacción Runt no exitosa");
           }
         })
         .catch((error) => {

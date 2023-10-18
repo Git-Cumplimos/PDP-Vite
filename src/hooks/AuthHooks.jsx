@@ -9,17 +9,19 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
-import { notifyError } from "../utils/notify";
+import { notify, notifyError } from "../utils/notify";
 import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
+import { fetchSecure } from "../utils/functions";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
+// const urlQuota = `http://127.0.0.1:5000/cupo`;
 const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/servicio-wallet-comisiones/consulta-wallet-comercio`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
-const url_user =
-  "https://7i347am3a5.execute-api.us-east-2.amazonaws.com/v1/cognitovalidator";
+const url_user = process.env.REACT_APP_URL_COGNITO;
+const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
 
 const validateUser = async (email) => {
   const get = {
@@ -136,6 +138,7 @@ export const AuthContext = createContext({
   handleChangePass: () => {},
   forgotPassword: () => {},
   forgotPasswordSubmit: () => {},
+  resetTopt: () => {},
   parameters: null,
   qr: null,
   ...initialUser,
@@ -167,6 +170,10 @@ export const useProvideAuth = () => {
       const user = await Auth.signIn(username, password);
       if (user) {
         dispatchAuth({ type: SIGN_IN, payload: { user } });
+        dispatchAuth({
+          type: SET_PDPUSER,
+          payload: { pdpU: { email: username } },
+        });
         setParameters(user.challengeParam.userAttributes);
       }
     } catch (err) {
@@ -198,9 +205,13 @@ export const useProvideAuth = () => {
             ? "/"
             : pathname
         );
-        if (timer) {
-          clearTimeout(timer);
-        }
+        setTimer((old) => {
+          if (!old) {
+            return old;
+          }
+          clearTimeout(old);
+          return null;
+        });
       } catch (err) {
         if (err.code === "NotAuthorizedException") {
           dispatchAuth({ type: SIGN_OUT });
@@ -208,7 +219,7 @@ export const useProvideAuth = () => {
         throw err;
       }
     },
-    [cognitoUser, navigate, state, pathname, timer]
+    [cognitoUser, navigate, state, pathname]
   );
 
   const signOut = useCallback(() => {
@@ -234,6 +245,120 @@ export const useProvideAuth = () => {
     } catch (err) {}
   }, []);
 
+  const checkTOTPFlow = useCallback(
+    async (user) => {
+      if (!user || !(user?.challengeName === "MFA_SETUP")) {
+        return;
+      }
+      setTimer((old) => {
+        clearTimeout(old);
+        return setTimeout(() => {
+          signOut();
+          notifyError(
+            "La sesión ha expirado, por favor intente de nuevo",
+            5000,
+            { toastId: "expired-session-not" }
+          );
+          setQr("");
+        }, 90000);
+      });
+
+      const session = user?.Session;
+      if (!userState?.pdpUser?.email || !session) {
+        return;
+      }
+
+      try {
+        const semillaAws = await Auth.setupTOTP(user);
+        const response = await fetch(
+          `${public_urls}/users-totp/generate`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              email: userState?.pdpUser?.email,
+              otp_base32: semillaAws,
+            }),
+            headers: {
+              // Authorization: `Bearer ${session}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response.ok) {
+          notifyError(
+            <p>
+              Error consultando el servicio de generacion de token:
+              <br />
+              Error http: {response.statusText} ({response.status})
+            </p>
+          );
+          return;
+        }
+        const resJson = await response.json();
+        if (!resJson?.status) {
+          notifyError(resJson?.msg);
+          return;
+        }
+
+        const strQr = resJson?.obj?.otpauth_url;
+        console.log(strQr);
+        setQr(strQr);
+        setTimer((old) => {
+          clearTimeout(old);
+          return null;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [signOut, userState?.pdpUser?.email]
+  );
+
+  const verifyTOTP = useCallback(
+    async (totp) => {
+      if (!totp) {
+        notifyError("No se ha pasado el totp para verificacion");
+        signOut();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${public_urls}/users-totp/verify`, {
+          method: "POST",
+          body: JSON.stringify({
+            email: userState?.pdpUser?.email,
+            totp,
+          }),
+          headers: {
+            // Authorization: `Bearer ${session}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          notifyError(
+            <p>
+              Error consultando el servicio de verificacion de token:
+              <br />
+              Error http: {response.statusText} ({response.status})
+            </p>
+          );
+          return;
+        }
+        const resJson = await response.json();
+        if (!resJson?.status) {
+          notifyError(resJson?.msg);
+          return;
+        }
+        notify(resJson?.msg);
+      } catch (err) {
+        console.error(err);
+        signOut();
+        throw new Error(err, { cause: "unknown" });
+      }
+    },
+    [signOut, userState?.pdpUser?.email]
+  );
+
   const handleChangePass = useCallback(
     async (
       nombreUsuario,
@@ -258,26 +383,20 @@ export const useProvideAuth = () => {
           type: SIGN_IN,
           payload: { user: loggedUser },
         });
-        if (loggedUser.challengeName === "MFA_SETUP") {
-          setTimer(
-            setTimeout(() => {
-              signOut();
-              notifyError("La sesión ha expirado, por favor intente de nuevo");
-            }, 90000)
-          );
-          await handleSetupTOTP(loggedUser);
-        }
+        await checkTOTPFlow(loggedUser);
       } catch (err) {
         throw err;
       }
     },
-    [handleSetupTOTP, signOut]
+    [checkTOTPFlow]
   );
 
   const forgotPassword = useCallback(async (email) => {
     try {
       await Auth.forgotPassword(email);
-    } catch (error) {}
+    } catch (error) {
+      throw error;
+    }
   }, []);
 
   const forgotPasswordSubmit = useCallback(async (email, code, confirmPass) => {
@@ -291,6 +410,7 @@ export const useProvideAuth = () => {
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
+        await verifyTOTP(totp);
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
@@ -300,7 +420,7 @@ export const useProvideAuth = () => {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn, signOut]
+    [cognitoUser, confirmSignIn, signOut, verifyTOTP]
   );
 
   const handleverifyTotpToken = useCallback(
@@ -319,15 +439,17 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0 };
+      const tempRole = { quota: 0, comision: 0, sobregiro: 0, alerta: '' };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
+      tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
+      tempRole.alerta = quota["alerta cupo"];
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
     onError: useCallback((error) => {
       dispatchAuth({
         type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0 } },
+        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: '' } },
       });
       if (error?.cause === "custom") {
         notifyError(error.message);
@@ -336,6 +458,7 @@ export const useProvideAuth = () => {
       }
     }, []),
   });
+
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
       let _roleinfo = {};
@@ -362,6 +485,7 @@ export const useProvideAuth = () => {
       }
     }, []),
   });
+
   const [getLoginPdp] = useFetchDispatchDebounce({
     onSuccess: useCallback(
       (res) => {
@@ -423,6 +547,7 @@ export const useProvideAuth = () => {
       );
     }
   }, [pathname, id_comercio, id_dispositivo, getQuota]);
+
   useEffect(() => {
     const email = userState?.userInfo?.attributes?.email;
     if (email) {
@@ -436,53 +561,18 @@ export const useProvideAuth = () => {
   }, [userState?.userInfo?.attributes?.email, getSuserInfo, getLoginPdp]);
 
   useEffect(() => {
-    const validate = async () => {
-      if (cognitoUser?.challengeName === "MFA_SETUP") {
-        setTimer(
-          setTimeout(() => {
-            signOut();
-            notifyError("La sesión ha expirado, por favor intente de nuevo");
-          }, 90000)
-        );
-        try {
-          const validartoken = await Auth.setupTOTP(cognitoUser);
-          const str =
-            "otpauth://totp/AWSCognito:" +
-            "Punto de Pago Token" +
-            "?secret=" +
-            validartoken +
-            "&issuer=" +
-            "Punto de Pago Multibanco";
-          setQr(str);
-        } catch (err) {}
-      }
-    };
-    validate();
-  }, [cognitoUser, signOut]);
+    checkTOTPFlow(cognitoUser);
+  }, [checkTOTPFlow, cognitoUser]);
 
   useEffect(() => {
-    const temp = async () => {
-      if (cognitoUser?.challengeName === "MFA_SETUP") {
-        setTimer(
-          setTimeout(() => {
-            signOut();
-          }, 90000)
-        );
-        try {
-          const validartoken = await Auth.setupTOTP(cognitoUser);
-          const str =
-            "otpauth://totp/AWSCognito:" +
-            "Punto de Pago Token" +
-            "?secret=" +
-            validartoken +
-            "&issuer=" +
-            "Punto de Pago Multibanco";
-          setQr(str);
-        } catch (err) {}
+    setTimer((old) => {
+      if (!userState?.isSignedIn || !old) {
+        return old;
       }
-    };
-    temp();
-  }, [cognitoUser, signOut]);
+      clearTimeout(old);
+      return null;
+    });
+  }, [userState?.isSignedIn]);
 
   return {
     handleverifyTotpToken,

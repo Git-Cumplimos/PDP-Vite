@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import classes from "./Modal.module.css";
 
 const Modal = ({
@@ -20,11 +20,16 @@ const Modal = ({
     }
   };
 
-  if (show) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "auto";
-  }
+  useEffect(() => {
+    if (show) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [show]);
 
   return show ? (
     <div ref={refModal} className={`${modal} flex`}>
@@ -40,7 +45,7 @@ const Modal = ({
       </section>
     </div>
   ) : (
-    ""
+    <></>
   );
 };
 

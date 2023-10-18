@@ -10,13 +10,36 @@ const filterExtraDigit = (data, digits = 0) => {
     return data;
   }
 
-  return `${arr[0]},${arr[1].substring(0, digits)}`;
+  return `${arr[0]},${arr[1].substring(
+    0,
+    digits + arr[1].replace(/\d/g, "").length
+  )}`;
 };
+
+const getDecimal = (data, digits = 0) => {
+  if (!digits) return "";
+
+  const arr = data.split(/,/);
+  if (arr.length < 2) return "";
+
+  return `,${arr[1].substring(0, digits + arr[1].replace(/\d/g, "").length)}`;
+};
+
+export const moneyValidatorDecimal = (
+  value,
+  { negativeValues = false, decimalDigits = 0 }
+) =>
+  Math.round(
+    moneyValidator(filterExtraDigit(value, decimalDigits), negativeValues) *
+      Math.pow(10, decimalDigits)
+  ) / Math.pow(10, decimalDigits);
 
 const useMoney = ({
   limits = [0, 10000000],
   equalError = false,
+  equalErrorMin = false,
   decimalDigits = 0,
+  negativeValues = false,
 }) => {
   const onChangeMoney = useCallback(
     (ev) => {
@@ -24,17 +47,24 @@ const useMoney = ({
 
       let caret_pos = ev.target.selectionStart ?? 0;
 
-      const len = filterExtraDigit(ev.target.value, decimalDigits).length;
+      const filteredValue = filterExtraDigit(ev.target.value, decimalDigits);
+      const len = filteredValue.length;
 
-      const moneyValue =
-        Math.round(
-          moneyValidator(ev.target.value) * Math.pow(10, decimalDigits)
-        ) / Math.pow(10, decimalDigits);
+      const moneyValue = moneyValidatorDecimal(filteredValue, {
+        negativeValues,
+        decimalDigits,
+      });
 
       const [min, max] = limits;
-      if (moneyValue < min) {
+      if (moneyValue === min && equalErrorMin) {
         ev.target.setCustomValidity(
           `El valor debe ser mayor a ${moneyFormatter.format(min)}`
+        );
+      } else if (moneyValue < min) {
+        ev.target.setCustomValidity(
+          `El valor debe ser mayor ${
+            !equalErrorMin ? " o igual" : ""
+          } a ${moneyFormatter.format(min)}`
         );
       } else if (moneyValue > max) {
         ev.target.setCustomValidity(
@@ -50,12 +80,12 @@ const useMoney = ({
         ev.target.setCustomValidity("");
       }
 
-      const toAdd =
-        [",", "."].includes(ev.target.value.at(-1) ?? "") && decimalDigits
-          ? ","
-          : "";
+      const decimalPart = getDecimal(ev.target.value, decimalDigits);
+
       ev.target.value =
-        moneyValue === 0 ? "$ " : moneyFormatter.format(moneyValue) + toAdd;
+        moneyValue === 0
+          ? "$ "
+          : moneyFormatter.format(Math.floor(moneyValue)) + decimalPart;
 
       ev.target.focus();
       caret_pos += ev.target.value.length - len;
@@ -63,7 +93,7 @@ const useMoney = ({
 
       return moneyValue;
     },
-    [limits, decimalDigits, equalError]
+    [limits, decimalDigits, equalError, equalErrorMin, negativeValues]
   );
   return onChangeMoney;
 };

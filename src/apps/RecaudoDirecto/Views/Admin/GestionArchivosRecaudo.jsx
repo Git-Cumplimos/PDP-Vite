@@ -41,8 +41,6 @@ const GestionArchivosRecaudo = () => {
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
 
-
-
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 

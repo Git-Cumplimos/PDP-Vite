@@ -5,9 +5,12 @@ import Select from "../../../components/Base/Select";
 import SellResp from "../components/SellResp/SellResp";
 import SendForm from "../components/SendForm/SendForm";
 import { useLoteria } from "../utils/LoteriaHooks";
+import { LineasLot_disclamer } from "../utils/enum";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
+import BarcodeReader from "../../../components/Base/BarcodeReader/BarcodeReader";
+import Button from "../../../components/Base/Button/Button";
 import { useLocation } from "react-router-dom";
 import { notifyError } from "../../../utils/notify";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
@@ -17,7 +20,7 @@ const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
   const { roleInfo } = useAuth();
-  const { searchLoteriafisica,searchLoteria } = useLoteria();
+  const { searchLoteriafisica, searchLoteria } = useLoteria();
   const { pathname } = useLocation();
   const nitsLoterias = {
     "loteria-de-bogota": "899.999.270-1",
@@ -26,13 +29,13 @@ const Loteria = ({ route }) => {
   };
   const [maxPages, setMaxPages] = useState(0);
   const [loterias, setLoterias] = useState([]);
-  const [{ page, limit}, setPageData] = useState({
+  const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
-  
-  const [fecha_trx, setFecha_trx] = useState(new Date())
-   
+
+  const [fecha_trx, setFecha_trx] = useState(new Date());
+
   const {
     infoLoto: {
       numero,
@@ -51,7 +54,6 @@ const Loteria = ({ route }) => {
     codigos_lot,
     loadConsulta,
   } = useLoteria();
-
   const { idloteria } = useLoteria();
   const [sorteoOrdi, setSorteoOrdi] = useState(null);
   const [sorteoExtra, setSorteoExtra] = useState(null);
@@ -61,18 +63,44 @@ const Loteria = ({ route }) => {
   const [nit_loteria, setNit_loteria] = useState(null);
   const [nom_loteria, setNom_loteria] = useState(null);
   const navigate = useNavigate();
-  const [isInputDisabled, setIsInputDisabled] = useState(false);
-  
+  const [flagEscaner, setFlagEscaner] = useState(false);
+
   const validarEntradaScanner = useCallback(
     (validarNum) => {
-      if (validarNum[0] === "]") {
-        return validarNum.replace("]C1", "");
+      var cod = "";
+      if (codigos_lot?.length === 2) {
+        cod = [`0${codigos_lot?.[0]?.cod_loteria}`,`${codigos_lot?.[1]?.cod_loteria}`];
       } else {
-        return validarNum;
+        cod = [`0${codigos_lot?.[0]?.cod_loteria}`];
+      }
+      if (validarNum?.length===23){
+        if (validarNum.substring(0, 3) === "]C1") {
+          if (cod.includes(validarNum.substring(4, 7))){
+            setNumero(String(validarNum.substr(-9, 4)));
+            setSerie(String(validarNum.substr(-5, 3)));
+            setFlagEscaner(true)
+            setDatosEscaneados(validarNum.replace("]C1", ""));
+          } else{
+            setFlagEscaner(false)
+            notifyError("El código de barras escaneado no corresponde a la lotería seleccionada")
+          }
+        } else {
+          setFlagEscaner(false)
+          notifyError("El código de barras escaneado es incorrecto")
+        }
+      } else {
+        setFlagEscaner(false)
+        notifyError("El código de barras escaneado es incorrecto")
       }
     },
-    [datosEscaneados]
+    [setNumero,setSerie,codigos_lot]
   );
+
+  const limpiarCampos = () =>{
+    setNumero("");
+    setSerie("");
+    setFlagEscaner(false)
+  }
 
   const sorteosLOT = useMemo(() => {
     var cod = "";
@@ -90,13 +118,13 @@ const Loteria = ({ route }) => {
       setNit_loteria(nit);
       idloteria(nit).then((res) => {
         if (res?.status) {
-          setNom_loteria(res['obj'][0]['nombre'])
+          setNom_loteria(res["obj"][0]["nombre"]);
         } else {
           navigate(-1);
         }
       });
     }
-  }, [pathname,idloteria,navigate]);
+  }, [pathname, idloteria, navigate]);
 
   useEffect(() => {
     const query = {
@@ -116,7 +144,7 @@ const Loteria = ({ route }) => {
         });
         if (sortOrd.length > 0) {
           setSorteoOrdi(sortOrd[0]);
-        } 
+        }
         if (sortExt.length > 0) {
           setSorteoExtra(sortExt[0]);
         }
@@ -129,7 +157,7 @@ const Loteria = ({ route }) => {
         });
         if (sortOrdfisico.length > 0) {
           setSorteofisico(sortOrdfisico[0]);
-        } 
+        }
         if (sortExtfisico.length > 0) {
           setSorteofisicoextraordinario(sortExtfisico[0]);
         }
@@ -147,7 +175,6 @@ const Loteria = ({ route }) => {
 
   useEffect(() => {
     setSellResponse(null);
-    setCustomer({ fracciones: "", phone: "", doc_id: "" });
     const copy = [{ value: "", label: "" }];
     if (sorteoOrdi !== null) {
       copy.push({
@@ -174,7 +201,19 @@ const Loteria = ({ route }) => {
       });
     }
     SetOpcionesDisponibles([...copy]);
-  }, [setCustomer,loterias,setNumero,setSellResponse,setSerie,sorteoExtra,sorteoExtrafisico,sorteoOrdi,sorteoOrdifisico,sorteosLOT,codigos_lot]);
+  }, [
+    setCustomer,
+    loterias,
+    setNumero,
+    setSellResponse,
+    setSerie,
+    sorteoExtra,
+    sorteoExtrafisico,
+    sorteoOrdi,
+    sorteoOrdifisico,
+    sorteosLOT,
+    codigos_lot,
+  ]);
 
   const closeModal = useCallback(() => {
     navigate(-1);
@@ -184,25 +223,25 @@ const Loteria = ({ route }) => {
     setSelected(null);
     setSelecFrac([]);
     setTipoPago(null);
-  },
-    [setCustomer,setSelected,setSellResponse,navigate]
-  );
-  
+  }, [setCustomer, setSelected, setSellResponse, navigate]);
+
   useEffect(() => {
-    if (sellResponse !== null){
-      const fecha_venta =new Date();
-      setFecha_trx(fecha_venta)
+    if (sellResponse !== null) {
+      const fecha_venta = new Date();
+      setFecha_trx(fecha_venta);
     }
-  }, [sellResponse])
+  }, [sellResponse]);
 
   const ticket = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "VENTA LOTERÍA",
       timeInfo: {
         "Fecha de pago": "",
         Hora: "",
       },
       commerceInfo: [
+        ["Razón social", "Soluciones en Red S.A.S."],
+        ["Nit", "830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", ""],
@@ -212,34 +251,41 @@ const Loteria = ({ route }) => {
         ["Dirección", roleInfo?.direccion],
         ["", ""],
       ],
-      commerceName: sellResponse?.obj?.nom_loteria,
+      commerceName:
+        sellResponse?.obj?.cod_loteria !== "064"
+          ? sellResponse?.obj?.nom_loteria
+          : sellResponse?.obj?.nom_loteria + " Extraordinario",
+      descriPM: "***Descripción del premios mayor asociado al sorteo***",
       trxInfo: [
         ["Sorteo", sorteo],
-        ["Billete", numero],
+        ["Fecha del sorteo", ""],
+        ["", ""],
+        ["Número", numero],
         ["Serie", serie],
         ["Fracción", ""],
-        ["Tipo de Billete", ""],
+        ["Tipo de billete", ""],
+        ["", ""],
         ["", ""],
         ["Valor", ""],
         ["", ""],
-        ["Forma de Pago", ""],
+        ["", ""],
+        ["Forma de pago", ""],
+        ["", ""],
         ["", ""],
       ],
-      disclamer:
-        "Para quejas o reclamos comuníquese, al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+      disclamer: LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
     };
-  }, [roleInfo,sellResponse,sorteo,serie,numero]
-  );
+  }, [roleInfo, sellResponse, sorteo, serie, numero]);
 
   useEffect(() => {
-    if (sorteo.split("-")[0] !== ""){
+    if (sorteo.split("-")[0] !== "") {
       fetchTablaBilletes();
     }
-  }, [page,limit,sorteo,numero,serie])
+  }, [page, limit, sorteo, numero, serie]);
 
   const fetchTablaBilletes = () => {
-    if (sorteo.split("-")[1] === "true"){
-      searchLoteriafisica({ 
+    if (sorteo.split("-")[1] === "true") {
+      searchLoteriafisica({
         sorteo: sorteo.split("-")[0],
         lot: sorteo.split("-")[2],
         num: numero,
@@ -253,35 +299,34 @@ const Loteria = ({ route }) => {
               setLoterias(res.Resultado ?? []);
               setMaxPages(res.Num_Datos ?? 1);
             } else {
-              notifyError(res.msg);
+              notifyError(res.msg, 5000, { toastId: "notify-lot" });
+              setLoterias([]);
+            }
+          }
+        })
+        .catch((err) => console.error(err));
+    } else {
+      searchLoteria({
+        sorteo: sorteo.split("-")[0],
+        lot: sorteo.split("-")[2],
+        num: numero,
+        ser: serie,
+        page,
+        limit,
+      })
+        .then((res) => {
+          if (res !== undefined) {
+            if (!("msg" in res)) {
+              setLoterias(res.Resultado ?? []);
+              setMaxPages(res.Num_Datos ?? 1);
+            } else {
+              notifyError(res.msg, 5000, { toastId: "notify-lot2" });
               setLoterias([]);
             }
           }
         })
         .catch((err) => console.error(err));
     }
-    else {
-      searchLoteria({ 
-        sorteo: sorteo.split("-")[0],
-        lot: sorteo.split("-")[2],
-        num: numero,
-        ser: serie,
-        page,
-        limit,
-      })
-        .then((res) => {
-          if (res !== undefined) {
-            if (!("msg" in res)) {
-              setLoterias(res.Resultado ?? []);
-              setMaxPages(res.Num_Datos ?? 1);
-            } else {
-              notifyError(res.msg);
-              setLoterias([]);
-            }
-          }
-        })
-        .catch((err) => console.error(err));
-    }    
   };
   // *****************************************BANDERA******************
   return (
@@ -290,28 +335,38 @@ const Loteria = ({ route }) => {
       <SimpleLoading show={loadConsulta}></SimpleLoading>
       <Select
         className={"place-self-strech"}
-        disabled={serie !== "" || numero !== ""}
+        // disabled={serie !== "" || numero !== ""}
         id="selectSorteo"
         label="Tipo de sorteo"
         options={opcionesdisponibles}
         value={sorteo}
-        onChange={(e) => setSorteo(e.target.value)}
+        onChange={(e) => {
+          setSorteo(e.target.value);
+          setNumero("");
+          setSerie("");
+        }}
       />
-      {sorteo !== "" ?
-          <TableEnterprise
-          title={sorteo.split("-")[1] === "true" ? 'Billetería física' : 'Billetería virtual'}
+      {sorteo !== "" ? (
+        <TableEnterprise
+          title={
+            sorteo.split("-")[1] === "true"
+              ? "Billetería física"
+              : "Billetería virtual"
+          }
           maxPage={maxPages}
-          headers={["Número","Serie","Fracciones disponibles"]}
+          headers={["Número", "Serie", "Fracciones disponibles"]}
           onSetPageData={setPageData}
-          data={loterias.map(({Num_billete,serie:Serie_lot,Fracciones_disponibles}) => {
-              return {Num_billete,serie:Serie_lot,Fracciones_disponibles};
-            })}
+          data={loterias.map(
+            ({ Num_billete, serie: Serie_lot, Fracciones_disponibles }) => {
+              return { Num_billete, serie: Serie_lot, Fracciones_disponibles };
+            }
+          )}
           onSelectRow={(e, index) => {
             setSelected(loterias[index]);
             setShowModal(true);
           }}
-          >
-            <Input
+        >
+          <Input
             id="numTicket"
             label="Número de billete"
             type="search"
@@ -326,8 +381,9 @@ const Loteria = ({ route }) => {
                 setNumero(num);
               }
             }}
-            />
-            <Input
+            disabled={flagEscaner}
+          />
+          <Input
             id="numSerie"
             label="Número de serie"
             type="search"
@@ -342,30 +398,32 @@ const Loteria = ({ route }) => {
                 setSerie(num);
               }
             }}
-            />
-            {sorteo.split("-")[1] === "true" ?
+            disabled={flagEscaner}
+          />
+          {sorteo.split("-")[1] === "true" ? (
+            !flagEscaner ? (
+              <>
+                <BarcodeReader onSearchCodigo={validarEntradaScanner}/>
+                <Button type="reset">Escanear de nuevo</Button>
+              </>
+             ) :
+             <>
               <Input
-                label="Escanee el código de barras"
-                type="search"
-                value={datosEscaneados}
-                onInput={(e) => {
-                  const num = e.target.value || "";
-                  setDatosEscaneados(validarEntradaScanner(num));
-                  if (num?.length === 20) {
-                    fetchTablaBilletes();
-                    setNumero(String(num.substr(-9, 4)));
-                    setSerie(String(num.substr(-5, 3)));
-                  } else {
-                    setNumero("");
-                    setSerie("");
-                    setIsInputDisabled(true);
-                  }
-                }}
-                disabled={isInputDisabled}
-              ></Input>
-              : ""}
-          </TableEnterprise>
-          : ""}
+              label="Código de barras"
+              type="text"
+              autoComplete="off"
+              value={datosEscaneados}
+              disabled
+              />
+              <Button onClick={()=>limpiarCampos()}>Limpiar campos</Button>
+             </>                 
+          ) : (
+            ""
+          )}
+        </TableEnterprise>
+      ) : (
+        ""
+      )}
       <Modal show={showModal} handleClose={() => closeModal()}>
         {sellResponse === null ? (
           <SendForm
@@ -388,6 +446,7 @@ const Loteria = ({ route }) => {
         ) : (
           <SellResp
             codigos_lot={codigos_lot}
+            rta_billeteria={loterias}
             sellResponse={sellResponse}
             setSellResponse={setSellResponse}
             closeModal={closeModal}

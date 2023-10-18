@@ -122,7 +122,7 @@ const RetiroDirecto = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  },{delay:2000});
+  }, { delay: 2000 });
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);
@@ -161,38 +161,38 @@ const RetiroDirecto = () => {
     if (body['Valor mínimo'] || body['Valor máximo']) {
       delete body['Valor mínimo']; delete body['Valor máximo'];
       body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0}`, `${limites['Valor máximo'] ?? 0}`]
-      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])){
+      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])) {
         notifyError("En la restriccion de valores, el valor máximo debe ser mayor al valor mínima")
         validacion = false
       }
     }
-    if (validacion){
+    if (validacion) {
       notifyPending(
         selected
-        ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
-        : addConveniosRetiroList(body),
+          ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
+          : addConveniosRetiroList(body),
         {
           render() {
             return "Enviando solicitud";
           },
         },
         {
-        render({ data: res }) {
-          handleClose();
-          searchTrxs();
-          return `Convenio ${selected ? "modificado" : "agregado"
-            } exitosamente`;
+          render({ data: res }) {
+            handleClose();
+            searchTrxs();
+            return `Convenio ${selected ? "modificado" : "agregado"
+              } exitosamente`;
+          },
         },
-      },
-      {
-        render({ data: err }) {
-          if (err?.cause === "custom") {
-            return err?.message;
-          }
-          console.error(err?.message);
-          return `${selected ? "Edicion" : "Creación"} fallida`;
-        },
-      }
+        {
+          render({ data: err }) {
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return `${selected ? "Edicion" : "Creación"} fallida`;
+          },
+        }
       )
     }
   }, [handleClose, searchTrxs, selected, referencias, limites])
@@ -372,7 +372,7 @@ const RetiroDirecto = () => {
             {Object.entries(limites).map(([keyLimit, valLimit], index) => {
               return (
                 <MoneyInput
-                  key={keyLimit}
+                  key={`${keyLimit}_${index}`}
                   className={"mb-1"}
                   id={`${keyLimit}_${index}`}
                   name={keyLimit}
@@ -381,13 +381,15 @@ const RetiroDirecto = () => {
                   maxLength={"11"}
                   min={limitesMontos.min}
                   max={limitesMontos.max}
-                  value={valLimit ?? 0}
-                  equalError={false}
+                  // value={valLimit}
+                  defaultValue={selected ? selected.limite_monto[index] : valLimit}
                   onInput={(e, valor) => {
                     const copyRef = { ...limites };
                     copyRef[keyLimit] = valor;
                     setlimites(copyRef);
                   }}
+                  equalError={false}
+                  equalErrorMin={false}
                   required
                 />
               )
@@ -409,7 +411,7 @@ const RetiroDirecto = () => {
                         maxLength={`${keyRef.includes("Longitud") ? "2" : "40"}`}
                         autoComplete="off"
                         value={valRef}
-                        onInput={(ev) => { 
+                        onInput={(ev) => {
                           if (keyRef.includes("Longitud")) (ev.target.value = onChangeNumber(ev))
                           const copyRef = [...referencias];
                           copyRef[index][keyRef] = ev.target.value;

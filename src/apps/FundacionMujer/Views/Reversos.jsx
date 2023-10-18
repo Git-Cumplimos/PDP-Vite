@@ -1,40 +1,33 @@
-import { useCallback, useState, useRef, useEffect, useMemo } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import fetchData from "../../../../src/utils/fetchData";
-import { useMujer } from "../utils/mujerHooks";
-import { toast } from "react-toastify";
 import { notifyError } from "../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../components/Base/Tickets";
 import useForm from "../../../hooks/useForm";
-import MoneyInput from "../../../components/Base/MoneyInput/MoneyInput";
+import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput/MoneyInput";
 import TextArea from "../../../components/Base/TextArea";
 import { useAuth } from "../../../hooks/AuthHooks";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import useQuery from "../../../hooks/useQuery";
+import { fetchCustom } from "../utils/fetchFDLM";
+import { notifyPending } from "../../../utils/notify";
+import { useNavigate } from "react-router-dom";
+import { useFetch } from "../../../hooks/useFetch";
+import { onChangeNumber } from "../../../utils/functions";
 
 /* URLS para consultar información de oficinas de donde hay que hacer el reverso*/
 const url_USERS = process.env.REACT_APP_URL_IAM_PDP;
 const url_datosComercio = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 /**/
+const URL_INGRESAR_REVERSO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`
 
 const Reversos = () => {
-  const {
-    infoLoto: {},
-    ingresoreversorecibo,
-  } = useMujer();
-
-  const formatMoney = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
-
   /*__________ Fechas para consulta de transacciones del día________________ */
   const fecha = new Date();
   const fecha_ini = fecha.toLocaleDateString();
@@ -42,7 +35,6 @@ const Reversos = () => {
   fecha.setDate(fecha.getDate() + 1);
   const fecha_fin = fecha.toLocaleDateString();
   /*_________________________________________________________ */
-
   const [selected, setSelected] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [value, setValue] = useState("");
@@ -53,9 +45,9 @@ const Reversos = () => {
   const [motivo, setMotivo] = useState("");
   const [maxPageUsers, setMaxPageUsers] = useState(1);
   const [usuariosDB, setUsuariosDB] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState("");
-  const [municipio, setMunicipio] = useState("");
-  const [stop, setStop] = useState("");
+  const { roleInfo, pdpUser } = useAuth();
+  const navigate = useNavigate();
+  const [tickets, setTickets] = useState("");
 
   const [{ page: pageUSER, limit: limitUSER }, setPageData] = useState({
     page: 1,
@@ -81,7 +73,6 @@ const Reversos = () => {
         {},
         false
       );
-      setMunicipio(resp_ciudad[0].municipio);
     } catch (err) {}
   };
 
@@ -152,52 +143,14 @@ const Reversos = () => {
     reference: "",
   });
 
-  const pageStyle = `
-  @page {
-    size: 80mm 50mm;
-  }
-
-  @media all {
-    .pagebreak {
-      display: none;
-    }
-  }
-
-  @media print {
-    .pagebreak {
-      page-break-before: always;
-    }
-  }
-`;
-  const { infoTicket } = useAuth();
-
-  // Envio del ticket para guardarolo en transacciones
-  useEffect(() => {
-    infoTicket(selected?.id_trx, 6, tickets);
-  }, [infoTicket, selected, ticket]);
-
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
-    pageStyle: pageStyle,
   });
-
-  const notify = (msg) => {
-    toast.info(msg, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
 
   const reversosFDLM = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end, state, limit) => {
-      setStop(true);
       const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio?.id_comercio === -1 || Comercio?.id_comercio === "")) {
@@ -222,16 +175,14 @@ const Reversos = () => {
       fetchData(url, "GET", queries)
         .then((res) => {
           if (res?.status) {
-            setStop(false);
             if (res?.obj?.trxs.length < 1) {
               notifyError(
-                "No se encontraron transacciones en el rango de fechas"
+                "No se encontraron transacciones realizadas el día de hoy por el comercio seleccionado"
               );
             }
             setMaxPages(res?.obj?.maxpages);
             setTrxs(res?.obj?.trxs);
           } else {
-            setStop(false);
             throw new Error(res?.msg);
           }
         })
@@ -240,102 +191,71 @@ const Reversos = () => {
     []
   );
 
-  const tickets = useMemo(() => {
-    return {
-      title: "Recibo de pago(Reverso recaudo)",
-      timeInfo: {
-        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        }).format(new Date()),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "numeric",
-          minute: "numeric",
-          second: "numeric",
-          hour12: false,
-        }).format(new Date()),
-      },
-      commerceInfo: [
-        ["Id comercio", comercio?.id_comercio],
-        /*id_dispositivo*/
-        ["No. terminal", comercio?.id_dispositivo],
-        ["Id Trx", selected.id_trx],
-        ["Id Aut", "Id FDLM"],  
-        /*ciudad*/
-        ["Comercio", comercio?.["nombre comercio"]],
-        ["", ""],
-        /*direccion*/
-        ["Dirección", comercio?.direccion],
-        ["", ""],
-      ],
-      commerceName: "FUNDACIÓN DE LA MUJER",
-      trxInfo: [
-        ["CRÉDITO", selected?.res_obj?.info?.credito],
-        ["VALOR", formatMoney.format(value)],
-        ["Cliente", selected?.res_obj?.info?.cliente],
-        ["", ""],
-        ["Cédula", selected?.res_obj?.info?.cedula],
-        ["", ""],
-      ],
-      disclamer:
-        "Para quejas o reclamos comuniquese al 3503485532(Servicio al cliente) o al 3102976460(chatbot)",
-    };
-  }, [
-    comercio?.ciudad,
-    comercio?.direccion,
-    comercio?.id_comercio,
-    comercio?.id_dispositivo,
-    selected,
-    value,
-  ]);
-
-  const closeModal = useCallback(async (ticket) => {
+  const handleClose = useCallback(() => {
     setTicket(false);
     setShowModal(false);
     handleChange();
-    setMotivo("")
-    setTrxs([])
+    setMotivo("");
+    setTrxs([]);
   }, []);
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    setShowModal(true);
-  };
+  const goToReverso = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  const [loadingPeticionIngresarReverso, peticionIngresarReverso] = useFetch(
+    fetchCustom(URL_INGRESAR_REVERSO, "POST", "Ingresar Reverso")
+  );
 
   const reverse = (e) => {
     e.preventDefault();
-    setStop(true)
-    let tipo_comercio = selected?.res_obj?.tipo_comercio ?? ""
-    if (comercio?.tipo_comercio === "KIOSCO"){
-      tipo_comercio = "OFICINAS PROPIAS"
-    }
-    const values = {
-      tipo: tipo_comercio,
-      dispositivo: selected?.id_terminal,
-      usuario: selected?.id_usuario,
-      comercio: selected?.id_comercio,
-      idtrx: selected?.id_trx,
-      val: value,
-      motivo: motivo,
-      ...data,
+    const data_request = selected?.res_obj?.request?.Datos
+    const data = {
+      comercio: {
+        id_comercio: roleInfo?.id_comercio,
+        id_usuario: roleInfo?.id_usuario,
+        id_terminal: roleInfo?.id_dispositivo,
+      },
+      nombre_comercio: roleInfo?.["nombre comercio"],
+      nombre_usuario: pdpUser?.uname ?? "",
+      id_trx: selected?.id_trx,
+      // valor_total_trx: parseFloat(value),
+      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+      Datos: {
+        nroBusqueda: data_request?.nroBusqueda,
+        Motivo: motivo,
+        Cliente: data_request?.Cliente,
+        Cedula: data_request?.Cedula,
+        Direccion: comercio?.direccion,
+      },
     };
-    ingresoreversorecibo(values)
-      .then((res) => {        
-        if (!res?.status) {
-          setStop(false)
-          setTicket(false);
-          notifyError(res?.obj?.Mensaje);
-        }else {
+    notifyPending(
+      peticionIngresarReverso({}, data),
+      {
+        render: () => {
+          return "Procesando transacción";
+        },
+      },
+      {
+        render: ({data: res }) =>{
           setTicket(true);
-          notify(res?.msg)
-          setStop(false)
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setStop(false)
-      });
+          setTickets(res?.obj?.ticket);
+          return res?.msg;
+        },
+      },
+      {
+        render({ data: err }) {
+          handleClose();
+          navigate("/funmujer");
+          setTicket(false);
+          if (err?.cause === "custom") {
+            return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
+          }
+          console.error(err?.message);
+          return err?.message ?? "Transacción fallida";
+        },
+      }
+    );
   };
   return (
     <>
@@ -357,6 +277,8 @@ const Reversos = () => {
           name='email'
           label={"email"}
           type='text'
+          minLength={5}
+          maxLength={100}
           autoComplete='off'
           defaultValue={email}
         />
@@ -364,29 +286,21 @@ const Reversos = () => {
           id='nombre'
           name='nombre'
           label={"nombre"}
+          minLength={1}
+          maxLength={40}
           type='text'
           autoComplete='off'
           defaultValue={nombre}
         />
       </TableEnterprise>
 
-      <Modal show={showModal} handleClose={() => closeModal(ticket)}>
+      <Modal show={showModal}  handleClose={ticket || loadingPeticionIngresarReverso ? () => {} : handleClose}>
         {ticket !== false ? (
           <div className='flex flex-col justify-center items-center'>
             <Tickets refPrint={printDiv} ticket={tickets} />
             <ButtonBar>
-              <Button
-                onClick={() => {
-                  handlePrint();
-                }}>
-                Imprimir
-              </Button>
-              <Button
-                onClick={() => {
-                  closeModal(ticket);
-                }}>
-                Cerrar
-              </Button>
+            <Button onClick={handlePrint}>Imprimir</Button>
+            <Button onClick={goToReverso}>Cerrar</Button>
             </ButtonBar>
           </div>
         ) : (
@@ -412,7 +326,7 @@ const Reversos = () => {
                   autoComplete='off'
                   minLength={"7"}
                   maxLength={"12"}
-                  value={data?.credit ?? ""}
+                  value={selected?.res_obj?.request?.Datos?.nroBusqueda ?? ""}
                   onInput={handleChange}
                   required></Input>
                 <MoneyInput
@@ -423,23 +337,27 @@ const Reversos = () => {
                   autoComplete='off'
                   maxLength={"15"}
                   value={value ?? ""}
-                  // onInput={(e, valor) => {
-                  //   const num = valor || "";
-                  //   setValue(num);
-                  // }}
                   required></MoneyInput>
                 <Input
                   id='refCredito'
                   name='reference'
                   label='Referencia'
                   type='text'
+                  min={1}
+                  maxLength={32}
                   autoComplete='off'
-                  value={data?.reference ?? ""}
-                  onInput={handleChange}></Input>
+                  // value={data?.reference ?? ""}
+                  // onInput={handleChange}
+                  onChange={(ev) => {
+                    ev.target.value = onChangeNumber(ev);
+                  }}>
+                </Input>
                 <TextArea
                   id='motivo'
                   label='Motivo'
                   type='text'
+                  minLength= {1}
+                  maxLength= {40}
                   autoComplete='off'
                   value={motivo}
                   required
@@ -448,7 +366,7 @@ const Reversos = () => {
                   }}
                 />
                 <ButtonBar>
-                  <Button type='submit' disabled={stop}>
+                  <Button type='submit' disabled={loadingPeticionIngresarReverso}>
                     Aceptar
                   </Button>
                 </ButtonBar>
@@ -465,12 +383,11 @@ const Reversos = () => {
           <TableEnterprise
             title='Recaudos'
             maxPage={maxPages}
-            // onChange={onChangeRecaudos}
             headers={[
               "ID transacción",
               "Fecha",
-              "Cedula",
-              "Credito",
+              "Cédula",
+              "Crédito",
               "Referencia",
               "Monto",
             ]}
@@ -485,9 +402,10 @@ const Reversos = () => {
                 minute: "numeric",
               }).format(tempDate);
               monto = formatMoney.format(monto);
-              const referencia = res_obj?.Referencia;
-              const credito = res_obj?.info?.credito;
-              const cedula = res_obj?.info?.cedula;
+              const res_data = res_obj?.request?.Datos;
+              const referencia = res_data?.Referencia;
+              const credito = res_data?.nroBusqueda;
+              const cedula = res_data?.Cedula;
               return {
                 id_trx,
                 created,

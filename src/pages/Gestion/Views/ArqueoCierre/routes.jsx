@@ -6,11 +6,15 @@ const AppIcons = lazy(() => import("../../../../components/Base/AppIcons"));
  * COMPONENTES ROL CAJERO
  */
 const Panel = lazy(() => import("./Panel"));
-const ReporteTrx = lazy(() => import("./ReporteTrx"));
-const CierreCaja = lazy(() => import("./CierreCaja"));
+const ReporteTrx = lazy(() => import("./ReporteArqueoCaja/ReporteTrx"));
+const ReporteEfectivo = lazy(() => import("./ReporteArqueoCaja/ReporteEfectivo"));
+const ReporteTarjeta = lazy(() => import("./ReporteArqueoCaja/ReporteTarjeta"));
+const CierreCaja = lazy(() => import("./CierreCaja/CierreCaja"));
 const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
 const Notas = lazy(() => import("./Notas/Notas"));
+const ReporteSobranteFaltantes = lazy(() => import("./ReporteArqueoCaja/ReporteSobranteFaltantes"));
+
 
 /**
  * COMPONENTES ROL ANALISTA
@@ -18,9 +22,10 @@ const Notas = lazy(() => import("./Notas/Notas"));
 const PanelHistorico = lazy(() => import("./PanelHistorico"));
 const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
+const PlataformasExternas = lazy(() => import("./PlataformasExternas"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
-
 const ReportesCierre = lazy(() => import("./ReportesCierre"));
+const ValidacionSobranteFaltantes = lazy(() => import("./ValidacionSobranteFaltantes"));
 
 export const rutasArqueo = [
   {
@@ -38,10 +43,15 @@ export const rutasArqueo = [
     permission: [PermissionsCaja.RealizarArqueoCierre],
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/reporte-trxs",
-    label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
-    // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
-    component: ReporteTrx,
+    link: "/gestion/arqueo/arqueo-cierre/reporte-efectivo-trxs",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte Efectivo Arqueo de Caja" />,
+    component: ReporteEfectivo,
+    permission: [PermissionsCaja.VerReporteTrxCierre],
+  },
+  {
+    link: "/gestion/arqueo/arqueo-cierre/reporte-tarjeta-trxs",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte Tarjeta Arqueo de Caja" />,
+    component: ReporteTarjeta,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {
@@ -66,6 +76,12 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/parametrizar-cuenta",
     label: <AppIcons Logo={"RECAUDO"} name="Parametrizar Transportadoras y Entidades Bancarias" />,
     component: ParametrizacionRecaudo,
+    permission: [PermissionsCaja.AgregarEntidades],
+  },
+  {
+    link: "/gestion/arqueo/plataformas-externas",
+    label: <AppIcons Logo={"RECAUDO"} name="Creación Plataforma Externos" />,
+    component: PlataformasExternas,
     permission: [PermissionsCaja.AgregarEntidades],
   },
   {
@@ -106,6 +122,19 @@ export const rutasArqueo = [
     component: ReportesCierre,
     permission: [PermissionsCaja.VerHistoricoCierresCaja],
   },
+  {
+    link: "/gestion/arqueo/validacion-sobrantes-faltantes",
+    label: <AppIcons Logo={"RECAUDO"} name="Validación sobrantes y faltantes" />,
+    component: ValidacionSobranteFaltantes,
+    permission: [PermissionsCaja.ValidacionSobrantesFaltantes],
+  },
+  {
+    link: "/gestion/arqueo/reporte-sobrantes-faltantes",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte de sobrantes/faltantes" />,
+    component: ReporteSobranteFaltantes,
+    permission: [PermissionsCaja.ReporteSobrantesFaltantes],
+  },
+
 ];
 
 const listPermissions = Object.values(PermissionsCaja);

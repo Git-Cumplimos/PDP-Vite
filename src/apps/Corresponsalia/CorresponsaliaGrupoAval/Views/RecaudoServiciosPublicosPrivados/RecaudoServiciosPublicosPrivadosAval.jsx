@@ -19,6 +19,7 @@ import {
   postConsultaTablaConveniosEspecifico,
   postRecaudoConveniosAval,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 
 const RecaudoServiciosPublicosPrivadosAval = () => {
   const { state } = useLocation();
@@ -36,39 +37,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     valorConst: "",
     valorVar: "",
   });
-  const [objTicketActual, setObjTicketActual] = useState({
-    title: "RECIBO DE PAGO",
-    timeInfo: {
-      "Fecha de pago": "",
-      Hora: "",
-    },
-    commerceInfo: [
-      /*id transaccion recarga*/
-      /*id_comercio*/
-      ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : 0],
-      /*id_dispositivo*/
-      ["No. terminal", roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0],
-      /*Id trx*/
-      ["Id Trx", ""],
-      /*Id Aut*/
-      ["Id Aut", ""],
-      /*comercio*/
-      [
-        "Comercio",
-        roleInfo?.["nombre comercio"]
-          ? roleInfo?.["nombre comercio"]
-          : "Sin datos",
-      ],
-      ["", ""],
-      /*direccion*/
-      ["Dirección", roleInfo?.direccion ? roleInfo?.direccion : "Sin datos"],
-      ["", ""],
-    ],
-    commerceName: "Recaudo de facturas",
-    trxInfo: [],
-    disclamer:
-      "Corresponsal bancario para Banco de Occidente. La impresión de este tiquete implica su aceptación, verifique la información. Este es el unico recibo oficial de pago. Requerimientos 018000 514652.",
-  });
+  const [objTicketActual, setObjTicketActual] = useState({});
   const [datosConsulta, setDatosConsulta] = useState({});
   const [isUploading, setIsUploading] = useState(true);
   const [convenio, setConvenio] = useState([]);
@@ -98,6 +67,9 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     // setShowModal((old) => ({ ...old, showModal: true }));
+    if (parseInt(datosTrans.ref1) <= 0) {
+      return notifyError("La referencia no puede ser 0");
+    }
     setIsUploading(true);
     postConsultaConveniosAval({
       oficina_propia:
@@ -125,19 +97,21 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
     })
       .then((res) => {
         if (res?.status) {
+          let valorTrxCons = res?.obj?.valorTrx ?? 0;
           setIsUploading(false);
           notify(res?.msg);
-          setShowModal((old) => ({ ...old, showModal: true }));
           setDatosConsulta(res?.obj);
           setDatosTrans((old) => ({
             ...old,
-            valorConst: formatMoney.format(res?.obj?.valorTrx) ?? "",
+            valorConst: valorTrxCons ?? "",
             valorVar: res?.obj?.valorTrx,
           }));
+          setShowModal((old) => ({ ...old, showModal: true }));
         } else {
           setIsUploading(false);
           handleClose();
           notifyError(res?.msg);
+          navigate(-1)
         }
       })
       .catch((err) => {
@@ -145,37 +119,12 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         notifyError("No se ha podido conectar al servidor");
         handleClose();
         console.error(err);
+        navigate(-1)
       });
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
-    let valorTransaccion = parseInt(datosTrans?.valorVar) ?? 0;
-    const fecha = Intl.DateTimeFormat("es-CO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    /*hora actual */
-    const hora = Intl.DateTimeFormat("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    }).format(new Date());
-    const objTicket = { ...objTicketActual };
-    objTicket["timeInfo"]["Fecha de pago"] = fecha;
-    objTicket["timeInfo"]["Hora"] = hora;
-    objTicket["trxInfo"].push(["Convenio", convenio.convenio]);
-    objTicket["trxInfo"].push(["", ""]);
-    // objTicket["trxInfo"].push(["Código convenio", convenio.nura]);
-    // objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push(["Referencia de pago", datosTrans?.ref1 ?? ""]);
-    objTicket["trxInfo"].push(["", ""]);
-    objTicket["trxInfo"].push([
-      "Valor",
-      formatMoney.format(valorTransaccion ?? "0"),
-    ]);
-    objTicket["trxInfo"].push(["", ""]);
+    let valorTransaccion = parseFloat(datosTrans?.valorVar) ?? 0;
     setIsUploading(true);
     postRecaudoConveniosAval({
       oficina_propia:
@@ -186,13 +135,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       valor_total_trx: valorTransaccion,
       nombre_comercio: roleInfo?.["nombre comercio"],
       nombre_usuario: pdpUser?.uname ?? "",
-      ticket: objTicket,
       comercio: {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
       },
       recaudoAval: {
+        nombreConvenio: convenio.convenio,
         numeroConvenio: convenio.nura,
         valReferencia1: datosTrans.ref1,
         pila: datosConsulta?.["pila"] ?? "",
@@ -211,17 +160,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         if (res?.status) {
           setIsUploading(false);
           notify(res?.msg);
-          objTicket["commerceInfo"][2] = ["Id Trx", res?.obj?.id_trx];
-          objTicket["commerceInfo"][3] = [
-            "Id Aut",
-            res?.obj?.codigo_autorizacion,
-          ];
-          setObjTicketActual(objTicket);
+          setObjTicketActual(res?.obj?.ticket);
           setShowModal((old) => ({ ...old, estadoPeticion: 4 }));
         } else {
           setIsUploading(false);
           notifyError(res?.msg);
           handleClose();
+          navigate(-1)
         }
       })
       .catch((err) => {
@@ -229,6 +174,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
         notifyError("No se ha podido conectar al servidor");
         handleClose();
         console.error(err);
+        navigate(-1)
       });
   };
   const handleClose = useCallback(() => {
@@ -240,54 +186,10 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
       valorConst: "",
       valorVar: "",
     });
-    setObjTicketActual((old) => {
-      return {
-        ...old,
-        commerceInfo: [
-          /*id transaccion recarga*/
-          /*id_dispositivo*/
-          [
-            "No. Terminal",
-            roleInfo?.id_dispositivo ? roleInfo?.id_dispositivo : 0,
-          ],
-          /*telefono*/
-          ["Teléfono", roleInfo?.telefono ? roleInfo?.telefono : "Sin datos"],
-          /*Id trx*/
-          ["Id Trx", ""],
-          /*Id Aut*/
-          ["Id Aut", ""],
-          /*comercio*/
-          [
-            "Comercio",
-            roleInfo?.["nombre comercio"]
-              ? roleInfo?.["nombre comercio"]
-              : "Sin datos",
-          ],
-          ["", ""],
-          /*direccion*/
-          [
-            "Dirección",
-            roleInfo?.direccion ? roleInfo?.direccion : "Sin datos",
-          ],
-          ["", ""],
-        ],
-        trxInfo: [],
-      };
-    });
+    setObjTicketActual({});
     setDatosConsulta({});
+    navigate(-1);
   }, [roleInfo]);
-  const onChangeMoneyLocal = (ev, valor) => {
-    if (!isNaN(valor)) {
-      const num = valor;
-      setDatosTrans((old) => {
-        return { ...old, valor: onChangeMoney(ev) };
-      });
-    }
-  };
-  const onChangeMoney = useMoney({
-    limits: [1, 9999999],
-    decimalDigits: 2,
-  });
   return (
     <>
       <SimpleLoading show={isUploading} />
@@ -305,13 +207,13 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
           type='text'
           name='ref1'
           minLength='1'
-          maxLength='20'
+          maxLength='25'
           required
           value={datosTrans.ref1}
           autoComplete='off'
           onInput={(e) => {
             let valor = e.target.value;
-            let num = valor.replace(/[\s\.]/g, "");
+            let num = valor.replace(/[\s\.\-+eE]/g, "");
             if (!isNaN(num)) {
               setDatosTrans((old) => {
                 return { ...old, ref1: num };
@@ -326,9 +228,18 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
             type='text'
             autoComplete='off'
             maxLength={"12"}
-            value={datosTrans.valor ?? ""}
-            onInput={onChangeMoneyLocal}
-            required></MoneyInput>
+            decimalDigits={2}
+            defaultValue={datosTrans.valor ?? ""}
+            onInput={(ev, val) => {
+              setDatosTrans((old) => {
+                return { ...old, valor: val };
+              });
+            }}
+            min={0}
+            max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
+            equalError={false}
+            equalErrorMin={false}
+          />
         )}
         <ButtonBar>
           <Button type='submit'>Realizar consulta</Button>
@@ -344,7 +255,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.nura}`}</h2>
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-              <h2 className='text-base'>
+              <h2 className='text-base font-semibold'>
                 {`Valor consultado: ${formatMoney.format(
                   datosConsulta?.valorTrx ?? "0"
                 )} `}
@@ -360,36 +271,24 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
                     id='valCashOut'
                     name='valCashOut'
                     label='Valor a pagar'
+                    min={enumParametrosGrupoAval.MIN_RECAUDO_AVAL}
+                    max={enumParametrosGrupoAval.MAX_RECAUDO_AVAL}
                     type='text'
+                    decimalDigits={2}
                     autoComplete='off'
-                    maxLength={"12"}
-                    value={datosTrans.valorConst ?? ""}
-                    onInput={(ev) =>
-                      setDatosTrans((old) => ({
-                        ...old,
-                        valorConst: onChangeMoney(ev),
-                        valorVar: onChangeMoney(ev),
-                      }))
-                    }
-                    required></MoneyInput>
-                  {/* <Input
-                    id='valor'
-                    name='valor'
-                    label='Valor a pagar'
-                    autoComplete='off'
-                    type='tel'
-                    minLength={"2"}
                     maxLength={"12"}
                     defaultValue={datosTrans.valorConst ?? ""}
-                    onInput={(ev) =>
+                    // defaultValue={datosTrans.valorConst ?? ""}
+                    onInput={(ev, valMoney) =>
                       setDatosTrans((old) => ({
                         ...old,
-                        valorConst: onChangeMoney(ev),
-                        valorVar: onChangeMoney(ev),
+                        valorConst: valMoney,
+                        valorVar: valMoney,
                       }))
                     }
-                    required
-                  /> */}
+                    equalError={false}
+                    equalErrorMin={false}
+                    required></MoneyInput>
                   <ButtonBar>
                     <Button
                       onClick={() => {
@@ -431,7 +330,7 @@ const RecaudoServiciosPublicosPrivadosAval = () => {
               <h2>{`Nombre convenio: ${convenio?.convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.nura}`}</h2>
               <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-              <h2 className='text-base'>
+              <h2 className='text-base font-semibold'>
                 {`Valor a pagar: ${formatMoney.format(
                   datosTrans.valorVar ?? "0"
                 )} `}

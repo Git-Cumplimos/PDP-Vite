@@ -11,8 +11,14 @@ import {
   buscarEntidades,
   editarEntidades,
 } from "../../utils/fetchCaja";
-import { notifyError, notifyPending } from "../../../../utils/notify";
+import {notifyError, notifyPending} from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
+import _ from 'lodash';
+
+let Num = 1;
+let valor = 0;
+
+const originalState= {pk_numero_cuenta1: undefined, pk_numero_cuenta2: undefined, pk_numero_cuenta3: undefined};
 
 const ParametrizacionRecaudo = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
@@ -22,17 +28,33 @@ const ParametrizacionRecaudo = () => {
   const [data, setData] = useState([]);
   const [searchFilters, setSearchFilters] = useState({ pk_nombre_entidad: "" });
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [Count, setCount] = useState(1);
+  const [NumCountjson, setNumCountjson] = useState(originalState)
+  const keysToExclude = ["pk_numero_cuenta1", "pk_numero_cuenta2", "pk_numero_cuenta3"];
+  let NumCuentas = [];
 
   const closeModal = useCallback(() => {
+    setCount(1);
+    Num = 1;
     setShowModal(false);
     setType(null);
     setSelectedEntity(null);
+    setNumCountjson(originalState);
   }, []);
 
   const buscarEnt = useCallback(() => {
     buscarEntidades({ ...pageData, ...searchFilters })
       .then((res) => {
         setMaxPages(res?.obj?.maxPages);
+        for (const element of res?.obj?.results) {
+          if (element.pk_numero_cuenta !== null) {
+              NumCuentas=[element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
+            if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
+              NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2+"\n")
+            if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
+              NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3+"\n")
+            element.pk_numero_cuenta=NumCuentas
+        }}
         setData(res?.obj?.results);
       })
       .catch((error) => {
@@ -50,41 +72,52 @@ const ParametrizacionRecaudo = () => {
       ev.preventDefault();
       const formData = new FormData(ev.currentTarget);
       const body = Object.fromEntries(
-        Object.entries(Object.fromEntries(formData)).map(([key, val]) => [
-          key,
-          key === "pk_is_transportadora"
-            ? val === "2"
-            : key === "pk_nombre_entidad"
-            ? val.trim()
-            : val,
-        ])
+        Object.entries(Object.fromEntries(formData)).map(([key, val]) => {
+          if (keysToExclude.includes(key)) {return ["pk_numero_cuenta",NumCountjson];}
+          return [
+            key,
+            key === "pk_is_transportadora"
+              ? val === "2"
+              : key === "pk_nombre_entidad"
+              ? val.trim()
+              : val,
+          ];
+        })
       );
-      notifyPending(
-        crearEntidad(body),
-        {
-          render: () => {
-            return "Procesando peticion";
+      const validate = verificarValoresDiferentes(
+        body.pk_numero_cuenta.pk_numero_cuenta1,
+        body.pk_numero_cuenta.pk_numero_cuenta2,
+        body.pk_numero_cuenta.pk_numero_cuenta3)
+      if (validate) {
+        notifyPending(
+          crearEntidad(body),
+          {
+            render: () => {
+              return "Procesando peticion";
+            },
           },
-        },
-        {
-          render: ({ data: res }) => {
-            closeModal();
-            buscarEnt();
-            return res?.msg;
+          {
+            render: ({ data: res }) => {
+              closeModal();
+              buscarEnt();
+              return res?.msg;
+            },
           },
-        },
-        {
-          render: ({ data: err }) => {
-            if (err?.cause === "custom") {
-              return err?.message;
-            }
-            console.error(err?.message);
-            return "Peticion fallida";
-          },
-        }
-      );
+          {
+            render: ({ data: err }) => {
+              if (err?.cause === "custom") {
+                return err?.message;
+              }
+              console.error(err?.message);
+              return "Peticion fallida";
+            },
+          }
+        );
+      }else{
+        notifyError('Número de cuentas duplicado')
+      }
     },
-    [closeModal, buscarEnt]
+    [closeModal, buscarEnt,NumCountjson]
   );
 
   const handleSubmitUpdate = useCallback(
@@ -128,6 +161,54 @@ const ParametrizacionRecaudo = () => {
     buscarEnt();
   }, [buscarEnt]);
 
+  const handleChangeCount = (Nun) => {
+    if(Num >= 1 ){ if(Num <= 2 || Nun < 0){
+        Num = Num + Nun
+        valor=Num+1
+        if (valor < 4) {NumCountjson['pk_numero_cuenta'+(valor).toString()] = undefined}
+        setCount(Num) 
+      }
+    }if (Num === 0){ Num=1  
+      setCount(Num)}
+  };
+
+  const handleInput = (e) => {
+    let value = e.target.value;
+    if (/^[0-9]*$/.test(value) && value.length <= 20) {
+      if(e.target.name === 'pk_numero_cuenta1'){
+        setNumCountjson((old)=>{return{...old,pk_numero_cuenta1:value}})
+      }else if(e.target.name === 'pk_numero_cuenta2'){
+        setNumCountjson((old)=>{return{...old,pk_numero_cuenta2:value}})
+      }else{
+        setNumCountjson((old)=>{return{...old,pk_numero_cuenta3:value}})
+      }
+    }
+  }
+
+  const range = _.range(1, Count+1);
+  const listNumCuenta = range.map((number) => 
+    <Input
+      id={"pk_numero_cuenta"+number}
+      name={"pk_numero_cuenta"+number}
+      label={`Número de Cuenta`}
+      type="number"
+      value={NumCountjson['pk_numero_cuenta'+number]}
+      onChange={(e) => handleInput(e)}
+      autoComplete="off"
+      required
+    />);
+  
+  function verificarValoresDiferentes(...valores) {
+    let no_cuentas=[]
+    for (const valor of valores) {
+      if (valor !== undefined) {
+        no_cuentas.push(valor);
+      }
+    }
+    const conjunto = new Set(no_cuentas);
+    return conjunto.size === no_cuentas.length;
+  }
+
   return (
     <Fragment>
       <ButtonBar>
@@ -137,15 +218,14 @@ const ParametrizacionRecaudo = () => {
       </ButtonBar>
       <TableEnterprise
         title="Bancos/Transportadoras"
-        headers={["Nombre entidad", "Tipo entidad"]}
+        headers={["Nombre entidad", "Tipo entidad","Número de Cuentas"]}
         maxPage={maxpages}
         onSetPageData={setPageData}
         data={
-          data?.map(({ pk_nombre_entidad, pk_is_transportadora }) => ({
+          data?.map(({ pk_nombre_entidad, pk_is_transportadora, pk_numero_cuenta}) => ({
             pk_nombre_entidad,
-            pk_is_transportadora: pk_is_transportadora
-              ? "TRANSPORTADORA"
-              : "BANCO",
+            pk_is_transportadora: pk_is_transportadora ? "TRANSPORTADORA" : "BANCO",
+            pk_numero_cuenta,
           })) ?? []
         }
         onChange={(ev) =>
@@ -168,6 +248,7 @@ const ParametrizacionRecaudo = () => {
         />
         <ButtonBar />
       </TableEnterprise>
+
       <Modal show={showModal || selectedEntity} handleClose={closeModal}>
         {!selectedEntity ? (
           <Form onSubmit={handleSubmit} grid>
@@ -204,10 +285,20 @@ const ParametrizacionRecaudo = () => {
                   maxLength={"20"}
                   required
                 />
+                {type === false ?(<>
+                  {listNumCuenta}
+                </>):null}
                 <ButtonBar>
                   <Button type="button" onClick={closeModal}>
                     Cancelar
                   </Button>
+                  {type === false ?( 
+                    <Button type="button" onClick={() =>handleChangeCount(1)}>
+                      Añadir cuenta
+                    </Button>):null}
+                  {type === false ?(
+                     Count > 1 ?(<Button type="button" onClick={() =>handleChangeCount(-1)}>Eliminar Cuenta</Button>):null
+                  ):null}
                   <Button type="submit">
                     Crear {type ? "transportadora" : "banco"}
                   </Button>

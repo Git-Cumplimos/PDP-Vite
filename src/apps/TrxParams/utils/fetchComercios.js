@@ -1,6 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const urlComercios = `http://127.0.0.1:5000`;
 
 export const postConsultaTipoNivelComercio = async (bodyObj) => {
   if (!bodyObj) {
@@ -107,18 +108,16 @@ export const postCrearComercio = async (bodyObj) => {
     throw err;
   }
 };
-export const putModificarComercio = async (pkComercio, bodyObj) => {
+export const putModificarComercio = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
   try {
     const res = await fetchData(
-      `${urlComercios}/comercios/modificar?pk_comercio=${pkComercio}`,
+      `${urlComercios}/comercios/modificar`,
       "PUT",
       {},
       bodyObj,
-      {},
-      true
     );
     if (!res?.status) {
       console.error(res?.msg);

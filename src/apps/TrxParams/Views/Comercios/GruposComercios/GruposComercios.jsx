@@ -100,7 +100,7 @@ const GruposComercios = () => {
   const onSelectTipoNivelComercios = useCallback(
     (e, i) => {
       navigate(
-        `/params-operations/grupos-comercio/edit/${gruposComercios[i]?.["pk_tbl_grupo_comercios"]}`
+        `/params-operations/comercios-params/grupos-comercio/edit/${gruposComercios[i]?.["pk_tbl_grupo_comercios"]}`
       );
     },
     [gruposComercios, navigate]
@@ -361,6 +361,7 @@ const GruposComercios = () => {
                 return { ...old, nombre_grupo_comercios: e.target.value };
               })
             }
+            maxLength={50}
             required
           />
           <Select

@@ -65,7 +65,7 @@ const IAMGroups = () => {
       <h1 className="text-3xl">Buscar grupos</h1>
       <PaginationAuth
         filters={{
-          unameSearch: { label: "Nombre" },
+          unameSearch: { label: "Nombre", maxLength: 60 },
         }}
         maxPage={maxPage}
         onChange={onChange}

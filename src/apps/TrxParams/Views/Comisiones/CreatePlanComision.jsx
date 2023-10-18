@@ -1,6 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-
-import useQuery from "../../../../hooks/useQuery";
+import { Fragment, useCallback, useState } from "react";
 
 import Button from "../../../../components/Base/Button";
 import FormComission from "../../components/FormComission/FormComission";
@@ -49,6 +47,15 @@ const CreatePlanComision = () => {
         }
         return curr;
       });
+
+      comissionData?.ranges.forEach((data,index)=>{
+        if (data["Rango maximo"] !== "" && data["Rango minimo"] !== ""){
+          if (parseInt(data["Rango maximo"]) < parseInt(data["Rango minimo"])){
+            notifyError(`El valor del Rango máximo (${index+1}) debe ser superior al valor del Rango mínimo (${index+1})`);
+            errRang = true;
+          }
+        }
+      })
 
       if (errRang) {
         return;
@@ -119,6 +126,8 @@ const CreatePlanComision = () => {
           autoComplete='off'
           value={newComision?.["nombre_plan_comision"]}
           onChange={() => {}}
+          maxLength={100}
+          required
         />
         <Select
           name='tipo_comision'
@@ -126,10 +135,10 @@ const CreatePlanComision = () => {
           options={{ Cobrar: "COBRAR", Pagar: "PAGAR" }}
           value={newComision?.["tipo_comision"]}
           onChange={() => {}}
+          required
           // defaultValue={""}
         />
       </Form>
-      {/* {JSON.stringify(newComision)} */}
       <FormComission outerState={[comissionData, setComissionData]}>
         <Button type='submit' onClick={createComission}>
           Crear comision

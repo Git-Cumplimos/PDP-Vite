@@ -14,10 +14,15 @@ import TicketsPines from "../apps/PinesVus/components/TicketsPines";
 import TicketsAval from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketColpatria from "../apps/Colpatria/components/TicketColpatria";
 import TicketsAgrario from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
+import TicketsPowwi from "../apps/Powwi/components/TicketsPowwi/TicketsPowwi";
+import TicketsLot from "../apps/LoteriaBog/components/TicketsLot/TicketLot";
 import DataTable from "../components/Base/DataTable";
 import useFetchDispatchDebounce from "../hooks/useFetchDispatchDebounce";
 import useMap from "../hooks/useMap";
 import { onChangeNumber } from "../utils/functions";
+import MoneyRange from "../components/Compound/MoneyRange/MoneyRange";
+import TicketsDale from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsDale/TicketsDale";
+import TicketsEmcali from "../apps/Emcali/components/Tickets/TicketsEmcali";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -33,6 +38,8 @@ const initialSearchFilters = new Map([
   ["id_usuario", ""],
   ["id_tipo_transaccion", ""],
   ["id_trx", ""],
+  ["referencia", ""],
+  ["monto", null],
   ["date_ini", ""],
   ["date_end", ""],
   ["page", 1],
@@ -165,16 +172,20 @@ const Transacciones = () => {
       <DataTable
         title="Transacciones"
         headers={[
-          "Id transaccion",
+          "Id transacción",
           "Operación",
+          "Referencia 1",
+          // "Referencia 2",
           "Monto",
           "Fecha",
-          "Estado de la trasacción",
+          "Estado de la transacción",
         ]}
         data={trxs.map(
           ({
             id_trx,
             "Tipo transaccion": Tipo_operacion,
+            referencia_1,
+            // referencia_2,
             monto,
             created,
             status_trx_text,
@@ -186,9 +197,11 @@ const Transacciones = () => {
             return {
               id_trx,
               Tipo_operacion,
+              referencia_1,
+              // referencia_2,
               money,
               created,
-              status_trx_text
+              status_trx_text,
             };
           }
         )}
@@ -229,6 +242,7 @@ const Transacciones = () => {
         }
         onChange={(ev) => {
           setSearchFilters((old) => {
+            if (!ev.target.name) return old;
             const copy = new Map(old)
               .set(
                 ev.target.name,
@@ -261,7 +275,7 @@ const Transacciones = () => {
           className="place-self-stretch"
           id="searchBySorteo"
           name="id_tipo_transaccion"
-          label="Tipo de busqueda"
+          label="Tipo de búsqueda"
           options={[
             { value: "", label: "" },
             ...tiposOp.map(({ Nombre, id_tipo_operacion }) => {
@@ -274,9 +288,30 @@ const Transacciones = () => {
         <Input
           id="id_trx"
           name="id_trx"
-          label="Id de transaccion"
+          label="Id de transacción"
           type="tel"
+          maxLength={30}
           value={searchFilters.get("id_trx")}
+          onChange={() => {}}
+        />
+        <MoneyRange
+          label="Rango de monto"
+          value={searchFilters.get("monto")}
+          onChange={(val) =>
+            setSingleFilter("monto", () => {
+              if (val[1] < val[0]) return null;
+              if (val[1] === 0 && val[0] === 0) return null;
+              return val;
+            })
+          }
+        />
+        <Input
+          id="referencia"
+          name="referencia"
+          label="Referencia"
+          type="text"
+          maxLength={30}
+          value={searchFilters.get("referencia")}
           onChange={() => {}}
         />
         {userPermissions
@@ -305,29 +340,47 @@ const Transacciones = () => {
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
-            {selected?.id_autorizador === 13 ? (
-              <TicketsDavivienda
-                refPrint={printDiv}
-                type="Reimpresión"
-                ticket={selected?.ticket}
-                stateTrx={selected?.status_trx}
-              />
-            ) : selected?.id_autorizador === 14 ? (
+            {selected?.ticket.autorizador === 14 ||
+            selected?.id_autorizador === 14 ? (
               <TicketColpatria
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_autorizador === 17 ? (
+            ) : selected?.id_tipo_transaccion === 165 ? (
+              <TicketsDale
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 17 ||
+              selected?.id_autorizador === 17 ? (
               <TicketsAval
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.id_autorizador === 16 ? (
+            ) : selected?.ticket?.autorizador === 16 ||
+              selected?.id_autorizador === 16 ? (
               <TicketsAgrario
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 13 ? (
+              <TicketsDavivienda
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_tipo_transaccion === 148 ||
+              selected?.id_tipo_transaccion === 151 ? (
+              <TicketsPowwi
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
@@ -364,6 +417,37 @@ const Transacciones = () => {
                   />
                 )}
               </div>
+            ) : selected?.id_autorizador === 3 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería de Bogotá"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 8 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería del Tolima"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 19 ? (
+              <TicketsLot
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                loteria={"Lotería de Cundinamarca"}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.id_autorizador === 56 ? (
+              <TicketsEmcali
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
             ) : (
               <Tickets
                 refPrint={printDiv}

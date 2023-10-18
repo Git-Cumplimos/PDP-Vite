@@ -41,6 +41,7 @@ const SendForm = ({
 
   const [checkedState, setCheckedState] = useState([]);
   const [flagFraccionV, setFlagFraccionV] = useState([]);
+
   useEffect(() => {
     const copy = [];
     selected?.Fracciones?.forEach(() => {
@@ -57,10 +58,8 @@ const SendForm = ({
     const updatedCheckedState = checkedState.map((item, frac) =>
       frac === position ? !item : item
     );
-
     setCheckedState(updatedCheckedState);
     setFlagFraccionV(updatedCheckedState);
-
     for (var i = 0; i < selected?.Fracciones?.length; i++) {
       if (updatedCheckedState[i] === true) {
         selecFrac.push(selected.Fracciones[i]);
@@ -94,11 +93,12 @@ const SendForm = ({
     notifyError("Venta de lotería cancelada");
   })
 
-  const formPago = (value) => {
-    setTipoPago(value);
-  };
+  // const formPago = (value) => {
+  //   setTipoPago(operacion?.Venta_Fisica);
+  // };
 
   useEffect(() => {
+    setTipoPago(operacion?.Venta_Fisica);
     const cus = { fracciones, phone, doc_id, email };
     cus.fracciones = "1";
     setCustomer({ ...cus });
@@ -225,7 +225,7 @@ const SendForm = ({
               }
             }}
           />
-          <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
+          {/* <div className="flex flex-row justify-center items-center mx-auto container gap-10 text-lg">
             Efectivo
             <input
               id="Efectivo"
@@ -237,12 +237,14 @@ const SendForm = ({
             Bono
             <input
               id="Bono"
-              value={operacion?.Venta_Intercambio}
+              value={operacion?.Venta_Fisica}
+              data-alt-value={operacion?.Venta_Intercambio}
               name="pago"
               type="radio"
-              onChange={(e) => formPago(e.target.value)}
+              // onChange={(e) => formPago(e.target.value)}
+              onChange={(e) => formPago(e.target.getAttribute('data-alt-value'))}
             />
-          </div>
+          </div> */}
           <ButtonBar>
             <Button type="submit" disabled={disabledBtns}>
               Aceptar

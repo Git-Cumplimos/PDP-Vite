@@ -89,6 +89,12 @@ const InputSuggestions = ({
     };
   }, [onClearSearch]);
 
+  useEffect(() => {
+    if (suggestions.length === 0) {
+      setIndexSelected(-1);
+    }
+  }, [suggestions]);
+
   return (
     <div className={`${formItem}`}>
       {label && label !== "" && (
@@ -114,7 +120,8 @@ const InputSuggestions = ({
                       el.click();
                     }
                   );
-                }}>
+                }}
+              >
                 {el}
               </li>
             ))}

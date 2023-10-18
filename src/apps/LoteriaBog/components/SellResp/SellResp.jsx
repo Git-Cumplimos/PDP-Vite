@@ -7,7 +7,9 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { useEffect } from "react";
 import Tickets from "../../../../components/Base/Tickets";
 import { useLoteria } from "../../utils/LoteriaHooks";
+import {LineasLot_disclamer} from "../../utils/enum";
 import { notify, notifyError } from "../../../../utils/notify";
+import TicketsLot from "../TicketsLot/TicketLot"
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -16,6 +18,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 });
 const SellResp = ({
   codigos_lot,
+  rta_billeteria,
   sellResponse,
   setSellResponse,
   closeModal,
@@ -37,12 +40,14 @@ const SellResp = ({
 
   @media print {
     .pagebreak {
-      page-break-before: always;
+      page-break-before: always;hLoteriafisica
     }
   }
 `;
   const { tiposOperaciones } = useLoteria();
-
+  const dateParts = rta_billeteria[0]?.Fecha_sorteo.split(" ");
+  const formattedDateString = `${dateParts[0]}, ${dateParts[2]} ${dateParts[1]} ${dateParts[3]} ${dateParts[4]}`;
+  const fecha_sorteo = new Date(formattedDateString);
   const operacion = useMemo(() => {
     return tiposOperaciones;
   }, [tiposOperaciones]);
@@ -67,10 +72,9 @@ const SellResp = ({
     content: () => printDiv.current,
     pageStyle: pageStyle,
   });
-
   const ticket = useMemo(() => {
     return {
-      title: "Recibo de pago",
+      title: "VENTA LOTERÍA",
       timeInfo: {
         "Fecha de pago": Intl.DateTimeFormat("es-CO", {
           year: "numeric",
@@ -85,6 +89,8 @@ const SellResp = ({
         }).format(fecha_trx),
       },
       commerceInfo: [
+        ["Razón social","Soluciones en Red S.A.S."],
+        ["Nit","830.084.645-1"],
         ["Id Comercio", roleInfo?.id_comercio],
         ["No. terminal", roleInfo?.id_dispositivo],
         ["Id Trx ", sellResponse?.obj?.id_trx],
@@ -96,28 +102,36 @@ const SellResp = ({
       ],
       commerceName: sellResponse?.obj?.cod_loteria !== '064' 
       ? sellResponse?.obj?.nom_loteria : sellResponse?.obj?.nom_loteria+" Extraordinario",
+      descriPM: "Plan de premios vigente: "+sellResponse?.obj?.descrip_PM,
       trxInfo: [
         ["Sorteo", sellResponse?.obj?.sorteo],
-        ["Billete", sellResponse?.obj?.num_billete],
+        ["Fecha del sorteo",Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(fecha_sorteo)],
+        [],
+        ["Número",sellResponse?.obj?.num_billete],
         ["Serie", sellResponse?.obj?.serie],
         ["Fracción", sellResponse?.obj?.fisico === true? JSON.stringify(selecFrac).replace(/,/g," - ").replace(/[[]/,"").replace(/]/,"") : JSON.stringify(selecFrac).replace(/[[]/,"").replace(/]/,"")],
-        ["Tipo de Billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
-        ["", ""],
+        ["Tipo de billete", sellResponse?.obj?.fisico === true ? "Físico" : "Virtual"],
+        [],[],
         ["Valor", parseInt(sellResponse?.obj?.tipoPago) ===
         parseInt(operacion?.Venta_Fisica) || 
         parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
         ? formatMoney.format(sellResponse?.obj?.valor_pago)
-        : formatMoney.format(0)],
-        ["", ""],
-        ["Forma de Pago", parseInt(sellResponse?.obj?.tipoPago) ===
+        : formatMoney.format(rta_billeteria[0]?.Valor_fraccion)],
+        [],[],
+        ["Forma de pago", parseInt(sellResponse?.obj?.tipoPago) ===
           parseInt(operacion?.Venta_Fisica) || 
           parseInt(sellResponse?.obj?.tipoPago) === parseInt(operacion?.Venta_Virtual)
           ? "Efectivo"
           : "Bono"],
-        ["", ""],
+        [],
+        [],    
       ],
       disclamer:
-        "Para quejas o reclamos comuníquese al 3503485532 (Servicio al cliente) o al 3102976460 (chatbot)",
+        LineasLot_disclamer[sellResponse?.obj?.nom_loteria],
     };
   }, [roleInfo, sellResponse,operacion,selecFrac,fecha_trx]);
  
@@ -134,7 +148,7 @@ const SellResp = ({
     </div>
   ) : (
     <div className="flex flex-col justify-center items-center">
-      <Tickets refPrint={printDiv} ticket={ticket} />
+      <TicketsLot refPrint={printDiv} ticket={ticket} loteria={sellResponse?.obj?.nom_loteria} />
       <ButtonBar>
         <Button onClick={handlePrint}>Imprimir</Button>
         <Button

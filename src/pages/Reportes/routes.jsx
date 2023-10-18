@@ -2,6 +2,7 @@ import AppIcons from "../../components/Base/AppIcons";
 import { lazy } from "react";
 
 const Koncilia = lazy(() => import("./views/Koncilia"));
+const ReporteComercios = lazy(() => import("./views/ReporteComercios"));
 const ReporteComisiones = lazy(() => import("./views/ReporteComisiones"));
 const ReporteConteoComisiones = lazy(() =>
   import("./views/ReporteConteoComisiones")
@@ -9,12 +10,21 @@ const ReporteConteoComisiones = lazy(() =>
 const ReporteComisionesComercios = lazy(() =>
   import("./views/ReporteComisionesComercios")
 );
+const ReporteConsignacionesTransportadora = lazy(() =>
+  import("./views/ReporteConsignacionesTransportadora")
+);
 
 export const rutasReportes = [
   {
     link: "/reportes/koncilia",
     label: <AppIcons Logo={"RECAUDO"} name='Reportes koncilia' />,
     component: Koncilia,
+    permission: [40],
+  },
+  {
+    link: "/reportes/comercios",
+    label: <AppIcons Logo={"RECAUDO"} name='Reportes comercio' />,
+    component: ReporteComercios,
     permission: [40],
   },
   {
@@ -33,6 +43,12 @@ export const rutasReportes = [
     link: "/reportes/comisiones-comercio",
     label: <AppIcons Logo={"RECAUDO"} name='Reportes comisiones comercio' />,
     component: ReporteComisionesComercios,
+    permission: [25001],
+  },
+  {
+    link: "/reportes/consignaciones_transportadora",
+    label: <AppIcons Logo={"RECAUDO"} name='Reporte Consignaciones y Transportadora' />,
+    component: ReporteConsignacionesTransportadora,
     permission: [25001],
   },
 ];

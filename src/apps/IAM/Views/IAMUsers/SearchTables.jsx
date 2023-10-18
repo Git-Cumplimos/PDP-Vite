@@ -3,6 +3,7 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import { notifyError } from "../../../../utils/notify";
 import Input from "../../../../components/Base/Input";
+import CommerceTable from "../../../TrxParams/components/Commerce/CommerceTable";
 
 const urlIAM = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -114,6 +115,14 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
     }
   }, [searchType, searchData]);
 
+  if (searchType === "commerce") {
+    return (
+      <CommerceTable
+        onSelectComerce={(commerce_info) => onSelectItem(commerce_info)}
+      />
+    );
+  }
+
   return (
     <Fragment>
       <TableEnterprise
@@ -136,6 +145,7 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
               name="id_group"
               label={"Id de grupo"}
               type="tel"
+              maxLength={10}
               autoComplete="off"
             />
             <Input
@@ -143,6 +153,7 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
               name="name_group"
               label={"Nombre de grupo"}
               type="text"
+              maxLength={60}
               autoComplete="off"
             />
           </Fragment>

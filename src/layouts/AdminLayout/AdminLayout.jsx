@@ -18,6 +18,7 @@ import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
 import ButtonBar from "../../components/Base/ButtonBar";
+import ModalAlert from "./ModalAlert";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -33,6 +34,8 @@ const AdminLayout = () => {
     usrData,
     saldoCupo,
     comision,
+    diasSobregiro,
+    diasSobregiroD,
     cargar,
   } = classes;
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -54,6 +57,10 @@ const AdminLayout = () => {
   const comisionTotal = useMemo(() => {
     return formatMoney.format(quotaInfo?.comision ?? 0);
   }, [quotaInfo?.comision]);
+
+  const sobregiro = useMemo(() => {
+    return quotaInfo?.sobregiro ?? 0;
+  }, [quotaInfo?.sobregiro]);
 
   const nombreComercio = useMemo(
     () => roleInfo?.["nombre comercio"],
@@ -95,7 +102,7 @@ const AdminLayout = () => {
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
       userPermissions?.map(({ id_permission }) => id_permission).includes(6101),
-      false,
+      // false,
     ];
     if (conditions.every((val) => val)) {
       searchCierre({
@@ -151,7 +158,12 @@ const AdminLayout = () => {
           </div>
           <div className={usrData}>
             <div className={saldoCupo}>
-              Saldo cupo {saldoDisponible || "$0.00"}
+              Cupo disponible {saldoDisponible || "$0.00"}
+            </div>
+          </div>
+          <div className={usrData}>
+            <div className={diasSobregiro}>
+              Dias sobregiro {sobregiro || "0"}
             </div>
           </div>
           <div className={usrData}>
@@ -160,6 +172,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </div>
+        <ModalAlert/>
         <HNavbar links={urls} isText />
       </header>
       <main className="container">
@@ -169,7 +182,7 @@ const AdminLayout = () => {
             <div className="items-center text-center">
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
-                realizar transacciones hasta que la cierre.
+                realizar transacciones hasta que realice el cierre.
                 <ButtonBar>
                   <Button
                     className="btn mx-auto d-block"
@@ -203,7 +216,7 @@ const AdminLayout = () => {
         </Modal>
         <Modal show={showModalPublicidad} handleClose={handleClose}>
           <img
-            src={`${urlAssets}/assets/img/MODALPUBLICIDAD.png`}
+            src={`${urlAssets}/assets/svg/recaudo/MODAL_PUBLICIDAD/MODAL_PUBLICIDAD.jpg`}
             alt="Proximamente Corresponsal Colpatria"
           ></img>
         </Modal>

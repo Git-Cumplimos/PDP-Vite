@@ -298,7 +298,6 @@ const ConveniosPines = () => {
             ev.target.value = onChangeNumber(ev);
           }}
           defaultValue={selected?.pk_codigo_convenio ?? ""}
-          readOnly={selected}
           required
         />
         <Input
@@ -390,6 +389,7 @@ const ConveniosPines = () => {
                   ev.target.value = onChangeNumber(ev);
                 }}
                 defaultValue={selected?.codigo_pin ?? ""}
+                readOnly={selected}
                 required
               />
               <Input
