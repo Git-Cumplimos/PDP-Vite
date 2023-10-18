@@ -458,7 +458,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type="submit">Realizar consulta</Button>
+                <Button type="submit" disabled={showModal}>Realizar consulta</Button>
               )}
             </ButtonBar>
           </Form>
@@ -518,7 +518,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         >
                           Cancelar
                         </Button>
-                        <Button type="submit" onClick={onSubmitPago}>
+                        <Button type="submit" disabled={peticion !== 2 && showModal}>
                           Realizar pago
                         </Button>
                       </ButtonBar>
@@ -556,7 +556,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         >
                           Cancelar
                         </Button>
-                        <Button type="submit" onClick={onSubmitPago}>
+                        <Button type="submit" disabled={peticion !== 2 && showModal}>
                           Realizar pago
                         </Button>
                       </ButtonBar>

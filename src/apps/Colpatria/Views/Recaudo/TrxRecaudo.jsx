@@ -587,24 +587,22 @@ const TrxRecaudo = () => {
           </div>
         )}
         {validacionPago?.peticion === 1 && (
-          <form onSubmit={onMakePayment}>
+          <form onSubmit={() => {
+            if (datosConvenio?.fk_tipo_valor !== 3 && validacionPago?.trueCodbarras) {
+              setValTrxRecaudo(0);
+              setValidacionPago((old) => ({
+                ...old,
+                peticion: 3,
+              }));
+            } else {
+              onMakePayment();
+            }
+          }}>
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
                   type="submit"
                   disabled={loadingSell}
-                  onClick={(e) => {
-                    if (
-                      datosConvenio?.fk_tipo_valor !== 3 &&
-                      validacionPago?.trueCodbarras
-                    ) {
-                      setValTrxRecaudo(0);
-                      setValidacionPago((old) => ({
-                        ...old,
-                        peticion: 3,
-                      }));
-                    }
-                  }}
                 >
                   Aceptar
                 </Button>
@@ -654,7 +652,7 @@ const TrxRecaudo = () => {
                 <Button onClick={handleClose} disabled={loadingSell}>
                   Cancelar
                 </Button>
-                <Button type="submit">Realizar pago</Button>
+                <Button type="submit" disabled={loadingSell}>Realizar pago</Button>
               </ButtonBar>
             </Form>
           </>
