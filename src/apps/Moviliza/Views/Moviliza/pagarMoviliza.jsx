@@ -304,7 +304,7 @@ const PagarMoviliza = () => {
             else if (response?.status === false){ 
                   if (response?.obj?.mensaje != null){
                     if (response?.obj?.mensaje=="Error autenticando adminot "){
-                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                      notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
                       navigate("/");
                       navigate("/moviliza");
                     }
@@ -438,11 +438,18 @@ const PagarMoviliza = () => {
             notify("Respuesta PDP: Pago Moviliza exitoso");
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
+            let mensaje = response?.msg.replace("Error respuesta PDP: (Error:", "")
+            mensaje = mensaje.replace("(", "")
+            mensaje = mensaje.replace("))", "")
+            mensaje = mensaje.replace(")", "")
             if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
               notifyError("Error respuesta Moviliza: falla en la notificación");
             }
             else if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))"){
               notifyError("Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))");
+            }
+            else if (response?.msg){
+              notifyError(mensaje);
             }
             else{
               notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
