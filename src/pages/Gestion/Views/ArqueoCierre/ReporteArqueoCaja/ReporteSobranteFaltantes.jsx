@@ -23,6 +23,29 @@ const ReporteSobranteFaltantes = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
+  const insertFaltantesSobr = useCallback((body) => {
+    notifyPending(
+      ReportFaltantesSobr(body),
+      {
+        render: () => {
+          setIsLoading(true);
+          return "Reportando Novedad";
+        },
+      },
+      {
+        render: ({ data: response }) => {
+          setIsLoading(false);
+          if (response?.codigo === 200) {
+            navigate('/gestion/arqueo');
+            return "Novedad Reportada";
+          }else{
+            return "Error al Reportar";
+          }
+        },
+      },
+    );
+  }, [navigate]);
+
   const handleSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -32,7 +55,7 @@ const ReporteSobranteFaltantes = () => {
           return [key,val];}));
       body['id_comercio']=id_comercio;
       body['pk_id_cajero']=id_user;
-      if (body.pk_id_transaccion !== '') {
+      if (body?.pk_id_transaccion !== '') {
         notifyPending(
           buscarIdTrx(body),
           {
@@ -43,10 +66,9 @@ const ReporteSobranteFaltantes = () => {
           },
           {
             render: ({ data: response }) => {
-              setIsLoading(false);
               if (response?.obj !== null) {
-                ReportFaltantesSobr(body)
-                return "Novedad Reportada";
+                insertFaltantesSobr(body)
+                return "ID de transacción válido";
               }else{
                 return "Número de la transacción ingresado no corresponde a una transacción del comercio";
               }
@@ -54,30 +76,14 @@ const ReporteSobranteFaltantes = () => {
           },
         );
       }else{
-        notifyPending(
-          ReportFaltantesSobr(body),
-          {
-            render: () => {
-              setIsLoading(true);
-              return "Reportando Novedad";
-            },
-          },
-          {
-            render: ({ data: response }) => {
-              setIsLoading(false);
-              if (response?.codigo === 200) {
-                navigate('/gestion/arqueo');
-                return "Novedad Reportada";
-              }else{
-                return "Error al Reportar";
-              }
-            },
-          },
-        );
+        delete body.pk_id_transaccion
+        insertFaltantesSobr(body)
       }
     },
-    [id_comercio,id_user,navigate]
+    [id_comercio,id_user,insertFaltantesSobr]
   );
+
+  
 
   const handleChangeCurrenci = (e) => {
     const inputValue = e.target.value;
