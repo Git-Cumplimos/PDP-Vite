@@ -15,8 +15,10 @@ import {notifyError, notifyPending} from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
 import _ from 'lodash';
 
-let Num = 1;
-let valor = 0;
+var Num = 1;
+var valor = 0;
+var validate = true;
+
 
 const originalState= {pk_numero_cuenta1: undefined, pk_numero_cuenta2: undefined, pk_numero_cuenta3: undefined};
 
@@ -26,12 +28,13 @@ const ParametrizacionRecaudo = () => {
   const [type, setType] = useState(null);
   const [maxpages, setMaxPages] = useState(2);
   const [data, setData] = useState([]);
+  const [dataComplet, setDataComplet] = useState([]);
   const [searchFilters, setSearchFilters] = useState({ pk_nombre_entidad: "" });
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [Count, setCount] = useState(1);
   const [NumCountjson, setNumCountjson] = useState(originalState)
   const keysToExclude = ["pk_numero_cuenta1", "pk_numero_cuenta2", "pk_numero_cuenta3"];
-  let NumCuentas = [];
+  const range = _.range(1, Count+1);
 
   const closeModal = useCallback(() => {
     setCount(1);
@@ -46,16 +49,20 @@ const ParametrizacionRecaudo = () => {
     buscarEntidades({ ...pageData, ...searchFilters })
       .then((res) => {
         setMaxPages(res?.obj?.maxPages);
-        for (const element of res?.obj?.results) {
+        const originalData =  JSON.parse(JSON.stringify(res?.obj?.results));
+        const changeValues = res?.obj?.results.map((element) => {
           if (element.pk_numero_cuenta !== null) {
-              NumCuentas=[element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
-            if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
+            let NumCuentas=element.pk_numero_cuenta.pk_numero_cuenta1===undefined?[]:[element.pk_numero_cuenta.pk_numero_cuenta1+"\n"]
+            if(element?.pk_numero_cuenta?.pk_numero_cuenta2 !== undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2+"\n")
-            if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
+            if(element?.pk_numero_cuenta?.pk_numero_cuenta3 !== undefined)
               NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta3+"\n")
-            element.pk_numero_cuenta=NumCuentas
-        }}
-        setData(res?.obj?.results);
+            element.pk_numero_cuenta=NumCuentas;
+          }
+          return element
+        });
+        setDataComplet(originalData);
+        setData(changeValues);
       })
       .catch((error) => {
         if (error?.cause === "custom") {
@@ -84,13 +91,64 @@ const ParametrizacionRecaudo = () => {
           ];
         })
       );
-      const validate = verificarValoresDiferentes(
-        body.pk_numero_cuenta.pk_numero_cuenta1,
-        body.pk_numero_cuenta.pk_numero_cuenta2,
-        body.pk_numero_cuenta.pk_numero_cuenta3)
+      if (body.pk_numero_cuenta['pk_numero_cuenta1'] !== undefined) {
+        validate = verificarValoresDiferentes(
+        body?.pk_numero_cuenta?.pk_numero_cuenta1,
+        body?.pk_numero_cuenta?.pk_numero_cuenta2,
+        body?.pk_numero_cuenta?.pk_numero_cuenta3);
+      }
       if (validate) {
         notifyPending(
           crearEntidad(body),
+          {
+            render: () => {
+              return "Procesando peticion";
+            },
+          },
+          {
+            render: ({ data: res }) => {
+              closeModal();
+              buscarEnt();
+              return res?.msg;
+            },
+          },
+          {
+            render: ({ data: err }) => {
+              if (err?.cause === "custom") {
+                return 'Entidad Duplicada';
+              }
+              console.error(err?.message);
+              return "Peticion fallida";
+            },
+          }
+        );
+      }else{
+        notifyError('Número de cuentas duplicado')
+      }
+    },
+    [closeModal, buscarEnt,NumCountjson]
+  );
+
+  const handleSubmitUpdate = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      console.log(selectedEntity)
+      if (selectedEntity?.parametros === null ) {
+        delete selectedEntity.parametros
+      } 
+        validate = verificarValoresDiferentes(
+          selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta1,
+          selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta2,
+          selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta3);
+      if (validate) {
+        notifyPending(
+          editarEntidades(
+            {
+              pk_nombre_entidad: "",
+              pk_is_transportadora: "",
+            },
+            selectedEntity
+          ),
           {
             render: () => {
               return "Procesando peticion";
@@ -117,43 +175,6 @@ const ParametrizacionRecaudo = () => {
         notifyError('Número de cuentas duplicado')
       }
     },
-    [closeModal, buscarEnt,NumCountjson]
-  );
-
-  const handleSubmitUpdate = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      notifyPending(
-        editarEntidades(
-          {
-            pk_nombre_entidad: "",
-            pk_is_transportadora: "",
-          },
-          selectedEntity
-        ),
-        {
-          render: () => {
-            return "Procesando peticion";
-          },
-        },
-        {
-          render: ({ data: res }) => {
-            closeModal();
-            buscarEnt();
-            return res?.msg;
-          },
-        },
-        {
-          render: ({ data: err }) => {
-            if (err?.cause === "custom") {
-              return err?.message;
-            }
-            console.error(err?.message);
-            return "Peticion fallida";
-          },
-        }
-      );
-    },
     [closeModal, buscarEnt, selectedEntity]
   );
 
@@ -173,30 +194,11 @@ const ParametrizacionRecaudo = () => {
   };
 
   const handleInput = (e) => {
-    let value = e.target.value;
+    const value = e.target.value;
     if (/^[0-9]*$/.test(value) && value.length <= 20) {
-      if(e.target.name === 'pk_numero_cuenta1'){
-        setNumCountjson((old)=>{return{...old,pk_numero_cuenta1:value}})
-      }else if(e.target.name === 'pk_numero_cuenta2'){
-        setNumCountjson((old)=>{return{...old,pk_numero_cuenta2:value}})
-      }else{
-        setNumCountjson((old)=>{return{...old,pk_numero_cuenta3:value}})
-      }
+      setNumCountjson((old)=>{return{...old,[e.target.name]:value}})
     }
   }
-
-  const range = _.range(1, Count+1);
-  const listNumCuenta = range.map((number) => 
-    <Input
-      id={"pk_numero_cuenta"+number}
-      name={"pk_numero_cuenta"+number}
-      label={`Número de Cuenta`}
-      type="number"
-      value={NumCountjson['pk_numero_cuenta'+number]}
-      onChange={(e) => handleInput(e)}
-      autoComplete="off"
-      required
-    />);
   
   function verificarValoresDiferentes(...valores) {
     let no_cuentas=[]
@@ -208,6 +210,37 @@ const ParametrizacionRecaudo = () => {
     const conjunto = new Set(no_cuentas);
     return conjunto.size === no_cuentas.length;
   }
+
+  const generateUniqueKey = (existingKeys) => {
+    let index = 1;
+    let newKey = `pk_numero_cuenta${index}`;
+    while (existingKeys.includes(newKey)) {
+      index++;
+      newKey = `pk_numero_cuenta${index}`;
+    }
+    return newKey;
+  };
+
+  const DisableState = (valueDsBle) => {
+    let valores = Object.values(valueDsBle)
+    return valores.includes("")
+  };
+
+  const handleChangeNum = (e,key) => {
+    const value = e.target.value;
+    if (/^[0-9]*$/.test(value) && value.length <= 20) {
+      setSelectedEntity((old) => {
+        const cuentasBanco = new Map(
+          Object.entries(old?.pk_numero_cuenta ?? {})
+        );
+        cuentasBanco.set(key, value);
+        return {
+          ...old,
+          pk_numero_cuenta: Object.fromEntries(cuentasBanco),
+        };
+      })
+    }
+  };
 
   return (
     <Fragment>
@@ -225,7 +258,7 @@ const ParametrizacionRecaudo = () => {
           data?.map(({ pk_nombre_entidad, pk_is_transportadora, pk_numero_cuenta}) => ({
             pk_nombre_entidad,
             pk_is_transportadora: pk_is_transportadora ? "TRANSPORTADORA" : "BANCO",
-            pk_numero_cuenta,
+            pk_numero_cuenta: pk_numero_cuenta === undefined ? null : pk_numero_cuenta,
           })) ?? []
         }
         onChange={(ev) =>
@@ -235,7 +268,8 @@ const ParametrizacionRecaudo = () => {
           }))
         }
         onSelectRow={(e, i) => {
-          setSelectedEntity(data[i]);
+          setSelectedEntity(dataComplet[i]);
+          setSelectedEntity((old)=>{return {...old, pk_numero_cuenta : dataComplet[i].pk_numero_cuenta === null?{}:dataComplet[i].pk_numero_cuenta}});
         }}
       >
         <Input
@@ -248,7 +282,6 @@ const ParametrizacionRecaudo = () => {
         />
         <ButtonBar />
       </TableEnterprise>
-
       <Modal show={showModal || selectedEntity} handleClose={closeModal}>
         {!selectedEntity ? (
           <Form onSubmit={handleSubmit} grid>
@@ -285,9 +318,20 @@ const ParametrizacionRecaudo = () => {
                   maxLength={"20"}
                   required
                 />
-                {type === false ?(<>
-                  {listNumCuenta}
-                </>):null}
+                {type === false ?(
+                  range.map((number) => (
+                    <Input
+                      id={"pk_numero_cuenta"+number}
+                      name={"pk_numero_cuenta"+number}
+                      label={`Número de Cuenta`}
+                      type="number"
+                      value={NumCountjson['pk_numero_cuenta'+number]}
+                      onChange={(e) => handleInput(e)}
+                      autoComplete="off"
+                      required
+                    />
+                  ))
+                ):null}
                 <ButtonBar>
                   <Button type="button" onClick={closeModal}>
                     Cancelar
@@ -303,7 +347,7 @@ const ParametrizacionRecaudo = () => {
                     Crear {type ? "transportadora" : "banco"}
                   </Button>
                 </ButtonBar>
-              </Fragment>
+               </Fragment>
             )}
           </Form>
         ) : (
@@ -321,6 +365,70 @@ const ParametrizacionRecaudo = () => {
               value={selectedEntity?.pk_nombre_entidad ?? ""}
               readOnly
             />
+            {selectedEntity.pk_is_transportadora === false ? (
+              <Fieldset legend={"Cuentas"}>
+                {Object.entries(selectedEntity?.pk_numero_cuenta ?? {}).map(
+                  ([key, val], ind) => (
+                    <div>
+                      <Input
+                        id={`pk_numero_cuenta${ind+1}`}
+                        name={`pk_numero_cuenta${ind+1}`}
+                        label={`Número de Cuenta`}
+                        value={val}
+                        type="text"
+                        onChange={(e) => handleChangeNum(e,key)}
+                        autoComplete="off"
+                        maxLength={"20"}
+                        required
+                      />
+                      <ButtonBar className={"lg:col-span-2"}>
+                        <Button
+                          type="button"
+                          onClick={() =>{
+                            setSelectedEntity((old) => {
+                              const cuentasBanco = new Map(
+                                Object.entries(old?.pk_numero_cuenta ?? {})
+                              );
+                              cuentasBanco.delete(key);
+                              return {
+                                ...old,
+                                pk_numero_cuenta: Object.fromEntries(cuentasBanco),
+                              };
+                            })
+                          }}
+                        >
+                          Eliminar Cuenta
+                        </Button>
+                      </ButtonBar>
+                    </div>
+                  )
+                )}
+
+                {Object.keys(selectedEntity?.pk_numero_cuenta).length < 3?
+                  <ButtonBar>
+                    <Button
+                      type="button"
+                      onClick={() =>{
+                        setSelectedEntity((old) => {
+                          const cuentasBanco = new Map(
+                            Object.entries(old?.pk_numero_cuenta ?? {})
+                          );
+                          const newKey = generateUniqueKey(Object.keys(old?.pk_numero_cuenta ?? {}));
+                            cuentasBanco.set(newKey,'');
+                            return {
+                              ...old,
+                              pk_numero_cuenta: Object.fromEntries(cuentasBanco),
+                            };
+                        })
+                      }}
+                      disabled={DisableState(selectedEntity?.pk_numero_cuenta)}
+                    >
+                      Agregar Cuenta
+                    </Button>
+                  </ButtonBar>
+                :null}
+              </Fieldset>
+            ):null}
             <Fieldset legend={"Parámetros"}>
               {Object.entries(selectedEntity?.parametros ?? {}).map(
                 ([key, val], ind) => (

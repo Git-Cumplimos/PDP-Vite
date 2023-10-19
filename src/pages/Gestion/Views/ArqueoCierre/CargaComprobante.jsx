@@ -40,11 +40,11 @@ const CargaComprobante = () => {
   const [selectedEntity, setSelectedEntity] = useState("");
   const [EntityIndex, setEntityIndex] = useState([]);
   const [file, setFile] = useState(null);
+  const [image, setImage] = useState(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [comprobanteNumber, setComprobanteNumber] = useState("");
   const [valorComprobante, setValorComprobante] = useState(0.0);
   const [observaciones, setObservaciones] = useState("");
-  let NumCuentas = [];
   const [limitesMontos, setLimitesMontos] = useState({
     max: 100000000,
     min: 5000,
@@ -71,7 +71,7 @@ const CargaComprobante = () => {
         if (Array.isArray(res?.obj?.results)) {
           for (const element of res?.obj?.results) {
             if (element.pk_numero_cuenta !== null) {
-                NumCuentas = [element.pk_numero_cuenta.pk_numero_cuenta1]
+              let NumCuentas = element.pk_numero_cuenta.pk_numero_cuenta1===undefined?[]:[element.pk_numero_cuenta.pk_numero_cuenta1]
               if(element.pk_numero_cuenta.pk_numero_cuenta2 !== undefined)
                 NumCuentas.push(element.pk_numero_cuenta.pk_numero_cuenta2)
               if(element.pk_numero_cuenta.pk_numero_cuenta3 !== undefined)
@@ -181,6 +181,11 @@ const CargaComprobante = () => {
     const _files = Array.from(files);
     if (_files.length > 0) {
       setFile(_files[0]);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result);
+      };
+      reader.readAsDataURL(_files[0]);
     }
   }, []);
 
@@ -234,7 +239,6 @@ const CargaComprobante = () => {
       });
   }, []);
 
-  console.log(file)
   return (
     <Fragment>
       <h1 className="text-3xl mt-10 mb-8">Transportadora y Consignaciones</h1>
@@ -369,23 +373,28 @@ const CargaComprobante = () => {
                 allowDrop={true}
               />
             ) : (
-              <div className="text-center my-4 mx-auto md:mx-4 flex flex-row flex-wrap justify-around">
-                <div className="">
-                  <div className="flex flex-row justify-center">
-                    {/* <span className="bi bi-file-earmark-image text-5xl" /> */}
-                    {/* {file && (
-                      <div className="my-4 mx-auto md:mx-4 gap-4">
-                        <Magnifier src={file} zoomFactor={2} />
-                      </div>
-                    )} */}
-                    <span
-                      className="bi bi-x-lg text-2xl self-center cursor-pointer"
-                      onClick={() => setFile(null)}
-                    />
+              <>
+                <div className="text-center my-4 mx-auto md:mx-4 flex flex-row flex-wrap justify-around">
+                  <div className="">
+                    <div className="flex flex-row justify-center">
+                      <h3 className="text-sm">{file?.name ?? ""}</h3>
+                      <span
+                        className="bi bi-x-lg text-2xl ml-5 self-center cursor-pointer"
+                        onClick={() => setFile(null)}
+                      />
+                    </div>
                   </div>
-                  <h3 className="text-sm">{file?.name ?? ""}</h3>
                 </div>
-              </div>
+                <div className="lg:col-span-2">
+                  <div className="text-2xl mt-2 mb-3">                            
+                    {file && (
+                      <div style={{ width: '30%', margin: '0 auto' }}>
+                        <Magnifier src={image} zoomFactor={2} alt="Uploaded" style={{ width: '100%' }}/>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
             <ButtonBar className="lg:col-span-2">
               <Button type="submit" className="text-center">
