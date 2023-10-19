@@ -495,7 +495,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         label="Validación valor"
                         type="text"
                         min={0}
-                        max={datosTransaccion.valorSinModificar2}
+                        max={Math.ceil(datosTransaccion.valorSinModificar2)}
                         autoComplete="off"
                         maxLength={"12"}
                         defaultValue={parseFloat(validacionPago.validacion)}
