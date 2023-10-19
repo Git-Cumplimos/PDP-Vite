@@ -7,8 +7,6 @@ import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce
 
 const urlIAM = process.env.REACT_APP_URL_IAM_PDP;
 
-const urlComercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-
 const mapGroups = (data) => data;
 // const mapCommerce = ({
 //   pk_comercio,

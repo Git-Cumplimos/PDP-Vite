@@ -21,8 +21,7 @@ import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce
 import { onChangeNumber } from "../../../../utils/functions";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-// const url = process.env.REACT_APP_URL_IAM_PDP;
-const url = "http://localhost:5000";
+const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const HandleUser = () => {
   const { uuid } = useParams();
