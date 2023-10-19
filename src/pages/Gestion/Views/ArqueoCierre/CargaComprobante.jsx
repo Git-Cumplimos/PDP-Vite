@@ -177,15 +177,17 @@ const CargaComprobante = () => {
     observaciones,
   ]);
 
-  const onFileChange = useCallback((files) => {
+  const onFileChange = useCallback((files) => {   
     const _files = Array.from(files);
     if (_files.length > 0) {
       setFile(_files[0]);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(_files[0]);
+      setImage(URL.createObjectURL(_files[0]));
+      // setFile(_files[0]);
+      // const reader = new FileReader();
+      // reader.onload = () => {
+      //   setImage(reader.result);
+      // };
+      // reader.readAsDataURL(_files[0]);
     }
   }, []);
 
