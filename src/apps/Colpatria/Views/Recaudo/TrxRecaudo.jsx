@@ -251,6 +251,18 @@ const TrxRecaudo = () => {
   const onMakePayment = useCallback(
     (ev) => {
       ev.preventDefault();
+      if (
+        datosConvenio?.fk_tipo_valor !== 3 &&
+        validacionPago?.trueCodbarras  && 
+        validacionPago?.peticion !== 3
+      ) {
+        setValTrxRecaudo(0);
+        setValidacionPago((old) => ({
+          ...old,
+          peticion: 3,
+        }));
+        return;
+      }
       if (valTrxRecaudo <= 0) {
         notifyError("El valor debe ser mayor a cero");
         return;
@@ -587,17 +599,7 @@ const TrxRecaudo = () => {
           </div>
         )}
         {validacionPago?.peticion === 1 && (
-          <form onSubmit={() => {
-            if (datosConvenio?.fk_tipo_valor !== 3 && validacionPago?.trueCodbarras) {
-              setValTrxRecaudo(0);
-              setValidacionPago((old) => ({
-                ...old,
-                peticion: 3,
-              }));
-            } else {
-              onMakePayment();
-            }
-          }}>
+          <form onSubmit={onMakePayment}>
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
