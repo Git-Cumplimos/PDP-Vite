@@ -405,7 +405,8 @@ const PagarMoviliza = () => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
         idLiquidacion: resConsultMoviliza.numero_moviliza,
-        medioPago: "PSE",
+        // medioPago: "PSE",
+        medioPago: "Ventanilla en Efectivo",
         // medioPago: {
         //   descripcion: "Ventanilla de efectivo",
         //   id: 1,
