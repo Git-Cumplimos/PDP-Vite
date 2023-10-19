@@ -441,6 +441,9 @@ const PagarMoviliza = () => {
             if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
               notifyError("Error respuesta Moviliza: falla en la notificación");
             }
+            else if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacci\\u00f3n [0020003]))"){
+              notifyError("Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))");
+            }
             else{
               notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
             }
