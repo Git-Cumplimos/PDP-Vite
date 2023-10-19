@@ -91,11 +91,13 @@ const ParametrizacionRecaudo = () => {
           ];
         })
       );
-      if (body.pk_numero_cuenta['pk_numero_cuenta1'] !== undefined) {
-        validate = verificarValoresDiferentes(
-        body?.pk_numero_cuenta?.pk_numero_cuenta1,
-        body?.pk_numero_cuenta?.pk_numero_cuenta2,
-        body?.pk_numero_cuenta?.pk_numero_cuenta3);
+      if (body?.pk_is_transportadora === false) {
+        if (body?.pk_numero_cuenta['pk_numero_cuenta1'] !== undefined) {
+          validate = verificarValoresDiferentes(
+          body?.pk_numero_cuenta?.pk_numero_cuenta1,
+          body?.pk_numero_cuenta?.pk_numero_cuenta2,
+          body?.pk_numero_cuenta?.pk_numero_cuenta3);
+        }
       }
       if (validate) {
         notifyPending(
