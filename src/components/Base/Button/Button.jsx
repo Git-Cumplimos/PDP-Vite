@@ -39,7 +39,9 @@ const Button = ({ self = false, ...button }) => {
       clearTimeout(timer);
     };
   }, []);
-
+  button.onKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") e.preventDefault();
+  };
   return self ? (
     <button {...button} disabled={isClicking || button.disabled} />
   ) : (

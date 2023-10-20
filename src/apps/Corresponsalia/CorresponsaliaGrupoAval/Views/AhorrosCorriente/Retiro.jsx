@@ -330,11 +330,11 @@ const Retiro = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Retiros</h1>
+        <h1 className="text-3xl mt-6">Retiros</h1>
         <Form onSubmit={onSubmitModal} grid>
           <Select
-            id='banco'
-            label='Banco a Retirar'
+            id="banco"
+            label="Banco a Retirar"
             options={optionsBanco}
             value={banco}
             onChange={(e) => {
@@ -343,8 +343,8 @@ const Retiro = () => {
             required
           />
           <Select
-            id='tipCuenta'
-            label='Tipo de cuenta'
+            id="tipCuenta"
+            label="Tipo de cuenta"
             options={optionsTipoCuenta}
             value={tipoCuenta}
             onChange={(e) => {
@@ -353,11 +353,11 @@ const Retiro = () => {
             required
           />
           <Input
-            id='docCliente'
-            name='docCliente'
-            label='Documento cliente'
-            type='text'
-            autoComplete='off'
+            id="docCliente"
+            name="docCliente"
+            label="Documento cliente"
+            type="text"
+            autoComplete="off"
             minLength={"5"}
             maxLength={"12"}
             value={userDoc}
@@ -370,11 +370,11 @@ const Retiro = () => {
             required
           />
           <Input
-            id='numCliente'
-            name='numCliente'
-            label='Número celular'
-            type='text'
-            autoComplete='off'
+            id="numCliente"
+            name="numCliente"
+            label="Número celular"
+            type="text"
+            autoComplete="off"
             minLength={"10"}
             maxLength={"10"}
             value={phone}
@@ -393,13 +393,13 @@ const Retiro = () => {
             required
           />
           <HideInput
-            id='otp'
-            label='Número OTP'
-            type='text'
-            name='otp'
+            id="otp"
+            label="Número OTP"
+            type="text"
+            name="otp"
             minLength={"3"}
             maxLength={"6"}
-            autoComplete='off'
+            autoComplete="off"
             value={otp}
             onInput={(e, valor) => {
               let num = valor.replace(/[\s\.\-+eE]/g, "");
@@ -407,13 +407,14 @@ const Retiro = () => {
                 setOtp(num);
               }
             }}
-            required></HideInput>
+            required
+          ></HideInput>
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a retirar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a retirar"
+            autoComplete="off"
+            type="text"
             maxLength={"9"}
             // min={limitesMontos?.min}
             // max={limitesMontos?.max}
@@ -441,9 +442,10 @@ const Retiro = () => {
               : loadingRetiroCorresponsalGrupoAval
               ? () => {}
               : handleClose
-          }>
+          }
+        >
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketsAval refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
@@ -454,9 +456,10 @@ const Retiro = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type='submit'
+                  type="submit"
                   onClick={onMakePayment}
-                  disabled={loadingRetiroCorresponsalGrupoAval}>
+                  disabled={loadingRetiroCorresponsalGrupoAval}
+                >
                   Realizar retiro
                 </Button>
                 {/* {showBTNConsulta ? (
@@ -475,7 +478,8 @@ const Retiro = () => {
                     handleClose();
                     notifyError("Transacción cancelada por el usuario");
                   }}
-                  disabled={loadingRetiroCorresponsalGrupoAval}>
+                  disabled={loadingRetiroCorresponsalGrupoAval}
+                >
                   Cancelar
                 </Button>
               </ButtonBar>
