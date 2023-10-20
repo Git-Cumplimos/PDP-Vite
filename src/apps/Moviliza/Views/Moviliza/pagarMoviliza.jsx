@@ -70,7 +70,7 @@ const PagarMoviliza = () => {
   );
   const [token, setToken] = useState("");
   const navigate = useNavigate();
-  
+  const [cambioBarcodeBoton, setCambioBarcodeBoton] = useState(false);
 
   useEffect(() => {
     const data = {
@@ -152,6 +152,7 @@ const PagarMoviliza = () => {
       setPaso("LecturaMoviliza");
       setProcedimiento(option_manual);
       setBloqueoInput(false)
+      setCambioBarcodeBoton(false)
     }
     setNumeroMoviliza("");
   }, []);
@@ -175,9 +176,14 @@ const PagarMoviliza = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroMoviliza(response?.obj?.result?.numero_moviliza);
-            // notify("Respuesta PDP: "+response?.msg);
+            // notify(response?.msg);
             setBloqueoInput(true)
             // setPaso("LecturaMoviliza");
+            setCambioBarcodeBoton(true)
+          }
+          else{
+            notifyError(response?.msg)
+            setNumeroMoviliza("");
           }
         })
         .catch((error) => {
@@ -193,6 +199,7 @@ const PagarMoviliza = () => {
     e.preventDefault();
     setBloqueoInput(false)
     setNumeroMoviliza("")
+    setCambioBarcodeBoton(false)
  }
 
   const onSubmitConsultMoviliza = (e) => {
@@ -633,6 +640,7 @@ const PagarMoviliza = () => {
             bloqueoInput={bloqueoInput}
             resetConsultaBarcode={resetConsultaBarcode}
             token={token}
+            cambioBarcodeBoton={cambioBarcodeBoton}
           ></LecturaBarcode>
         )}
 
