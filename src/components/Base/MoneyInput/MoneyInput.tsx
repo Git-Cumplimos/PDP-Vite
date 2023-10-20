@@ -32,6 +32,7 @@ export interface CustomProps {
   negativeValues?: boolean;
   onInput?: (ev: FormEvent<HTMLInputElement>, valor: number) => void;
   onChange?: (ev: ChangeEvent<HTMLInputElement>, valor: number) => void;
+  required?: boolean;
 }
 
 type Props = CustomProps & Omit<CustomInputProps, "onInput" | "onChange">;
@@ -45,6 +46,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       negativeValues = false,
       value: origValue,
       defaultValue: origdefaultValue,
+      required = true,
       ...input
     },
     ref
@@ -163,6 +165,11 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
           } else {
             inptRef.current.setCustomValidity("");
           }
+
+          if (!required && !moneyValue) {
+            inptRef.current.setCustomValidity("");
+          }
+
           return true;
         }
         return old;
@@ -175,6 +182,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
       negativeValues,
       value,
       defaultValue,
+      required,
     ]);
 
     return (
@@ -198,6 +206,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
         onKeyDown={
           negativeValues ? onHandleNegativeNumbers : handleBlockNegativeSign
         }
+        required={required}
       />
     );
   }
