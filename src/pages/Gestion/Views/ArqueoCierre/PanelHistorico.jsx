@@ -40,7 +40,7 @@ const PanelHistorico = () => {
   }, []);
 
   const buscarPlataforma = useCallback(() => {
-    buscarPlataformaExt()
+    buscarPlataformaExt({totaldata: '1'})
       .then((res) => {
         const EntidadesExt=res.obj.results
         let nomEntidades = ''
@@ -55,7 +55,7 @@ const PanelHistorico = () => {
         console.error(error?.message);
         notifyError("Busqueda fallida");
       });
-  },[dataPlfExt]);
+  },[]);
 
   const buscarConsignaciones = useCallback(() => {
     searchInfo.totaldata = 0
@@ -82,7 +82,7 @@ const PanelHistorico = () => {
   useEffect(() => {
     buscarConsignaciones();
     buscarPlataforma();
-  }, [buscarConsignaciones]);
+  }, [buscarConsignaciones,buscarPlataforma]);
 
   const printDiv = useRef();
 
@@ -236,6 +236,7 @@ const PanelHistorico = () => {
           "Total consignaciones bancarias",
           "Total transferencias cajeros",
           "Total notas débito o crédito",
+          "Estado Cierre",
           "Fecha y hora cierre",
         ]}
         maxPage={maxPages}
@@ -258,6 +259,7 @@ const PanelHistorico = () => {
             total_notas,
             total_recibido_transportadora,
             total_sobrante,
+            state,
             total_transferencias,
           }) => ({
             pk_id_cierre,
@@ -282,6 +284,7 @@ const PanelHistorico = () => {
             total_consignaciones: formatMoney.format(total_consignaciones),
             total_transferencias: formatMoney.format(total_transferencias),
             total_notas: formatMoney.format(total_notas),
+            state:"realizado",
             created: dateFormatter.format(new Date(created)),
           })
         )}

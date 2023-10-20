@@ -13,6 +13,7 @@ import {
 } from "../../utils/fetchCaja";
 import {notifyError, notifyPending} from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 import _ from 'lodash';
 
 var Num = 1;
@@ -21,6 +22,7 @@ var validate = true;
 
 
 const originalState= {pk_numero_cuenta1: undefined, pk_numero_cuenta2: undefined, pk_numero_cuenta3: undefined};
+const originalStateParametros = {monto_maximo: undefined, monto_minimo: undefined};
 
 const ParametrizacionRecaudo = () => {
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
@@ -33,6 +35,7 @@ const ParametrizacionRecaudo = () => {
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [Count, setCount] = useState(1);
   const [NumCountjson, setNumCountjson] = useState(originalState)
+  const [parametrosValues, setParametrosValues] = useState(originalStateParametros)
   const keysToExclude = ["pk_numero_cuenta1", "pk_numero_cuenta2", "pk_numero_cuenta3"];
   const range = _.range(1, Count+1);
 
@@ -117,7 +120,11 @@ const ParametrizacionRecaudo = () => {
           {
             render: ({ data: err }) => {
               if (err?.cause === "custom") {
-                return 'Entidad Duplicada';
+                if (body.pk_is_transportadora) {
+                  return 'Transportadora duplicada';
+                }else{
+                  return 'Entidad bancaria duplicada';
+                }
               }
               console.error(err?.message);
               return "Peticion fallida";
@@ -134,20 +141,21 @@ const ParametrizacionRecaudo = () => {
   const handleSubmitUpdate = useCallback(
     (ev) => {
       ev.preventDefault();
-      console.log(selectedEntity)
+      selectedEntity.parametros = parametrosValues
       if (selectedEntity?.parametros === null ) {
         delete selectedEntity.parametros
       } 
-        validate = verificarValoresDiferentes(
-          selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta1,
-          selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta2,
-          selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta3);
+      validate = verificarValoresDiferentes(
+        selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta1,
+        selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta2,
+        selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta3);
       if (validate) {
         notifyPending(
           editarEntidades(
             {
               pk_nombre_entidad: "",
               pk_is_transportadora: "",
+              pk_id_entidad:"",
             },
             selectedEntity
           ),
@@ -177,7 +185,7 @@ const ParametrizacionRecaudo = () => {
         notifyError('Número de cuentas duplicado')
       }
     },
-    [closeModal, buscarEnt, selectedEntity]
+    [closeModal, buscarEnt, selectedEntity,parametrosValues]
   );
 
   useEffect(() => {
@@ -244,6 +252,12 @@ const ParametrizacionRecaudo = () => {
     }
   };
 
+  const handleChangeCurrenci = (e,valor) => {
+    setParametrosValues((old) => {
+      return{...old,[e.target.name]:valor}
+    })
+  };
+
   return (
     <Fragment>
       <ButtonBar>
@@ -272,6 +286,11 @@ const ParametrizacionRecaudo = () => {
         onSelectRow={(e, i) => {
           setSelectedEntity(dataComplet[i]);
           setSelectedEntity((old)=>{return {...old, pk_numero_cuenta : dataComplet[i].pk_numero_cuenta === null?{}:dataComplet[i].pk_numero_cuenta}});
+          setParametrosValues((old)=>{return {
+            ...old, 
+            monto_maximo : data[i]?.parametros?.monto_maximo,
+            monto_minimo : data[i]?.parametros?.monto_minimo
+          }})
         }}
       >
         <Input
@@ -405,7 +424,6 @@ const ParametrizacionRecaudo = () => {
                     </div>
                   )
                 )}
-
                 {Object.keys(selectedEntity?.pk_numero_cuenta).length < 3?
                   <ButtonBar>
                     <Button
@@ -432,96 +450,26 @@ const ParametrizacionRecaudo = () => {
               </Fieldset>
             ):null}
             <Fieldset legend={"Parámetros"}>
-              {Object.entries(selectedEntity?.parametros ?? {}).map(
-                ([key, val], ind) => (
-                  <div
-                    className="grid grid-cols-auto-fit-md place-items-center place-content-end"
-                    key={ind}
-                  >
-                    <Input
-                      id={`paramero_llave_${ind}`}
-                      name={`paramero_llave_${ind}`}
-                      label="Llave"
-                      value={key}
-                      onChange={(e) =>
-                        setSelectedEntity((old) => {
-                          const parametros = new Map(
-                            Object.entries(old?.parametros ?? {})
-                          );
-                          parametros.delete(key);
-                          parametros.set(e.target.value, val);
-                          return {
-                            ...old,
-                            parametros: Object.fromEntries(parametros),
-                          };
-                        })
-                      }
-                      autoComplete="off"
-                      maxLength={"20"}
-                      required
-                    />
-                    <Input
-                      id={`paramero_valor_${ind}`}
-                      name={`paramero_valor_${ind}`}
-                      label="Valor"
-                      value={val}
-                      onChange={(e) =>
-                        setSelectedEntity((old) => {
-                          const parametros = new Map(
-                            Object.entries(old?.parametros ?? {})
-                          );
-                          parametros.set(key, e.target.value);
-                          return {
-                            ...old,
-                            parametros: Object.fromEntries(parametros),
-                          };
-                        })
-                      }
-                      autoComplete="off"
-                      maxLength={"20"}
-                      required
-                    />
-                    <ButtonBar className={"lg:col-span-2"}>
-                      <Button
-                        type="button"
-                        onClick={() =>
-                          setSelectedEntity((old) => {
-                            const parametros = new Map(
-                              Object.entries(old?.parametros ?? {})
-                            );
-                            parametros.delete(key);
-                            return {
-                              ...old,
-                              parametros: Object.fromEntries(parametros),
-                            };
-                          })
-                        }
-                      >
-                        Eliminar parámetro
-                      </Button>
-                    </ButtonBar>
-                  </div>
-                )
-              )}
-              <ButtonBar>
-                <Button
-                  type="button"
-                  onClick={() =>
-                    setSelectedEntity((old) => {
-                      const parametros = new Map(
-                        Object.entries(old?.parametros ?? {})
-                      );
-                      parametros.set("", "");
-                      return {
-                        ...old,
-                        parametros: Object.fromEntries(parametros),
-                      };
-                    })
-                  }
-                >
-                  Agregar parámetro
-                </Button>
-              </ButtonBar>
+              <MoneyInput
+                id='monto_maximo'
+                name='monto_maximo'
+                label="Monto Máximo"
+                defaultValue={parametrosValues?.monto_maximo !== undefined?parametrosValues?.monto_maximo:null}
+                onChange={handleChangeCurrenci}
+                autoComplete="off"
+                placeholder="$0"
+                maxLength={28}
+              />
+              <MoneyInput
+                key='monto_minimo'
+                name='monto_minimo'
+                label="Monto Mínimo"
+                defaultValue={parametrosValues?.monto_minimo !== undefined?parametrosValues?.monto_minimo:null}
+                onChange={handleChangeCurrenci}
+                autoComplete="off"
+                placeholder="$0"
+                maxLength={28}
+              />
             </Fieldset>
             <ButtonBar>
               <Button type="submit">Actualizar información</Button>
