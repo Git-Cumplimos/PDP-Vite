@@ -459,6 +459,8 @@ const ParametrizacionRecaudo = () => {
                 autoComplete="off"
                 placeholder="$0"
                 maxLength={28}
+                max={10000000000000000000}
+                required={false}
               />
               <MoneyInput
                 key='monto_minimo'
@@ -469,6 +471,8 @@ const ParametrizacionRecaudo = () => {
                 autoComplete="off"
                 placeholder="$0"
                 maxLength={28}
+                max={10000000000000000000}
+                required={false}
               />
             </Fieldset>
             <ButtonBar>

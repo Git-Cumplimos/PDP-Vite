@@ -390,12 +390,11 @@ const PanelConsignaciones = () => {
             {selectedFileUrl && (
               <a
                 href={selectedFileUrl}
-                download="comprobante"
+                download
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn"
               >
-                {/* Descargar imagen */}
                 <Button type="button">Descargar imagen</Button>
               </a>
             )}
