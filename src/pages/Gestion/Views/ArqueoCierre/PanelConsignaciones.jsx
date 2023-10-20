@@ -9,7 +9,6 @@ import {
   buscarComprobantesCajero,
 } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-
 import {
   makeMoneyFormatter,
   makeDateFormatter,
@@ -119,7 +118,7 @@ const PanelConsignaciones = () => {
         console.error(err?.message);
         return "Peticion fallida";
       });
-  }, [searchInfo, pageData]);
+  }, [searchInfo, pageData,roleInfo]);
 
   const handleSubmit = useCallback(
     (ev) => {
@@ -176,7 +175,7 @@ const PanelConsignaciones = () => {
     id_permission.includes(6110) && id_permission.includes(6111)? 
       searchComprobantes():
       searchComprobantesCajero();
-  },[searchComprobantes]);
+  },[searchComprobantes,userPermissions,searchComprobantesCajero]);
 
   const handleChangeNumber = (e) => {
     if (e.target.name === 'id_comercio') {
@@ -367,14 +366,9 @@ const PanelConsignaciones = () => {
             className="w-full place-self-stretch"
             autoComplete="off"
             maxLength={"60"}
-            value={
-              selected?.fk_estado_revision !== null
-                ? selected?.observaciones_analisis
-                : observacionesAnalisis
-            }
+            defaultValue={selected?.observaciones_analisis}
             onInput={(e) => {
-              setObservacionesAnalisis(e.target.value.trimLeft());
-              e.target.value = e.target.value.trimLeft();
+              setObservacionesAnalisis(e.target.value);
             }}
             info={
               selected?.fk_estado_revision === null && `Máximo 60 caracteres`
@@ -396,8 +390,10 @@ const PanelConsignaciones = () => {
             {selectedFileUrl && (
               <a
                 href={selectedFileUrl}
+                download
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn"
               >
                 <Button type="button">Descargar imagen</Button>
               </a>

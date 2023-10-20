@@ -70,6 +70,7 @@ const ReporteSobranteFaltantes = () => {
                 insertFaltantesSobr(body)
                 return "ID de transacción válido";
               }else{
+                setIsLoading(false);
                 return "Número de la transacción ingresado no corresponde a una transacción del comercio";
               }
             },

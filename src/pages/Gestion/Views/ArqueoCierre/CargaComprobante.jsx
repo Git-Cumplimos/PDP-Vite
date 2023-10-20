@@ -182,12 +182,6 @@ const CargaComprobante = () => {
     if (_files.length > 0) {
       setFile(_files[0]);
       setImage(URL.createObjectURL(_files[0]));
-      // setFile(_files[0]);
-      // const reader = new FileReader();
-      // reader.onload = () => {
-      //   setImage(reader.result);
-      // };
-      // reader.readAsDataURL(_files[0]);
     }
   }, []);
 
