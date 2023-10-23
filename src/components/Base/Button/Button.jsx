@@ -16,7 +16,7 @@ const Button = ({ self = false, ...button }) => {
           setTimerOnSubmit(
             setTimeout(() => {
               setIsClicking(false);
-            }, 2000)
+            }, 1000)
           );
         }
       } catch (error) {
