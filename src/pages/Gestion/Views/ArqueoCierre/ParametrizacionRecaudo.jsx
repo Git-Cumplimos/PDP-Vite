@@ -149,6 +149,11 @@ const ParametrizacionRecaudo = () => {
         selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta1,
         selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta2,
         selectedEntity?.pk_numero_cuenta?.pk_numero_cuenta3);
+      if (selectedEntity?.parametros.monto_maximo === 0 || selectedEntity?.parametros.monto_maximo === undefined) {
+        delete selectedEntity.parametros.monto_maximo
+      }if (selectedEntity?.parametros.monto_minimo === 0 || selectedEntity?.parametros.monto_minimo === undefined) {
+        delete selectedEntity.parametros.monto_minimo
+      }
       if (validate) {
         notifyPending(
           editarEntidades(
@@ -458,8 +463,8 @@ const ParametrizacionRecaudo = () => {
                 onChange={handleChangeCurrenci}
                 autoComplete="off"
                 placeholder="$0"
-                maxLength={28}
-                max={10000000000000000000}
+                maxLength={13}
+                max={100000000}
                 required={false}
               />
               <MoneyInput
@@ -470,8 +475,8 @@ const ParametrizacionRecaudo = () => {
                 onChange={handleChangeCurrenci}
                 autoComplete="off"
                 placeholder="$0"
-                maxLength={28}
-                max={10000000000000000000}
+                maxLength={13}
+                max={100000000}
                 required={false}
               />
             </Fieldset>
