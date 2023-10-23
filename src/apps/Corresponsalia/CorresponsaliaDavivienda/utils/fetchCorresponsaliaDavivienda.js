@@ -1,3 +1,4 @@
+import { fetchDataTotp } from "../../../../utils/MFA";
 import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
 import { hash } from "../../../../utils/hash";
@@ -64,7 +65,7 @@ export const pagoGiroDaviplata = async (bodyObj) => {
     ),
   };
   try {
-    const res = await fetchData(
+    const res = await fetchDataTotp(
       `${urlDaviplata}davivienda_cb_cashIn/pagoGiroDaviplata`,
       "POST",
       {},
@@ -227,7 +228,7 @@ export const depositoCorresponsal = async (bodyObj) => {
   };
 
   try {
-    const res = await fetchData(
+    const res = await fetchDataTotp(
       `${urlDaviplata}davivienda_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},

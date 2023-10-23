@@ -23,8 +23,11 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
 import { decryptAES } from "../../../../../utils/cryptoUtils";
+import { useMFA } from "../../../../../components/Base/MFAScreen";
 
 const Deposito = () => {
+  const { submitEventSetter } = useMFA();
+
   const navigate = useNavigate();
   const [verificacionTel, setVerificacionTel] = useState("");
 
@@ -389,7 +392,7 @@ const Deposito = () => {
               <ButtonBar>
                 <Button
                   type='submit'
-                  onClick={onMakePayment}
+                  onClick={submitEventSetter(onMakePayment)}
                   disabled={loadingCashIn}>
                   Aceptar
                 </Button>
