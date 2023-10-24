@@ -4,6 +4,12 @@ import { notify, notifyError } from "../../../utils/notify";
 const urlParametrizacion =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const URL_CORRESPONSALIA_OTROS = process.env.REACT_APP_URL_CORRESPONSALIA_OTROS;
+
+// const urlReportes = `http://localhost:5000/reportes`;
+const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
+ 
+export const buscarReporteTrxTuLlave = () => {return `${urlReportes}/trx-tullave`};
+
 export const fetchDatafonosTuLlave = async (obj) => {
   try {
     const res = await fetchData(
