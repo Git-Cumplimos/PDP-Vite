@@ -72,8 +72,8 @@ const CargaPaquetesMovistar = () => {
               "carga-paquetes"
             )
               .then((response) => {
-                if (response?.status == true) {
-                  notify("se cargo de archivo de paquetes exitosamente");
+                if (response?.status === true) {
+                  notify("Se cargó el archivo de paquetes exitosamente");
                   HandleCloseSecond();
                 }
               })
