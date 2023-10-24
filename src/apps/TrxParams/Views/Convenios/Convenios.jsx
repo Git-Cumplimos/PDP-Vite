@@ -9,6 +9,7 @@ import Modal from "../../../../components/Base/Modal";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import useQuery from "../../../../hooks/useQuery";
+import Select from "../../../../components/Base/Select";
 import { onChangeNumber } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 import {
@@ -20,8 +21,8 @@ import {
 } from "../../utils/fetchRevalConvenios";
 
 const Convenios = () => {
-  const [{ searchConvenio = "", ean13Convenio = "" }, setQuery] = useQuery();
-
+  const [{ searchConvenio = "", ean13Convenio = "", nombreAutorizador = ""}, setQuery] = useQuery();
+  const [idConvenio, setIdConvenio] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const handleClose = useCallback(() => {
@@ -44,10 +45,7 @@ const Convenios = () => {
     fetchConveniosUnique();
   }, []);
 
-  const [{ page, limit }, setPageData] = useState({
-    page: 1,
-    limit: 10,
-  });
+  const [{ page, limit }, setPageData] = useState({page: 1,limit: 10,});
   const [convenios, setConvenios] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [tiposConvenios, setTiposConvenios] = useState([]);
@@ -65,6 +63,7 @@ const Convenios = () => {
       //   "Longitud maxima": "",
       // },
     ],
+    nombre_autorizador:"",
   });
   const [maxPages, setMaxPages] = useState(0);
   const mapSuggestionsTiposConvenios = useMemo(
@@ -115,6 +114,7 @@ const Convenios = () => {
               tags,
               referencias,
               nombre_tipo_convenio,
+              nombre_autorizador,
             }) => {
               return {
                 "Id convenio": id_convenio,
@@ -137,6 +137,7 @@ const Convenios = () => {
                       })
                     : []),
                 ],
+                nombre_autorizador: nombre_autorizador,
               };
             }
           )[0];
@@ -160,6 +161,8 @@ const Convenios = () => {
         setQuery({ searchConvenio: ev.target.value }, { replace: true });
       } else if (ev.target.name === "ean13Convenio") {
         setQuery({ ean13Convenio: ev.target.value }, { replace: true });
+      } else if (ev.target.name === "nombreAutorizador") {
+        setQuery({ nombreAutorizador: ev.target.value }, { replace: true });
       }
     },
     [setQuery]
@@ -180,6 +183,7 @@ const Convenios = () => {
       "Referencias",
       "tiposConvenios",
       "id_convenio",
+      "nombre_autorizador",
     ].forEach((col) => {
       let data = null;
       if (col === "Referencias") {
@@ -230,6 +234,7 @@ const Convenios = () => {
           {
             ...obj,
             // id_convenio: selectedConvenio?.["Id convenio"],
+            nombre_autorizador: selectedConvenio?.["nombre_autorizador"],
             nombre_convenio: selectedConvenio?.["Nombre de convenio"],
             tags: selectedConvenio?.Tags.join(","),
             referencias: [
@@ -274,6 +279,7 @@ const Convenios = () => {
         }
         postConvenios({
           ...obj,
+          nombre_autorizador: selectedConvenio?.["nombre_autorizador"],
           nombre_convenio: selectedConvenio?.["Nombre de convenio"],
           tags: selectedConvenio?.Tags.join(","),
           referencias: [
@@ -314,18 +320,20 @@ const Convenios = () => {
 
   useEffect(() => {
     fetchConveniosUniqueFetch();
-  }, [searchConvenio, page, limit,ean13Convenio]);
+  }, [searchConvenio, page, limit,ean13Convenio,idConvenio,nombreAutorizador]);
 
   const fetchConveniosUniqueFetch = useCallback(() => {
     setIsUploading(true);
-    fetchConveniosUnique({ tags: searchConvenio, ean13:ean13Convenio , page, limit })
+    fetchConveniosUnique({ tags: searchConvenio, ean13:ean13Convenio, nombre_autorizador:nombreAutorizador, id_convenio:idConvenio, page, limit })
       .then((res) => {
         setIsUploading(false);
         setConvenios(
-          [...res?.results].map(({ id_convenio, nombre_convenio }) => {
+          [...res?.results].map(({ id_convenio, nombre_convenio,ean13,nombre_autorizador }) => {
             return {
               "Id convenio": id_convenio,
               "Nombre de convenio": nombre_convenio,
+              "EAN": ean13,
+              "Autorizador": nombre_autorizador,
             };
           })
         );
@@ -336,7 +344,7 @@ const Convenios = () => {
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
       });
-  }, [searchConvenio, page, limit,ean13Convenio]);
+  }, [searchConvenio, page, limit,ean13Convenio,nombreAutorizador,idConvenio]);
 
   // useEffect(() => {
   //   fetchConveniosUnique(null, ean13Convenio)
@@ -376,6 +384,13 @@ const Convenios = () => {
       });
   };
 
+  const handleChangeNum = (e) => {
+    const value = e.target.value;
+    if (/^[0-9]*$/.test(value) && value.length <= 20) {
+      setIdConvenio(value);
+    }
+  };
+
   return (
     <Fragment>
       <SimpleLoading show={isUploading} />
@@ -392,7 +407,7 @@ const Convenios = () => {
         title='Convenios'
         maxPage={maxPages}
         onChange={onChange}
-        headers={["Id convenio", "Nombre convenio"]}
+        headers={["Id convenio", "Nombre convenio","EAN","Autorizador"]}
         data={convenios}
         onSelectRow={onSelectConvenio}
         onSetPageData={setPageData}>
@@ -411,6 +426,29 @@ const Convenios = () => {
           type='text'
           autoComplete='off'
           defaultValue={ean13Convenio}
+        />
+        <Input
+          id='idConvenio'
+          name='idConvenio'
+          label={"Id Convenio"}
+          type='text'
+          autoComplete='off'
+          maxLength={20}
+          onChange={handleChangeNum}
+          value={idConvenio}
+        />
+        <Select
+          id="nombreAutorizador"
+          name="nombreAutorizador"
+          label={"Nombre Autorizador"}
+          options={[
+            { value: "", label: "" },
+            { value: "Davivienda", label: "Davivienda" },
+            { value: "Colpatria", label: "Colpatria" },
+            { value: "Grupo Aval", label: "Grupo Aval" },
+            { value: "Banco Agrario", label: "Banco Agrario" },
+          ]}
+          defaultValue={nombreAutorizador}
         />
       </TableEnterprise>
 
@@ -457,6 +495,21 @@ const Convenios = () => {
             autoComplete='off'
             value={selectedConvenio?.Ean13}
             onChange={() => {}}
+          />
+          <Select
+            id="nombre_autorizador"
+            name="nombre_autorizador"
+            label="Nombre autorizador"
+            value={selectedConvenio?.nombre_autorizador}
+            options={[
+              { value: "", label: "" },
+              { value: "Davivienda", label: "Davivienda" },
+              { value: "Colpatria", label: "Colpatria" },
+              { value: "Grupo Aval", label: "Grupo Aval" },
+              { value: "Banco Agrario", label: "Banco Agrario" },
+            ]}
+            onChange={() =>{}}
+            required
           />
           <InputSuggestions
             id='tiposConvenios'
