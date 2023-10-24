@@ -6,7 +6,7 @@ import {
 import {
   defaultParamsError,
   fetchCustom,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 import {
   FuctionEvaluateResponsePractisistemas,
   AcrominosPractisistemas,
@@ -25,7 +25,8 @@ export const useBackendRecargasPractisistemas = (
     setStatePeticion(true);
     let response = {
       status: false,
-      ticket: {},
+      id_trx: null,
+      ticket: null,
     };
     let fetchResult;
     //SECUENCIA ---------------trx-------------------------------

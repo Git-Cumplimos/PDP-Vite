@@ -84,7 +84,7 @@ const inputDataInitial: TypingInputData = {
 
 //---------------------------Componente-----------------------------------------------
 const RecaudoTripleA = () => {
-  // const uniqueId = v4();
+  const uniqueId = v4();
   const [paso, setPaso] = useState<TypingPaso>("LecturaBarcode");
   const [showModal2, setShowModal2] = useState(false);
   const [procedimiento, setProcedimiento] =
@@ -108,7 +108,7 @@ const RecaudoTripleA = () => {
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
     setShowModal2(false);
     if (notify_error_ === true) {
-      notifyError("Transacción cancelada", 5000, {
+      notifyError("Transacción cancelada por el usuario", 5000, {
         toastId: "notifyError-HandleCloseTrx",
       });
     }
@@ -125,7 +125,7 @@ const RecaudoTripleA = () => {
     setInputData(inputDataInitial);
     // setConsultaData(null);
     setProcedimiento(option_manual);
-    validNavigate("/TripleA/recaudos");
+    validNavigate("/TripleA");
   }, [validNavigate]);
 
   const HandleCloseModal = useCallback(() => {
@@ -192,31 +192,37 @@ const RecaudoTripleA = () => {
           id_terminal: roleInfo?.["id_dispositivo"] ?? "",
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
+          direccion: roleInfo?.["direccion"] ?? "",
         },
         numeroCupon: inputData.numeroCupon,
       };
-      PeticionValidation(data)
-        .then((res: TypeServicesBackendTripleA) => {
-          setPaso("ResumenTrx");
-          setConsultaData({
-            numeroCupon: res?.obj?.result?.cupon,
-            valorPagado: res?.obj?.result?.valorcupon,
-            id_trx: res?.obj?.result?.id_trx,
-          });
-          setShowModal2(true);
-        })
-        .catch((error: any) => {
-          if (!(error instanceof ErrorCustomFetch)) {
-            const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServiceBackend.validation.name}) [0010002]`;
-            const errorSequence = `${name_componente} - realizar consulta directamente en el modulo`;
-            console.error({
-              "Error PDP": errorPdp,
-              "Error Sequence": errorSequence,
-              "Error Console": `${error.message}`,
+      if (inputData.numeroCupon !== '') {
+        PeticionValidation(data)
+          .then((res: TypeServicesBackendTripleA) => {
+            setPaso("ResumenTrx");
+            setConsultaData({
+              numeroCupon: res?.obj?.result?.cupon,
+              valorPagado: res?.obj?.result?.valorcupon,
+              id_trx: res?.obj?.result?.id_trx,
             });
-          }
-          HandleCloseTrx(false);
-        });
+            setShowModal2(true);
+          })
+          .catch((error: any) => {
+            if (!(error instanceof ErrorCustomFetch)) {
+              const errorPdp = `Error respuesta Frontend PDP: Fallo al consumir el servicio (${infServiceBackend.validation.name}) [0010002]`;
+              const errorSequence = `${name_componente} - realizar consulta directamente en el modulo`;
+              console.error({
+                "Error PDP": errorPdp,
+                "Error Sequence": errorSequence,
+                "Error Console": `${error.message}`,
+              });
+            }
+            HandleCloseTrx(false);
+          });
+      }
+      else {
+        notifyError("Complete el campo número de cupón")
+      }
     },
     [PeticionValidation,HandleCloseTrx,inputData.numeroCupon,pdpUser,roleInfo]
   );
@@ -235,13 +241,14 @@ const RecaudoTripleA = () => {
             tipo__comercio.search("oficinas propias") >= 0
               ? true
               : false,
-          // id_uuid_trx: uniqueId,
           nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
           nombre_usuario: pdpUser?.["uname"] ?? "",
+          direccion: roleInfo?.["direccion"] ?? "",
         },
+        id_uuid_trx: uniqueId,
         numeroCupon: consultData?.numeroCupon,
         id_trx: consultData?.id_trx,
-        valorPagado: consultData?.valorPagado,
+        valor_total_trx: consultData?.valorPagado,
       };
       PeticionPay(data)
         .then((res: TypeServicesBackendTripleA) => {
@@ -262,7 +269,7 @@ const RecaudoTripleA = () => {
           HandleCloseTrx(false);
         });
     },
-    [pdpUser,roleInfo,consultData,HandleCloseTrx,PeticionPay]
+    [pdpUser,roleInfo,consultData,uniqueId,HandleCloseTrx,PeticionPay]
   );
 
   //********************Funciones Demas**************************
@@ -276,7 +283,7 @@ const RecaudoTripleA = () => {
       <SimpleLoading show={loadingPeticion}></SimpleLoading>
       <h1 className="text-3xl mt-6">Recaudo Triple A</h1>
       <Form grid={false} className=" flex flex-col content-center items-center">
-        <h1>Tipo de captura</h1>
+        <h1 className={"text-xl"}>Tipo de captura</h1>
         <div className={styleComponents}>
           <Select
             id="opciones"
@@ -284,6 +291,7 @@ const RecaudoTripleA = () => {
             options={options_select}
             onChange={onChangeSelect}
             value={procedimiento}
+            className={"text-xl"}
           />
         </div>
 
@@ -304,8 +312,7 @@ const RecaudoTripleA = () => {
         {/******************************Lectura Triple A*******************************************************/}
         {paso === "LecturaTripleA" && (
           <Fragment>
-            <h1>Número de cupón</h1>
-
+            <h1 className={"text-xl"}>Número de cupón</h1>
             <Input
               label=""
               required
@@ -335,6 +342,7 @@ const RecaudoTripleA = () => {
                 Consultar cupón
               </Button>
               <Button
+                type="button"
                 onClick={() => HandleCloseTrx(true)}
                 disabled={loadingPeticion}
               >
@@ -361,7 +369,7 @@ const RecaudoTripleA = () => {
               <Button type="submit" onClick={onSubmitPay}>
                 Realizar Pago
               </Button>
-              <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
+              <Button type="button" onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
             </ButtonBar>
           </PaymentSummary>
         )}

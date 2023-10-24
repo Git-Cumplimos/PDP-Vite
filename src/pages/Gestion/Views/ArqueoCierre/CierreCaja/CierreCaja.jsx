@@ -20,6 +20,12 @@ import * as CierreCajaCons from "./CierreCaja.cons";
 
 const formatMoney = makeMoneyFormatter(2);
 
+
+// transacciones de consignación   = tbl_comprobantes
+// el traslado de comisiones al cupo   = 
+// notas débito/crédito  = tbl_notas_dc
+
+
 const GridRow = ({ cols = [], self = false }) => (
   <div
     className={`grid gap-4 ${
@@ -36,52 +42,52 @@ const GridRow = ({ cols = [], self = false }) => (
 )
 
 const TreeView = ({ tree = {}, child }) =>
-Object.entries(tree).map(([key, info]) => {
-  var cols = []
-  if (child) {
-    cols = [
-      info.id,
-      info.nombre, 
-      info.transaccionesExitosas,
-      info.transaccionesFallidas, 
-      formatMoney.format(info.monto), 
-      formatMoney.format(info.comisiones)
-    ];
-    if (info?.transacciones) {
-      return (
-        <Accordion titulo={<GridRow cols={cols} />} key={key}>
-          {info?.transacciones && (
-            <TreeView tree={info?.transacciones} child={true} />
-          )}
-        </Accordion>
-      );
+  Object.entries(tree).map(([key, info]) => {
+    var cols = []
+    if (child) {
+      cols = [
+        info.id,
+        info.nombre, 
+        info.transaccionesExitosas,
+        info.transaccionesFallidas, 
+        formatMoney.format(info.monto), 
+        formatMoney.format(info.comisiones)
+      ];
+      if (info?.transacciones) {
+        return (
+          <Accordion titulo={<GridRow cols={cols} />} key={key}>
+            {info?.transacciones && (
+              <TreeView tree={info?.transacciones} child={true} />
+            )}
+          </Accordion>
+        );
+      }
+    } else {
+      cols = [
+        "",
+        info.nombre,
+        valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_SUCCESS),
+        valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_FAILURE), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_AMOUNT)), 
+        formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_COMMISSION))
+      ];
+      if (info?.autorizadores) {
+        return (
+          <Accordion titulo={<GridRow cols={cols} />} key={key}>
+            {info?.autorizadores && (
+              <TreeView tree={info?.autorizadores} child={true} />
+            )}
+          </Accordion>
+        );
+      }
     }
-  } else {
-    cols = [
-      "",
-      info.nombre,
-      valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_SUCCESS),
-      valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_TRX_FAILURE), 
-      formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_AMOUNT)), 
-      formatMoney.format(valoresCalculadosGrupos(info.autorizadores,CierreCajaCons.TAG_COMMISSION))
-    ];
-    if (info?.autorizadores) {
-      return (
-        <Accordion titulo={<GridRow cols={cols} />} key={key}>
-          {info?.autorizadores && (
-            <TreeView tree={info?.autorizadores} child={true} />
-          )}
-        </Accordion>
-      );
-    }
-  }
-  return (
-    <GridRow
-      key={key}
-      cols={cols}
-      self
-    />
-  );
+    return (
+      <GridRow
+        key={key}
+        cols={cols}
+        self
+      />
+    );
 })
 
 const valoresCalculadosTotales = (gruposTransaccion, valor) => {
@@ -166,7 +172,9 @@ const CierreCaja = () => {
     const [dataComercios, setDataComercios] = useState([]);
     const [dataInicioDia, setDataInicioDia] = useState({});
     const [dataTransacciones, setDataTransacciones] = useState([]);
-  
+    const [dataPdp, setDataPdp] = useState();
+    const [dataPdphead, setDataPdpHead] = useState();
+
     const [fechas, setFechas] = useState({ fechaInicial: "", fechaFinal: "" });
     const [comercio, setComercio] = useState("");
     const [comercioSeleccionado, setComercioSeleccionado] = useState("");
@@ -229,10 +237,13 @@ const CierreCaja = () => {
                   setDataCapitalizar(dataBack.obj.capitalizar);
                   setDataInicioDia(dataBack.obj.inicioDia);
                   setDataTransacciones(dataBack.obj.grupoTransacciones);
+                  setDataPdp(dataBack.obj.pdP)
+                  setDataPdpHead(dataBack.obj.pdP)
                 } else {
                   setDataCapitalizar({});
                   setDataInicioDia({});
                   setDataTransacciones([]);
+                  setDataPdp([])
                   notifyError(CierreCajaCons.MESSAGE_EMPY_DATA_PER_DATE);
                 }
               } else {
@@ -405,33 +416,36 @@ const CierreCaja = () => {
                 child={false}
               />
               <Accordion
-                estiloTitulo = {false}
-                titulo={
-                  <GridRow
-                    cols={[
-                      "", 
-                      dataCapitalizar.nombre, 
-                      dataCapitalizar.transaccionesExitosas,
-                      dataCapitalizar.transaccionesFallidas,
-                      formatMoney.format(dataCapitalizar.monto), 
-                      formatMoney.format(dataCapitalizar.comisiones)
-                    ]}
-                  />
-                }
-              />
+              titulo={
+                <GridRow
+                  cols={[
+                    "", 
+                    dataPdphead.nombre, 
+                    valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_SUCCESS),
+                    valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_FAILURE),
+                    formatMoney.format(Number(valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_AMOUNT))),
+                    dataPdphead.comisiones,
+                  ]}
+                />
+              }>
+                <TreeView
+                  tree={dataPdp.valores_report}
+                  child={false}
+                />
+              </Accordion>
               <Accordion
                 titulo={
                   <GridRow
                     cols={[
                       "", 
                       CierreCajaCons.LABEL_COLUMN_BALANCE,
-                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas,
-                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas,
+                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_SUCCESS)+dataCapitalizar.transaccionesExitosas+valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_SUCCESS),
+                      valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_TRX_FAILURE)+dataCapitalizar.transaccionesFallidas+valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_TRX_FAILURE),
                       dataInicioDia.monto !== CierreCajaCons.LABEL_NA ? 
                         (
-                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto))
+                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataInicioDia.monto)+Number(dataCapitalizar.monto)+Number(valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_AMOUNT)))
                         ) : (
-                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto))
+                          formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_AMOUNT))+Number(dataCapitalizar.monto)+Number(valoresCalculadosTotales(dataPdphead.valores_report,CierreCajaCons.TAG_AMOUNT)))
                         ),
                       formatMoney.format(Number(valoresCalculadosTotales(dataTransacciones,CierreCajaCons.TAG_COMMISSION))+Number(dataInicioDia.comisiones)+Number(dataCapitalizar.comisiones))
                     ]}

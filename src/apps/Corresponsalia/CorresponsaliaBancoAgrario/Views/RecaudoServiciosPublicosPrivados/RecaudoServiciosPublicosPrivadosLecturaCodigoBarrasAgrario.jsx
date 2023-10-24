@@ -404,7 +404,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type='submit'>Realizar pago</Button>
+                <Button type='submit' disabled={showModal}>Realizar pago</Button>
               )}
             </ButtonBar>
           </Form>
@@ -442,18 +442,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                       datosTransaccion.valorSinModificar
                     )} `}
                   </h2>
-                  <ButtonBar>
-                    <Button
-                      onClick={() => {
-                        notifyError("Transacción cancelada por el usuario");
-                        hideModalReset();
-                      }}>
-                      Cancelar
-                    </Button>
-                    <Button type='submit' onClick={onSubmitPago}>
-                      Realizar pago
-                    </Button>
-                  </ButtonBar>
+                  <Form grid onSubmit={onSubmitPago} className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                    <ButtonBar>
+                      <Button
+                        onClick={() => {
+                          notifyError("Transacción cancelada por el usuario");
+                          hideModalReset();
+                        }}>
+                        Cancelar
+                      </Button>
+                      <Button type='submit' disabled={peticion !== 1 && showModal}>
+                        Realizar pago
+                      </Button>
+                    </ButtonBar>
+                  </Form>
                 </div>
               )}
               {peticion === 2 && (

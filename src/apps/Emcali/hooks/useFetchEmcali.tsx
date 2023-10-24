@@ -15,10 +15,6 @@ export class ErrorFetchEmcali extends Error {
 }
 
 //--------- Typing ------------------
-type TypePeticion = {
-  params?: { [key: string]: any };
-  body?: { [key: string]: any };
-};
 
 type TypeServicesBackendEmcaliObj = {
   error_status: boolean;

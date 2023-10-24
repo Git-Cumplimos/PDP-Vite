@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PropOperadoresComponent } from "../utils/TypesUtils";
+import { PropOperadoresComponent } from "../TypeDinamic";
 import { useImgs } from "../../../../hooks/ImgsHooks";
 
 import classes from "./LayoutTelefoniaMovil.module.css";
@@ -17,13 +17,14 @@ const LayoutTelefoniaMovil = ({
   operadores,
   operadorCurrent,
   setOperadorCurrent,
+  setStateComponectBody,
 }: {
   operadores: PropOperadoresComponent[];
-  operadorCurrent: any;
+  operadorCurrent: PropOperadoresComponent;
   setOperadorCurrent: any;
+  setStateComponectBody: any;
 }) => {
   const { svgs }: any = useImgs();
-
   return (
     <div className={contenedorLayoutTelefoniaMovil}>
       {operadores.map((operadorInd) => (
@@ -31,6 +32,7 @@ const LayoutTelefoniaMovil = ({
           className={contenedorImg}
           onClick={() => {
             setOperadorCurrent(operadorInd);
+            setStateComponectBody(true);
           }}
         >
           <nav>
@@ -39,11 +41,7 @@ const LayoutTelefoniaMovil = ({
                 <img
                   className={zoom}
                   // className="w-24 transition duration-150 ease-out hover:ease-in"
-                  src={
-                    operadorInd?.logo?.includes("http")
-                      ? operadorInd?.logo
-                      : svgs?.[operadorInd?.logo]
-                  }
+                  src={`${svgs?.TELEFONIA_MOVIL}${operadorInd?.logo}`}
                   alt={operadorInd?.name}
                 />
                 <h1 className={operador}>{operadorInd.name}</h1>

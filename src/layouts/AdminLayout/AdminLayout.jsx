@@ -18,6 +18,7 @@ import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
 import ButtonBar from "../../components/Base/ButtonBar";
+import ModalAlert from "./ModalAlert";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",
@@ -44,7 +45,7 @@ const AdminLayout = () => {
   const { pathname } = useLocation();
 
   const { urlsPrivate: urls } = useUrls();
- 
+
   const [showModal, setShowModal] = useState(false);
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
   const [cajaState, setCajaState] = useState("");
@@ -101,7 +102,7 @@ const AdminLayout = () => {
       roleInfo?.direccion !== undefined,
       nombreComercio !== undefined,
       userPermissions?.map(({ id_permission }) => id_permission).includes(6101),
-      false,
+      // false,
     ];
     if (conditions.every((val) => val)) {
       searchCierre({
@@ -171,6 +172,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </div>
+        <ModalAlert/>
         <HNavbar links={urls} isText />
       </header>
       <main className="container">
@@ -180,7 +182,7 @@ const AdminLayout = () => {
             <div className="items-center text-center">
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
-                realizar transacciones hasta que la cierre.
+                realizar transacciones hasta que realice el cierre.
                 <ButtonBar>
                   <Button
                     className="btn mx-auto d-block"

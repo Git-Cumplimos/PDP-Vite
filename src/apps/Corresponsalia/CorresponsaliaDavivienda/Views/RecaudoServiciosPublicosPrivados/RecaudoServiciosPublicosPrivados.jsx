@@ -94,6 +94,7 @@ const RecaudoServiciosPublicosPrivados = () => {
   };
   const onSubmitValidacion = (e) => {
     e.preventDefault();
+    let tipo_convenio = convenio?.tipo_convenio_cnb
     if (estadoPeticion !== 1 && convenio.tipo_convenio_cnb === "DNR") {
       if (convenio?.ctrol_ref1_cnb === "1") {
         if (datosTrans.ref1 !== datosTransValidacion.ref1)
@@ -162,7 +163,7 @@ const RecaudoServiciosPublicosPrivados = () => {
       }
       setIsUploading(true);
       postRecaudoConveniosDavivienda({
-        valTipoConsultaConvenio: "2",
+        valTipoConsultaConvenio: tipo_convenio === "CBR" ? "1" : "2",
         numConvenio: convenio.cod_convenio_cnb,
         // numTipoProductoRecaudo: convenio.tipo_cta_recaudo_cnb,
         // numProductoRecaudo: convenio.nro_cta_recaudo_cnb,
@@ -172,7 +173,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         numProductoRecaudo: convenio.nro_cta_destino_cnb,
         valTipoProdDestinoRecaudoCent: convenio.tipo_cta_recaudo_cnb,
         valProdDestinoRecaudoCent: convenio.nro_cta_recaudo_cnb,
-        valCodigoIAC: "0",
+        valCodigoIAC: tipo_convenio === "CBR" ? convenio?.cod_iac_cnb : "0",
         valor: valorTransaccion,
         valReferencia1: datosTransValidacion?.ref1 ?? "",
         valReferencia2: datosTransValidacion?.ref2 ?? "",
@@ -185,6 +186,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         issuerIdDane: roleInfo?.codigo_dane,
         nombreComercio: roleInfo?.["nombre comercio"],
         municipio: roleInfo?.["ciudad"],
+        valCodigoDeBarras: tipo_convenio === "CBR" ? valorTransaccion : "0.00",
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
@@ -284,8 +286,8 @@ const RecaudoServiciosPublicosPrivados = () => {
       }
       setIsUploading(true);
       postConsultaConveniosDavivienda({
-        tipoTransaccion: "2",
-        numNumeroConvenioIAC: convenio.cod_convenio_cnb,
+        tipoTransaccion: tipo_convenio === "CBR" ? "1" : "2",
+        numNumeroConvenioIAC: tipo_convenio === "CBR" ? convenio?.cod_iac_cnb : convenio?.cod_convenio_cnb,
         valReferencia1: datosTransValidacion?.ref1 ?? "",
         valReferencia2: datosTransValidacion?.ref2 ?? "",
         numValorTotalDebito: datosTransValidacion.valor ?? 0,
@@ -314,10 +316,7 @@ const RecaudoServiciosPublicosPrivados = () => {
             }));
             setDatosTransValidacion((old) => ({
               ...old,
-              valor:
-                formatMoney.format(
-                  res?.obj?.respuesta_davivienda?.numValorTotalFactura
-                ) ?? "",
+              valor: res?.obj?.respuesta_davivienda?.numValorTotalFactura ?? "",
             }));
             setShowModal((old) => ({ ...old, estadoPeticion: 1 }));
           } else {

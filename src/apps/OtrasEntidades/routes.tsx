@@ -2,6 +2,7 @@ import AppIcons from "../../components/Base/AppIcons/AppIcons";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import { TypingRoutes } from "../../utils/TypingUtils";
 import rutasTripleA from "../OtrasEntidades/TripleA/rutasTripleA"
+import rutasCrezcamos from "./Crezcamos/routes";
 
 const routesOtrasEntidades = {
   link: "/OtrasEntidades",
@@ -9,9 +10,10 @@ const routesOtrasEntidades = {
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
-  permission: [1],
+  permission: [158],
   subRoutes: [
     rutasTripleA,
+    rutasCrezcamos,
   ],
 };
 

@@ -10,8 +10,29 @@ const filterExtraDigit = (data, digits = 0) => {
     return data;
   }
 
-  return `${arr[0]},${arr[1].substring(0, digits)}`;
+  return `${arr[0]},${arr[1].substring(
+    0,
+    digits + arr[1].replace(/\d/g, "").length
+  )}`;
 };
+
+const getDecimal = (data, digits = 0) => {
+  if (!digits) return "";
+
+  const arr = data.split(/,/);
+  if (arr.length < 2) return "";
+
+  return `,${arr[1].substring(0, digits + arr[1].replace(/\d/g, "").length)}`;
+};
+
+export const moneyValidatorDecimal = (
+  value,
+  { negativeValues = false, decimalDigits = 0 }
+) =>
+  Math.round(
+    moneyValidator(filterExtraDigit(value, decimalDigits), negativeValues) *
+      Math.pow(10, decimalDigits)
+  ) / Math.pow(10, decimalDigits);
 
 const useMoney = ({
   limits = [0, 10000000],
@@ -23,17 +44,17 @@ const useMoney = ({
   const onChangeMoney = useCallback(
     (ev) => {
       const moneyFormatter = makeMoneyFormatter(decimalDigits);
+      const required = ev?.target?.required ?? true;
 
       let caret_pos = ev.target.selectionStart ?? 0;
 
       const filteredValue = filterExtraDigit(ev.target.value, decimalDigits);
       const len = filteredValue.length;
 
-      const moneyValue =
-        Math.round(
-          moneyValidator(filteredValue, negativeValues) *
-            Math.pow(10, decimalDigits)
-        ) / Math.pow(10, decimalDigits);
+      const moneyValue = moneyValidatorDecimal(filteredValue, {
+        negativeValues,
+        decimalDigits,
+      });
 
       const [min, max] = limits;
       if (moneyValue === min && equalErrorMin) {
@@ -60,12 +81,16 @@ const useMoney = ({
         ev.target.setCustomValidity("");
       }
 
-      const toAdd =
-        [",", "."].includes(filteredValue.at(-1) ?? "") && decimalDigits
-          ? ","
-          : "";
+      if (!required && !moneyValue) {
+        ev.target.setCustomValidity("");
+      }
+
+      const decimalPart = getDecimal(ev.target.value, decimalDigits);
+
       ev.target.value =
-        moneyValue === 0 ? "$ " : moneyFormatter.format(moneyValue) + toAdd;
+        moneyValue === 0
+          ? "$ "
+          : moneyFormatter.format(Math.floor(moneyValue)) + decimalPart;
 
       ev.target.focus();
       caret_pos += ev.target.value.length - len;

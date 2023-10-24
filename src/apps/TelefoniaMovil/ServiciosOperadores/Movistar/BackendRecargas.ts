@@ -4,7 +4,7 @@ import {
   fetchCustom,
   FuctionEvaluateResponse,
   defaultParamsError,
-} from "../../DynamicTelefoniaMovil/utils/utils";
+} from "../../DynamicTelefoniaMovil/utils/fetchUtils";
 import {
   TypeInputPromisesRecargas,
   TypeOutputDataRecargas,
@@ -15,23 +15,23 @@ import { FuctionEvaluateResponseMovistar } from "./utilsMovistar";
 const url_trx_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-recargas/metodo1/trx-recarga`;
 const url_consulta_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-recargas/metodo1/consulta-recarga`;
 const trxParamsError: ParamsError = {
-  errorFetchCustomCode: {
+  errorCustomFetchCode: {
     typeNotify: "notifyError",
     ignoring: false,
   },
-  errorFetchCustomApiGateway: {
+  errorCustomApiGateway: {
     typeNotify: "notifyError",
     ignoring: false,
   },
-  errorFetchCustomApiGatewayTimeout: {
-    typeNotify: undefined,
-    ignoring: true,
-  },
-  errorFetchCustomBackend: {
+  errorCustomApiGatewayTimeout: {
     typeNotify: "notifyError",
     ignoring: false,
   },
-  errorFetchCustomBackendUser: {
+  errorCustomBackend: {
+    typeNotify: "notifyError",
+    ignoring: false,
+  },
+  errorCustomBackendUser: {
     typeNotify: "notify",
     ignoring: true,
   },
@@ -58,7 +58,8 @@ export const useBackendRecargasMovistar = (
     let id_movistar = null;
     let response = {
       status: false,
-      ticket: {},
+      id_trx: null,
+      ticket: null,
     };
     setStatePeticion(true);
     //?-----Iniciar intervalo para la alertas del usuario debido a la demora de la transaccion
@@ -151,6 +152,7 @@ export const useBackendRecargasMovistar = (
         );
         response = {
           status: fetchPaso2Result?.status,
+          id_trx: null,
           ticket: JSON.parse(fetchPaso2Result?.obj?.result?.ticket),
         };
       } catch (error: any) {
@@ -208,6 +210,7 @@ export const useBackendRecargasMovistar = (
         );
         response = {
           status: analysis?.status,
+          id_trx: null,
           ticket: analysis?.obj?.result?.ticket,
         };
       } catch (error) {

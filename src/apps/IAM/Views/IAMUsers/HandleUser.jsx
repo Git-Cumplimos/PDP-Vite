@@ -30,6 +30,7 @@ const HandleUser = () => {
 
   const [userData, setUserData] = useState(null);
   const [userGroups, setUserGroups] = useState(null);
+  const [userCommerces, setUserCommerces] = useState(null);
   const [docTypes, setDocTypes] = useState(null);
 
   const [selected, setSelected] = useState(null);
@@ -72,6 +73,25 @@ const HandleUser = () => {
     },
     [handleClose]
   );
+  const onSelectMultipleCommerce = useCallback(
+    (selectedCommerce) => {
+      setSelected((old) => ({
+        ...old,
+        comercios_relacionados: [
+          ...(old.comercios_relacionados ?? []),
+          selectedCommerce,
+        ].filter(
+          ({ pk_comercio }, index, self) =>
+            index ===
+            self.findIndex(
+              ({ pk_comercio: id_compare }) => pk_comercio === id_compare
+            )
+        ),
+      }));
+      handleClose();
+    },
+    [handleClose]
+  );
 
   const onSubmit = useCallback(
     (ev) => {
@@ -85,6 +105,7 @@ const HandleUser = () => {
             doc_type_id: selected?.doc_type_id,
             phone: selected?.phone,
             direccion: selected?.direccion,
+            is_comercio_padre: selected?.is_comercio_padre,
           }
         : {
             uuid: selected?.uuid,
@@ -92,6 +113,7 @@ const HandleUser = () => {
             phone: selected?.phone,
             direccion: selected?.direccion,
             active: selected?.active,
+            is_comercio_padre: selected?.is_comercio_padre,
           };
       if (isCreate) {
         const formData = new FormData(ev.target);
@@ -104,6 +126,11 @@ const HandleUser = () => {
 
       if (selected?.fk_id_comercio) {
         bodyData.fk_id_comercio = selected?.fk_id_comercio;
+      }
+      if (selected?.comercios_relacionados) {
+        bodyData.comercios_relacionados = (
+          selected?.comercios_relacionados ?? []
+        ).map(({ pk_comercio }) => pk_comercio);
       }
 
       notifyPending(
@@ -189,6 +216,19 @@ const HandleUser = () => {
     },
     { delay: 100 }
   );
+  const [getUserCommerces] = useFetchDispatchDebounce(
+    {
+      onSuccess: useCallback((res) => setUserCommerces(res?.obj), []),
+      onError: useCallback((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error.message);
+        } else {
+          console.error(error);
+        }
+      }, []),
+    },
+    { delay: 100 }
+  );
   const [getDocTypes] = useFetchDispatchDebounce(
     {
       onSuccess: useCallback((res) => setDocTypes(res?.obj), []),
@@ -207,10 +247,11 @@ const HandleUser = () => {
     if (!isNaN(parseInt(uuid))) {
       getUser(`${url}/user-unique?uuid=${uuid}`);
       getUserGroups(`${url}/user-groups?uuid=${uuid}`);
+      getUserCommerces(`${url}/user-commerce?uuid=${uuid}`);
     } else {
       getDocTypes(`${url_types}/type-doc`);
     }
-  }, [uuid, getUser, getUserGroups, getDocTypes]);
+  }, [uuid, getUser, getUserGroups, getDocTypes, getUserCommerces]);
 
   useEffect(() => {
     if (isNaN(parseInt(uuid))) {
@@ -218,9 +259,13 @@ const HandleUser = () => {
       setSelected({});
     } else {
       setIsCreate(false);
-      setSelected({ ...userData, groups_user: userGroups });
+      setSelected({
+        ...userData,
+        groups_user: userGroups,
+        comercios_relacionados: userCommerces,
+      });
     }
-  }, [uuid, userData, userGroups]);
+  }, [uuid, userData, userGroups, userCommerces]);
 
   if (!selected) {
     return <Fragment />;
@@ -456,6 +501,18 @@ const HandleUser = () => {
               }
             />
           )}
+          <ToggleInput
+            id={`is_comercio_padre_edit`}
+            name={`is_comercio_padre`}
+            label={"¿Es un usuario padre?"}
+            checked={selected?.is_comercio_padre ?? false}
+            onChange={() =>
+              setSelected((old) => ({
+                ...old,
+                is_comercio_padre: !old?.is_comercio_padre,
+              }))
+            }
+          />
         </Fieldset>
         <Fieldset legend={"Grupos del usuario"} className={"lg:col-span-2"}>
           <ButtonBar className={"lg:col-span-2"}>
@@ -494,10 +551,58 @@ const HandleUser = () => {
                 setSearchSelectFunction(() => onSelectGroup);
               }}
             >
-              Agregar grupos
+              Agregar grupo
             </Button>
           </ButtonBar>
         </Fieldset>
+        {selected?.is_comercio_padre && (
+          <Fieldset
+            legend={"Comercios relacionados"}
+            className={"lg:col-span-2"}
+          >
+            <ButtonBar className={"lg:col-span-2"}>
+              {selected?.comercios_relacionados?.length > 0 ? (
+                selected?.comercios_relacionados?.map(
+                  ({ pk_comercio, nombre_comercio }, ind) => (
+                    <button
+                      type="button"
+                      className="rounded-md bg-primary-light px-4 py-2 my-2 text-base text-white"
+                      title={nombre_comercio}
+                      key={ind}
+                    >
+                      {pk_comercio}) {nombre_comercio} &nbsp;&nbsp;
+                      <span
+                        className="bi bi-x-lg pointer-events-auto"
+                        onClick={() =>
+                          setSelected((old) => {
+                            const copy = structuredClone(old);
+                            copy.comercios_relacionados.splice(ind, 1);
+                            return copy;
+                          })
+                        }
+                      />
+                    </button>
+                  )
+                )
+              ) : (
+                <h1 className="text-xl text-center my-auto">
+                  No hay comercios relacionados
+                </h1>
+              )}
+            </ButtonBar>
+            <ButtonBar className={"lg:col-span-2"}>
+              <Button
+                type="button"
+                onClick={() => {
+                  setSearchType("commerce");
+                  setSearchSelectFunction(() => onSelectMultipleCommerce);
+                }}
+              >
+                Agregar comercio
+              </Button>
+            </ButtonBar>
+          </Fieldset>
+        )}
         <ButtonBar className={"lg:col-span-2"}>
           <Button type="submit">
             {isCreate ? "Crear" : "Actualizar"} usuario

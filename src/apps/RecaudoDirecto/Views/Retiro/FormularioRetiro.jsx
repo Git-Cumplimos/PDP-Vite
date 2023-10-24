@@ -15,7 +15,7 @@ import { onChangeNumber } from "../../../../utils/functions";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
 const limitesMontos = {
-  max: 99999999,
+  max: 9999999,
   min: 1,
 };
 
@@ -259,6 +259,9 @@ const FormularioRetiro = () => {
               name="valor_total_trx"
               autoComplete="off"
               value={(dataRetiro.valor - dataRetiro.valor_retirado ?? 0)}
+              maxLength={"11"}
+              min={limitesMontos.min}
+              max={limitesMontos.max}
               disabled
               required
             />
@@ -269,6 +272,7 @@ const FormularioRetiro = () => {
               autoComplete="off"
               min={dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]}
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
+              maxLength={"11"}
               max={validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })

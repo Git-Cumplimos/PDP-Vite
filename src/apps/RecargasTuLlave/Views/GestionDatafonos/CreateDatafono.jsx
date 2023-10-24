@@ -184,6 +184,13 @@ const CreateDatafono = () => {
         value = value.toLowerCase() === "false" ? false : true;
       }
     }
+    if (
+      ev.target.name === "tarjeta_sim" ||
+      ev.target.name === "numero_serie" ||
+      ev.target.name === "hardware_id"
+    ) {
+      value = value.toUpperCase();
+    }
     setDataDatafono((old) => {
       return { ...old, [ev.target.name]: value };
     });
@@ -221,8 +228,8 @@ const CreateDatafono = () => {
             type='text'
             autoComplete='off'
             value={dataDatafono?.["numero_serie"]}
-            maxLength={15}
-            onChange={onChangeFormatNumber}
+            maxLength={16}
+            onChange={onChangeFormat}
             required
             disabled={
               loadingPeticionConsultaDatafono ||
@@ -253,8 +260,8 @@ const CreateDatafono = () => {
             type='text'
             autoComplete='off'
             value={dataDatafono?.["tarjeta_sim"]}
-            maxLength={15}
-            onChange={onChangeFormatNumber}
+            maxLength={25}
+            onChange={onChangeFormat}
             required
             disabled={
               loadingPeticionConsultaDatafono ||

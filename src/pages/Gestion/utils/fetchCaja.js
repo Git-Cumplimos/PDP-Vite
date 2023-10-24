@@ -8,13 +8,16 @@ const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
 const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
 const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
 const urlCierreCaja = `${process.env.REACT_APP_URL_CAJA}/transacciones`;
+const urltransacciones =`${process.env.REACT_APP_URL_CAJA}/transacciones`;
 
+// const urlCierreCaja = `http://localhost:5000/transacciones`;
 // const urlArqueo = `http://localhost:5000/arqueo`;
 // const urlCaja = `http://localhost:5000/caja`;
 // const urlComprobantes = `http://localhost:5000/comprobantes`;
 // const urlCuentas = `http://localhost:5000/cuentas`;
 // const urlNotas = `http://localhost:5000/notas`;
 // const urlReportes = `http://localhost:5000/reportes`;
+// const urltransacciones = `http://localhost:5000/transacciones`;
 
 const buildGetFunction = (url) => {
   return async (args = {}) => {
@@ -24,7 +27,6 @@ const buildGetFunction = (url) => {
         if (res?.msg) {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
-
         throw new Error("Error interno del servicio", { cause: "custom" });
       }
       return res;
@@ -33,6 +35,7 @@ const buildGetFunction = (url) => {
     }
   };
 };
+
 const buildPostFunction = (url) => {
   return async (body) => {
     if (!body) {
@@ -44,9 +47,8 @@ const buildPostFunction = (url) => {
         if (res?.msg) {
           throw new Error("Error en la peticion", { cause: "custom" });
         }
-
         throw new Error("Error interno del servicio", { cause: "custom" });
-      }
+      } 
       return res;
     } catch (err) {
       throw err;
@@ -83,50 +85,33 @@ export const confirmaArqueo = buildPostFunction(`${urlArqueo}/administrar`);
 export const confirmaCierre = buildPostFunction(`${urlCaja}/cierre/usuario`);
 export const searchCash = buildGetFunction(`${urlCaja}/cash`);
 // export const searchCierre = buildGetFunction(`${urlCaja}/consultacierre`);
-export const searchCierre = buildGetFunction(
-  `${urlCaja}/consulta-cierre-state`
-);
+export const searchCierre = buildGetFunction(`${urlCaja}/consulta-cierre-state`);
 // export const searchHistorico = buildGetFunction(`${urlCaja}/consultahistoricos`);
 export const searchHistorico = buildGetFunction(`${urlCaja}/cierre/usuario`);
 export const crearEntidad = buildPostFunction(`${urlCuentas}/administrar`);
 export const buscarEntidades = buildGetFunction(`${urlCuentas}/administrar`);
 export const editarEntidades = buildPutFunction(`${urlCuentas}/administrar`);
 
-export const buscarTiposComprobantes = buildGetFunction(
-  `${urlComprobantes}/tipos`
-);
-export const subirComprobante = buildGetFunction(
-  `${urlComprobantes}/upload-file`
-);
-export const buscarReporteCierreCaja = buildPostFunction(
-  `${urlCierreCaja}/reporte`
-);
-export const buscarListaComerciosCierreCaja = buildGetFunction(
-  `${urlCierreCaja}/comercios`
-);
-export const descargarComprobante = buildGetFunction(
-  `${urlComprobantes}/download-file`
-);
-export const agregarComprobante = buildPostFunction(
-  `${urlComprobantes}/administrar`
-);
-export const buscarComprobantes = buildGetFunction(
-  `${urlComprobantes}/administrar`
-);
-export const editarComprobante = buildPutFunction(
-  `${urlComprobantes}/administrar`
-);
+export const editarExterno = buildPutFunction(`${urlCuentas}/crear_externo`);
+export const crearPltExterno = buildPostFunction(`${urlCuentas}/crear_externo`);
+export const buscarPlataformaExt = buildGetFunction(`${urlCuentas}/crear_externo`);
+
+export const buscarTiposComprobantes = buildGetFunction(`${urlComprobantes}/tipos`);
+export const subirComprobante = buildGetFunction(`${urlComprobantes}/upload-file`);
+export const buscarReporteCierreCaja = buildPostFunction(`${urlCierreCaja}/reporte`);
+export const buscarListaComerciosCierreCaja = buildGetFunction(`${urlCierreCaja}/comercios`);
+export const descargarComprobante = buildGetFunction(`${urlComprobantes}/download-file`);
+export const agregarComprobante = buildPostFunction(`${urlComprobantes}/administrar`);
+export const buscarComprobantes = buildGetFunction(`${urlComprobantes}/administrar`);
+export const buscarComprobantesCajero = buildGetFunction(`${urlComprobantes}/comprobantes_cajero`);
+export const editarComprobante = buildPutFunction(`${urlComprobantes}/administrar`);
 
 export const agregarNota = buildPostFunction(`${urlNotas}/administrar`);
 export const buscarNotas = buildGetFunction(`${urlNotas}/administrar`);
 
-export const buscarReporteTrxArqueo = () => {
-  return `${urlReportes}/trx-arqueo-usuario`
-};
+export const buscarReporteTrxArqueo = () => {return `${urlReportes}/trx-arqueo-usuario`};
 
-export const buscarTicketReporte = buildGetFunction(
-  `${urlReportes}/trx-ticket`
-);
+export const buscarTicketReporte = buildGetFunction(`${urlReportes}/trx-ticket`);
 
 export const buscarReportesArqueo = async (args) => {
   try {
@@ -143,7 +128,6 @@ export const buscarReportesArqueo = async (args) => {
     ) {
       return response;
     }
-
     const res = await response.json();
     if (!res?.status) {
       if (res?.msg) {
@@ -157,3 +141,7 @@ export const buscarReportesArqueo = async (args) => {
     throw err;
   }
 };
+export const buscarIdTrx = buildGetFunction(`${urltransacciones}/id_Trx`);
+export const ReportFaltantesSobr = buildPostFunction(`${urltransacciones}/sobrantes_faltantes`);
+export const VldFaltantesSobr = buildGetFunction(`${urltransacciones}/vld_sobrantes_faltantes`);
+export const editarNovedad = buildPutFunction(`${urltransacciones}/upd_sobrantes_faltantes`);

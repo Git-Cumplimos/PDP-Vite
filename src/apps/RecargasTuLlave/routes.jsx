@@ -1,5 +1,8 @@
 import { lazy } from "react";
-import { enumPermisosTuLlave } from "./enumPermisosTuLlave";
+import {
+  enumPermisosTuLlave,
+  enumPermisosTuLlaveAdmin,
+} from "./enumPermisosTuLlave";
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 
@@ -21,45 +24,64 @@ const TransaccionRecargaDatafono = lazy(() =>
 const TransaccionRecargaTarjeta = lazy(() =>
   import("./Views/RecargaTullave/TransaccionRecargaTarjeta")
 );
+const AdminRecargasTuLlave = lazy(() =>
+  import("./Views/GestionDatafonos/index")
+);
 
 const CorresponsaliaTuLlave = lazy(() => import("./CorresponsaliaTuLlave"));
 
 const listPermissions = Object.values(enumPermisosTuLlave);
 export const listPermissionsTuLlave = listPermissions;
+export const listPermissionsTuLlaveAdmin = Object.values(
+  enumPermisosTuLlaveAdmin
+);
 
-const rutasRecargasTullave = {
-  link: "/recargas-tu-llave",
-  label: <AppIcons Logo={"RECARGASTULLAVE"} name='Recargas Tu Llave' />,
-  component: CorresponsaliaTuLlave,
-  permission: listPermissionsTuLlave,
+export const rutasGestionRecargasTullave = {
+  link: "/GestionTransaccional/recargas-tu-llave",
+  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Gestión Recargas Tullave" />,
+  component: AdminRecargasTuLlave,
+  permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
   subRoutes: [
     {
-      link: "/recargas-tu-llave/gestion-datafonos",
-      label: <AppIcons Logo={"DAVIPLATA"} name='Gestión datáfonos' />,
+      link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos",
+      label: (
+        <AppIcons
+          Logo={"TULLAVE_GESTION_DATAFONO"}
+          name="Gestión Datáfonos Tullave"
+        />
+      ),
       component: MainGestionDatafonos,
-      permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
+      permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
       subRoutes: [
         {
-          link: "/recargas-tu-llave/gestion-datafonos/crear",
+          link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos/crear",
           label: <AppIcons Logo={"IMPUESTO"} name={"Crear datáfono"} />,
           component: CreateDatafono,
-          permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
+          permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
           show: false,
         },
         {
-          link: "/recargas-tu-llave/gestion-datafonos/editar/:id",
+          link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos/editar/:id",
           label: <AppIcons Logo={"RECAUDO"} name={"Editar datáfono"} />,
           component: CreateDatafono,
-          permission: [enumPermisosTuLlave.GESTION_DATAFONOS_TULLAVE],
+          permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
           show: false,
         },
       ],
     },
+  ],
+};
 
+const rutasRecargasTullave = {
+  link: "/recargas-tu-llave",
+  label: <AppIcons Logo={"RECARGASTULLAVE"} name="Recargas Tullave" />,
+  component: CorresponsaliaTuLlave,
+  permission: listPermissionsTuLlave,
+  subRoutes: [
     {
       link: "/recargas-tu-llave/recarga-datafonos",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga datáfonos' />
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Recarga datáfonos" />
       ),
       component: MainRecargaDatafonos,
       permission: [enumPermisosTuLlave.RECARGA_DATAFONOS_TULLAVE],
@@ -68,7 +90,7 @@ const rutasRecargasTullave = {
           link: "/recargas-tu-llave/recarga-datafonos/transaccion/:id",
           label: (
             <AppIcons
-              Logo={"DAVIVIENDA_PAGO_POR_GIRO"}
+              Logo={"TULLAVE_GESTION_DATAFONO"}
               name={"Recarga datáfonos"}
             />
           ),
@@ -81,7 +103,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/recarga-tarjetas",
       label: (
-        <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name='Recarga tarjetas' />
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Recarga tarjetas" />
       ),
       component: TransaccionRecargaTarjeta,
       permission: [enumPermisosTuLlave.RECARGA_TARJETAS_TULLAVE],

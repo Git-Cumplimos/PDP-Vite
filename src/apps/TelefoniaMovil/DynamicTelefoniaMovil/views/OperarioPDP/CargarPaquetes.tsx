@@ -7,11 +7,10 @@ import Button from "../../../../../components/Base/Button/Button";
 import Input from "../../../../../components/Base/Input/Input";
 
 import classes from "./CargarPaquetes.module.css";
-import { PropsBackendRecargas } from "../../utils/TypesSubModulos";
 import { useImgs } from "../../../../../hooks/ImgsHooks";
 
 type PropsCargaPaquetes = {
-  BackendCargaPaquetes: () => Promise<PropsBackendRecargas>;
+  BackendCargaPaquetes: () => Promise<any>;
 };
 
 const {
@@ -114,14 +113,14 @@ const CargarPaquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
 
   return (
     <div className="py-10 flex items-center flex-col">
-  <img
-      className="w-24  "
-      src={
-        operadorCurrent?.logo?.includes("http")
-          ? operadorCurrent?.logo
-          : svgs?.[operadorCurrent?.logo]
-      }
-    ></img>
+      <img
+        className="w-24  "
+        src={
+          operadorCurrent?.logo?.includes("http")
+            ? operadorCurrent?.logo
+            : svgs?.[operadorCurrent?.logo]
+        }
+      ></img>
       <FileInput
         id="contingencia"
         label={"pppppppppppppppppppppppp"}

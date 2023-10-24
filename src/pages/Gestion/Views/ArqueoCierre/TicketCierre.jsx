@@ -1,11 +1,6 @@
 import LogoPDP from "../../../../components/Base/LogoPDP";
 
-const TicketCierre = ({
-  refPrint,
-  type = "ORIGINAL",
-  ticket,
-  stateTrx = true,
-}) => {
+const TicketCierre = ({ refPrint, type = "ORIGINAL", ticket, stateTrx = true, }) => {
   if (!ticket) {
     return <div>Sin informacion de ticket</div>;
   }
