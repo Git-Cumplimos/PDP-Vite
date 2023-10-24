@@ -108,7 +108,7 @@ const PanelHistorico = () => {
         ["", ""],
       ],
       cajaInfo: [
-        ["movimientos del día",formatMoney.format(data.total_movimientos)],
+        ["Movimientos del día",formatMoney.format(data.total_movimientos)],
         ["", ""],
         ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior)],
         ["", ""],
