@@ -13,42 +13,61 @@ const ReporteComisionesComercios = lazy(() =>
 const ReporteConsignacionesTransportadora = lazy(() =>
   import("./views/ReporteConsignacionesTransportadora")
 );
+const ReportesComisionesPadres = lazy(() =>
+  import("./views/ReportesComisionesPadres")
+);
 
 export const rutasReportes = [
   {
     link: "/reportes/koncilia",
-    label: <AppIcons Logo={"RECAUDO"} name='Reportes koncilia' />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes koncilia" />,
     component: Koncilia,
     permission: [40],
   },
   {
     link: "/reportes/comercios",
-    label: <AppIcons Logo={"RECAUDO"} name='Reportes comercio' />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes comercio" />,
     component: ReporteComercios,
     permission: [40],
   },
   {
     link: "/reportes/comisiones",
-    label: <AppIcons Logo={"RECAUDO"} name='Reportes comisiones' />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes comisiones" />,
     component: ReporteComisiones,
     permission: [42],
   },
   {
     link: "/reportes/conteo-comisiones",
-    label: <AppIcons Logo={"RECAUDO"} name='Reportes conteo comisiones' />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes conteo comisiones" />,
     component: ReporteConteoComisiones,
     permission: [42],
   },
   {
     link: "/reportes/comisiones-comercio",
-    label: <AppIcons Logo={"RECAUDO"} name='Reportes comisiones comercio' />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes comisiones comercio" />,
     component: ReporteComisionesComercios,
     permission: [25001],
   },
   {
     link: "/reportes/consignaciones_transportadora",
-    label: <AppIcons Logo={"RECAUDO"} name='Reporte Consignaciones y Transportadora' />,
+    label: (
+      <AppIcons
+        Logo={"RECAUDO"}
+        name="Reporte Consignaciones y Transportadora"
+      />
+    ),
     component: ReporteConsignacionesTransportadora,
+    permission: [25001],
+  },
+  {
+    link: "/reportes/comisiones-usuario-padre",
+    label: (
+      <AppIcons
+        Logo={"RECAUDO"}
+        name="Reporte comisiones hijos"
+      />
+    ),
+    component: ReportesComisionesPadres,
     permission: [25001],
   },
 ];
