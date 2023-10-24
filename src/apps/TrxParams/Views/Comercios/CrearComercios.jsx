@@ -593,7 +593,6 @@ const CrearComercios = () => {
             }
           />
         </Fieldset>
-
         <Fieldset legend="Ubicación comercio" className="lg:col-span-2">
           <Input
             id="direccion_comercio"
