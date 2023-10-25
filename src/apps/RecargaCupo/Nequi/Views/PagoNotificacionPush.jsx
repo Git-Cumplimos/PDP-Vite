@@ -1,21 +1,21 @@
-import Form from "../../../components/Base/Form";
-import Input from "../../../components/Base/Input";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import Button from "../../../components/Base/Button";
+import Form from "../../../../components/Base/Form";
+import Input from "../../../../components/Base/Input";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
 import { Fragment, useCallback, useRef, useState } from "react";
-import Modal from "../../../components/Base/Modal";
+import Modal from "../../../../components/Base/Modal";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import {
   notifyError,
   notifyPending,
-} from "../../../utils/notify";
-import Tickets from "../../../components/Base/Tickets/Tickets"
-import PaymentSummary from "../../../components/Compound/PaymentSummary";
+} from "../../../../utils/notify";
+import Tickets from "../../../../components/Base/Tickets/Tickets"
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
   formatMoney,
-} from "../../../components/Base/MoneyInput";
-import { useAuth } from "../../../hooks/AuthHooks";
+} from "../../../../components/Base/MoneyInput";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import { enumParametrosNequi } from "../utils/enumParametrosNequi";
 import { v4 } from "uuid";
 import { useFetchNequi } from "../hooks/fetchNequi";

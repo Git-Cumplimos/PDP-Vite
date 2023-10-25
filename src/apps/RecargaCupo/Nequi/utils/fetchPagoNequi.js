@@ -1,5 +1,5 @@
-import fetchData from "../../../utils/fetchData";
-import { notify } from "../../../utils/notify";
+import fetchData from "../../../../utils/fetchData";
+import { notify } from "../../../../utils/notify";
 
 export const fetchCustom = (
   url_,

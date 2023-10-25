@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, fetchCustom } from "../utils/fetchPagoNequi";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
