@@ -88,11 +88,11 @@ const Nequi = () => {
     (ev) => {
       ev.preventDefault();
       const data = {
-        id_uuid_trx: uuid,
         comercio: {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
+          id_uuid_trx: uuid,
         },
         nombre_comercio: roleInfo?.["nombre comercio"],
         oficina_propia:
@@ -101,14 +101,13 @@ const Nequi = () => {
             ? true
             : false,
         nombre_usuario: pdpUser?.uname ?? "",
-        ubicacion: {
-          address: roleInfo?.["direccion"],
-          dane_code: roleInfo?.codigo_dane,
-          city: roleInfo?.["ciudad"],
-        },
-        valor_trx_total: valor,
+        address: roleInfo?.["direccion"],
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.["ciudad"],
+        valor_total_trx: valor,
         Datos:{
-          num_celular: numeroTelefono
+          num_celular: numeroTelefono,
+          uuid_trx: uuid
         }
       };
       const dataAditional = {
