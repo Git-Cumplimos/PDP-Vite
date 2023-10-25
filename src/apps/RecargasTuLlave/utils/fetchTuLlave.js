@@ -6,7 +6,7 @@ const urlParametrizacion =
 const URL_CORRESPONSALIA_OTROS = process.env.REACT_APP_URL_CORRESPONSALIA_OTROS;
 
 // const urlReporte = `http://localhost:5000/tu-llave`;
-const urlReporte = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/`;
+const urlReporte = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave`;
  
 export const buscarReporteTrxTuLlave = () => {return `${urlReporte}/reporte-trx`};
 
