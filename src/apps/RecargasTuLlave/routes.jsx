@@ -117,7 +117,7 @@ const rutasRecargasTullave = {
         <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Consolidacion transacciones" />
       ),
       component: ReporteTuLLaveTrx,
-      permission: [enumPermisosTuLlave.RECARGA_TARJETAS_TULLAVE],
+      permission: [enumPermisosTuLlave.CONSOLIDACION_TULLAVE],
     },
   ],
 };
