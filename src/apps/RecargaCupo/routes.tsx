@@ -1,7 +1,8 @@
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import { TypingRoutes } from "../../utils/TypingUtils";
-import rutasNequi from "../RecargaCupo/Nequi/routes";
+import rutasNequi,  { listPermissionsNequi } from "./Nequi/routes";
+
 
 const routesRecargaCupo = {
   link: "/RecargaCupo",
@@ -9,7 +10,7 @@ const routesRecargaCupo = {
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
-  permission: [33000],
+  permission: [...listPermissionsNequi],
   subRoutes: [
     rutasNequi,
   ],
