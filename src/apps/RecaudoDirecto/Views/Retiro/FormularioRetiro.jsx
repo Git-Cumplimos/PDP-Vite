@@ -174,6 +174,7 @@ const FormularioRetiro = () => {
           referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
         },
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        nombre_usuario: pdpUser?.uname ?? "",
         direccion: roleInfo?.direccion ?? ""
       };
       modRetiro(data)
@@ -191,7 +192,7 @@ const FormularioRetiro = () => {
       setDisableBtn(false); 
       notifyError("El valor recibido no cumple con los limites establecidos");
     }
-  }, [dataRetiro, roleInfo, dataReferencias, id_trx, valorRecibido,
+  }, [dataRetiro, roleInfo, pdpUser, dataReferencias, id_trx, valorRecibido,
     dataConvRetiro, pk_id_convenio, handleClose, validarLimiteMax])
 
   return (

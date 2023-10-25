@@ -165,6 +165,7 @@ const RecaudoConjunto = () => {
         roleInfo?.tipo_comercio === "KIOSCO",
       ...valorRecibido,
       nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+      nombre_usuario: pdpUser?.uname ?? "",
       direccion: roleInfo?.direccion ?? ""
     };
 
@@ -208,7 +209,7 @@ const RecaudoConjunto = () => {
       notifyError("El valor recibido no cumple con los limites establecidos") 
     }
 
-  }, [roleInfo, valorRecibido, dataRecaudo, id_trx,
+  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
