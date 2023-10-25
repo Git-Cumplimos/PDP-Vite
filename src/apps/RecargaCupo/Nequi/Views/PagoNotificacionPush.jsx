@@ -25,7 +25,7 @@ const URL_CONSULTA_TRX_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/n
 const costoTrx = parseInt(enumParametrosNequi.costoTransaccion)
 const impuesto = parseInt(enumParametrosNequi.porcentajeImpuesto)
 
-const Nequi = () => {
+const PagoNotificacionPush = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
@@ -246,4 +246,4 @@ const Nequi = () => {
   );
 };
 
-export default Nequi;
+export default PagoNotificacionPush;

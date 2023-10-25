@@ -4,7 +4,7 @@ import { useCallback, useEffect } from "react";
 import { notifyError } from "../../utils/notify";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 
-const RecargarCupo = ({ subRoutes }) => {
+const RecargaCupoMenu = ({ subRoutes }) => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
@@ -42,4 +42,4 @@ const RecargarCupo = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default RecargarCupo;
+export default RecargaCupoMenu;
