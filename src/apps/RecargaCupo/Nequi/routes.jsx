@@ -16,7 +16,7 @@ export const listPermissionsNequi = listPermissions;
 
 const rutasNequi = {
   //corresponsaliaNequi
-  link: "/Nequi",
+  link: "/recarga-cupo/nequi",
   label: <AppIcons Logo={"NEQUI"} name="Nequi" />,
   component: Nequi,
   permission: listPermissionsNequi,

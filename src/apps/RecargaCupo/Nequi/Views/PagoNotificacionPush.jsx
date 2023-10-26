@@ -190,16 +190,6 @@ const PagoNotificacionPush = () => {
                 <Button type={"submit"} disabled={loadingPeticionPagoNotificacionPush}>
                     Realizar Recarga
                 </Button>
-                <Button
-                    type='button'
-                    onClick={() => 
-                        {
-                        goToRecaudo();
-                        notifyError("Transacción cancelada por el usuario");
-                        }}
-                    >
-                    Cancelar
-                </Button>
             </ButtonBar>
         </Form>
         <Modal
@@ -222,11 +212,6 @@ const PagoNotificacionPush = () => {
               <Form onSubmit={makeCashOut}>
                 <ButtonBar>
                   <Button
-                    type='submit'
-                    disabled={loadingPeticionPagoNotificacionPush}>
-                    Aceptar
-                  </Button>
-                  <Button
                     type='button'
                     onClick={() => 
                       {
@@ -235,6 +220,11 @@ const PagoNotificacionPush = () => {
                       }}
                     disabled={loadingPeticionPagoNotificacionPush}>
                     Cancelar
+                  </Button>
+                  <Button
+                    type='submit'
+                    disabled={loadingPeticionPagoNotificacionPush}>
+                    Aceptar
                   </Button>
                 </ButtonBar>
               </Form>
