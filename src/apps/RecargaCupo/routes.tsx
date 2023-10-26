@@ -5,7 +5,7 @@ import rutasNequi,  { listPermissionsNequi } from "./Nequi/routes";
 
 
 const routesRecargaCupo = {
-  link: "/RecargaCupo",
+  link: "/recarga-cupo",
   label: <AppIcons Logo={"RECARGA_CUPO"} name="Recargar Cupo" />,
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />

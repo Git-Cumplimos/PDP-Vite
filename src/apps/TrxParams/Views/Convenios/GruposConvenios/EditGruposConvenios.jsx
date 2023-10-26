@@ -115,14 +115,15 @@ const EditGruposConvenios = () => {
     let obj = {};
     obj["fk_tbl_grupo_convenios"] = parseInt(params.id);
     if (datosBusqueda.fk_convenio !== "")
-      obj["fk_convenio"] = parseInt(datosBusqueda.fk_convenio);
+      obj["pk_fk_id_convenio"] = parseInt(datosBusqueda.fk_convenio);
     if (datosBusqueda.nombre_convenio !== "")
       obj["nombre_convenio"] = datosBusqueda.nombre_convenio;
+    console.log(obj)
     fetchConveniosGrupoConvenios({
       ...obj,
       page,
       limit,
-      sortBy: "fk_convenio",
+      sortBy: "pk_fk_id_convenio",
       sortDir: "DESC",
     })
       .then((autoArr) => {
@@ -135,15 +136,15 @@ const EditGruposConvenios = () => {
     (e, i) => {
       e.preventDefault();
       const fk_convenio =
-        selectedGruposConvenios.convenios_agregar[i].fk_convenio;
+        selectedGruposConvenios.convenios_agregar[i].id_convenio_autorizador;
       const obj = { ...selectedGruposConvenios };
       if (
         selectedGruposConvenios?.convenios_agregar?.find(
-          (a) => a?.fk_convenio === fk_convenio
+          (a) => a?.id_convenio_autorizador === fk_convenio
         )
       ) {
         const b = obj["convenios_agregar"].filter(
-          (a) => a?.fk_convenio !== fk_convenio
+          (a) => a?.id_convenio_autorizador !== fk_convenio
         );
         obj["convenios_agregar"] = b;
       }
@@ -183,7 +184,7 @@ const EditGruposConvenios = () => {
         if (
           !selectedGruposConvenios?.convenios_agregar?.find(
             (a) =>
-              a?.fk_convenio ===
+              a?.id_convenio_autorizador ===
               parseInt(selectedGruposConvenios["id_convenio"])
           )
         ) {
@@ -240,10 +241,11 @@ const EditGruposConvenios = () => {
   const addEliminarComercio = useCallback(
     (ev, i) => {
       ev.preventDefault();
-      const fk_convenio = convenios[i].fk_convenio;
+      const pk_id_convenio = convenios[i].fk_convenio;
+      const fk_convenio = convenios[i].pk_fk_id_convenio;
       if (
         !selectedGruposConvenios?.convenios_eliminar?.find(
-          (a) => a?.fk_convenio === parseInt(fk_convenio)
+          (a) => a?.fk_convenio === parseInt(pk_id_convenio)
         )
       ) {
         const obj = { ...selectedGruposConvenios };
@@ -251,9 +253,10 @@ const EditGruposConvenios = () => {
         obj["convenios_eliminar"] = [
           ...obj["convenios_eliminar"],
           {
-            fk_convenio: parseInt(fk_convenio),
+            fk_convenio: parseInt(pk_id_convenio),
             fk_tbl_grupo_convenios:
               selectedGruposConvenios["pk_tbl_grupo_convenios"],
+            pk_fk_id_convenio: fk_convenio,
           },
         ];
         setSelectedGruposConvenios((old) => {
@@ -279,15 +282,20 @@ const EditGruposConvenios = () => {
     });
   }, []);
   const dataTable = useMemo(() => {
-    return convenios.map(({ fk_convenio, nombre_convenio }) => {
+    return convenios.map(({ pk_fk_id_convenio, nombre_convenio,nombre_autorizador }) => {
       return {
-        fk_convenio,
+        pk_fk_id_convenio,
         nombre_convenio: nombre_convenio
           ? nombre_convenio
           : "No esta enlazado a convenios PDP",
+        nombre_autorizador,
       };
     });
   }, [convenios]);
+
+  console.log(convenios)
+
+  console.log(selectedGruposConvenios)
   return (
     <Fragment>
       <SimpleLoading show={isUploading} />
@@ -364,7 +372,7 @@ const EditGruposConvenios = () => {
           {selectedGruposConvenios?.convenios_eliminar?.length > 0 ? (
             <TagsAlongSide
               data={selectedGruposConvenios?.convenios_eliminar.map(
-                (it) => it.fk_convenio
+                (it) => it.pk_fk_id_convenio
               )}
               onSelect={onSelectConvenioDeleteEliminar}
             />
@@ -388,7 +396,7 @@ const EditGruposConvenios = () => {
       <TableEnterprise
         title='Convenios asociados al grupo originalmente'
         maxPage={maxPages}
-        headers={["Id", "Convenio"]}
+        headers={["Id", "Convenio","Autorizador"]}
         data={dataTable}
         onSelectRow={addEliminarComercio}
         onSetPageData={setPageData}>
