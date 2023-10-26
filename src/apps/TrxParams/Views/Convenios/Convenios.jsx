@@ -21,7 +21,7 @@ import {
 } from "../../utils/fetchRevalConvenios";
 
 const Convenios = () => {
-  const [{ searchConvenio = "", ean13Convenio = "", nombreAutorizador = ""}, setQuery] = useQuery();
+  const [{ searchConvenio = "", ean13Convenio = "", nombreAutorizador = 0}, setQuery] = useQuery();
   const [idConvenio, setIdConvenio] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -42,11 +42,15 @@ const Convenios = () => {
         // },
       ],
     });
+    setExistAuto(null)
     fetchConveniosUnique();
   }, []);
 
   const [{ page, limit }, setPageData] = useState({page: 1,limit: 10,});
   const [convenios, setConvenios] = useState([]);
+  const [autorizadores, setAutorizadores] = useState([]);
+  const [idselect, setIdselect] = useState();
+  const [existAuto, setExistAuto] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [tiposConvenios, setTiposConvenios] = useState([]);
   const [selectedConvenio, setSelectedConvenio] = useState({
@@ -101,23 +105,25 @@ const Convenios = () => {
     (e, i) => {
       setShowModal(true);
       setIsUploading(true);
-      fetchConveniosUnique({ id_convenio: convenios[i]?.["Id convenio"] })
+      fetchConveniosUnique({ id_convenio_autorizador: convenios[i]?.id_convenio_autorizador })
         .then((res) => {
           setIsUploading(false);
           const dataTemp = [...res?.results];
+          setIdselect(dataTemp[0].id_convenio_autorizador)
+          setExistAuto(dataTemp[0].pk_fk_id_autorizador)
           const dataSelect = dataTemp.map(
             ({
-              id_convenio,
+              pk_fk_id_convenio,
               fk_id_tipo_convenio,
               nombre_convenio,
               ean13,
               tags,
               referencias,
               nombre_tipo_convenio,
-              nombre_autorizador,
+              pk_fk_id_autorizador,
             }) => {
               return {
-                "Id convenio": id_convenio,
+                "Id convenio": pk_fk_id_convenio,
                 "Nombre de convenio": nombre_convenio,
                 Ean13: ean13,
                 pk_id_tipo_convenio: fk_id_tipo_convenio,
@@ -137,7 +143,7 @@ const Convenios = () => {
                       })
                     : []),
                 ],
-                nombre_autorizador: nombre_autorizador,
+                nombre_autorizador: pk_fk_id_autorizador,
               };
             }
           )[0];
@@ -203,7 +209,17 @@ const Convenios = () => {
         data = formData.getAll(col);
       } else if (col === "Ean13") {
         data = ((formData.get(col) ?? "").match(/\d/g) ?? []).join("");
-      } else {
+      } 
+      else if (col === "nombre_autorizador") {
+        if(existAuto != null){
+          if (existAuto !== parseInt(formData.get(col))) {
+            data = formData.get(col)
+          }
+        }else{
+          data = formData.get(col);
+        }
+      }
+      else {
         data = formData.get(col);
       }
       newData.push([col, data]);
@@ -212,7 +228,8 @@ const Convenios = () => {
       "Id convenio": old?.["Id convenio"] || -1,
       ...Object.fromEntries(newData),
     }));
-  }, []);
+  }, [existAuto]);
+
 
   const onSubmit = useCallback(
     (ev) => {
@@ -230,11 +247,11 @@ const Convenios = () => {
           obj = { ...obj, ean13: selectedConvenio?.Ean13 };
         }
         putConvenios(
-          { id_convenio: selectedConvenio?.["Id convenio"] },
+          { id_convenio_autorizador: idselect },
           {
             ...obj,
-            // id_convenio: selectedConvenio?.["Id convenio"],
-            nombre_autorizador: selectedConvenio?.["nombre_autorizador"],
+            pk_fk_id_convenio: selectedConvenio?.["Id convenio"],
+            pk_fk_id_autorizador: parseInt(selectedConvenio?.["nombre_autorizador"]),
             nombre_convenio: selectedConvenio?.["Nombre de convenio"],
             tags: selectedConvenio?.Tags.join(","),
             referencias: [
@@ -275,11 +292,11 @@ const Convenios = () => {
           obj = { ...obj, ean13: selectedConvenio?.Ean13 };
         }
         if (selectedConvenio?.id_convenio !== "") {
-          obj = { ...obj, id_convenio: selectedConvenio?.id_convenio };
+          obj = { ...obj, pk_fk_id_convenio: selectedConvenio?.id_convenio };
         }
         postConvenios({
           ...obj,
-          nombre_autorizador: selectedConvenio?.["nombre_autorizador"],
+          pk_fk_id_autorizador: parseInt(selectedConvenio?.["nombre_autorizador"]),
           nombre_convenio: selectedConvenio?.["Nombre de convenio"],
           tags: selectedConvenio?.Tags.join(","),
           referencias: [
@@ -315,7 +332,7 @@ const Convenios = () => {
           });
       }
     },
-    [selectedConvenio]
+    [selectedConvenio,idselect]
   );
 
   useEffect(() => {
@@ -324,19 +341,18 @@ const Convenios = () => {
 
   const fetchConveniosUniqueFetch = useCallback(() => {
     setIsUploading(true);
-    fetchConveniosUnique({ tags: searchConvenio, ean13:ean13Convenio, nombre_autorizador:nombreAutorizador, id_convenio:idConvenio, page, limit })
+    fetchConveniosUnique({ tags: searchConvenio, ean13:ean13Convenio, pk_fk_id_autorizador:nombreAutorizador===""?0:nombreAutorizador, pk_fk_id_convenio:idConvenio, page, limit })
       .then((res) => {
         setIsUploading(false);
-        setConvenios(
-          [...res?.results].map(({ id_convenio, nombre_convenio,ean13,nombre_autorizador }) => {
-            return {
-              "Id convenio": id_convenio,
-              "Nombre de convenio": nombre_convenio,
-              "EAN": ean13,
-              "Autorizador": nombre_autorizador,
-            };
+        const preAutorizadores = [{ "autorizador": "", "id_autorizador": "" },];
+        [...res?.autorizadores].map(({ nombre_autorizador, pk_id_autorizador }) => {
+          preAutorizadores.push( {
+            "autorizador": nombre_autorizador,
+            "id_autorizador": pk_id_autorizador,
           })
-        );
+        })
+        setAutorizadores(preAutorizadores)
+        setConvenios(res?.results ?? [])
         setMaxPages(res?.maxPages);
       })
       .catch((err) => {
@@ -408,7 +424,19 @@ const Convenios = () => {
         maxPage={maxPages}
         onChange={onChange}
         headers={["Id convenio", "Nombre convenio","EAN","Autorizador"]}
-        data={convenios}
+        data={convenios.map(
+          ({
+            pk_fk_id_convenio,
+            nombre_convenio,
+            ean13,
+            nombre_autorizador,
+          }) => ({
+            pk_fk_id_convenio,
+            nombre_convenio,
+            ean13,
+            nombre_autorizador,
+          })
+        )}
         onSelectRow={onSelectConvenio}
         onSetPageData={setPageData}>
         <Input
@@ -441,13 +469,11 @@ const Convenios = () => {
           id="nombreAutorizador"
           name="nombreAutorizador"
           label={"Nombre Autorizador"}
-          options={[
-            { value: "", label: "" },
-            { value: "Davivienda", label: "Davivienda" },
-            { value: "Colpatria", label: "Colpatria" },
-            { value: "Grupo Aval", label: "Grupo Aval" },
-            { value: "Banco Agrario", label: "Banco Agrario" },
-          ]}
+          options={
+            autorizadores.map(function(e){
+              return {value: e.id_autorizador, label: e.autorizador}
+            })
+          }
           defaultValue={nombreAutorizador}
         />
       </TableEnterprise>
@@ -501,14 +527,12 @@ const Convenios = () => {
             name="nombre_autorizador"
             label="Nombre autorizador"
             value={selectedConvenio?.nombre_autorizador}
-            options={[
-              { value: "", label: "" },
-              { value: "Davivienda", label: "Davivienda" },
-              { value: "Colpatria", label: "Colpatria" },
-              { value: "Grupo Aval", label: "Grupo Aval" },
-              { value: "Banco Agrario", label: "Banco Agrario" },
-            ]}
-            onChange={() =>{}}
+            options={
+              autorizadores.map(function(e){
+                return {value: e.id_autorizador, label: e.autorizador}
+              })
+            }
+            // onChange={() =>{}}
             required
           />
           <InputSuggestions
