@@ -25,10 +25,11 @@ const SearchConveniosNotInGruposConvenios = ({
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(({ nombre_convenio, id_convenio }) => {
+      ...convenios.map(({ nombre_convenio, pk_fk_id_convenio,nombre_autorizador }) => {
         return {
-          id_convenio,
+          pk_fk_id_convenio,
           nombre_convenio,
+          nombre_autorizador,
         };
       }),
     ];
@@ -39,16 +40,15 @@ const SearchConveniosNotInGruposConvenios = ({
   const fetchConveniosNotInGruposConveniosFunc = useCallback(() => {
     let obj = {};
     if (parseInt(dataConvenios.id_convenio))
-      obj["id_convenio"] = parseInt(dataConvenios.id_convenio);
+      obj["pk_fk_id_convenio"] = parseInt(dataConvenios.id_convenio);
     if (dataConvenios.nombre_convenio)
       obj["nombre_convenio"] = dataConvenios.nombre_convenio;
-
     obj["pk_tbl_grupo_convenios"] = pk_tbl_grupo_convenios;
     fetchConveniosNotInGruposConvenios({
       ...obj,
       page,
       limit,
-      sortBy: "id_convenio",
+      sortBy: "pk_fk_id_convenio",
       sortDir: "DESC",
     })
       .then((autoArr) => {
@@ -92,7 +92,7 @@ const SearchConveniosNotInGruposConvenios = ({
       <TableEnterprise
         title='Lista de convenios'
         maxPage={maxPages}
-        headers={["Id", "Comercio"]}
+        headers={["Id", "Comercio", "Autorizador"]}
         data={tableConvenios}
         onSelectRow={addConvenio}
         onSetPageData={setPageData}>
