@@ -25,7 +25,7 @@ const SearchConveniosNotInGruposConvenios = ({
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(({ nombre_convenio, pk_fk_id_convenio,nombre_autorizador }) => {
+      ...convenios.map(({ nombre_convenio, pk_fk_id_convenio,nombre_autorizador}) => {
         return {
           pk_fk_id_convenio,
           nombre_convenio,
@@ -34,9 +34,11 @@ const SearchConveniosNotInGruposConvenios = ({
       }),
     ];
   }, [convenios]);
+  
   useEffect(() => {
     fetchConveniosNotInGruposConveniosFunc();
   }, [page, limit, dataConvenios]);
+
   const fetchConveniosNotInGruposConveniosFunc = useCallback(() => {
     let obj = {};
     if (parseInt(dataConvenios.id_convenio))
@@ -53,25 +55,26 @@ const SearchConveniosNotInGruposConvenios = ({
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results ?? []);
+        setConvenios(autoArr?.results ?? []);    
       })
       .catch((err) => console.error(err));
   }, [page, limit, dataConvenios]);
+
   const addConvenio = useCallback(
     (ev, i) => {
       ev.preventDefault();
       if (
         !selectedGruposConvenios?.convenios_agregar?.find(
-          (a) => a?.fk_convenio === convenios[i].id_convenio
+          (a) => a?.id_convenio_autorizador === convenios[i].id_convenio_autorizador
         )
       ) {
         const obj = { ...selectedGruposConvenios };
         obj["convenios_agregar"] = [
           ...obj["convenios_agregar"],
           {
-            fk_convenio: convenios[i].id_convenio,
-            fk_tbl_grupo_convenios:
-              selectedGruposConvenios["pk_tbl_grupo_convenios"],
+            fk_convenio: convenios[i].pk_fk_id_convenio,
+            fk_tbl_grupo_convenios:selectedGruposConvenios["pk_tbl_grupo_convenios"],
+            id_convenio_autorizador:convenios[i].id_convenio_autorizador
           },
         ];
         setSelectedGruposConvenios((old) => {
@@ -87,6 +90,7 @@ const SearchConveniosNotInGruposConvenios = ({
     },
     [selectedGruposConvenios, convenios]
   );
+
   return (
     <>
       <TableEnterprise
@@ -103,7 +107,6 @@ const SearchConveniosNotInGruposConvenios = ({
           name='id_convenio'
           minLength='1'
           maxLength='10'
-          // required
           value={dataConvenios.id_convenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -120,7 +123,6 @@ const SearchConveniosNotInGruposConvenios = ({
           name='nombre_convenio'
           minLength='1'
           maxLength='10'
-          // required
           value={dataConvenios.nombre_convenio}
           onInput={(e) => {
             setDataConvenios((old) => {
