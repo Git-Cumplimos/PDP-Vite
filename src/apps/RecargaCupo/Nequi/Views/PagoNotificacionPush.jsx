@@ -64,7 +64,7 @@ const PagoNotificacionPush = () => {
   const onSubmitDeposito = useCallback(
     (ev) => {
       ev.preventDefault();
-      const totalImpuesto = impuesto === 0 ? 0 : ((impuesto * parseInt(valor)) / 100);
+      const totalImpuesto = impuesto === 0 ? 0 : ((impuesto * costoTrx) / 100);
       const costoFinalTrx = costoTrx + parseInt(totalImpuesto)
       const totalRecarga = parseInt(valor) - parseInt(costoFinalTrx)
       if (totalRecarga <= 0){
@@ -75,7 +75,7 @@ const PagoNotificacionPush = () => {
         "Número Nequi": numeroTelefono,
         "Valor de la recarga": formatMoney.format(valor),
         "Costo de transacción": formatMoney.format(costoFinalTrx),
-        "Valor total a recargar": formatMoney.format(totalRecarga),
+        "Valor neto a recargar": formatMoney.format(totalRecarga),
       };
       setCostoTotalTrx(costoFinalTrx)
       setSummary(summary);
