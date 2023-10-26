@@ -1,8 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
-const urlParametrizacion =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlParametrizacion = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlParametrizacion = "http://127.0.0.1:5000"
 const URL_CORRESPONSALIA_OTROS = process.env.REACT_APP_URL_CORRESPONSALIA_OTROS;
 export const fetchDatafonosTuLlave = async (obj) => {
   try {

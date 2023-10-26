@@ -5,6 +5,9 @@ import Input from "../../../../components/Base/Input/Input";
 import Select from "../../../../components/Base/Select/Select";
 import { notifyError } from "../../../../utils/notify";
 import useDelayedCallback from "../../../../hooks/useDelayedCallback";
+import {makeDateFormatter} from "../../../../utils/functions";
+
+const dateFormatter = makeDateFormatter(true);
 
 const ConsultaDatafonos = ({
   navigate,
@@ -22,22 +25,26 @@ const ConsultaDatafonos = ({
     page: 1,
     limit: 10,
   });
-
+  
   const tableDatafonos = useMemo(() => {
     return [
       ...datafonos.map(
-        ({ pos_id, fk_comercio_asociado, numero_serie, estado }) => {
+        ({ pos_id, fk_comercio_asociado, numero_serie, estado,fecha_creacion,fecha_modificacion}) => {
           if (type === "Gestion") {
             return {
               pos_id,
               fk_comercio_asociado: fk_comercio_asociado ?? "No asociado",
-              numero_serie,
+              // numero_serie,
               estado: estado ? "Activo" : "Inactivo",
+              fecha_creacion: dateFormatter.format(new Date(fecha_creacion)),
+              fecha_modificacion: new Date(fecha_modificacion).toLocaleString('en-US')
             };
           } else {
             return {
               pos_id,
-              numero_serie,
+              // numero_serie,
+              fecha_creacion,
+              fecha_modificacion,
             };
           }
         }
@@ -123,8 +130,8 @@ const ConsultaDatafonos = ({
         maxPage={maxPages}
         headers={
           type === "Gestion"
-            ? ["Pos Id", "Id Comercio", "Número de serie", "Estado"]
-            : ["Pos Id", "Número de serie"]
+            ? ["Pos Id", "Id Comercio", "Estado","Fecha de Registro","Fecha de Modificación"]
+            : ["Pos Id", "Número de serie","Fecha de Registro","Fecha de Modificación"]
         }
         data={tableDatafonos}
         onSelectRow={selectDatafono}
