@@ -184,7 +184,7 @@ const FormularioRetiro = () => {
           handleClose()
         })
         .catch((err) => {
-          notifyError(err?.msg);
+          notifyError(String(err));
           handleClose()
         });
     }
