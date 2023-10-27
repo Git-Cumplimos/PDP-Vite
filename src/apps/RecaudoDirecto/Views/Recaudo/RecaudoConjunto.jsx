@@ -199,7 +199,7 @@ const RecaudoConjunto = () => {
           handleClose()
         })
         .catch((err) => {
-          notifyError(err?.msg);
+          notifyError(String(err));
           handleClose()
         });
 
