@@ -14,10 +14,16 @@ import MoneyInput, {
 import { enumParametrosNequi } from "../../utils/enumParametrosNequi";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
-import { useFetchTuLlave } from "../../hooks/fetchNequi";
+import { useFetchNequi } from "../../hooks/fetchNequi";
 
 const URL_REALIZAR_RETIRO_NEQUI = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/pagonotificacionpush`;
 const URL_CONSULTAR_RETIRO_NEQUI = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
+const costoTrx = parseInt(
+  enumParametrosNequi.COSTO_TRANSACCION_RETIRO_NEQUI_NOTIFICACION
+);
+const impuesto = parseInt(
+  enumParametrosNequi.PORCENTAJE_IMPUESTO_RETIRO_NEQUI_NOTIFICACION
+);
 
 const TransaccionRetiroNequiNotificacion = () => {
   const navigate = useNavigate();
@@ -88,7 +94,7 @@ const TransaccionRetiroNequiNotificacion = () => {
     },
     [dataUsuario, navigate, roleInfo, pdpUser]
   );
-  const [loadingPeticionRetiroNequi, peticionRetiroNequi] = useFetchTuLlave(
+  const [loadingPeticionRetiroNequi, peticionRetiroNequi] = useFetchNequi(
     URL_REALIZAR_RETIRO_NEQUI,
     URL_CONSULTAR_RETIRO_NEQUI,
     "Realizar retiro nequi"
@@ -113,7 +119,10 @@ const TransaccionRetiroNequiNotificacion = () => {
       if (!isNaN(num)) {
         if (ev.target.name === "numeroNequi") {
           if (dataUsuario.numeroNequi.length === 0 && num !== "3") {
-            return notifyError("El número de teléfono debe comenzar por 3");
+            return notifyError("El número Nequi debe comenzar por 3");
+          } else if (num.length !== 0) {
+            if (num[0] !== "3")
+              return notifyError("El número Nequi debe comenzar por 3");
           }
         }
         setDataUsuario((old) => {
@@ -145,8 +154,8 @@ const TransaccionRetiroNequiNotificacion = () => {
           name="valor"
           label="Valor a retirar"
           type="text"
-          min={enumParametrosNequi.MIN_RETIRO_NEQUI}
-          max={enumParametrosNequi.MAX_RETIRO_NEQUI}
+          min={enumParametrosNequi.MIN_RETIRO_NEQUI_NOTIFICACION}
+          max={enumParametrosNequi.MAX_RETIRO_NEQUI_NOTIFICACION}
           autoComplete="off"
           maxLength={"10"}
           value={parseInt(dataUsuario?.valorRetiro)}
