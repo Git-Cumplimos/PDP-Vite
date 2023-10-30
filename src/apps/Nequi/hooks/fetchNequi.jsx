@@ -4,14 +4,14 @@ import { notify, notifyError } from "../../../utils/notify";
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
-export const useFetchTuLlave = (
+export const useFetchNequi = (
   url_trx_ = "",
   url_consulta_ = "",
   name_ = ""
 ) => {
   const [state, setState] = useState(false);
 
-  const fetchTuLlaveTrx = useCallback(
+  const fetchNequiTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(
         url_trx_,
@@ -95,7 +95,7 @@ export const useFetchTuLlave = (
     [setState, url_trx_, url_consulta_, name_]
   );
 
-  return [state, fetchTuLlaveTrx];
+  return [state, fetchNequiTrx];
 };
 
 export class ErrorCustom extends Error {
