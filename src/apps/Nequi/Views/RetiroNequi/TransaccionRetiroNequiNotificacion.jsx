@@ -25,24 +25,9 @@ const TransaccionRetiroNequiNotificacion = () => {
   const navigate = useNavigate();
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
-  const optionsTipoDocumento = [
-    { value: "", label: "" },
-    { value: "1", label: "Cédula de ciudadanía" },
-    { value: "2", label: "Cédula de extranjería" },
-    { value: "4", label: "Número único de identificación" },
-    { value: "5", label: "Tarjeta de identidad" },
-    { value: "6", label: "Pasaporte" },
-  ];
   const [dataUsuario, setDataUsuario] = useState({
-    NTargeta: "",
+    numeroNequi: "",
     valorRecarga: 0,
-    nombresCliente: "",
-    apellidosCliente: "",
-    telefonoCliente: "",
-    emailCliente: "",
-    tipoDocumentoId: "",
-    tipoDocumento: "",
-    documento: "",
   });
   const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [objTicketActual, setObjTicketActual] = useState({});
@@ -148,8 +133,8 @@ const TransaccionRetiroNequiNotificacion = () => {
       const valor = ev.target.value;
       const num = valor.replace(/[\s\.\-+eE]/g, "");
       if (!isNaN(num)) {
-        if (ev.target.name === "telefonoCliente") {
-          if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
+        if (ev.target.name === "numeroNequi") {
+          if (dataUsuario.numeroNequi.length === 0 && num !== "3") {
             return notifyError("El número de teléfono debe comenzar por 3");
           }
         }
@@ -158,7 +143,7 @@ const TransaccionRetiroNequiNotificacion = () => {
         });
       }
     },
-    [dataUsuario.telefonoCliente]
+    [dataUsuario.numeroNequi]
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
@@ -168,18 +153,17 @@ const TransaccionRetiroNequiNotificacion = () => {
   }, []);
   return (
     <>
-      <h1 className="text-3xl">Recargar Tarjeta Tu Llave</h1>
+      <h1 className="text-3xl">Retiro Nequi</h1>
       <Form onSubmit={handleShow} grid>
-        <Fieldset legend="Datos obligatorios" className="lg:col-span-2">
           <Input
-            id="NTargeta"
-            name="NTargeta"
-            label={"Número tarjeta"}
+            id="numeroNequi"
+            name="numeroNequi"
+            label={"Número Nequi"}
             type="text"
             autoComplete="off"
-            value={dataUsuario?.["NTargeta"]}
-            maxLength={16}
-            minLength={16}
+            value={dataUsuario?.["numeroNequi"]}
+            maxLength={10}
+            minLength={10}
             onChange={onChangeFormatNumber}
             required
             disabled={loadingPeticionRecargaTarjeta}
@@ -206,77 +190,6 @@ const TransaccionRetiroNequiNotificacion = () => {
             equalError={false}
             equalErrorMin={false}
           />
-        </Fieldset>
-        <Fieldset legend="Datos opcionales" className="lg:col-span-2">
-          <Input
-            id="nombresCliente"
-            name="nombresCliente"
-            label={"Nombres cliente"}
-            type="text"
-            autoComplete="off"
-            value={dataUsuario?.["nombresCliente"]}
-            maxLength={50}
-            onChange={onChangeFormat}
-            disabled={loadingPeticionRecargaTarjeta}
-          />
-          <Input
-            id="apellidosCliente"
-            name="apellidosCliente"
-            label={"Apellidos cliente"}
-            type="text"
-            autoComplete="off"
-            value={dataUsuario?.["apellidosCliente"]}
-            maxLength={50}
-            onChange={onChangeFormat}
-            disabled={loadingPeticionRecargaTarjeta}
-          />
-          <Input
-            id="telefonoCliente"
-            name="telefonoCliente"
-            label={"Teléfono cliente"}
-            type="text"
-            autoComplete="off"
-            value={dataUsuario?.["telefonoCliente"]}
-            maxLength={10}
-            onChange={onChangeFormatNumber}
-            disabled={loadingPeticionRecargaTarjeta}
-          />
-          <Input
-            id="emailCliente"
-            name="emailCliente"
-            label={"Correo cliente"}
-            type="email"
-            autoComplete="off"
-            value={dataUsuario?.["emailCliente"]}
-            maxLength={70}
-            onChange={onChangeFormat}
-            disabled={loadingPeticionRecargaTarjeta}
-          />
-          <Input
-            id="documento"
-            name="documento"
-            label={"Documento cliente"}
-            type="text"
-            autoComplete="off"
-            value={dataUsuario?.["documento"]}
-            maxLength={12}
-            onChange={onChangeFormatNumber}
-            disabled={loadingPeticionRecargaTarjeta}
-          />
-          <Select
-            id="tipoDocumentoId"
-            label="Tipo de documento"
-            options={optionsTipoDocumento}
-            value={dataUsuario?.tipoDocumentoId}
-            onChange={(e) => {
-              setDataUsuario((old) => ({
-                ...old,
-                tipoDocumentoId: e.target.value,
-                tipoDocumento: e.target[e.target.selectedIndex].text,
-              }));
-            }}
-          />
-        </Fieldset>
         <ButtonBar className="lg:col-span-2">
           <Button
             type="button"
