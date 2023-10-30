@@ -197,44 +197,6 @@ const LoginForm = () => {
         },
       }
     );
-    // auth
-    //   .validateUser(username)
-    //   .then((res) => {
-    //     if (res?.Status === true) {
-    //       notify("Usuario valido");
-    //       setDisabled(false);
-    //       setPassword("");
-    //       setCode("");
-    //       setNewPass("");
-    //       setConfirmPass("");
-    //       setForgotPass(false);
-    //       auth
-    //         .forgotPassword(username)
-    //         .then(() => {
-    //           notify(
-    //             "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
-    //           );
-    //           setCode("");
-    //           setNewPass("");
-    //           setConfirmPass("");
-    //           setForgotPassSubmit(true);
-    //         })
-    //         .catch((err) => {
-    //           setForgotPassSubmit(false);
-    //           if (err.code === "LimitExceededException") {
-    //             notifyError(
-    //               "Se ha alcanzado el limite de intentos de restablecer contraseña."
-    //             );
-    //             return;
-    //           }
-    //           console.error(err);
-    //         });
-    //     } else {
-    //       notifyError("El usuario no existe");
-    //       setDisabled(false);
-    //     }
-    //   })
-    //   .catch((err) => {});
   };
 
   const handleForgotPasswordSubmit = (event) => {
