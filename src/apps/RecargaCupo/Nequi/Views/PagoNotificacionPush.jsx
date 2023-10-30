@@ -71,7 +71,7 @@ const PagoNotificacionPush = () => {
         notifyError("El costo de la transacción es mayor o igual al valor de la recarga")
         return;
       }
-      if (numeroTelefono !== "3")
+      if (numeroTelefono[0] !== "3")
         return notifyError("El Número Nequi debe comenzar por 3");
       const summary = {
         "Número Nequi": numeroTelefono,
