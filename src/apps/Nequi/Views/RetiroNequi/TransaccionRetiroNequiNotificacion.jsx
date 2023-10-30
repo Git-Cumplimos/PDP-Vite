@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
@@ -12,14 +11,13 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import MoneyInput, {
   formatMoney,
 } from "../../../../components/Base/MoneyInput/MoneyInput";
-import { enumParametrosTuLlave } from "../../utils/enumParametrosTuLlave";
+import { enumParametrosNequi } from "../../utils/enumParametrosNequi";
 import { useReactToPrint } from "react-to-print";
-import Select from "../../../../components/Base/Select/Select";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
-import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
+import { useFetchTuLlave } from "../../hooks/fetchNequi";
 
-const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
-const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
+const URL_REALIZAR_RETIRO_NEQUI = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/pagonotificacionpush`;
+const URL_CONSULTAR_RETIRO_NEQUI = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
 
 const TransaccionRetiroNequiNotificacion = () => {
   const navigate = useNavigate();
@@ -63,66 +61,46 @@ const TransaccionRetiroNequiNotificacion = () => {
           numero_tarjeta: dataUsuario?.NTargeta,
         },
       };
-      if (dataUsuario?.nombresCliente !== "")
-        data["recarga_tarjeta"]["nombres_cliente"] =
-          dataUsuario?.nombresCliente;
-      if (dataUsuario?.apellidosCliente !== "")
-        data["recarga_tarjeta"]["apellidos_cliente"] =
-          dataUsuario?.apellidosCliente;
-      if (dataUsuario?.telefonoCliente !== "")
-        data["recarga_tarjeta"]["telefono_cliente"] =
-          dataUsuario?.telefonoCliente;
-      if (dataUsuario?.emailCliente !== "")
-        data["recarga_tarjeta"]["email_cliente"] = dataUsuario?.emailCliente;
-      if (dataUsuario?.tipoDocumentoId !== "")
-        data["recarga_tarjeta"]["tipo_id_cliente"] =
-          dataUsuario?.tipoDocumentoId;
-      if (dataUsuario?.documento !== "")
-        data["recarga_tarjeta"]["id_cliente"] = dataUsuario?.documento;
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
       notifyPending(
-        peticionRecargaTarjeta(data, dataAditional),
+        peticionRetiroNequi(data, dataAditional),
         {
           render: () => {
-            return "Procesando recarga";
+            return "Procesando retiro";
           },
         },
         {
           render: ({ data: res }) => {
             setObjTicketActual(res?.obj?.ticket);
             setEstadoPeticion(1);
-            return "Recarga satisfactoria";
+            return "Retiro satisfactorio";
           },
         },
         {
           render: ({ data: error }) => {
             navigate(-1);
-            return error?.message ?? "Recarga fallida";
+            return error?.message ?? "Retiro fallido";
           },
         }
       );
     },
     [dataUsuario, navigate, roleInfo, pdpUser]
   );
-  const [loadingPeticionRecargaTarjeta, peticionRecargaTarjeta] =
-    useFetchTuLlave(
-      URL_REALIZAR_RECARGA_TARJETA,
-      URL_CONSULTAR_RECARGA_TARJETA,
-      "Realizar recarga tarjeta"
-    );
-  const handleShow = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      if (dataUsuario.valorRecarga % 50 !== 0) {
-        return notifyError("El valor de la recarga debe ser múltiplo de 50");
-      }
-      setEstadoPeticion(0);
-      setShowModal(true);
-    },
-    [dataUsuario]
+  const [loadingPeticionRetiroNequi, peticionRetiroNequi] = useFetchTuLlave(
+    URL_REALIZAR_RETIRO_NEQUI,
+    URL_CONSULTAR_RETIRO_NEQUI,
+    "Realizar retiro nequi"
   );
+  const handleShow = useCallback((ev) => {
+    ev.preventDefault();
+    // if (dataUsuario.valorRecarga % 50 !== 0) {
+    //   return notifyError("El valor de la recarga debe ser múltiplo de 50");
+    // }
+    setEstadoPeticion(0);
+    setShowModal(true);
+  }, []);
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
@@ -145,63 +123,48 @@ const TransaccionRetiroNequiNotificacion = () => {
     },
     [dataUsuario.numeroNequi]
   );
-  const onChangeFormat = useCallback((ev) => {
-    let value = ev.target.value;
-    setDataUsuario((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
-  }, []);
   return (
     <>
       <h1 className="text-3xl">Retiro Nequi</h1>
       <Form onSubmit={handleShow} grid>
-          <Input
-            id="numeroNequi"
-            name="numeroNequi"
-            label={"Número Nequi"}
-            type="text"
-            autoComplete="off"
-            value={dataUsuario?.["numeroNequi"]}
-            maxLength={10}
-            minLength={10}
-            onChange={onChangeFormatNumber}
-            required
-            disabled={loadingPeticionRecargaTarjeta}
-          />
-          <MoneyInput
-            id="valor"
-            name="valor"
-            label="Valor a recargar"
-            type="text"
-            min={enumParametrosTuLlave.MINRECARGATARJETA}
-            max={enumParametrosTuLlave.MAXRECARGATARJETA}
-            autoComplete="off"
-            maxLength={"9"}
-            value={parseInt(dataUsuario?.valorRecarga)}
-            required
-            disabled={loadingPeticionRecargaTarjeta}
-            onInput={(e, monto) => {
-              if (!isNaN(monto)) {
-                setDataUsuario((old) => {
-                  return { ...old, valorRecarga: monto };
-                });
-              }
-            }}
-            equalError={false}
-            equalErrorMin={false}
-          />
+        <Input
+          id="numeroNequi"
+          name="numeroNequi"
+          label={"Número Nequi"}
+          type="text"
+          autoComplete="off"
+          value={dataUsuario?.["numeroNequi"]}
+          maxLength={10}
+          minLength={10}
+          onChange={onChangeFormatNumber}
+          required
+          disabled={loadingPeticionRetiroNequi}
+        />
+        <MoneyInput
+          id="valor"
+          name="valor"
+          label="Valor a retirar"
+          type="text"
+          min={enumParametrosNequi.MIN_RETIRO_NEQUI}
+          max={enumParametrosNequi.MAX_RETIRO_NEQUI}
+          autoComplete="off"
+          maxLength={"10"}
+          value={parseInt(dataUsuario?.valorRetiro)}
+          required
+          disabled={loadingPeticionRetiroNequi}
+          onInput={(e, monto) => {
+            if (!isNaN(monto)) {
+              setDataUsuario((old) => {
+                return { ...old, valorRetiro: monto };
+              });
+            }
+          }}
+          equalError={false}
+          equalErrorMin={false}
+        />
         <ButtonBar className="lg:col-span-2">
-          <Button
-            type="button"
-            onClick={() => {
-              navigate(-1);
-            }}
-            disabled={loadingPeticionRecargaTarjeta}
-          >
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={loadingPeticionRecargaTarjeta}>
-            Recargar tarjeta
+          <Button type="submit" disabled={loadingPeticionRetiroNequi}>
+            Realizar recarga
           </Button>
         </ButtonBar>
       </Form>
@@ -214,30 +177,12 @@ const TransaccionRetiroNequiNotificacion = () => {
           {estadoPeticion === 0 ? (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
               <h1 className="text-2xl text-center mb-5 font-semibold">
-                ¿Está seguro de realizar la recarga?
+                ¿Está seguro de realizar el retiro?
               </h1>
-              <h2>{`Número tarjeta: ${dataUsuario?.NTargeta}`}</h2>
-              {dataUsuario?.nombresCliente !== "" && (
-                <h2>{`Nombres cliente: ${dataUsuario?.nombresCliente}`}</h2>
-              )}
-              {dataUsuario?.apellidosCliente !== "" && (
-                <h2>{`Apellidos cliente: ${dataUsuario?.apellidosCliente}`}</h2>
-              )}
-              {dataUsuario?.telefonoCliente !== "" && (
-                <h2>{`Teléfono cliente: ${dataUsuario?.telefonoCliente}`}</h2>
-              )}
-              {dataUsuario?.emailCliente !== "" && (
-                <h2>{`Correo cliente: ${dataUsuario?.emailCliente}`}</h2>
-              )}
-              {dataUsuario?.documento !== "" && (
-                <h2>{`Documento cliente: ${dataUsuario?.documento}`}</h2>
-              )}
-              {dataUsuario?.tipoDocumento !== "" && (
-                <h2>{`Tipo documento cliente: ${dataUsuario?.tipoDocumento}`}</h2>
-              )}
+              <h2>{`Número nequi: ${dataUsuario?.numeroNequi}`}</h2>
               <h2 className="text-base">
-                {`Valor a recargar: ${formatMoney.format(
-                  dataUsuario?.valorRecarga
+                {`Valor a retirar: ${formatMoney.format(
+                  dataUsuario?.valorRetiro
                 )} `}
               </h2>
               <>
@@ -247,16 +192,16 @@ const TransaccionRetiroNequiNotificacion = () => {
                       handleClose();
                       notifyError("Transacción cancelada por el usuario");
                     }}
-                    disabled={loadingPeticionRecargaTarjeta}
+                    disabled={loadingPeticionRetiroNequi}
                   >
                     Cancelar
                   </Button>
                   <Button
                     type="submit"
                     onClick={makeRecharge}
-                    disabled={loadingPeticionRecargaTarjeta}
+                    disabled={loadingPeticionRetiroNequi}
                   >
-                    Realizar recarga
+                    Realizar retiro
                   </Button>
                 </ButtonBar>
               </>
