@@ -20,8 +20,8 @@ import { enumParametrosNequi } from "../utils/enumParametrosNequi";
 import { v4 } from "uuid";
 import { useFetchNequi } from "../hooks/fetchNequi";
 
-const URL_REALIZAR_PAGO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/pagonotificacionpush`;
-const URL_CONSULTA_TRX_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/check_estado_pagocredito_nequi`;
+const URL_REALIZAR_PAGO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/recarga-notificacion-push`;
+const URL_CONSULTA_TRX_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/check-estado-recarga-credito-nequi`;
 const costoTrx = parseInt(enumParametrosNequi.costoTransaccion)
 const impuesto = parseInt(enumParametrosNequi.porcentajeImpuesto)
 
@@ -71,6 +71,8 @@ const PagoNotificacionPush = () => {
         notifyError("El costo de la transacción es mayor o igual al valor de la recarga")
         return;
       }
+      if (numeroTelefono !== "3")
+        return notifyError("El Número Nequi debe comenzar por 3");
       const summary = {
         "Número Nequi": numeroTelefono,
         "Valor de la recarga": formatMoney.format(valor),
