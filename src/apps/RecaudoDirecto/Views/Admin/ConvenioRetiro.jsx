@@ -25,6 +25,11 @@ const initialSearchFilters = new Map([
   ["limit", 10],
 ]);
 
+const limitesMontos = {
+  max: 9999999,
+  min: 1,
+};
+
 const RetiroDirecto = () => {
   const [listRetiro, setListRetiro] = useState([]);
   const [selected, setSelected] = useState(false);
@@ -39,15 +44,12 @@ const RetiroDirecto = () => {
     "Longitud mínima": "",
     "Longitud máxima": "",
   }])
-  const [res] = useState(
-    [
-      ["REFERENCIA_1", "REFERENCIA_2",
-        "APELLIDO_PRODUCTOR", "TOTAL_PAGAR", "FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
-      [332421666, 5645454, "apellido", 50000, "8/06/2023", 125],
-      [332421667, 5456458, "apellido", 865000, "8/06/2023", 125],
-      [332421668, 5456458, "apellido", 20000, "8/06/2023", 125],
-    ]
-  )
+  const [res] = useState([
+    ["REFERENCIA_1", "REFERENCIA_2", "TOTAL_PAGAR","FECHA_VENCIMIENTO"],
+    [332421116, 432422226, 50000, "8/12/2023"],
+    [332421117, 432422227, 80000, "16/10/2023"],
+    [332421118, 432422228, 1250000, "12/11/2023"],
+  ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
     { label: "Valor menor", value: 2 },
@@ -120,7 +122,7 @@ const RetiroDirecto = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  },{delay:2000});
+  }, { delay: 2000 });
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);
@@ -159,38 +161,38 @@ const RetiroDirecto = () => {
     if (body['Valor mínimo'] || body['Valor máximo']) {
       delete body['Valor mínimo']; delete body['Valor máximo'];
       body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0}`, `${limites['Valor máximo'] ?? 0}`]
-      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])){
+      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])) {
         notifyError("En la restriccion de valores, el valor máximo debe ser mayor al valor mínima")
         validacion = false
       }
     }
-    if (validacion){
+    if (validacion) {
       notifyPending(
         selected
-        ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
-        : addConveniosRetiroList(body),
+          ? modConveniosRetiroList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
+          : addConveniosRetiroList(body),
         {
           render() {
             return "Enviando solicitud";
           },
         },
         {
-        render({ data: res }) {
-          handleClose();
-          searchTrxs();
-          return `Convenio ${selected ? "modificado" : "agregado"
-            } exitosamente`;
+          render({ data: res }) {
+            handleClose();
+            searchTrxs();
+            return `Convenio ${selected ? "modificado" : "agregado"
+              } exitosamente`;
+          },
         },
-      },
-      {
-        render({ data: err }) {
-          if (err?.cause === "custom") {
-            return err?.message;
-          }
-          console.error(err?.message);
-          return `${selected ? "Edicion" : "Creación"} fallida`;
-        },
-      }
+        {
+          render({ data: err }) {
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return `${selected ? "Edicion" : "Creación"} fallida`;
+          },
+        }
       )
     }
   }, [handleClose, searchTrxs, selected, referencias, limites])
@@ -370,20 +372,24 @@ const RetiroDirecto = () => {
             {Object.entries(limites).map(([keyLimit, valLimit], index) => {
               return (
                 <MoneyInput
-                  key={keyLimit}
+                  key={`${keyLimit}_${index}`}
                   className={"mb-1"}
                   id={`${keyLimit}_${index}`}
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
-                  maxLength={"12"}
-                  value={valLimit ?? 0}
-                  equalError={false}
+                  maxLength={"11"}
+                  min={limitesMontos.min}
+                  max={limitesMontos.max}
+                  // value={valLimit}
+                  defaultValue={selected ? selected.limite_monto[index] : valLimit}
                   onInput={(e, valor) => {
                     const copyRef = { ...limites };
                     copyRef[keyLimit] = valor;
                     setlimites(copyRef);
                   }}
+                  equalError={false}
+                  equalErrorMin={false}
                   required
                 />
               )
@@ -405,7 +411,7 @@ const RetiroDirecto = () => {
                         maxLength={`${keyRef.includes("Longitud") ? "2" : "40"}`}
                         autoComplete="off"
                         value={valRef}
-                        onInput={(ev) => { 
+                        onInput={(ev) => {
                           if (keyRef.includes("Longitud")) (ev.target.value = onChangeNumber(ev))
                           const copyRef = [...referencias];
                           copyRef[index][keyRef] = ev.target.value;

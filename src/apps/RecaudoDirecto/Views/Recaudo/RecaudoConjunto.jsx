@@ -15,7 +15,7 @@ import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce
 import { onChangeNumber } from "../../../../utils/functions";
 
 const limitesMontos = {
-  max: 99999999,
+  max: 9999999,
   min: 1,
 };
 
@@ -165,6 +165,7 @@ const RecaudoConjunto = () => {
         roleInfo?.tipo_comercio === "KIOSCO",
       ...valorRecibido,
       nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+      nombre_usuario: pdpUser?.uname ?? "",
       direccion: roleInfo?.direccion ?? ""
     };
 
@@ -198,7 +199,7 @@ const RecaudoConjunto = () => {
           handleClose()
         })
         .catch((err) => {
-          notifyError(err?.msg);
+          notifyError(String(err));
           handleClose()
         });
 
@@ -208,7 +209,7 @@ const RecaudoConjunto = () => {
       notifyError("El valor recibido no cumple con los limites establecidos") 
     }
 
-  }, [roleInfo, valorRecibido, dataRecaudo, id_trx,
+  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
@@ -288,6 +289,7 @@ const RecaudoConjunto = () => {
               equalError={false}
               min={validarLimites(4, 'min')}
               value={valorRecibido.valor_total_trx}
+              maxLength={"11"}
               max={validarLimites(4, 'max')}
               onInput={(e, valor) =>
                 setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
@@ -325,6 +327,9 @@ const RecaudoConjunto = () => {
                   name="valor_total_trx"
                   autoComplete="off"
                   value={valorCodigoBarras ? valorRecibido.valor_total_trx : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
+                  maxLength={"11"}
+                  min={limitesMontos.min}
+                  max={limitesMontos.max}
                   disabled
                   required
                 />
@@ -335,6 +340,7 @@ const RecaudoConjunto = () => {
                   autoComplete="off"
                   min={validarLimites(dataRecaudo?.fk_modificar_valor, 'min')}
                   equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
+                  maxLength={"11"}
                   max={validarLimites(dataRecaudo?.fk_modificar_valor, 'max')}
                   onInput={(e, valor) =>
                     setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
@@ -364,6 +370,9 @@ const RecaudoConjunto = () => {
                 name="valor_total_trx"
                 autoComplete="off"
                 value={valorRecibido.valor_total_trx}
+                maxLength={"11"}
+                min={limitesMontos.min}
+                max={limitesMontos.max}
                 disabled
                 required
               />

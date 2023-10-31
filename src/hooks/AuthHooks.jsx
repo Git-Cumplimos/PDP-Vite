@@ -11,7 +11,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notify, notifyError } from "../utils/notify";
 import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
-import { fetchSecure } from "../utils/functions";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
@@ -27,9 +26,19 @@ const validateUser = async (email) => {
   const get = {
     email: email,
   };
+  if (!email) {
+    throw new Error("Sin datos de busqueda", {
+      cause: "custom",
+    });
+  }
 
   try {
     const res = await fetchData(url_user, "GET", get, {}, {}, false);
+    if (!res?.Status) {
+      throw new Error("Usuario invalido", {
+        cause: "custom",
+      });
+    }
     return res;
   } catch (err) {
     throw err;
@@ -270,20 +279,17 @@ export const useProvideAuth = () => {
 
       try {
         const semillaAws = await Auth.setupTOTP(user);
-        const response = await fetch(
-          `${public_urls}/users-totp/generate`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: userState?.pdpUser?.email,
-              otp_base32: semillaAws,
-            }),
-            headers: {
-              // Authorization: `Bearer ${session}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${public_urls}/users-totp/generate`, {
+          method: "POST",
+          body: JSON.stringify({
+            email: userState?.pdpUser?.email,
+            otp_base32: semillaAws,
+          }),
+          headers: {
+            // Authorization: `Bearer ${session}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           notifyError(
             <p>
@@ -450,7 +456,7 @@ export const useProvideAuth = () => {
     onError: useCallback((error) => {
       dispatchAuth({
         type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: '' } },
+        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" } },
       });
       if (error?.cause === "custom") {
         notifyError(error.message);

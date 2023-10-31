@@ -4,7 +4,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../utils/notify";
 import SimpleLoading from "../../Base/SimpleLoading";
 
 const LoginForm = () => {
@@ -143,23 +143,36 @@ const LoginForm = () => {
 
   const handleForgotPassword = (event) => {
     event.preventDefault();
-    notify("Validando usuario en base de datos");
-    setDisabled(true);
-
-    auth
-      .validateUser(username)
-      .then((res) => {
+    notifyPending(
+      auth.validateUser(username).then((res) => {
+        setDisabled(true);
         if (res?.Status === true) {
-          notify("Usuario valido");
           setDisabled(false);
           setPassword("");
+          setCode("");
+          setNewPass("");
+          setConfirmPass("");
           setForgotPass(false);
+        } else {
+          setDisabled(false);
+        }
+      }),
+      {
+        render: () => {
+          return "Validando usuario";
+        },
+      },
+      {
+        render: () => {
           auth
             .forgotPassword(username)
             .then(() => {
               notify(
                 "Recibira un correo con un número de 6 dígitos que deberá ingresar en el campo 'CÓDIGO'"
               );
+              setCode("");
+              setNewPass("");
+              setConfirmPass("");
               setForgotPassSubmit(true);
             })
             .catch((err) => {
@@ -172,12 +185,18 @@ const LoginForm = () => {
               }
               console.error(err);
             });
-        } else {
-          notifyError("El usuario no existe");
-          setDisabled(false);
-        }
-      })
-      .catch((err) => {});
+          return "Usuario encontrado";
+        },
+      },
+      {
+        render: ({ data: err }) => {
+          if (err?.cause === "custom") {
+            return err?.message;
+          }
+          console.error(err);
+        },
+      }
+    );
   };
 
   const handleForgotPasswordSubmit = (event) => {
@@ -428,6 +447,7 @@ const LoginForm = () => {
               type="email"
               autoFocus
               autoComplete="off"
+              disabled
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value);

@@ -581,6 +581,18 @@ const CrearComercios = () => {
               }
             />
           )}
+          <ToggleInput
+            id={`use_totp_edit`}
+            name={`use_totp`}
+            label={"Seguridad con totp"}
+            checked={comercio?.use_totp ?? false}
+            onChange={() =>
+              setComercio((old) => ({
+                ...old,
+                use_totp: !old?.use_totp,
+              }))
+            }
+          />
         </Fieldset>
         <Fieldset legend="Ubicación comercio" className="lg:col-span-2">
           <Input

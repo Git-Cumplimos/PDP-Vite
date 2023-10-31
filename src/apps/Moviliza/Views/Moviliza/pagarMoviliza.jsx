@@ -70,7 +70,7 @@ const PagarMoviliza = () => {
   );
   const [token, setToken] = useState("");
   const navigate = useNavigate();
-  
+  const [cambioBarcodeBoton, setCambioBarcodeBoton] = useState(false);
 
   useEffect(() => {
     const data = {
@@ -152,6 +152,7 @@ const PagarMoviliza = () => {
       setPaso("LecturaMoviliza");
       setProcedimiento(option_manual);
       setBloqueoInput(false)
+      setCambioBarcodeBoton(false)
     }
     setNumeroMoviliza("");
   }, []);
@@ -175,9 +176,14 @@ const PagarMoviliza = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroMoviliza(response?.obj?.result?.numero_moviliza);
-            notify("Respuesta PDP: "+response?.msg);
+            // notify(response?.msg);
             setBloqueoInput(true)
             // setPaso("LecturaMoviliza");
+            setCambioBarcodeBoton(true)
+          }
+          else{
+            notifyError(response?.msg)
+            setNumeroMoviliza("");
           }
         })
         .catch((error) => {
@@ -193,6 +199,7 @@ const PagarMoviliza = () => {
     e.preventDefault();
     setBloqueoInput(false)
     setNumeroMoviliza("")
+    setCambioBarcodeBoton(false)
  }
 
   const onSubmitConsultMoviliza = (e) => {
@@ -297,24 +304,33 @@ const PagarMoviliza = () => {
               }
               else{
                 notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
+                navigate("/");
+                navigate("/moviliza");
               }
             }
             else if (response?.status === false){ 
                   if (response?.obj?.mensaje != null){
                     if (response?.obj?.mensaje=="Error autenticando adminot "){
-                      notifyError ("Respuesta PDP: Recargar página");
+                      notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
+                      navigate("/");
+                      navigate("/moviliza");
                     }
                     else{
                       notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
+                      navigate("/");
+                      navigate("/moviliza");
                     }
             }
                 else{
-                  notifyError ("Respuesta PDP: Recargar página")
+                  notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                  navigate("/");
+                  navigate("/moviliza");
                 }
             }
            }
         )
         .catch((error) => {
+          navigate("/");
           navigate("/moviliza");
           if (error?.cause === "custom") {
             return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
@@ -396,7 +412,8 @@ const PagarMoviliza = () => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
         idLiquidacion: resConsultMoviliza.numero_moviliza,
-        medioPago: "PSE",
+        // medioPago: "PSE",
+        medioPago: "Ventanilla en Efectivo",
         // medioPago: {
         //   descripcion: "Ventanilla de efectivo",
         //   id: 1,
@@ -429,7 +446,24 @@ const PagarMoviliza = () => {
             notify("Respuesta PDP: Pago Moviliza exitoso");
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
-            notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
+            let mensaje = response?.msg.replace("Error respuesta PDP: (Error:", "")
+            mensaje = mensaje.replace("(", "")
+            mensaje = mensaje.replace("))", "")
+            mensaje = mensaje.replace(")", "")
+            if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
+              notifyError("Error respuesta Moviliza: falla en la notificación");
+            }
+            else if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))"){
+              notifyError("Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))");
+            }
+            else if (response?.msg){
+              notifyError(mensaje);
+            }
+            else{
+              notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
+            }
+            navigate("/");
+            navigate("/moviliza");
           }
         })
         .catch((error) => {
@@ -606,6 +640,7 @@ const PagarMoviliza = () => {
             bloqueoInput={bloqueoInput}
             resetConsultaBarcode={resetConsultaBarcode}
             token={token}
+            cambioBarcodeBoton={cambioBarcodeBoton}
           ></LecturaBarcode>
         )}
 

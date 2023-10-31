@@ -673,7 +673,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type='submit'>
+                <Button type='submit' disabled={showModal}>
                   {dataConveniosPagar.includes(
                     datosEnvio?.datosConvenio?.num_ind_consulta_cnb
                   )
@@ -687,35 +687,37 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
               {peticion === 1 && (
                 <>
-                  <h1 className='text-2xl font-semibold'>
-                    {dataConveniosPagar.includes(
-                      datosEnvio?.datosConvenio?.num_ind_consulta_cnb
-                    )
-                      ? "¿Está seguro de realizar el pago?"
-                      : "¿Está seguro de realizar la consulta?"}
-                  </h1>
-                  <h2>{`Convenio: ${
-                    datosEnvio?.datosConvenio?.nom_convenio_cnb ?? ""
-                  }`}</h2>
-                  {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
-                    <h2>{`${datosEnvio?.datosConvenio?.nom_ref1_cnb}: ${
-                      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                  <Form grid onSubmit={onSubmitPago} className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                    <h1 className='text-2xl font-semibold'>
+                      {dataConveniosPagar.includes(
+                        datosEnvio?.datosConvenio?.num_ind_consulta_cnb
+                      )
+                        ? "¿Está seguro de realizar el pago?"
+                        : "¿Está seguro de realizar la consulta?"}
+                    </h1>
+                    <h2>{`Convenio: ${
+                      datosEnvio?.datosConvenio?.nom_convenio_cnb ?? ""
                     }`}</h2>
-                  )}
-                  {datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1" && (
-                    <h2>{`${datosEnvio?.datosConvenio?.nom_ref2_cnb}: ${
-                      datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
-                    }`}</h2>
-                  )}
-                  <h2>{`Valor transacción: ${formatMoney.format(
-                    datosTransaccion.valor
-                  )}`}</h2>
-                  <ButtonBar>
-                    <Button onClick={hideModalReset}>Cancelar</Button>
-                    <Button type='submit' onClick={onSubmitPago}>
-                      Aceptar
-                    </Button>
-                  </ButtonBar>
+                    {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
+                      <h2>{`${datosEnvio?.datosConvenio?.nom_ref1_cnb}: ${
+                        datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                      }`}</h2>
+                    )}
+                    {datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1" && (
+                      <h2>{`${datosEnvio?.datosConvenio?.nom_ref2_cnb}: ${
+                        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                      }`}</h2>
+                    )}
+                    <h2>{`Valor transacción: ${formatMoney.format(
+                      datosTransaccion.valor
+                    )}`}</h2>
+                      <ButtonBar>
+                        <Button onClick={hideModalReset}>Cancelar</Button>
+                        <Button type='submit' disabled={peticion !== 1 && showModal}>
+                          Aceptar
+                        </Button>
+                    </ButtonBar>
+                  </Form>
                 </>
               )}
               {peticion === 2 && (
@@ -770,22 +772,24 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       />
                       <ButtonBar>
                         <Button onClick={hideModalReset}>Cancelar</Button>
-                        <Button type='submit'>Realizar pago</Button>
+                        <Button type='submit' disabled={peticion !== 2 && showModal}>Realizar pago</Button>
                       </ButtonBar>
                     </Form>
                   ) : (
-                    <ButtonBar>
+                    <Form onSubmit={() => {
+                      setDatosTransaccion((old) => ({
+                        ...old,
+                        valor: 0,
+                        showValor: 0,
+                      }));
+                      setPeticion(3)}}>
+                      <ButtonBar>
                       <Button onClick={hideModalReset}>Cancelar</Button>
-                      <Button type='submit' onClick={() => {
-                        setDatosTransaccion((old) => ({
-                          ...old,
-                          valor: 0,
-                          showValor: 0,
-                        }));
-                        setPeticion(3) }}>
+                      <Button type='submit' disabled={peticion !== 2 && showModal}>
                         Realizar pago
                       </Button>
                     </ButtonBar>
+                    </Form>
                   )}
                 </>
               )}
@@ -830,7 +834,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     />
                     <ButtonBar>
                       <Button onClick={hideModalReset}>Cancelar</Button>
-                      <Button type='submit'>Realizar pago</Button>
+                      <Button type='submit' disabled={peticion !== 3 && showModal}>Realizar pago</Button>
                     </ButtonBar>
                   </Form>
                 </>

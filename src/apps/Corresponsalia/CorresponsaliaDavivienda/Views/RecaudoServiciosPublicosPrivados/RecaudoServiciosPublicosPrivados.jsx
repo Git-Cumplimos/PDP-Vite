@@ -186,6 +186,7 @@ const RecaudoServiciosPublicosPrivados = () => {
         issuerIdDane: roleInfo?.codigo_dane,
         nombreComercio: roleInfo?.["nombre comercio"],
         municipio: roleInfo?.["ciudad"],
+        valCodigoDeBarras: tipo_convenio === "CBR" ? valorTransaccion : "0.00",
         oficinaPropia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
