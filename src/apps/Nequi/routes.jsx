@@ -39,7 +39,7 @@ const rutasCorresponsaliaNequi = {
 };
 export const rutasRecargaNequi = {
   link: "/recarga-cupo/nequi",
-  label: <AppIcons Logo={"NEQUI"} name="Nequi" />,
+  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Nequi" />,
   component: RecargaCupoNequiNoficacion,
   permission: listPermissionsRecargaCupoNequi,
   subRoutes: [],
