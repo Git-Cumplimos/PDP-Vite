@@ -112,9 +112,9 @@ const PanelHistorico = () => {
         ["", ""],
         ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior)],
         ["", ""],
-        ["Efectivo en caja PDP",formatMoney.format(data.total_efectivo_en_caja)],
+        ["Efectivo en caja PDP",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+Num)],
         ["", ""],
-        ["Efectivo en caja PDP + Externos",formatMoney.format(Num+data.total_efectivo_en_caja)],
+        ["Efectivo en caja PDP + Externos",formatMoney.format(data.total_efectivo_en_caja)],
         ["", ""],
       ],
       trxInfo: [

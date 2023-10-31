@@ -439,10 +439,11 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0, sobregiro: 0, alerta: '' };
+      const tempRole = { quota: 0, comision: 0, sobregiro: 0,sobregirovalue: 0, alerta: '' };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
       tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
+      tempRole.sobregirovalue = quota["sobregiro"];
       tempRole.alerta = quota["alerta cupo"];
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
