@@ -8,7 +8,7 @@ import {
 
 const routesRecargaCupo = {
   link: "/recarga-cupo",
-  label: <AppIcons Logo={"RECARGA_CUPO"} name="Recargar Cupo" />,
+  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargar Cupo" />,
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
