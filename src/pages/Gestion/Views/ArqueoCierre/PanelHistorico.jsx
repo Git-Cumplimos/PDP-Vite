@@ -110,7 +110,7 @@ const PanelHistorico = () => {
       cajaInfo: [
         ["Movimientos del día",formatMoney.format(data.total_movimientos)],
         ["", ""],
-        ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior)],
+        ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior-Num)],
         ["", ""],
         ["Efectivo en caja PDP",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+Num)],
         ["", ""],
@@ -162,9 +162,9 @@ const PanelHistorico = () => {
             'Idcomercio': itemData?.id_comercio,
             'Idusuario': itemData?.id_usuario,
             'TotalmovimientosDía': itemData?.total_movimientos,
-            'EfectivoCierre': itemData?.total_efectivo_cierre_día_anterior,
-            'EfectivoCajaPDP': itemData?.total_efectivo_en_caja,
-            'EfectivoCajaPDPExt': totalvalorEntidades + itemData?.total_efectivo_en_caja,
+            'EfectivoCierre': itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades,
+            'EfectivoCajaPDP': totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+totalvalorEntidades,
+            'EfectivoCajaPDPExt': itemData?.total_efectivo_en_caja,
             'Sobrante': itemData?.total_sobrante,
             'Faltante': itemData?.total_faltante,
             'estimacion': itemData?.total_estimacion_faltante,
@@ -267,7 +267,7 @@ const PanelHistorico = () => {
             id_usuario,
             total_movimientos: formatMoney.format(total_movimientos),
             total_efectivo_cierre_día_anterior: formatMoney.format(
-              total_efectivo_cierre_día_anterior
+              total_efectivo_cierre_día_anterior-(total_efectivo_en_caja-total_movimientos)
             ),
             total_efectivo_en_caja: formatMoney.format(total_efectivo_en_caja),
             total_sobrante: formatMoney.format(total_sobrante),
