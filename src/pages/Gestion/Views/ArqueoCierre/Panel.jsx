@@ -58,6 +58,26 @@ const Panel = () => {
     () => tiposOficinas.includes(roleInfo?.tipo_comercio),
     [roleInfo?.tipo_comercio]
   );
+  const buscarPlataforma = useCallback(() => {
+    buscarPlataformaExt({totaldata: '1'})
+      .then((res) => {
+        const listValue = [];
+        res?.obj?.results.map(function(element){
+            const inputValue = element
+            inputValue['valor'] = 0
+            listValue.push(inputValue)
+        })
+      setDataPlfExt(listValue);
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  },[]);
 
   useEffect(() => {
     const conditions = [
@@ -103,28 +123,7 @@ const Panel = () => {
         { toastId: "busqueda-cierre-123" }
       );
     }
-  }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio]);
-
-  const buscarPlataforma = useCallback(() => {
-    buscarPlataformaExt({totaldata: '1'})
-      .then((res) => {
-        const listValue = [];
-        res?.obj?.results.map(function(element){
-            const inputValue = element
-            inputValue['valor'] = 0
-            listValue.push(inputValue)
-        })
-      setDataPlfExt(listValue);
-      })
-      .catch((error) => {
-        if (error?.cause === "custom") {
-          notifyError(error?.message);
-          return;
-        }
-        console.error(error?.message);
-        notifyError("Busqueda fallida");
-      });
-  },[]);
+  }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio,buscarPlataforma]);
 
   const closeModalFunction = useCallback(() => {
     navigate(-1);
@@ -329,7 +328,7 @@ const Panel = () => {
         )}
         <Modal
           show={estado}
-          handleClose={loading || resumenCierre ? () => {} : closeModalFunction}
+          handleClose={!resumenCierre ? loading || resumenCierre ? () => {} : closeModalFunction:false}
         >
           {!resumenCierre ? (
             !confirmarArqueo ? (
