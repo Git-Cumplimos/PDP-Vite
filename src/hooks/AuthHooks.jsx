@@ -14,13 +14,12 @@ import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
-// const urlQuota = `http://127.0.0.1:5000/cupo`;
-const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/servicio-wallet-comisiones/consulta-wallet-comercio`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user = process.env.REACT_APP_URL_COGNITO;
 const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
+const url_pdp_commerce = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const validateUser = async (email) => {
   const get = {
@@ -84,7 +83,8 @@ const initialUser = {
   roleInfo: null,
   quotaInfo: null,
   pdpUser: null,
-  userPermissions: null,
+  userPermissions: [],
+  commerceInfo: null,
 };
 
 const SIGN_IN = "SIGN_IN";
@@ -95,6 +95,7 @@ const SET_ROLEINFO = "SET_ROLEINFO";
 const SET_PERMISSIONS = "SET_PERMISSIONS";
 const SET_PDPUSER = "SET_PDPUSER";
 const SET_QUOTA = "SET_QUOTA";
+const SET_COMMERCE_INFO = "SET_COMMERCE_INFO";
 
 const reducerAuth = (userState, action) => {
   const { payload } = action;
@@ -125,6 +126,10 @@ const reducerAuth = (userState, action) => {
     case SET_QUOTA:
       const { quota } = payload;
       return { ...userState, quotaInfo: quota };
+
+    case SET_COMMERCE_INFO:
+      const { commerce } = payload;
+      return { ...userState, commerceInfo: commerce };
 
     case CONFIRM_SIGN_IN:
       const { loggedUser } = payload;
@@ -239,20 +244,6 @@ export const useProvideAuth = () => {
       })
       .catch(() => {});
   }, [navigate]);
-
-  const handleSetupTOTP = useCallback(async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" +
-        "Punto de Pago Token" +
-        "?secret=" +
-        validartoken +
-        "&issuer=" +
-        "Punto de Pago Multibanco";
-      setQr(str);
-    } catch (err) {}
-  }, []);
 
   const checkTOTPFlow = useCallback(
     async (user) => {
@@ -504,12 +495,26 @@ export const useProvideAuth = () => {
 
         dispatchAuth({
           type: SET_PERMISSIONS,
-          payload: { uAccess: res?.obj?.uAccess },
+          payload: { uAccess: res?.obj?.uAccess ?? [] },
         });
         dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
       },
       [signOut]
     ),
+    onError: useCallback((error) => {
+      if (error?.cause === "custom") {
+        notifyError(error.message);
+      } else {
+        console.error(error);
+      }
+    }, []),
+  });
+
+  const [getComercios] = useFetchDispatchDebounce({
+    onSuccess: useCallback((res) => {
+      const commerce = res?.obj;
+      dispatchAuth({ type: SET_COMMERCE_INFO, payload: { commerce } });
+    }, []),
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
         notifyError(error.message);
@@ -553,6 +558,14 @@ export const useProvideAuth = () => {
       );
     }
   }, [pathname, id_comercio, id_dispositivo, getQuota]);
+
+  useEffect(() => {
+    if (id_comercio) {
+      getComercios(
+        `${url_pdp_commerce}/comercios/consultar-unique?pk_comercio=${id_comercio}`
+      );
+    }
+  }, [pathname, id_comercio, getComercios]);
 
   useEffect(() => {
     const email = userState?.userInfo?.attributes?.email;
