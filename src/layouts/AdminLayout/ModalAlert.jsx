@@ -19,9 +19,10 @@ const ModalAlert = () => {
       if (quotaInfo?.alerta !== '' && quotaInfo?.quota !== 0) {
         let valorLimit = quotaInfo?.alerta
         const valorCupo = quotaInfo?.quota
+        const sobregiro = quotaInfo?.sobregirovalue
         if (valorLimit?.includes('%')) {
           let alert = parseFloat(valorLimit.replace("%", ""))
-          let porcent = Math.floor(valorCupo*alert)/100
+          let porcent = Math.floor(sobregiro*alert)/100
           if (valorCupo < porcent) {
             setShowModalAlertCupo(true)
           }

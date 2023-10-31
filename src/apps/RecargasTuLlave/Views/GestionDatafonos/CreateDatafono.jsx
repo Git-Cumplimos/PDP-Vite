@@ -9,29 +9,30 @@ import Modal from "../../../../components/Base/Modal/Modal";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchTuLlave";
 import TextArea from "../../../../components/Base/TextArea/TextArea";
-import Select from "../../../../components/Base/Select/Select";
+// import Select from "../../../../components/Base/Select/Select";
 import Form from "../../../../components/Base/Form/Form";
 import ConsultaComerciosDatafonos from "../../components/ConsultaComerciosDatafonos/ConsultaComerciosDatafonos";
 
 const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
 const URL_EDITAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/actualizar`;
-const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
+// const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
+const URL_CREAR_DATAFONO = `http://127.0.0.1:5000/tullave-gestion-datafonos/crear`;
 
 const CreateDatafono = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [dataDatafono, setDataDatafono] = useState({
     comentarios: "",
-    estado: true,
+    // estado: true,
     fecha_creacion: null,
     fecha_modificacion: null,
     fk_comercio_asociado: "",
-    hardware_id: "",
-    numero_serie: "",
+    // hardware_id: "",
+    // numero_serie: "",
     pk_tullave_datafonos: "",
     pos_id: "",
-    tarjeta_lsam: "",
-    tarjeta_sim: "",
+    // tarjeta_lsam: "",
+    // tarjeta_sim: "",
   });
   const [selectedOpt, setSelectedOpt] = useState("");
 
@@ -45,11 +46,11 @@ const CreateDatafono = () => {
       if (params?.id) {
         const data = {
           pk_tullave_datafonos: params?.id,
-          numero_serie: dataDatafono?.numero_serie,
-          tarjeta_lsam: dataDatafono?.tarjeta_lsam,
-          hardware_id: dataDatafono?.hardware_id,
+          // numero_serie: dataDatafono?.numero_serie,
+          // tarjeta_lsam: dataDatafono?.tarjeta_lsam,
+          // hardware_id: dataDatafono?.hardware_id,
           comentarios: dataDatafono?.comentarios,
-          estado: dataDatafono?.estado,
+          // estado: dataDatafono?.estado,
         };
         if (dataDatafono?.fk_comercio_asociado) {
           data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
@@ -76,12 +77,12 @@ const CreateDatafono = () => {
       } else {
         const data = {
           pos_id: dataDatafono?.pos_id,
-          numero_serie: dataDatafono?.numero_serie,
-          tarjeta_lsam: dataDatafono?.tarjeta_lsam,
-          tarjeta_sim: dataDatafono?.tarjeta_sim,
-          hardware_id: dataDatafono?.hardware_id,
+          // numero_serie: dataDatafono?.numero_serie,
+          // tarjeta_lsam: dataDatafono?.tarjeta_lsam,
+          // tarjeta_sim: dataDatafono?.tarjeta_sim,
+          // hardware_id: dataDatafono?.hardware_id,
           comentarios: dataDatafono?.comentarios,
-          estado: dataDatafono?.estado,
+          estado: true,
         };
         if (dataDatafono?.fk_comercio_asociado) {
           data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
@@ -179,18 +180,18 @@ const CreateDatafono = () => {
   }, []);
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (ev.target.name === "estado") {
-      if (value && typeof value === "string") {
-        value = value.toLowerCase() === "false" ? false : true;
-      }
-    }
-    if (
-      ev.target.name === "tarjeta_sim" ||
-      ev.target.name === "numero_serie" ||
-      ev.target.name === "hardware_id"
-    ) {
-      value = value.toUpperCase();
-    }
+    // if (ev.target.name === "estado") {
+    //   if (value && typeof value === "string") {
+    //     value = value.toLowerCase() === "false" ? false : true;
+    //   }
+    // }
+    // if (
+    //   ev.target.name === "tarjeta_sim" ||
+    //   ev.target.name === "numero_serie" ||
+    //   ev.target.name === "hardware_id"
+    // ) {
+    //   value = value.toUpperCase();
+    // }
     setDataDatafono((old) => {
       return { ...old, [ev.target.name]: value };
     });
@@ -199,8 +200,8 @@ const CreateDatafono = () => {
     <>
       <h1 className='text-3xl'>
         {params?.id
-          ? "Actualizar datáfono Tu Llave"
-          : "Crear datáfono Tu Llave"}
+          ? "Actualizar Datáfono tuLlave"
+          : "Asociar Datáfono tullave"}
       </h1>
       <Form onSubmit={createDatafono} grid>
         <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
@@ -221,7 +222,7 @@ const CreateDatafono = () => {
               loadingPeticionCreacionDatafono
             }
           />
-          <Input
+          {/* <Input
             id='numero_serie'
             name='numero_serie'
             label={"Número de serie"}
@@ -303,7 +304,7 @@ const CreateDatafono = () => {
               loadingPeticionActualizacionDatafono ||
               loadingPeticionCreacionDatafono
             }
-          />
+          /> */}
         </Fieldset>
         <Fieldset legend='Comercio asociado' className='lg:col-span-2'>
           <Input
