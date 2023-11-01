@@ -122,6 +122,11 @@ const Retiro = () => {
           const userDoc = formData.get("docCliente");
           const numeroTelefono = formData.get("numeroTelefono");
           const valorFormat = formData.get("valor");
+          if (numeroTelefono.length !== 0){
+            if (numeroTelefono[0] !== "3"){
+              return notifyError("El número Powwi debe comenzar por 3");
+            }
+          }
           const data = {
             comercio: {
               id_comercio: roleInfo?.id_comercio,
