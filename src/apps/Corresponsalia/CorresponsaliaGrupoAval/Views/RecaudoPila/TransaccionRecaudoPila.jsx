@@ -22,10 +22,10 @@ import { fetchCustom } from "../../utils/fetchDale";
 import { useFetchDale } from "../../hooks/useFetchDale";
 import { operadoresRecaudoPila } from "../../operadorRecaudoPila";
 
-const URL_CONSULTAR_COSTO_PLANILLA = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/consulta_planilla`;
-const URL_CONSULTAR_COSTO_DOCUMENTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/consulta_pin_unico`;
-const URL_RECAUDO_PILA = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/recaudo`;
-const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo_pila/check_bd_estado_trx`;
+const URL_CONSULTAR_COSTO_PLANILLA = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo-pila/consulta-planilla`;
+const URL_CONSULTAR_COSTO_DOCUMENTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo-pila/consulta-pin-unico`;
+const URL_RECAUDO_PILA = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo-pila/recaudo`;
+const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/recaudo-pila/check-bd-estado-trx`;
 
 const TransaccionRecaudoPila = () => {
   const navigate = useNavigate();
