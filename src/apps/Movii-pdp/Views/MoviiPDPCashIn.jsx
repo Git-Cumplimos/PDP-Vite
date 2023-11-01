@@ -5,15 +5,10 @@ import Modal from "../../../components/Base/Modal";
 import { useAuth } from "../../../hooks/AuthHooks";
 import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
-import { notify, notifyError, notifyPending } from "../../../utils/notify";
+import { notifyError, notifyPending } from "../../../utils/notify";
 import Tickets from "../../../components/Base/Tickets";
 import { useReactToPrint } from "react-to-print";
-import {
-  postRealizarCashout,
-  consultaValidateUserMoviiCashIn,
-  trxDepositoMoviiCashIn,
-  fetchCustom,
-} from "../utils/fetchMoviiRed";
+import { fetchCustom } from "../utils/fetchMoviiRed";
 import { v4 } from "uuid";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
@@ -36,16 +31,8 @@ const MoviiPDPCashIn = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const [showModal2, setShowModal2] = useState(false);
-  const [limiteRecarga, setLimiteRecarga] = useState({
-    superior: enumParametrosMovii.MAXCASHINMOVII,
-    inferior: enumParametrosMovii.MINCASHINMOVII,
-  });
   const uniqueId = v4();
-  const [loadingPinPago, setLoadingPinPago] = useState(false);
   const [peticion, setPeticion] = useState(0);
-  const [banderaConsulta, setBanderaConsulta] = useState(false);
-  const [botonAceptar, setBotonAceptar] = useState(false);
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
     numeroTelefono: "",
@@ -57,39 +44,7 @@ const MoviiPDPCashIn = () => {
     genero: "",
     id_trx: "",
   });
-  const [isUploading, setIsUploading] = useState(false);
-  useEffect(() => {
-    fetchParametrosAutorizadoresFunc();
-  }, []);
-  const fetchParametrosAutorizadoresFunc = useCallback(() => {
-    fetchParametrosAutorizadores({})
-      .then((autoArr) => {
-        setLimiteRecarga({
-          superior: parseInt(
-            autoArr?.results?.filter(
-              (i) =>
-                i.id_tabla_general_parametros_autorizadores ===
-                enumParametrosAutorizador.limite_superior_cash_out_movii
-            )[0]?.valor_parametro
-          ),
-          inferior: parseInt(
-            autoArr?.results?.filter(
-              (i) =>
-                i.id_tabla_general_parametros_autorizadores ===
-                enumParametrosAutorizador.limite_inferior_cash_out_movii
-            )[0]?.valor_parametro
-          ),
-        });
-      })
-      .catch((err) => console.error(err));
-  }, []);
   const [objTicketActual, setObjTicketActual] = useState({});
-
-  // /*ENVIAR NUMERO DE TARJETA Y VALOR DE LA RECARGA*/
-  const onSubmit = (e) => {
-    e.preventDefault();
-    habilitarModal();
-  };
 
   /*Funcion para habilitar el modal*/
   const habilitarModal = () => {
@@ -97,9 +52,7 @@ const MoviiPDPCashIn = () => {
   };
 
   const hideModal = () => {
-    setBanderaConsulta(false);
     setShowModal(false);
-    setShowModal2(false);
     setDatosTrans({
       otp: "",
       numeroTelefono: "",
@@ -118,7 +71,6 @@ const MoviiPDPCashIn = () => {
   };
   const hideModalUsuario = () => {
     setShowModal(false);
-    setShowModal2(false);
     setDatosTrans({
       otp: "",
       numeroTelefono: "",
@@ -134,6 +86,24 @@ const MoviiPDPCashIn = () => {
     });
     setPeticion(0);
     notifyError("Transacción cancelada por el usuario");
+    navigate(-1);
+  };
+  const hideModalUsuarioInicial = () => {
+    setShowModal(false);
+    setDatosTrans({
+      otp: "",
+      numeroTelefono: "",
+      valorCashIn: "",
+    });
+    setInfoUsers({
+      nombreUsuario: "",
+      ciudad: "",
+      genero: "",
+    });
+    setObjTicketActual((old) => {
+      return { ...old, trxInfo: [] };
+    });
+    setPeticion(0);
     navigate(-1);
   };
 
@@ -195,14 +165,11 @@ const MoviiPDPCashIn = () => {
         },
         {
           render: ({ data: res }) => {
-            setLoadingPinPago(false);
-            setBotonAceptar(false);
             const result = { data: res };
             const msg = result.data.msg;
             if (res?.obj?.ticket) setObjTicketActual(res?.obj?.ticket);
             if (res?.status) {
               setPeticion(2);
-              setShowModal2(!showModal2);
               setInfoUsers((old) => {
                 return {
                   ...old,
@@ -232,6 +199,7 @@ const MoviiPDPCashIn = () => {
 
   const peticionConsulta = useCallback(
     (ev) => {
+      ev.preventDefault();
       const data = {
         comercio: {
           id_comercio: roleInfo?.id_comercio,
@@ -255,20 +223,16 @@ const MoviiPDPCashIn = () => {
         peticionConsultaDepositoMovii({}, data),
         {
           render() {
-            setLoadingPinPago(true);
-            setBotonAceptar(true);
             return "Procesando transacción";
           },
         },
         {
           render({ data: res }) {
-            setLoadingPinPago(false);
-            setBotonAceptar(false);
             const result = { data: res };
             const msg = result.data.msg;
             if (res?.status) {
               setPeticion(1);
-              setShowModal2(!showModal2);
+              habilitarModal();
               setInfoUsers((old) => {
                 return {
                   ...old,
@@ -297,18 +261,17 @@ const MoviiPDPCashIn = () => {
   );
   return (
     <>
-      <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>Depósito Movii</h1>
-      <Form grid onSubmit={onSubmit}>
+      <h1 className="text-3xl">Depósito Movii</h1>
+      <Form grid onSubmit={peticionConsulta}>
         <Input
-          id='numeroTelefono'
-          label='Número Movii'
-          type='text'
-          name='numeroTelefono'
-          minLength='10'
-          maxLength='10'
+          id="numeroTelefono"
+          label="Número Movii"
+          type="text"
+          name="numeroTelefono"
+          minLength="10"
+          maxLength="10"
           required
-          autoComplete='off'
+          autoComplete="off"
           value={datosTrans.numeroTelefono}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -322,13 +285,14 @@ const MoviiPDPCashIn = () => {
                 return { ...old, numeroTelefono: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <MoneyInput
-          id='valCashIn'
-          name='valCashIn'
-          label='Valor a depositar'
-          type='text'
-          autoComplete='off'
+          id="valCashIn"
+          name="valCashIn"
+          label="Valor a depositar"
+          type="text"
+          autoComplete="off"
           maxLength={"12"}
           value={datosTrans.valorCashIn ?? ""}
           onInput={(e, valor) => {
@@ -340,65 +304,41 @@ const MoviiPDPCashIn = () => {
           }}
           required
           min={enumParametrosMovii.MINCASHINMOVII}
-          max={enumParametrosMovii.MAXCASHINMOVII} 
+          max={enumParametrosMovii.MAXCASHINMOVII}
           equalError={false}
           equalErrorMin={false}
-          ></MoneyInput>
-        <ButtonBar className='lg:col-span-2'>
+        ></MoneyInput>
+        <ButtonBar className="lg:col-span-2">
           <Button
-            type='submit'
+            disabled={
+              loadingPeticionCashinMovii || loadingPeticionConsultaDepositoMovii
+            }
+            onClick={hideModalUsuarioInicial}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
             disabled={
               loadingPeticionConsultaDepositoMovii || loadingPeticionCashinMovii
-            }>
-            Aceptar
+            }
+          >
+            Realizar consulta
           </Button>
         </ButtonBar>
       </Form>
-      <Modal
-        show={showModal}
-        handleClose={loadingPinPago ? () => {} : hideModal}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-          {peticion === 0 ? (
+      <Modal show={showModal}>
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+          {peticion === 1 ? (
             <>
-              <h1 className='text-2xl font-semibold'>
-                ¿Está seguro de realizar la transacción?
-              </h1>
-              <h2 className='text-base'>
-                {`Valor a depositar: ${formatMoney.format(
-                  datosTrans.valorCashIn
-                )} COP`}
-              </h2>
-              <h2>{`Número Movii: ${datosTrans.numeroTelefono}`}</h2>
-              <ButtonBar>
-                <Button
-                  disabled={
-                    loadingPeticionCashinMovii ||
-                    loadingPeticionConsultaDepositoMovii
-                  }
-                  onClick={hideModalUsuario}>
-                  Cancelar
-                </Button>
-                <Button
-                  disabled={
-                    loadingPeticionCashinMovii ||
-                    loadingPeticionConsultaDepositoMovii
-                  }
-                  type='submit'
-                  onClick={peticionConsulta}>
-                  Realizar consulta
-                </Button>
-              </ButtonBar>
-            </>
-          ) : peticion === 1 ? (
-            <>
-              <h1 className='text-2xl font-bold'>
+              <h1 className="text-2xl font-bold">
                 Respuesta de consulta Movii
               </h1>
-              <h4 className='text-2xl font-semibold'>
+              <h4 className="text-2xl font-semibold">
                 Resumen de la transacción
               </h4>
               <h2>{`Nombre usuario: ${infoUsers.nombreUsuario}`}</h2>
-              <h2 className='text-base'>
+              <h2 className="text-base">
                 {`Valor a depositar: ${formatMoney.format(
                   datosTrans.valorCashIn
                 )} COP`}
@@ -415,7 +355,8 @@ const MoviiPDPCashIn = () => {
                     loadingPeticionCashinMovii ||
                     loadingPeticionConsultaDepositoMovii
                   }
-                  onClick={hideModalUsuario}>
+                  onClick={hideModalUsuario}
+                >
                   Cancelar
                 </Button>
                 <Button
@@ -423,8 +364,9 @@ const MoviiPDPCashIn = () => {
                     loadingPeticionCashinMovii ||
                     loadingPeticionConsultaDepositoMovii
                   }
-                  type='submit'
-                  onClick={peticionCashIn}>
+                  type="submit"
+                  onClick={peticionCashIn}
+                >
                   Aceptar
                 </Button>
               </ButtonBar>
@@ -435,14 +377,15 @@ const MoviiPDPCashIn = () => {
               <h2>
                 <ButtonBar>
                   <Button
-                    type='submit'
+                    type="submit"
                     disabled={
                       loadingPeticionCashinMovii ||
                       loadingPeticionConsultaDepositoMovii
                     }
                     onClick={() => {
                       hideModal();
-                    }}>
+                    }}
+                  >
                     Aceptar
                   </Button>
                   <Button
@@ -450,7 +393,8 @@ const MoviiPDPCashIn = () => {
                     disabled={
                       loadingPeticionCashinMovii ||
                       loadingPeticionConsultaDepositoMovii
-                    }>
+                    }
+                  >
                     Imprimir
                   </Button>
                 </ButtonBar>
