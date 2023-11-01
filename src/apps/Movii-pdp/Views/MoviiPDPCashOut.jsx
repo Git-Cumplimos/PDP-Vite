@@ -208,8 +208,11 @@ const MoviiPDPCashOut = () => {
           equalErrorMin={false}
         ></MoneyInput>
         <ButtonBar className="lg:col-span-2">
+          <Button disabled={loadingPeticionCashoutMovii} onClick={hideModal}>
+            Cancelar
+          </Button>
           <Button type="submit" disabled={loadingPeticionCashoutMovii}>
-            Aceptar
+            Realizar Retiro
           </Button>
         </ButtonBar>
       </Form>
