@@ -166,12 +166,13 @@ export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
 
   const [parameters, setParameters] = useState("");
+  const [suserInactive, setSuserInactive] = useState("");
 
   const [timer, setTimer] = useState(null);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
-  const { cognitoUser, roleInfo } = userState;
+  const { cognitoUser, roleInfo, pdpUser } = userState;
   const id_comercio = roleInfo?.id_comercio;
   const id_dispositivo = roleInfo?.id_dispositivo;
 
@@ -459,6 +460,7 @@ export const useProvideAuth = () => {
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
       let _roleinfo = {};
+      setSuserInactive((old) => ("msg" in suserInfo ? suserInfo?.msg : old));
       if (!("msg" in suserInfo)) {
         _roleinfo = structuredClone(suserInfo);
       }
@@ -477,8 +479,10 @@ export const useProvideAuth = () => {
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
         notifyError(error.message);
+        setSuserInactive(error.message);
       } else {
         console.error(error);
+        setSuserInactive(error);
       }
     }, []),
   });
@@ -578,6 +582,14 @@ export const useProvideAuth = () => {
       );
     }
   }, [userState?.userInfo?.attributes?.email, getSuserInfo, getLoginPdp]);
+
+  useEffect(() => {
+    const isPdpCommerce = !!pdpUser?.fk_id_comercio;
+    if (isPdpCommerce && suserInactive) {
+      notifyError(suserInactive, false, { toastId: "failed-suser" });
+      signOut();
+    }
+  }, [pdpUser?.fk_id_comercio, suserInactive, signOut]);
 
   useEffect(() => {
     checkTOTPFlow(cognitoUser);

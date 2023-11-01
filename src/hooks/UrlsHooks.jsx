@@ -148,10 +148,11 @@ export const useUrls = () => {
 };
 
 export const useProvideUrls = () => {
-  const { userPermissions, commerceInfo, roleInfo } = useAuth();
+  const { userPermissions, commerceInfo, pdpUser } = useAuth();
 
   const urlsPrivateApps = useMemo(() => {
-    if (roleInfo?.id_comercio && !commerceInfo?.estado) {
+    const isPdpCommerce = !!pdpUser?.fk_id_comercio;
+    if (isPdpCommerce && !commerceInfo?.estado) {
       return [
         {
           link: "https://portal.solucionesenred.co/",
@@ -173,7 +174,7 @@ export const useProvideUrls = () => {
     } else {
       return [];
     }
-  }, [userPermissions, commerceInfo?.estado, roleInfo?.id_comercio]);
+  }, [userPermissions, commerceInfo?.estado, pdpUser?.fk_id_comercio]);
 
   const urlsGestion = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
