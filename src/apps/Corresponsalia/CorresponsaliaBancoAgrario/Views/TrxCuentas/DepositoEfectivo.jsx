@@ -27,9 +27,12 @@ import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
+import { useMFA } from "../../../../../components/Base/MFAScreen";
 
 const Deposito = () => {
   const navigate = useNavigate();
+
+  const { submitEventSetter } = useMFA();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosBancoAgrario.maxDepositoCuentas,
@@ -280,7 +283,7 @@ const Deposito = () => {
               <ButtonBar>
                 <Button
                   type='submit'
-                  onClick={onMakePayment}
+                  onClick={submitEventSetter(onMakePayment)}
                   disabled={loadingDepositoCorresponsalBancoAgrario}>
                   Realizar Depósito
                 </Button>
