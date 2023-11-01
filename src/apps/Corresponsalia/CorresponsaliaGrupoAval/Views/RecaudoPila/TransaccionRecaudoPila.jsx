@@ -48,7 +48,7 @@ const TransaccionRecaudoPila = () => {
     month: currentMonth,
     periodoLiquidacion: "",
     valor: 0,
-    operador: operadoresRecaudoPila["Mi Planilla"],
+    operador: operadoresRecaudoPila["COMPENSAR"],
   });
   const [summary, setSummary] = useState([]);
   const [uuid, setUuid] = useState(v4());
@@ -72,14 +72,14 @@ const TransaccionRecaudoPila = () => {
         year: currentYear,
         month: currentMonth,
         tipo: "2",
-        operador: operadoresRecaudoPila["Mi Planilla"]
+        operador: operadoresRecaudoPila["COMPENSAR"]
       }));
     } else if (e.target.value === "3") {
       setDatosTrx((old) => ({
         ...old,
         tipo: "3",
         numeroDocumento: "",
-        operador: operadoresRecaudoPila["Mi Planilla"],
+        operador: operadoresRecaudoPila["COMPENSAR"],
         year: currentYear,
         month: currentMonth,        
       }));
@@ -96,7 +96,7 @@ const TransaccionRecaudoPila = () => {
       month: currentMonth,
       valor: 0,
       periodoLiquidacion: "",
-      operador: operadoresRecaudoPila["Mi Planilla"],
+      operador: operadoresRecaudoPila["COMPENSAR"],
     });
     setSummary([]);
     setUuid(v4());
@@ -164,7 +164,7 @@ const TransaccionRecaudoPila = () => {
               month: currentMonth,
               valor: 0,
               periodoLiquidacion: "",
-              operador: operadoresRecaudoPila["Mi Planilla"],
+              operador: operadoresRecaudoPila["COMPENSAR"],
             });
             return error?.message ?? "Consulta fallida";
           },
@@ -231,7 +231,7 @@ const TransaccionRecaudoPila = () => {
               month: currentMonth,
               valor: 0,
               periodoLiquidacion: "",
-              operador: operadoresRecaudoPila["Mi Planilla"],
+              operador: operadoresRecaudoPila["COMPENSAR"],
             });
             return error?.message ?? "Consulta fallida";
           },
