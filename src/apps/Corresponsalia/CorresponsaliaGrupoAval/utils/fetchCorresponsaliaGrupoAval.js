@@ -1,3 +1,4 @@
+import { fetchDataTotp } from "../../../../utils/MFA";
 import fetchData from "../../../../utils/fetchData";
 
 const urlGrupoAval = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}`;
@@ -35,7 +36,7 @@ export const depositoCorresponsalGrupoAval = async (bodyObj) => {
     });
   }
   try {
-    const res = await fetchData(
+    const res = await fetchDataTotp(
       `${urlGrupoAval}/grupo_aval_cb_deposito_retiro/depositoCorresponsal`,
       "POST",
       {},
