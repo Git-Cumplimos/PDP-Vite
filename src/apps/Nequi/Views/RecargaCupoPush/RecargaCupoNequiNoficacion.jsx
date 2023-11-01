@@ -75,9 +75,11 @@ const RecargaCupoNequiNoficacion = () => {
         );
         return;
       }
-      if (numeroTelefono.length !== 0)
-        if (numeroTelefono[0] !== "3")
+      if (numeroTelefono.length !== 0){
+        if (numeroTelefono[0] !== "3"){
           return notifyError("El número Nequi debe comenzar por 3");
+        }
+      }
 
       const summary = {
         "Número Nequi": numeroTelefono,
