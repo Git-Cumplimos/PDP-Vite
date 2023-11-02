@@ -126,17 +126,6 @@ const Deposito = () => {
         const userDoc = formData.get("docCliente");
         const numeroTelefono = formData.get("numeroTelefono");
         const valorFormat = formData.get("valor");
-        const numdepositante = formData.get("numeroTelefonoDepositante")
-        if (numeroTelefono.length !== 0){
-          if (numeroTelefono[0] !== "3"){
-            return notifyError("El número Powwi debe comenzar por 3");
-          }
-        }
-        if (numdepositante !== 0){
-          if (numdepositante[0] !== "3"){
-            return notifyError("El número de celular del depositante debe comenzar por 3");
-          }
-        }
         const data = {
           comercio: {
             id_comercio: roleInfo?.id_comercio,
@@ -295,15 +284,27 @@ const Deposito = () => {
                 onInput={(e) => {
                   let valor = e.target.value;
                   let num = valor.replace(/[\s\.\-+eE]/g, "");
-                  if (!isNaN(num)) {
-                    if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
-                        return notifyError("El número debe comenzar por 3");
-                    }
+                  if (
+                    (String(e.target.value).length > 0) &
+                    (String(e.target.value).slice(0, 1) !== "3")
+                  ) {
+                    notifyError("El número de celular debe iniciar por 3");
                     setDatosTrx(prevState => ({
                       ...prevState,
-                      numeroTelefono: num
-                    }));
+                      numeroTelefono: ""
+                    }));;
                   }
+                  else {
+                    if (!isNaN(num)) {
+                      if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
+                          return notifyError("El número debe comenzar por 3");
+                      }
+                      setDatosTrx(prevState => ({
+                        ...prevState,
+                        numeroTelefono: num
+                      }));
+                    }
+                  } 
                 }}
             />
             <Select
@@ -350,17 +351,29 @@ const Deposito = () => {
                 autoComplete='off'
                 value={datosTrx.numeroTelefonoDepositante}
                 onInput={(e) => {
-                let valor = e.target.value;
-                let num = valor.replace(/[\s\.\-+eE]/g, "");
-                if (!isNaN(num)) {
-                    if (datosTrx.numeroTelefonoDepositante.length === 0 && num !== "3") {
-                    return notifyError("El número debe comenzar por 3");
-                    }
+                  let valor = e.target.value;
+                  let num = valor.replace(/[\s\.\-+eE]/g, "");
+                  if (
+                    (String(e.target.value).length > 0) &
+                    (String(e.target.value).slice(0, 1) !== "3")
+                  ) {
+                    notifyError("El número de celular debe iniciar por 3");
                     setDatosTrx(prevState => ({
                       ...prevState,
-                      numeroTelefonoDepositante: num
-                    }));
-                }
+                      numeroTelefonoDepositante: ""
+                    }));;
+                  }
+                  else {
+                    if (!isNaN(num)) {
+                      if (datosTrx.numeroTelefonoDepositante.length === 0 && num !== "3") {
+                      return notifyError("El número debe comenzar por 3");
+                      }
+                      setDatosTrx(prevState => ({
+                        ...prevState,
+                        numeroTelefonoDepositante: num
+                      }));
+                    }
+                  }
                 }}
             />
             <Input
