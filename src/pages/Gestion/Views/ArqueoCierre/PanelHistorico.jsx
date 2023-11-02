@@ -24,6 +24,7 @@ const PanelHistorico = () => {
   const [pageData, setPageData] = useState({});
   const [maxPages, setMaxPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [disablereport, setDisablereport] = useState(false);
   const [resumenCierre, setResumenCierre] = useState(null);
   const [searchInfo, setSearchInfo] = useState({
     id_usuario: "",
@@ -33,7 +34,7 @@ const PanelHistorico = () => {
     totaldata:"",
   });
   const [dataPlfExt, setDataPlfExt] = useState(null);
-
+  
   const CloseModal = useCallback(() => {
     setResumenCierre(null)
     Num = 0
@@ -143,81 +144,94 @@ const PanelHistorico = () => {
   }, []);
 
   const handle = useCallback((entidades) => {
-    searchInfo.totaldata=1
-    searchHistorico({
-      ...Object.fromEntries(
-        Object.entries(searchInfo).filter(([, val]) => val,)
-      ),
-      ...pageData,
-    })
-      .then((res) => {
-        const newData = []
-        res?.obj?.results?.map((itemData)=>{
-          var totalvalorEntidades = 0
-          itemData?.entidades_externas?.data.map((val) => {
-            totalvalorEntidades+=val.valor
-          })
-          const valJson = {
-            'Idcierre': itemData?.pk_id_cierre,
-            'Idcomercio': itemData?.id_comercio,
-            'Idusuario': itemData?.id_usuario,
-            'TotalmovimientosDía': Math.round(itemData?.total_movimientos),
-            'EfectivoCierre': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
-            'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+totalvalorEntidades),
-            'EfectivoCajaPDPExt': Math.round(itemData?.total_efectivo_en_caja),
-            'Sobrante': Math.round(itemData?.total_sobrante),
-            'Faltante': Math.round(itemData?.total_faltante),
-            'estimacion': itemData?.total_estimacion_faltante,
-            'Consignaciones': itemData?.total_consignaciones,
-            'outransportadora': itemData?.total_entregado_transportadora,
-            'intransportadora': itemData?.total_recibido_transportadora,
-            'notas': itemData?.total_notas,
-          }
-          entidades.map((val)=>{
-            valJson[val]='0'
-          })
-          if (itemData.hasOwnProperty('entidades_externas')) {
-            itemData?.entidades_externas?.data.map((val)=>{
-              valJson[val.pk_nombre_plataforma]=val.valor
-            })
-          }
-          valJson['Estado Cierre']='Realizado'
-          valJson['Fecha_hora_cierre'] = dateFormatter.format(new Date(itemData.created)).replace(",", "");
-          newData.push(valJson)
-        })
-        const concatenadosParcil = entidades
-        const concatenadosFinal = concatenadosParcil.join(',');
-        const headers = 'Id cierre,Id comercio,Id usuario,Total movimientos dia,Efectivo cierre dia anterior,Efectivo en caja PDP,Efectivo en caja PDP + Externos,Sobrante,Faltante,Estimacion faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas debito o credito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
-        const main = newData.map((item)=>{
-          return Object.values(item).toString();
-        })
-        const csv = [headers, ...main].join('\n')
-        const blob = new Blob([csv], {type: 'application/csv'})
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        const now = Intl.DateTimeFormat("es-CO", { year: "2-digit",  month: "2-digit", day: "2-digit"}).format(new Date())
-        a.download = 'Reporte Cierre de Caja '+now+'.csv'
-        a.href=url
-        a.style.play = 'none'
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
+    const fechaInicial = new Date (searchInfo.date_ini)
+    const fechaFinal = new Date (searchInfo.date_end)
+    let dias = Math.round((fechaFinal.getTime() - fechaInicial.getTime())/ (1000*60*60*24))
+    if (searchInfo.date_end !== "" && 
+        searchInfo.date_ini !== "" &&
+        dias < 15
+    ) {
+      setDisablereport(true)
+      searchInfo.totaldata=1
+      searchHistorico({
+        ...Object.fromEntries(
+          Object.entries(searchInfo).filter(([, val]) => val,)
+        ),
+        ...pageData,
       })
-      .catch((err) => {
-        if (err?.cause === "custom") {
-          notifyError(err?.message);
-          return;
-        }
-        console.error(err?.message);
-        notifyError("Peticion fallida");
-      });
+        .then((res) => {
+          const newData = []
+          res?.obj?.results?.map((itemData)=>{
+            var totalvalorEntidades = 0
+            itemData?.entidades_externas?.data.map((val) => {
+              totalvalorEntidades+=val.valor
+            })
+            const valJson = {
+              'Idcierre': itemData?.pk_id_cierre,
+              'Idcomercio': itemData?.id_comercio,
+              'Idusuario': itemData?.id_usuario,
+              'TotalmovimientosDía': Math.round(itemData?.total_movimientos),
+              'EfectivoCierre': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
+              'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+totalvalorEntidades),
+              'EfectivoCajaPDPExt': Math.round(itemData?.total_efectivo_en_caja),
+              'Sobrante': Math.round(itemData?.total_sobrante),
+              'Faltante': Math.round(itemData?.total_faltante),
+              'estimacion': itemData?.total_estimacion_faltante,
+              'Consignaciones': itemData?.total_consignaciones,
+              'outransportadora': itemData?.total_entregado_transportadora,
+              'intransportadora': itemData?.total_recibido_transportadora,
+              'notas': itemData?.total_notas,
+            }
+            entidades.map((val)=>{
+              valJson[val]='0'
+            })
+            if (itemData.hasOwnProperty('entidades_externas')) {
+              itemData?.entidades_externas?.data.map((val)=>{
+                valJson[val.pk_nombre_plataforma]=val.valor
+              })
+            }
+            valJson['Estado Cierre']='Realizado'
+            valJson['Fecha_hora_cierre'] = dateFormatter.format(new Date(itemData.created)).replace(",", "");
+            newData.push(valJson)
+          })
+          const concatenadosParcil = entidades
+          const concatenadosFinal = concatenadosParcil.join(',');
+          const headers = 'Id cierre,Id comercio,Id usuario,Total movimientos dia,Efectivo cierre dia anterior,Efectivo en caja PDP,Efectivo en caja PDP + Externos,Sobrante,Faltante,Estimacion faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas debito o credito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
+          const main = newData.map((item)=>{
+            return Object.values(item).toString();
+          })
+          const csv = [headers, ...main].join('\n')
+          const blob = new Blob([csv], {type: 'application/csv'})
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          const now = Intl.DateTimeFormat("es-CO", { year: "2-digit",  month: "2-digit", day: "2-digit"}).format(new Date())
+          a.download = 'Reporte Cierre de Caja '+now+'.csv'
+          a.href=url
+          a.style.play = 'none'
+          document.body.appendChild(a)
+          a.click()
+          a.remove()
+          URL.revokeObjectURL(url)
+          setDisablereport(false)
+        })
+        .catch((err) => {
+          setDisablereport(false)
+          if (err?.cause === "custom") {
+            notifyError(err?.message);
+            return;
+          }
+          console.error(err?.message);
+          notifyError("Peticion fallida");
+        });
+    }else{
+      notifyError("Seleccione un rango de fecha no mayor a 15 días");
+    }
   },[searchInfo,pageData]);
 
   return (
     <Fragment>
       <ButtonBar>
-        <Button type="submit" onClick={() => {handle(dataPlfExt,receipt)}}>Generar Reporte</Button>
+        <Button type="submit" onClick={() => {handle(dataPlfExt,receipt)}} disabled={disablereport}>Generar Reporte</Button>
       </ButtonBar>
       <TableEnterprise
         title="Históricos - Cierre de Caja"

@@ -84,8 +84,6 @@ const ReporteSobranteFaltantes = () => {
     [id_comercio,id_user,insertFaltantesSobr]
   );
 
-  
-
   const handleChangeCurrenci = (e) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '').slice(0, 7);
