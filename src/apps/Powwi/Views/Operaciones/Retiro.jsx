@@ -287,14 +287,25 @@ const Retiro = () => {
             onInput={(e) => {
               let valor = e.target.value;
               let num = valor.replace(/[\s\.\-+eE]/g, "");
-              if (!isNaN(num)) {
-                if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
-                  return notifyError("El número debe comenzar por 3");
-                }
+              if (
+                (String(e.target.value).length > 0) &
+                (String(e.target.value).slice(0, 1) !== "3")
+              ) {
+                notifyError("El número de celular debe iniciar por 3");
                 setDatosTrx(prevState => ({
                   ...prevState,
-                  numeroTelefono: num
-                }));
+                  numeroTelefono: ""
+                }));;
+              } else{ 
+                if (!isNaN(num)) {
+                  if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
+                    return notifyError("El número debe comenzar por 3");
+                  }
+                  setDatosTrx(prevState => ({
+                    ...prevState,
+                    numeroTelefono: num
+                  }));
+                }
               }
             }}/>
           <Select
