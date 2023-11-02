@@ -166,7 +166,7 @@ export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
 
   const [parameters, setParameters] = useState("");
-  const [suserInactive, setSuserInactive] = useState("");
+  const [, setSuserInactive] = useState("");
 
   const [timer, setTimer] = useState(null);
 
@@ -587,11 +587,14 @@ export const useProvideAuth = () => {
 
   useEffect(() => {
     const isPdpCommerce = !!pdpUser?.fk_id_comercio;
-    if (isPdpCommerce && suserInactive) {
-      notifyError(suserInactive, false, { toastId: "failed-suser" });
-      signOut();
-    }
-  }, [pdpUser?.fk_id_comercio, suserInactive, signOut]);
+    setSuserInactive((old) => {
+      if (isPdpCommerce && old) {
+        notifyError(old, false, { toastId: "failed-suser" });
+        signOut();
+      }
+      return "";
+    });
+  }, [pdpUser?.fk_id_comercio, signOut]);
 
   useEffect(() => {
     checkTOTPFlow(cognitoUser);
