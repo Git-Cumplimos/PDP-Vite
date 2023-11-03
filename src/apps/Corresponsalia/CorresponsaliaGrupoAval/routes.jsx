@@ -45,6 +45,9 @@ const TransaccionRetiroDale = lazy(() =>
 const MenuTransaccionesDaleAval = lazy(() =>
   import("./Views/Dale/MenuTransaccionesDaleAval")
 );
+const TransaccionDepositoDale = lazy(() =>
+  import("./Views/Dale/TransaccionDepositoDale")
+);
 const TransaccionRecaudoPila = lazy(() =>
   import("./Views/RecaudoPila/TransaccionRecaudoPila")
 );
@@ -54,7 +57,7 @@ export const listPermissionsAval = listPermissions;
 
 const rutasAvalCB = {
   link: "/corresponsalia/CorresponsaliaGrupoAval",
-  label: <AppIcons Logo={"AVAL"} name='Corresponsalía Grupo Aval' />,
+  label: <AppIcons Logo={"AVAL"} name="Corresponsalía Grupo Aval" />,
   component: CorresponsaliaGrupoAval,
   permission: listPermissionsAval,
   subRoutes: [
@@ -63,7 +66,7 @@ const rutasAvalCB = {
       label: (
         <AppIcons
           Logo={"AVAL_TRANSACCIONES_CUENTAS"}
-          name='Transacciones cuentas Grupo Aval'
+          name="Transacciones cuentas Grupo Aval"
         />
       ),
       component: AhorrosCorriente,
@@ -74,13 +77,13 @@ const rutasAvalCB = {
       subRoutes: [
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/deposito",
-          label: <AppIcons Logo={"AVAL_DEPOSITO"} name='Depósitos' />,
+          label: <AppIcons Logo={"AVAL_DEPOSITO"} name="Depósitos" />,
           component: DepositoGrupoAval,
           permission: [enumPermisosAval.aval_cb_depositos],
         },
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/ahorrosCorriente/retiro",
-          label: <AppIcons Logo={"AVAL_RETIROS"} name='Retiros' />,
+          label: <AppIcons Logo={"AVAL_RETIROS"} name="Retiros" />,
           component: RetiroGrupoAval,
           permission: [enumPermisosAval.aval_cb_retiros],
         },
@@ -91,7 +94,7 @@ const rutasAvalCB = {
       label: (
         <AppIcons
           Logo={"AVAL_RECAUDO_SERVICIOS_PUBLICOS_PRIVADOS"}
-          name='Recaudo servicios públicos y privados'
+          name="Recaudo servicios públicos y privados"
         />
       ),
       component: RecaudoServiciosPublicosPrivadosMenuAval,
@@ -103,7 +106,7 @@ const rutasAvalCB = {
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/seleccion",
           label: (
-            <AppIcons Logo={"AVAL_RECAUDO_MANUAL"} name='Recaudo manual' />
+            <AppIcons Logo={"AVAL_RECAUDO_MANUAL"} name="Recaudo manual" />
           ),
           component: SeleccionServicioPagarAval,
           permission: [enumPermisosAval.aval_cb_recaudo],
@@ -113,7 +116,7 @@ const rutasAvalCB = {
           label: (
             <AppIcons
               Logo={"AVAL_RECAUDO_CODIGO_DE_BARRAS"}
-              name='Recaudo código de barras'
+              name="Recaudo código de barras"
             />
           ),
           component: RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval,
@@ -121,7 +124,7 @@ const rutasAvalCB = {
         },
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/manual",
-          label: <AppIcons Logo={"MARKETPLACE"} name='Recaudo manual' />,
+          label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: RecaudoServiciosPublicosPrivadosAval,
           permission: [enumPermisosAval.aval_cb_recaudo],
           show: false,
@@ -131,7 +134,7 @@ const rutasAvalCB = {
           label: (
             <AppIcons
               Logo={"AVAL_CONVENIO_RECAUDO"}
-              name='Convenios recaudo AVAL'
+              name="Convenios recaudo AVAL"
             />
           ),
           component: ConveniosRecaudoAval,
@@ -142,7 +145,7 @@ const rutasAvalCB = {
     {
       link: "/corresponsalia/CorresponsaliaGrupoAval/pagoterceros",
       label: (
-        <AppIcons Logo={"AVAL_PAGO_DE_TERCEROS"} name='Pago de terceros' />
+        <AppIcons Logo={"AVAL_PAGO_DE_TERCEROS"} name="Pago de terceros" />
       ),
       component: PagoTerceros,
       permission: [enumPermisosAval.aval_cb_pago_terceros],
@@ -150,7 +153,7 @@ const rutasAvalCB = {
     {
       link: "/corresponsalia/CorresponsaliaGrupoAval/pagosubsidios",
       label: (
-        <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name='Pago de subsidios' />
+        <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name="Pago de subsidios" />
       ),
       component: PagoSubsidios,
       permission: [enumPermisosAval.aval_cb_pago_subsidios],
@@ -160,25 +163,32 @@ const rutasAvalCB = {
       label: (
         <AppIcons
           Logo={"AVAL_RECAUDO_SERVICIOS_PUBLICOS_PRIVADOS"}
-          name='Dale'
+          name="Dale"
         />
       ),
       component: MenuTransaccionesDaleAval,
-      permission: [enumPermisosAval.RETIRO_OTP_DALE],
+      permission: [
+        enumPermisosAval.RETIRO_OTP_DALE,
+        enumPermisosAval.DEPOSITO_DALE,
+      ],
       subRoutes: [
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/dale/retiro",
-          label: <AppIcons Logo={"AVAL_RECAUDO_MANUAL"} name='Retiro OTP' />,
+          label: <AppIcons Logo={"AVAL_RECAUDO_MANUAL"} name="Retiro OTP" />,
           component: TransaccionRetiroDale,
           permission: [enumPermisosAval.RETIRO_OTP_DALE],
+        },
+        {
+          link: "/corresponsalia/CorresponsaliaGrupoAval/dale/deposito",
+          label: <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name="Deposito" />,
+          component: TransaccionDepositoDale,
+          permission: [enumPermisosAval.DEPOSITO_DALE],
         },
       ],
     },
     {
       link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoPila",
-      label: (
-        <AppIcons Logo={"RECAUDO_PILA"} name='Recaudo Pila' />
-      ),
+      label: <AppIcons Logo={"RECAUDO_PILA"} name="Recaudo Pila" />,
       component: TransaccionRecaudoPila,
       permission: [enumPermisosAval.RECAUDO_PILA],
     },
