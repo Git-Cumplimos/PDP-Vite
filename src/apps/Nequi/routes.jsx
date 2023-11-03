@@ -24,13 +24,13 @@ export const listPermissionsRecargaCupoNequi = Object.values(
 );
 const rutasCorresponsaliaNequi = {
   link: "/nequi",
-  label: <AppIcons Logo={"NEQUI"} name="NEQUI" />,
+  label: <AppIcons Logo={"RECARGA_CELULAR"} name="NEQUI" />,
   component: CorresponsaliaNequi,
   permission: listPermissions,
   subRoutes: [
     {
       link: "/nequi/retiro-nequi-notificacion",
-      label: <AppIcons Logo={"NEQUI"} name="Retiro Nequi" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Retiro Nequi" />,
       component: TransaccionRetiroNequiNotificacion,
       permission: [enumPermisosNequi.RETIRO_NEQUI],
       subRoutes: [],

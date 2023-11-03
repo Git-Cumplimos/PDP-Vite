@@ -30,6 +30,8 @@ const RecargaCupoNequiNoficacion = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const [modalNotificacion, setModalNotificacion] = useState(false);
+  const [idTrx, setIdTrx] = useState("");
   const [objTicketActual, setObjTicketActual] = useState("");
   const [numeroTelefono, setNumeroTelefono] = useState("");
   const [costoTotalTrx, setCostoTotalTrx] = useState(0);
@@ -50,6 +52,8 @@ const RecargaCupoNequiNoficacion = () => {
     setSummary([]);
     setUuid(v4());
     setObjTicketActual("");
+    setModalNotificacion(false);
+    setIdTrx("");
   }, []);
 
   const [loadingPeticionPagoNotificacionPush, peticionPagoNotificacionPush] =
@@ -80,7 +84,6 @@ const RecargaCupoNequiNoficacion = () => {
           return notifyError("El número Nequi debe comenzar por 3");
         }
       }
-
       const summary = {
         "Número Nequi": numeroTelefono,
         "Valor de la recarga": formatMoney.format(valor),
@@ -132,10 +135,20 @@ const RecargaCupoNequiNoficacion = () => {
         },
         {
           render: ({ data: res }) => {
-            setObjTicketActual(res?.obj?.ticket);
-            setShowModal(false);
-            handleClose();
-            return "Transacción satisfactoria, revisar centro de Notificaciones de Nequi para aceptar el débito de la transacción";
+            if (!res?.status) {
+              const error = res?.msg;
+              handleClose();
+              return error;
+            } else if (res?.obj?.ticket !== undefined){
+              setObjTicketActual(res?.obj?.ticket);
+              setShowModal(true);
+              return "Transacción satisfactoria";
+            } else {
+              setIdTrx(res?.obj?.id_trx);
+              setModalNotificacion(true);
+              setShowModal(true);
+              return "Envío Notificación Nequi satisfactorio"
+            }
           },
         },
         {
@@ -219,7 +232,7 @@ const RecargaCupoNequiNoficacion = () => {
       <Modal
         show={showModal}
         handleClose={
-          objTicketActual || loadingPeticionPagoNotificacionPush
+          objTicketActual || loadingPeticionPagoNotificacionPush || modalNotificacion
             ? () => {}
             : handleClose
         }
@@ -231,6 +244,21 @@ const RecargaCupoNequiNoficacion = () => {
               <Button onClick={goToRecaudo}>Cerrar</Button>
             </ButtonBar>
             <Tickets refPrint={printDiv} ticket={objTicketActual} />
+          </div>
+        ) : modalNotificacion ? (
+          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+            <h1 className='text-2xl text-center mb-5 font-semibold'>
+              Envío Notificación Nequi Satisfactorio
+            </h1>
+            <h2 className='text-xl text-justify font'>1. Revisar centro de Notificaciones de Nequi para aceptar el débito de la transacción.</h2>
+            <h2 className='text-xl text-justify font'>
+              2. Para consultar el estado de la transacción revisar el 
+              <span style={{ color: 'green', fontSize: '20px', fontWeight: 'bold' }}> ID:{idTrx} </span>
+              en el <span style={{ color: '#FF8C00', fontSize: '20px', fontWeight: 'bold'}}>módulo de transacciones</span>.
+            </h2>
+            <ButtonBar>
+              <Button onClick={handleClose}>Cerrar</Button>
+            </ButtonBar>
           </div>
         ) : (
           <PaymentSummary summaryTrx={summary}>
