@@ -29,6 +29,7 @@ export const useFetchNequi = (
       let PeticionTrx;
       let PeticionConsulta;
       let banderaConsulta = false;
+      let banderaConsultaNequi = false;
       let response;
       setState(true);
 
@@ -36,6 +37,7 @@ export const useFetchNequi = (
       try {
         PeticionTrx = await fetchTrx({}, data_);
         response = PeticionTrx;
+        banderaConsultaNequi = true;
       } catch (error) {
         if (error.name === "ErrorCustomTimeout") {
           banderaConsulta = true;
@@ -46,7 +48,46 @@ export const useFetchNequi = (
       }
 
       //SECUENCIA ---------------Paso 2-------------------------------
-      if (banderaConsulta) {
+      if (banderaConsultaNequi) {
+        try {
+          let data_consulta = {
+            id_comercio: data_?.comercio?.id_comercio,
+            id_terminal: data_?.comercio?.id_terminal,
+            id_uuid_trx: data_additional_?.id_uuid_trx,
+          };
+          for (let i = 0; i <= 3; i++) {
+            PeticionConsulta = await fetchConsulta({}, data_consulta);
+            if (PeticionConsulta?.msg.includes("No ha terminado")) {
+              notify(
+                "Envío Notificación Nequi Satisfactorio, revisar centro de Notificaciones de Nequi para aceptar el débito de la transacción."
+              );
+              await sleep(15000);
+            } else {
+              break;
+            }
+          }
+          if (PeticionConsulta?.msg.includes("Error respuesta Nequi:")) {
+            response = PeticionConsulta;
+            throw new ErrorCustomBackend(
+              PeticionConsulta?.msg,
+              PeticionConsulta?.msg
+            );
+          } else if (PeticionConsulta?.obj?.status_trx === "Aprobada") {
+            response = PeticionConsulta;
+          } else {
+            if (PeticionConsulta?.msg === "No ha terminado el reintento") {
+              throw new ErrorCustomTimeout(
+                `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+                "Timeout"
+              );
+            }
+          }
+        } catch (error) {
+          setState(false);
+          throw error;
+        }
+      }
+      else if (banderaConsulta) {
         try {
           let data_consulta = {
             id_comercio: data_?.comercio?.id_comercio,
