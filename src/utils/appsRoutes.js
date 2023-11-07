@@ -45,9 +45,13 @@ import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
 import rutasAvalCB, {
   listPermissionsAval,
+  listPermissionsGestionAval,
+  rutasGestionGrupoAval,
 } from "../apps/Corresponsalia/CorresponsaliaGrupoAval/routes";
 import rutasAgrarioCB, {
   listPermissionsAgrario,
+  listPermissionsGestionAgrario,
+  rutasGestionAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 import rutasConfiguraciones from "../apps/TrxParams/routes";
 import rutasRecaudoMultiple, {
@@ -129,13 +133,6 @@ const ReportInventario = lazy(() =>
 );
 
 /**
- * ColCard
- */
-// const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
-// const RecargarColCard = lazy(() =>
-//   import("../apps/ColCard/Views/RecargarColCard")
-// );
-/**
  * Cupo
  */
 const cupo = lazy(() => import("../apps/Cupo/Cupo"));
@@ -166,18 +163,6 @@ const ReporteGral = lazy(() => import("../apps/MarketPlace/Records/Crossval"));
  * Pines Vus
  */
 const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
-const PinesCrc = lazy(() => import("../apps/PinesCrc/Views/Pines/VentaPines"));
-
-/**
- * IAM
- */
-const IAMUsers = lazy(() => import("../apps/IAM/Views/IAMUsers"));
-const IAMGroups = lazy(() => import("../apps/IAM/Views/IAMGroups"));
-const IAMRoles = lazy(() => import("../apps/IAM/Views/IAMRoles"));
-const IAMPermissions = lazy(() => import("../apps/IAM/Views/IAMPermissions"));
-const IAMIndex = lazy(() => import("../apps/IAM/IAMIndex"));
-const IAMPolicies = lazy(() => import("../apps/IAM/Views/IAMPolicies"));
-
 /**
  * Formulario de actualizacion
  */
@@ -378,7 +363,13 @@ const allUrlsPrivateApps = [
     link: "/GestionTransaccional",
     label: <AppIcons Logo={"PINES_ADMINISTRAR"} name="Gestión Transaccional" />,
     component: GestionTransaccional,
-    permission: [63, 53, ...listPermissionsTuLlaveAdmin],
+    permission: [
+      63,
+      53,
+      ...listPermissionsTuLlaveAdmin,
+      ...listPermissionsGestionAval,
+      ...listPermissionsGestionAgrario,
+    ],
     subRoutes: [
       {
         link: "/GestionTransaccional/AnulacionesPinesCRC",
@@ -419,6 +410,8 @@ const allUrlsPrivateApps = [
       },
       rutasGestionColpatria,
       rutasGestionRecargasTullave,
+      rutasGestionGrupoAval,
+      rutasGestionAgrario,
     ],
   },
   {
