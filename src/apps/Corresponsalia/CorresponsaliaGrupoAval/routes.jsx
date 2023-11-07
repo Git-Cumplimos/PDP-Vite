@@ -170,7 +170,7 @@ const rutasAvalCB = {
         },
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/dale/deposito",
-          label: <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name="Deposito" />,
+          label: <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name="Depósito" />,
           component: TransaccionDepositoDale,
           permission: [enumPermisosAval.DEPOSITO_DALE],
         },
