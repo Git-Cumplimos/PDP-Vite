@@ -605,25 +605,25 @@ const allUrlsPrivateApps = [
     permission: [8],
   },
   rutasIAM,
-  {
-    link: "/update-commerce",
-    label: (
-      <AppIcons Logo={"ACTUALIZACION_DATOS"} name="Actualizacion de datos" />
-    ),
-    component: FormCommerce,
-    permission: [7],
-  },
-  {
-    link: "/review-commerce-forms",
-    label: (
-      <AppIcons
-        Logo={"ACTUALIZACION_DATOS"}
-        name="Revisar actualizacion de datos"
-      />
-    ),
-    component: CommerceInfo,
-    permission: [9],
-  },
+  // {
+  //   link: "/update-commerce",
+  //   label: (
+  //     <AppIcons Logo={"ACTUALIZACION_DATOS"} name="Actualizacion de datos" />
+  //   ),
+  //   component: FormCommerce,
+  //   permission: [7],
+  // },
+  // {
+  //   link: "/review-commerce-forms",
+  //   label: (
+  //     <AppIcons
+  //       Logo={"ACTUALIZACION_DATOS"}
+  //       name="Revisar actualizacion de datos"
+  //     />
+  //   ),
+  //   component: CommerceInfo,
+  //   permission: [9],
+  // },
   {
     link: "https://www.puntodecompra.com.co/",
     label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
