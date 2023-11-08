@@ -116,7 +116,6 @@ const Deposito = () => {
         const userDoc = formData.get("docCliente");
         const numeroTelefono = formData.get("numeroTelefono");
         const valorFormat = formData.get("valor");
-
         const data = {
           comercio: {
             id_comercio: roleInfo?.id_comercio,

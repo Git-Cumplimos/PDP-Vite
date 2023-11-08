@@ -1,5 +1,8 @@
 import { lazy } from "react";
-import { enumPermisosAgrario } from "./enumPermisosAgrario";
+import {
+  enumPermisosAgrario,
+  enumPermisosAgrarioGestion,
+} from "./enumPermisosAgrario";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
@@ -10,12 +13,16 @@ const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
 const CorresponsaliaBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
 );
-
+const AdminGestionAgrario = lazy(() => import("./AdminGestionAgrario"));
 const PagarRunt = lazy(() => import("./Views/Runt/PagarRunt"));
 
-const PagoCarteraEfectivo = lazy(() => import("./Views/PagoCartera/PagoCarteraEfectivo/PagoCarteraEfectivo.jsx"));
+const PagoCarteraEfectivo = lazy(() =>
+  import("./Views/PagoCartera/PagoCarteraEfectivo/PagoCarteraEfectivo.jsx")
+);
 
-const PagoTarjCredito = lazy(() => import("./Views/PagoCartera/PagoTarjCredito/PagoTarjCredito.jsx"));
+const PagoTarjCredito = lazy(() =>
+  import("./Views/PagoCartera/PagoTarjCredito/PagoTarjCredito.jsx")
+);
 
 const TrxCuentasBancoAgrario = lazy(() =>
   import("./CorresponsaliaBancoAgrario")
@@ -50,6 +57,9 @@ const RecaudoServiciosPublicosPrivadosMenuAgrario = lazy(() =>
 
 const listPermissions = Object.values(enumPermisosAgrario);
 export const listPermissionsAgrario = listPermissions;
+export const listPermissionsGestionAgrario = Object.values(
+  enumPermisosAgrarioGestion
+);
 
 const rutasAgrarioCB = {
   link: "/corresponsalia/corresponsalia-banco-agrario",
@@ -66,7 +76,10 @@ const rutasAgrarioCB = {
         />
       ),
       component: TrxCuentasBancoAgrario,
-      permission: [enumPermisosAgrario.agrario_cb_depositos, enumPermisosAgrario.agrario_cb_retiros],
+      permission: [
+        enumPermisosAgrario.agrario_cb_depositos,
+        enumPermisosAgrario.agrario_cb_retiros,
+      ],
       subRoutes: [
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/transacciones-cuentas/deposito",
@@ -117,14 +130,6 @@ const rutasAgrarioCB = {
           permission: [enumPermisosAgrario.agrario_cb_recaudo],
           show: false,
         },
-        {
-          link: "/corresponsalia/corresponsalia-banco-agrario/recaudoServiciosPublicosPrivados/convenios",
-          label: (
-            <AppIcons Logo={"MARKETPLACE"} name="Convenios recaudo Agrario" />
-          ),
-          component: ConveniosRecaudoAgrario,
-          permission: [enumPermisosAgrario.agrario_cb_convenios_recaudo],
-        },
       ],
     },
 
@@ -138,10 +143,7 @@ const rutasAgrarioCB = {
     {
       link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios",
       label: (
-        <AppIcons
-          Logo={"MARKETPLACE"}
-          name="Recaudo de productos propios"
-        />
+        <AppIcons Logo={"MARKETPLACE"} name="Recaudo de productos propios" />
       ),
       component: RecaudoServiciosPublicosPrivadosMenuAgrario,
       permission: [
@@ -151,7 +153,9 @@ const rutasAgrarioCB = {
       subRoutes: [
         {
           link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios/pago-cartera-tarjeta-credito",
-          label: <AppIcons Logo={"MARKETPLACE"} name={"Pago de tarjeta crédito"} />,
+          label: (
+            <AppIcons Logo={"MARKETPLACE"} name={"Pago de tarjeta crédito"} />
+          ),
           component: PagoTarjCredito,
           permission: [enumPermisosAgrario.pago_cartera_targ_credito],
           subRoutes: [],
@@ -167,4 +171,19 @@ const rutasAgrarioCB = {
     },
   ],
 };
+export const rutasGestionAgrario = {
+  link: "/GestionTransaccional/corresponsalia-banco-agrario",
+  label: <AppIcons Logo={"MARKETPLACE"} name="Gestión Banco Agrario" />,
+  component: AdminGestionAgrario,
+  permission: [enumPermisosAgrarioGestion.agrario_cb_convenios_recaudo],
+  subRoutes: [
+    {
+      link: "/GestionTransaccional/corresponsalia-banco-agrario/convenios",
+      label: <AppIcons Logo={"MARKETPLACE"} name="Convenios recaudo Agrario" />,
+      component: ConveniosRecaudoAgrario,
+      permission: [enumPermisosAgrarioGestion.agrario_cb_convenios_recaudo],
+    },
+  ],
+};
+
 export default rutasAgrarioCB;

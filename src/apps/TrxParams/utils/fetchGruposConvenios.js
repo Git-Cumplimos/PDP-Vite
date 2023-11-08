@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
-const urlComisiones =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlComisiones = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlComisiones = 'http://127.0.0.1:5000';
 
 export const fetchGruposConvenios = async (obj) => {
   try {

@@ -11,7 +11,6 @@ import { useReactToPrint } from "react-to-print";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
-import useMoney from "../../../hooks/useMoney";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { useFetchMovii } from "../hooks/fetchMovii";
@@ -209,12 +208,15 @@ const MoviiPDPCashOut = () => {
           equalErrorMin={false}
         ></MoneyInput>
         <ButtonBar className="lg:col-span-2">
+          <Button disabled={loadingPeticionCashoutMovii} onClick={hideModal}>
+            Cancelar
+          </Button>
           <Button type="submit" disabled={loadingPeticionCashoutMovii}>
-            Aceptar
+            Realizar Retiro
           </Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={hideModal}>
+      <Modal show={showModal}>
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
           {!peticion ? (
             <>

@@ -346,7 +346,7 @@ const CrearComercios = () => {
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
-
+      if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0) dataOrg.alert_cupo = ''
       if (pk_comercio_handled) {
         delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(structuredClone(dataOrg))
@@ -401,7 +401,7 @@ const CrearComercios = () => {
   const handleChangeCurrenci = (e,valor) => {
     if (e.target.name === 'configuración_porcentual') {
       setAlertPorcent(e.target.value.replace(/[^0-9]/g, '').slice(0, 2))
-      setComercio((old)=>{return {...old,alert_cupo:e.target.value}})
+      setComercio((old)=>{return {...old,alert_cupo:(e.target.value.replace(/[^0-9]/g, '').slice(0, 2)+'%')}})
     }else{
       setAlertMonto(valor)
       setComercio((old)=>{return {...old,alert_cupo:valor}})

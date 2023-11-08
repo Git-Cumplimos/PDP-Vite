@@ -1,10 +1,10 @@
-import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import HNavbar from "../../../components/Base/HNavbar";
-import { useAuth } from "../../../hooks/AuthHooks";
-import { notifyError } from "../../../utils/notify";
+import { useAuth } from "../../hooks/AuthHooks";
+import { useCallback, useEffect } from "react";
+import { notifyError } from "../../utils/notify";
+import HNavbar from "../../components/Base/HNavbar/HNavbar";
 
-const CorresponsaliaGrupoAval = ({ subRoutes }) => {
+const RecargaCupoMenu = ({ subRoutes }) => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
@@ -12,10 +12,10 @@ const CorresponsaliaGrupoAval = ({ subRoutes }) => {
     if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
       navigate("/");
     } else {
-      fetchIdTotalComercio();
+      fetchComercio();
     }
   }, []);
-  const fetchIdTotalComercio = useCallback(() => {
+  const fetchComercio = useCallback(() => {
     let hasKeys = true;
     const keys = [
       "id_comercio",
@@ -42,4 +42,4 @@ const CorresponsaliaGrupoAval = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default CorresponsaliaGrupoAval;
+export default RecargaCupoMenu;

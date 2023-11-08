@@ -33,6 +33,8 @@ const RecaudoConjunto = () => {
   const [id_trx, setId_Trx] = useState(null)
   const [pago, setPago] = useState(false)
   const [cargando, setCargando] = useState(false)
+  const [referenciaExtra, setReferenciaExtra] = useState('')
+  const [permiteRefExtra, setPermiteRefExtra] = useState(false);
   const [convenioRecaudo, setConvenioRecaudo] = useState(null);
   const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
   const [dataReferencias, setDataReferencias] = useState({
@@ -43,6 +45,7 @@ const RecaudoConjunto = () => {
   const handleClose = useCallback((err = null) => {
     setShowModal(false);
     setDisableBtn(false)
+    setReferenciaExtra('')
     if (err) notifyError("Transacción de recaudo cancelada por el usuario")
     if (modificar !== true) {
       setDataRecaudo('')
@@ -79,11 +82,16 @@ const RecaudoConjunto = () => {
 
   const getData = useCallback(async () => {
     try {
-      let rest = await searchConveniosRecaudoList({ convenio_id: pk_id_convenio })
-        .then((rest) => { return rest })
-      if (rest.length < 1) throw new Error("Convenio no existe")
-      setConvenioRecaudo(rest.obj)
-      setCargando(true)
+      searchConveniosRecaudoList({ convenio_id: pk_id_convenio })
+        .then((rest) => { 
+          if (rest.length < 1) throw new Error("Convenio no existe")
+          setConvenioRecaudo(rest.obj)
+          if (rest?.obj?.permite_referencia_extra ?? false) setPermiteRefExtra(true)
+          setCargando(true)
+        })
+        .catch((err) => {
+          notifyError(err?.msg);
+        });
     } catch (e) {
       notifyError(e.message)
       navigate("/recaudo-directo/recaudo")
@@ -165,10 +173,11 @@ const RecaudoConjunto = () => {
         roleInfo?.tipo_comercio === "KIOSCO",
       ...valorRecibido,
       nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+      nombre_usuario: pdpUser?.uname ?? "",
       direccion: roleInfo?.direccion ?? ""
     };
 
-    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0 
+    let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
     let sumaTotal = valoresRecibido + dataRecaudo.valor_pagado
 
     const ValidacionTRX = {
@@ -189,6 +198,7 @@ const RecaudoConjunto = () => {
       nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
       pk_id_recaudo: dataRecaudo.pk_id_recaudo,
       referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
+      referencia_extra:referenciaExtra ?? ''
     }
     if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
       modRecaudo(data)
@@ -198,18 +208,18 @@ const RecaudoConjunto = () => {
           handleClose()
         })
         .catch((err) => {
-          notifyError(err?.msg);
+          notifyError(String(err));
           handleClose()
         });
 
     }
     else {
       setDisableBtn(false);
-      notifyError("El valor recibido no cumple con los limites establecidos") 
+      notifyError("El valor recibido no cumple con los limites establecidos")
     }
 
-  }, [roleInfo, valorRecibido, dataRecaudo, id_trx,
-    pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites])
+  }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
+    pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites,referenciaExtra])
 
   useEffect(() => { getData() }, [getData, pk_id_convenio])
 
@@ -279,6 +289,19 @@ const RecaudoConjunto = () => {
                 required />
             )
           })}
+          {permiteRefExtra && (
+            <Input
+              id={`permite_referencia_extra`}
+              label={convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"}
+              minLength={convenioRecaudo['limite_ref_extra'][0] ?? 0}
+              maxLength={convenioRecaudo['limite_ref_extra'][1] ?? 20}
+              name={`permite_referencia_extra`}
+              type="tel"
+              value={referenciaExtra}
+              onInput={(e) => { setReferenciaExtra(onChangeNumber(e)) }}
+              autoComplete="off"
+              required />
+          )}
           {
             (convenioRecaudo?.fk_id_tipo_convenio === 3 || valorCodigoBarras) &&
             <MoneyInput
@@ -304,7 +327,7 @@ const RecaudoConjunto = () => {
           </ButtonBar>
         </Form>
       ) : (<> Cargando...</>)}
-      <Modal show={showModal} handleClose={()=>handleClose(true)}>
+      <Modal show={showModal} handleClose={() => handleClose(true)}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo {
           !dataRecaudo && convenioRecaudo?.fk_id_tipo_convenio === 3 ? 'no registrado' : ''
         } </h2>
@@ -320,6 +343,17 @@ const RecaudoConjunto = () => {
                 autoComplete="off"
                 disabled
               />
+              {permiteRefExtra && (
+                <Input
+                  id={"nombre_tipo_referencia_extra"}
+                  label={convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"}
+                  name={"nombre_tipo_referencia_extra"}
+                  type="tel"
+                  defaultValue={referenciaExtra}
+                  autoComplete="off"
+                  disabled
+                />
+              )}
               {dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
                 <MoneyInput
                   label="Valor a recaudar"
@@ -364,6 +398,17 @@ const RecaudoConjunto = () => {
                     required />
                 )
               })}
+              {permiteRefExtra && (
+                <Input
+                  id={"nombre_tipo_referencia_extra"}
+                  label={convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"}
+                  name={"nombre_tipo_referencia_extra"}
+                  type="tel"
+                  defaultValue={referenciaExtra}
+                  autoComplete="off"
+                  disabled
+                />
+              )}
               <MoneyInput
                 label="Valor a recaudar"
                 name="valor_total_trx"

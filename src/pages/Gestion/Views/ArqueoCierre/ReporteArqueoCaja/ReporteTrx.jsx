@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState,useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../../hooks/useFetchDispatchDebounce";
@@ -22,7 +22,7 @@ import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { notifyError,notifyPending } from "../../../../../utils/notify";
-import { buscarReporteTrxArqueo, buscarTicketReporte } from "../../../utils/fetchCaja";
+import { buscarReporteTrxArqueo, buscarTicketReporte, searchCierre } from "../../../utils/fetchCaja";
 import { validateDates } from "../../../utils/functions";
 import Input from "../../../../../components/Base/Input/Input";
 
@@ -86,7 +86,7 @@ const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => { } }) =>
   });
 
 const ReporteTrx = ({ tipo_reporte = "" }) => {
-  const { roleInfo } = useAuth();
+  const { roleInfo,userInfo } = useAuth();
   const { pathname } = useLocation();
 
   const initialSearchFilters = new Map([
@@ -101,19 +101,55 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       }).format(new Date()).split("/").reverse().join("-")],
   ]);
   const printDiv = useRef();
-
+  const nombreComercio = useMemo(
+    () => roleInfo?.["nombre comercio"],
+    [roleInfo]
+  );
   const [tipoReporte, setTipoReporte] = useState("");
 
   useEffect(() => {
     setTipoReporte(tipo_reporte === 1 ? "Efectivo" :tipo_reporte === 2 ? "Tarjeta": "General")
   }, [tipo_reporte])
 
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter  }] =
+    useMap(initialSearchFilters);
+
+  useEffect(() => {
+    searchCierre({
+      id_usuario: roleInfo?.id_usuario,
+      id_comercio: roleInfo?.id_comercio,
+      id_terminal: roleInfo?.id_dispositivo,
+      nombre_comercio: nombreComercio,
+      nombre_usuario: userInfo?.attributes?.name,
+      direccion_comercio: roleInfo?.direccion,
+    })
+      .then((res) => {
+        if (res?.obj === 1) {
+          setSearchFilters((old)=>{
+            const copy = new Map(old)
+              .set("date", res?.date_end_trx);
+            return copy;
+          });
+          setFecha(res?.date_end_trx)
+        }
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+        }
+        console.error(error?.message);
+      });
+    },
+  [ 
+    roleInfo,
+    userInfo?.attributes?.name,
+    nombreComercio,
+    setSearchFilters,
+  ])
+
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-
-  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter  }] =
-    useMap(initialSearchFilters);
 
   const [fecha, setFecha] = useState(
     Intl.DateTimeFormat("es-CO", {
@@ -121,7 +157,6 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       month: "2-digit",
       day: "2-digit",
   }).format(new Date()).split("/").reverse().join("-"));
-
 
   const [trxTree, setTrxTree] = useState({});
   const [montoTotal, setMontoTotal] = useState(0.0);
@@ -252,7 +287,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
             type="date"
             autoComplete="off"
             onChange={(e) => {
-              let bool = validateDates(e.target.value ); 
+              let bool = validateDates(e.target.value );    
               if (bool && tipoReporte !== "General" ) {
                 setFecha(e.target.value)
                 setSearchFilters((old)=>{

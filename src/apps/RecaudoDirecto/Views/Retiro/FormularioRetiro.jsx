@@ -30,6 +30,8 @@ const FormularioRetiro = () => {
   const [id_trx, setId_Trx] = useState('')
   const [pago, setPago] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [referenciaExtra, setReferenciaExtra] = useState('')
+  const [permiteRefExtra, setPermiteRefExtra] = useState(false);
   const [valorRecibido, setValorRecibido] = useState({ valor_total_trx: '' })
   const { roleInfo, pdpUser } = useAuth();
   const [dataReferencias, setDataReferencias] = useState({
@@ -45,7 +47,8 @@ const FormularioRetiro = () => {
   });
 
   const handleClose = useCallback((err = null) => {
-    setDisableBtn(false)
+    setDisableBtn(false);
+    setReferenciaExtra('');
     if (err) notifyError("Transacción de retiro cancelada por el usuario")
     setShowModal(false);
     setDataReferencias({
@@ -58,7 +61,7 @@ const FormularioRetiro = () => {
     onSuccess: useCallback((data) => {
       setDataRetiro(data?.obj.retiro ?? "")
       setId_Trx(data?.obj?.id_trx ?? "")
-      if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor-data?.obj?.retiro?.valor_retirado }) }
+      if (data?.obj?.retiro?.fk_modificar_valor === 1) { setValorRecibido({ valor_total_trx: data?.obj?.retiro?.valor - data?.obj?.retiro?.valor_retirado }) }
       notify(data.msg)
       setShowModal(true);
     }, []),
@@ -88,8 +91,9 @@ const FormularioRetiro = () => {
     try {
       searchConveniosRetiroList({ convenio_id: pk_id_convenio })
         .then((rest) => {
-          if (rest.length < 1) throw new Error("No hay datos");
+          if (rest.length < 1) throw new Error("Convenio no existe");
           setDataConvRetiro(rest?.obj)
+          if (rest?.obj?.permite_referencia_extra ?? false) setPermiteRefExtra(true)
           setCargando(true)
         })
         .catch((err) => {
@@ -146,7 +150,7 @@ const FormularioRetiro = () => {
         valoresRecibido >= (dataConvRetiro?.limite_monto[0] === "0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
         valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')) ? { estado: true } : undefined,
 
-      2: () => (valoresRecibido >= (dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
+      2: () => (valoresRecibido >= (dataConvRetiro?.limite_monto[0] === "0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]) &&
         valoresRecibido <= validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')
       ) ? { estado: true } : undefined,
 
@@ -171,9 +175,11 @@ const FormularioRetiro = () => {
           convenio_id: pk_id_convenio,
           nombre_convenio: dataConvRetiro?.nombre_convenio ?? "",
           pk_id_retiro: dataRetiro.pk_id_recaudo,
+          referencia_extra: referenciaExtra ?? '',
           referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
         },
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+        nombre_usuario: pdpUser?.uname ?? "",
         direccion: roleInfo?.direccion ?? ""
       };
       modRetiro(data)
@@ -183,16 +189,16 @@ const FormularioRetiro = () => {
           handleClose()
         })
         .catch((err) => {
-          notifyError(err?.msg);
+          notifyError(String(err));
           handleClose()
         });
     }
     else {
-      setDisableBtn(false); 
+      setDisableBtn(false);
       notifyError("El valor recibido no cumple con los limites establecidos");
     }
-  }, [dataRetiro, roleInfo, dataReferencias, id_trx, valorRecibido,
-    dataConvRetiro, pk_id_convenio, handleClose, validarLimiteMax])
+  }, [dataRetiro, roleInfo, pdpUser, dataReferencias, id_trx, valorRecibido,
+    dataConvRetiro, pk_id_convenio, handleClose, validarLimiteMax, referenciaExtra])
 
   return (
     <Fragment>
@@ -234,6 +240,19 @@ const FormularioRetiro = () => {
                 required />
             )
           })}
+          {permiteRefExtra && (
+            <Input
+              id={`permite_referencia_extra`}
+              label={dataConvRetiro['nombre_tipo_referencia_extra'] ?? "Referencia extra"}
+              minLength={dataConvRetiro['limite_ref_extra'][0] ?? 0}
+              maxLength={dataConvRetiro['limite_ref_extra'][1] ?? 20}
+              name={`permite_referencia_extra`}
+              type="tel"
+              value={referenciaExtra}
+              onInput={(e) => { setReferenciaExtra(onChangeNumber(e)) }}
+              autoComplete="off"
+              required />
+          )}
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"} >
               Consultar
@@ -241,7 +260,7 @@ const FormularioRetiro = () => {
           </ButtonBar>
         </Form>
       ) : (<>cargando...</>)}
-      <Modal show={showModal} handleClose={()=>handleClose(true)}>
+      <Modal show={showModal} handleClose={() => handleClose(true)}>
         <h2 className="text-3xl mx-auto text-center mb-4"> Realizar retiro </h2>
         <Form onSubmit={hacerRetiro} grid >
           <Input
@@ -253,6 +272,17 @@ const FormularioRetiro = () => {
             autoComplete="off"
             disabled
           />
+          {permiteRefExtra && (
+            <Input
+              id={"nombre_tipo_referencia_extra"}
+              label={dataConvRetiro['nombre_tipo_referencia_extra'] ?? "Referencia extra"}
+              name={"nombre_tipo_referencia_extra"}
+              type="tel"
+              defaultValue={referenciaExtra}
+              autoComplete="off"
+              disabled
+            />
+          )}
           {dataRetiro?.fk_modificar_valor === 1 ? (
             <MoneyInput
               label="Valor a retirar"
@@ -270,7 +300,7 @@ const FormularioRetiro = () => {
               label="Valor a retirar"
               name="valor_total_trx"
               autoComplete="off"
-              min={dataConvRetiro?.limite_monto[0] ==="0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]}
+              min={dataConvRetiro?.limite_monto[0] === "0" ? limitesMontos.min : dataConvRetiro?.limite_monto[0]}
               equalError={dataRetiro?.fk_modificar_valor === 2 ? null : false}
               maxLength={"11"}
               max={validarLimiteMax(dataRetiro?.fk_modificar_valor, 'max')}

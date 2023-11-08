@@ -322,6 +322,7 @@ const ValidacionSobranteFaltantes = () => {
               setIsButtonDisabled(false)
             }}
             maxLength={"150"}
+            disabled={DisableState(selected?.pk_estado)}
           />
           <ButtonBar>
             <Button type="button" onClick={AlertCancelar} disabled={loading}>
