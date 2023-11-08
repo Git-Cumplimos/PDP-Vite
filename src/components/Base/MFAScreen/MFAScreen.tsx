@@ -56,7 +56,7 @@ export const MFAScreen = (props: Props) => {
               />
             </div>
             <div className={field}>
-              <button type="submit">Validar codigo</button>
+              <button type="submit">Validar código</button>
             </div>
           </form>
         </div>

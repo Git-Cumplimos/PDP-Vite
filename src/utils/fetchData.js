@@ -71,6 +71,15 @@ const fetchData = async (
   }
 
   const response = await fetchWithTimeout(url, fetchOptions, timeout);
+  if (response.status === 403) {
+    const commerceUseTotp = JSON.parse(
+      window.localStorage.getItem("commerce_use_totp") ?? "null"
+    );
+    if (commerceUseTotp) {
+      const _msg = (await response.json())?.message;
+      throw new Error(_msg, { cause: "custom-403" });
+    }
+  }
   const contentType = response.headers.get("content-type");
 
   if (contentType && contentType.includes("application/json")) {

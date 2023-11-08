@@ -534,6 +534,7 @@ export const useProvideAuth = () => {
     }, []),
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
+        signOut();
         notifyError(error.message);
       } else {
         console.error(error);
