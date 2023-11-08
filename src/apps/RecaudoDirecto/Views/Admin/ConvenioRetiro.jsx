@@ -116,9 +116,17 @@ const RetiroDirecto = () => {
         "Longitud máxima ext": "",
       }
     }
+
+    let refExtra = false
+    if (selected['permite_referencia_extra'] || 
+        ( selected['fk_id_tipo_referencia_extra'] !== null && 
+          selected['fk_id_tipo_referencia_extra'] !== ""
+        ) 
+      ) refExtra = true
     setlimites(limite)
     setReferencias(referencia)
     setReferenciaExtra(limiteRefExtra)
+    setPermiteRefExtra(refExtra)
   }, [selected])
 
   const handleClose = useCallback(() => {
@@ -132,6 +140,10 @@ const RetiroDirecto = () => {
     setlimites({
       "Valor mínimo": "0",
       "Valor máximo": "0",
+    })
+    setReferenciaExtra({
+      "Longitud mínima ext": "",
+      "Longitud máxima ext": "",
     })
   }, []);
 
@@ -231,7 +243,7 @@ const RetiroDirecto = () => {
         }
       )
     }
-  }, [handleClose, searchTrxs, selected, referencias, limites])
+  }, [handleClose, searchTrxs, selected, referencias, limites, referenciaExtra])
 
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_retiro', res)
