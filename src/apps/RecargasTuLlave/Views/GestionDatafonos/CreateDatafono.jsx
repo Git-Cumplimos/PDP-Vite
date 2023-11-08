@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { notifyPending } from "../../../../utils/notify";
+import { notifyPending,notifyError } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
@@ -12,27 +12,27 @@ import TextArea from "../../../../components/Base/TextArea/TextArea";
 // import Select from "../../../../components/Base/Select/Select";
 import Form from "../../../../components/Base/Form/Form";
 import ConsultaComerciosDatafonos from "../../components/ConsultaComerciosDatafonos/ConsultaComerciosDatafonos";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
 const URL_EDITAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/actualizar`;
-// const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
-const URL_CREAR_DATAFONO = `http://127.0.0.1:5000/tullave-gestion-datafonos/crear`;
+const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
+const URL_CONSULTA_INVENTARIO = `${process.env.REACT_APP_URL_INVENTARIO}/consultar_datafono_unique`;
+const URL_EDITAR_INVENTARIO = `${process.env.REACT_APP_URL_INVENTARIO}/editar_datafono`;
+// const URL_EDITAR_INVENTARIO = `http://127.0.0.1:8000/tullave-gestion-datafonos/editar_datafono`;
 
 const CreateDatafono = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const { userInfo } = useAuth();
   const [dataDatafono, setDataDatafono] = useState({
     comentarios: "",
-    // estado: true,
     fecha_creacion: null,
     fecha_modificacion: null,
     fk_comercio_asociado: "",
-    // hardware_id: "",
-    // numero_serie: "",
+    name_comercio:"",
     pk_tullave_datafonos: "",
     pos_id: "",
-    // tarjeta_lsam: "",
-    // tarjeta_sim: "",
   });
   const [selectedOpt, setSelectedOpt] = useState("");
 
@@ -44,68 +44,144 @@ const CreateDatafono = () => {
     (ev) => {
       ev.preventDefault();
       if (params?.id) {
-        const data = {
-          pk_tullave_datafonos: params?.id,
-          // numero_serie: dataDatafono?.numero_serie,
-          // tarjeta_lsam: dataDatafono?.tarjeta_lsam,
-          // hardware_id: dataDatafono?.hardware_id,
-          comentarios: dataDatafono?.comentarios,
-          // estado: dataDatafono?.estado,
-        };
-        if (dataDatafono?.fk_comercio_asociado) {
-          data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
-        }
-        notifyPending(
-          peticionActualizacionDatafono({ pk_tullave_datafonos: "" }, data),
-          {
-            render: () => {
-              return "Procesando actualización";
-            },
-          },
-          {
-            render: ({ data: res }) => {
-              navigate(-1);
-              return "Actualización satisfactoria";
-            },
-          },
-          {
-            render: ({ data: error }) => {
-              return error?.message ?? "Actualización fallida";
-            },
-          }
-        );
+        peticionConsultaInventario({pos_id: dataDatafono?.pos_id})
+          .then((res) => {
+            var dataDatafonoInventario = res?.obj?.results[0]
+            const dataInventario = {
+              pos_id: dataDatafonoInventario.pos_id,
+              tipo_dispositivo: dataDatafonoInventario.tipo_dispositivo,
+              numero_serie: dataDatafonoInventario.numero_serie,
+              tarjeta_lsam: dataDatafonoInventario.tarjeta_lsam,
+              tarjeta_sim: dataDatafonoInventario.tarjeta_sim,
+              hardware_id: dataDatafonoInventario.hardware_id,
+              comentarios: dataDatafonoInventario.comentarios,
+              estado: dataDatafonoInventario.estado,
+              user_name: userInfo?.attributes?.name,
+              id_comercio: dataDatafono?.fk_comercio_asociado,
+              name_comercio: dataDatafono?.name_comercio,
+            }
+            peticionActualizacionInventario({ pk_datafonos_tullave: dataDatafonoInventario.pk_datafonos_tullave },dataInventario)
+              .then((res) => {
+                if (res?.msg === "Datafono Creado") {
+                  const data = {
+                    pk_tullave_datafonos: params?.id,
+                    comentarios: dataDatafono?.comentarios,
+                  };
+                  if (dataDatafono?.fk_comercio_asociado) {
+                    data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
+                  }
+                  notifyPending(
+                    peticionActualizacionDatafono({ pk_tullave_datafonos: "" }, data),
+                    {
+                      render: () => {
+                        return "Procesando actualización";
+                      },
+                    },
+                    {
+                      render: ({ data: res }) => {
+                        navigate(-1);
+                        return "Actualización satisfactoria";
+                      },
+                    },
+                    {
+                      render: ({ data: error }) => {
+                        return error?.message ?? "Actualización fallida";
+                      },
+                    }
+                  );
+                }
+              })
+              .catch((err) => {
+                if (err?.cause === "custom") {
+                  notifyError(err?.message);
+                  return;
+                }
+                console.error(err?.message);
+                notifyError("Peticion fallida");
+              });
+          })
+          .catch((err) => {
+            if (err?.cause === "custom") {
+              notifyError(err?.message);
+              return;
+            }
+            console.error(err?.message);
+            notifyError("Peticion fallida");
+          });
       } else {
-        const data = {
-          pos_id: dataDatafono?.pos_id,
-          // numero_serie: dataDatafono?.numero_serie,
-          // tarjeta_lsam: dataDatafono?.tarjeta_lsam,
-          // tarjeta_sim: dataDatafono?.tarjeta_sim,
-          // hardware_id: dataDatafono?.hardware_id,
-          comentarios: dataDatafono?.comentarios,
-          estado: true,
-        };
-        if (dataDatafono?.fk_comercio_asociado) {
-          data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
-        }
-        notifyPending(
-          peticionCreacionDatafono({}, data),
-          {
-            render: () => {
-              return "Procesando creación";
-            },
-          },
-          {
-            render: ({ data: res }) => {
-              navigate(-1);
-              return "Datáfono creado";
-            },
-          },
-          {
-            render: ({ data: error }) => {
-              return error?.message ?? "Creación fallida";
-            },
-          }
-        );
+        peticionConsultaInventario({pos_id: dataDatafono?.pos_id})
+          .then((res) => {
+            var dataDatafonoInventario = res?.obj?.results[0]
+            if (res?.obj?.results.length !== 0) {
+              if (dataDatafono?.fk_comercio_asociado !== "") {
+                const data = {
+                  pos_id: dataDatafono?.pos_id,
+                  comentarios: dataDatafono?.comentarios,
+                  estado: true,
+                };
+                if (dataDatafono?.fk_comercio_asociado) {
+                  data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
+                }
+                const dataInventario = {
+                  pos_id: dataDatafonoInventario.pos_id,
+                  tipo_dispositivo: dataDatafonoInventario.tipo_dispositivo,
+                  numero_serie: dataDatafonoInventario.numero_serie,
+                  tarjeta_lsam: dataDatafonoInventario.tarjeta_lsam,
+                  tarjeta_sim: dataDatafonoInventario.tarjeta_sim,
+                  hardware_id: dataDatafonoInventario.hardware_id,
+                  comentarios: dataDatafonoInventario.comentarios,
+                  estado: dataDatafonoInventario.estado,
+                  user_name: userInfo?.attributes?.name,
+                  id_comercio: dataDatafono?.fk_comercio_asociado,
+                  name_comercio: dataDatafono?.name_comercio,
+                }
+                peticionActualizacionInventario({ pk_datafonos_tullave: dataDatafonoInventario.pk_datafonos_tullave },dataInventario)
+                  .then((res) => {
+                    if (res?.msg === "Datafono Creado") {
+                      notifyPending(
+                        peticionCreacionDatafono({}, data),
+                        {
+                          render: () => {
+                            return "Procesando creación";
+                          },
+                        },
+                        {
+                          render: ({ data: res }) => {
+                            navigate(-1);
+                            return "Datáfono creado";
+                          },
+                        },
+                        {
+                          render: ({ data: error }) => {
+                            return error?.message ?? "Creación fallida";
+                          },
+                        }
+                      );
+                    }
+                  })
+                  .catch((err) => {
+                    if (err?.cause === "custom") {
+                      notifyError(err?.message);
+                      return;
+                    }
+                    console.error(err?.message);
+                    notifyError("Peticion fallida");
+                  });
+              }else {
+                notifyError("Seleccione Comercio asociado");
+              }
+            }else{
+              notifyError("POS ID no se encuentra en el inventario de datáfonos");
+            }
+          })
+          .catch((err) => {
+            if (err?.cause === "custom") {
+              notifyError(err?.message);
+              return;
+            }
+            console.error(err?.message);
+            notifyError("Peticion fallida");
+          });
       }
     },
     [params?.id, dataDatafono, navigate]
@@ -117,6 +193,12 @@ const CreateDatafono = () => {
     useFetch(fetchCustom(URL_EDITAR_DATAFONO, "PUT", "Editar datáfono"));
   const [loadingPeticionCreacionDatafono, peticionCreacionDatafono] = useFetch(
     fetchCustom(URL_CREAR_DATAFONO, "POST", "Crear datáfono")
+  );
+  const [loadingPeticionConsultaInventario, peticionConsultaInventario] = useFetch(
+    fetchCustom(URL_CONSULTA_INVENTARIO, "GET", "Consultar datáfono inventario")
+  );
+  const [loadingPeticionActualizacionInventario, peticionActualizacionInventario] = useFetch(
+    fetchCustom(URL_EDITAR_INVENTARIO, "PUT", "Actualizacion datáfono inventario")
   );
   useEffect(() => {
     fetchDatafonosFunc();
@@ -138,16 +220,12 @@ const CreateDatafono = () => {
             setDataDatafono(
               res?.obj?.results[0] ?? {
                 comentarios: "",
-                estado: true,
                 fecha_creacion: null,
                 fecha_modificacion: null,
                 fk_comercio_asociado: "",
-                hardware_id: "",
-                numero_serie: "",
+                name_comercio:"",
                 pk_tullave_datafonos: "",
                 pos_id: "",
-                tarjeta_lsam: "",
-                tarjeta_sim: "",
               }
             );
             return "Consulta satisfactoria";
@@ -180,18 +258,6 @@ const CreateDatafono = () => {
   }, []);
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    // if (ev.target.name === "estado") {
-    //   if (value && typeof value === "string") {
-    //     value = value.toLowerCase() === "false" ? false : true;
-    //   }
-    // }
-    // if (
-    //   ev.target.name === "tarjeta_sim" ||
-    //   ev.target.name === "numero_serie" ||
-    //   ev.target.name === "hardware_id"
-    // ) {
-    //   value = value.toUpperCase();
-    // }
     setDataDatafono((old) => {
       return { ...old, [ev.target.name]: value };
     });
@@ -212,99 +278,19 @@ const CreateDatafono = () => {
             type='text'
             autoComplete='off'
             value={dataDatafono?.["pos_id"]}
-            maxLength={15}
+            maxLength={10}
+            minLength={10}
             onChange={onChangeFormatNumber}
             required
             disabled={
               loadingPeticionConsultaDatafono ||
               params?.id ||
               loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
+              loadingPeticionCreacionDatafono ||
+              loadingPeticionConsultaInventario ||
+              loadingPeticionActualizacionInventario
             }
           />
-          {/* <Input
-            id='numero_serie'
-            name='numero_serie'
-            label={"Número de serie"}
-            type='text'
-            autoComplete='off'
-            value={dataDatafono?.["numero_serie"]}
-            maxLength={16}
-            onChange={onChangeFormat}
-            required
-            disabled={
-              loadingPeticionConsultaDatafono ||
-              loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
-            }
-          />
-          <Input
-            id='tarjeta_lsam'
-            name='tarjeta_lsam'
-            label={"Tarjeta Lsam"}
-            type='text'
-            autoComplete='off'
-            value={dataDatafono?.["tarjeta_lsam"]}
-            maxLength={15}
-            onChange={onChangeFormatNumber}
-            required
-            disabled={
-              loadingPeticionConsultaDatafono ||
-              loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
-            }
-          />
-          <Input
-            id='tarjeta_sim'
-            name='tarjeta_sim'
-            label={"Tarjeta Sim"}
-            type='text'
-            autoComplete='off'
-            value={dataDatafono?.["tarjeta_sim"]}
-            maxLength={25}
-            onChange={onChangeFormat}
-            required
-            disabled={
-              loadingPeticionConsultaDatafono ||
-              params?.id ||
-              loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
-            }
-          />
-          <Input
-            id='hardware_id'
-            name='hardware_id'
-            label={"Hardware Id"}
-            type='text'
-            autoComplete='off'
-            value={dataDatafono?.["hardware_id"]}
-            maxLength={30}
-            onChange={onChangeFormat}
-            required
-            disabled={
-              loadingPeticionConsultaDatafono ||
-              loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
-            }
-          />
-          <Select
-            className='place-self-stretch'
-            id='estado'
-            name='estado'
-            label='Estado del datáfono'
-            required={true}
-            options={{
-              Inactivo: false,
-              Activo: true,
-            }}
-            onChange={onChangeFormat}
-            value={dataDatafono?.estado}
-            disabled={
-              loadingPeticionConsultaDatafono ||
-              loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
-            }
-          /> */}
         </Fieldset>
         <Fieldset legend='Comercio asociado' className='lg:col-span-2'>
           <Input
@@ -324,7 +310,9 @@ const CreateDatafono = () => {
               disabled={
                 loadingPeticionConsultaDatafono ||
                 loadingPeticionActualizacionDatafono ||
-                loadingPeticionCreacionDatafono
+                loadingPeticionCreacionDatafono||
+                loadingPeticionConsultaInventario||
+                loadingPeticionActualizacionInventario
               }>
               {dataDatafono?.fk_comercio_asociado
                 ? "Actualizar comercio asociado"
@@ -345,7 +333,9 @@ const CreateDatafono = () => {
             disabled={
               loadingPeticionConsultaDatafono ||
               loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
+              loadingPeticionCreacionDatafono||
+              loadingPeticionConsultaInventario||
+              loadingPeticionActualizacionInventario
             }
           />
         </Fieldset>
@@ -358,7 +348,9 @@ const CreateDatafono = () => {
             disabled={
               loadingPeticionConsultaDatafono ||
               loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
+              loadingPeticionCreacionDatafono||
+              loadingPeticionConsultaInventario||
+              loadingPeticionActualizacionInventario
             }>
             Cancelar
           </Button>
@@ -367,7 +359,9 @@ const CreateDatafono = () => {
             disabled={
               loadingPeticionConsultaDatafono ||
               loadingPeticionActualizacionDatafono ||
-              loadingPeticionCreacionDatafono
+              loadingPeticionCreacionDatafono||
+              loadingPeticionConsultaInventario||
+              loadingPeticionActualizacionInventario
             }>
             {params?.id ? "Actualizar datáfono" : "Crear datáfono"}
           </Button>
