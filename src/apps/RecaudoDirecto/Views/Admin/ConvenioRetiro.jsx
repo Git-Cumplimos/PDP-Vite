@@ -35,6 +35,7 @@ const RetiroDirecto = () => {
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
+  const [permiteRefExtra, setPermiteRefExtra] = useState(false);
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
     "Valor máximo": "0",
@@ -44,8 +45,13 @@ const RetiroDirecto = () => {
     "Longitud mínima": "",
     "Longitud máxima": "",
   }])
+  const [referenciaExtra, setReferenciaExtra] = useState({
+    "Longitud mínima ext": "",
+    "Longitud máxima ext": "",
+  })
+
   const [res] = useState([
-    ["REFERENCIA_1", "REFERENCIA_2", "TOTAL_PAGAR","FECHA_VENCIMIENTO"],
+    ["REFERENCIA_1", "REFERENCIA_2", "TOTAL_PAGAR", "FECHA_VENCIMIENTO"],
     [332421116, 432422226, 50000, "8/12/2023"],
     [332421117, 432422227, 80000, "16/10/2023"],
     [332421118, 432422228, 1250000, "12/11/2023"],
@@ -61,6 +67,11 @@ const RetiroDirecto = () => {
   const tipoArchivoConciliacion = [
     { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
+  ]
+  const tipoReferenciaExtra = [
+    { label: "Numero documento", value: 1 },
+    { label: "Numero Celular", value: 2 },
+    { label: "Referencia extra", value: 3 },
   ]
 
   useEffect(() => {
@@ -93,8 +104,21 @@ const RetiroDirecto = () => {
         "Valor máximo": "0",
       }
     }
+    let limiteRefExtra = {}
+    if (selected['limite_ref_extra']) {
+      limiteRefExtra = {
+        "Longitud mínima ext": selected['limite_ref_extra'][0] ?? 0,
+        "Longitud máxima ext": selected['limite_ref_extra'][1] ?? 0,
+      }
+    } else {
+      limiteRefExtra = {
+        "Longitud mínima ext": "",
+        "Longitud máxima ext": "",
+      }
+    }
     setlimites(limite)
     setReferencias(referencia)
+    setReferenciaExtra(limiteRefExtra)
   }, [selected])
 
   const handleClose = useCallback(() => {
@@ -143,10 +167,10 @@ const RetiroDirecto = () => {
   const crearModificarConvenioRetiro = useCallback((e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    const data = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     let validacion = true
-    if (body['Nombre de Referencia']) {
-      delete body['Nombre de Referencia']; delete body['Longitud mínima']; delete body['Longitud máxima']
+    if (data['Nombre de Referencia']) {
+      delete data['Nombre de Referencia']; delete data['Longitud mínima']; delete data['Longitud máxima']
       let allReferencias = []
       for (let i in referencias) {
         if (parseInt(referencias[i]["Longitud mínima"]) > parseInt(referencias[i]["Longitud máxima"])) validacion = false
@@ -155,17 +179,29 @@ const RetiroDirecto = () => {
           "length": [referencias[i]["Longitud mínima"], referencias[i]["Longitud máxima"],]
         })
       }
-      body['referencias'] = allReferencias
+      data['referencias'] = allReferencias
       if (!validacion) notifyError("En la restriccion de referencias, la longitud máxima debe ser mayor a la longitud mínima")
     }
-    if (body['Valor mínimo'] || body['Valor máximo']) {
-      delete body['Valor mínimo']; delete body['Valor máximo'];
-      body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0}`, `${limites['Valor máximo'] ?? 0}`]
-      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])) {
+    if (data['Valor mínimo'] || data['Valor máximo']) {
+      delete data['Valor mínimo']; delete data['Valor máximo'];
+      data['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0}`, `${limites['Valor máximo'] ?? 0}`]
+      if (parseInt(data['limite_monto'][0]) > parseInt(data['limite_monto'][1])) {
         notifyError("En la restriccion de valores, el valor máximo debe ser mayor al valor mínima")
         validacion = false
       }
     }
+
+    if (data['Longitud mínima ext'] || data['Longitud máxima ext']) {
+      data['limite_ref_extra'] = [`${referenciaExtra['Longitud mínima ext'] ?? 0}`, `${referenciaExtra['Longitud máxima ext'] ?? 0}`]
+      if (parseInt(data['limite_ref_extra'][0]) > parseInt(data['limite_ref_extra'][1])) {
+        notifyError("En la restriccion de limites de referencia extra, el limite máximo debe ser mayor al limite mínimo")
+        validacion = false
+      }
+      delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
+    }
+
+    const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
+    const body = Object.fromEntries(filteredBody);
     if (validacion) {
       notifyPending(
         selected
@@ -455,6 +491,44 @@ const RetiroDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
+          <Fieldset legend={"Referencia Extra"}>
+            <Select
+              className="place-self-stretch mb-1"
+              id={"Tipo_referencia_extra"}
+              label={"Tipo referencia"}
+              name={"fk_id_tipo_referencia_extra"}
+              options={[{ label: "", value: "" }, ...tipoReferenciaExtra]}
+              defaultValue={selected?.fk_id_tipo_referencia_extra ?? ""}
+              required
+              // onChange={(ev) => {
+              //   setPermiteRefExtra(
+              //     ev.target.value !== null && ev.target.value !== "" ? true : false
+              //   )
+              // }}
+            />
+            {Object.entries(referenciaExtra).map(([keyRef, valRef], index) => {
+              return (
+                <Input
+                  key={keyRef}
+                  className={"mb-4"}
+                  id={`${keyRef}_${index}`}
+                  name={keyRef}
+                  label={keyRef.replace("ext","")}
+                  type={`tel`}
+                  maxLength={`2`}
+                  autoComplete="off"
+                  value={valRef}
+                  onInput={(ev, valor) => {
+                    if (keyRef.includes("Longitud")) (valor = onChangeNumber(ev))
+                    const copyRef = { ...referenciaExtra };
+                    copyRef[keyRef] = valor;
+                    setReferenciaExtra(copyRef);
+                  }}
+                  required
+                />
+              );
+            })}
+          </Fieldset>
           <Select
             className="place-self-stretch mb-1"
             id={"Tipo_archivo"}
@@ -478,6 +552,15 @@ const RetiroDirecto = () => {
             label={"Permite vencidos"}
             name={"permite_vencidos"}
             defaultChecked={selected?.permite_vencidos ?? ""}
+          />
+          <ToggleInput
+            id={"permite_referencia_extra"}
+            label={"Permite referencia extra"}
+            name={"permite_referencia_extra"}
+            defaultChecked={selected?.permite_referencia_extra ?? ""}
+            onChange={() =>
+              setPermiteRefExtra((old) => !old)
+            }
           />
           {selected && (
             <ToggleInput
