@@ -297,6 +297,7 @@ const RecaudoConjunto = () => {
               maxLength={convenioRecaudo['limite_ref_extra'][1] ?? 20}
               name={`permite_referencia_extra`}
               type="tel"
+              value={referenciaExtra}
               onInput={(e) => { setReferenciaExtra(onChangeNumber(e)) }}
               autoComplete="off"
               required />
