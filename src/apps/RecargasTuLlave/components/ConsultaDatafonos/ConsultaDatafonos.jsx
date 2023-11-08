@@ -34,15 +34,13 @@ const ConsultaDatafonos = ({
             return {
               pos_id,
               fk_comercio_asociado: fk_comercio_asociado ?? "No asociado",
-              // numero_serie,
               estado: estado ? "Activo" : "Inactivo",
               fecha_creacion: dateFormatter.format(new Date(fecha_creacion)),
-              fecha_modificacion: new Date(fecha_modificacion).toLocaleString('en-US')
+              fecha_modificacion: dateFormatter.format(new Date(fecha_modificacion))
             };
           } else {
             return {
               pos_id,
-              // numero_serie,
               fecha_creacion,
               fecha_modificacion,
             };
@@ -143,11 +141,9 @@ const ConsultaDatafonos = ({
           name='pos_id'
           minLength='1'
           maxLength='10'
-          // required
           value={dataDatafonos.pos_id}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              // const num = e.target.value;
               const valor = e.target.value;
               const num = valor.replace(/[\s\.-]/g, "");
               setDataDatafonos((old) => {
@@ -164,11 +160,9 @@ const ConsultaDatafonos = ({
               name='fk_comercio_asociado'
               minLength='1'
               maxLength='10'
-              // required
               value={dataDatafonos.fk_comercio_asociado}
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
-                  // const num = e.target.value;
                   const valor = e.target.value;
                   const num = valor.replace(/[\s\.-]/g, "");
                   setDataDatafonos((old) => {
