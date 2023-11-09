@@ -2,7 +2,6 @@ import { lazy } from "react";
 
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
-import { TypingRoutes } from "../../utils/TypingUtils";
 
 const RecaudoCodigo = lazy(() => import("./Views/RecaudoCodigo"));
 const RecaudoManual = lazy(() => import("./Views/RecaudoManual"));
@@ -10,7 +9,7 @@ const RecaudoManual = lazy(() => import("./Views/RecaudoManual"));
 const routesRecaudoGenerico = {
   link: "/recaudo-generico",
   label: <AppIcons Logo={"RECAUDO"} name="Recaudo Servicio Públicos y Privador Genérico" />,
-  component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
+  component: ({subRoutes}) => (
     <HNavbar links={subRoutes} />
   ),
   permission: [200, 201, 202],

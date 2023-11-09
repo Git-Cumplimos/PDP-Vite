@@ -20,7 +20,7 @@ const RecaudoCodigo = () => {
     return (
       <Fragment>
         <Form grid={false}
-          onSubmit={(ev: any) => {
+          onSubmit={(ev) => {
             ev.preventDefault();
             const formData = new FormData(ev.target);
             navigateRecaudo(Object.fromEntries(formData));

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 import TableEnterprise from "../../../components/Base/TableEnterprise/TableEnterprise";
+import Table from "../../../components/Base/Table/Table";
 import Input from "../../../components/Base/Input";
 import ButtonBar from "../../../components/Base/ButtonBar";
 
@@ -16,8 +17,6 @@ const RecaudoManual = () => {
         onSelectRow={() => {}}
         onChange={() => {}}
       >
-        <></>
-      </TableEnterprise>
       <Input
         id={"id_convenio"}
         label={"Código convenio - Nura"}
@@ -43,6 +42,7 @@ const RecaudoManual = () => {
         maxLength={13}
         required
       />
+      </TableEnterprise>
     </div>
   );
 };
