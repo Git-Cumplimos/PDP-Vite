@@ -305,7 +305,6 @@ const Panel = () => {
     setDataPlfExt(updateData)
   }, [dataPlfExt]);
 
-  console.log(validTipoComercio)
   return (
     validTipoComercio && (
       <Fragment>
