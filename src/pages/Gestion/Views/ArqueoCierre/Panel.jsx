@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
+const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","PAPELERIA Y MISCELANEA","DROGUERIA"];
 let Num = 0;
 
 
