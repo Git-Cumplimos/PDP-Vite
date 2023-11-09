@@ -57,6 +57,9 @@ type TypingConsultData = null | {
 
 //Constantes
 const valor_total_trx_maximo = 9900000;
+const len_valor_total_trx_maximo = formatMoney.format(
+  valor_total_trx_maximo
+).length;
 const name_componente = "Recaudo";
 const infServiceBackend: TypeInf = {
   barcode: {
@@ -95,6 +98,9 @@ const Recaudo = () => {
   const [procedimiento, setProcedimiento] =
     useState<TypeProcedimiento>(option_barcode);
   const [inputData, setInputData] = useState<TypingInputData>(inputDataInitial);
+  const [valorTotalTrxMaximo, setValorTotalTrxMaximo] = useState<number>(
+    valor_total_trx_maximo
+  );
   const [consultData, setConsultaData] = useState<TypingConsultData>(null);
   const [infTicket, setInfTicket] = useState(null);
   const printDiv = useRef(null);
@@ -108,6 +114,16 @@ const Recaudo = () => {
     setProcedimiento(option_manual);
     setPaso("LecturaEmcali");
   }, []);
+
+  useEffect(() => {
+    if (consultData?.valor_faltante) {
+      setValorTotalTrxMaximo(
+        inputData?.valor_total_trx > valor_total_trx_maximo
+          ? valor_total_trx_maximo
+          : consultData?.valor_faltante
+      );
+    }
+  }, [inputData?.valor_total_trx, consultData?.valor_faltante]);
 
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
@@ -239,15 +255,16 @@ const Recaudo = () => {
 
   const onSubmitPay = useCallback(
     (e: MouseEvent<HTMLFormElement>) => {
+      e.preventDefault();
       if (inputData?.valor_total_trx > valor_total_trx_maximo) {
         notifyError(
-          `No se puede realizar el pago por que el valor debe ser menor o igual $${formatMoney.format(
+          `No se puede realizar el pago por que el valor debe ser menor o igual ${formatMoney.format(
             valor_total_trx_maximo
           )}`
         );
+        setPaso("ResumenConsulta");
         return;
       }
-      e.preventDefault();
       let tipo__comercio = roleInfo?.["tipo_comercio"] ?? "";
       tipo__comercio = tipo__comercio.toLowerCase();
       const data = {
@@ -332,7 +349,6 @@ const Recaudo = () => {
               onSearchCodigo={onSubmitBarcode}
               disabled={loadingPeticion}
             />
-
             <div className={formItem} ref={buttonDelate}>
               <button type="reset">Volver a ingresar código de barras</button>
             </div>
@@ -415,7 +431,8 @@ const Recaudo = () => {
                 equalErrorMin={true}
                 autoComplete="off"
                 min={0}
-                max={consultData.valor_faltante}
+                max={valorTotalTrxMaximo}
+                maxLength={len_valor_total_trx_maximo}
                 // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
                 value={inputData.valor_total_trx} //se usa este por que es con decimales
                 onInput={(e: any, valor: any) => {
