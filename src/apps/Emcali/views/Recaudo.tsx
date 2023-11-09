@@ -56,6 +56,7 @@ type TypingConsultData = null | {
 };
 
 //Constantes
+const valor_total_trx_maximo = 9900000;
 const name_componente = "Recaudo";
 const infServiceBackend: TypeInf = {
   barcode: {
@@ -238,6 +239,14 @@ const Recaudo = () => {
 
   const onSubmitPay = useCallback(
     (e: MouseEvent<HTMLFormElement>) => {
+      if (inputData?.valor_total_trx > valor_total_trx_maximo) {
+        notifyError(
+          `No se puede realizar el pago por que el valor debe ser menor o igual $${formatMoney.format(
+            valor_total_trx_maximo
+          )}`
+        );
+        return;
+      }
       e.preventDefault();
       let tipo__comercio = roleInfo?.["tipo_comercio"] ?? "";
       tipo__comercio = tipo__comercio.toLowerCase();
