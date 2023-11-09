@@ -16,9 +16,8 @@ import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","PAPELERIA Y MISCELANEA","DROGUERIA"];
+const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","DROGUERIA"];
 let Num = 0;
-
 
 const Panel = () => {
   const navigate = useNavigate();
@@ -306,6 +305,7 @@ const Panel = () => {
     setDataPlfExt(updateData)
   }, [dataPlfExt]);
 
+  console.log(validTipoComercio)
   return (
     validTipoComercio && (
       <Fragment>
