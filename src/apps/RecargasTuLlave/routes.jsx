@@ -114,7 +114,7 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/consolidacion-trx",
       label: (
-        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Consolidación transacciones Recarga Tarjeta Datafonos" />
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Transacciones Recarga Tarjeta Datafonos" />
       ),
       component: ReporteTuLLaveTrx,
       permission: [enumPermisosTuLlave.CONSOLIDACION_TULLAVE],
