@@ -214,7 +214,7 @@ const Panel = () => {
               ["", ""],
               [
                 "Efectivo en caja PDP",
-                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+Num),
+                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)),
               ],
               ["", ""],
               [
