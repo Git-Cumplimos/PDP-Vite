@@ -42,7 +42,9 @@ export class ErrorPDPFetch extends Error {
 const handlePDPFetchResponse = async (response: Response) => {
   const jsonResponse = await response.json();
   if ("status" in jsonResponse && !jsonResponse.status) {
-    throw new ErrorPDPFetch(jsonResponse?.msg, jsonResponse, { cause: "custom" });
+    throw new ErrorPDPFetch(jsonResponse?.msg, jsonResponse, {
+      cause: "custom",
+    });
   }
   return jsonResponse;
 };
@@ -80,10 +82,7 @@ const useFetchDispatchDebounce = (
 
   const [abortController, setAbortController] = useState(new AbortController());
 
-  const abort = useCallback(
-    () => abortController.abort(),
-    [abortController]
-  );
+  const abort = useCallback(() => abortController.abort(), [abortController]);
 
   const dispatchFetch = useCallback(
     async (url: RequestInfo | URL, options?: RequestInit) => {
@@ -109,6 +108,13 @@ const useFetchDispatchDebounce = (
               ...options,
               signal: _abortController.signal,
             });
+          }
+          if (response.status === 403) {
+            throw new ErrorPDPFetch(
+              (await response.json())?.message,
+              response,
+              { cause: "custom-403" }
+            );
           }
           if (!checkStatus) {
             return response;

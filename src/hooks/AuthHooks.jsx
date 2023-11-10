@@ -437,7 +437,13 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0, sobregiro: 0,sobregirovalue: 0, alerta: '' };
+      const tempRole = {
+        quota: 0,
+        comision: 0,
+        sobregiro: 0,
+        sobregirovalue: 0,
+        alerta: "",
+      };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
       tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
@@ -478,21 +484,23 @@ export const useProvideAuth = () => {
         });
     }, []),
     onError: useCallback((error) => {
-      if (error?.cause === "custom") {
+      if (error?.cause === "custom-403") {
+        notifyError(error.message);
+        signOut();
+      } else if (error?.cause === "custom") {
         notifyError(error.message);
         setSuserInactive(error.message);
       } else {
         console.error(error);
-        setSuserInactive(error);
       }
-    }, []),
+    }, [signOut]),
   });
 
   const [getLoginPdp] = useFetchDispatchDebounce({
     onSuccess: useCallback(
       (res) => {
         const pdpU = res?.obj?.pdpU;
-        if (!pdpU && !("active" in pdpU) && !pdpU.active) {
+        if (!pdpU && !pdpU.active) {
           notifyError("Usuario inactivo");
           signOut();
           return;
@@ -506,14 +514,17 @@ export const useProvideAuth = () => {
       },
       [signOut]
     ),
-    onError: useCallback((error) => {
-      signOut();
-      if (error?.cause === "custom") {
-        notifyError(error.message);
-      } else {
-        console.error(error);
-      }
-    }, [signOut]),
+    onError: useCallback(
+      (error) => {
+        if (error?.cause in ["custom-403", "custom"]) {
+          notifyError(error.message);
+          signOut();
+        } else {
+          console.error(error);
+        }
+      },
+      [signOut]
+    ),
   });
 
   const [getComercios] = useFetchDispatchDebounce({
@@ -523,6 +534,7 @@ export const useProvideAuth = () => {
     }, []),
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
+        signOut();
         notifyError(error.message);
       } else {
         console.error(error);
@@ -579,11 +591,17 @@ export const useProvideAuth = () => {
       getSuserInfo(
         `${urlLog}?correo=${userState?.userInfo?.attributes?.email}`
       );
+    }
+  }, [userState?.userInfo?.attributes?.email, getSuserInfo]);
+
+  useEffect(() => {
+    const email = userState?.userInfo?.attributes?.email;
+    if (email && roleInfo) {
       getLoginPdp(
         `${url_iam_pdp_users}/user-login?email=${userState?.userInfo?.attributes?.email}`
       );
     }
-  }, [userState?.userInfo?.attributes?.email, getSuserInfo, getLoginPdp]);
+  }, [userState?.userInfo?.attributes?.email, roleInfo, getLoginPdp]);
 
   useEffect(() => {
     const isPdpCommerce = !!pdpUser?.fk_id_comercio;

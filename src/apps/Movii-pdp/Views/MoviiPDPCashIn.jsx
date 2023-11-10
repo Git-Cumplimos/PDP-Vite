@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { enumParametrosMovii } from "../utils/enumParametrosMovii";
 import { useFetchMovii } from "../hooks/fetchMovii";
 import { useFetch } from "../../../hooks/useFetch";
+import { useMFA } from "../../../components/Base/MFAScreen";
 const URL_CONSULTA_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/check-estado-deposito-movii`;
 const URL_CONSULTAR_USUARIO_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/consulta-deposito-movii`;
 const URL_REALIZAR_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/deposito-corresponsal-movii`;
@@ -30,6 +31,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
 const MoviiPDPCashIn = () => {
   const navigate = useNavigate();
   const { roleInfo, pdpUser } = useAuth();
+  const { submitEventSetter } = useMFA();
   const [showModal, setShowModal] = useState(false);
   const uniqueId = v4();
   const [peticion, setPeticion] = useState(0);
@@ -365,8 +367,7 @@ const MoviiPDPCashIn = () => {
                     loadingPeticionConsultaDepositoMovii
                   }
                   type="submit"
-                  onClick={peticionCashIn}
-                >
+                  onClick={submitEventSetter(peticionCashIn)}>
                   Aceptar
                 </Button>
               </ButtonBar>

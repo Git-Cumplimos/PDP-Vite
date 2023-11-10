@@ -16,9 +16,8 @@ import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
+const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","DROGUERIA"];
 let Num = 0;
-
 
 const Panel = () => {
   const navigate = useNavigate();
@@ -215,7 +214,7 @@ const Panel = () => {
               ["", ""],
               [
                 "Efectivo en caja PDP",
-                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+Num),
+                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)),
               ],
               ["", ""],
               [
