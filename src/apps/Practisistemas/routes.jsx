@@ -129,13 +129,15 @@ export const rutasPines = {
 
 export const rutasApuestas = {
   link: "/apuestas-deportivas",
-  label: <AppIcons Logo={"RECAUDO"} name='Apuestas Deportivas' />,
+  label: <AppIcons Logo={"APUESTAS_DEPORTIVAS"} name="Apuestas Deportivas" />,
   component: ApuestasDeportivas,
   permission: [enumPermisosPractisistemas.practisistemasApuestas],
   subRoutes: [
     {
       link: "/apuestas-deportivas/Recargar",
-      label: <AppIcons Logo={"RECAUDO"} name='Apuestas Deportivas' />,
+      label: (
+        <AppIcons Logo={"APUESTAS_DEPORTIVAS"} name="Apuestas Deportivas" />
+      ),
       component: RecargarCuentaApuestas,
       permission: [enumPermisosPractisistemas.practisistemasApuestas],
       show: false,
