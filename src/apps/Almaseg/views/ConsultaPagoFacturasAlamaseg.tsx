@@ -9,13 +9,8 @@ import Form from "../../../components/Base/Form/Form";
 import Input from "../../../components/Base/Input/Input";
 import ButtonBar from "../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../components/Base/Button/Button";
-import SimpleLoading from "../../../components/Base/SimpleLoading/SimpleLoading";
-import { notifyError, notifyPending } from "../../../utils/notify";
-import {
-  useFetchAlmaseg,
-  TypeServicesBackendAlmaseg,
-  ErrorFetchAlmaseg,
-} from "../hooks/useFetchAlmaseg";
+import { notifyPending } from "../../../utils/notify";
+import { useFetchAlmaseg } from "../hooks/useFetchAlmaseg";
 import { v4 } from "uuid";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetchAlmasegTrx } from "../hooks/useFetchAlmasegTrx";
@@ -105,7 +100,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   const doOnResetAll = useCallback(() => {
     doOnReset();
     navigate(-1);
-  }, []);
+  }, [doOnReset, navigate]);
 
   const doOnSubmit = useCallback(
     (ev: FormEvent<HTMLFormElement>) => {
@@ -135,13 +130,14 @@ const ConsultaGeneracionPin = (): JSX.Element => {
         }
       );
     },
-    [peticionConsultaPin, doOnReset, dataInput]
+    [peticionConsultaPin, dataInput, doOnResetAll]
   );
   const checkSubmit = useCallback((ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     setShowModal(true);
     setPeticion(false);
   }, []);
+
   const doOnSubmitCashout = useCallback(
     (ev: FormEvent<HTMLFormElement>) => {
       ev.preventDefault();
@@ -158,6 +154,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
         id_trx_retiro_directo: dataOutput?.["id_trx_retiro_directo"] ?? 0,
         pk_id_retiro: dataOutput?.["pk_id_recaudo"] ?? 0,
         valor_total_trx: dataOutput?.["valor_total_trx"] ?? 0,
+        numero_identificacion: dataOutput?.["numero_identificacion"],
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
@@ -184,15 +181,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
         }
       );
     },
-    [
-      peticionConsultaPin,
-      doOnReset,
-      dataOutput,
-      pdpUser,
-      roleInfo,
-      uniqueId,
-      dataInput,
-    ]
+    [dataOutput, roleInfo, uniqueId, dataInput, doOnResetAll, fetchAlmasegTrx]
   );
   const printDiv = useRef(null);
 
