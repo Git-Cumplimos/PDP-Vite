@@ -1,3 +1,4 @@
+import { fetchDataTotp } from "../../../utils/MFA";
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
@@ -6,7 +7,8 @@ export const fetchCustom = (
   metodo_,
   name_,
   evaluate = true,
-  notificacion = true
+  notificacion = true,
+  totp = false
 ) => {
   return async (params_ = {}, data_ = {}) => {
     let urlCompleto = url_;
@@ -32,12 +34,13 @@ export const fetchCustom = (
     //Petición
     let Peticion;
     try {
+      const fetchFunc = totp ? fetchDataTotp : fetchData;
       if (metodo_ === "GET") {
-        Peticion = await fetchData(urlCompleto, "GET", {}, {}, {}, true);
+        Peticion = await fetchFunc(urlCompleto, "GET", {}, {}, {}, true);
       } else if (metodo_ === "PUT") {
-        Peticion = await fetchData(urlCompleto, "PUT", {}, data_, {}, true);
+        Peticion = await fetchFunc(urlCompleto, "PUT", {}, data_, {}, true);
       } else if (metodo_ === "POST") {
-        Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
+        Peticion = await fetchFunc(urlCompleto, "POST", {}, data_, {}, true);
       }
     } catch (error) {
       throw new ErrorCustomFetch(

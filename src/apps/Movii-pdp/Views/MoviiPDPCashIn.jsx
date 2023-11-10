@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef, useMemo } from "react";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Modal from "../../../components/Base/Modal";
@@ -11,9 +11,6 @@ import { useReactToPrint } from "react-to-print";
 import { fetchCustom } from "../utils/fetchMoviiRed";
 import { v4 } from "uuid";
 import MoneyInput from "../../../components/Base/MoneyInput";
-import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
-import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
-import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
 import { enumParametrosMovii } from "../utils/enumParametrosMovii";
 import { useFetchMovii } from "../hooks/fetchMovii";
@@ -33,7 +30,7 @@ const MoviiPDPCashIn = () => {
   const { roleInfo, pdpUser } = useAuth();
   const { submitEventSetter } = useMFA();
   const [showModal, setShowModal] = useState(false);
-  const uniqueId = v4();
+  const uniqueId = useMemo(() => v4(), []);
   const [peticion, setPeticion] = useState(0);
   const [datosTrans, setDatosTrans] = useState({
     otp: "",
@@ -46,14 +43,15 @@ const MoviiPDPCashIn = () => {
     genero: "",
     id_trx: "",
   });
+
   const [objTicketActual, setObjTicketActual] = useState({});
 
   /*Funcion para habilitar el modal*/
-  const habilitarModal = () => {
-    setShowModal(!showModal);
-  };
+  const habilitarModal = useCallback(() => {
+    setShowModal((old) => !old);
+  }, []);
 
-  const hideModal = () => {
+  const hideModal = useCallback(() => {
     setShowModal(false);
     setDatosTrans({
       otp: "",
@@ -70,7 +68,8 @@ const MoviiPDPCashIn = () => {
     });
     setPeticion(0);
     navigate(-1);
-  };
+  }, [navigate]);
+
   const hideModalUsuario = () => {
     setShowModal(false);
     setDatosTrans({
@@ -196,7 +195,16 @@ const MoviiPDPCashIn = () => {
         }
       );
     },
-    [datosTrans, pdpUser, roleInfo, uniqueId, infoUsers]
+    [
+      datosTrans,
+      pdpUser,
+      roleInfo,
+      uniqueId,
+      infoUsers,
+      hideModal,
+      navigate,
+      peticionCashInMovii,
+    ]
   );
 
   const peticionConsulta = useCallback(
@@ -259,7 +267,15 @@ const MoviiPDPCashIn = () => {
         }
       );
     },
-    [datosTrans, roleInfo, pdpUser?.uname, pdpUser, navigate]
+    [
+      datosTrans,
+      roleInfo,
+      pdpUser,
+      navigate,
+      habilitarModal,
+      hideModal,
+      peticionConsultaDepositoMovii,
+    ]
   );
   return (
     <>
@@ -367,7 +383,8 @@ const MoviiPDPCashIn = () => {
                     loadingPeticionConsultaDepositoMovii
                   }
                   type="submit"
-                  onClick={submitEventSetter(peticionCashIn)}>
+                  onClick={submitEventSetter(peticionCashIn)}
+                >
                   Aceptar
                 </Button>
               </ButtonBar>
