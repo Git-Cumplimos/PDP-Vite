@@ -206,7 +206,7 @@ const RetiroDirecto = () => {
     if (data['Longitud mínima ext'] || data['Longitud máxima ext']) {
       data['limite_ref_extra'] = [`${referenciaExtra['Longitud mínima ext'] ?? 0}`, `${referenciaExtra['Longitud máxima ext'] ?? 0}`]
       if (parseInt(data['limite_ref_extra'][0]) > parseInt(data['limite_ref_extra'][1])) {
-        notifyError("En la restriccion de limites de referencia extra, el limite máximo debe ser mayor al limite mínimo")
+        notifyError("En la restriccion de limites de datos extra, el limite máximo debe ser mayor al limite mínimo")
         validacion = false
       }
       delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
@@ -503,7 +503,7 @@ const RetiroDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-          <Fieldset legend={"Referencia Extra"}>
+          <Fieldset legend={"Datos Extra"}>
             <Select
               className="place-self-stretch mb-1"
               id={"Tipo_referencia_extra"}
@@ -567,7 +567,7 @@ const RetiroDirecto = () => {
           />
           <ToggleInput
             id={"permite_referencia_extra"}
-            label={"Permite referencia extra"}
+            label={"Permite datos extra"}
             name={"permite_referencia_extra"}
             defaultChecked={selected?.permite_referencia_extra ?? ""}
             onChange={() =>
