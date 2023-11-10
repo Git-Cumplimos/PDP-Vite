@@ -320,7 +320,7 @@ const Transacciones = () => {
         {userPermissions
           .map(({ id_permission }) => id_permission)
           .includes(5) &&
-          commerceInfo?.estado && (
+          (!pdpUser?.fk_id_comercio || commerceInfo?.estado) && (
             <Fragment>
               <Input
                 id="id_comercio"

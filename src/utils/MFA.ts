@@ -40,7 +40,7 @@ export const fetchDataTotp = async (
     const newheaders = structuredClone(headers);
     newheaders["X-Pdp-Totp"] = currentTotp;
 
-    return await fetchData(
+    const res = await fetchData(
       url,
       method,
       queries,
@@ -49,7 +49,11 @@ export const fetchDataTotp = async (
       authenticate,
       timeout
     );
-  } catch (error) {
+    return res;
+  } catch (error: any) {
+    if (error?.cause === "custom-403") {
+      notifyError(error?.message);
+    }
     throw error;
   } finally {
     window.localStorage.setItem("current_totp", JSON.stringify(null));
@@ -81,7 +85,13 @@ export const fetchSecureTotp = async (
     );
     newinit.headers.append("X-Pdp-Totp", currentTotp);
 
-    return await fetchSecure(input, newinit);
+    const response = await fetchSecure(input, newinit);
+    if (response.status === 403) {
+      const _msg = (await response.json())?.message;
+      notifyError(_msg);
+      throw new Error(_msg, { cause: "custom-403" });
+    }
+    return response;
   } catch (error) {
     throw error;
   } finally {

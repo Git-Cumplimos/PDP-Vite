@@ -188,7 +188,6 @@ const TransaccionDepositoDale = () => {
     });
     setObjTicketActual({});
     setDatosConsulta({});
-    navigate(-1);
   }, [roleInfo]);
   return (
     <>
@@ -249,6 +248,7 @@ const TransaccionDepositoDale = () => {
             onClick={() => {
               notifyError("Transacción cancelada por el usuario");
               handleClose();
+              navigate(-1);
             }}
           >
             Cancelar
@@ -302,6 +302,7 @@ const TransaccionDepositoDale = () => {
                       onClick={() => {
                         notifyError("Transacción cancelada por el usuario");
                         handleClose();
+                        navigate(-1);
                       }}
                     >
                       Cancelar
@@ -316,6 +317,7 @@ const TransaccionDepositoDale = () => {
                       onClick={() => {
                         notifyError("Transacción cancelada por el usuario");
                         handleClose();
+                        navigate(-1);
                       }}
                     >
                       Cancelar
@@ -335,7 +337,13 @@ const TransaccionDepositoDale = () => {
               ></TicketsAval>
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
-                <Button type="button" onClick={handleClose}>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    handleClose();
+                    navigate(-1);
+                  }}
+                >
                   Cerrar
                 </Button>
               </ButtonBar>

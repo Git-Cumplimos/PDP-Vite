@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { enumPermisosAval } from "./enumPermisosAval";
+import { enumPermisosAval, enumPermisosAvalGestion } from "./enumPermisosAval";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
@@ -13,6 +13,7 @@ const CorresponsaliaGrupoAval = lazy(() => import("./CorresponsaliaGrupoAval"));
 //    "../apps/Corresponsalia/CorresponsaliaDavivienda/Views/AhorrosCorriente"
 //  )
 // );
+const AdminGestionAval = lazy(() => import("./Views/AdminGestionAval"));
 const DepositoGrupoAval = lazy(() =>
   import("./Views/AhorrosCorriente/Deposito")
 );
@@ -54,6 +55,9 @@ const TransaccionRecaudoPila = lazy(() =>
 
 const listPermissions = Object.values(enumPermisosAval);
 export const listPermissionsAval = listPermissions;
+export const listPermissionsGestionAval = Object.values(
+  enumPermisosAvalGestion
+);
 
 const rutasAvalCB = {
   link: "/corresponsalia/CorresponsaliaGrupoAval",
@@ -98,10 +102,7 @@ const rutasAvalCB = {
         />
       ),
       component: RecaudoServiciosPublicosPrivadosMenuAval,
-      permission: [
-        enumPermisosAval.aval_cb_recaudo,
-        enumPermisosAval.aval_cb_convenios_recaudo,
-      ],
+      permission: [enumPermisosAval.aval_cb_recaudo],
       subRoutes: [
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/seleccion",
@@ -128,17 +129,6 @@ const rutasAvalCB = {
           component: RecaudoServiciosPublicosPrivadosAval,
           permission: [enumPermisosAval.aval_cb_recaudo],
           show: false,
-        },
-        {
-          link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoServiciosPublicosPrivados/convenios",
-          label: (
-            <AppIcons
-              Logo={"AVAL_CONVENIO_RECAUDO"}
-              name="Convenios recaudo AVAL"
-            />
-          ),
-          component: ConveniosRecaudoAval,
-          permission: [enumPermisosAval.aval_cb_convenios_recaudo],
         },
       ],
     },
@@ -180,7 +170,7 @@ const rutasAvalCB = {
         },
         {
           link: "/corresponsalia/CorresponsaliaGrupoAval/dale/deposito",
-          label: <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name="Deposito" />,
+          label: <AppIcons Logo={"AVAL_PAGO_DE_SUBSIDIOS"} name="Depósito" />,
           component: TransaccionDepositoDale,
           permission: [enumPermisosAval.DEPOSITO_DALE],
         },
@@ -194,4 +184,25 @@ const rutasAvalCB = {
     },
   ],
 };
+
+export const rutasGestionGrupoAval = {
+  link: "/GestionTransaccional/corresponsalia-grupo-aval",
+  label: <AppIcons Logo={"AVAL_CONVENIO_RECAUDO"} name="Gestión Grupo Aval" />,
+  component: AdminGestionAval,
+  permission: [enumPermisosAvalGestion.aval_cb_convenios_recaudo],
+  subRoutes: [
+    {
+      link: "/GestionTransaccional/corresponsalia-grupo-aval/convenios",
+      label: (
+        <AppIcons
+          Logo={"AVAL_CONVENIO_RECAUDO"}
+          name="Convenios recaudo AVAL"
+        />
+      ),
+      component: ConveniosRecaudoAval,
+      permission: [enumPermisosAvalGestion.aval_cb_convenios_recaudo],
+    },
+  ],
+};
+
 export default rutasAvalCB;
