@@ -74,7 +74,7 @@ const RetiroDirecto = () => {
   const validateCommerce = useCallback(() => {  
     if (!hasData) {
       notifyError(
-        "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        "El usuario no cuenta con datos de comercio, no se permite la transacción"
       );
       navigate("/")
     }
