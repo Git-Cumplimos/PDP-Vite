@@ -22,13 +22,7 @@ import { useReactToPrint } from "react-to-print";
 //--------- Typing ------------------
 type TypeDataInput = {
   numero_factura: string;
-  comercio: {
-    id_comercio: null | number;
-    id_usuario: number | null;
-    id_terminal: number | null;
-  };
-  oficina_propia: boolean | null;
-  nombre_usuario: string | null;
+  numero_identificacion_retiro: string;
 };
 type TypeDataOutput = null | {
   numero_identificacion: string;
@@ -45,6 +39,7 @@ type TypeDataOutput = null | {
 //--------- constantes ------------------
 const dataInputInitial = {
   numero_factura: "",
+  numero_identificacion_retiro: "",
 };
 const url_consulta = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/consulta-generacion-pin`;
 const URL_REALIZAR_RETIRO_ALMASEG = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/retiro-almaseg`;
@@ -57,20 +52,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [peticion, setPeticion] = useState(false);
-  const [dataInput, setDataInput] = useState<TypeDataInput>({
-    ...dataInputInitial,
-    comercio: {
-      id_comercio: roleInfo?.["id_comercio"] ?? 0,
-      id_usuario: roleInfo?.["id_usuario"] ?? 0,
-      id_terminal: roleInfo?.["id_dispositivo"] ?? 0,
-    },
-    oficina_propia:
-      roleInfo?.["tipo_comercio"] === "OFICINAS PROPIAS" ||
-      roleInfo?.["tipo_comercio"] === "KIOSCO"
-        ? true
-        : false,
-    nombre_usuario: pdpUser?.["uname"] ?? "",
-  });
+  const [dataInput, setDataInput] = useState<TypeDataInput>(dataInputInitial);
   const [dataOutput, setDataOutput] = useState<TypeDataOutput>(null);
   const [objTicketActual, setObjTicketActual] = useState({});
   const [loadingPeticionConsultaPin, peticionConsultaPin] = useFetchAlmaseg(
@@ -84,9 +66,6 @@ const ConsultaGeneracionPin = (): JSX.Element => {
     "Realizar retiro Almaseg"
   );
   const { loadingState, fetchAlmasegTrx } = fetchAlmasegFunc;
-  const doOnChange = useCallback((ev: ChangeEvent<HTMLFormElement>) => {
-    setDataInput((old) => ({ ...old, [ev.target.name]: ev.target.value }));
-  }, []);
 
   const doOnReset = useCallback(() => {
     setShowModal(false);
@@ -105,8 +84,23 @@ const ConsultaGeneracionPin = (): JSX.Element => {
   const doOnSubmit = useCallback(
     (ev: FormEvent<HTMLFormElement>) => {
       ev.preventDefault();
+      const data = {
+        comercio: {
+          id_comercio: roleInfo?.["id_comercio"] ?? 0,
+          id_usuario: roleInfo?.["id_usuario"] ?? 0,
+          id_terminal: roleInfo?.["id_dispositivo"] ?? 0,
+        },
+        oficina_propia:
+          roleInfo?.["tipo_comercio"] === "OFICINAS PROPIAS" ||
+          roleInfo?.["tipo_comercio"] === "KIOSCO"
+            ? true
+            : false,
+
+        nombre_usuario: pdpUser?.["uname"] ?? "",
+        numero_factura: dataInput.numero_factura,
+      };
       notifyPending(
-        peticionConsultaPin({}, dataInput),
+        peticionConsultaPin({}, data),
         {
           render: () => {
             return "Procesando consulta";
@@ -130,7 +124,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
         }
       );
     },
-    [peticionConsultaPin, dataInput, doOnResetAll]
+    [peticionConsultaPin, dataInput, doOnResetAll, pdpUser, roleInfo]
   );
   const checkSubmit = useCallback((ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -142,25 +136,29 @@ const ConsultaGeneracionPin = (): JSX.Element => {
     (ev: FormEvent<HTMLFormElement>) => {
       ev.preventDefault();
       const data = {
-        oficina_propia: dataInput.oficina_propia,
+        oficina_propia:
+          roleInfo?.["tipo_comercio"] === "OFICINAS PROPIAS" ||
+          roleInfo?.["tipo_comercio"] === "KIOSCO"
+            ? true
+            : false,
         comercio: {
-          ...dataInput.comercio,
+          id_comercio: roleInfo?.["id_comercio"] ?? 0,
+          id_usuario: roleInfo?.["id_usuario"] ?? 0,
+          id_terminal: roleInfo?.["id_dispositivo"] ?? 0,
         },
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: dataInput.nombre_usuario,
+        nombre_usuario: pdpUser?.["uname"] ?? "",
         numero_factura: dataInput.numero_factura,
         id_uuid_trx: uniqueId,
         direccion: roleInfo?.["direccion"],
         id_trx_retiro_directo: dataOutput?.["id_trx_retiro_directo"] ?? 0,
         pk_id_retiro: dataOutput?.["pk_id_recaudo"] ?? 0,
         valor_total_trx: dataOutput?.["valor_total_trx"] ?? 0,
-        numero_identificacion: dataOutput?.["numero_identificacion"],
+        numero_identificacion: dataInput.numero_identificacion_retiro,
       };
-      const dataAditional = {
-        id_uuid_trx: uniqueId,
-      };
+
       notifyPending(
-        fetchAlmasegTrx(data, dataAditional),
+        fetchAlmasegTrx(data, {}),
         {
           render: () => {
             return "Procesando transacción";
@@ -181,7 +179,15 @@ const ConsultaGeneracionPin = (): JSX.Element => {
         }
       );
     },
-    [dataOutput, roleInfo, uniqueId, dataInput, doOnResetAll, fetchAlmasegTrx]
+    [
+      dataOutput,
+      roleInfo,
+      uniqueId,
+      dataInput,
+      pdpUser,
+      doOnResetAll,
+      fetchAlmasegTrx,
+    ]
   );
   const printDiv = useRef(null);
 
@@ -192,7 +198,7 @@ const ConsultaGeneracionPin = (): JSX.Element => {
     <>
       <h1 className="text-3xl mt-6">Consulta y pago de facturas Almaseg</h1>
       <div className="px-6 py-8 mt-6 flex items-center flex-col border-solid border-2 border-slate-600 rounded-2xl">
-        <Form onSubmit={doOnSubmit} onChange={doOnChange} grid>
+        <Form onSubmit={doOnSubmit} grid>
           <Input
             name="numero_factura"
             label="Número de factura"
@@ -201,20 +207,17 @@ const ConsultaGeneracionPin = (): JSX.Element => {
             minLength={1}
             maxLength={20}
             value={dataInput.numero_factura}
-            onChange={() => {}}
+            onChange={(ev) =>
+              setDataInput((old) => ({
+                ...old,
+                [ev.target.name]: ev.target.value,
+              }))
+            }
             required
             disabled={dataOutput ? true : false}
           />
           <ButtonBar className={"lg:col-span-2"}>
-            {dataOutput ? (
-              <Button
-                disabled={loadingState || loadingPeticionConsultaPin}
-                type="reset"
-                onClick={doOnReset}
-              >
-                Búsqueda nueva
-              </Button>
-            ) : (
+            {!dataOutput && (
               <Button
                 disabled={loadingState || loadingPeticionConsultaPin}
                 type={"submit"}
@@ -226,19 +229,47 @@ const ConsultaGeneracionPin = (): JSX.Element => {
         </Form>
         {dataOutput ? (
           <>
-            <div className="px-4 py-8 mt-6  grid gap-4 grid-cols-2 grid-rows-3 justify-items-center border-solid border-2 border-gray-400 rounded-2xl">
-              <h2 className="font-semibold">Número de factura: </h2>
-              <h2>{dataOutput?.numero_factura ?? ""}</h2>
-              <h2 className="font-semibold">Tipo de identificación: </h2>
-              <h2>{dataOutput?.tipo_identificacion ?? ""} </h2>
-              <h2 className="font-semibold">Número de identificación: </h2>
-              <h2>{dataOutput?.numero_identificacion ?? ""} </h2>
-              <h2 className="font-semibold">Nombres y Apellidos: </h2>
-              <h2>{dataOutput?.nombres ?? ""} </h2>
-              <h2 className="font-semibold">Valor del PIN: </h2>
-              <h2>{`$ ${dataOutput?.valor_total ?? ""}`} </h2>
-            </div>
             <Form grid onSubmit={checkSubmit}>
+              <Input
+                name="numero_identificacion_retiro"
+                label="Número documento cliente"
+                type="text"
+                autoComplete="off"
+                minLength={1}
+                maxLength={12}
+                value={dataInput.numero_identificacion_retiro}
+                onChange={(ev) =>
+                  setDataInput((old) => ({
+                    ...old,
+                    [ev.target.name]: (
+                      (ev.target.value ?? "").match(/\d/g) ?? []
+                    ).join(""),
+                  }))
+                }
+                required
+              />
+              <ButtonBar className={"lg:col-span-2"}>
+                <Button
+                  disabled={loadingState || loadingPeticionConsultaPin}
+                  type="reset"
+                  onClick={doOnReset}
+                >
+                  Búsqueda nueva
+                </Button>
+              </ButtonBar>
+
+              <div className="px-4 py-8 mt-6  grid gap-4 grid-cols-2 grid-rows-3 justify-items-center border-solid border-2 border-gray-400 rounded-2xl">
+                <h2 className="font-semibold">Número de factura: </h2>
+                <h2>{dataOutput?.numero_factura ?? ""}</h2>
+                <h2 className="font-semibold">Tipo de identificación: </h2>
+                <h2>{dataOutput?.tipo_identificacion ?? ""} </h2>
+                <h2 className="font-semibold">Número de identificación: </h2>
+                <h2>{dataOutput?.numero_identificacion ?? ""} </h2>
+                <h2 className="font-semibold">Nombres y Apellidos: </h2>
+                <h2>{dataOutput?.nombres ?? ""} </h2>
+                <h2 className="font-semibold">Valor del PIN: </h2>
+                <h2>{`$ ${dataOutput?.valor_total ?? ""}`} </h2>
+              </div>
               <ButtonBar className="lg:col-span-2">
                 <Button
                   disabled={loadingState || loadingPeticionConsultaPin}
