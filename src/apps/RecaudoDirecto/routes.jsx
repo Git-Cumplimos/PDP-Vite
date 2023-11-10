@@ -81,7 +81,7 @@ export const rutasRetiro = {
 
 export const rutasGestionRecaudoDirecto = {
   link: "/recaudo-directo/gestion",
-  label: <AppIcons Logo={"RETIRO"} name={"Gestión"} />,
+  label: <AppIcons Logo={"RETIRO"} name={"Gestión Recaudo/Retiro Directos"} />,
   component: AdminRecaudoDirecto,
   permission: [PermissionsRecaudoDirecto.Gestion_recaudo_retiro_directo],
   subRoutes: [
@@ -122,7 +122,7 @@ const rutasRecaudoDirecto = {
   ),
   component: RecaudoEntryPoint,
   permission: listPermissionsRecaudoDirecto,
-  subRoutes: [rutasRecaudo, rutasRetiro, rutasGestionRecaudoDirecto],
+  subRoutes: [rutasRecaudo, rutasRetiro],
 };
 
 export default rutasRecaudoDirecto;
