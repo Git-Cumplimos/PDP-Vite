@@ -8,7 +8,7 @@ import rutasIAM from "../apps/IAM/routes";
 import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
 import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
 
-import rutasRecaudoDirecto from "../apps/RecaudoDirecto/routes";
+import rutasRecaudoDirecto,{rutasGestionRecaudoDirecto} from "../apps/RecaudoDirecto/routes";
 
 import rutasColpatria, {
   listPermissionsColpatria,
@@ -410,6 +410,7 @@ const allUrlsPrivateApps = [
       },
       rutasGestionColpatria,
       rutasGestionRecargasTullave,
+      rutasGestionRecaudoDirecto,
       rutasGestionGrupoAval,
       rutasGestionAgrario,
     ],
