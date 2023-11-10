@@ -73,9 +73,9 @@ const RecaudoDirecto = () => {
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
   const tipoReferenciaExtra = [
-    { label: "Numero documento", value: 1 },
-    { label: "Numero Celular", value: 2 },
-    { label: "Referencia extra", value: 3 },
+    { label: "Número Documento", value: 1 },
+    { label: "Número Celular", value: 2 },
+    { label: "Datos Extra Cliente", value: 3 },
   ]
 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
@@ -514,7 +514,7 @@ const RecaudoDirecto = () => {
               name={"fk_id_tipo_referencia_extra"}
               options={[{ label: "", value: "" }, ...tipoReferenciaExtra]}
               defaultValue={selected?.fk_id_tipo_referencia_extra ?? ""}
-              required
+              required={permiteRefExtra}
             />
             {Object.entries(referenciaExtra).map(([keyRef, valRef], index) => {
               return (
@@ -534,7 +534,7 @@ const RecaudoDirecto = () => {
                     copyRef[keyRef] = valor;
                     setReferenciaExtra(copyRef);                    
                   }}
-                  required
+                  required={permiteRefExtra}
                 />
               );
             })}
