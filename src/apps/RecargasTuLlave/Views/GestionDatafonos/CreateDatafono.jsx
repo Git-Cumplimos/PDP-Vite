@@ -134,38 +134,36 @@ const CreateDatafono = () => {
                   id_comercio: dataDatafono?.fk_comercio_asociado,
                   name_comercio: dataDatafono?.name_comercio,
                 }
-                peticionActualizacionInventario({ pk_datafonos_tullave: dataDatafonoInventario.pk_datafonos_tullave },dataInventario)
-                  .then((res) => {
-                    if (res?.msg === "Datafono Creado") {
-                      notifyPending(
-                        peticionCreacionDatafono({}, data),
-                        {
-                          render: () => {
-                            return "Procesando creación";
-                          },
-                        },
-                        {
-                          render: ({ data: res }) => {
-                            navigate(-1);
-                            return "Datáfono creado";
-                          },
-                        },
-                        {
-                          render: ({ data: error }) => {
-                            return error?.message ?? "Creación fallida";
-                          },
+                notifyPending(
+                  peticionCreacionDatafono({}, data),
+                  {
+                    render: () => {
+                      return "Procesando creación";
+                    },
+                  },
+                  {
+                    render: ({ data: res }) => {
+                      peticionActualizacionInventario({ pk_datafonos_tullave: dataDatafonoInventario.pk_datafonos_tullave },dataInventario)
+                      .then((res) => {
+                        navigate(-1);
+                      })
+                      .catch((err) => {
+                        if (err?.cause === "custom") {
+                          notifyError(err?.message);
+                          return;
                         }
-                      );
-                    }
-                  })
-                  .catch((err) => {
-                    if (err?.cause === "custom") {
-                      notifyError(err?.message);
-                      return;
-                    }
-                    console.error(err?.message);
-                    notifyError("Peticion fallida");
-                  });
+                        console.error(err?.message);
+                        notifyError("Error al actaulizar el registro");
+                      });
+                      return "Datáfono creado"
+                    },
+                  },
+                  {
+                    render: ({ data: error }) => {
+                      return error?.message ?? "Creación fallida";
+                    },
+                  }
+                );
               }else {
                 notifyError("Seleccione Comercio asociado");
               }
