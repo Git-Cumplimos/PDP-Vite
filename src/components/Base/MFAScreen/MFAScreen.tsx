@@ -3,12 +3,14 @@ import classes from "./MFAScreen.module.css";
 
 import { MFAContext, useProvideMFA, useMFAApi } from "./useMFA";
 import { onChangeNumber } from "../../../utils/functions";
+import { useNavigate } from "react-router-dom";
 
 type Props = {};
 
 const { card, field } = classes;
 
 export const MFAScreen = (props: Props) => {
+  const navigate = useNavigate();
   const { deactivateTotpWall, activeModal, setCurrentTotp, submitEvent } =
     useMFAApi();
 
@@ -57,6 +59,15 @@ export const MFAScreen = (props: Props) => {
             </div>
             <div className={field}>
               <button type="submit">Validar código</button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate(-1);
+                  deactivateTotpWall();
+                }}
+              >
+                Cancelar
+              </button>
             </div>
           </form>
         </div>
