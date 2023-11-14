@@ -76,6 +76,10 @@ const RetiroDirecto = () => {
 
   useEffect(() => {
     let referencia = []
+    let limite = {}
+    let limiteRefExtra = {}
+    let refExtra = false
+
     if (selected['referencias']) {
       for (let i in selected['referencias']) {
         referencia.push({
@@ -92,7 +96,7 @@ const RetiroDirecto = () => {
         "Longitud máxima": "",
       }]
     }
-    let limite = {}
+
     if (selected['limite_monto']) {
       limite = {
         "Valor mínimo": selected['limite_monto'][0] ?? 0,
@@ -104,7 +108,7 @@ const RetiroDirecto = () => {
         "Valor máximo": "0",
       }
     }
-    let limiteRefExtra = {}
+
     if (selected['limite_ref_extra']) {
       limiteRefExtra = {
         "Longitud mínima ext": selected['limite_ref_extra'][0] ?? 0,
@@ -117,12 +121,8 @@ const RetiroDirecto = () => {
       }
     }
 
-    let refExtra = false
-    if (selected['permite_referencia_extra'] || 
-        ( selected['fk_id_tipo_referencia_extra'] !== null && 
-          selected['fk_id_tipo_referencia_extra'] !== ""
-        ) 
-      ) refExtra = true
+    if (selected['permite_referencia_extra']) refExtra = true
+
     setlimites(limite)
     setReferencias(referencia)
     setReferenciaExtra(limiteRefExtra)
@@ -512,11 +512,11 @@ const RetiroDirecto = () => {
               options={[{ label: "", value: "" }, ...tipoReferenciaExtra]}
               defaultValue={selected?.fk_id_tipo_referencia_extra ?? ""}
               required={permiteRefExtra}
-              // onChange={(ev) => {
-              //   setPermiteRefExtra(
-              //     ev.target.value !== null && ev.target.value !== "" ? true : false
-              //   )
-              // }}
+            // onChange={(ev) => {
+            //   setPermiteRefExtra(
+            //     ev.target.value !== null && ev.target.value !== "" ? true : false
+            //   )
+            // }}
             />
             {Object.entries(referenciaExtra).map(([keyRef, valRef], index) => {
               return (
@@ -525,7 +525,7 @@ const RetiroDirecto = () => {
                   className={"mb-4"}
                   id={`${keyRef}_${index}`}
                   name={keyRef}
-                  label={keyRef.replace("ext","")}
+                  label={keyRef.replace("ext", "")}
                   type={`tel`}
                   maxLength={`2`}
                   autoComplete="off"

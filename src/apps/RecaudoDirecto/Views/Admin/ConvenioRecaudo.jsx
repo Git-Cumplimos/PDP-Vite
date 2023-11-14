@@ -109,6 +109,10 @@ const RecaudoDirecto = () => {
 
   useEffect(() => {
     let referencia = []
+    let refExtra = false
+    let limiteRefExtra = {}
+    let limite = {}
+
     if (selected['referencias']) {
       for (let i in selected['referencias']) {
         referencia.push({
@@ -125,7 +129,7 @@ const RecaudoDirecto = () => {
         "Longitud máxima": "",
       }]
     }
-    let limite = {}
+
     if (selected['limite_monto']) {
       limite = {
         "Valor mínimo": selected['limite_monto'][0] ?? 0,
@@ -137,7 +141,7 @@ const RecaudoDirecto = () => {
         "Valor máximo": "0",
       }
     }
-    let limiteRefExtra = {}
+
     if (selected['limite_ref_extra']) {
       limiteRefExtra = {
         "Longitud mínima ext": selected['limite_ref_extra'][0] ?? 0,
@@ -149,12 +153,9 @@ const RecaudoDirecto = () => {
         "Longitud máxima ext": "",
       }
     }
-    let refExtra = false
-    if (selected['permite_referencia_extra'] || 
-        ( selected['fk_id_tipo_referencia_extra'] !== null && 
-          selected['fk_id_tipo_referencia_extra'] !== ""
-        ) 
-      ) refExtra = true
+
+    if (selected['permite_referencia_extra']) refExtra = true
+
     setlimites(limite)
     setReferencias(referencia)
     setReferenciaExtra(limiteRefExtra)
@@ -212,11 +213,11 @@ const RecaudoDirecto = () => {
         notifyError("En la restriccion de limites de datos extra, el limite máximo debe ser mayor al limite mínimo")
         validacion = false
       }
-      delete data['Longitud mínima ext'] ; delete data['Longitud máxima ext'];
+      delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
     }
     const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
     const body = Object.fromEntries(filteredBody);
-    
+
     if (validacion) {
       notifyPending(
         selected
@@ -523,7 +524,7 @@ const RecaudoDirecto = () => {
                   className={"mb-4"}
                   id={`${keyRef}_${index}`}
                   name={keyRef}
-                  label={keyRef.replace("ext","")}
+                  label={keyRef.replace("ext", "")}
                   type={`tel`}
                   maxLength={`2`}
                   autoComplete="off"
@@ -532,7 +533,7 @@ const RecaudoDirecto = () => {
                     if (keyRef.includes("Longitud")) (valor = onChangeNumber(ev))
                     const copyRef = { ...referenciaExtra };
                     copyRef[keyRef] = valor;
-                    setReferenciaExtra(copyRef);                    
+                    setReferenciaExtra(copyRef);
                   }}
                   required={permiteRefExtra}
                 />
