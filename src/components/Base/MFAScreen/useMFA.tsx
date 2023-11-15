@@ -8,13 +8,11 @@ import {
   MouseEvent,
   useEffect,
   SetStateAction,
+  useMemo,
 } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useLocalStorage from "../../../hooks/useLocalStorage";
-import useFetchDispatchDebounce from "../../../hooks/useFetchDispatchDebounce";
-
-const urlComercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 export const MFAContext = createContext({
   consumer: {
@@ -37,9 +35,12 @@ export const useMFAApi = () => {
 };
 
 export const useProvideMFA = () => {
-  const { roleInfo } = useAuth();
+  const { commerceInfo } = useAuth();
 
-  const pk_id_comercio = (roleInfo as any)?.id_comercio;
+  const commUseTotp = useMemo(
+    () => (commerceInfo as any)?.use_totp ?? false,
+    [commerceInfo]
+  );
 
   const { pathname } = useLocation();
 
@@ -85,23 +86,9 @@ export const useProvideMFA = () => {
     setSubmitEvent(() => () => {});
   }, [pathname]);
 
-  const [searchCommerceTotp] = useFetchDispatchDebounce({
-    onSuccess: useCallback(
-      (response) => setCommerceUseTotp(response?.obj?.use_totp ?? false),
-      [setCommerceUseTotp]
-    ),
-    onError: useCallback((error) => console.error(error), []),
-  });
-
   useEffect(() => {
-    if (pk_id_comercio) {
-      searchCommerceTotp(
-        `${urlComercios}/comercios/consultar-unique?pk_comercio=${pk_id_comercio}`
-      );
-    } else {
-      setCommerceUseTotp(false);
-    }
-  }, [searchCommerceTotp, pk_id_comercio, setCommerceUseTotp]);
+    setCommerceUseTotp(commUseTotp ?? false);
+  }, [commUseTotp, setCommerceUseTotp]);
 
   return {
     consumer: {
