@@ -65,6 +65,7 @@ const CreateDatafono = () => {
                   const data = {
                     pk_tullave_datafonos: params?.id,
                     comentarios: dataDatafono?.comentarios,
+                    estado: dataDatafonoInventario.estado,
                   };
                   if (dataDatafono?.fk_comercio_asociado) {
                     data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
@@ -116,7 +117,7 @@ const CreateDatafono = () => {
                 const data = {
                   pos_id: dataDatafono?.pos_id,
                   comentarios: dataDatafono?.comentarios,
-                  estado: true,
+                  estado: dataDatafonoInventario.estado,
                 };
                 if (dataDatafono?.fk_comercio_asociado) {
                   data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
