@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, fetchCustom } from "../utils/fetchNequi";
 import { notify, notifyError } from "../../../utils/notify";
+import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
@@ -35,7 +36,22 @@ export const useFetchNequi = (
 
       //SECUENCIA ---------------Paso 1-------------------------------
       try {
-        PeticionTrx = await fetchTrx({}, data_);
+        let parseObj = JSON.stringify(data_);
+        let dataObj = {
+          data: cifrarAES(
+            `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
+            `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+            parseObj
+          ),
+        };
+        PeticionTrx = await fetchTrx({}, dataObj);
+        const dataDecrypt = PeticionTrx?.obj?.data ?? "";
+        const obj = decryptAES(
+          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
+          `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+          dataDecrypt
+        );
+        PeticionTrx.obj = JSON.parse(obj);
         response = PeticionTrx;
         banderaConsultaNequi = true;
       } catch (error) {
