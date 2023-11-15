@@ -172,7 +172,7 @@ const PanelHistorico = () => {
               'Idusuario': itemData?.id_usuario,
               'TotalmovimientosDía': Math.round(itemData?.total_movimientos),
               'EfectivoCierre': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
-              'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+totalvalorEntidades),
+              'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+(-totalvalorEntidades)),
               'EfectivoCajaPDPExt': Math.round(itemData?.total_efectivo_en_caja),
               'Sobrante': Math.round(itemData?.total_sobrante),
               'Faltante': Math.round(itemData?.total_faltante),

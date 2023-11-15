@@ -209,9 +209,9 @@ const ParametrizacionRecaudo = () => {
   };
 
   const handleInput = (e) => {
-    const value = e.target.value;
-    if (/^[0-9]*$/.test(value) && value.length <= 20) {
-      setNumCountjson((old)=>{return{...old,[e.target.name]:value}})
+    const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
+    if (/^[0-9]*$/.test(onlyNumbers) && onlyNumbers.length <= 20) {
+      setNumCountjson((old)=>{return{...old,[e.target.name]:onlyNumbers}})
     }
   }
   
@@ -350,10 +350,12 @@ const ParametrizacionRecaudo = () => {
                       id={"pk_numero_cuenta"+number}
                       name={"pk_numero_cuenta"+number}
                       label={`Número de Cuenta`}
-                      type="number"
+                      type="tel"
                       value={NumCountjson['pk_numero_cuenta'+number]}
-                      onChange={(e) => handleInput(e)}
+                      onInput={(e) => handleInput(e)}
                       autoComplete="off"
+                      maxLength={"20"}
+                      minLength={"4"}
                       required
                     />
                   ))
@@ -405,6 +407,7 @@ const ParametrizacionRecaudo = () => {
                         onChange={(e) => handleChangeNum(e,key)}
                         autoComplete="off"
                         maxLength={"20"}
+                        minLength={"4"}
                         required
                       />
                       <ButtonBar className={"lg:col-span-2"}>

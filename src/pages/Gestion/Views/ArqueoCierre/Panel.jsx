@@ -179,6 +179,7 @@ const Panel = () => {
         render: ({ data: res }) => {
           setLoading(false);
           const cierre = res?.obj;
+          console.log(cierre)
           const tempTicket = {
             title: "Cierre de caja",
             timeInfo: {

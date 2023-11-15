@@ -330,7 +330,7 @@ const CargaComprobante = () => {
               label="Número de comprobante"
               type="tel"
               autoComplete="off"
-              minLength={"19"}
+              minLength={"4"}
               maxLength={"19"}
               onInput={(ev) => setComprobanteNumber(onChangeAccountNumber(ev))}
               required
