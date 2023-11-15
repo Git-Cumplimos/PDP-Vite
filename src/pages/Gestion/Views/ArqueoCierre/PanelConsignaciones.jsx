@@ -53,7 +53,7 @@ const PanelConsignaciones = () => {
   const [stateRev, setStateRev] = useState(null);
   const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userPermissions,roleInfo } = useAuth();
+  const { userPermissions,roleInfo,updateCommerceQuota  } = useAuth();
   const [rol, setRol] = useState(false);
   const [idComercio, setIdComercio] = useState('');
   const [idCajero, setIdCajero] = useState('');
@@ -141,8 +141,9 @@ const PanelConsignaciones = () => {
         {
           render: () => {
             setLoading(false);
-            searchComprobantes()
+            searchComprobantes();
             CloseModal();
+            updateCommerceQuota();
             return "Comprobante actualizado exitosamente";
           },
         },
@@ -164,6 +165,7 @@ const PanelConsignaciones = () => {
       observacionesAnalisis,
       selected?.pk_id_comprobante,
       stateRev,
+      updateCommerceQuota,
     ]
   );
 
