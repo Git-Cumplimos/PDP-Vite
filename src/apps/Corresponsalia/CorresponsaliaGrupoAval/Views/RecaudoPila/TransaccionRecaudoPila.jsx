@@ -264,7 +264,7 @@ const TransaccionRecaudoPila = () => {
         nombre_usuario: pdpUser?.uname ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"],
         oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-        valor_total_trx: valorTransaccion,
+        valor_total_trx: parseFloat(valorTransaccion),
         id_trx: datosConsulta?.id_trx,
         recaudoPila:{
           numPlanilla: datosTrx?.numeroPlanilla,
