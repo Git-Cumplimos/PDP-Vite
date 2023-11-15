@@ -50,11 +50,13 @@ export const MFAScreen = (props: Props) => {
                 id="totp"
                 type="tel"
                 name="totp"
+                minLength={6}
                 maxLength={6}
                 autoFocus
                 autoComplete="off"
                 // value={totp}
                 onChange={(ev) => setCurrentTotp(onChangeNumber(ev))}
+                required
               />
             </div>
             <div className={field}>
