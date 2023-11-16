@@ -59,7 +59,6 @@ const ConsultaDatafonos = ({
       ),
     ];
   }, [datafonos, type]);
-  console.log("casdas", tableDatafonos);
   useEffect(() => {
     if (type === "Gestion") {
       fetchDatafonosFunc();
