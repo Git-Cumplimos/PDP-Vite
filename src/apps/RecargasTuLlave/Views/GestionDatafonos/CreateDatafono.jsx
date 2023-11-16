@@ -66,6 +66,10 @@ const CreateDatafono = () => {
                     pk_tullave_datafonos: params?.id,
                     comentarios: dataDatafono?.comentarios,
                     estado: dataDatafonoInventario.estado,
+                    numero_serie: dataDatafonoInventario.numero_serie,
+                    tarjeta_lsam: dataDatafonoInventario.tarjeta_lsam,
+                    tarjeta_sim: dataDatafonoInventario.tarjeta_sim,
+                    hardware_id: dataDatafonoInventario.hardware_id,
                   };
                   if (dataDatafono?.fk_comercio_asociado) {
                     data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
@@ -118,6 +122,10 @@ const CreateDatafono = () => {
                   pos_id: dataDatafono?.pos_id,
                   comentarios: dataDatafono?.comentarios,
                   estado: dataDatafonoInventario.estado,
+                  numero_serie: dataDatafonoInventario.numero_serie,
+                  tarjeta_lsam: dataDatafonoInventario.tarjeta_lsam,
+                  tarjeta_sim: dataDatafonoInventario.tarjeta_sim,
+                  hardware_id: dataDatafonoInventario.hardware_id,
                 };
                 if (dataDatafono?.fk_comercio_asociado) {
                   data["fk_comercio_asociado"] = dataDatafono?.fk_comercio_asociado;
