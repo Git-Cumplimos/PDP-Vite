@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import { TypingRoutes } from "../../utils/TypingUtils";
@@ -6,6 +7,8 @@ import {
   rutasRecargaNequi,
 } from "../Nequi/routes";
 
+const RecargaCupo = lazy(() => import("./RecargaCupoMenu"));
+
 const routesRecargaCupo = {
   link: "/recarga-cupo",
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargar Cupo" />,
@@ -13,7 +16,7 @@ const routesRecargaCupo = {
     <HNavbar links={subRoutes} />
   ),
   permission: [...listPermissionsRecargaCupoNequi],
-  subRoutes: [rutasRecargaNequi],
+  subRoutes: [rutasRecargaNequi, RecargaCupo],
 };
 
 export default routesRecargaCupo;
