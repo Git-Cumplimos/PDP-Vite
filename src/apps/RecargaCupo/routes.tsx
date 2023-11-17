@@ -1,22 +1,18 @@
 import { lazy } from "react";
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
-import { TypingRoutes } from "../../utils/TypingUtils";
 import {
   listPermissionsRecargaCupoNequi,
   rutasRecargaNequi,
 } from "../Nequi/routes";
 
-const RecargaCupo = lazy(() => import("./RecargaCupoMenu"));
+const RecargaCupoMenu = lazy(() => import("./RecargaCupoMenu"));
 
 const routesRecargaCupo = {
   link: "/recarga-cupo",
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargar Cupo" />,
-  component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
-    <HNavbar links={subRoutes} />
-  ),
+  component: RecargaCupoMenu,
   permission: [...listPermissionsRecargaCupoNequi],
-  subRoutes: [rutasRecargaNequi, RecargaCupo],
+  subRoutes: [rutasRecargaNequi],
 };
 
 export default routesRecargaCupo;
