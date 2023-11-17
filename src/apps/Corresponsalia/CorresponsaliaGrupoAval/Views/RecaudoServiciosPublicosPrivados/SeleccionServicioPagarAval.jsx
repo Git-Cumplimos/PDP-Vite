@@ -76,11 +76,11 @@ const SeleccionServicioPagarAval = () => {
   );
   return (
     <>
-      <h1 className='text-3xl text-center'>
+      <h1 className="text-3xl text-center">
         Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
-        title='Tabla convenios AVAL corresponsal bancario'
+        title="Tabla convenios AVAL corresponsal bancario"
         maxPage={maxPages}
         headers={["Id", "Convenio", "NIT", "EAN"]}
         data={tableConvenios}
@@ -89,13 +89,13 @@ const SeleccionServicioPagarAval = () => {
         // onChange={onChange}
       >
         <Input
-          id='searchConvenio'
-          name='searchConvenio'
+          id="searchConvenio"
+          name="searchConvenio"
           label={"Nombre convenio"}
-          minLength='1'
-          maxLength='30'
-          type='text'
-          autoComplete='off'
+          minLength="1"
+          maxLength="30"
+          type="text"
+          autoComplete="off"
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
@@ -103,12 +103,12 @@ const SeleccionServicioPagarAval = () => {
           }}
         />
         <Input
-          id='idConvenio'
-          label='Código convenio'
-          type='text'
-          name='idConvenio'
-          minLength='1'
-          maxLength='13'
+          id="idConvenio"
+          label="NURA"
+          type="text"
+          name="idConvenio"
+          minLength="1"
+          maxLength="13"
           required
           value={datosTrans.idConvenio}
           onInput={(e) => {
@@ -119,14 +119,15 @@ const SeleccionServicioPagarAval = () => {
                 return { ...old, idConvenio: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <Input
-          id='nit'
-          label='NIT'
-          type='text'
-          name='nit'
-          minLength='1'
-          maxLength='13'
+          id="nit"
+          label="NIT"
+          type="text"
+          name="nit"
+          minLength="1"
+          maxLength="13"
           required
           value={datosTrans.nit}
           onInput={(e) => {
@@ -137,14 +138,15 @@ const SeleccionServicioPagarAval = () => {
                 return { ...old, nit: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <Input
-          id='ean'
-          label='EAN'
-          type='text'
-          name='ean'
-          minLength='1'
-          maxLength='13'
+          id="ean"
+          label="EAN"
+          type="text"
+          name="ean"
+          minLength="1"
+          maxLength="13"
           required
           value={datosTrans.ean}
           onInput={(e) => {
@@ -155,7 +157,8 @@ const SeleccionServicioPagarAval = () => {
                 return { ...old, ean: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
       </TableEnterprise>
     </>
   );

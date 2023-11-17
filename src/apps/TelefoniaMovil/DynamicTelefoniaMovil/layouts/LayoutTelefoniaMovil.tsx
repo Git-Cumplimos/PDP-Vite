@@ -41,11 +41,7 @@ const LayoutTelefoniaMovil = ({
                 <img
                   className={zoom}
                   // className="w-24 transition duration-150 ease-out hover:ease-in"
-                  src={
-                    operadorInd?.logo?.includes("http")
-                      ? operadorInd?.logo
-                      : svgs?.[operadorInd?.logo]
-                  }
+                  src={`${svgs?.TELEFONIA_MOVIL}${operadorInd?.logo}`}
                   alt={operadorInd?.name}
                 />
                 <h1 className={operador}>{operadorInd.name}</h1>

@@ -8,7 +8,7 @@ import rutasIAM from "../apps/IAM/routes";
 import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
 import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
 
-import rutasRecaudoDirecto from "../apps/RecaudoDirecto/routes";
+import rutasRecaudoDirecto,{rutasGestionRecaudoDirecto} from "../apps/RecaudoDirecto/routes";
 
 import rutasColpatria, {
   listPermissionsColpatria,
@@ -45,9 +45,13 @@ import ProvideLoteria from "../apps/LoteriaBog/components/ProvideLoteria";
 import ProvidepinesVus from "../apps/PinesVus/components/ProvidepinesVus";
 import rutasAvalCB, {
   listPermissionsAval,
+  listPermissionsGestionAval,
+  rutasGestionGrupoAval,
 } from "../apps/Corresponsalia/CorresponsaliaGrupoAval/routes";
 import rutasAgrarioCB, {
   listPermissionsAgrario,
+  listPermissionsGestionAgrario,
+  rutasGestionAgrario,
 } from "../apps/Corresponsalia/CorresponsaliaBancoAgrario/routes";
 import rutasConfiguraciones from "../apps/TrxParams/routes";
 import rutasRecaudoMultiple, {
@@ -62,6 +66,8 @@ import routesAlmaseg from "../apps/Almaseg/routes"; //Modulo Almaseg
 import rutasFundacionMujer from "../apps/FundacionMujer/routes";
 import rutasMovii from "../apps/Movii-pdp/routes";
 import rutasMoviliza from "../apps/Moviliza/routes";
+import routesRecargaCupo from "../apps/RecargaCupo/routes";
+import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
 
 /**
 
@@ -127,13 +133,6 @@ const ReportInventario = lazy(() =>
 );
 
 /**
- * ColCard
- */
-// const ColCard = lazy(() => import("../apps/ColCard/ColCard"));
-// const RecargarColCard = lazy(() =>
-//   import("../apps/ColCard/Views/RecargarColCard")
-// );
-/**
  * Cupo
  */
 const cupo = lazy(() => import("../apps/Cupo/Cupo"));
@@ -164,18 +163,6 @@ const ReporteGral = lazy(() => import("../apps/MarketPlace/Records/Crossval"));
  * Pines Vus
  */
 const PinesVus = lazy(() => import("../apps/PinesVus/PinesVus"));
-const PinesCrc = lazy(() => import("../apps/PinesCrc/Views/Pines/VentaPines"));
-
-/**
- * IAM
- */
-const IAMUsers = lazy(() => import("../apps/IAM/Views/IAMUsers"));
-const IAMGroups = lazy(() => import("../apps/IAM/Views/IAMGroups"));
-const IAMRoles = lazy(() => import("../apps/IAM/Views/IAMRoles"));
-const IAMPermissions = lazy(() => import("../apps/IAM/Views/IAMPermissions"));
-const IAMIndex = lazy(() => import("../apps/IAM/IAMIndex"));
-const IAMPolicies = lazy(() => import("../apps/IAM/Views/IAMPolicies"));
-
 /**
  * Formulario de actualizacion
  */
@@ -376,7 +363,13 @@ const allUrlsPrivateApps = [
     link: "/GestionTransaccional",
     label: <AppIcons Logo={"PINES_ADMINISTRAR"} name="Gestión Transaccional" />,
     component: GestionTransaccional,
-    permission: [63, 53, ...listPermissionsTuLlaveAdmin],
+    permission: [
+      63,
+      53,
+      ...listPermissionsTuLlaveAdmin,
+      ...listPermissionsGestionAval,
+      ...listPermissionsGestionAgrario,
+    ],
     subRoutes: [
       {
         link: "/GestionTransaccional/AnulacionesPinesCRC",
@@ -417,6 +410,9 @@ const allUrlsPrivateApps = [
       },
       rutasGestionColpatria,
       rutasGestionRecargasTullave,
+      rutasGestionRecaudoDirecto,
+      rutasGestionGrupoAval,
+      rutasGestionAgrario,
     ],
   },
   {
@@ -610,25 +606,25 @@ const allUrlsPrivateApps = [
     permission: [8],
   },
   rutasIAM,
-  {
-    link: "/update-commerce",
-    label: (
-      <AppIcons Logo={"ACTUALIZACION_DATOS"} name="Actualizacion de datos" />
-    ),
-    component: FormCommerce,
-    permission: [7],
-  },
-  {
-    link: "/review-commerce-forms",
-    label: (
-      <AppIcons
-        Logo={"ACTUALIZACION_DATOS"}
-        name="Revisar actualizacion de datos"
-      />
-    ),
-    component: CommerceInfo,
-    permission: [9],
-  },
+  // {
+  //   link: "/update-commerce",
+  //   label: (
+  //     <AppIcons Logo={"ACTUALIZACION_DATOS"} name="Actualizacion de datos" />
+  //   ),
+  //   component: FormCommerce,
+  //   permission: [7],
+  // },
+  // {
+  //   link: "/review-commerce-forms",
+  //   label: (
+  //     <AppIcons
+  //       Logo={"ACTUALIZACION_DATOS"}
+  //       name="Revisar actualizacion de datos"
+  //     />
+  //   ),
+  //   component: CommerceInfo,
+  //   permission: [9],
+  // },
   {
     link: "https://www.puntodecompra.com.co/",
     label: <AppIcons Logo={"MARKETPLACE"} name="Marketplace" />,
@@ -1136,6 +1132,10 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
+  //Modulo Recarga Cupo
+  routesRecargaCupo,
+  //Modulo Nequi
+  rutasCorresponsaliaNequi,
 ];
 
 export { allUrlsPrivateApps };

@@ -323,7 +323,7 @@ const ConveniosRecaudoAval = () => {
     <>
       <SimpleLoading show={isUploading} />
       <TableEnterprise
-        title='Tabla convenios AVAL corresponsal bancario'
+        title="Tabla convenios AVAL corresponsal bancario"
         maxPage={maxPages}
         headers={["Id", "Convenio", "NIT", "EAN"]}
         data={tableConvenios}
@@ -332,13 +332,13 @@ const ConveniosRecaudoAval = () => {
         // onChange={onChange}
       >
         <Input
-          id='searchConvenio'
-          name='searchConvenio'
+          id="searchConvenio"
+          name="searchConvenio"
           label={"Buscar convenio"}
-          minLength='1'
-          maxLength='30'
-          type='text'
-          autoComplete='off'
+          minLength="1"
+          maxLength="30"
+          type="text"
+          autoComplete="off"
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
@@ -346,12 +346,12 @@ const ConveniosRecaudoAval = () => {
           }}
         />
         <Input
-          id='idConvenio'
-          label='Id convenio'
-          type='text'
-          name='idConvenio'
-          minLength='1'
-          maxLength='13'
+          id="idConvenio"
+          label="NURA"
+          type="text"
+          name="idConvenio"
+          minLength="1"
+          maxLength="13"
           value={datosTrans.idConvenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -361,14 +361,15 @@ const ConveniosRecaudoAval = () => {
                 return { ...old, idConvenio: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <Input
-          id='nit'
-          label='NIT'
-          type='text'
-          name='nit'
-          minLength='1'
-          maxLength='13'
+          id="nit"
+          label="NIT"
+          type="text"
+          name="nit"
+          minLength="1"
+          maxLength="13"
           value={datosTrans.nit}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -378,14 +379,15 @@ const ConveniosRecaudoAval = () => {
                 return { ...old, nit: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <Input
-          id='ean'
-          label='EAN'
-          type='text'
-          name='ean'
-          minLength='1'
-          maxLength='13'
+          id="ean"
+          label="EAN"
+          type="text"
+          name="ean"
+          minLength="1"
+          maxLength="13"
           value={datosTrans.ean}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -395,42 +397,44 @@ const ConveniosRecaudoAval = () => {
                 return { ...old, ean: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <ButtonBar>
           <Button
-            type='button'
+            type="button"
             onClick={() => {
               setStatusModal("cargue");
               setShowModal(true);
-            }}>
+            }}
+          >
             Subir convenios
           </Button>
         </ButtonBar>
       </TableEnterprise>
       <Modal show={showModal} handleClose={hideModal}>
         {statusModal === "cargue" ? (
-          <Form formDir='col' onSubmit={saveFile}>
-            <h1 className='text-2xl text-center mb-10 mt-5'>
+          <Form formDir="col" onSubmit={saveFile}>
+            <h1 className="text-2xl text-center mb-10 mt-5">
               Archivo de convenios AVAL
             </h1>
             <InputX
               id={`archivo`}
               label={file.name ? "Cambiar archivo" : `Elegir archivo`}
-              type='file'
+              type="file"
               // disabled={progress !== 0}
-              accept='.txt,.csv'
+              accept=".txt,.csv"
               onGetFile={onChangeFile}
             />
             {file.name ? (
               <>
-                <h2 className='text-l text-center mt-5'>
+                <h2 className="text-l text-center mt-5">
                   {`Archivo seleccionado: ${file.name}`}
                 </h2>
                 <ButtonBar>
-                  <Button type='button' onClick={hideModal}>
+                  <Button type="button" onClick={hideModal}>
                     Cancelar
                   </Button>
-                  <Button type='submit'>Subir</Button>
+                  <Button type="submit">Subir</Button>
                 </ButtonBar>
               </>
             ) : (
@@ -439,7 +443,7 @@ const ConveniosRecaudoAval = () => {
           </Form>
         ) : (
           <>
-            <h1 className='text-3xl mx-auto text-center mb-4'>
+            <h1 className="text-3xl mx-auto text-center mb-4">
               Editar convenio
             </h1>
             <Form onSubmit={handleConvenio} grid>
@@ -447,8 +451,8 @@ const ConveniosRecaudoAval = () => {
                 id={"nura"}
                 label={"Código NURA"}
                 name={"nura"}
-                type='tel'
-                autoComplete='off'
+                type="tel"
+                autoComplete="off"
                 minLength={"13"}
                 maxLength={"13"}
                 onChange={(ev) => {
@@ -460,8 +464,8 @@ const ConveniosRecaudoAval = () => {
                 id={"ean"}
                 label={"Código EAN o IAC"}
                 name={"ean"}
-                type='tel'
-                autoComplete='off'
+                type="tel"
+                autoComplete="off"
                 minLength={"13"}
                 maxLength={"13"}
                 onChange={(ev) => {
@@ -473,8 +477,8 @@ const ConveniosRecaudoAval = () => {
                 id={"convenio"}
                 label={"Nombre del Convenio"}
                 name={"convenio"}
-                type='text'
-                autoComplete='off'
+                type="text"
+                autoComplete="off"
                 maxLength={"30"}
                 defaultValue={convenio?.convenio ?? ""}
                 required
@@ -483,8 +487,8 @@ const ConveniosRecaudoAval = () => {
                 id={"nit"}
                 label={"NIT"}
                 name={"nit"}
-                type='text'
-                autoComplete='off'
+                type="text"
+                autoComplete="off"
                 maxLength={"30"}
                 defaultValue={convenio?.nit ?? ""}
                 onChange={(ev) => {
@@ -504,13 +508,13 @@ const ConveniosRecaudoAval = () => {
                 name={"estado"}
                 defaultChecked={convenio?.estado === "1" ?? false}
               />
-              <Fieldset legend='Restricción de longitud de referencias'>
+              <Fieldset legend="Restricción de longitud de referencias">
                 {restriccionReferencias.length > 0 ? (
                   restriccionReferencias.map((data, i) => {
                     return (
-                      <Fieldset legend='Restricción de referencia' key={i}>
+                      <Fieldset legend="Restricción de referencia" key={i}>
                         <Select
-                          className='place-self-stretch'
+                          className="place-self-stretch"
                           id={"referencia"}
                           label={"Referencia"}
                           name={"referencia"}
@@ -534,8 +538,8 @@ const ConveniosRecaudoAval = () => {
                           id={"limiteMenor"}
                           label={"Limite menor"}
                           name={"limiteMenor"}
-                          type='text'
-                          autoComplete='off'
+                          type="text"
+                          autoComplete="off"
                           maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
@@ -554,8 +558,8 @@ const ConveniosRecaudoAval = () => {
                           id={"limiteMayor"}
                           label={"Limite mayor"}
                           name={"limiteMayor"}
-                          type='text'
-                          autoComplete='off'
+                          type="text"
+                          autoComplete="off"
                           maxLength={"2"}
                           onInput={(e) => {
                             let valor = e.target.value;
@@ -578,7 +582,8 @@ const ConveniosRecaudoAval = () => {
                               let copy = [...restriccionReferencias];
                               copy.splice(i, 1);
                               setRestriccionReferencias(copy);
-                            }}>
+                            }}
+                          >
                             Eliminar restricción
                           </Button>
                         </ButtonBar>
@@ -586,7 +591,7 @@ const ConveniosRecaudoAval = () => {
                     );
                   })
                 ) : (
-                  <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+                  <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
                     <h1>
                       No se ha configurado ninguna restricción de longitud a las
                       referencias
@@ -607,7 +612,8 @@ const ConveniosRecaudoAval = () => {
                             limiteMayor: 0,
                           },
                         ]);
-                      }}>
+                      }}
+                    >
                       Agregar restricción
                     </Button>
                   </ButtonBar>

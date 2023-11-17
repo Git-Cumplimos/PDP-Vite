@@ -25,12 +25,18 @@ const initialSearchFilters = new Map([
   ["limit", 10],
 ]);
 
+const limitesMontos = {
+  max: 9999999,
+  min: 1,
+};
+
 const RecaudoDirecto = () => {
   const [listRecaudos, setListRecaudos] = useState([])
   // const [sinBaseDatos, setSinBaseDatos] = useState(false);
   const [selected, setSelected] = useState(false);
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
+  const [permiteRefExtra, setPermiteRefExtra] = useState(false);
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
     "Valor máximo": "0",
@@ -40,13 +46,16 @@ const RecaudoDirecto = () => {
     "Longitud mínima": "",
     "Longitud máxima": "",
   }])
+  const [referenciaExtra, setReferenciaExtra] = useState({
+    "Longitud mínima ext": "",
+    "Longitud máxima ext": "",
+  })
 
   const [res] = useState([
-    ["REFERENCIA_1", "REFERENCIA_2",
-      "APELLIDO_PRODUCTOR", "TOTAL_PAGAR","FECHA_VENCIMIENTO", "NUMERO_QUINCENA"],
-    [332421116, "JUAN", "apellido", 50000, "8/06/2023", 125],
-    [332421117, "PEDRO", "apellido", 80000, "16/06/2023", 125],
-    [332421118, "MARIA", "apellido", 1250000, "12/06/2023", 125],
+    ["REFERENCIA_1", "REFERENCIA_2", "TOTAL_PAGAR", "FECHA_VENCIMIENTO"],
+    [332421116, 432422226, 50000, "8/12/2023"],
+    [332421117, 432422227, 80000, "16/10/2023"],
+    [332421118, 432422228, 1250000, "12/11/2023"],
   ])
   const tipoModificacion = [
     { label: "Valor igual", value: 1 },
@@ -63,6 +72,11 @@ const RecaudoDirecto = () => {
     { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
+  const tipoReferenciaExtra = [
+    { label: "Número Documento", value: 1 },
+    { label: "Número Celular", value: 2 },
+    { label: "Datos Extra Cliente", value: 3 },
+  ]
 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
@@ -75,7 +89,7 @@ const RecaudoDirecto = () => {
     onError: useCallback((error) => {
       if (!error instanceof DOMException) console.error(error)
     }, []),
-  },{delay:2000});
+  }, { delay: 2000 });
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);
@@ -95,6 +109,10 @@ const RecaudoDirecto = () => {
 
   useEffect(() => {
     let referencia = []
+    let refExtra = false
+    let limiteRefExtra = {}
+    let limite = {}
+
     if (selected['referencias']) {
       for (let i in selected['referencias']) {
         referencia.push({
@@ -111,7 +129,7 @@ const RecaudoDirecto = () => {
         "Longitud máxima": "",
       }]
     }
-    let limite = {}
+
     if (selected['limite_monto']) {
       limite = {
         "Valor mínimo": selected['limite_monto'][0] ?? 0,
@@ -123,13 +141,31 @@ const RecaudoDirecto = () => {
         "Valor máximo": "0",
       }
     }
+
+    if (selected['limite_ref_extra']) {
+      limiteRefExtra = {
+        "Longitud mínima ext": selected['limite_ref_extra'][0] ?? 0,
+        "Longitud máxima ext": selected['limite_ref_extra'][1] ?? 0,
+      }
+    } else {
+      limiteRefExtra = {
+        "Longitud mínima ext": "",
+        "Longitud máxima ext": "",
+      }
+    }
+
+    if (selected['permite_referencia_extra']) refExtra = true
+
     setlimites(limite)
     setReferencias(referencia)
+    setReferenciaExtra(limiteRefExtra)
+    setPermiteRefExtra(refExtra)
   }, [selected])
 
   const handleClose = useCallback(() => {
     setShowModal(false);
     setSelected(false)
+    setPermiteRefExtra(false)
     setReferencias([{
       "Nombre de Referencia": "",
       "Longitud mínima": "",
@@ -139,15 +175,19 @@ const RecaudoDirecto = () => {
       "Valor mínimo": "0",
       "Valor máximo": "0",
     })
+    setReferenciaExtra({
+      "Longitud mínima ext": "",
+      "Longitud máxima ext": "",
+    })
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const body = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
+    let data = Object.fromEntries(Object.entries(Object.fromEntries(formData)))
     let validacion = true
-    if (body['Nombre de Referencia']) {
-      delete body['Nombre de Referencia']; delete body['Longitud mínima']; delete body['Longitud máxima']
+    if (data['Nombre de Referencia']) {
+      delete data['Nombre de Referencia']; delete data['Longitud mínima']; delete data['Longitud máxima']
       let allReferencias = []
       for (let i in referencias) {
         if (parseInt(referencias[i]["Longitud mínima"]) > parseInt(referencias[i]["Longitud máxima"])) validacion = false
@@ -157,46 +197,57 @@ const RecaudoDirecto = () => {
         })
       }
       if (!validacion) notifyError("En la restriccion de referencias, la longitud máxima debe ser mayor a la longitud mínima")
-      body['referencias'] = allReferencias
+      data['referencias'] = allReferencias
     }
-    if (body['Valor mínimo'] || body['Valor máximo']) {
-      delete body['Valor mínimo']; delete body['Valor máximo'];
-      body['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0 }`, `${limites['Valor máximo'] ?? 0}`]
-      if (parseInt(body['limite_monto'][0]) > parseInt(body['limite_monto'][1])){
+    if (data['Valor mínimo'] || data['Valor máximo']) {
+      delete data['Valor mínimo']; delete data['Valor máximo'];
+      data['limite_monto'] = [`${[limites['Valor mínimo']] ?? 0}`, `${limites['Valor máximo'] ?? 0}`]
+      if (parseInt(data['limite_monto'][0]) > parseInt(data['limite_monto'][1])) {
         notifyError("En la restriccion de valores, el valor máximo debe ser mayor al valor mínima")
         validacion = false
       }
     }
-    if (validacion){
+    if (data['Longitud mínima ext'] || data['Longitud máxima ext']) {
+      data['limite_ref_extra'] = [`${referenciaExtra['Longitud mínima ext'] ?? 0}`, `${referenciaExtra['Longitud máxima ext'] ?? 0}`]
+      if (parseInt(data['limite_ref_extra'][0]) > parseInt(data['limite_ref_extra'][1])) {
+        notifyError("En la restriccion de limites de datos extra, el limite máximo debe ser mayor al limite mínimo")
+        validacion = false
+      }
+      delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
+    }
+    const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
+    const body = Object.fromEntries(filteredBody);
+
+    if (validacion) {
       notifyPending(
         selected
-        ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
-        : addConveniosRecaudoList(body),
-      {
-        render() {
-          return "Enviando solicitud";
+          ? modConveniosRecaudoList({ convenio_id: selected?.pk_id_convenio_directo ?? '' }, body)
+          : addConveniosRecaudoList(body),
+        {
+          render() {
+            return "Enviando solicitud";
+          },
         },
-      },
-      {
-        render({ data: res }) {
-          searchTrxs();
-          handleClose();
-          return `Convenio ${selected ? "modificado" : "agregado"
-        } exitosamente`;
-      },
-      },
-      {
-        render({ data: err }) {
-          if (err?.cause === "custom") {
-            return err?.message;
-          }
-          console.error(err?.message);
-          return `${selected ? "Edicion" : "Creación"} fallida`;
+        {
+          render({ data: res }) {
+            searchTrxs();
+            handleClose();
+            return `Convenio ${selected ? "modificado" : "agregado"
+              } exitosamente`;
+          },
         },
-      }
+        {
+          render({ data: err }) {
+            if (err?.cause === "custom") {
+              return err?.message;
+            }
+            console.error(err?.message);
+            return `${selected ? "Edicion" : "Creación"} fallida`;
+          },
+        }
       )
-    } 
-  }, [handleClose, searchTrxs, selected, referencias, limites])
+    }
+  }, [handleClose, searchTrxs, selected, referencias, limites, referenciaExtra])
 
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_recaudo', res)
@@ -373,20 +424,24 @@ const RecaudoDirecto = () => {
             {Object.entries(limites).map(([keyLimit, valLimit], index) => {
               return (
                 <MoneyInput
-                  key={keyLimit}
+                  key={`${keyLimit}_${index}`}
                   className={"mb-1"}
                   id={`${keyLimit}_${index}`}
                   name={keyLimit}
                   label={keyLimit}
                   autoComplete="off"
-                  maxLength={"12"}
-                  value={valLimit}
-                  equalError={false}
+                  maxLength={"11"}
+                  min={limitesMontos.min}
+                  max={limitesMontos.max}
+                  // value={valLimit}
+                  defaultValue={selected ? selected.limite_monto[index] : valLimit}
                   onInput={(e, valor) => {
                     const copyRef = { ...limites };
                     copyRef[keyLimit] = valor;
                     setlimites(copyRef);
                   }}
+                  equalError={false}
+                  equalErrorMin={false}
                   required
                 />
               )
@@ -408,7 +463,7 @@ const RecaudoDirecto = () => {
                         maxLength={`${keyRef.includes("Longitud") ? "2" : "40"}`}
                         autoComplete="off"
                         value={valRef}
-                        onInput={(ev) => { 
+                        onInput={(ev) => {
                           if (keyRef.includes("Longitud")) (ev.target.value = onChangeNumber(ev))
                           const copyRef = [...referencias];
                           copyRef[index][keyRef] = ev.target.value;
@@ -452,15 +507,48 @@ const RecaudoDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-          <Select
+          <Fieldset legend={"Datos Extra"}>
+            <Select
               className="place-self-stretch mb-1"
-              id={"Tipo_archivo"}
-              label={"Tipo archivo Conciliación"}
-              name={"fk_nombre_tipo_archivo"}
-              options={[{ label: "", value: "" }, ...tipoArchivoConciliacion]}
-              defaultValue={selected?.fk_nombre_tipo_archivo ?? ""}
-              required
+              id={"Tipo_referencia_extra"}
+              label={"Tipo referencia"}
+              name={"fk_id_tipo_referencia_extra"}
+              options={[{ label: "", value: "" }, ...tipoReferenciaExtra]}
+              defaultValue={selected?.fk_id_tipo_referencia_extra ?? ""}
+              required={permiteRefExtra}
             />
+            {Object.entries(referenciaExtra).map(([keyRef, valRef], index) => {
+              return (
+                <Input
+                  key={keyRef}
+                  className={"mb-4"}
+                  id={`${keyRef}_${index}`}
+                  name={keyRef}
+                  label={keyRef.replace("ext", "")}
+                  type={`tel`}
+                  maxLength={`2`}
+                  autoComplete="off"
+                  value={valRef}
+                  onInput={(ev, valor) => {
+                    if (keyRef.includes("Longitud")) (valor = onChangeNumber(ev))
+                    const copyRef = { ...referenciaExtra };
+                    copyRef[keyRef] = valor;
+                    setReferenciaExtra(copyRef);
+                  }}
+                  required={permiteRefExtra}
+                />
+              );
+            })}
+          </Fieldset>
+          <Select
+            className="place-self-stretch mb-1"
+            id={"Tipo_archivo"}
+            label={"Tipo archivo Conciliación"}
+            name={"fk_nombre_tipo_archivo"}
+            options={[{ label: "", value: "" }, ...tipoArchivoConciliacion]}
+            defaultValue={selected?.fk_nombre_tipo_archivo ?? ""}
+            required
+          />
           <TextArea
             id={"Observaciones"}
             label={"Observaciones"}
@@ -475,6 +563,15 @@ const RecaudoDirecto = () => {
             label={"Permite vencidos"}
             name={"permite_vencidos"}
             defaultChecked={selected?.permite_vencidos ?? ""}
+          />
+          <ToggleInput
+            id={"permite_referencia_extra"}
+            label={"Permite datos extra"}
+            name={"permite_referencia_extra"}
+            defaultChecked={selected?.permite_referencia_extra ?? ""}
+            onChange={() =>
+              setPermiteRefExtra((old) => !old)
+            }
           />
           {selected && (
             <ToggleInput

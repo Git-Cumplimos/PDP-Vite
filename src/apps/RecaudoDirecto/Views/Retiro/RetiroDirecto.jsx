@@ -1,5 +1,6 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../hooks/AuthHooks";
 import Input from "../../../../components/Base/Input";
 import DataTable from "../../../../components/Base/DataTable";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
@@ -20,6 +21,7 @@ const initialSearchFilters = new Map([
 
 const RetiroDirecto = () => {
   const navigate = useNavigate()
+  const { roleInfo, pdpUser } = useAuth();
 
   const [listRetiro, setListRetiro] = useState([])
   const [isNextPage, setIsNextPage] = useState(false);
@@ -47,6 +49,40 @@ const RetiroDirecto = () => {
     const queries = new URLSearchParams(tempMap.entries()).toString();
     fetchTrxs(`${url}?${queries}`);
   }, [fetchTrxs, searchFilters2]);
+
+  const hasData = useMemo(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      return false;
+    }
+    const keys = [
+      "id_comercio",
+      "id_usuario",
+      "tipo_comercio",
+      "id_dispositivo",
+      "ciudad",
+      "direccion",
+      "codigo_dane",
+    ];
+    for (const key of keys) {
+      if (!(key in roleInfo)) {
+        return false;
+      }
+    }
+    return true;
+  },[roleInfo]);
+
+  const validateCommerce = useCallback(() => {  
+    if (!hasData) {
+      notifyError(
+        "El usuario no cuenta con datos de comercio, no se permite la transacción"
+      );
+      navigate("/")
+    }
+  }, [roleInfo, navigate,hasData]);
+
+  useEffect(() => {
+    validateCommerce();
+  },[validateCommerce])
 
   useEffect(() => {
     searchTrxs();

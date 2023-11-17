@@ -11,6 +11,7 @@ import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../utils/fetchMoviliza";
 import { ComponentsModalSummaryTrx } from "./components/components_modal";
+import { ComponentsMsgFallaNotificacion } from "./components/components_falla_notificacion";
 import {
   LecturaBarcode,
   LecturaMoviliza,
@@ -48,6 +49,7 @@ const PagarMoviliza = () => {
   const [bloqueoInput, setBloqueoInput] = useState(false);
   const [procedimiento, setProcedimiento] = useState(option_manual);
   const [showModal, setShowModal] = useState(false);
+  const [showModalMsg, setShowModalMsg] = useState(false);
   const [resConsultMoviliza, setResConsultMoviliza] = useState({});
   const [infTicket, setInfTicket] = useState(null);
   const printDiv = useRef();
@@ -70,7 +72,7 @@ const PagarMoviliza = () => {
   );
   const [token, setToken] = useState("");
   const navigate = useNavigate();
-  
+  const [cambioBarcodeBoton, setCambioBarcodeBoton] = useState(false);
 
   useEffect(() => {
     const data = {
@@ -152,6 +154,7 @@ const PagarMoviliza = () => {
       setPaso("LecturaMoviliza");
       setProcedimiento(option_manual);
       setBloqueoInput(false)
+      setCambioBarcodeBoton(false)
     }
     setNumeroMoviliza("");
   }, []);
@@ -175,9 +178,14 @@ const PagarMoviliza = () => {
         .then((response) => {
           if (response?.status === true) {
             setNumeroMoviliza(response?.obj?.result?.numero_moviliza);
-            // notify("Respuesta PDP: "+response?.msg);
+            // notify(response?.msg);
             setBloqueoInput(true)
             // setPaso("LecturaMoviliza");
+            setCambioBarcodeBoton(true)
+          }
+          else{
+            notifyError(response?.msg)
+            setNumeroMoviliza("");
           }
         })
         .catch((error) => {
@@ -193,6 +201,7 @@ const PagarMoviliza = () => {
     e.preventDefault();
     setBloqueoInput(false)
     setNumeroMoviliza("")
+    setCambioBarcodeBoton(false)
  }
 
   const onSubmitConsultMoviliza = (e) => {
@@ -304,7 +313,7 @@ const PagarMoviliza = () => {
             else if (response?.status === false){ 
                   if (response?.obj?.mensaje != null){
                     if (response?.obj?.mensaje=="Error autenticando adminot "){
-                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                      notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
                       navigate("/");
                       navigate("/moviliza");
                     }
@@ -405,7 +414,8 @@ const PagarMoviliza = () => {
         dane_code: roleInfo?.codigo_dane,
         city: roleInfo?.["ciudad"],
         idLiquidacion: resConsultMoviliza.numero_moviliza,
-        medioPago: "PSE",
+        // medioPago: "PSE",
+        medioPago: "Ventanilla en Efectivo",
         // medioPago: {
         //   descripcion: "Ventanilla de efectivo",
         //   id: 1,
@@ -438,14 +448,27 @@ const PagarMoviliza = () => {
             notify("Respuesta PDP: Pago Moviliza exitoso");
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
+            let mensaje = response?.msg.replace("Error respuesta PDP: (Error:", "")
+            mensaje = mensaje.replace("(", "")
+            mensaje = mensaje.replace("))", "")
+            mensaje = mensaje.replace(")", "")
             if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
+              setShowModalMsg(true)
               notifyError("Error respuesta Moviliza: falla en la notificación");
+            }
+            else if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))"){
+              notifyError("Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))");
+            }
+            else if (response?.msg){
+              notifyError(mensaje);
             }
             else{
               notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
             }
-            navigate("/");
-            navigate("/moviliza");
+            if (response?.msg !== "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
+              navigate("/");
+              navigate("/moviliza");
+            }
           }
         })
         .catch((error) => {
@@ -531,6 +554,17 @@ const PagarMoviliza = () => {
     setResConsultMoviliza(null);
     setProcedimiento(option_manual);
     setBloqueoInput(false)
+  }, []);
+
+  const HandleCloseMsg = useCallback(() => {
+    setPaso("LecturaMoviliza");
+    setShowModalMsg(false);
+    setNumeroMoviliza("");
+    setResConsultMoviliza(null);
+    setProcedimiento(option_manual);
+    setBloqueoInput(false);
+    navigate("/");
+    navigate("/moviliza");
   }, []);
 
   const HandleCloseTrxExitosa = useCallback(() => {
@@ -622,6 +656,7 @@ const PagarMoviliza = () => {
             bloqueoInput={bloqueoInput}
             resetConsultaBarcode={resetConsultaBarcode}
             token={token}
+            cambioBarcodeBoton={cambioBarcodeBoton}
           ></LecturaBarcode>
         )}
 
@@ -652,6 +687,15 @@ const PagarMoviliza = () => {
         )}
         {/*************** Recarga Exitosa **********************/}
       </Modal>
+
+      {/**************** Transaccion Fallida por notificación **********************/}
+      <Modal show={showModalMsg} handleClose={HandleCloseMsg}>
+      {(
+          <ComponentsMsgFallaNotificacion
+          handleClose={HandleCloseMsg}
+          ></ComponentsMsgFallaNotificacion>
+          )}
+          </Modal>
     </Fragment>
   );
 };

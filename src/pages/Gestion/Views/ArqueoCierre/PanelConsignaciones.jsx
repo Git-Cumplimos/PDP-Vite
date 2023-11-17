@@ -9,7 +9,6 @@ import {
   buscarComprobantesCajero,
 } from "../../utils/fetchCaja";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-
 import {
   makeMoneyFormatter,
   makeDateFormatter,
@@ -54,7 +53,7 @@ const PanelConsignaciones = () => {
   const [stateRev, setStateRev] = useState(null);
   const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userPermissions,roleInfo } = useAuth();
+  const { userPermissions,roleInfo,updateCommerceQuota  } = useAuth();
   const [rol, setRol] = useState(false);
   const [idComercio, setIdComercio] = useState('');
   const [idCajero, setIdCajero] = useState('');
@@ -119,7 +118,7 @@ const PanelConsignaciones = () => {
         console.error(err?.message);
         return "Peticion fallida";
       });
-  }, [searchInfo, pageData]);
+  }, [searchInfo, pageData,roleInfo]);
 
   const handleSubmit = useCallback(
     (ev) => {
@@ -142,8 +141,9 @@ const PanelConsignaciones = () => {
         {
           render: () => {
             setLoading(false);
-            searchComprobantes()
+            searchComprobantes();
             CloseModal();
+            updateCommerceQuota();
             return "Comprobante actualizado exitosamente";
           },
         },
@@ -165,6 +165,7 @@ const PanelConsignaciones = () => {
       observacionesAnalisis,
       selected?.pk_id_comprobante,
       stateRev,
+      updateCommerceQuota,
     ]
   );
 
@@ -176,7 +177,7 @@ const PanelConsignaciones = () => {
     id_permission.includes(6110) && id_permission.includes(6111)? 
       searchComprobantes():
       searchComprobantesCajero();
-  },[searchComprobantes]);
+  },[searchComprobantes,userPermissions,searchComprobantesCajero]);
 
   const handleChangeNumber = (e) => {
     if (e.target.name === 'id_comercio') {
@@ -232,7 +233,7 @@ const PanelConsignaciones = () => {
         onSelectRow={(_e, index) => {
           setSelected(comprobantes[index]);
           descargarComprobante({ filename: comprobantes[index].archivo })
-            .then((res) => setSelectedFileUrl(res?.obj ?? ""))
+            .then((res) =>  setSelectedFileUrl(res?.obj ?? ""))
             .catch((err) => {
               if (err?.cause === "custom") {
                 return err?.message;
@@ -367,14 +368,9 @@ const PanelConsignaciones = () => {
             className="w-full place-self-stretch"
             autoComplete="off"
             maxLength={"60"}
-            value={
-              selected?.fk_estado_revision !== null
-                ? selected?.observaciones_analisis
-                : observacionesAnalisis
-            }
+            defaultValue={selected?.observaciones_analisis}
             onInput={(e) => {
-              setObservacionesAnalisis(e.target.value.trimLeft());
-              e.target.value = e.target.value.trimLeft();
+              setObservacionesAnalisis(e.target.value);
             }}
             info={
               selected?.fk_estado_revision === null && `Máximo 60 caracteres`
@@ -384,7 +380,7 @@ const PanelConsignaciones = () => {
           />
           {selectedFileUrl && (
             <div className="my-4 mx-auto md:mx-4 gap-4">
-              <img src={selectedFileUrl}/>
+              <Magnifier src={selectedFileUrl}  zoomFactor={2}/>
             </div>
           )}
           <ButtonBar>
@@ -396,8 +392,10 @@ const PanelConsignaciones = () => {
             {selectedFileUrl && (
               <a
                 href={selectedFileUrl}
+                download
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn"
               >
                 <Button type="button">Descargar imagen</Button>
               </a>

@@ -458,7 +458,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type="submit">Realizar consulta</Button>
+                <Button type="submit" disabled={showModal}>Realizar consulta</Button>
               )}
             </ButtonBar>
           </Form>
@@ -495,7 +495,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         label="Validación valor"
                         type="text"
                         min={0}
-                        max={datosTransaccion.valorSinModificar2}
+                        max={Math.ceil(datosTransaccion.valorSinModificar2)}
                         autoComplete="off"
                         maxLength={"12"}
                         defaultValue={parseFloat(validacionPago.validacion)}
@@ -518,7 +518,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         >
                           Cancelar
                         </Button>
-                        <Button type="submit" onClick={onSubmitPago}>
+                        <Button type="submit" disabled={peticion !== 2 && showModal}>
                           Realizar pago
                         </Button>
                       </ButtonBar>
@@ -556,7 +556,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         >
                           Cancelar
                         </Button>
-                        <Button type="submit" onClick={onSubmitPago}>
+                        <Button type="submit" disabled={peticion !== 2 && showModal}>
                           Realizar pago
                         </Button>
                       </ButtonBar>

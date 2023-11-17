@@ -56,6 +56,10 @@ type TypingConsultData = null | {
 };
 
 //Constantes
+const valor_total_trx_maximo = 9900000;
+const len_valor_total_trx_maximo = formatMoney.format(
+  valor_total_trx_maximo
+).length;
 const name_componente = "Recaudo";
 const infServiceBackend: TypeInf = {
   barcode: {
@@ -323,7 +327,6 @@ const Recaudo = () => {
               onSearchCodigo={onSubmitBarcode}
               disabled={loadingPeticion}
             />
-
             <div className={formItem} ref={buttonDelate}>
               <button type="reset">Volver a ingresar código de barras</button>
             </div>
@@ -379,7 +382,6 @@ const Recaudo = () => {
             </ButtonBar>
           </Fragment>
         )}
-
         {/******************************Respuesta Lectura runt*******************************************************/}
       </Form>
 
@@ -406,7 +408,11 @@ const Recaudo = () => {
                 equalErrorMin={true}
                 autoComplete="off"
                 min={0}
-                max={consultData.valor_faltante}
+                max={Math.min(
+                  valor_total_trx_maximo,
+                  consultData?.valor_faltante
+                )}
+                maxLength={len_valor_total_trx_maximo}
                 // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
                 value={inputData.valor_total_trx} //se usa este por que es con decimales
                 onInput={(e: any, valor: any) => {

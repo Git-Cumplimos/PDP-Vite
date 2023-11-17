@@ -11,7 +11,6 @@ import { useReactToPrint } from "react-to-print";
 import MoneyInput from "../../../components/Base/MoneyInput";
 import { fetchParametrosAutorizadores } from "../../TrxParams/utils/fetchParametrosAutorizadores";
 import { enumParametrosAutorizador } from "../../../utils/enumParametrosAutorizador";
-import useMoney from "../../../hooks/useMoney";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { useFetchMovii } from "../hooks/fetchMovii";
@@ -157,50 +156,40 @@ const MoviiPDPCashOut = () => {
     },
     [datosTrans]
   );
-  const onChangeFormat = useCallback((ev) => {
-    let value = ev.target.value;
-    setDatosTrans((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
-  }, []);
-  const onChangeMoney = useMoney({
-    limits: [limiteRecarga.inferior, limiteRecarga.superior],
-    equalError: false,
-  });
   return (
     <>
-      <h1 className='text-3xl'>Retiro MOVII</h1>
+      <h1 className="text-3xl">Retiro MOVII</h1>
       <Form grid onSubmit={onSubmit}>
         <Input
-          id='numeroTelefono'
-          label='Número de teléfono'
-          type='text'
-          name='numeroTelefono'
-          minLength='10'
-          maxLength='10'
+          id="numeroTelefono"
+          label="Número de teléfono"
+          type="text"
+          name="numeroTelefono"
+          minLength="10"
+          maxLength="10"
           required
-          autoComplete='off'
+          autoComplete="off"
           value={datosTrans.numeroTelefono}
           onInput={onChangeFormatNumber}
         />
         <Input
-          id='otp'
-          label='Número OTP'
-          type='text'
-          name='otp'
-          minLength='2'
-          maxLength='6'
+          id="otp"
+          label="Número OTP"
+          type="text"
+          name="otp"
+          minLength="2"
+          maxLength="6"
           required
-          autoComplete='off'
+          autoComplete="off"
           value={datosTrans.otp}
           onInput={onChangeFormatNumber}
         />
         <MoneyInput
-          id='valCashOut'
-          name='valCashOut'
-          label='Valor'
-          type='text'
-          autoComplete='off'
+          id="valCashOut"
+          name="valCashOut"
+          label="Valor"
+          type="text"
+          autoComplete="off"
           maxLength={"12"}
           // min={limiteRecarga.inferior}
           // max={limiteRecarga.superior}
@@ -214,24 +203,27 @@ const MoviiPDPCashOut = () => {
           }}
           required
           min={enumParametrosMovii.MINCASHOUTMOVII}
-          max={enumParametrosMovii.MAXCASHOUTMOVII} 
+          max={enumParametrosMovii.MAXCASHOUTMOVII}
           equalError={false}
           equalErrorMin={false}
-          ></MoneyInput>
-        <ButtonBar className='lg:col-span-2'>
-          <Button type='submit' disabled={loadingPeticionCashoutMovii}>
-            Aceptar
+        ></MoneyInput>
+        <ButtonBar className="lg:col-span-2">
+          <Button disabled={loadingPeticionCashoutMovii} onClick={hideModal}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={loadingPeticionCashoutMovii}>
+            Realizar Retiro
           </Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={hideModal}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+      <Modal show={showModal}>
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
           {!peticion ? (
             <>
-              <h1 className='text-2xl font-semibold'>
+              <h1 className="text-2xl font-semibold">
                 ¿Está seguro de realizar el retiro?
               </h1>
-              <h2 className='text-base'>
+              <h2 className="text-base">
                 {`Valor de transacción: ${formatMoney.format(
                   datosTrans.valorCashOut
                 )} COP`}
@@ -241,13 +233,15 @@ const MoviiPDPCashOut = () => {
               <ButtonBar>
                 <Button
                   disabled={loadingPeticionCashoutMovii}
-                  onClick={hideModal}>
+                  onClick={hideModal}
+                >
                   Cancelar
                 </Button>
                 <Button
                   disabled={loadingPeticionCashoutMovii}
-                  type='submit'
-                  onClick={peticionCashOut}>
+                  type="submit"
+                  onClick={peticionCashOut}
+                >
                   Aceptar
                 </Button>
               </ButtonBar>
@@ -257,7 +251,7 @@ const MoviiPDPCashOut = () => {
               <Tickets ticket={objTicketActual} refPrint={printDiv}></Tickets>
               <h2>
                 <ButtonBar>
-                  <Button type='submit' onClick={hideModal}>
+                  <Button type="submit" onClick={hideModal}>
                     Aceptar
                   </Button>
                   <Button onClick={handlePrint}>Imprimir</Button>

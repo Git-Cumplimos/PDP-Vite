@@ -24,6 +24,9 @@ const TransaccionRecargaDatafono = lazy(() =>
 const TransaccionRecargaTarjeta = lazy(() =>
   import("./Views/RecargaTullave/TransaccionRecargaTarjeta")
 );
+const ReporteTuLLaveTrx = lazy(() =>
+  import("./Views/ConsolidacionTrx/Consolidacion")
+);
 const AdminRecargasTuLlave = lazy(() =>
   import("./Views/GestionDatafonos/index")
 );
@@ -107,6 +110,14 @@ const rutasRecargasTullave = {
       ),
       component: TransaccionRecargaTarjeta,
       permission: [enumPermisosTuLlave.RECARGA_TARJETAS_TULLAVE],
+    },
+    {
+      link: "/recargas-tu-llave/consolidacion-trx",
+      label: (
+        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Transacciones Recarga Tarjeta Datafonos" />
+      ),
+      component: ReporteTuLLaveTrx,
+      permission: [enumPermisosTuLlave.CONSOLIDACION_TULLAVE],
     },
   ],
 };

@@ -5,4 +5,5 @@ export const enumPermisosTuLlaveAdmin = Object.freeze({
 export const enumPermisosTuLlave = Object.freeze({
   RECARGA_DATAFONOS_TULLAVE: 27001,
   RECARGA_TARJETAS_TULLAVE: 27002,
+  CONSOLIDACION_TULLAVE: 27003,
 });

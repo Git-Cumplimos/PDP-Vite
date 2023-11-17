@@ -12,11 +12,11 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import TicketCierre from "./TicketCierre";
 import { useNavigate } from "react-router-dom";
-import MoneyInput from "../../../../components/Base/MoneyInput";
+// import MoneyInput from "../../../../components/Base/MoneyInput";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
+const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","DROGUERIA"];
 let Num = 0;
 
 const Panel = () => {
@@ -57,6 +57,26 @@ const Panel = () => {
     () => tiposOficinas.includes(roleInfo?.tipo_comercio),
     [roleInfo?.tipo_comercio]
   );
+  const buscarPlataforma = useCallback(() => {
+    buscarPlataformaExt({totaldata: '1'})
+      .then((res) => {
+        const listValue = [];
+        res?.obj?.results.map(function(element){
+            const inputValue = element
+            inputValue['valor'] = 0
+            listValue.push(inputValue)
+        })
+      setDataPlfExt(listValue);
+      })
+      .catch((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error?.message);
+          return;
+        }
+        console.error(error?.message);
+        notifyError("Busqueda fallida");
+      });
+  },[]);
 
   useEffect(() => {
     const conditions = [
@@ -102,28 +122,7 @@ const Panel = () => {
         { toastId: "busqueda-cierre-123" }
       );
     }
-  }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio]);
-
-  const buscarPlataforma = useCallback(() => {
-    buscarPlataformaExt({totaldata: '1'})
-      .then((res) => {
-        const listValue = [];
-        res?.obj?.results.map(function(element){
-            const inputValue = element
-            inputValue['valor'] = 0
-            listValue.push(inputValue)
-        })
-      setDataPlfExt(listValue);
-      })
-      .catch((error) => {
-        if (error?.cause === "custom") {
-          notifyError(error?.message);
-          return;
-        }
-        console.error(error?.message);
-        notifyError("Busqueda fallida");
-      });
-  },[dataPlfExt]);
+  }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio,buscarPlataforma]);
 
   const closeModalFunction = useCallback(() => {
     navigate(-1);
@@ -147,7 +146,18 @@ const Panel = () => {
   }, [navigate]);
 
   const cierreCaja = useCallback((dataPlfExt) => {
-    dataPlfExt.map((elemento) => Num=Num+elemento.valor)
+    const originalData =  dataPlfExt;
+    originalData.map((elemento,i) => {
+      if (typeof(elemento.valor) === "string") {
+        if (elemento.valor.includes("$")) {
+          originalData[i].valor = elemento.valor.replace("$","");
+        }while (elemento.valor.includes(",")) {
+          originalData[i].valor = elemento.valor.replace(",","");
+        }
+        originalData[i].valor = parseInt(originalData[i].valor)
+      }
+      Num=Num+parseInt(elemento.valor);
+    })
     notifyPending(
       confirmaCierre({
         id_comercio: roleInfo?.id_comercio,
@@ -157,7 +167,8 @@ const Panel = () => {
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
         arqueo: Object.fromEntries(denominaciones),
-        entidades_externas: {'data':dataPlfExt}
+        entidades_externas: {'data':originalData},
+        stateCierre: totalCierres,
       }),
       {
         render: () => {
@@ -173,7 +184,7 @@ const Panel = () => {
             title: "Cierre de caja",
             timeInfo: {
               "Fecha de pago": Intl.DateTimeFormat("es-CO", {
-                year: "2-digit",
+                year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
               }).format(new Date()),
@@ -204,12 +215,12 @@ const Panel = () => {
               ["", ""],
               [
                 "Efectivo en caja PDP",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
+                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)),
               ],
               ["", ""],
               [
                 "Efectivo en caja PDP + Externos",
-                formatMoney.format(Num+cierre?.total_efectivo_en_caja),
+                formatMoney.format(cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
             ],
@@ -219,7 +230,7 @@ const Panel = () => {
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Estimación faltantes",
+                "Estimación faltante",
                 formatMoney.format(cierre?.total_estimacion_faltante),
               ],
               ["", ""],
@@ -274,13 +285,26 @@ const Panel = () => {
     content: () => printDiv.current,
   });
 
-  const handleChangeCurrenci = (e,valor) => {
-    dataPlfExt.map(function (elemento, indice) {
-      if(elemento.pk_nombre_plataforma === e.target.name){
-        dataPlfExt[indice]['valor']= valor
-      }
+  const handleChangeCurrenci = useCallback((e,key) => {
+    const inputValue = e.target.value;
+    let numericValue = inputValue.replace(/[^0-9-]/g,'').slice(0, 12);
+    const isNegative = numericValue.startsWith("-");
+    if (isNegative) {
+      numericValue = numericValue.slice(1); // Elimina el signo "-" para el formato interno
+    }
+    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const updateData = dataPlfExt.map((value,i) => {
+        if(value.pk_nombre_plataforma !== key.pk_nombre_plataforma){
+          return value
+        } else {
+          return {
+            ...value,
+            valor: formattedValue,
+          };
+        }
     })
-  };
+    setDataPlfExt(updateData)
+  }, [dataPlfExt]);
 
   return (
     validTipoComercio && (
@@ -289,7 +313,7 @@ const Panel = () => {
           <h1 className="text-3xl mt-6">
             Señor usuario la caja ya fue cerrada el día de hoy
           </h1>
-        ) : totalCierres === 3 || totalCierres === 1 || true ? (
+        ) : totalCierres === 6 || totalCierres === 3 || totalCierres === 1 || true ? (
           <ButtonBar>
             <Button
               type="submit"
@@ -304,19 +328,21 @@ const Panel = () => {
         )}
         <Modal
           show={estado}
-          handleClose={loading || resumenCierre ? () => {} : closeModalFunction}
+          handleClose={!resumenCierre ? loading || resumenCierre ? () => {} : closeModalFunction:false}
         >
           {!resumenCierre ? (
             !confirmarArqueo ? (
               next === 0 ?(
               <Fragment>
                 <Fieldset className="col-span-2" legend={"Arqueo de caja"}>
-                  {dataPlfExt?.map((key) => (
-                    <MoneyInput
+                  {dataPlfExt?.map(key => (
+                    <Input
                       key={key.pk_nombre_plataforma}
                       name={key.pk_nombre_plataforma}
                       label={key.pk_nombre_plataforma}
-                      onChange={handleChangeCurrenci}
+                      value={key.valor === 0 || key.valor === "$"? null:key.valor}
+                      type="text"
+                      onChange={(e) => handleChangeCurrenci(e,key)}
                       placeholder="$0"
                       maxLength={12}
                       autoComplete='off'

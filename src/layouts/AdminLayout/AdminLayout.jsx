@@ -182,7 +182,7 @@ const AdminLayout = () => {
             <div className="items-center text-center">
               <h1>
                 Señor usuario, la caja presenta cierre tardío, no se pueden
-                realizar transacciones hasta que la cierre.
+                realizar transacciones hasta que realice el cierre.
                 <ButtonBar>
                   <Button
                     className="btn mx-auto d-block"

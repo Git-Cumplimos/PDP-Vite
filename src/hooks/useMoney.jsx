@@ -44,6 +44,7 @@ const useMoney = ({
   const onChangeMoney = useCallback(
     (ev) => {
       const moneyFormatter = makeMoneyFormatter(decimalDigits);
+      const required = ev?.target?.required ?? true;
 
       let caret_pos = ev.target.selectionStart ?? 0;
 
@@ -77,6 +78,10 @@ const useMoney = ({
           `El valor debe ser menor a ${moneyFormatter.format(max)}`
         );
       } else {
+        ev.target.setCustomValidity("");
+      }
+
+      if (!required && !moneyValue) {
         ev.target.setCustomValidity("");
       }
 

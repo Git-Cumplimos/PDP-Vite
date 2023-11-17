@@ -49,7 +49,7 @@ const initialSearchFilters = new Map([
 const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transacciones-paginated`;
 
 const Transacciones = () => {
-  const { roleInfo, userPermissions, pdpUser } = useAuth();
+  const { roleInfo, userPermissions, pdpUser, commerceInfo } = useAuth();
   const [tiposOp, setTiposOp] = useState([]);
   const [trxs, setTrxs] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
@@ -70,6 +70,9 @@ const Transacciones = () => {
   });
 
   const searchTrxs = useCallback(() => {
+    if (!searchFilters.get("uuid")) {
+      return;
+    }
     const tempMap = new Map(searchFilters);
 
     tempMap.forEach((val, key, map) => {
@@ -316,26 +319,27 @@ const Transacciones = () => {
         />
         {userPermissions
           .map(({ id_permission }) => id_permission)
-          .includes(5) && (
-          <Fragment>
-            <Input
-              id="id_comercio"
-              name="id_comercio"
-              label="Id comercio"
-              type="tel"
-              value={searchFilters.get("id_comercio")}
-              onChange={() => {}}
-            />
-            <Input
-              id="id_usuario"
-              name="id_usuario"
-              label="Id usuario"
-              type="tel"
-              value={searchFilters.get("id_usuario")}
-              onChange={() => {}}
-            />
-          </Fragment>
-        )}
+          .includes(5) &&
+          (!pdpUser?.fk_id_comercio || commerceInfo?.estado) && (
+            <Fragment>
+              <Input
+                id="id_comercio"
+                name="id_comercio"
+                label="Id comercio"
+                type="tel"
+                value={searchFilters.get("id_comercio")}
+                onChange={() => {}}
+              />
+              <Input
+                id="id_usuario"
+                name="id_usuario"
+                label="Id usuario"
+                type="tel"
+                value={searchFilters.get("id_usuario")}
+                onChange={() => {}}
+              />
+            </Fragment>
+          )}
       </DataTable>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (

@@ -18,6 +18,9 @@ const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
 const LoginLayout = lazy(() => import("../layouts/LoginLayout"));
 
+const AppIcons = lazy(() => import("../components/Base/AppIcons"));
+const Transacciones = lazy(() => import("../pages/Transacciones"));
+
 const getAllRoutes = (urls, link_padre = null) => {
   const allUrls = [];
 
@@ -145,15 +148,33 @@ export const useUrls = () => {
 };
 
 export const useProvideUrls = () => {
-  const { userPermissions } = useAuth();
+  const { userPermissions, commerceInfo, pdpUser } = useAuth();
 
   const urlsPrivateApps = useMemo(() => {
+    const isPdpCommerce = !!pdpUser?.fk_id_comercio;
+    if (isPdpCommerce && !commerceInfo?.estado) {
+      return [
+        {
+          link: "https://portal.solucionesenred.co/",
+          label: <AppIcons Logo={"SUSER"} name="SUSER" />,
+          extern: true,
+          permission: [1],
+        },
+        {
+          link: "/transacciones",
+          // label: <AppIcons Logo={"MARKETPLACE"} name="Transacciones" />,
+          label: <AppIcons Logo={"TRANSACCIONES"} name="Transacciones" />,
+          component: Transacciones,
+          permission: [8],
+        },
+      ];
+    }
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
       return [...filterPermissions(allUrlsPrivateApps, userPermissions)];
     } else {
       return [];
     }
-  }, [userPermissions]);
+  }, [userPermissions, commerceInfo?.estado, pdpUser?.fk_id_comercio]);
 
   const urlsGestion = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
