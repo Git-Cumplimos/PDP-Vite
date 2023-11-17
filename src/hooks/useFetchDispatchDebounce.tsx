@@ -42,7 +42,9 @@ export class ErrorPDPFetch extends Error {
 const handlePDPFetchResponse = async (response: Response) => {
   const jsonResponse = await response.json();
   if ("status" in jsonResponse && !jsonResponse.status) {
-    throw new ErrorPDPFetch(jsonResponse?.msg, jsonResponse, { cause: "custom" });
+    throw new ErrorPDPFetch(jsonResponse?.msg, jsonResponse, {
+      cause: "custom",
+    });
   }
   return jsonResponse;
 };
@@ -80,60 +82,63 @@ const useFetchDispatchDebounce = (
 
   const [abortController, setAbortController] = useState(new AbortController());
 
-  const abort = useCallback(
-    () => abortController.abort(),
-    [abortController]
+  const abort = useCallback(() => abortController.abort(), [abortController]);
+
+  const peticion = useCallback(
+    async (url: RequestInfo | URL, options?: RequestInit) => {
+      const _abortController = new AbortController();
+      setAbortController((old) => {
+        old.abort();
+        return _abortController;
+      });
+      try {
+        setLoading(true);
+        let response;
+        if (isSecure) {
+          response = await fetchSecure(url, {
+            ...options,
+            signal: _abortController.signal,
+          });
+        } else {
+          response = await fetch(url, {
+            ...options,
+            signal: _abortController.signal,
+          });
+        }
+        if (!checkStatus) {
+          return response;
+        }
+        return await handlePDPFetchResponse(response);
+      } catch (error: any) {
+        // if (error?.name !== "AbortError") {
+        // }
+        throw error;
+      } finally {
+        setLoading(false);
+        onFinally?.();
+      }
+    },
+    [isSecure, checkStatus, onFinally]
   );
 
   const dispatchFetch = useCallback(
     async (url: RequestInfo | URL, options?: RequestInit) => {
-      const peticion = async (
-        url: RequestInfo | URL,
-        options?: RequestInit
-      ) => {
-        const _abortController = new AbortController();
-        setAbortController((old) => {
-          old.abort();
-          return _abortController;
-        });
-        try {
-          setLoading(true);
-          let response;
-          if (isSecure) {
-            response = await fetchSecure(url, {
-              ...options,
-              signal: _abortController.signal,
-            });
-          } else {
-            response = await fetch(url, {
-              ...options,
-              signal: _abortController.signal,
-            });
-          }
-          if (!checkStatus) {
-            return response;
-          }
-          return await handlePDPFetchResponse(response);
-        } catch (error: any) {
-          // if (error?.name !== "AbortError") {
-          // }
-          throw error;
-        } finally {
-          setLoading(false);
-          onFinally?.();
-        }
-      };
       if (!notify) {
         onPending();
         return await peticion(url, options).then(onSuccess).catch(onError);
       }
-      return await toast.promise(peticion(url, options), {
-        pending: { type: "info", render: () => onPending() },
-        error: { type: "warning", render: ({ data: error }) => onError(error) },
-        success: { type: "info", render: ({ data }) => onSuccess(data) },
-      });
+      return await toast
+        .promise(peticion(url, options), {
+          pending: { type: "info", render: () => onPending() },
+          error: {
+            type: "warning",
+            render: ({ data: error }) => onError(error),
+          },
+          success: { type: "info", render: ({ data }) => onSuccess(data) },
+        })
+        .catch(() => {});
     },
-    [isSecure, checkStatus, notify, onPending, onSuccess, onError, onFinally]
+    [notify, onPending, onSuccess, onError, peticion]
   );
 
   const dispatcher = useDelayedCallback(dispatchFetch, delay);
