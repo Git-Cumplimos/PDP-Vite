@@ -167,7 +167,8 @@ const Panel = () => {
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
         arqueo: Object.fromEntries(denominaciones),
-        entidades_externas: {'data':originalData}
+        entidades_externas: {'data':originalData},
+        stateCierre: totalCierres,
       }),
       {
         render: () => {
@@ -179,7 +180,6 @@ const Panel = () => {
         render: ({ data: res }) => {
           setLoading(false);
           const cierre = res?.obj;
-          console.log(cierre)
           const tempTicket = {
             title: "Cierre de caja",
             timeInfo: {
@@ -313,7 +313,7 @@ const Panel = () => {
           <h1 className="text-3xl mt-6">
             Señor usuario la caja ya fue cerrada el día de hoy
           </h1>
-        ) : totalCierres === 3 || totalCierres === 1 || true ? (
+        ) : totalCierres === 6 || totalCierres === 3 || totalCierres === 1 || true ? (
           <ButtonBar>
             <Button
               type="submit"
