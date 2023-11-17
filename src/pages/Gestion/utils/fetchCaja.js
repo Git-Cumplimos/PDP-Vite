@@ -2,7 +2,7 @@ import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
 const urlArqueo = `${process.env.REACT_APP_URL_CAJA}/arqueo`;
-const urlCaja = `${process.env.REACT_APP_URL_CAJA}/caja`;
+// const urlCaja = `${process.env.REACT_APP_URL_CAJA}/caja`;
 const urlComprobantes = `${process.env.REACT_APP_URL_CAJA}/comprobantes`;
 const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
 const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
@@ -12,7 +12,7 @@ const urltransacciones =`${process.env.REACT_APP_URL_CAJA}/transacciones`;
 
 // const urlCierreCaja = `http://localhost:5000/transacciones`;
 // const urlArqueo = `http://localhost:5000/arqueo`;
-// const urlCaja = `http://localhost:5000/caja`;
+const urlCaja = `http://localhost:5000/caja`;
 // const urlComprobantes = `http://localhost:5000/comprobantes`;
 // const urlCuentas = `http://localhost:5000/cuentas`;
 // const urlNotas = `http://localhost:5000/notas`;
