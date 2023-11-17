@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import useFetchDispatchDebounce, {
   FetchProps,
   ResponseCallbacks,
@@ -8,7 +8,8 @@ import useFetchDispatchDebounce, {
 const useFetchDebounce = (
   { url, options }: FetchProps,
   responseCallbacks: ResponseCallbacks,
-  hookOptions?: HookOptions
+  hookOptions?: HookOptions,
+  autoDispatch: boolean = true
 ) => {
   const [dispatcher, loading, abort] = useFetchDispatchDebounce(
     responseCallbacks,
@@ -73,11 +74,18 @@ const useFetchDebounce = (
     options?.window,
   ]);
 
-  useEffect(() => {
-    dispatcher(url, copyOptions);
-  }, [dispatcher, url, copyOptions]);
+  const wholeDispacher = useCallback(
+    () => dispatcher(url, copyOptions),
+    [dispatcher, url, copyOptions]
+  );
 
-  return [loading, abort] as const;
+  useEffect(() => {
+    if (autoDispatch) {
+      wholeDispacher();
+    }
+  }, [wholeDispacher, autoDispatch]);
+
+  return [loading, abort, wholeDispacher] as const;
 };
 
 export default useFetchDebounce;

@@ -2,8 +2,8 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { notifyError } from "../../../../utils/notify";
 import Input from "../../../../components/Base/Input";
-import CommerceTable from "../../../TrxParams/components/Commerce/CommerceTable";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import { CommerceTableIam } from "../../components/Commerce";
 
 const urlIAM = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -120,7 +120,8 @@ const SearchTables = ({ searchType, onSelectItem = () => {} }) => {
 
   if (searchType === "commerce") {
     return (
-      <CommerceTable
+      <CommerceTableIam
+        type="SEARCH_TABLE_STATE"
         onSelectComerce={(commerce_info) => onSelectItem(commerce_info)}
       />
     );
