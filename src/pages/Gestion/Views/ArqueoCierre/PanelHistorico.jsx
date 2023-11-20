@@ -162,6 +162,7 @@ const PanelHistorico = () => {
         .then((res) => {
           const newData = []
           res?.obj?.results?.map((itemData)=>{
+
             var totalvalorEntidades = 0
             itemData?.entidades_externas?.data.map((val) => {
               totalvalorEntidades+=val.valor
@@ -192,6 +193,8 @@ const PanelHistorico = () => {
             }
             valJson['Estado Cierre']='Realizado'
             valJson['Fecha_hora_cierre'] = dateFormatter.format(new Date(itemData.created)).replace(",", "");
+            let nuevaCadena = valJson['Fecha_hora_cierre'].slice(0, 22) + valJson['Fecha_hora_cierre'].slice(23);
+            valJson['Fecha_hora_cierre'] = nuevaCadena
             newData.push(valJson)
           })
           const concatenadosParcil = entidades
