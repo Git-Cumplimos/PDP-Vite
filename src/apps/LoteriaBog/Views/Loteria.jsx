@@ -282,7 +282,7 @@ const Loteria = ({ route }) => {
     if (sorteo.split("-")[0] !== "") {
       fetchTablaBilletes();
     }
-  }, [page, limit, sorteo, numero, serie]);
+  }, [page, limit, sorteo, numero, serie, datosEscaneados]);
 
   const fetchTablaBilletes = () => {
     if (sorteo.split("-")[1] === "true") {
