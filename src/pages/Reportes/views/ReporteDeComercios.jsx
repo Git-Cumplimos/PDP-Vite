@@ -22,7 +22,7 @@ const ReporteDeComercios = () => {
 
   const getFile = useCallback((date) => {
     pageData.date=date
-    fetchList(`${url}/reportes/read-files-comprobantes`, "GET", { ...pageData })
+    fetchList(`${url}/reportes/read-files-comercios`, "GET", { ...pageData })
       .then((res) => {
         if (!res?.status) {
           notifyError(res?.msg);
@@ -67,8 +67,8 @@ const ReporteDeComercios = () => {
         onSelectRow={(_, i) => {
           if (!isLoading) {
               if (fileList[i]?.type === "Archivo") {
-              fetchFile(`${url}/reportes/file-url-comprobantes`, "GET", {
-                filename: `Reportes/${fileList[i]?.name}`,
+              fetchFile(`${url}/reportes/file-url-comercios`, "GET", {
+                filename: `Reporte-de-comercios/${fileList[i]?.name}`,
               })
                 .then((res) => {
                   if (!res?.status) {
@@ -76,7 +76,7 @@ const ReporteDeComercios = () => {
                     return;
                   }
                   window.open(res?.obj, "_blank");
-                  notify('El reporte de Consignaciones y Transportadora ha sido creado exitosamente')
+                  notify('El reporte de Comercios ha sido creado exitosamente')
                 })
                 .catch((err) => console.error(err));
             }
