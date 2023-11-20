@@ -394,7 +394,7 @@ const Recaudo = () => {
             summaryTrx={{
               "Número de referencia": inputData.numcupon,
               Nombre: consultData.nombre,
-              "Valor maximo a pagar": formatMoney.format(
+              "Valor máximo a pagar": formatMoney.format(
                 consultData.valor_faltante
               ),
             }}
@@ -402,7 +402,7 @@ const Recaudo = () => {
             <Form onSubmit={onSubmitResumenTrx} grid>
               <MoneyInput
                 name="valor_total_trx"
-                // label=""
+                label="Ingrese el valor a pagar"
                 // decimalDigits={2} //No Se usa este por que es con decimales
                 equalError={false}
                 equalErrorMin={true}
