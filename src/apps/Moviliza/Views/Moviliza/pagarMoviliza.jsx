@@ -452,7 +452,7 @@ const PagarMoviliza = () => {
             mensaje = mensaje.replace("(", "")
             mensaje = mensaje.replace("))", "")
             mensaje = mensaje.replace(")", "")
-            if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
+            if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación Moviliza)"){
               setShowModalMsg(true)
               notifyError("Error respuesta Moviliza: falla en la notificación");
             }
@@ -465,7 +465,7 @@ const PagarMoviliza = () => {
             else{
               notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
             }
-            if (response?.msg !== "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
+            if (response?.msg !== "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación Moviliza)"){
               navigate("/");
               navigate("/moviliza");
             }
