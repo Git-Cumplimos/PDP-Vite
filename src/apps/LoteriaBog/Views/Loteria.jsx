@@ -69,6 +69,8 @@ const Loteria = ({ route }) => {
   const validarEntradaScanner = useCallback(
     (validarNum) => {
       var cod = "";
+      setPageData((old) => ({...old,page: 1}))
+      setPageData((old) => ({...old,limit: 10}))
       if (codigos_lot?.length === 2) {
         cod = [`0${codigos_lot?.[0]?.cod_loteria}`,`${codigos_lot?.[1]?.cod_loteria}`];
       } else {
