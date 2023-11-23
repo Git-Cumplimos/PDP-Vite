@@ -382,6 +382,8 @@ const Loteria = ({ route }) => {
               if (!isNaN(e.target.value)) {
                 const num = e.target.value;
                 setNumero(num);
+                setPageData((old) => ({...old,page: 1}))
+                setPageData((old) => ({...old,limit: 10}))
               }
             }}
             disabled={flagEscaner}
@@ -399,6 +401,8 @@ const Loteria = ({ route }) => {
               if (!isNaN(e.target.value)) {
                 const num = e.target.value;
                 setSerie(num);
+                setPageData((old) => ({...old,page: 1}))
+                setPageData((old) => ({...old,limit: 10}))
               }
             }}
             disabled={flagEscaner}
