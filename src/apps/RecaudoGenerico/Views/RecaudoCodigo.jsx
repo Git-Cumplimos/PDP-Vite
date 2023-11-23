@@ -4,31 +4,54 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Form from "../../../components/Base/Form";
 import BarcodeReader from "../../../components/Base/BarcodeReader";
 import { useNavigate } from "react-router-dom";
+import fetchData from "../../../utils/fetchData";
+import { useAuth } from "../../../hooks/AuthHooks";
+
+const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
 
 const RecaudoCodigo = () => {
     const navigate = useNavigate();
-  
+    const { pdpUser, roleInfo } = useAuth();
+
     const navigateRecaudo = useCallback(
-      ({ codigo_barras }) => {
-        const urlParams = new URLSearchParams()
-        urlParams.set("codigo", JSON.stringify(codigo_barras))
-        navigate(`/recaudo/trx?${urlParams.toString()}`)
+      (codigo_barras) => {
+        const data = {
+          comercio: {
+            id_comercio: roleInfo.id_comercio,
+            id_usuario: roleInfo.id_usuario,
+            id_terminal: roleInfo.id_dispositivo,
+            nombre_comercio: roleInfo?.["nombre comercio"],
+            nombre_usuario:pdpUser?.uname
+          },
+          ubicacion:{
+            address: roleInfo.direccion,
+            dane_code: roleInfo.codigo_dane,
+            city:roleInfo.ciudad
+          },
+          info_transaccion:{
+            codigo_barras: codigo_barras
+          }
+        }
+        fetchData(`${url}/backend/recaudo-generico/convenios/consulta-convenio-codigo-barras`, "POST",{},data)
+        .then((res) => {
+          if (res?.status) {
+            console.log("res-->",res)
+          } else {
+            console.error(res?.msg);
+          }
+        })
+        .catch(() => {});
       },
-      [navigate]
+      []
     );
   
     return (
       <Fragment>
         <Form grid={false}
-          onSubmit={(ev) => {
-            ev.preventDefault();
-            const formData = new FormData(ev.target);
-            navigateRecaudo(Object.fromEntries(formData));
-          }}
           formDir="col"
         >
           <BarcodeReader
-            onSearchCodigo={(codigo) => navigateRecaudo({ codigo_barras: codigo })}
+            onSearchCodigo={navigateRecaudo}
           />
           <ButtonBar className="lg:col-span-2">
             <Button type="reset">Volver a ingresar código de barras</Button>
