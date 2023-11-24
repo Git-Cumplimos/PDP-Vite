@@ -102,9 +102,8 @@ export const cargueArchivo = (url_cargar, url_verificar) => {
   return async (file, nombre_convenio, convenio_id) => {
 
     try {
-      const responsePostUrl = await fetchSecure(`${url_cargar}?nombre_convenio=${nombre_convenio}`);
+      const responsePostUrl = await fetchSecure(`${url_cargar}?nombre_convenio=${nombre_convenio}&file=${file.type}`);
       const resPostUrl = await responsePostUrl.json();
-
       const { url, fields } = resPostUrl.obj;
       const filename = fields.key;
       const formData = new FormData();
