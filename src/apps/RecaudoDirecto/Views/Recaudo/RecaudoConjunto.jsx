@@ -98,8 +98,7 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD =
-    useCallback(async (e) => {
+  const consultarRecaudoD = useCallback(async (e) => {
       e.preventDefault()
       const data = {
         consulta_recaudo: {
@@ -198,7 +197,7 @@ const RecaudoConjunto = () => {
       nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
       pk_id_recaudo: dataRecaudo.pk_id_recaudo,
       referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-      referencia_extra:referenciaExtra ?? ''
+      referencia_extra: convenioRecaudo?.fk_id_tipo_convenio === 4?dataRecaudo.referencia_extra:referenciaExtra ?? ''
     }
     if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
       modRecaudo(data)
@@ -343,6 +342,17 @@ const RecaudoConjunto = () => {
                 autoComplete="off"
                 disabled
               />
+              {convenioRecaudo?.fk_id_tipo_convenio === 4 ?(
+                <Input
+                  id={"nombre_tipo_referencia_extra"}
+                  label={"Referencia extra"}
+                  name={"nombre_tipo_referencia_extra"}
+                  type="tel"
+                  defaultValue={dataRecaudo.referencia_extra}
+                  autoComplete="off"
+                  disabled
+                />
+              ):null}
               {permiteRefExtra && (
                 <Input
                   id={"nombre_tipo_referencia_extra"}

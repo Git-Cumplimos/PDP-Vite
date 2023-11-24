@@ -37,6 +37,8 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
   const [permiteRefExtra, setPermiteRefExtra] = useState(false);
+  const [selecTipoConvenio, setSelecTipoConvenio] = useState(false);
+
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
     "Valor máximo": "0",
@@ -67,6 +69,7 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
+    { label: "Interno sin valor a pagar", value: 4 },
   ]
   const tipoArchivoConciliacion = [
     { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
@@ -217,7 +220,6 @@ const RecaudoDirecto = () => {
     }
     const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
     const body = Object.fromEntries(filteredBody);
-
     if (validacion) {
       notifyPending(
         selected
@@ -252,6 +254,10 @@ const RecaudoDirecto = () => {
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_recaudo', res)
   }, [res]);
+
+  const handleConvenio = useCallback((e) => {
+    setSelecTipoConvenio(e.target.value)
+  }, []);
 
   return (
     <Fragment>
@@ -397,6 +403,7 @@ const RecaudoDirecto = () => {
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}
             defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            onInput={(e) => {handleConvenio(e)}}
             // onInput={(e) => { setSinBaseDatos(e.target.value === 3 ? true : false) }}
             required
             disabled={selected ? true : false}
@@ -417,7 +424,7 @@ const RecaudoDirecto = () => {
               id={"Tipo modificación"}
               label={"Tipo modificación"}
               name={"fk_modificar_valor"}
-              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              options={selecTipoConvenio !== "4"? [{ label: "", value: "" }, ...tipoModificacion]:[{ label: "Valor mayor", value: 3 },]}
               defaultValue={selected?.fk_modificar_valor ?? ""}
               required
             />
