@@ -156,9 +156,6 @@ const RecaudoDirecto = () => {
         "Longitud máxima ext": "",
       }
     }
-    if (selected['correos']) {
-      setCorreos(selected['correos'])
-    }
 
     if (selected['permite_referencia_extra']) refExtra = true
 
@@ -325,6 +322,7 @@ const RecaudoDirecto = () => {
         onClickRow={(_, index) => {
           setShowModal(true);
           setSelected(listRecaudos[index]);
+          setCorreos(listRecaudos[index]["correos"] === null?[]:listRecaudos[index]["correos"])
         }}
         tblFooter={
           <Fragment>
