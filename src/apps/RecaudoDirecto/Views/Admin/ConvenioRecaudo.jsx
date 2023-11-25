@@ -38,7 +38,7 @@ const RecaudoDirecto = () => {
   const [isNextPage, setIsNextPage] = useState(false);
   const [permiteRefExtra, setPermiteRefExtra] = useState(false);
   const [selecTipoConvenio, setSelecTipoConvenio] = useState(false);
-
+  const [correos, setCorreos] = useState([]);
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
     "Valor máximo": "0",
@@ -156,6 +156,9 @@ const RecaudoDirecto = () => {
         "Longitud máxima ext": "",
       }
     }
+    if (selected['correos']) {
+      setCorreos(selected['correos'])
+    }
 
     if (selected['permite_referencia_extra']) refExtra = true
 
@@ -182,6 +185,7 @@ const RecaudoDirecto = () => {
       "Longitud mínima ext": "",
       "Longitud máxima ext": "",
     })
+    setCorreos([])
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
@@ -217,6 +221,13 @@ const RecaudoDirecto = () => {
         validacion = false
       }
       delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
+    }
+    const correos = Object.entries(data).filter(([key]) => key.startsWith('correo_')).map(([, value]) => value);
+    Object.entries(data)
+    .filter(([key]) => key.startsWith('correo_'))
+    .forEach(([key]) => delete data[key]);
+    if (correos.length > 0) {
+      data.correos = correos;
     }
     const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
     const body = Object.fromEntries(filteredBody);
@@ -258,6 +269,24 @@ const RecaudoDirecto = () => {
   const handleConvenio = useCallback((e) => {
     setSelecTipoConvenio(e.target.value)
   }, []);
+
+  const handleEliminarCorreo = (index) => {
+    const copyCorreos = [...correos];
+    copyCorreos.splice(index, 1);
+    setCorreos(copyCorreos);
+  };
+
+  const handleAgregarCorreo = () => {
+    if (correos.length < 6) {
+      setCorreos([...correos, '']);
+    }
+  };
+
+  const handleChangeCorreo = (index, value) => {
+    const copyCorreos = [...correos];
+    copyCorreos[index] = value;
+    setCorreos(copyCorreos);
+  };
 
   return (
     <Fragment>
@@ -546,6 +575,37 @@ const RecaudoDirecto = () => {
                 />
               );
             })}
+          </Fieldset>
+          <Fieldset legend="Correos">
+            {correos.map((correo, index) => (
+              <div key={index}>
+                <Input
+                  className="mb-4"
+                  id={`correo_${index}`}
+                  name={`correo_${index}`}
+                  label={`Correo ${index + 1}`}
+                  type="email"
+                  autoComplete="off"
+                  value={correo}
+                  onInput={(ev) => handleChangeCorreo(index, ev.target.value)}
+                  required
+                />
+                {correos.length > 0 && (
+                  <ButtonBar>
+                    <Button type="button" onClick={() => handleEliminarCorreo(index)}>
+                      Eliminar correo
+                    </Button>
+                  </ButtonBar>
+                )}
+              </div>
+            ))}
+            {correos.length < 6 && (
+              <ButtonBar>
+                <Button type="button" onClick={handleAgregarCorreo}>
+                  Añadir correo
+                </Button>
+              </ButtonBar>
+            )}
           </Fieldset>
           <Select
             className="place-self-stretch mb-1"
