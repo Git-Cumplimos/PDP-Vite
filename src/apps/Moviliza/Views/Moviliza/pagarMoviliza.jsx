@@ -438,7 +438,18 @@ const PagarMoviliza = () => {
       peticionPayMoviliza(data, dataAditional)
         .then((response) => {
           if (response?.status === true) {
-            const voucher = response?.obj?.result?.ticket
+            if (response?.msg == "Notificación de pago fallida"){
+              const voucher = response?.obj?.result?.ticket
+              ? response?.obj?.result?.ticket
+              : response?.obj?.ticket
+              ? response?.obj?.ticket
+              : {};
+            setInfTicket(voucher);
+            setShowModalMsg(true)
+            setPaso("TransaccionExitosa");
+            }
+            else{
+              const voucher = response?.obj?.result?.ticket
               ? response?.obj?.result?.ticket
               : response?.obj?.ticket
               ? response?.obj?.ticket
@@ -446,6 +457,7 @@ const PagarMoviliza = () => {
             setInfTicket(voucher);
             setPaso("TransaccionExitosa");
             notify("Respuesta PDP: Pago Moviliza exitoso");
+            }
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
             let mensaje = response?.msg.replace("Error respuesta PDP: (Error:", "")
@@ -557,14 +569,14 @@ const PagarMoviliza = () => {
   }, []);
 
   const HandleCloseMsg = useCallback(() => {
-    setPaso("LecturaMoviliza");
+    // setPaso("LecturaMoviliza");
     setShowModalMsg(false);
-    setNumeroMoviliza("");
-    setResConsultMoviliza(null);
-    setProcedimiento(option_manual);
-    setBloqueoInput(false);
-    navigate("/");
-    navigate("/moviliza");
+    // setNumeroMoviliza("");
+    // setResConsultMoviliza(null);
+    // setProcedimiento(option_manual);
+    // setBloqueoInput(false);
+    // navigate("/");
+    // navigate("/moviliza");
   }, []);
 
   const HandleCloseTrxExitosa = useCallback(() => {
