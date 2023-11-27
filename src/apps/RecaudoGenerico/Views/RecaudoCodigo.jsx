@@ -35,14 +35,21 @@ const RecaudoCodigo = () => {
         fetchData(`${url}/backend/recaudo-generico/convenios/consulta-convenio-codigo-barras`, "POST",{},data)
         .then((res) => {
           if (res?.status) {
-            console.log("res-->",res)
+            navigate("../recaudo-generico/recaudo", {
+              state: {
+                autorizadores:res?.obj?.result?.autorizadores,
+                nombre_convenio:res?.obj?.result?.data_codigo_barras?.nombre_convenio,
+                referencia:res?.obj?.result?.data_codigo_barras?.codigosReferencia[0],
+                valor:res?.obj?.result?.data_codigo_barras?.pago
+              }
+            })
           } else {
             console.error(res?.msg);
           }
         })
         .catch(() => {});
       },
-      []
+      [navigate]
     );
   
     return (

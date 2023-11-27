@@ -5,14 +5,18 @@ import Input from "../../../components/Base/Input";
 import fetchData from "../../../utils/fetchData";
 import useDelayedCallback from "../../../hooks/useDelayedCallback";
 import { useAuth } from "../../../hooks/AuthHooks";
+import { useNavigate } from "react-router-dom";
  
 const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
 
 const RecaudoManual = () => {
+  const navigate = useNavigate();
   const { pdpUser, roleInfo } = useAuth();
   const [conv, setConv] = useState([]);
+  const [autorizadores, setAutorizadores] = useState([]);
   const [maxPage, setMaxPage] = useState(0);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [showModal, setShowModal] = useState(false);
   const [searchFilters, setSearchFilters] = useState({
     id_convenio_autorizador: "",
     nombre_convenio: "",
@@ -47,7 +51,6 @@ const RecaudoManual = () => {
       fetchData(`${url}/backend/recaudo-generico/convenios/consultar-convenios`, "POST",{},data)
         .then((res) => {
           if (res?.status) {
-            
             setConv(res?.obj?.result?.results);
             setMaxPage(res?.obj?.result?.max_pages);
           } else {
@@ -59,7 +62,19 @@ const RecaudoManual = () => {
 
   useEffect(() => {
     searchConvenios();
-  }, [searchConvenios]);
+    navigate('/recaudo-generico/manual')
+  }, [searchConvenios,navigate]);
+
+  const onSelectConvenio = useCallback(
+    (e,i) => {
+      navigate("../recaudo-generico/recaudo", {
+        state: {
+          id_convenio:conv[i]["pk_fk_id_convenio"]
+        }
+      })
+    },
+    [navigate,conv]
+  );
 
   return (
     <div className="py-10 flex items-center flex-col">
@@ -73,7 +88,7 @@ const RecaudoManual = () => {
         }))}
         maxPage={maxPage}
         onSetPageData={setPageData}
-        onSelectRow={() => {}}
+        onSelectRow={onSelectConvenio}
         onChange={(ev) => setSearchFilters((old) => ({
           ...old,
           [ev.target.name]: ev.target.value,
