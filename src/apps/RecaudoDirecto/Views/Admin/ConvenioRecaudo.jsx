@@ -37,6 +37,8 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
   const [permiteRefExtra, setPermiteRefExtra] = useState(false);
+  const [selecTipoConvenio, setSelecTipoConvenio] = useState(false);
+  const [correos, setCorreos] = useState([]);
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
     "Valor máximo": "0",
@@ -67,15 +69,16 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
+    { label: "Interno sin valor a pagar", value: 4 },
   ]
   const tipoArchivoConciliacion = [
     { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
   const tipoReferenciaExtra = [
-    { label: "Numero documento", value: 1 },
-    { label: "Numero Celular", value: 2 },
-    { label: "Referencia extra", value: 3 },
+    { label: "Número Documento", value: 1 },
+    { label: "Número Celular", value: 2 },
+    { label: "Datos Extra Cliente", value: 3 },
   ]
 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
@@ -109,6 +112,10 @@ const RecaudoDirecto = () => {
 
   useEffect(() => {
     let referencia = []
+    let refExtra = false
+    let limiteRefExtra = {}
+    let limite = {}
+
     if (selected['referencias']) {
       for (let i in selected['referencias']) {
         referencia.push({
@@ -125,7 +132,7 @@ const RecaudoDirecto = () => {
         "Longitud máxima": "",
       }]
     }
-    let limite = {}
+
     if (selected['limite_monto']) {
       limite = {
         "Valor mínimo": selected['limite_monto'][0] ?? 0,
@@ -137,7 +144,7 @@ const RecaudoDirecto = () => {
         "Valor máximo": "0",
       }
     }
-    let limiteRefExtra = {}
+
     if (selected['limite_ref_extra']) {
       limiteRefExtra = {
         "Longitud mínima ext": selected['limite_ref_extra'][0] ?? 0,
@@ -149,12 +156,9 @@ const RecaudoDirecto = () => {
         "Longitud máxima ext": "",
       }
     }
-    let refExtra = false
-    if (selected['permite_referencia_extra'] || 
-        ( selected['fk_id_tipo_referencia_extra'] !== null && 
-          selected['fk_id_tipo_referencia_extra'] !== ""
-        ) 
-      ) refExtra = true
+
+    if (selected['permite_referencia_extra']) refExtra = true
+
     setlimites(limite)
     setReferencias(referencia)
     setReferenciaExtra(limiteRefExtra)
@@ -178,6 +182,7 @@ const RecaudoDirecto = () => {
       "Longitud mínima ext": "",
       "Longitud máxima ext": "",
     })
+    setCorreos([])
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
@@ -209,14 +214,20 @@ const RecaudoDirecto = () => {
     if (data['Longitud mínima ext'] || data['Longitud máxima ext']) {
       data['limite_ref_extra'] = [`${referenciaExtra['Longitud mínima ext'] ?? 0}`, `${referenciaExtra['Longitud máxima ext'] ?? 0}`]
       if (parseInt(data['limite_ref_extra'][0]) > parseInt(data['limite_ref_extra'][1])) {
-        notifyError("En la restriccion de limites de referencia extra, el limite máximo debe ser mayor al limite mínimo")
+        notifyError("En la restriccion de limites de datos extra, el limite máximo debe ser mayor al limite mínimo")
         validacion = false
       }
-      delete data['Longitud mínima ext'] ; delete data['Longitud máxima ext'];
+      delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
+    }
+    const correos = Object.entries(data).filter(([key]) => key.startsWith('correo_')).map(([, value]) => value);
+    Object.entries(data)
+    .filter(([key]) => key.startsWith('correo_'))
+    .forEach(([key]) => delete data[key]);
+    if (correos.length > 0) {
+      data.correos = correos;
     }
     const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
     const body = Object.fromEntries(filteredBody);
-    
     if (validacion) {
       notifyPending(
         selected
@@ -251,6 +262,28 @@ const RecaudoDirecto = () => {
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_recaudo', res)
   }, [res]);
+
+  const handleConvenio = useCallback((e) => {
+    setSelecTipoConvenio(e.target.value)
+  }, []);
+
+  const handleEliminarCorreo = (index) => {
+    const copyCorreos = [...correos];
+    copyCorreos.splice(index, 1);
+    setCorreos(copyCorreos);
+  };
+
+  const handleAgregarCorreo = () => {
+    if (correos.length < 6) {
+      setCorreos([...correos, '']);
+    }
+  };
+
+  const handleChangeCorreo = (index, value) => {
+    const copyCorreos = [...correos];
+    copyCorreos[index] = value;
+    setCorreos(copyCorreos);
+  };
 
   return (
     <Fragment>
@@ -289,6 +322,7 @@ const RecaudoDirecto = () => {
         onClickRow={(_, index) => {
           setShowModal(true);
           setSelected(listRecaudos[index]);
+          setCorreos(listRecaudos[index]["correos"] === null?[]:listRecaudos[index]["correos"])
         }}
         tblFooter={
           <Fragment>
@@ -396,6 +430,7 @@ const RecaudoDirecto = () => {
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}
             defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            onInput={(e) => {handleConvenio(e)}}
             // onInput={(e) => { setSinBaseDatos(e.target.value === 3 ? true : false) }}
             required
             disabled={selected ? true : false}
@@ -416,7 +451,7 @@ const RecaudoDirecto = () => {
               id={"Tipo modificación"}
               label={"Tipo modificación"}
               name={"fk_modificar_valor"}
-              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              options={selecTipoConvenio !== "4"? [{ label: "", value: "" }, ...tipoModificacion]:[{ label: "Valor mayor", value: 3 },]}
               defaultValue={selected?.fk_modificar_valor ?? ""}
               required
             />
@@ -506,7 +541,7 @@ const RecaudoDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-          <Fieldset legend={"Referencia Extra"}>
+          <Fieldset legend={"Datos Extra"}>
             <Select
               className="place-self-stretch mb-1"
               id={"Tipo_referencia_extra"}
@@ -514,7 +549,7 @@ const RecaudoDirecto = () => {
               name={"fk_id_tipo_referencia_extra"}
               options={[{ label: "", value: "" }, ...tipoReferenciaExtra]}
               defaultValue={selected?.fk_id_tipo_referencia_extra ?? ""}
-              required
+              required={permiteRefExtra}
             />
             {Object.entries(referenciaExtra).map(([keyRef, valRef], index) => {
               return (
@@ -523,7 +558,7 @@ const RecaudoDirecto = () => {
                   className={"mb-4"}
                   id={`${keyRef}_${index}`}
                   name={keyRef}
-                  label={keyRef.replace("ext","")}
+                  label={keyRef.replace("ext", "")}
                   type={`tel`}
                   maxLength={`2`}
                   autoComplete="off"
@@ -532,12 +567,43 @@ const RecaudoDirecto = () => {
                     if (keyRef.includes("Longitud")) (valor = onChangeNumber(ev))
                     const copyRef = { ...referenciaExtra };
                     copyRef[keyRef] = valor;
-                    setReferenciaExtra(copyRef);                    
+                    setReferenciaExtra(copyRef);
                   }}
-                  required
+                  required={permiteRefExtra}
                 />
               );
             })}
+          </Fieldset>
+          <Fieldset legend="Correos">
+            {correos.map((correo, index) => (
+              <div key={index}>
+                <Input
+                  className="mb-4"
+                  id={`correo_${index}`}
+                  name={`correo_${index}`}
+                  label={`Correo ${index + 1}`}
+                  type="email"
+                  autoComplete="off"
+                  value={correo}
+                  onInput={(ev) => handleChangeCorreo(index, ev.target.value)}
+                  required
+                />
+                {correos.length > 0 && (
+                  <ButtonBar>
+                    <Button type="button" onClick={() => handleEliminarCorreo(index)}>
+                      Eliminar correo
+                    </Button>
+                  </ButtonBar>
+                )}
+              </div>
+            ))}
+            {correos.length < 6 && (
+              <ButtonBar>
+                <Button type="button" onClick={handleAgregarCorreo}>
+                  Añadir correo
+                </Button>
+              </ButtonBar>
+            )}
           </Fieldset>
           <Select
             className="place-self-stretch mb-1"
@@ -565,7 +631,7 @@ const RecaudoDirecto = () => {
           />
           <ToggleInput
             id={"permite_referencia_extra"}
-            label={"Permite referencia extra"}
+            label={"Permite datos extra"}
             name={"permite_referencia_extra"}
             defaultChecked={selected?.permite_referencia_extra ?? ""}
             onChange={() =>

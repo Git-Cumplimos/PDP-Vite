@@ -68,6 +68,8 @@ const Loteria = ({ route }) => {
   const validarEntradaScanner = useCallback(
     (validarNum) => {
       var cod = "";
+      setPageData((old) => ({...old,page: 1}))
+      setPageData((old) => ({...old,limit: 10}))
       if (codigos_lot?.length === 2) {
         cod = [`0${codigos_lot?.[0]?.cod_loteria}`,`${codigos_lot?.[1]?.cod_loteria}`];
       } else {
@@ -281,7 +283,7 @@ const Loteria = ({ route }) => {
     if (sorteo.split("-")[0] !== "") {
       fetchTablaBilletes();
     }
-  }, [page, limit, sorteo, numero, serie]);
+  }, [page, limit, sorteo, numero, serie, datosEscaneados]);
 
   const fetchTablaBilletes = () => {
     if (sorteo.split("-")[1] === "true") {
@@ -379,6 +381,8 @@ const Loteria = ({ route }) => {
               if (!isNaN(e.target.value)) {
                 const num = e.target.value;
                 setNumero(num);
+                setPageData((old) => ({...old,page: 1}))
+                setPageData((old) => ({...old,limit: 10}))
               }
             }}
             disabled={flagEscaner}
@@ -396,6 +400,8 @@ const Loteria = ({ route }) => {
               if (!isNaN(e.target.value)) {
                 const num = e.target.value;
                 setSerie(num);
+                setPageData((old) => ({...old,page: 1}))
+                setPageData((old) => ({...old,limit: 10}))
               }
             }}
             disabled={flagEscaner}

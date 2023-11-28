@@ -69,13 +69,17 @@ const RetiroDirecto = () => {
     { label: "Asobancaria 2001", value: "Asobancaria 2001" }
   ]
   const tipoReferenciaExtra = [
-    { label: "Numero documento", value: 1 },
-    { label: "Numero Celular", value: 2 },
-    { label: "Referencia extra", value: 3 },
+    { label: "Número Documento", value: 1 },
+    { label: "Número Celular", value: 2 },
+    { label: "Datos Extra Cliente", value: 3 },
   ]
 
   useEffect(() => {
     let referencia = []
+    let limite = {}
+    let limiteRefExtra = {}
+    let refExtra = false
+
     if (selected['referencias']) {
       for (let i in selected['referencias']) {
         referencia.push({
@@ -92,7 +96,7 @@ const RetiroDirecto = () => {
         "Longitud máxima": "",
       }]
     }
-    let limite = {}
+
     if (selected['limite_monto']) {
       limite = {
         "Valor mínimo": selected['limite_monto'][0] ?? 0,
@@ -104,7 +108,7 @@ const RetiroDirecto = () => {
         "Valor máximo": "0",
       }
     }
-    let limiteRefExtra = {}
+
     if (selected['limite_ref_extra']) {
       limiteRefExtra = {
         "Longitud mínima ext": selected['limite_ref_extra'][0] ?? 0,
@@ -117,12 +121,8 @@ const RetiroDirecto = () => {
       }
     }
 
-    let refExtra = false
-    if (selected['permite_referencia_extra'] || 
-        ( selected['fk_id_tipo_referencia_extra'] !== null && 
-          selected['fk_id_tipo_referencia_extra'] !== ""
-        ) 
-      ) refExtra = true
+    if (selected['permite_referencia_extra']) refExtra = true
+
     setlimites(limite)
     setReferencias(referencia)
     setReferenciaExtra(limiteRefExtra)
@@ -206,7 +206,7 @@ const RetiroDirecto = () => {
     if (data['Longitud mínima ext'] || data['Longitud máxima ext']) {
       data['limite_ref_extra'] = [`${referenciaExtra['Longitud mínima ext'] ?? 0}`, `${referenciaExtra['Longitud máxima ext'] ?? 0}`]
       if (parseInt(data['limite_ref_extra'][0]) > parseInt(data['limite_ref_extra'][1])) {
-        notifyError("En la restriccion de limites de referencia extra, el limite máximo debe ser mayor al limite mínimo")
+        notifyError("En la restriccion de limites de datos extra, el limite máximo debe ser mayor al limite mínimo")
         validacion = false
       }
       delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
@@ -503,7 +503,7 @@ const RetiroDirecto = () => {
               </ButtonBar>
             }
           </Fieldset>
-          <Fieldset legend={"Referencia Extra"}>
+          <Fieldset legend={"Datos Extra"}>
             <Select
               className="place-self-stretch mb-1"
               id={"Tipo_referencia_extra"}
@@ -511,12 +511,12 @@ const RetiroDirecto = () => {
               name={"fk_id_tipo_referencia_extra"}
               options={[{ label: "", value: "" }, ...tipoReferenciaExtra]}
               defaultValue={selected?.fk_id_tipo_referencia_extra ?? ""}
-              required
-              // onChange={(ev) => {
-              //   setPermiteRefExtra(
-              //     ev.target.value !== null && ev.target.value !== "" ? true : false
-              //   )
-              // }}
+              required={permiteRefExtra}
+            // onChange={(ev) => {
+            //   setPermiteRefExtra(
+            //     ev.target.value !== null && ev.target.value !== "" ? true : false
+            //   )
+            // }}
             />
             {Object.entries(referenciaExtra).map(([keyRef, valRef], index) => {
               return (
@@ -525,7 +525,7 @@ const RetiroDirecto = () => {
                   className={"mb-4"}
                   id={`${keyRef}_${index}`}
                   name={keyRef}
-                  label={keyRef.replace("ext","")}
+                  label={keyRef.replace("ext", "")}
                   type={`tel`}
                   maxLength={`2`}
                   autoComplete="off"
@@ -536,7 +536,7 @@ const RetiroDirecto = () => {
                     copyRef[keyRef] = valor;
                     setReferenciaExtra(copyRef);
                   }}
-                  required
+                  required={permiteRefExtra}
                 />
               );
             })}
@@ -567,7 +567,7 @@ const RetiroDirecto = () => {
           />
           <ToggleInput
             id={"permite_referencia_extra"}
-            label={"Permite referencia extra"}
+            label={"Permite datos extra"}
             name={"permite_referencia_extra"}
             defaultChecked={selected?.permite_referencia_extra ?? ""}
             onChange={() =>

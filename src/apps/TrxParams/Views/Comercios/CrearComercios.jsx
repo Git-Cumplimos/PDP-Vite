@@ -584,7 +584,7 @@ const CrearComercios = () => {
           <ToggleInput
             id={`use_totp_edit`}
             name={`use_totp`}
-            label={"Seguridad con totp"}
+            label={"Seguridad con OTP"}
             checked={comercio?.use_totp ?? false}
             onChange={() =>
               setComercio((old) => ({

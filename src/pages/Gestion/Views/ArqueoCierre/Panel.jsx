@@ -16,9 +16,8 @@ import { useNavigate } from "react-router-dom";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO"];
+const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","DROGUERIA"];
 let Num = 0;
-
 
 const Panel = () => {
   const navigate = useNavigate();
@@ -168,7 +167,8 @@ const Panel = () => {
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
         arqueo: Object.fromEntries(denominaciones),
-        entidades_externas: {'data':originalData}
+        entidades_externas: {'data':originalData},
+        stateCierre: totalCierres,
       }),
       {
         render: () => {
@@ -215,7 +215,7 @@ const Panel = () => {
               ["", ""],
               [
                 "Efectivo en caja PDP",
-                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+Num),
+                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)),
               ],
               ["", ""],
               [
@@ -313,7 +313,7 @@ const Panel = () => {
           <h1 className="text-3xl mt-6">
             Señor usuario la caja ya fue cerrada el día de hoy
           </h1>
-        ) : totalCierres === 3 || totalCierres === 1 || true ? (
+        ) : totalCierres === 6 || totalCierres === 3 || totalCierres === 1 || true ? (
           <ButtonBar>
             <Button
               type="submit"

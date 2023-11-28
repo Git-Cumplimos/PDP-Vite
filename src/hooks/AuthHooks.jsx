@@ -153,6 +153,7 @@ export const AuthContext = createContext({
   forgotPassword: () => {},
   forgotPasswordSubmit: () => {},
   resetTopt: () => {},
+  updateCommerceQuota: () => {},
   parameters: null,
   qr: null,
   ...initialUser,
@@ -464,6 +465,14 @@ export const useProvideAuth = () => {
     }, []),
   });
 
+  const updateCommerceQuota = useCallback(() => {
+    if (id_comercio && id_dispositivo) {
+      getQuota(
+        `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
+      );
+    }
+  },[id_comercio, id_dispositivo, getQuota]);
+
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
       let _roleinfo = {};
@@ -569,12 +578,8 @@ export const useProvideAuth = () => {
   }, [pathname]);
 
   useEffect(() => {
-    if (id_comercio && id_dispositivo) {
-      getQuota(
-        `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
-      );
-    }
-  }, [pathname, id_comercio, id_dispositivo, getQuota]);
+    updateCommerceQuota();
+  }, [pathname, updateCommerceQuota]);
 
   useEffect(() => {
     if (id_comercio) {
@@ -640,6 +645,7 @@ export const useProvideAuth = () => {
     parameters,
     infoTicket,
     validateUser,
+    updateCommerceQuota,
     ...userState,
   };
 };

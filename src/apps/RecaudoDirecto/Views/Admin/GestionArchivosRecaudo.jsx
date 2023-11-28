@@ -40,7 +40,7 @@ const GestionArchivosRecaudo = () => {
   const [listRecaudos, setListRecaudos] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
   const [file, setFile] = useState(null);
-
+  const typoArchivos = ["text/csv","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"] 
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
@@ -81,11 +81,11 @@ const GestionArchivosRecaudo = () => {
   const CargarArchivo = useCallback(
     async (e) => {
       e.preventDefault();
-      if (file.type !== 'text/csv'){
+      if (!typoArchivos.includes(file.type)){
         notifyError('Tipo de archivo incorrecto')
         return;
       }
-      if (selected.fk_id_tipo_convenio === 1) {
+      if (selected.fk_id_tipo_convenio === 1 || selected.fk_id_tipo_convenio === 4) {
         notifyPending(
           cargarArchivoRecaudo(
             file,
@@ -286,7 +286,7 @@ const GestionArchivosRecaudo = () => {
           Gestión de archivos de recaudo
         </h2>
         <ButtonBar>
-          {selected.fk_id_tipo_convenio === 1 && selected.estado && (
+          {(selected.fk_id_tipo_convenio === 1 || selected.fk_id_tipo_convenio === 4) && selected.estado && (
             <Button
               onClick={() => {
                 setShowMainModal(true);
@@ -317,7 +317,7 @@ const GestionArchivosRecaudo = () => {
               onChange={(e) => {
                 setFile(e.target.files[0]);
               }}
-              accept=".csv"
+              accept=".csv,.xlsx"
               required
             />
           )}

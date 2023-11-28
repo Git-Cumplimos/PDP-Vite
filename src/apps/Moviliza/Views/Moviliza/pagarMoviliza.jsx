@@ -11,6 +11,7 @@ import { notify, notifyError, notifyPending } from "../../../../utils/notify";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../utils/fetchMoviliza";
 import { ComponentsModalSummaryTrx } from "./components/components_modal";
+import { ComponentsMsgFallaNotificacion } from "./components/components_falla_notificacion";
 import {
   LecturaBarcode,
   LecturaMoviliza,
@@ -48,6 +49,7 @@ const PagarMoviliza = () => {
   const [bloqueoInput, setBloqueoInput] = useState(false);
   const [procedimiento, setProcedimiento] = useState(option_manual);
   const [showModal, setShowModal] = useState(false);
+  const [showModalMsg, setShowModalMsg] = useState(false);
   const [resConsultMoviliza, setResConsultMoviliza] = useState({});
   const [infTicket, setInfTicket] = useState(null);
   const printDiv = useRef();
@@ -436,7 +438,18 @@ const PagarMoviliza = () => {
       peticionPayMoviliza(data, dataAditional)
         .then((response) => {
           if (response?.status === true) {
-            const voucher = response?.obj?.result?.ticket
+            if (response?.msg == "Notificación de pago fallida"){
+              const voucher = response?.obj?.result?.ticket
+              ? response?.obj?.result?.ticket
+              : response?.obj?.ticket
+              ? response?.obj?.ticket
+              : {};
+            setInfTicket(voucher);
+            setShowModalMsg(true)
+            setPaso("TransaccionExitosa");
+            }
+            else{
+              const voucher = response?.obj?.result?.ticket
               ? response?.obj?.result?.ticket
               : response?.obj?.ticket
               ? response?.obj?.ticket
@@ -444,14 +457,16 @@ const PagarMoviliza = () => {
             setInfTicket(voucher);
             setPaso("TransaccionExitosa");
             notify("Respuesta PDP: Pago Moviliza exitoso");
+            }
           } else if (response?.status === false || response === undefined) {
             HandleCloseTrxExitosa();
             let mensaje = response?.msg.replace("Error respuesta PDP: (Error:", "")
             mensaje = mensaje.replace("(", "")
             mensaje = mensaje.replace("))", "")
             mensaje = mensaje.replace(")", "")
-            if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación)"){
-              notifyError("Error respuesta Moviliza: falla en la notificación");
+            if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación Moviliza)"){
+              setShowModalMsg(true)
+              // notifyError("Error respuesta Moviliza: falla en la notificación");
             }
             else if (response?.msg == "Error respuesta PDP: (Error: Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))"){
               notifyError("Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))");
@@ -462,8 +477,10 @@ const PagarMoviliza = () => {
             else{
               notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
             }
-            navigate("/");
-            navigate("/moviliza");
+            if (response?.msg !== "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación Moviliza)"){
+              navigate("/");
+              navigate("/moviliza");
+            }
           }
         })
         .catch((error) => {
@@ -549,6 +566,17 @@ const PagarMoviliza = () => {
     setResConsultMoviliza(null);
     setProcedimiento(option_manual);
     setBloqueoInput(false)
+  }, []);
+
+  const HandleCloseMsg = useCallback(() => {
+    // setPaso("LecturaMoviliza");
+    setShowModalMsg(false);
+    // setNumeroMoviliza("");
+    // setResConsultMoviliza(null);
+    // setProcedimiento(option_manual);
+    // setBloqueoInput(false);
+    // navigate("/");
+    // navigate("/moviliza");
   }, []);
 
   const HandleCloseTrxExitosa = useCallback(() => {
@@ -671,6 +699,15 @@ const PagarMoviliza = () => {
         )}
         {/*************** Recarga Exitosa **********************/}
       </Modal>
+
+      {/**************** Transaccion Fallida por notificación **********************/}
+      <Modal show={showModalMsg} handleClose={HandleCloseMsg}>
+      {(
+          <ComponentsMsgFallaNotificacion
+          handleClose={HandleCloseMsg}
+          ></ComponentsMsgFallaNotificacion>
+          )}
+          </Modal>
     </Fragment>
   );
 };

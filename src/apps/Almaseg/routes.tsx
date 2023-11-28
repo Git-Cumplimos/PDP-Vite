@@ -11,7 +11,7 @@ const ConsultaGeneracionPin = lazy(
 const listPermissions = Object.values(enumPermisosAlmaseg);
 const routesAlmaseg = {
   link: "/almaseg",
-  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Almaseg" />,
+  label: <AppIcons Logo={"ALMASEG"} name="Almaseg" />,
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),

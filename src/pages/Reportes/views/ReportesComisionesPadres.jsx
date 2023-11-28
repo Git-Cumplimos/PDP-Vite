@@ -37,7 +37,7 @@ const ReportesComisionesPadres = () => {
         headers={[
           "Fecha del reporte",
           "Nombre del archivo",
-          "Fecha ultima modificacion",
+          "Fecha ultima modificación",
         ]}
         data={reports?.map(({ name, date, last_modified }) => ({
           date,

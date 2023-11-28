@@ -113,7 +113,7 @@ const PanelHistorico = () => {
         ["", ""],
         ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior-Num)],
         ["", ""],
-        ["Efectivo en caja PDP",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+Num)],
+        ["Efectivo en caja PDP",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+(-Num))],
         ["", ""],
         ["Efectivo en caja PDP + Externos",formatMoney.format(data.total_efectivo_en_caja)],
         ["", ""],
@@ -162,6 +162,7 @@ const PanelHistorico = () => {
         .then((res) => {
           const newData = []
           res?.obj?.results?.map((itemData)=>{
+
             var totalvalorEntidades = 0
             itemData?.entidades_externas?.data.map((val) => {
               totalvalorEntidades+=val.valor
@@ -172,7 +173,7 @@ const PanelHistorico = () => {
               'Idusuario': itemData?.id_usuario,
               'TotalmovimientosDía': Math.round(itemData?.total_movimientos),
               'EfectivoCierre': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
-              'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+totalvalorEntidades),
+              'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+(-totalvalorEntidades)),
               'EfectivoCajaPDPExt': Math.round(itemData?.total_efectivo_en_caja),
               'Sobrante': Math.round(itemData?.total_sobrante),
               'Faltante': Math.round(itemData?.total_faltante),
@@ -192,6 +193,8 @@ const PanelHistorico = () => {
             }
             valJson['Estado Cierre']='Realizado'
             valJson['Fecha_hora_cierre'] = dateFormatter.format(new Date(itemData.created)).replace(",", "");
+            let nuevaCadena = valJson['Fecha_hora_cierre'].slice(0, 22) + valJson['Fecha_hora_cierre'].slice(23);
+            valJson['Fecha_hora_cierre'] = nuevaCadena
             newData.push(valJson)
           })
           const concatenadosParcil = entidades

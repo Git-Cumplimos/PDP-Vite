@@ -9,7 +9,7 @@ const ReporteCaja = lazy(() => import("./views/ReporteCaja"));
 
 const routesEmcali = {
   link: "/emcali",
-  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Emcali" />,
+  label: <AppIcons Logo={"EMCALI"} name="Emcali" />,
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),

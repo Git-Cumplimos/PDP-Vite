@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, fetchCustom } from "../utils/fetchNequi";
 import { notify, notifyError } from "../../../utils/notify";
+import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
@@ -35,7 +36,22 @@ export const useFetchNequi = (
 
       //SECUENCIA ---------------Paso 1-------------------------------
       try {
-        PeticionTrx = await fetchTrx({}, data_);
+        let parseObj = JSON.stringify(data_);
+        let dataObj = {
+          data: cifrarAES(
+            `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+            `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+            parseObj
+          ),
+        };
+        PeticionTrx = await fetchTrx({}, dataObj);
+        const dataDecrypt = PeticionTrx?.obj?.data ?? "";
+        const obj = decryptAES(
+          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          dataDecrypt
+        );
+        PeticionTrx.obj = JSON.parse(obj);
         response = PeticionTrx;
         banderaConsultaNequi = true;
       } catch (error) {
@@ -56,7 +72,22 @@ export const useFetchNequi = (
             id_uuid_trx: data_additional_?.id_uuid_trx,
           };
           for (let i = 0; i <= 3; i++) {
-            PeticionConsulta = await fetchConsulta({}, data_consulta);
+            let parseObjConsulta = JSON.stringify(data_consulta);
+            let dataObjConsulta = {
+              data: cifrarAES(
+                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                parseObjConsulta
+              ),
+            };
+            PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
+            const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
+            const objConsulta = decryptAES(
+              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              dataDecryptConsulta
+            );
+            PeticionConsulta.obj = JSON.parse(objConsulta);
             if (PeticionConsulta?.msg.includes("No ha terminado")) {
               notify(
                 "Envío Notificación Nequi Satisfactorio, revisar centro de Notificaciones de Nequi para aceptar el débito de la transacción."
@@ -95,7 +126,22 @@ export const useFetchNequi = (
             id_uuid_trx: data_additional_?.id_uuid_trx,
           };
           for (let i = 0; i <= 4; i++) {
-            PeticionConsulta = await fetchConsulta({}, data_consulta);
+            let parseObjConsulta = JSON.stringify(data_consulta);
+            let dataObjConsulta = {
+              data: cifrarAES(
+                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                parseObjConsulta
+              ),
+            };
+            PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
+            const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
+            const objConsulta = decryptAES(
+              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              dataDecryptConsulta
+            );
+            PeticionConsulta.obj = JSON.parse(objConsulta);
             if (PeticionConsulta?.msg.includes("No ha terminado")) {
               notify(
                 "Su transacción esta siendo procesada, no recargue la página"

@@ -204,7 +204,17 @@ const svgs = {
   CREZCAMOS_PAGO_CREDITOS: `${urlAssets}/assets/svg/recaudo/CREZCAMOS/CREZCAMOS.png`,
 
   //MOVILIZA
-  MOVILIZA: `${urlAssets}/assets/svg/recaudo/MOVILIZA/Logo_Moviliza.png`,
+  MOVILIZA: `${urlAssets}/assets/svg/recaudo/MOVILIZA/MOVILIZA.svg`,
+
+  //EMCALI
+  EMCALI: `${urlAssets}/assets/svg/recaudo/EMCALI/EMCALI.svg`,
+
+  //ALMASEG
+  ALMASEG: `${urlAssets}/assets/svg/recaudo/ALMASEG/ALMASEG.svg`,
+
+  //APUESTAS DEPORTIVAS
+  APUESTAS_DEPORTIVAS: `${urlAssets}/assets/svg/recaudo/APUESTAS_DEPORTIVAS/APUESTAS_DEPORTIVAS.svg`,
+
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
