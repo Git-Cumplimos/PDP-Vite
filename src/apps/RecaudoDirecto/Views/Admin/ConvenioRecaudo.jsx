@@ -37,7 +37,7 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
   const [permiteRefExtra, setPermiteRefExtra] = useState(false);
-  const [selecTipoConvenio, setSelecTipoConvenio] = useState(false);
+  const [selecTipoConvenio, setSelecTipoConvenio] = useState();
   const [correos, setCorreos] = useState([]);
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
@@ -183,6 +183,7 @@ const RecaudoDirecto = () => {
       "Longitud máxima ext": "",
     })
     setCorreos([])
+    setSelecTipoConvenio()
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
@@ -274,7 +275,7 @@ const RecaudoDirecto = () => {
   };
 
   const handleAgregarCorreo = () => {
-    if (correos.length < 6) {
+    if (correos.length < 12) {
       setCorreos([...correos, '']);
     }
   };
@@ -322,6 +323,8 @@ const RecaudoDirecto = () => {
         onClickRow={(_, index) => {
           setShowModal(true);
           setSelected(listRecaudos[index]);
+          let strTipoConvenio = listRecaudos[index]?.fk_id_tipo_convenio.toString()
+          setSelecTipoConvenio(strTipoConvenio)
           setCorreos(listRecaudos[index]["correos"] === null?[]:listRecaudos[index]["correos"])
         }}
         tblFooter={
@@ -451,7 +454,7 @@ const RecaudoDirecto = () => {
               id={"Tipo modificación"}
               label={"Tipo modificación"}
               name={"fk_modificar_valor"}
-              options={selecTipoConvenio !== "4"? [{ label: "", value: "" }, ...tipoModificacion]:[{ label: "Valor mayor", value: 3 },]}
+              options={selecTipoConvenio !== "4" &&  selected?.fk_id_tipo_convenio !== 4? [{ label: "", value: "" }, ...tipoModificacion]:[{ label: "Valor mayor", value: 3 },]}
               defaultValue={selected?.fk_modificar_valor ?? ""}
               required
             />
@@ -597,7 +600,7 @@ const RecaudoDirecto = () => {
                 )}
               </div>
             ))}
-            {correos.length < 6 && (
+            {correos.length < 12 && (
               <ButtonBar>
                 <Button type="button" onClick={handleAgregarCorreo}>
                   Añadir correo
@@ -629,15 +632,17 @@ const RecaudoDirecto = () => {
             name={"permite_vencidos"}
             defaultChecked={selected?.permite_vencidos ?? ""}
           />
-          <ToggleInput
-            id={"permite_referencia_extra"}
-            label={"Permite datos extra"}
-            name={"permite_referencia_extra"}
-            defaultChecked={selected?.permite_referencia_extra ?? ""}
-            onChange={() =>
-              setPermiteRefExtra((old) => !old)
-            }
-          />
+          {selecTipoConvenio !== "4"?
+            <ToggleInput
+              id={"permite_referencia_extra"}
+              label={"Permite datos extra"}
+              name={"permite_referencia_extra"}
+              defaultChecked={selected?.permite_referencia_extra ?? ""}
+              onChange={() =>
+                setPermiteRefExtra((old) => !old)
+              }
+            />
+          :null}
           {selected && (
             <ToggleInput
               id={"activo"}
