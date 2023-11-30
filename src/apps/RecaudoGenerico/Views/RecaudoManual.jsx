@@ -6,7 +6,7 @@ import fetchData from "../../../utils/fetchData";
 import useDelayedCallback from "../../../hooks/useDelayedCallback";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useNavigate } from "react-router-dom";
- 
+
 const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
 
 const RecaudoManual = () => {
@@ -21,7 +21,7 @@ const RecaudoManual = () => {
     id_convenio_autorizador: "",
     nombre_convenio: "",
     ean_convenio: "",
-    estado: true
+    estado: true,
   });
 
   const searchConvenios = useDelayedCallback(
@@ -32,23 +32,27 @@ const RecaudoManual = () => {
           id_usuario: roleInfo.id_usuario,
           id_terminal: roleInfo.id_dispositivo,
           nombre_comercio: roleInfo?.["nombre comercio"],
-          nombre_usuario:pdpUser?.uname
+          nombre_usuario: pdpUser?.uname,
         },
-        ubicacion:{
+        ubicacion: {
           address: roleInfo.direccion,
           dane_code: roleInfo.codigo_dane,
-          city:roleInfo.ciudad
+          city: roleInfo.ciudad,
         },
-        info_transaccion:{
+        info_transaccion: {
           limit: pageData.limit,
           page: pageData.page,
           ...Object.fromEntries(
-            Object.entries(searchFilters)
-              .filter(([_, val]) => val)
+            Object.entries(searchFilters).filter(([_, val]) => val)
           ),
-        }
-      }
-      fetchData(`${url}/backend/recaudo-generico/convenios/consultar-convenios`, "POST",{},data)
+        },
+      };
+      fetchData(
+        `${url}/backend/recaudo-generico/convenios/consultar-convenios`,
+        "POST",
+        {},
+        data
+      )
         .then((res) => {
           if (res?.status) {
             setConv(res?.obj?.result?.results);
@@ -58,22 +62,25 @@ const RecaudoManual = () => {
           }
         })
         .catch(() => {});
-    },[pageData,searchFilters]),300);
+    }, [pageData, searchFilters]),
+    300
+  );
 
   useEffect(() => {
     searchConvenios();
-    navigate('/recaudo-generico/manual')
-  }, [searchConvenios,navigate]);
+    navigate("/recaudo-generico/manual");
+  }, [searchConvenios, navigate]);
 
   const onSelectConvenio = useCallback(
-    (e,i) => {
-      navigate("../recaudo-generico/recaudo", {
+    (e, i) => {
+      navigate("../recaudo-generico/trx", {
         state: {
-          id_convenio:conv[i]["pk_fk_id_convenio"]
-        }
-      })
+          pk_fk_id_convenio: conv[i]["pk_fk_id_convenio"],
+          convenio_name: conv[i]["nombre_convenio"],
+        },
+      });
     },
-    [navigate,conv]
+    [navigate, conv]
   );
 
   return (
@@ -81,59 +88,63 @@ const RecaudoManual = () => {
       <TableEnterprise
         title="Recaudo Servicios Públicos y Privados Manual"
         headers={["Código de convenio", "Nombre de convenio", "EAN"]}
-        data={conv.map(({id_convenio_autorizador,nombre_convenio,ean_convenio}) => ({
-          id_convenio_autorizador,
-          nombre_convenio,
-          ean_convenio,
-        }))}
+        data={conv.map(
+          ({ id_convenio_autorizador, nombre_convenio, ean_convenio }) => ({
+            id_convenio_autorizador,
+            nombre_convenio,
+            ean_convenio,
+          })
+        )}
         maxPage={maxPage}
         onSetPageData={setPageData}
         onSelectRow={onSelectConvenio}
-        onChange={(ev) => setSearchFilters((old) => ({
-          ...old,
-          [ev.target.name]: ev.target.value,
-        }))}
+        onChange={(ev) =>
+          setSearchFilters((old) => ({
+            ...old,
+            [ev.target.name]: ev.target.value,
+          }))
+        }
       >
-      <Input
-        id={"id_convenio"}
-        label={"Código convenio - Nura"}
-        type="tel"
-        maxLength={20}
-        value={searchFilters.id_convenio_autorizador}
-        onChange={(e) => {
-          if (!isNaN(e.target.value)) {
-            setSearchFilters((old) => {
-              return { ...old, id_convenio_autorizador: e.target.value };
-            });
-          }
-        }}
-      />
-      <Input
-        id={"nombre_convenio"}
-        label={"Nombre convenio"}
-        type="text"
-        maxLength={30}
-        value={searchFilters.nombre_convenio}
-        onChange={(e) => {
+        <Input
+          id={"id_convenio"}
+          label={"Código convenio - Nura"}
+          type="tel"
+          maxLength={20}
+          value={searchFilters.id_convenio_autorizador}
+          onChange={(e) => {
+            if (!isNaN(e.target.value)) {
+              setSearchFilters((old) => {
+                return { ...old, id_convenio_autorizador: e.target.value };
+              });
+            }
+          }}
+        />
+        <Input
+          id={"nombre_convenio"}
+          label={"Nombre convenio"}
+          type="text"
+          maxLength={30}
+          value={searchFilters.nombre_convenio}
+          onChange={(e) => {
             setSearchFilters((old) => {
               return { ...old, nombre_convenio: e.target.value };
             });
-        }}
-      />
-      <Input
-        id={"ean"}
-        label={"EAN"}
-        type="text"
-        maxLength={13}
-        value={searchFilters.ean_convenio}
-        onChange={(e) => {
-          if (!isNaN(e.target.value)) {
-            setSearchFilters((old) => {
-              return { ...old, ean_convenio: e.target.value };
-            });
-          }
-        }}
-      />
+          }}
+        />
+        <Input
+          id={"ean"}
+          label={"EAN"}
+          type="text"
+          maxLength={13}
+          value={searchFilters.ean_convenio}
+          onChange={(e) => {
+            if (!isNaN(e.target.value)) {
+              setSearchFilters((old) => {
+                return { ...old, ean_convenio: e.target.value };
+              });
+            }
+          }}
+        />
       </TableEnterprise>
     </div>
   );
