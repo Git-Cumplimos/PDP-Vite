@@ -1,4 +1,5 @@
 import { Auth } from "@aws-amplify/auth";
+
 import {
   createContext,
   useCallback,
@@ -471,7 +472,7 @@ export const useProvideAuth = () => {
         `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
       );
     }
-  },[id_comercio, id_dispositivo, getQuota]);
+  }, [id_comercio, id_dispositivo, getQuota]);
 
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
@@ -492,17 +493,20 @@ export const useProvideAuth = () => {
           });
         });
     }, []),
-    onError: useCallback((error) => {
-      if (error?.cause === "custom-403") {
-        notifyError(error.message);
-        signOut();
-      } else if (error?.cause === "custom") {
-        notifyError(error.message);
-        setSuserInactive(error.message);
-      } else {
-        console.error(error);
-      }
-    }, [signOut]),
+    onError: useCallback(
+      (error) => {
+        if (error?.cause === "custom-403") {
+          notifyError(error.message);
+          signOut();
+        } else if (error?.cause === "custom") {
+          notifyError(error.message);
+          setSuserInactive(error.message);
+        } else {
+          console.error(error);
+        }
+      },
+      [signOut]
+    ),
   });
 
   const [getLoginPdp] = useFetchDispatchDebounce({
