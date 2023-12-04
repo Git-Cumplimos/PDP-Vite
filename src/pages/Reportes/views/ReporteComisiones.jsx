@@ -112,18 +112,23 @@ const ReporteComisiones = () => {
               notify("Procesando la informacion...");
             }
           }else{
-            if (res?.body?.status) {
-              notify(res?.body?.msg);
-              window.open(res?.body?.obj?.url);
+            if (res?.codigo === 0) {
               setIsUploading(false);
-            } else {
-              notifyError(res?.body?.msg);
-              setIsUploading(false);
+              notifyError(res?.msg);
+            }
+            if (res["body"] !== undefined) {
+              if (res?.body?.status) {
+                notify(res?.body?.msg);
+                window.open(res?.body?.obj?.url);
+                setIsUploading(false);
+              } else {
+                notifyError(res?.body?.msg);
+                setIsUploading(false);
+              }
             }
           }
         })
         .catch((err) => {
-          console.log(err)
           console.error(err);
           notifyError("No se pudo conectar al servidor");
           setIsUploading(false);
