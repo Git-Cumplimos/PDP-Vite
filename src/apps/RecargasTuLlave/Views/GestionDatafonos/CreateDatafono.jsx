@@ -19,6 +19,8 @@ const URL_EDITAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACI
 const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
 const URL_CONSULTA_INVENTARIO = `${process.env.REACT_APP_URL_INVENTARIO}/consultar_datafono_unique`;
 const URL_EDITAR_INVENTARIO = `${process.env.REACT_APP_URL_INVENTARIO}/editar_datafono`;
+// const URL_CONSULTA_INVENTARIO = `http://127.0.0.1:8000/tullave-gestion-datafonos/consultar_datafono_unique`;
+// const URL_EDITAR_INVENTARIO = `http://127.0.0.1:8000/tullave-gestion-datafonos/editar_datafono`;
 
 const CreateDatafono = () => {
   const navigate = useNavigate();
@@ -58,6 +60,7 @@ const CreateDatafono = () => {
               user_name: userInfo?.attributes?.name,
               id_comercio: dataDatafono?.fk_comercio_asociado,
               name_comercio: dataDatafono?.name_comercio,
+              ubicacion: dataDatafonoInventario.ubicacion,
             }
             peticionActualizacionInventario({ pk_datafonos_tullave: dataDatafonoInventario.pk_datafonos_tullave },dataInventario)
               .then((res) => {
@@ -142,6 +145,7 @@ const CreateDatafono = () => {
                   user_name: userInfo?.attributes?.name,
                   id_comercio: dataDatafono?.fk_comercio_asociado,
                   name_comercio: dataDatafono?.name_comercio,
+                  ubicacion: dataDatafonoInventario.ubicacion,
                 }
                 notifyPending(
                   peticionCreacionDatafono({}, data),
