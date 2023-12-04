@@ -70,44 +70,46 @@ const PagoCarteraEfectivo = () => {
     fetchCustom(url_consult_pago_cartera, "POST", "Consultar Pago Cartera")
   );
 
-  const CallErrorPeticion = useCallback((error) => {
-    let msg = "Pago Cartera no exitosa";
-    if (error instanceof ErrorCustom) {
-      switch (error.name) {
-        case "ErrorCustomBackend":
-          notifyError(error.message);
-          break;
-        case "msgCustomBackend":
-          notify(error.message);
-          break;
-        default:
-          if (error.notificacion == null) {
-            notifyError(`${msg}: ${error.message}`);
-          }
-          break;
-      }
-    } else {
-      if (
-        error.message ===
-        "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagoCartera) [0010002]"
-      ) {
+  const CallErrorPeticion = useCallback(
+    (error) => {
+      let msg = "Pago Cartera no exitosa";
+      if (error instanceof ErrorCustom) {
+        switch (error.name) {
+          case "ErrorCustomBackend":
+            notifyError(error.message);
+            break;
+          case "msgCustomBackend":
+            notify(error.message);
+            break;
+          default:
+            if (error.notificacion == null) {
+              notifyError(`${msg}: ${error.message}`);
+            }
+            break;
+        }
       } else {
-        notifyError(msg);
+        if (
+          error.message ===
+          "Error respuesta Front-end PDP: Timeout al consumir el servicio (PagoCartera) [0010002]"
+        ) {
+        } else {
+          notifyError(msg);
+        }
       }
-    }
-    setDatosPagoEfectivo((old) => {
-      return { ...old, documento: "LecturaNumeroObligacion" };
-    });
-    setDatosPagoEfectivo((old) => {
-      return { ...old, numeroPagoCartera: "" };
-    });
-    setShowModalGenerico((old) => {
-      return { ...old, showModal: false };
-    });
-    setDatosPagoEfectivo((old) => {
-      return { ...old, procedimiento: datosPagoEfectivo?.numero_obligacion };
-    });
-  }, []);
+      setDatosPagoEfectivo((old) => {
+        return {
+          ...old,
+          numeroPagoCartera: "",
+          documento: "LecturaNumeroObligacion",
+          procedimiento: datosPagoEfectivo?.numero_obligacion,
+        };
+      });
+      setShowModalGenerico((old) => {
+        return { ...old, showModal: false };
+      });
+    },
+    [datosPagoEfectivo]
+  );
 
   const onChangeNumeroCartera = useCallback((e) => {
     let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
