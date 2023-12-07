@@ -56,7 +56,7 @@ type TypingConsultData = null | {
 };
 
 //Constantes
-const valor_total_trx_maximo = 9900000;
+const valor_total_trx_maximo = 10000000;
 const len_valor_total_trx_maximo = formatMoney.format(
   valor_total_trx_maximo
 ).length;
