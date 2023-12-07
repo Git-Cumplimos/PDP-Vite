@@ -337,52 +337,76 @@ const RecaudoConjunto = () => {
               {
                 "Estado": dataRecaudo.nombre_estado ?? "",
                 ...(convenioRecaudo?.fk_id_tipo_convenio === 4 ?{"Referencia extra": dataRecaudo.referencia_extra} : {}),
-                ...(permiteRefExtra ? {[convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"]: referenciaExtra}:null),
+                ...(permiteRefExtra ? {[convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"]: referenciaExtra}:{}),
+                ...(convenioRecaudo?.referencias?.reduce((acc, dict, index) => {
+                  return {
+                    ...acc,
+                    [dict?.nombre_referencia ?? `Referencia ${index + 1}`]: dataReferencias['referencia' + (index + 1)],
+                  };
+                }, {}) || {}),
               }
             :
               {
-                ...(convenioRecaudo?.referencias?.map((dict, index) => (
-                      {[dict?.nombre_referencia ?? "Referencia 1"]:dataReferencias[`referencia' ${index + 1}`]}
-                    ))?? {}
-                  ),
+                ...(convenioRecaudo?.referencias?.reduce((acc, dict, index) => {
+                  return {
+                    ...acc,
+                    [dict?.nombre_referencia ?? `Referencia ${index + 1}`]: dataReferencias['referencia' + (index + 1)],
+                  };
+                }, {}) || {}),
+                ...(permiteRefExtra ? {[convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"]: referenciaExtra}:{}),
               }
           }>
           </PaymentSummary>
-          {dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
-                <MoneyInput
-                  label="Valor a recaudar"
-                  name="valor_total_trx"
-                  autoComplete="off"
-                  value={valorCodigoBarras ? valorRecibido.valor_total_trx : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
-                  maxLength={"11"}
-                  min={limitesMontos.min}
-                  max={limitesMontos.max}
-                  disabled
-                  required
-                />
-              ) : (
-                <MoneyInput
-                  label="Valor a recaudar"
-                  name="valor_total_trx"
-                  autoComplete="off"
-                  min={validarLimites(dataRecaudo?.fk_modificar_valor, 'min')}
-                  equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
-                  maxLength={"11"}
-                  max={validarLimites(dataRecaudo?.fk_modificar_valor, 'max')}
-                  onInput={(e, valor) =>
-                    setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
-                  }
-                  required
-                />
-            )}
-            <ButtonBar>
-              <Button type={"submit"} disabled={disableBtn}>
-                {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
-              </Button>
-              <Button onClick={() => handleClose(true)} >
-                Cancelar
-              </Button>
-            </ButtonBar>
+          {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
+            dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
+              <MoneyInput
+                label="Valor a recaudar"
+                name="valor_total_trx"
+                autoComplete="off"
+                value={valorCodigoBarras ? valorRecibido.valor_total_trx : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
+                maxLength={"11"}
+                min={limitesMontos.min}
+                max={limitesMontos.max}
+                disabled
+                required
+              />
+            ) : (
+              <MoneyInput
+                label="Valor a recaudar"
+                name="valor_total_trx"
+                autoComplete="off"
+                min={validarLimites(dataRecaudo?.fk_modificar_valor, 'min')}
+                equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
+                maxLength={"11"}
+                max={validarLimites(dataRecaudo?.fk_modificar_valor, 'max')}
+                onInput={(e, valor) =>
+                  setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
+                }
+                required
+              />
+            )
+          ):(
+              <MoneyInput
+                label="Valor a recaudar"
+                name="valor_total_trx"
+                autoComplete="off"
+                value={valorRecibido.valor_total_trx}
+                maxLength={"11"}
+                min={limitesMontos.min}
+                max={limitesMontos.max}
+                disabled
+                required
+              />
+            )
+          }
+          <ButtonBar>
+            <Button type={"submit"} disabled={disableBtn}>
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
+            </Button>
+            <Button onClick={() => handleClose(true)} >
+              Cancelar
+            </Button>
+          </ButtonBar>
           {/* {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
             <>
               <Input
