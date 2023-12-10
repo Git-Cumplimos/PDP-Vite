@@ -18,13 +18,13 @@ export const listPermissionsTuLlave = Object.values(enumPermisosTranscaribe);
 
 const rutasRecargasTranscaribe = {
   link: "/recargas-transcaribe",
-  label: <AppIcons Logo={"RECARGASTRANSCARIBE"} name="Recargas Transcaribe" />,
+  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargas Transcaribe" />,
   component: CorresponsaliaTranscaribe,
   permission: listPermissionsTuLlave,
   subRoutes: [
     {
       link: "/recargas-transcaribe/recarga-tarjetas",
-      label: <AppIcons Logo={"RECARGASTRANSCARIBE"} name="Recarga tarjeta" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recarga tarjeta" />,
       component: TransaccionRecargaTarjeta,
       permission: [enumPermisosTranscaribe.RECARGA_TARJETAS_TRANSCARIBE],
     },
