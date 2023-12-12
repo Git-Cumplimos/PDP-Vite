@@ -1,6 +1,10 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, fetchCustom } from "../utils/fetchCreditoFacil";
 import { notify, notifyError } from "../../../utils/notify";
+import fetchData from "../../../utils/fetchData";
+
+const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
+
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
@@ -124,3 +128,23 @@ export class ErrorCustomTimeout extends ErrorCustom {
     super(message, "ErrorCustomTimeout", error_msg, notificacion);
   }
 }
+
+export const postDescargarSimulacion = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${URL_DESCARGAR_SIMULACION}`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};

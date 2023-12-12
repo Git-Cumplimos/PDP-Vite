@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
-import { notifyError, notifyPending } from "../../../../utils/notify";
+import { notifyError, notifyPending, notify } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
@@ -17,18 +17,26 @@ import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
-import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
+import {
+  useFetchTuLlave,
+  postDescargarSimulacion,
+  postTerminosCondiciones,
+} from "../../hooks/fetchTuLlave";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
 const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
 const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
 const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
+const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
 
 const RealizarCreditoFacil = () => {
   const navigate = useNavigate();
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
   const [table, setTable] = useState("");
+  const [isChecked, setChecked] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [termsAndConditions, setTermsAndConditions] = useState("");
   const [dataCredito, setDataCredito] = useState({
     valorPreaprobado: 0,
     valorSimulacion: 0,
@@ -135,7 +143,6 @@ const RealizarCreditoFacil = () => {
 
   const simulacionCredito = useCallback(
     (ev) => {
-      console.log(dataCredito?.valorSimulacion);
       ev.preventDefault();
       const data = {
         oficina_propia:
@@ -177,7 +184,6 @@ const RealizarCreditoFacil = () => {
               consultSiian: res?.obj,
               formPeticion: 1,
             }));
-            console.log(res);
             const formattedData = res?.obj?.listaCuotas.map((row) => ({
               Cuota: row.cuota,
               FechaPago: new Date(row.fechaPago).toLocaleDateString("es-ES", {
@@ -211,34 +217,45 @@ const RealizarCreditoFacil = () => {
       "Realizar simulación crédito"
     );
 
-  const printDiv = useRef();
+  const fecthDescargarSimulacion = () => {
+    let obj = {
+      response: dataCredito?.consultSiian,
+      nombre_comercio: roleInfo?.nombre_comercio,
+    };
+    postDescargarSimulacion(obj)
+      .then(async (res) => {
+        if (res?.status) {
+          notify(res?.msg);
+          window.open(res?.obj?.data);
+        }
+      })
+      .catch((err) => {
+        notifyError("Error de conexion con el servicio");
+        console.error(err);
+      });
+  };
 
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-  });
-  // const onChangeFormatNumber = useCallback(
-  //   (ev) => {
-  //     const valor = ev.target.value;
-  //     const num = valor.replace(/[\s\.\-+eE]/g, "");
-  //     if (!isNaN(num)) {
-  //       if (ev.target.name === "telefonoCliente") {
-  //         if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
-  //           return notifyError("El número de teléfono debe comenzar por 3");
-  //         }
-  //       }
-  //       setDataUsuario((old) => {
-  //         return { ...old, [ev.target.name]: num };
-  //       });
-  //     }
-  //   },
-  //   [dataUsuario.telefonoCliente]
-  // );
-  // const onChangeFormat = useCallback((ev) => {
-  //   let value = ev.target.value;
-  //   setDataUsuario((old) => {
-  //     return { ...old, [ev.target.name]: value };
-  //   });
-  // }, []);
+  const openModal = async () => {
+    try {
+      const response = await fetch(URL_TERMINOS_CONDICIONES);
+      const data = await response.json();
+      setTermsAndConditions(data.termsAndConditions);
+      setModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching terms and conditions:", error);
+    }
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleAccept = () => {
+    closeModal();
+    setChecked(true);
+    
+  };
+
 
   useEffect(() => {
     consultaDecisor();
@@ -413,7 +430,6 @@ const RealizarCreditoFacil = () => {
                       value={dataCredito?.valorSimulacion}
                       required
                       onInput={(e, val) => {
-                        console.log(val);
                         setDataCredito((old) => ({
                           ...old,
                           valorSimulacion: val,
@@ -440,53 +456,180 @@ const RealizarCreditoFacil = () => {
             </>
           </Modal>
         </>
+      ) : dataCredito?.formPeticion === 1 ? (
+        <>
+          <div className="flex flex-col justify-center ">
+            <h1 className="text-4xl text-center">Simulación de Crédito</h1>
+            <br />
+            <div className="grid grid-cols-3 gap-4">
+              <h2 className="text-xl ml-10">{`Comercio: ${
+                dataCredito?.consultSiian?.nombre ?? ""
+              }`}</h2>
+              <h2 className="text-xl ml-10">{`Monto del Crédito: ${
+                formatMoney.format(dataCredito?.consultSiian?.monto) ?? ""
+              }`}</h2>
+              <h2 className="text-xl ml-10">{`Plazo Crédito en Días: ${
+                dataCredito?.consultSiian?.plazo ?? ""
+              }`}</h2>
+            </div>
+            <TableEnterprise
+              title=""
+              headers={[
+                "Cuota",
+                "Fecha de Pago",
+                "Valor Cuota",
+                "Abono Capital",
+                "Abono Interés",
+                "Saldo Capital",
+              ]}
+              data={table || []}
+            ></TableEnterprise>
+            <ButtonBar className="lg:col-span-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  navigate(-1);
+                }}
+                disabled={loadingPeticionConsultaPreaprobado}
+              >
+                Regresar
+              </Button>
+              <Button type="submit" onClick={fecthDescargarSimulacion}>
+                Descargar Simulación
+              </Button>
+              <Button
+                type="submit"
+                onClick={() => {
+                  setDataCredito((old) => ({
+                    ...old,
+                    formPeticion: 2,
+                  }));
+                }}
+              >
+                Desembolsar
+              </Button>
+            </ButtonBar>
+          </div>
+        </>
       ) : (
         <>
+          <h1 className="text-4xl text-center">Desembolso de Crédito</h1>
           <Form grid>
-            <div className="flex flex-col justify-center ">
-              <h1 className="text-4xl text-center">Simulación de Crédito</h1>
-              <br />
-              <div className="grid grid-cols-3 gap-4">
-                <h2 className="text-xl ml-10">{`Comercio: ${
-                  dataCredito?.consultSiian?.nombre ?? ""
-                }`}</h2>
-                <h2 className="text-xl ml-10">{`Monto del Crédito: ${
-                  dataCredito?.consultSiian?.monto ?? ""
-                }`}</h2>
-                <h2 className="text-xl ml-10">{`Plazo Crédito en Días: ${
-                  dataCredito?.consultSiian?.plazo ?? ""
-                }`}</h2>
-              </div>
-              <TableEnterprise
-                title=""
-                headers={[
-                  "Cuota",
-                  "Fecha de Pago",
-                  "Valor Cuota",
-                  "Abono Capital",
-                  "Abono Interés",
-                  "Saldo Capital",
-                ]}
-                data={table || []}
-              ></TableEnterprise>
-              <ButtonBar className="lg:col-span-2">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    navigate(-1);
-                  }}
-                  disabled={loadingPeticionConsultaPreaprobado}
-                >
-                  Cancelar
-                </Button>
-                {dataCredito?.validacionValor && (
-                  <ButtonBar>
-                    <Button type="submit">Simular crédito</Button>
-                  </ButtonBar>
-                )}
-              </ButtonBar>
+            <Fieldset
+              legend="Datos del credito pre aprobado"
+              className="lg:col-span-2"
+            >
+              <Input
+                id="creditoPreaprobado"
+                name="idComercio"
+                label={"Crédito Preaprobado"}
+                type="text"
+                autoComplete="off"
+                value={formatMoney.format(dataCredito?.consultDecisor?.valor)}
+                onChange={() => {}}
+                required
+                disabled={true}
+              />
+              <Input
+                id="numCuotas"
+                name="numCuotas"
+                label={"No. de Cuotas"}
+                type="text"
+                autoComplete="off"
+                value={dataCredito?.consultSiian?.plazo}
+                onChange={() => {}}
+                required
+                disabled={true}
+              />
+              <Input
+                id="fechaPreaprobado"
+                name="fechaPreaprobado"
+                label={"Fecha de Preaprobado"}
+                type="text"
+                autoComplete="off"
+                value={new Date(
+                  dataCredito?.consultSiian?.fechaDesembolso
+                ).toLocaleDateString("es-ES", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+                onChange={() => {}}
+                required
+                disabled={true}
+              />
+              <Input
+                id="estadoCredito"
+                name="estadoCredito"
+                label={"Estado"}
+                type="text"
+                autoComplete="off"
+                value={dataCredito?.consultDecisor?.estado}
+                onChange={() => {}}
+                required
+                disabled={true}
+              />
+              <Input
+                id="valorSolicitud"
+                name="valorSolicitud"
+                label={"Valor a solicitar"}
+                type="text"
+                autoComplete="off"
+                value={formatMoney.format(dataCredito?.consultSiian?.monto)}
+                onChange={() => {}}
+                required
+                disabled={true}
+              />
+            </Fieldset>
+            <div className="text-center">
+              <label className="text-2xl">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onClick={openModal}
+                />
+                <span className="ml-2">Acepta Términos y Condiciones</span>
+              </label>
             </div>
           </Form>
+          {console.log(isModalOpen)}
+          {isModalOpen ? (
+            <Modal show={dataCredito?.showModal} handleClose={handleClose}>
+              <div>
+                <h1 style={{textAlign: "center" , fontWeight: 'bold', fontSize: 24} } >Términos y Condiciones</h1>
+                <br />
+              </div>
+              <p>{termsAndConditions}</p>
+              <ButtonBar>
+                <Button type="submit" onClick={handleAccept}>
+                  Aceptar
+                </Button>
+              </ButtonBar>
+            </Modal>
+          ) : (
+            <></>
+          )}
+          <ButtonBar className="lg:col-span-2">
+            <Button
+              type="button"
+              onClick={() => {
+                setDataCredito((old) => ({
+                  ...old,
+                  formPeticion: 0,
+                  showModal: false,
+                  estadoPeticion: 0,
+                }));
+              }}
+              disabled={loadingPeticionConsultaPreaprobado}
+            >
+              Cancelar
+            </Button>
+            {isChecked && (
+                <ButtonBar>
+                  <Button type="submit" onClick={fecthDescargarSimulacion}>Desembolsar Crédito</Button>
+                </ButtonBar>
+              )}
+          </ButtonBar>
         </>
       )}
     </>
