@@ -28,6 +28,7 @@ const TransaccionRecargaTarjeta = () => {
     NTargeta: "",
     valorRecarga: 0,
   });
+  const [revisionInputCodBarras, setRevisionInputCodBarras] = useState("");
   const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -111,22 +112,23 @@ const TransaccionRecargaTarjeta = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
       const num = valor.replace(/[\s\.\-+eE]/g, "");
-      if (!isNaN(num)) {
-        if (ev.target.name === "telefonoCliente") {
-          if (dataUsuario.telefonoCliente.length === 0 && num !== "3") {
-            return notifyError("El número de teléfono debe comenzar por 3");
+      if (ev.target.name === "NTargeta") {
+        setRevisionInputCodBarras(ev.target.value);
+        if (!isNaN(num)) {
+          if (revisionInputCodBarras !== "C") {
+            setDataUsuario((old) => {
+              return { ...old, [ev.target.name]: num };
+            });
           }
         }
-        setDataUsuario((old) => {
-          return { ...old, [ev.target.name]: num };
-        });
       }
     },
-    [dataUsuario.telefonoCliente]
+    [dataUsuario.telefonoCliente, revisionInputCodBarras]
   );
   return (
     <>
