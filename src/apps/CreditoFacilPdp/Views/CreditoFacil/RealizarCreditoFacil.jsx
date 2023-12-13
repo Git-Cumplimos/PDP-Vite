@@ -200,6 +200,7 @@ const RealizarCreditoFacil = () => {
               ...old,
               consultSiian: res?.obj,
               formPeticion: 1,
+              showModal: false,
             }));
             const formattedData = res?.obj?.listaCuotas.map((row) => ({
               Cuota: row.cuota,
@@ -277,12 +278,8 @@ const RealizarCreditoFacil = () => {
     consultaDecisor();
   }, []);
 
-  
   // Calcular número páginas
-  const calcularNumeroDePaginas = (
-    totalRegistros,
-    registrosPorPagina
-  ) => {
+  const calcularNumeroDePaginas = (totalRegistros, registrosPorPagina) => {
     return Math.ceil(totalRegistros / registrosPorPagina);
   };
 
