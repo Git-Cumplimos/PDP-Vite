@@ -278,7 +278,7 @@ const RealizarCreditoFacil = () => {
   }, []);
 
   
-  // Calcular el número de páginas
+  // Calcular número páginas
   const calcularNumeroDePaginas = (
     totalRegistros,
     registrosPorPagina
