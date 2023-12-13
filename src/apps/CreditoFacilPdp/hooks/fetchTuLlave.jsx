@@ -4,6 +4,7 @@ import { notify, notifyError } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 
 const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
+const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
 
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
@@ -146,5 +147,14 @@ export const postDescargarSimulacion = async (bodyObj) => {
     return res;
   } catch (err) {
     throw err;
+  }
+};
+
+export const postTerminosCondiciones = async () => {
+  try {
+    const res = await fetchData(URL_TERMINOS_CONDICIONES, "GET");
+    return res;
+  } catch (err) {
+    console.error(err);
   }
 };

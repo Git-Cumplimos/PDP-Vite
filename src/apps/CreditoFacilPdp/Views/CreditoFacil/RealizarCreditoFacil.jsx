@@ -27,7 +27,6 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
 const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
 const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
-const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
 
 const RealizarCreditoFacil = () => {
   const navigate = useNavigate();
@@ -36,16 +35,13 @@ const RealizarCreditoFacil = () => {
   const [table, setTable] = useState("");
   const [isChecked, setChecked] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [termsAndConditions, setTermsAndConditions] = useState("");
+  const [url, setUrl] = useState("");
   const [dataCredito, setDataCredito] = useState({
     valorPreaprobado: 0,
     valorSimulacion: 0,
-    validacionValor: true,
+    validacionValor: false,
     consultDecisor: {},
     consultSiian: {},
-    optionsFrecuencia: "2",
-    optionsTipoCliente: "10",
-    optionsTipoCredito: "12",
     estadoPeticion: 0,
     formPeticion: 0,
     showModal: false,
@@ -56,41 +52,48 @@ const RealizarCreditoFacil = () => {
       ...old,
       showModal: false,
     }));
-    navigate(-1);
   }, []);
 
-  const optionsFrecuenciaPago = [
-    { value: "2", label: "MENSUAL" },
-    { value: "4", label: "TRIMESTRAL" },
-    { value: "5", label: "CUATRIMESTRAL" },
-    { value: "6", label: "QUINQUEMESTRAL" },
-    { value: "7", label: "SEMESTRAL" },
-    { value: "8", label: "ANUAL" },
-    { value: "3", label: "BIMESTRAL" },
-    { value: "10", label: "PAGO UNICO" },
-    { value: "11", label: "DIARIA" },
-    { value: "12", label: "QUINCENAL" },
-  ];
-  const optionsTiposCreditos = [
-    { value: "12", label: "PEQUEÑOS PRODUCTORES" },
-    { value: "13", label: "COMERCIOS" },
-    { value: "14", label: "EMPLEADOS" },
-    { value: "15", label: "CRCS" },
-    { value: "11", label: "CEAS" },
-    { value: "16", label: "OLIMPIA" },
-  ];
-  const optionsTiposClientes = [
-    { value: "10", label: "OAT" },
-    { value: "11", label: "PEQUEÑOS PRODUCTORES" },
-    { value: "12", label: "COMERCIOS" },
-    { value: "13", label: "EMPLEADOS" },
-  ];
+  const handleCloseDecisor = useCallback(() => {
+    setDataCredito({
+      valorPreaprobado: 0,
+      valorSimulacion: 0,
+      validacionValor: false,
+      consultDecisor: {},
+      consultSiian: {},
+      estadoPeticion: 0,
+      formPeticion: 0,
+      showModal: false,
+      plazo: 0,
+    });
+    navigate(-1);
+    notifyError("Transacción cancelada por el usuario");
+  }, []);
+
+  const handleCloseSimulacion = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+
+  const handleCloseCancelarSimulacion = useCallback(() => {
+    setDataCredito({
+      valorPreaprobado: 0,
+      valorSimulacion: 0,
+      validacionValor: false,
+      consultDecisor: {},
+      consultSiian: {},
+      estadoPeticion: 0,
+      formPeticion: 0,
+      showModal: false,
+      plazo: 0,
+    });
+    consultaDecisor();
+  }, []);
 
   const consultaDecisor = useCallback(
     (ev) => {
       // ev.preventDefault();
       const data = {
-        id_comercio: roleInfo?.id_comercio,
+        id_comercio: 10106, //roleInfo?.id_comercio,
       };
       notifyPending(
         peticionConsultaPreaprobado({}, data),
@@ -101,15 +104,17 @@ const RealizarCreditoFacil = () => {
         },
         {
           render: ({ data: res }) => {
-            const val = res?.obj?.valor;
+            const val = res?.obj?.Respuesta1;
+            const cadena = val.split(";");
+            const valorFinal = parseInt(cadena[2]);
             setDataCredito((old) => ({
               ...old,
-              valorPreaprobado: val,
+              valorPreaprobado: valorFinal,
               consultDecisor: res?.obj,
             }));
             if (
-              val < enumParametrosCreditosPDP.MINCREDITOPREAPROBADO ||
-              val >= enumParametrosCreditosPDP.MAXCREDITOPREAPROBADO
+              valorFinal < enumParametrosCreditosPDP.MINCREDITOPREAPROBADO ||
+              valorFinal >= enumParametrosCreditosPDP.MAXCREDITOPREAPROBADO
             ) {
               notifyError("El comercio no dispone de un Crédito Preaprobado");
             } else {
@@ -144,6 +149,21 @@ const RealizarCreditoFacil = () => {
   const simulacionCredito = useCallback(
     (ev) => {
       ev.preventDefault();
+      let plazo_cuotas = 0
+      const valorCredito = dataCredito?.valorSimulacion;
+      if (valorCredito >= enumParametrosCreditosPDP.MONTOMINIMOCAMBIOPLAZO) {
+        setDataCredito((old) => ({
+          ...old,
+          plazo: 90,
+        }));
+        plazo_cuotas = 90;
+      } else {
+        setDataCredito((old) => ({
+          ...old,
+          plazo: 30,
+        }));
+        plazo_cuotas = 30;
+      }
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -160,11 +180,8 @@ const RealizarCreditoFacil = () => {
           id_uuid_trx: uniqueId,
         },
         Datos: {
-          plazo: dataCredito?.consultDecisor?.plazo,
-          fechaPago: dataCredito?.consultDecisor?.fechaPago,
-          frecuencia: dataCredito?.optionsFrecuencia,
-          tipoCliente: dataCredito?.optionsTipoCliente,
-          tipoCredito: dataCredito?.optionsTipoCredito,
+          fechaPago: dataCredito?.consultDecisor?.fecha_preaprobado,
+          plazo: plazo_cuotas,
         },
       };
       const dataAditional = {
@@ -194,7 +211,7 @@ const RealizarCreditoFacil = () => {
               ValorCuota: formatMoney.format(row?.valorCuota),
               AbonoCapital: formatMoney.format(row?.abonoCapital),
               AbonoInteres: formatMoney.format(row?.abonoIntereses),
-              SaldoCapital: formatMoney.format(row?.saldoCapital), // Formatear el valor como número con 2 decimales
+              SaldoCapital: formatMoney.format(row?.saldoCapital),
             }));
             setTable(formattedData);
             return "Simulación Crédito satisfactoria";
@@ -226,7 +243,7 @@ const RealizarCreditoFacil = () => {
       .then(async (res) => {
         if (res?.status) {
           notify(res?.msg);
-          window.open(res?.obj?.data);
+          window.open(res?.obj?.url);
         }
       })
       .catch((err) => {
@@ -236,26 +253,25 @@ const RealizarCreditoFacil = () => {
   };
 
   const openModal = async () => {
-    try {
-      const response = await fetch(URL_TERMINOS_CONDICIONES);
-      const data = await response.json();
-      setTermsAndConditions(data.termsAndConditions);
-      setModalOpen(true);
-    } catch (error) {
-      console.error("Error fetching terms and conditions:", error);
+    if (isChecked) {
+      setChecked(!isChecked);
+    } else {
+      postTerminosCondiciones().then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+        } else {
+          console.log(res);
+          setUrl(res?.obj?.url);
+          setModalOpen(true);
+        }
+      });
     }
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-  };
-
   const handleAccept = () => {
-    closeModal();
+    setModalOpen(false);
     setChecked(true);
-    
   };
-
 
   useEffect(() => {
     consultaDecisor();
@@ -301,17 +317,16 @@ const RealizarCreditoFacil = () => {
                 required
                 disabled={true}
               />
-              <MoneyInput
+              <Input
                 id="valorCredito"
                 name="valorCredito"
-                label="Valor del credito"
+                label={"Valor del crédito"}
                 type="text"
                 autoComplete="off"
-                maxLength={"12"}
-                value={parseInt(dataCredito?.valorPreaprobado)}
+                value={formatMoney.format(dataCredito?.valorPreaprobado)}
+                onChange={() => {}}
                 required
                 disabled={true}
-                onInput={() => {}}
               />
               <Input
                 id="numeroCuotas"
@@ -319,7 +334,7 @@ const RealizarCreditoFacil = () => {
                 label={"No. Cuotas"}
                 type="text"
                 autoComplete="off"
-                value={roleInfo?.["nombre comercio"]}
+                value={dataCredito?.consultDecisor?.plazo}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -330,7 +345,7 @@ const RealizarCreditoFacil = () => {
                 label={"Fecha de Preaprobado"}
                 type="text"
                 autoComplete="off"
-                value={roleInfo?.["nombre comercio"]}
+                value={dataCredito?.consultDecisor?.fecha_preaprobado}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -341,7 +356,7 @@ const RealizarCreditoFacil = () => {
                 label={"Estado"}
                 type="text"
                 autoComplete="off"
-                value={roleInfo?.["nombre comercio"]}
+                value={"Preaprobado"}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -350,16 +365,19 @@ const RealizarCreditoFacil = () => {
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
-                onClick={() => {
-                  navigate(-1);
-                }}
+                onClick={handleCloseDecisor}
                 disabled={loadingPeticionConsultaPreaprobado}
               >
                 Cancelar
               </Button>
               {dataCredito?.validacionValor && (
                 <ButtonBar>
-                  <Button type="submit">Simular crédito</Button>
+                  <Button
+                    type="submit"
+                    disabled={loadingPeticionConsultaPreaprobado}
+                  >
+                    Simular crédito
+                  </Button>
                 </ButtonBar>
               )}
             </ButtonBar>
@@ -376,48 +394,6 @@ const RealizarCreditoFacil = () => {
                     <h1 className="text-2xl text-center mb-5 font-semibold">
                       Simulación de Crédito
                     </h1>
-                    <Select
-                      className="place-self-stretch"
-                      id="tipoCliente"
-                      label="Tipo de cliente"
-                      options={optionsTiposClientes}
-                      value={dataCredito?.optionsTipoCliente}
-                      required
-                      onChange={(e) => {
-                        setDataCredito((old) => ({
-                          ...old,
-                          optionsTipoCliente: e.target.value,
-                        }));
-                      }}
-                    />
-                    <Select
-                      className="place-self-stretch"
-                      id="tipoCredito"
-                      label="Tipo de Crédito"
-                      options={optionsTiposCreditos}
-                      value={dataCredito?.optionsTipoCredito}
-                      required
-                      onChange={(e) => {
-                        setDataCredito((old) => ({
-                          ...old,
-                          optionsTipoCredito: e.target.value,
-                        }));
-                      }}
-                    />
-                    <Select
-                      className="place-self-stretch"
-                      id="frecuenciaPago"
-                      label="Frecuencias de pago"
-                      options={optionsFrecuenciaPago}
-                      value={dataCredito?.optionsFrecuencia}
-                      required
-                      onChange={(e) => {
-                        setDataCredito((old) => ({
-                          ...old,
-                          optionsFrecuencia: e.target.value,
-                        }));
-                      }}
-                    />
                     <MoneyInput
                       id="valor"
                       name="valor"
@@ -469,7 +445,7 @@ const RealizarCreditoFacil = () => {
                 formatMoney.format(dataCredito?.consultSiian?.monto) ?? ""
               }`}</h2>
               <h2 className="text-xl ml-10">{`Plazo Crédito en Días: ${
-                dataCredito?.consultSiian?.plazo ?? ""
+                dataCredito?.plazo ?? ""
               }`}</h2>
             </div>
             <TableEnterprise
@@ -487,9 +463,7 @@ const RealizarCreditoFacil = () => {
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
-                onClick={() => {
-                  navigate(-1);
-                }}
+                onClick={handleCloseCancelarSimulacion}
                 disabled={loadingPeticionConsultaPreaprobado}
               >
                 Regresar
@@ -513,19 +487,17 @@ const RealizarCreditoFacil = () => {
         </>
       ) : (
         <>
-          <h1 className="text-4xl text-center">Desembolso de Crédito</h1>
-          <Form grid>
-            <Fieldset
-              legend="Datos del credito pre aprobado"
-              className="lg:col-span-2"
-            >
+          <div className="flex flex-col justify-center ">
+            <h1 className="text-4xl text-center">Desembolso de Crédito</h1>
+            <br />
+            <Fieldset legend=" Datos del crédito " className="lg:col-span-2">
               <Input
                 id="creditoPreaprobado"
                 name="idComercio"
                 label={"Crédito Preaprobado"}
                 type="text"
                 autoComplete="off"
-                value={formatMoney.format(dataCredito?.consultDecisor?.valor)}
+                value={formatMoney.format(dataCredito?.valorPreaprobado)}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -564,7 +536,7 @@ const RealizarCreditoFacil = () => {
                 label={"Estado"}
                 type="text"
                 autoComplete="off"
-                value={dataCredito?.consultDecisor?.estado}
+                value={"Preaprobado"}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -581,55 +553,61 @@ const RealizarCreditoFacil = () => {
                 disabled={true}
               />
             </Fieldset>
+            <br />
             <div className="text-center">
               <label className="text-2xl">
                 <input
                   type="checkbox"
                   checked={isChecked}
                   onClick={openModal}
+                  required
                 />
                 <span className="ml-2">Acepta Términos y Condiciones</span>
               </label>
             </div>
-          </Form>
-          {console.log(isModalOpen)}
-          {isModalOpen ? (
-            <Modal show={dataCredito?.showModal} handleClose={handleClose}>
-              <div>
-                <h1 style={{textAlign: "center" , fontWeight: 'bold', fontSize: 24} } >Términos y Condiciones</h1>
-                <br />
-              </div>
-              <p>{termsAndConditions}</p>
-              <ButtonBar>
-                <Button type="submit" onClick={handleAccept}>
-                  Aceptar
-                </Button>
-              </ButtonBar>
-            </Modal>
-          ) : (
-            <></>
-          )}
-          <ButtonBar className="lg:col-span-2">
-            <Button
-              type="button"
-              onClick={() => {
-                setDataCredito((old) => ({
-                  ...old,
-                  formPeticion: 0,
-                  showModal: false,
-                  estadoPeticion: 0,
-                }));
-              }}
-              disabled={loadingPeticionConsultaPreaprobado}
-            >
-              Cancelar
-            </Button>
-            {isChecked && (
+            {isModalOpen ? (
+              <Modal
+                show={dataCredito?.showModal}
+                handleClose={handleCloseSimulacion}
+                className="flex align-middle"
+              >
+                <iframe
+                  title="PDF Viewer"
+                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(
+                    url
+                  )}&embedded=true`}
+                  style={{
+                    width: "100%",
+                    height: "530px",
+                    border: 0,
+                  }}
+                ></iframe>
                 <ButtonBar>
-                  <Button type="submit" onClick={fecthDescargarSimulacion}>Desembolsar Crédito</Button>
+                  <Button type="submit" onClick={handleAccept}>
+                    Aceptar
+                  </Button>
+                </ButtonBar>
+              </Modal>
+            ) : (
+              <></>
+            )}
+            <ButtonBar className="lg:col-span-2">
+              <Button
+                type="button"
+                onClick={handleCloseCancelarSimulacion}
+                disabled={loadingPeticionConsultaPreaprobado}
+              >
+                Cancelar
+              </Button>
+              {isChecked && (
+                <ButtonBar>
+                  <Button type="submit" onClick={fecthDescargarSimulacion}>
+                    Desembolsar Crédito
+                  </Button>
                 </ButtonBar>
               )}
-          </ButtonBar>
+            </ButtonBar>
+          </div>
         </>
       )}
     </>
