@@ -149,7 +149,7 @@ const RealizarCreditoFacil = () => {
   const simulacionCredito = useCallback(
     (ev) => {
       ev.preventDefault();
-      let plazo_cuotas = 0
+      let plazo_cuotas = 0;
       const valorCredito = dataCredito?.valorSimulacion;
       if (valorCredito >= enumParametrosCreditosPDP.MONTOMINIMOCAMBIOPLAZO) {
         setDataCredito((old) => ({
@@ -276,6 +276,21 @@ const RealizarCreditoFacil = () => {
   useEffect(() => {
     consultaDecisor();
   }, []);
+
+  
+  // Calcular el número de páginas
+  const calcularNumeroDePaginas = (
+    totalRegistros,
+    registrosPorPagina
+  ) => {
+    return Math.ceil(totalRegistros / registrosPorPagina);
+  };
+
+  const registrosPorPaginaPredeterminados = 10;
+
+  //limit y maxPage
+  const limit = registrosPorPaginaPredeterminados;
+  const maxPage = calcularNumeroDePaginas(table.length, limit);
 
   return (
     <>
@@ -459,6 +474,8 @@ const RealizarCreditoFacil = () => {
                 "Saldo Capital",
               ]}
               data={table || []}
+              maxPage={maxPage}
+              limit={limit}
             ></TableEnterprise>
             <ButtonBar className="lg:col-span-2">
               <Button
