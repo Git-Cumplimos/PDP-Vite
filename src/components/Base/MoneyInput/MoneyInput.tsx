@@ -126,7 +126,7 @@ const MoneyInput = forwardRef<HTMLInputElement, Props>(
 
     useEffect(() => {
       setDidRun((old) => {
-        if (old) return old;
+        if (old && input?.onChange) return old;
         if (inptRef.current) {
           const moneyFormatter = makeMoneyFormatter(decimalDigits);
 

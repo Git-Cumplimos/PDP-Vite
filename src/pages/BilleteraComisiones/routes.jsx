@@ -11,6 +11,9 @@ const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
 const MovimientoComisionesCupo = lazy(() =>
   import("./Views/MovimientoComisionesCupo/MovimientoComisionesCupo")
 );
+const DispersionUsuarioPadre = lazy(() =>
+  import("./Views/DispersionUsuarioPadre")
+);
 const BilleteraComisiones = lazy(() => import("./BilleteraComisiones"));
 
 const listPermissions = Object.values(enumBilleteraComisiones);
@@ -31,6 +34,13 @@ const rutasBilleteraComisiones = [
         component: MovimientoComisionesCupo,
         permission: [enumBilleteraComisiones.movimiento_comisiones_cupo],
         subRoutes: [],
+      },
+      {
+        link: "/billetera-comisiones/movimiento-comisiones-cupo-usuario-padre",
+        label: <AppIcons Logo={"RETIRO"} name={"Movimiento comisiones cupo"} />,
+        component: DispersionUsuarioPadre,
+        permission: [enumBilleteraComisiones.movimiento_comisiones_cupo],
+        show: false,
       },
     ],
   },
