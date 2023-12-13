@@ -17,7 +17,8 @@ export const useFetchMovii = (
         "POST",
         `'Trx ${name_}'`,
         true,
-        false
+        false,
+        name_ === "Realizar depósito Movii"
       );
       const fetchConsulta = fetchCustom(
         url_consulta_,

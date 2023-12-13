@@ -29,9 +29,12 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
+import { useMFA } from "../../../../../components/Base/MFAScreen";
 
 const Deposito = () => {
   const navigate = useNavigate();
+
+  const { submitEventSetter } = useMFA();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosGrupoAval.maxDepositoCuentas,
@@ -301,28 +304,28 @@ const Deposito = () => {
         notifyError("No se ha podido conectar al servidor");
       });
   }, [
-    numCuenta,
-    valor,
-    tipoCuenta,
-    userDoc,
-    fetchDepositoCorresponsalGrupoAval,
     roleInfo,
-    datosConsulta,
-    DataBanco,
+    valor,
+    DataBanco?.idBanco,
+    userDoc,
+    tipoCuenta,
     phone,
-    pdpUser.name,
+    numCuenta,
+    pdpUser?.uname,
+    fetchDepositoCorresponsalGrupoAval,
+    handleClose,
   ]);
 
   return (
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depósitos</h1>
+        <h1 className="text-3xl mt-6">Depósitos</h1>
         <br></br>
         <Form onSubmit={onSubmitModal} grid>
           <Select
-            id='banco'
-            label='Banco a depositar'
+            id="banco"
+            label="Banco a depositar"
             options={optionsBanco}
             value={banco}
             onChange={(e) => {
@@ -331,8 +334,8 @@ const Deposito = () => {
             required
           />
           <Select
-            id='tipoCuenta'
-            label='Tipo de cuenta'
+            id="tipoCuenta"
+            label="Tipo de cuenta"
             options={options}
             value={tipoCuenta}
             required
@@ -341,11 +344,11 @@ const Deposito = () => {
             }}
           />
           <Input
-            id='numCuenta'
-            name='numCuenta'
-            label='Número de cuenta'
-            type='text'
-            autoComplete='off'
+            id="numCuenta"
+            name="numCuenta"
+            label="Número de cuenta"
+            type="text"
+            autoComplete="off"
             minLength={"9"}
             maxLength={"14"}
             value={numCuenta}
@@ -358,11 +361,11 @@ const Deposito = () => {
             required
           />
           <Input
-            id='docCliente'
-            name='docCliente'
-            label='Documento cliente'
-            type='text'
-            autoComplete='off'
+            id="docCliente"
+            name="docCliente"
+            label="Documento cliente"
+            type="text"
+            autoComplete="off"
             minLength={"5"}
             maxLength={"12"}
             value={userDoc}
@@ -375,11 +378,11 @@ const Deposito = () => {
             required
           />
           <Input
-            id='numCliente'
-            name='numCliente'
-            label='Número celular'
-            type='text'
-            autoComplete='off'
+            id="numCliente"
+            name="numCliente"
+            label="Número celular"
+            type="text"
+            autoComplete="off"
             minLength={"10"}
             maxLength={"10"}
             value={phone}
@@ -398,11 +401,11 @@ const Deposito = () => {
             required
           />
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a depositar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a depositar"
+            autoComplete="off"
+            type="text"
             maxLength={"10"}
             // value={makeMoneyFormatter(0).format(valor)}
             // onInput={(ev) => setValor(onChangeMoney(ev))}
@@ -432,9 +435,10 @@ const Deposito = () => {
               : loadingDepositoCorresponsalGrupoAval
               ? () => {}
               : handleClose
-          }>
+          }
+        >
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketsAval refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
@@ -445,9 +449,10 @@ const Deposito = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type='submit'
-                  onClick={onMakePayment}
-                  disabled={loadingDepositoCorresponsalGrupoAval}>
+                  type="submit"
+                  onClick={submitEventSetter(onMakePayment)}
+                  disabled={loadingDepositoCorresponsalGrupoAval}
+                >
                   Realizar depósito
                 </Button>
                 {/* {showBTNConsulta ? 
@@ -466,7 +471,8 @@ const Deposito = () => {
                     handleClose();
                     notifyError("Transacción cancelada por el usuario");
                   }}
-                  disabled={loadingDepositoCorresponsalGrupoAval}>
+                  disabled={loadingDepositoCorresponsalGrupoAval}
+                >
                   Cancelar
                 </Button>
               </ButtonBar>

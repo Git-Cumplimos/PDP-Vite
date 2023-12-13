@@ -1,8 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 import { fetchAutorizadores } from "./fetchRevalAutorizadores";
 
-const urlConvenios =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlConvenios = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlConvenios = 'http://127.0.0.1:5000'
 const urlAutorizadores = process.env.REACT_APP_URL_REVAL_AUTORIZADOR;
 
 export const postConvenios = async (bodyObj) => {

@@ -6,12 +6,13 @@ import Input from "../../../../../components/Base/Input";
 import { notifyPending,notifyError } from "../../../../../utils/notify";
 import Select from "../../../../../components/Base/Select";
 import TextArea from "../../../../../components/Base/TextArea";
+import ButtonLink from "../../../../../components/Base/ButtonLink";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import {
   buscarIdTrx,
   ReportFaltantesSobr,
 } from "../../../utils/fetchCaja";
-import { Link } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 
 const ReporteSobranteFaltantes = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +20,31 @@ const ReporteSobranteFaltantes = () => {
   const [NumId, setNumId] = useState('');
   const id_comercio=useAuth().roleInfo.id_comercio
   const id_user=useAuth().pdpUser.uuid
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const insertFaltantesSobr = useCallback((body) => {
+    notifyPending(
+      ReportFaltantesSobr(body),
+      {
+        render: () => {
+          setIsLoading(true);
+          return "Reportando Novedad";
+        },
+      },
+      {
+        render: ({ data: response }) => {
+          setIsLoading(false);
+          if (response?.codigo === 200) {
+            navigate('/gestion/arqueo');
+            return "Novedad Reportada";
+          }else{
+            return "Error al Reportar";
+          }
+        },
+      },
+    );
+  }, [navigate]);
 
   const handleSubmit = useCallback(
     (ev) => {
@@ -27,9 +53,9 @@ const ReporteSobranteFaltantes = () => {
       const body = Object.fromEntries(
         Object.entries(Object.fromEntries(formData)).map(([key, val]) => {
           return [key,val];}));
-      {body['id_comercio']=id_comercio};
-      {body['pk_id_cajero']=id_user};
-      if (body.pk_id_transaccion !== '') {
+      body['id_comercio']=id_comercio;
+      body['pk_id_cajero']=id_user;
+      if (body?.pk_id_transaccion !== '') {
         notifyPending(
           buscarIdTrx(body),
           {
@@ -40,39 +66,22 @@ const ReporteSobranteFaltantes = () => {
           },
           {
             render: ({ data: response }) => {
-              setIsLoading(false);
               if (response?.obj !== null) {
-                ReportFaltantesSobr(body)
-                return "Novedad Reportada";
+                insertFaltantesSobr(body)
+                return "ID de transacción válido";
               }else{
+                setIsLoading(false);
                 return "Número de la transacción ingresado no corresponde a una transacción del comercio";
               }
             },
           },
         );
       }else{
-        notifyPending(
-          ReportFaltantesSobr(body),
-          {
-            render: () => {
-              setIsLoading(true);
-              return "Reportando Novedad";
-            },
-          },
-          {
-            render: ({ data: response }) => {
-              setIsLoading(false);
-              if (response?.codigo === 200) {
-                return "Novedad Reportada";
-              }else{
-                return "Error al Reportar";
-              }
-            },
-          },
-        );
+        delete body.pk_id_transaccion
+        insertFaltantesSobr(body)
       }
     },
-    []
+    [id_comercio,id_user,insertFaltantesSobr]
   );
 
   const handleChangeCurrenci = (e) => {
@@ -143,7 +152,15 @@ const ReporteSobranteFaltantes = () => {
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Link to={`/gestion/arqueo`}><Button type="button" onClick={() => { notifyError("Reporte Cancelado") }}>Cancelar</Button></Link>
+          {pathname === "/gestion/arqueo/reporte-sobrantes-faltantes" && (
+            <ButtonLink
+              className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
+              to={"/gestion/arqueo"}
+              onClick={() => { notifyError("Reporte Cancelado") }}
+            >
+              Cancelar
+            </ButtonLink>
+          )}
           <Button type="submit" disabled={isLoading}>
             Reportar Novedad
             <p className="w-full whitespace-pre-wrap"></p>

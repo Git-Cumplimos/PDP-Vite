@@ -6,47 +6,7 @@ import classes from "../pagarMoviliza.module.css";
 import Form from "../../../../../components/Base/Form/Form";
 
 //Clases estilos
-const { styleComponentsInput, formItem , ocultar} = classes;
-
-// export const LecturaBarcode = ({ loadingPeticion, onSubmit, buttonDelate }) => {
-//   return (
-//     <Fragment>
-//       <ButtonBar></ButtonBar>
-//       <BarcodeReader onSearchCodigo={onSubmit} disabled={loadingPeticion} />
-//       <ButtonBar></ButtonBar>
-
-//       <ButtonBar></ButtonBar>
-//       <h2 className="text-1xl mt-6">Escanee el código de barras</h2>
-//       <ButtonBar></ButtonBar>
-//     {console.log({ loadingPeticion, onSubmit, buttonDelate })}
-        
-
-//                 <Input
-//           required
-//           className={styleComponentsInput}
-//           type="text"
-//           minLength="30"
-//           maxLength="30"
-//           autoComplete="off"
-//           value={onSubmit}
-//           onChange={onSubmit}
-//         />
-      
-
-//       {!loadingPeticion ? (
-//         <div className={formItem} ref={buttonDelate}>
-//           <button type="reset">Volver a ingresar código de barras</button>
-//         </div>
-                 
-//       ) : (
-//         <Fragment>
-//           <ButtonBar></ButtonBar>
-//           <h1 className="text-2xl font-semibold">Procesando . . .</h1>
-//         </Fragment>
-//       )}
-//     </Fragment>
-//   );
-// };
+const { styleComponentsInput, formItem } = classes;
 
   export const LecturaBarcode = ({
     loadingPeticion,
@@ -60,7 +20,8 @@ const { styleComponentsInput, formItem , ocultar} = classes;
     onSubmitBarcode,
     bloqueoInput,
     resetConsultaBarcode,
-    token
+    token,
+    cambioBarcodeBoton
   }) => {
     return (
       <Fragment>
@@ -100,40 +61,43 @@ const { styleComponentsInput, formItem , ocultar} = classes;
           />
         )}
 
-
-
-      {/* {!loadingPeticion ? (
-        <div className={formItem} >
-          <button type="reset">Volver a ingresar código de barras</button>
-        </div>
-      ) : (
-        <Fragment>
-          <ButtonBar></ButtonBar>
-          <h1 className="text-2xl font-semibold">Procesando . . .</h1>
-        </Fragment>
-      )} */}
-
         {!loadingPeticion ? (
         <Fragment>
          <ButtonBar>
-         <button type={"submit"} onClick={onSubmitBarcode} disabled={loadingPeticion} className={ocultar} >Consultar código de barras</button>
+          {cambioBarcodeBoton?(
+          <Button  onClick={resetConsultaBarcode} disabled={loadingPeticion} >Volver a ingresar código de barras</Button>
+         ):(
+          <Button type={"submit"} onClick={onSubmitBarcode} disabled={loadingPeticion} >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consultar código de barras&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Button>
+         ) 
+         }
          </ButtonBar>
-         <ButtonBar>
-          <Button  onClick={resetConsultaBarcode} disabled={loadingPeticion}  >Volver a ingresar código de barras</Button>
-          </ButtonBar>
           </Fragment>
                  
       ) : (
         <Fragment>
           <ButtonBar></ButtonBar>
+          <br></br>
           <h1 className="text-2xl font-semibold">Procesando . . .</h1>
         </Fragment>
       )}
 
       <ButtonBar className="flex justify-center py-1">
-          <Button className={formItem} type={"submit"}  onClick={onSubmit} disabled={
-            token === "" || 
-            numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 300 ? !loadingPeticion : loadingPeticion }>
+          <Button 
+          className={formItem} 
+          type={"submit"}  
+          onClick={onSubmit} 
+          disabled={
+            (
+              token === "" || 
+              numeroMoviliza === "" ||
+              numeroMoviliza === 0 || 
+              0 >= numeroMoviliza.length || 
+              numeroMoviliza.length > 300 
+              ? !loadingPeticion : loadingPeticion
+              ) || (
+                !cambioBarcodeBoton ? true : false
+                ) 
+              }>
            Realizar consulta
           </Button>
           <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>

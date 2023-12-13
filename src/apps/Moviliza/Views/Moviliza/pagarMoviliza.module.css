@@ -26,7 +26,3 @@
 .formItem > button:disabled {
   @apply opacity-40 cursor-default;
 }
-
-.ocultar{
-  display: none;
-}

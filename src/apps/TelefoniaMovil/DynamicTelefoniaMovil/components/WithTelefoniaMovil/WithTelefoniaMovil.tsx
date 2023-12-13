@@ -86,11 +86,8 @@ const WithTelefoniaMovil = (
         <ComponectBody operadorCurrent={operadorCurrent}>
           <img
             className="w-24 "
-            src={
-              operadorCurrent?.logo?.includes("http")
-                ? operadorCurrent?.logo
-                : svgs?.[operadorCurrent?.logo]
-            }
+            src={`${svgs?.TELEFONIA_MOVIL}${operadorCurrent?.logo}`}
+            alt={operadorCurrent?.name}
           ></img>
         </ComponectBody>
       ) : (

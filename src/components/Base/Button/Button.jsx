@@ -6,7 +6,7 @@ const Button = ({ self = false, ...button }) => {
   const onClickInitFunc = button.onClick;
   const [isClicking, setIsClicking] = useState(false);
   const [timerOnSubmit, setTimerOnSubmit] = useState(null);
-  if (onClickInitFunc) {
+  if (onClickInitFunc && button?.type !== "submit") {
     button.onClick = (e) => {
       e.preventDefault();
       try {
@@ -16,7 +16,7 @@ const Button = ({ self = false, ...button }) => {
           setTimerOnSubmit(
             setTimeout(() => {
               setIsClicking(false);
-            }, 2000)
+            }, 1000)
           );
         }
       } catch (error) {
@@ -39,7 +39,9 @@ const Button = ({ self = false, ...button }) => {
       clearTimeout(timer);
     };
   }, []);
-
+  button.onKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") e.preventDefault();
+  };
   return self ? (
     <button {...button} disabled={isClicking || button.disabled} />
   ) : (

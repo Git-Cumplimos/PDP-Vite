@@ -3,26 +3,25 @@ import { lazy } from "react";
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import { TypingRoutes } from "../../utils/TypingUtils";
+import { enumPermisosAlmaseg } from "./utils/enumPermisosAlmaseg";
 
 const ConsultaGeneracionPin = lazy(
-  () => import("./views/ConsultaGeneracionPin")
+  () => import("./views/ConsultaPagoFacturasAlamaseg")
 );
-
+const listPermissions = Object.values(enumPermisosAlmaseg);
 const routesAlmaseg = {
   link: "/almaseg",
-  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Almaseg" />,
+  label: <AppIcons Logo={"ALMASEG"} name="Almaseg" />,
   component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
     <HNavbar links={subRoutes} />
   ),
-  permission: [100],
+  permission: [...listPermissions],
   subRoutes: [
     {
-      link: "/almaseg/consulta-generacion-pin",
-      label: (
-        <AppIcons Logo={"RECARGA_CELULAR"} name="Consulta Generación de PIN" />
-      ),
+      link: "/almaseg/retiro-almaseg",
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Retiro Almaseg" />,
       component: ConsultaGeneracionPin,
-      permission: [100],
+      permission: [enumPermisosAlmaseg.ALMASEG_RETIROS],
       subRoutes: [],
     },
   ],

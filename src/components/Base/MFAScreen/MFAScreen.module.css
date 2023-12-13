@@ -35,6 +35,10 @@ form > .field > button {
   @apply py-2 px-8 my-6 rounded-full font-medium bg-secondary-light opacity-100 transition-opacity duration-300;
 }
 
+form > .field > button[type="submit"] {
+  @apply bg-primary text-white;
+}
+
 form > .field > button:active {
   @apply opacity-70;
 }

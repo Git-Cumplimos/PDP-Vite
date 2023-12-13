@@ -1,4 +1,4 @@
-import fetchData from "../../../../utils/fetchData";
+import { fetchDataTotp } from "../../../../utils/MFA";
 const url_banco_agrario = `${process.env.REACT_APP_URL_BANCO_AGRARIO}`;
 
 // export ValidationRetiroEfectivo
@@ -10,7 +10,7 @@ export const depositoBancoAgrario = async (bodyObj) => {
     });
   }
   try {
-    const res = await fetchData(
+    const res = await fetchDataTotp(
       `${url_banco_agrario}/banco-agrario/depositoCorresponsal`,
       "POST",
       {},

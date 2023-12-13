@@ -25,53 +25,56 @@ const SearchConveniosNotInGruposConvenios = ({
 
   const tableConvenios = useMemo(() => {
     return [
-      ...convenios.map(({ nombre_convenio, id_convenio }) => {
+      ...convenios.map(({ nombre_convenio, pk_fk_id_convenio,nombre_autorizador}) => {
         return {
-          id_convenio,
+          pk_fk_id_convenio,
           nombre_convenio,
+          nombre_autorizador,
         };
       }),
     ];
   }, [convenios]);
+  
   useEffect(() => {
     fetchConveniosNotInGruposConveniosFunc();
   }, [page, limit, dataConvenios]);
+
   const fetchConveniosNotInGruposConveniosFunc = useCallback(() => {
     let obj = {};
     if (parseInt(dataConvenios.id_convenio))
-      obj["id_convenio"] = parseInt(dataConvenios.id_convenio);
+      obj["pk_fk_id_convenio"] = parseInt(dataConvenios.id_convenio);
     if (dataConvenios.nombre_convenio)
       obj["nombre_convenio"] = dataConvenios.nombre_convenio;
-
     obj["pk_tbl_grupo_convenios"] = pk_tbl_grupo_convenios;
     fetchConveniosNotInGruposConvenios({
       ...obj,
       page,
       limit,
-      sortBy: "id_convenio",
+      sortBy: "pk_fk_id_convenio",
       sortDir: "DESC",
     })
       .then((autoArr) => {
         setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results ?? []);
+        setConvenios(autoArr?.results ?? []);    
       })
       .catch((err) => console.error(err));
   }, [page, limit, dataConvenios]);
+
   const addConvenio = useCallback(
     (ev, i) => {
       ev.preventDefault();
       if (
         !selectedGruposConvenios?.convenios_agregar?.find(
-          (a) => a?.fk_convenio === convenios[i].id_convenio
+          (a) => a?.id_convenio_autorizador === convenios[i].id_convenio_autorizador
         )
       ) {
         const obj = { ...selectedGruposConvenios };
         obj["convenios_agregar"] = [
           ...obj["convenios_agregar"],
           {
-            fk_convenio: convenios[i].id_convenio,
-            fk_tbl_grupo_convenios:
-              selectedGruposConvenios["pk_tbl_grupo_convenios"],
+            fk_convenio: convenios[i].pk_fk_id_convenio,
+            fk_tbl_grupo_convenios:selectedGruposConvenios["pk_tbl_grupo_convenios"],
+            id_convenio_autorizador:convenios[i].id_convenio_autorizador
           },
         ];
         setSelectedGruposConvenios((old) => {
@@ -87,12 +90,13 @@ const SearchConveniosNotInGruposConvenios = ({
     },
     [selectedGruposConvenios, convenios]
   );
+
   return (
     <>
       <TableEnterprise
         title='Lista de convenios'
         maxPage={maxPages}
-        headers={["Id", "Comercio"]}
+        headers={["Id", "Comercio", "Autorizador"]}
         data={tableConvenios}
         onSelectRow={addConvenio}
         onSetPageData={setPageData}>
@@ -103,7 +107,6 @@ const SearchConveniosNotInGruposConvenios = ({
           name='id_convenio'
           minLength='1'
           maxLength='10'
-          // required
           value={dataConvenios.id_convenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -120,7 +123,6 @@ const SearchConveniosNotInGruposConvenios = ({
           name='nombre_convenio'
           minLength='1'
           maxLength='10'
-          // required
           value={dataConvenios.nombre_convenio}
           onInput={(e) => {
             setDataConvenios((old) => {

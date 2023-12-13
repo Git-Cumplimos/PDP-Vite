@@ -5,6 +5,9 @@ import Input from "../../../../components/Base/Input/Input";
 import Select from "../../../../components/Base/Select/Select";
 import { notifyError } from "../../../../utils/notify";
 import useDelayedCallback from "../../../../hooks/useDelayedCallback";
+import { makeDateFormatter } from "../../../../utils/functions";
+
+const dateFormatter = makeDateFormatter(true);
 
 const ConsultaDatafonos = ({
   navigate,
@@ -26,18 +29,30 @@ const ConsultaDatafonos = ({
   const tableDatafonos = useMemo(() => {
     return [
       ...datafonos.map(
-        ({ pos_id, fk_comercio_asociado, numero_serie, estado }) => {
+        ({
+          pos_id,
+          fk_comercio_asociado,
+          numero_serie,
+          estado,
+          fecha_creacion,
+          fecha_modificacion,
+        }) => {
           if (type === "Gestion") {
             return {
               pos_id,
               fk_comercio_asociado: fk_comercio_asociado ?? "No asociado",
-              numero_serie,
               estado: estado ? "Activo" : "Inactivo",
+              fecha_creacion:
+                dateFormatter.format(new Date(fecha_creacion)) ?? "",
+              fecha_modificacion:
+                dateFormatter.format(new Date(fecha_modificacion)) ?? "",
             };
           } else {
             return {
-              pos_id,
-              numero_serie,
+              pos_id: pos_id,
+              numero_serie: numero_serie ?? "",
+              fecha_creacion: fecha_creacion ?? "",
+              fecha_modificacion: fecha_modificacion ?? "",
             };
           }
         }
@@ -123,57 +138,67 @@ const ConsultaDatafonos = ({
         maxPage={maxPages}
         headers={
           type === "Gestion"
-            ? ["Pos Id", "Id Comercio", "Número de serie", "Estado"]
-            : ["Pos Id", "Número de serie"]
+            ? [
+                "Pos Id",
+                "Id Comercio",
+                "Estado",
+                "Fecha de Registro",
+                "Fecha de Modificación",
+              ]
+            : [
+                "Pos Id",
+                "Número de serie",
+                "Fecha de Registro",
+                "Fecha de Modificación",
+              ]
         }
         data={tableDatafonos}
         onSelectRow={selectDatafono}
-        onSetPageData={setPageData}>
+        onSetPageData={setPageData}
+      >
         <Input
-          id='pos_id'
-          label='Id datáfono'
-          type='text'
-          name='pos_id'
-          minLength='1'
-          maxLength='10'
-          // required
+          id="pos_id"
+          label="Id datáfono"
+          type="text"
+          name="pos_id"
+          minLength="1"
+          maxLength="10"
           value={dataDatafonos.pos_id}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
-              // const num = e.target.value;
               const valor = e.target.value;
               const num = valor.replace(/[\s\.-]/g, "");
               setDataDatafonos((old) => {
                 return { ...old, pos_id: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         {type === "Gestion" && (
           <>
             <Input
-              id='fk_comercio_asociado'
-              label='Id comercio'
-              type='text'
-              name='fk_comercio_asociado'
-              minLength='1'
-              maxLength='10'
-              // required
+              id="fk_comercio_asociado"
+              label="Id comercio"
+              type="text"
+              name="fk_comercio_asociado"
+              minLength="1"
+              maxLength="10"
               value={dataDatafonos.fk_comercio_asociado}
               onInput={(e) => {
                 if (!isNaN(e.target.value)) {
-                  // const num = e.target.value;
                   const valor = e.target.value;
                   const num = valor.replace(/[\s\.-]/g, "");
                   setDataDatafonos((old) => {
                     return { ...old, fk_comercio_asociado: num };
                   });
                 }
-              }}></Input>
+              }}
+            ></Input>
             <Select
-              className='place-self-stretch'
-              id='estado'
-              name='estado'
-              label='Estado del datáfono'
+              className="place-self-stretch"
+              id="estado"
+              name="estado"
+              label="Estado del datáfono"
               required={true}
               options={{
                 Inactivo: false,

@@ -23,9 +23,12 @@ import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import useMoney from "../../../../../hooks/useMoney";
 import { enumParametrosDavivienda } from "../../utils/enumParametrosDavivienda";
+import { useMFA } from "../../../../../components/Base/MFAScreen";
 
 const Deposito = () => {
   const navigate = useNavigate();
+
+  const { submitEventSetter } = useMFA();
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: enumParametrosDavivienda.maxDepositoCuentas,
@@ -359,7 +362,7 @@ const Deposito = () => {
               <ButtonBar>
                 <Button
                   type='submit'
-                  onClick={onMakePayment}
+                  onClick={submitEventSetter(onMakePayment)}
                   disabled={loadingDepositoCorresponsal}>
                   Aceptar
                 </Button>

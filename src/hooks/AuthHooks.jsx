@@ -11,25 +11,33 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notify, notifyError } from "../utils/notify";
 import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
-import { fetchSecure } from "../utils/functions";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
-// const urlQuota = `http://127.0.0.1:5000/cupo`;
-const urlComisiones = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/servicio-wallet-comisiones/consulta-wallet-comercio`;
 const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user = process.env.REACT_APP_URL_COGNITO;
 const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
+const url_pdp_commerce = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 const validateUser = async (email) => {
   const get = {
     email: email,
   };
+  if (!email) {
+    throw new Error("Sin datos de busqueda", {
+      cause: "custom",
+    });
+  }
 
   try {
     const res = await fetchData(url_user, "GET", get, {}, {}, false);
+    if (!res?.Status) {
+      throw new Error("Usuario invalido", {
+        cause: "custom",
+      });
+    }
     return res;
   } catch (err) {
     throw err;
@@ -75,7 +83,8 @@ const initialUser = {
   roleInfo: null,
   quotaInfo: null,
   pdpUser: null,
-  userPermissions: null,
+  userPermissions: [],
+  commerceInfo: null,
 };
 
 const SIGN_IN = "SIGN_IN";
@@ -86,6 +95,7 @@ const SET_ROLEINFO = "SET_ROLEINFO";
 const SET_PERMISSIONS = "SET_PERMISSIONS";
 const SET_PDPUSER = "SET_PDPUSER";
 const SET_QUOTA = "SET_QUOTA";
+const SET_COMMERCE_INFO = "SET_COMMERCE_INFO";
 
 const reducerAuth = (userState, action) => {
   const { payload } = action;
@@ -117,6 +127,10 @@ const reducerAuth = (userState, action) => {
       const { quota } = payload;
       return { ...userState, quotaInfo: quota };
 
+    case SET_COMMERCE_INFO:
+      const { commerce } = payload;
+      return { ...userState, commerceInfo: commerce };
+
     case CONFIRM_SIGN_IN:
       const { loggedUser } = payload;
       if (!loggedUser) {
@@ -139,6 +153,7 @@ export const AuthContext = createContext({
   forgotPassword: () => {},
   forgotPasswordSubmit: () => {},
   resetTopt: () => {},
+  updateCommerceQuota: () => {},
   parameters: null,
   qr: null,
   ...initialUser,
@@ -152,12 +167,13 @@ export const useProvideAuth = () => {
   const [qr, setQr] = useState("");
 
   const [parameters, setParameters] = useState("");
+  const [, setSuserInactive] = useState("");
 
   const [timer, setTimer] = useState(null);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
-  const { cognitoUser, roleInfo } = userState;
+  const { cognitoUser, roleInfo, pdpUser } = userState;
   const id_comercio = roleInfo?.id_comercio;
   const id_dispositivo = roleInfo?.id_dispositivo;
 
@@ -231,20 +247,6 @@ export const useProvideAuth = () => {
       .catch(() => {});
   }, [navigate]);
 
-  const handleSetupTOTP = useCallback(async (user) => {
-    try {
-      const validartoken = await Auth.setupTOTP(user);
-      const str =
-        "otpauth://totp/AWSCognito:" +
-        "Punto de Pago Token" +
-        "?secret=" +
-        validartoken +
-        "&issuer=" +
-        "Punto de Pago Multibanco";
-      setQr(str);
-    } catch (err) {}
-  }, []);
-
   const checkTOTPFlow = useCallback(
     async (user) => {
       if (!user || !(user?.challengeName === "MFA_SETUP")) {
@@ -270,20 +272,17 @@ export const useProvideAuth = () => {
 
       try {
         const semillaAws = await Auth.setupTOTP(user);
-        const response = await fetch(
-          `${public_urls}/users-totp/generate`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: userState?.pdpUser?.email,
-              otp_base32: semillaAws,
-            }),
-            headers: {
-              // Authorization: `Bearer ${session}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${public_urls}/users-totp/generate`, {
+          method: "POST",
+          body: JSON.stringify({
+            email: userState?.pdpUser?.email,
+            otp_base32: semillaAws,
+          }),
+          headers: {
+            // Authorization: `Bearer ${session}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (!response.ok) {
           notifyError(
             <p>
@@ -439,17 +438,24 @@ export const useProvideAuth = () => {
 
   const [getQuota] = useFetchDispatchDebounce({
     onSuccess: useCallback((quota) => {
-      const tempRole = { quota: 0, comision: 0, sobregiro: 0, alerta: '' };
+      const tempRole = {
+        quota: 0,
+        comision: 0,
+        sobregiro: 0,
+        sobregirovalue: 0,
+        alerta: "",
+      };
       tempRole.quota = quota["cupo disponible"];
       tempRole.comision = quota["comisiones"];
       tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
+      tempRole.sobregirovalue = quota["sobregiro"];
       tempRole.alerta = quota["alerta cupo"];
       dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
     }, []),
     onError: useCallback((error) => {
       dispatchAuth({
         type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: '' } },
+        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" } },
       });
       if (error?.cause === "custom") {
         notifyError(error.message);
@@ -459,9 +465,18 @@ export const useProvideAuth = () => {
     }, []),
   });
 
+  const updateCommerceQuota = useCallback(() => {
+    if (id_comercio && id_dispositivo) {
+      getQuota(
+        `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
+      );
+    }
+  },[id_comercio, id_dispositivo, getQuota]);
+
   const [getSuserInfo] = useFetchDispatchDebounce({
     onSuccess: useCallback((suserInfo) => {
       let _roleinfo = {};
+      setSuserInactive((old) => ("msg" in suserInfo ? suserInfo?.msg : old));
       if (!("msg" in suserInfo)) {
         _roleinfo = structuredClone(suserInfo);
       }
@@ -478,19 +493,23 @@ export const useProvideAuth = () => {
         });
     }, []),
     onError: useCallback((error) => {
-      if (error?.cause === "custom") {
+      if (error?.cause === "custom-403") {
         notifyError(error.message);
+        signOut();
+      } else if (error?.cause === "custom") {
+        notifyError(error.message);
+        setSuserInactive(error.message);
       } else {
         console.error(error);
       }
-    }, []),
+    }, [signOut]),
   });
 
   const [getLoginPdp] = useFetchDispatchDebounce({
     onSuccess: useCallback(
       (res) => {
         const pdpU = res?.obj?.pdpU;
-        if (!pdpU && !("active" in pdpU) && !pdpU.active) {
+        if (!pdpU && !pdpU.active) {
           notifyError("Usuario inactivo");
           signOut();
           return;
@@ -498,12 +517,30 @@ export const useProvideAuth = () => {
 
         dispatchAuth({
           type: SET_PERMISSIONS,
-          payload: { uAccess: res?.obj?.uAccess },
+          payload: { uAccess: res?.obj?.uAccess ?? [] },
         });
         dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
       },
       [signOut]
     ),
+    onError: useCallback(
+      (error) => {
+        if (error?.cause in ["custom-403", "custom"]) {
+          notifyError(error.message);
+          signOut();
+        } else {
+          console.error(error);
+        }
+      },
+      [signOut]
+    ),
+  });
+
+  const [getComercios] = useFetchDispatchDebounce({
+    onSuccess: useCallback((res) => {
+      const commerce = res?.obj;
+      dispatchAuth({ type: SET_COMMERCE_INFO, payload: { commerce } });
+    }, []),
     onError: useCallback((error) => {
       if (error?.cause === "custom") {
         notifyError(error.message);
@@ -541,12 +578,16 @@ export const useProvideAuth = () => {
   }, [pathname]);
 
   useEffect(() => {
-    if (id_comercio && id_dispositivo) {
-      getQuota(
-        `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
+    updateCommerceQuota();
+  }, [pathname, updateCommerceQuota]);
+
+  useEffect(() => {
+    if (id_comercio) {
+      getComercios(
+        `${url_pdp_commerce}/comercios/consultar-unique?pk_comercio=${id_comercio}`
       );
     }
-  }, [pathname, id_comercio, id_dispositivo, getQuota]);
+  }, [pathname, id_comercio, getComercios]);
 
   useEffect(() => {
     const email = userState?.userInfo?.attributes?.email;
@@ -554,11 +595,28 @@ export const useProvideAuth = () => {
       getSuserInfo(
         `${urlLog}?correo=${userState?.userInfo?.attributes?.email}`
       );
+    }
+  }, [userState?.userInfo?.attributes?.email, getSuserInfo]);
+
+  useEffect(() => {
+    const email = userState?.userInfo?.attributes?.email;
+    if (email && roleInfo) {
       getLoginPdp(
         `${url_iam_pdp_users}/user-login?email=${userState?.userInfo?.attributes?.email}`
       );
     }
-  }, [userState?.userInfo?.attributes?.email, getSuserInfo, getLoginPdp]);
+  }, [userState?.userInfo?.attributes?.email, roleInfo, getLoginPdp]);
+
+  useEffect(() => {
+    const isPdpCommerce = !!pdpUser?.fk_id_comercio;
+    setSuserInactive((old) => {
+      if (isPdpCommerce && old) {
+        notifyError(old, false, { toastId: "failed-suser" });
+        signOut();
+      }
+      return "";
+    });
+  }, [pdpUser?.fk_id_comercio, signOut]);
 
   useEffect(() => {
     checkTOTPFlow(cognitoUser);
@@ -587,6 +645,7 @@ export const useProvideAuth = () => {
     parameters,
     infoTicket,
     validateUser,
+    updateCommerceQuota,
     ...userState,
   };
 };

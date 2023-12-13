@@ -158,25 +158,8 @@ const svgs = {
   SMS_ENVIO_DE_MENSAJE: `${urlAssets}/assets/svg/recaudo/SMS/SMSENVIODEMENSAJE.svg`,
 
   //TelefoniaMovil
-  TELEFONIA_MOVIL_MOVISTAR: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_MOVISTAR.svg`,
-  TELEFONIA_MOVIL_CLARO: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_CLARO.svg`,
-  TELEFONIA_MOVIL_TIGO: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_TIGO.svg`,
-  TELEFONIA_MOVIL_WOM: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Wom1.png`,
-  TELEFONIA_MOVIL_UFF: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Uff.png`,
-  TELEFONIA_MOVIL_EXITO: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_EXITO.svg`,
-  TELEFONIA_MOVIL_VIRGIN: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_VIRGIN.svg`,
-  TELEFONIA_MOVIL_DIRECTV: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_DIRECT_TV.svg`,
-  TELEFONIA_MOVIL_UNE: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Une.png`,
-  TELEFONIA_MOVIL_AVANTEL: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Avantel.png`,
-  TELEFONIA_MOVIL_ETB: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Etb.png`,
-  TELEFONIA_MOVIL_FLASHMOBILE: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TELEFONIA_MOVIL_FLASH.svg`,
-  TELEFONIA_MOVIL_COMUNICATE: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Comunicate.png`,
-  TELEFONIA_MOVIL_BUENOFON: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL/TelefoniaMovil_Logo_Buenofon.png`,
-
-  //RECARGAS CELULAR
+  TELEFONIA_MOVIL: `${urlAssets}/assets/svg/recaudo/TELEFONIA_MOVIL`,
   RECARGA_CELULAR: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/RECARGASCELULAR.svg`,
-
-  //MOVISTAR
   MOVISTAR: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR.svg`,
   MOVISTAR_RECARGAS: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_RECARGAS.svg`,
   MOVISTAR_PAQUETES: `${urlAssets}/assets/svg/recaudo/RECARGAS_CELULAR/MOVISTAR/MOVISTAR_PAQUETES.svg`,
@@ -221,7 +204,17 @@ const svgs = {
   CREZCAMOS_PAGO_CREDITOS: `${urlAssets}/assets/svg/recaudo/CREZCAMOS/CREZCAMOS.png`,
 
   //MOVILIZA
-  MOVILIZA: `${urlAssets}/assets/svg/recaudo/MOVILIZA/Logo_Moviliza.png`,
+  MOVILIZA: `${urlAssets}/assets/svg/recaudo/MOVILIZA/MOVILIZA.svg`,
+
+  //EMCALI
+  EMCALI: `${urlAssets}/assets/svg/recaudo/EMCALI/EMCALI.svg`,
+
+  //ALMASEG
+  ALMASEG: `${urlAssets}/assets/svg/recaudo/ALMASEG/ALMASEG.svg`,
+
+  //APUESTAS DEPORTIVAS
+  APUESTAS_DEPORTIVAS: `${urlAssets}/assets/svg/recaudo/APUESTAS_DEPORTIVAS/APUESTAS_DEPORTIVAS.svg`,
+
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
