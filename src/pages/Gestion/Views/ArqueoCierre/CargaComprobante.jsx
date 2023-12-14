@@ -164,9 +164,6 @@ const CargaComprobante = () => {
         const { url, fields } = resFile.obj;
         const filename = fields.key;
   
-        /**
-         * Subir informacion a db
-         */
         const reqBody = {
           fk_nombre_entidad: selectedEntity,
           fk_tipo_comprobante: movementType,
