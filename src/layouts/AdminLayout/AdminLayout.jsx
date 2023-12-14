@@ -15,7 +15,7 @@ import { useImgs } from "../../hooks/ImgsHooks";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
 import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
-import { searchCierre } from "../../pages/Gestion/utils/fetchCaja";
+import { searchCierre,verValorBoveda } from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
 import ButtonBar from "../../components/Base/ButtonBar";
 import ModalAlert from "./ModalAlert";
@@ -25,6 +25,9 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
+
+var Idpermission = []
+
 
 const AdminLayout = () => {
   const {
@@ -38,18 +41,23 @@ const AdminLayout = () => {
     diasSobregiroD,
     cargar,
   } = classes;
+
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
+  const montoMaximoCaja = process.env.REACT_APP_MAX_MONTO_CAJA;
+  const porcentajeAlerta1 = process.env.REACT_APP_PORCENTAJE_ALERTA_1;
+  const porcentajeAlerta2 = process.env.REACT_APP_PORCENTAJE_ALERTA_2;
 
   const { quotaInfo, roleInfo, signOut, userPermissions, userInfo } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
   const { urlsPrivate: urls } = useUrls();
-
-  const [showModal, setShowModal] = useState(false);
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
+  const [ModalAlertBoveda, setModalAlertBoveda] = useState(true);
   const [cajaState, setCajaState] = useState("");
-
+  const [valorBoveda, setValorBoveda] = useState();
+  const [valorCaja, setMontoMaximoCaja] = useState(montoMaximoCaja);
+  const [conteoAlertaBoveda, setConteoAlertaBoveda] = useState(1);
+  
   const saldoDisponible = useMemo(() => {
     return formatMoney.format(quotaInfo?.quota ?? 0);
   }, [quotaInfo?.quota]);
@@ -72,6 +80,7 @@ const AdminLayout = () => {
   const closeCash = useCallback(() => {
     navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
   }, [navigate]);
+
   const navigateCommission = useCallback(() => {
     navigate(`/billetera-comisiones`);
   }, [navigate]);
@@ -134,6 +143,67 @@ const AdminLayout = () => {
     userInfo?.attributes?.name,
   ]);
 
+  const handleCloseBoveda = useCallback(() => {
+    setModalAlertBoveda(false)
+    var valorporcentajeAlerta1 = montoMaximoCaja*porcentajeAlerta1/100
+    var valorporcentajeAlerta2 = montoMaximoCaja*porcentajeAlerta2/100
+    if (conteoAlertaBoveda === 1) {
+      setMontoMaximoCaja(parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta1))
+      setConteoAlertaBoveda(2)
+    }if(conteoAlertaBoveda === 2){
+      setMontoMaximoCaja(parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta2))
+      setConteoAlertaBoveda(3)
+    }if(conteoAlertaBoveda === 3){
+      navigate(`/gestion/arqueo/carga-comprobante`);
+    }
+  }, [porcentajeAlerta1,montoMaximoCaja,porcentajeAlerta2,conteoAlertaBoveda,navigate]);
+
+  useEffect(() => {
+    userPermissions.forEach(function(val) {
+      Idpermission.push(val.id_permission)
+    })
+    const conditions = [
+      roleInfo?.id_usuario !== undefined,
+      roleInfo?.id_comercio !== undefined,
+      roleInfo?.id_dispositivo !== undefined,
+      userPermissions?.map(({ id_permission }) => id_permission).includes(7012),
+      userPermissions?.map(({ id_permission }) => id_permission).includes(7013),
+    ];
+    // if (Idpermission.includes(7012) && Idpermission.includes(7013)) {
+    if (conditions.every((val) => val)) {
+      verValorBoveda({
+        id_usuario: roleInfo?.id_usuario,
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+      })
+        .then((res) => {
+          setModalAlertBoveda(true)
+          setValorBoveda(res?.obj[0]?.valor_boveda)
+          if (parseInt(quotaInfo?.quota)> 0) {
+            if ((parseInt(quotaInfo?.quota) - parseInt(res?.obj[0]?.valor_boveda)) < montoMaximoCaja) {
+              setConteoAlertaBoveda(1)
+              setMontoMaximoCaja(montoMaximoCaja)
+            }
+          } 
+        })
+        .catch((error) => {
+          if (error?.cause === "custom") {
+            notifyError(error?.message);
+          }
+          console.error(error?.message);
+        });
+    }
+    // }
+  }, [userPermissions,roleInfo,quotaInfo,valorCaja,pathname,montoMaximoCaja]);
+
+  const showModalAlertBoveda = useMemo(() => {
+    return (
+      (parseInt(quotaInfo?.quota)-parseInt(valorBoveda)) >= valorCaja &&
+      !pathname.includes("/gestion/arqueo/carga-comprobante") &&
+      ModalAlertBoveda
+    );
+  }, [valorBoveda, quotaInfo,pathname,valorCaja,ModalAlertBoveda]);
+
   const infoCaja = useMemo(() => {
     return (
       (cajaState === 1 &&
@@ -177,6 +247,22 @@ const AdminLayout = () => {
       </header>
       <main className="container">
         <Suspense fallback={<ContentBox />}>{!infoCaja && <Outlet />}</Suspense>
+        <Modal show={showModalAlertBoveda}>
+          <div className="items-center text-center">
+            <h1>
+              Señor usuario, ha superado el valor de efectivo en caja, Ingrese el efectivo de caja en boveda.
+              <ButtonBar>
+                <Button
+                  className="btn mx-auto d-block"
+                  type="submit"
+                  onClick={() => handleCloseBoveda()}
+                >
+                  {conteoAlertaBoveda !== 3 ?"Cerrar":"Movimiento Boveda"}
+                </Button>
+              </ButtonBar>
+            </h1>
+          </div>
+        </Modal>
         <Modal show={infoCaja}>
           {cajaState === 1 ? (
             <div className="items-center text-center">
