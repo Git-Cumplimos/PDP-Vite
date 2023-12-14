@@ -21,6 +21,7 @@ import {
   useFetchTuLlave,
   postDescargarSimulacion,
   postTerminosCondiciones,
+  postEnviarCodigoOtp,
 } from "../../hooks/fetchTuLlave";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
@@ -35,6 +36,7 @@ const RealizarCreditoFacil = () => {
   const [isChecked, setChecked] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [numOtp, setNumOtp] = useState("");
   const [listadoCuotas, setListadoCuotas] = useState([]);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
@@ -50,6 +52,7 @@ const RealizarCreditoFacil = () => {
     estadoPeticion: 0,
     formPeticion: 0,
     showModal: false,
+    showModalOtp: false,
   });
 
   const handleClose = useCallback(() => {
@@ -70,6 +73,7 @@ const RealizarCreditoFacil = () => {
       formPeticion: 0,
       showModal: false,
       plazo: 0,
+      showModalOtp: false,
     });
     navigate(-1);
     notifyError("Transacción cancelada por el usuario");
@@ -90,6 +94,7 @@ const RealizarCreditoFacil = () => {
       formPeticion: 0,
       showModal: false,
       plazo: 0,
+      showModalOtp: false,
     });
     consultaDecisor();
   }, []);
@@ -242,6 +247,30 @@ const RealizarCreditoFacil = () => {
       })
       .catch((err) => {
         notifyError("Error de conexion con el servicio");
+        console.error(err);
+      });
+  };
+
+  const fecthEnviarCodigoOtp = () => {
+    let obj = {
+      id_comercio: roleInfo?.id_comercio,
+      phone: "3164198687", //roleInfo?.telefono_comercio,
+    };
+    postEnviarCodigoOtp(obj)
+      .then(async (res) => {
+        if (res?.status) {
+          notify(res?.msg);
+          setDataCredito((old) => ({
+            ...old,
+            showModalOtp: true,
+            showModal: true,
+          }));
+        } else {
+          notifyError(res?.obj?.error);
+        }
+      })
+      .catch((err) => {
+        notifyError("Error al enviar código OTP");
         console.error(err);
       });
   };
@@ -636,12 +665,66 @@ const RealizarCreditoFacil = () => {
               </Button>
               {isChecked && (
                 <ButtonBar>
-                  <Button type="submit" onClick={fecthDescargarSimulacion}>
+                  <Button type="submit" onClick={fecthEnviarCodigoOtp}>
                     Desembolsar Crédito
                   </Button>
                 </ButtonBar>
               )}
             </ButtonBar>
+            {dataCredito?.showModalOtp ? (
+              <>
+                <Modal
+                  show={dataCredito?.showModal}
+                  handleClose={(e) => {
+                    navigate(-1);
+                    notifyError("Transacción cancelada por el usuario");
+                  }}
+                  className="flex align-middle"
+                >
+                  <Form onSubmit={fecthEnviarCodigoOtp} grid>
+                    <h1 className="text-2xl font-semibold text-center">
+                      ¿Está seguro de realizar el desembolso del crédito? Este
+                      será a su cupo
+                    </h1>
+                    <Input
+                      id="numeroOtp"
+                      label="Ingresar Código OTP"
+                      type="text"
+                      name="numeroOtp"
+                      minLength="6"
+                      maxLength="6"
+                      required
+                      autoComplete="off"
+                      value={numOtp}
+                      onInput={(e) => {
+                        let valor = e.target.value;
+                        let num = valor.replace(/[\s\.\-+eE]/g, "");
+                        if (!isNaN(num)) {
+                          setNumOtp(num);
+                        }
+                      }}
+                    />
+                    <ButtonBar>
+                      <Button
+                        type="button"
+                        onClick={(e) => {
+                          navigate(-1);
+                          notifyError("Transacción cancelada por el usuario");
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button type="submit">Aceptar</Button>
+                      <Button type="submit" onClick={fecthEnviarCodigoOtp}>
+                        Reenviar OTP
+                      </Button>
+                    </ButtonBar>
+                  </Form>
+                </Modal>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
         </>
       )}

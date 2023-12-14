@@ -5,6 +5,7 @@ import fetchData from "../../../utils/fetchData";
 
 const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
 const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
+const URL_ENVIAR_CODIGO_OTP = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/generar-codigo-otp`;
 
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
@@ -156,5 +157,25 @@ export const postTerminosCondiciones = async () => {
     return res;
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const postEnviarCodigoOtp = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${URL_ENVIAR_CODIGO_OTP}`,
+      "POST",
+      {},
+      bodyObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
   }
 };
