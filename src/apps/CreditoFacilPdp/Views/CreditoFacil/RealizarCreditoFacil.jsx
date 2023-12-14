@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { notifyError, notifyPending, notify } from "../../../../utils/notify";
@@ -32,10 +32,15 @@ const RealizarCreditoFacil = () => {
   const navigate = useNavigate();
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
-  const [table, setTable] = useState("");
   const [isChecked, setChecked] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [listadoCuotas, setListadoCuotas] = useState([]);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
+  const [maxPages, setMaxPages] = useState(0);
   const [dataCredito, setDataCredito] = useState({
     valorPreaprobado: 0,
     valorSimulacion: 0,
@@ -202,19 +207,7 @@ const RealizarCreditoFacil = () => {
               formPeticion: 1,
               showModal: false,
             }));
-            const formattedData = res?.obj?.listaCuotas.map((row) => ({
-              Cuota: row.cuota,
-              FechaPago: new Date(row.fechaPago).toLocaleDateString("es-ES", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              }),
-              ValorCuota: formatMoney.format(row?.valorCuota),
-              AbonoCapital: formatMoney.format(row?.abonoCapital),
-              AbonoInteres: formatMoney.format(row?.abonoIntereses),
-              SaldoCapital: formatMoney.format(row?.saldoCapital),
-            }));
-            setTable(formattedData);
+            setListadoCuotas(res?.obj?.listaCuotas);
             return "Simulación Crédito satisfactoria";
           },
         },
@@ -261,9 +254,12 @@ const RealizarCreditoFacil = () => {
         if (!res?.status) {
           notifyError(res?.msg);
         } else {
-          console.log(res);
           setUrl(res?.obj?.url);
           setModalOpen(true);
+          setDataCredito((old) => ({
+            ...old,
+            showModal: true,
+          }));
         }
       });
     }
@@ -278,16 +274,41 @@ const RealizarCreditoFacil = () => {
     consultaDecisor();
   }, []);
 
-  // Calcular número páginas
-  const calcularNumeroDePaginas = (totalRegistros, registrosPorPagina) => {
-    return Math.ceil(totalRegistros / registrosPorPagina);
-  };
+  const tablaSimulacionCreditos = useMemo(() => {
+    const startIndex = (page - 1) * limit;
+    const endIndex = Math.min(startIndex + limit, listadoCuotas.length);
+    const currentPageCuotas = listadoCuotas.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(listadoCuotas.length / limit);
 
-  const registrosPorPaginaPredeterminados = 10;
+    setMaxPages(totalPages);
+    setPageData({ page, limit });
 
-  //limit y maxPage
-  const limit = registrosPorPaginaPredeterminados;
-  const maxPage = calcularNumeroDePaginas(table.length, limit);
+    return [
+      ...currentPageCuotas.map(
+        ({
+          cuota,
+          fechaPago,
+          valorCuota,
+          abonoCapital,
+          abonoIntereses,
+          saldoCapital,
+        }) => {
+          return {
+            Cuota: cuota,
+            FechaPago: new Date(fechaPago).toLocaleDateString("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }),
+            ValorCuota: formatMoney.format(valorCuota),
+            AbonoCapital: formatMoney.format(abonoCapital),
+            AbonoInteres: formatMoney.format(abonoIntereses),
+            SaldoCapital: formatMoney.format(saldoCapital),
+          };
+        }
+      ),
+    ];
+  }, [listadoCuotas, page, limit]);
 
   return (
     <>
@@ -470,9 +491,9 @@ const RealizarCreditoFacil = () => {
                 "Abono Interés",
                 "Saldo Capital",
               ]}
-              data={table || []}
-              maxPage={maxPage}
-              limit={limit}
+              data={tablaSimulacionCreditos}
+              onSetPageData={setPageData}
+              maxPage={maxPages}
             ></TableEnterprise>
             <ButtonBar className="lg:col-span-2">
               <Button
