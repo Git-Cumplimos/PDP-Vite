@@ -44,9 +44,13 @@ const buildPostFunction = (url) => {
     try {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
+        if (res?.msg === "Exception (decorated fcn): Efectivo insuficiente en boveda") {
+          throw new Error("Efectivo insuficiente en la boveda", { cause: "custom" });
+        }
         if (res?.msg) {
           throw new Error("Error en la peticion", { cause: "custom" });
-        }
+        } 
+
         throw new Error("Error interno del servicio", { cause: "custom" });
       } 
       return res;
@@ -102,6 +106,9 @@ export const buscarReporteCierreCaja = buildPostFunction(`${urlCierreCaja}/repor
 export const buscarListaComerciosCierreCaja = buildGetFunction(`${urlCierreCaja}/comercios`);
 export const descargarComprobante = buildGetFunction(`${urlComprobantes}/download-file`);
 export const agregarComprobante = buildPostFunction(`${urlComprobantes}/administrar`);
+export const movimientoBoveda = buildPostFunction(`${urlComprobantes}/movimiento-boveda`);
+export const verHistoricoBoveda = buildGetFunction(`${urlComprobantes}/movimiento-boveda`);
+export const verValorBoveda = buildGetFunction(`${urlComprobantes}/boveda`);
 export const buscarComprobantes = buildGetFunction(`${urlComprobantes}/administrar`);
 export const buscarComprobantesCajero = buildGetFunction(`${urlComprobantes}/comprobantes_cajero`);
 export const editarComprobante = buildPutFunction(`${urlComprobantes}/administrar`);
