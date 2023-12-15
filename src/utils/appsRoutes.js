@@ -23,6 +23,8 @@ import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
+//Recaudo genérico
+import routesRecaudoGenerico from "../apps/RecaudoGenerico/routes";
 import routesOtrasEntidades from "../apps/OtrasEntidades/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
@@ -1125,6 +1127,10 @@ const allUrlsPrivateApps = [
   // rutasSoat,
   rutasApuestas,
   rutasRecaudoDirecto,
+
+  //Módulo recaudo genérico
+  routesRecaudoGenerico,
+  
   rutasRecargasTullave,
   rutasPowwi,
 
