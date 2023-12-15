@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import {
   ErrorCustomFetch,
   ErrorCustomUseHookCode,
+  ParamsError,
   descriptionErrorFront,
   fetchCustom,
 } from "../utils/fetchUtils";
@@ -17,8 +18,14 @@ export type TypeConfiguracion = {
 
 export type TypeConvenio = {
   convenio_name: string;
-  pk_fk_id_convenio: number;
-  id_convenio_autorizador: number;
+  pk_id_convenio: number;
+  id_relacion_convenio_autorizador: number;
+  id_especifico_convenio_autorizador: number;
+};
+
+export type TypeAutorizador = {
+  name: string;
+  id_autorizador: number;
 };
 
 export type TypeInformacionTransaccionConsultaInput = {
@@ -29,6 +36,7 @@ export type TypeTransaccionConsultaOutput = {
   referencia: string; //string de solo numeros
   valor_total_trx?: number;
   convenio: TypeConvenio;
+  autorizador: TypeAutorizador;
   id_trx?: number;
   configuracion: TypeConfiguracion;
   datos_adicionales: { [key: string]: any };
@@ -36,7 +44,6 @@ export type TypeTransaccionConsultaOutput = {
 
 export type TypeInformacionTransaccionPagoInput = {
   referencia: string; //string de solo numeros
-  id_convenio_autorizador: number;
   convenio_name: string;
   id_trx?: number;
   valor_total_trx?: number;
@@ -71,6 +78,34 @@ export type TypeBackendRecaudoGenerico = {
   comercio: TypeComercio;
 };
 
+const ParamsErrorRecaudoGenerico: ParamsError = {
+  errorCustomFetchCode: {
+    typeNotify: "notifyError",
+    ignoring: true,
+    console_error: true,
+  },
+  errorCustomApiGateway: {
+    typeNotify: "notifyError",
+    ignoring: true,
+    console_error: true,
+  },
+  errorCustomApiGatewayTimeout: {
+    typeNotify: "notifyError",
+    ignoring: true,
+    console_error: true,
+  },
+  errorCustomBackend: {
+    typeNotify: "notifyError",
+    ignoring: true,
+    console_error: true,
+  },
+  errorCustomBackendUser: {
+    typeNotify: "notify",
+    ignoring: true,
+    console_error: true,
+  },
+};
+
 export const useBackendRecaudoGenerico = (
   common: TypeBackendRecaudoGenerico
 ) => {
@@ -82,7 +117,7 @@ export const useBackendRecaudoGenerico = (
 
   const PeticionConsulta = useCallback(
     async (
-      pk_fk_id_convenio: number,
+      pk_id_convenio: number,
       info_transaccion: TypeInformacionTransaccionConsultaInput
     ): Promise<TypeTransaccionConsultaOutput> => {
       const function_name = "PeticionConsulta";
@@ -92,11 +127,12 @@ export const useBackendRecaudoGenerico = (
       const body = { ...common, info_transaccion: info_transaccion };
       try {
         response = await fetchCustom(
-          `${url}/consulta/${pk_fk_id_convenio}`,
-          "POST",
+          `${url}/consulta`,
+          "PUT",
           name_service,
-          {},
-          body
+          { pk_id_convenio: pk_id_convenio },
+          body,
+          ParamsErrorRecaudoGenerico
         );
         const result = response?.obj?.result ?? {};
         const ids = response?.obj?.ids ?? {};
@@ -104,9 +140,15 @@ export const useBackendRecaudoGenerico = (
           referencia: result?.referencia ?? "",
           convenio: {
             convenio_name: result?.convenio?.convenio_name ?? "",
-            pk_fk_id_convenio: result?.convenio?.pk_fk_id_convenio ?? 0,
-            id_convenio_autorizador:
-              result?.convenio?.id_convenio_autorizador ?? 0,
+            pk_id_convenio: result?.convenio?.pk_id_convenio ?? 0,
+            id_relacion_convenio_autorizador:
+              result?.convenio?.id_relacion_convenio_autorizador ?? 0,
+            id_especifico_convenio_autorizador:
+              result?.convenio?.id_especifico_convenio_autorizador ?? 0,
+          },
+          autorizador: {
+            name: result?.autorizador?.name ?? "",
+            id_autorizador: result?.autorizador?.id_autorizador ?? 0,
           },
           datos_adicionales: result?.datos_adicionales ?? {},
           configuracion: result?.configuracion,
@@ -142,7 +184,7 @@ export const useBackendRecaudoGenerico = (
 
   const PeticionPago = useCallback(
     async (
-      pk_fk_id_convenio: number,
+      pk_id_convenio: number,
       info_transaccion: TypeInformacionTransaccionPagoInput
     ): Promise<TypeTransaccionPagoOutput> => {
       const function_name = "PeticionPago";
@@ -152,11 +194,12 @@ export const useBackendRecaudoGenerico = (
       const body = { ...common, info_transaccion: info_transaccion };
       try {
         response = await fetchCustom(
-          `${url}/pago/${pk_fk_id_convenio}`,
-          "POST",
+          `${url}/pago`,
+          "PUT",
           name_service,
-          {},
-          body
+          { pk_id_convenio: pk_id_convenio },
+          body,
+          ParamsErrorRecaudoGenerico
         );
         return {
           status: response?.status,

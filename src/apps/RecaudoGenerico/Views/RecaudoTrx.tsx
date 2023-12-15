@@ -24,12 +24,13 @@ import {
 //------ typíng--------
 type TypeDataInput = {
   referencia: string; //string de solo numeros
-  pk_fk_id_convenio: number;
+  pk_id_convenio: number;
   convenio_name: string;
   valor_total_trx: string;
 };
 type TypeProceso = "Ninguno" | "Consulta" | "Resumen" | "TrxExitosa";
 type TypeSummaryTrx = {
+  Autorizador?: string;
   "Nombre convenio"?: string;
   "Número convenio"?: number;
   "Referencia 1"?: string; //string de solo numeros
@@ -45,7 +46,7 @@ type TypeDataSee = {
 const valor_total_trx_maximo = 10000000;
 const dataInputInitial: TypeDataInput = {
   referencia: "",
-  pk_fk_id_convenio: 0,
+  pk_id_convenio: 0,
   convenio_name: "",
   valor_total_trx: "",
 };
@@ -58,7 +59,7 @@ const RecaudoTrx = () => {
   const { roleInfo, pdpUser }: any = useAuth();
   const [dataInput, setDataInput] = useState<TypeDataInput>({
     referencia: state.referencia ?? dataInputInitial.referencia,
-    pk_fk_id_convenio: state.pk_fk_id_convenio,
+    pk_id_convenio: state.pk_id_convenio,
     convenio_name: state.convenio_name ?? dataInputInitial.convenio_name,
     valor_total_trx: "",
   });
@@ -131,7 +132,7 @@ const RecaudoTrx = () => {
     (ev) => {
       ev.preventDefault();
       notifyPending(
-        PeticionConsulta(dataInput.pk_fk_id_convenio, {
+        PeticionConsulta(dataInput.pk_id_convenio, {
           referencia: dataInput.referencia,
         }),
         {
@@ -147,9 +148,10 @@ const RecaudoTrx = () => {
               ...old,
               summaryTrx: {
                 ...old.summaryTrx,
+                Autorizador: dataResponse.autorizador.name,
                 "Nombre convenio": dataResponse.convenio.convenio_name,
                 "Número convenio":
-                  dataResponse.convenio.id_convenio_autorizador,
+                  dataResponse.convenio.id_especifico_convenio_autorizador,
                 "Referencia 1": dataResponse.referencia,
               },
             }));
@@ -187,7 +189,7 @@ const RecaudoTrx = () => {
       );
     },
     [
-      dataInput.pk_fk_id_convenio,
+      dataInput.pk_id_convenio,
       dataInput.referencia,
       PeticionConsulta,
       handleCloseNinguno,
@@ -214,8 +216,6 @@ const RecaudoTrx = () => {
       ev.preventDefault();
       const info_transaccion: TypeInformacionTransaccionPagoInput = {
         referencia: dataInput.referencia,
-        id_convenio_autorizador:
-          dataConsult?.convenio?.id_convenio_autorizador ?? 0,
         convenio_name: dataConsult?.convenio?.convenio_name ?? "",
         datos_adicionales: dataConsult?.datos_adicionales ?? {},
       };
@@ -229,7 +229,7 @@ const RecaudoTrx = () => {
       }
 
       notifyPending(
-        PeticionPago(dataInput.pk_fk_id_convenio, info_transaccion),
+        PeticionPago(dataInput.pk_id_convenio, info_transaccion),
         {
           render: () => {
             return "Procesando transacción";
@@ -255,7 +255,7 @@ const RecaudoTrx = () => {
       );
     },
     [
-      dataInput.pk_fk_id_convenio,
+      dataInput.pk_id_convenio,
       dataInput.referencia,
       dataInput.valor_total_trx,
       dataConsult,

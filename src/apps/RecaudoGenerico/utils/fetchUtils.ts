@@ -18,27 +18,27 @@ export type ParamsError = {
 export const defaultParamsError: ParamsError = {
   errorCustomFetchCode: {
     typeNotify: "notifyError",
-    ignoring: true,
+    ignoring: false,
     console_error: true,
   },
   errorCustomApiGateway: {
     typeNotify: "notifyError",
-    ignoring: true,
+    ignoring: false,
     console_error: true,
   },
   errorCustomApiGatewayTimeout: {
     typeNotify: "notifyError",
-    ignoring: true,
+    ignoring: false,
     console_error: true,
   },
   errorCustomBackend: {
     typeNotify: "notifyError",
-    ignoring: true,
+    ignoring: false,
     console_error: true,
   },
   errorCustomBackendUser: {
     typeNotify: "notify",
-    ignoring: true,
+    ignoring: false,
     console_error: true,
   },
 };

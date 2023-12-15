@@ -43,7 +43,7 @@ const RecaudoCodigo = () => {
             navigate("../recaudo-generico/trx", {
               state: {
                 // autorizadores: res?.obj?.result?.autorizadores,
-                pk_fk_id_convenio: res?.obj?.result?.pk_fk_id_convenio,
+                pk_id_convenio: res?.obj?.result?.pk_id_convenio,
                 convenio_name:
                   res?.obj?.result?.data_codigo_barras?.nombre_convenio,
                 referencia:
