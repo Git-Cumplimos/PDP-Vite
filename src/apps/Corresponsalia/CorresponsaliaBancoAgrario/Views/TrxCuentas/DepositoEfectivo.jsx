@@ -211,12 +211,12 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depósitos</h1>
+        <h1 className="text-3xl mt-6">Depósitos</h1>
         <br></br>
         <Form onSubmit={onSubmitModal} grid>
           <Select
-            id='tipoCuenta'
-            label='Tipo de cuenta'
+            id="tipoCuenta"
+            label="Tipo de cuenta"
             options={options}
             value={tipoCuenta}
             required
@@ -225,11 +225,11 @@ const Deposito = () => {
             }}
           />
           <Input
-            id='numCuenta'
-            name='numCuenta'
-            label='Número de cuenta'
-            type='text'
-            autoComplete='off'
+            id="numCuenta"
+            name="numCuenta"
+            label="Número de cuenta"
+            type="text"
+            autoComplete="off"
             minLength={"10"}
             maxLength={"12"}
             value={numCuenta}
@@ -242,11 +242,11 @@ const Deposito = () => {
             required
           />
           <Input
-            id='valor'
-            name='valor'
-            label='Valor a depositar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a depositar"
+            autoComplete="off"
+            type="text"
             minLength={"15"}
             maxLength={"15"}
             min={limitesMontos?.min}
@@ -267,9 +267,10 @@ const Deposito = () => {
               : loadingDepositoCorresponsalBancoAgrario
               ? () => {}
               : handleClose
-          }>
+          }
+        >
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
@@ -282,15 +283,17 @@ const Deposito = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type='submit'
-                  onClick={submitEventSetter(onMakePayment)}
-                  disabled={loadingDepositoCorresponsalBancoAgrario}>
-                  Realizar Depósito
+                  onClick={HandleCloseModal}
+                  disabled={loadingDepositoCorresponsalBancoAgrario}
+                >
+                  Cancelar
                 </Button>
                 <Button
-                  onClick={HandleCloseModal}
-                  disabled={loadingDepositoCorresponsalBancoAgrario}>
-                  Cancelar
+                  type="submit"
+                  onClick={submitEventSetter(onMakePayment)}
+                  disabled={loadingDepositoCorresponsalBancoAgrario}
+                >
+                  Realizar Depósito
                 </Button>
               </ButtonBar>
             </PaymentSummary>

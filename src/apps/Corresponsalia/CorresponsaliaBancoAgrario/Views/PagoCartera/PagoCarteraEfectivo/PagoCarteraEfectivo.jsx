@@ -477,9 +477,7 @@ const PagoCarteraEfectivo = () => {
             peticion={onSubmitPayCartera}
             handleClose={HandleCloseTrx}
             posicion={selectIndiceObligacion}
-          >
-            <Select></Select>
-          </ComponentsModalSummaryTrx>
+          />
         </Modal>
       )}
       {infTicket &&
