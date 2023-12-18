@@ -24,10 +24,12 @@ import {
   postEnviarCodigoOtp,
 } from "../../hooks/fetchTuLlave";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { DAX } from "aws-sdk";
 
 const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
 const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
 const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
+const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
 
 const RealizarCreditoFacil = () => {
   const navigate = useNavigate();
@@ -38,6 +40,7 @@ const RealizarCreditoFacil = () => {
   const [url, setUrl] = useState("");
   const [numOtp, setNumOtp] = useState("");
   const [listadoCuotas, setListadoCuotas] = useState([]);
+  const [contador, setContador] = useState(0);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -53,6 +56,7 @@ const RealizarCreditoFacil = () => {
     formPeticion: 0,
     showModal: false,
     showModalOtp: false,
+    cosultEnvioOtp: {},
   });
 
   const handleClose = useCallback(() => {
@@ -74,6 +78,7 @@ const RealizarCreditoFacil = () => {
       showModal: false,
       plazo: 0,
       showModalOtp: false,
+      cosultEnvioOtp: {},
     });
     navigate(-1);
     notifyError("Transacción cancelada por el usuario");
@@ -95,6 +100,7 @@ const RealizarCreditoFacil = () => {
       showModal: false,
       plazo: 0,
       showModalOtp: false,
+      cosultEnvioOtp: {},
     });
     consultaDecisor();
   }, []);
@@ -187,18 +193,14 @@ const RealizarCreditoFacil = () => {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
-          id_uuid_trx: uniqueId,
         },
         Datos: {
           fechaPago: dataCredito?.consultDecisor?.fecha_preaprobado,
           plazo: plazo_cuotas,
         },
       };
-      const dataAditional = {
-        id_uuid_trx: uniqueId,
-      };
       notifyPending(
-        peticionSimulacionCredito(data, dataAditional),
+        peticionSimulacionCredito({}, data),
         {
           render: () => {
             return "Procesando Simulación Crédito";
@@ -227,8 +229,85 @@ const RealizarCreditoFacil = () => {
     [navigate, roleInfo, pdpUser, dataCredito]
   );
   const [loadingPeticionSimulacionCredito, peticionSimulacionCredito] =
+    useFetch(
+      fetchCustom(
+        URL_REALIZAR_SIMULACION_CREDITO,
+        "POST",
+        "Realizar simulación crédito"
+      )
+    );
+
+  const desembolsoCredito = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      setContador(contador + 1);
+      const data = {
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+        valor_total_trx: dataCredito?.valorSimulacion,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        nombre_usuario: pdpUser?.uname ?? "",
+        address: roleInfo?.["direccion"],
+        comercio: {
+          id_comercio: roleInfo?.id_comercio,
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+          id_uuid_trx: uniqueId,
+        },
+        id_trx: dataCredito?.consultSiian?.id_trx,
+        Datos: {
+          codigo_otp: numOtp,
+          reintento_otp: parseInt(contador),
+        },
+      };
+      const dataAditional = {
+        id_uuid_trx: uniqueId,
+      };
+      notifyPending(
+        peticionDesembolsoCredito(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando Desembolso del Crédito";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            navigate(-1);
+            return "Crédito desembolsado al cupo satisfactoriamente";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            if (error?.message) {
+              if (error?.message === "Código OTP incorrecto") {
+                setNumOtp("");
+                return error?.message;
+              } else if (
+                error?.message ===
+                "Código OTP incorrecto - Reintentos superados"
+              ) {
+                navigate(-1);
+                return error?.message;
+              } else {
+                navigate(-1);
+                return error?.message;
+              }
+            } else {
+              return "Desembolso del Crédito fallido";
+            }
+          },
+        }
+      );
+    },
+    [navigate, roleInfo, pdpUser, dataCredito, numOtp, uniqueId, contador]
+  );
+  console.log(contador);
+  const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
     useFetchTuLlave(
-      URL_REALIZAR_SIMULACION_CREDITO,
+      URL_REALIZAR_DESEMBOLSO_CREDITO,
       URL_CONSULTAR_ESTADO_SIMULACION,
       "Realizar simulación crédito"
     );
@@ -254,7 +333,6 @@ const RealizarCreditoFacil = () => {
   const fecthEnviarCodigoOtp = () => {
     let obj = {
       id_comercio: roleInfo?.id_comercio,
-      phone: "3164198687", //roleInfo?.telefono_comercio,
     };
     postEnviarCodigoOtp(obj)
       .then(async (res) => {
@@ -264,6 +342,7 @@ const RealizarCreditoFacil = () => {
             ...old,
             showModalOtp: true,
             showModal: true,
+            cosultEnvioOtp: res?.obj,
           }));
         } else {
           notifyError(res?.obj?.error);
@@ -681,16 +760,16 @@ const RealizarCreditoFacil = () => {
                   }}
                   className="flex align-middle"
                 >
-                  <Form onSubmit={fecthEnviarCodigoOtp} grid>
+                  <Form onSubmit={desembolsoCredito} grid>
                     <h1 className="text-2xl font-semibold text-center">
                       ¿Está seguro de realizar el desembolso del crédito? Este
                       será a su cupo
                     </h1>
                     <Input
-                      id="numeroOtp"
+                      id="numOtp"
                       label="Ingresar Código OTP"
                       type="text"
-                      name="numeroOtp"
+                      name="numOtp"
                       minLength="6"
                       maxLength="6"
                       required
@@ -711,15 +790,27 @@ const RealizarCreditoFacil = () => {
                           navigate(-1);
                           notifyError("Transacción cancelada por el usuario");
                         }}
+                        disabled={loadingPeticionDesembolsoCredito}
                       >
                         Cancelar
                       </Button>
-                      <Button type="submit">Aceptar</Button>
-                      <Button type="submit" onClick={fecthEnviarCodigoOtp}>
-                        Reenviar OTP
+                      <Button
+                        type="submit"
+                        disabled={loadingPeticionDesembolsoCredito}
+                      >
+                        Aceptar
                       </Button>
                     </ButtonBar>
                   </Form>
+                  <ButtonBar>
+                    <Button
+                      type="submit"
+                      disabled={loadingPeticionDesembolsoCredito}
+                      onClick={fecthEnviarCodigoOtp}
+                    >
+                      Reenviar OTP
+                    </Button>
+                  </ButtonBar>
                 </Modal>
               </>
             ) : (
