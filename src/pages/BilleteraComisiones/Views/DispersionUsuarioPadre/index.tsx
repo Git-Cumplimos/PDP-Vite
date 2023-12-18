@@ -1,7 +1,6 @@
 import React, {
   ChangeEvent,
   Fragment,
-  ReactText,
   useCallback,
   useMemo,
   useReducer,
@@ -36,8 +35,8 @@ type Props = {};
 const toastIdLoading = "progress-trx-123";
 const limite_maximo_dispersion = 10_000_000;
 
-// const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
-const urlComisiones = "http://localhost:5000";
+const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+// const urlComisiones = "http://localhost:5000";
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
 const DispersionUsuarioPadre = (props: Props) => {
@@ -59,12 +58,14 @@ const DispersionUsuarioPadre = (props: Props) => {
   } | null>(null);
   const [intervalDelay, setIntervalDelay] = useState<number | undefined>();
   const [timeoutDelay, setTimeoutDelay] = useState<number | undefined>();
+  const [letExit, setLetExit] = useState(false);
 
   const handleCloseModal = useCallback(() => setShowModal(false), []);
-  const handleEndConsulta = useCallback((endLoading?: boolean) => {
+  const handleEndConsulta = useCallback(() => {
     toast.done(toastIdLoading);
     setIntervalDelay(undefined);
     setTimeoutDelay(undefined);
+    setLetExit(true);
   }, []);
 
   const tsPdpUser = useMemo(
@@ -107,8 +108,8 @@ const DispersionUsuarioPadre = (props: Props) => {
   const summary = useMemo(
     () =>
       Object.fromEntries(
-        comerciosDispersion.map(({ commerce_name, value }) => [
-          commerce_name,
+        comerciosDispersion.map(({ pk_commerce, commerce_name, value }) => [
+          `${commerce_name} (${pk_commerce})`,
           formatMoney.format(value),
         ])
       ),
@@ -123,62 +124,54 @@ const DispersionUsuarioPadre = (props: Props) => {
     [comerciosDispersion]
   );
 
-  const existeDispersion = useCallback(
-    (value: number) =>
-      comerciosDispersion.map(({ pk_commerce }) => pk_commerce).includes(value),
-    [comerciosDispersion]
-  );
-
   const filterCommerces = useCallback(
     (pk_commerce: NumberString) =>
       allCommerces.filter(
         ({ value }) =>
-          !existeDispersion(value) ||
-          (existeDispersion(value) && pk_commerce === value)
+          !comerciosDispersion
+            .map(({ pk_commerce }) => pk_commerce)
+            .includes(value) || pk_commerce === value
       ),
-    [allCommerces, existeDispersion]
+    [allCommerces, comerciosDispersion]
   );
 
   const [loadingMakeDispersion, , makeDispersion] = useFetchDebounce(
     {
-      url: useMemo(
-        () =>
-          `${urlComisiones}/servicio-wallet-comisiones/transferencia-wallet-usuario-padre-cupo`,
-        []
-      ),
-      options: useMemo(() => {
-        const data = {
-          uuid,
-          saldos_comercios: Object.fromEntries(
-            comerciosDispersion.map(({ pk_commerce, commerce_name, value }) => [
-              pk_commerce,
-              {
-                nombre_comercio: commerce_name,
-                valor: value,
-              },
-            ])
-          ),
-        };
-        return {
+      url: `${urlComisiones}/servicio-wallet-comisiones/transferencia-wallet-usuario-padre-cupo`,
+      options: useMemo(
+        () => ({
           method: "POST",
-          body: JSON.stringify(data),
+          body: JSON.stringify({
+            uuid,
+            saldos_comercios: Object.fromEntries(
+              comerciosDispersion.map(
+                ({ pk_commerce, commerce_name, value }) => [
+                  pk_commerce,
+                  {
+                    nombre_comercio: commerce_name,
+                    valor: value,
+                  },
+                ]
+              )
+            ),
+          }),
           headers: { "Content-Type": "application/json" },
-        };
-      }, [uuid, comerciosDispersion]),
+        }),
+        [uuid, comerciosDispersion]
+      ),
     },
     {
-      onPending: useCallback(() => {
-        return "Procesando transaccion";
-      }, []),
+      onPending: useCallback(() => "Procesando transaccion", []),
       onSuccess: useCallback((res) => {
         setTrxState(true);
         setGetDispersionData(res?.obj?.actions?.consulta_estado);
-        // toastIdLoading.current = toast("Transferencia en progreso", {
-        //   progress: 0.01,
-        //   closeOnClick: false,
-        // });
-        setIntervalDelay(1000 * 5);
-        setTimeoutDelay(1000 * 60);
+        setIntervalDelay(1000 * res?.obj?.time_delta_request);
+        setTimeoutDelay(1000 * res?.obj?.timeout_request);
+        toast.info("Transferencia en progreso", {
+          progress: 0.01,
+          closeOnClick: false,
+          toastId: toastIdLoading,
+        });
         return res?.msg;
       }, []),
       onError: useCallback((error) => {
@@ -218,11 +211,6 @@ const DispersionUsuarioPadre = (props: Props) => {
             (totalExitosas + totalFallidas + totalProcesando * 0.25) /
             totalDispersion;
 
-          // toast.info("Transferencia en progreso", {
-          //   progress: progreso || 0.01,
-          //   closeOnClick: false,
-          //   toastId: toastIdLoading
-          // });
           toast.update(toastIdLoading, {
             type: toast.TYPE.INFO,
             render: "Transferencia en progreso",
@@ -241,22 +229,22 @@ const DispersionUsuarioPadre = (props: Props) => {
   );
 
   useInterval(
-    useCallback(() => {
-      consultarDispersion();
-    }, [consultarDispersion]),
+    useCallback(() => consultarDispersion(), [consultarDispersion]),
     intervalDelay
   );
 
   useTimeout(
     useCallback(() => {
-      handleEndConsulta(true);
+      handleEndConsulta();
       notifyError("Timeout en consulta");
     }, [handleEndConsulta]),
     timeoutDelay
   );
 
-  console.log(!loadingMakeDispersion || !trxState);
-  console.log(!loadingMakeDispersion || !trxState);
+  useTimeout(
+    useCallback(() => setLetExit(true), []),
+    intervalDelay != null ? intervalDelay * 2 : intervalDelay
+  );
 
   return (
     <Fragment>
@@ -360,6 +348,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           maxLength={15}
           value={sumaDispersion}
           max={saldoWalletUser}
+          equalError={false}
           required
         />
         <ButtonBar className="lg:col-span-2">
@@ -376,17 +365,17 @@ const DispersionUsuarioPadre = (props: Props) => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
+                onClick={handleCloseModal}
+                disabled={loadingMakeDispersion}
+              >
+                Cancelar
+              </Button>
+              <Button
                 type="submit"
                 onClick={() => makeDispersion()}
                 disabled={loadingMakeDispersion}
               >
                 Aceptar
-              </Button>
-              <Button
-                onClick={handleCloseModal}
-                disabled={loadingMakeDispersion}
-              >
-                Cancelar
               </Button>
             </ButtonBar>
           </PaymentSummary>
@@ -394,11 +383,22 @@ const DispersionUsuarioPadre = (props: Props) => {
         {!!trxState && (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <ButtonBar>
-              <Button onClick={() => navigate("/billetera-comisiones")}>
-                Revisar transferencia
-              </Button>
-              <Button onClick={() => navigate("/billetera-comisiones")}>
+              <Button
+                onClick={() => navigate("/billetera-comisiones")}
+                disabled={!letExit}
+              >
                 Cerrar
+              </Button>
+              <Button
+                type="submit"
+                onClick={() =>
+                  navigate(
+                    "/billetera-comisiones/historico-tranferencias-usuario-padre"
+                  )
+                }
+                disabled={!letExit}
+              >
+                Revisar transferencia
               </Button>
             </ButtonBar>
           </div>

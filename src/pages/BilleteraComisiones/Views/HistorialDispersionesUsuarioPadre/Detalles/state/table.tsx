@@ -1,19 +1,11 @@
-type AnyNumber = number | `${number}` | "";
-
 export type SearchFilters = {
-  fk_id_user: AnyNumber;
-  pk_id_dispersion: AnyNumber;
-  estado: string;
-  date_search: [string, string];
+  pk_id_dispersion: number;
   page: number;
   limit: number;
 };
 
 export const initialSearchObj: SearchFilters = {
-  fk_id_user: "",
-  pk_id_dispersion: "",
-  estado: "",
-  date_search: ["", ""],
+  pk_id_dispersion: 0,
   page: 1,
   limit: 10,
 };
@@ -29,22 +21,7 @@ const SET_ALL = "SET_ALL";
 export type ACTIONTYPE =
   | {
       type: "SET_PK_ID_DISPERSION";
-      value: AnyNumber | (() => AnyNumber) | ((old: AnyNumber) => AnyNumber);
-    }
-  | {
-      type: "SET_FK_ID_USER";
-      value: AnyNumber | (() => AnyNumber) | ((old: AnyNumber) => AnyNumber);
-    }
-  | {
-      type: "SET_ESTADO";
-      value: string | (() => string) | ((old: string) => string);
-    }
-  | {
-      type: "SET_DATE_SEARCH";
-      value:
-        | [string, string]
-        | (() => [string, string])
-        | ((old: [string, string]) => [string, string]);
+      value: number | (() => number) | ((old: number) => number);
     }
   | {
       type: "SET_PAGE";
@@ -77,45 +54,6 @@ export const reducerCommerceFilters = (
       }
       const clone = structuredClone(state);
       clone.pk_id_dispersion = newVal;
-      return clone;
-    }
-    case SET_FK_ID_USER: {
-      const newVal =
-        action.value instanceof Function
-          ? action.value(state.fk_id_user)
-          : action.value;
-      if (state.fk_id_user === newVal) {
-        return state;
-      }
-      const clone = structuredClone(state);
-      clone.fk_id_user = newVal;
-      return clone;
-    }
-    case SET_ESTADO: {
-      const newVal =
-        action.value instanceof Function
-          ? action.value(state.estado)
-          : action.value;
-      if (state.estado === newVal) {
-        return state;
-      }
-      const clone = structuredClone(state);
-      clone.estado = newVal;
-      return clone;
-    }
-    case SET_DATE_SEARCH: {
-      const newVal =
-        action.value instanceof Function
-          ? action.value(state.date_search)
-          : action.value;
-      if (
-        state.date_search[0] === newVal[0] &&
-        state.date_search[1] === newVal[1]
-      ) {
-        return state;
-      }
-      const clone = structuredClone(state);
-      clone.date_search = newVal;
       return clone;
     }
     case SET_PAGE: {
@@ -152,10 +90,6 @@ export const reducerCommerceFilters = (
           state.limit === newValAll.limit,
           state.page === newValAll.page,
           state.pk_id_dispersion === newValAll.pk_id_dispersion,
-          state.estado === newValAll.estado,
-          state.fk_id_user === newValAll.fk_id_user,
-          state.date_search[0] === newValAll.date_search[0] &&
-            state.date_search[1] === newValAll.date_search[1],
         ].every(Boolean)
       ) {
         return state;
