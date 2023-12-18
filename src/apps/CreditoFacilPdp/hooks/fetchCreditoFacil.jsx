@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, fetchCustom } from "../utils/fetchCreditoFacil";
 import { notify, notifyError } from "../../../utils/notify";
+import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import fetchData from "../../../utils/fetchData";
 
 const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
@@ -10,14 +11,14 @@ const URL_ENVIAR_CODIGO_OTP = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
-export const useFetchTuLlave = (
+export const useFetchCreditoFacil = (
   url_trx_ = "",
   url_consulta_ = "",
   name_ = ""
 ) => {
   const [state, setState] = useState(false);
 
-  const fetchTuLlaveTrx = useCallback(
+  const fetchCreditoFacilTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(
         url_trx_,
@@ -60,7 +61,22 @@ export const useFetchTuLlave = (
             id_uuid_trx: data_additional_?.id_uuid_trx,
           };
           for (let i = 0; i <= 4; i++) {
-            PeticionConsulta = await fetchConsulta({}, data_consulta);
+            let parseObjConsulta = JSON.stringify(data_consulta);
+            let dataObjConsulta = {
+              data: cifrarAES(
+                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                parseObjConsulta
+              ),
+            };
+            PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
+            const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
+            const objConsulta = decryptAES(
+              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              dataDecryptConsulta
+            );
+            PeticionConsulta.obj = JSON.parse(objConsulta);
             if (PeticionConsulta?.msg.includes("No ha terminado")) {
               notify(
                 "Su transacción esta siendo procesada, no recargue la página"
@@ -101,7 +117,7 @@ export const useFetchTuLlave = (
     [setState, url_trx_, url_consulta_, name_]
   );
 
-  return [state, fetchTuLlaveTrx];
+  return [state, fetchCreditoFacilTrx];
 };
 
 export class ErrorCustom extends Error {
@@ -135,15 +151,32 @@ export const postDescargarSimulacion = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      parseObj
+    ),
+  };
   try {
     const res = await fetchData(
       `${URL_DESCARGAR_SIMULACION}`,
       "POST",
       {},
-      bodyObj
+      dataObj
     );
     if (!res?.status) {
       console.error(res?.msg);
+    }
+    if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
     }
     return res;
   } catch (err) {
@@ -164,15 +197,32 @@ export const postEnviarCodigoOtp = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
   }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      parseObj
+    ),
+  };
   try {
     const res = await fetchData(
       `${URL_ENVIAR_CODIGO_OTP}`,
       "POST",
       {},
-      bodyObj
+      dataObj
     );
     if (!res?.status) {
       console.error(res?.msg);
+    }
+    if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
     }
     return res;
   } catch (err) {

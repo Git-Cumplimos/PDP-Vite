@@ -1,5 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
+import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 
 export const fetchCustom = (
   url_,
@@ -31,13 +32,28 @@ export const fetchCustom = (
 
     //Petición
     let Peticion;
+    let parseObj = JSON.stringify(data_);
+    let dataObj = {
+      data: cifrarAES(
+        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        parseObj
+      ),
+    };
     try {
       if (metodo_ === "GET") {
         Peticion = await fetchData(urlCompleto, "GET", {}, {}, {}, true);
       } else if (metodo_ === "PUT") {
-        Peticion = await fetchData(urlCompleto, "PUT", {}, data_, {}, true);
+        Peticion = await fetchData(urlCompleto, "PUT", {}, dataObj, {}, true);
       } else if (metodo_ === "POST") {
-        Peticion = await fetchData(urlCompleto, "POST", {}, data_, true);
+        Peticion = await fetchData(urlCompleto, "POST", {}, dataObj, true);
+        const dataDecrypt = Peticion?.obj?.data ?? "";
+        const obj = decryptAES(
+          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          dataDecrypt
+        );
+        Peticion.obj = JSON.parse(obj);
       }
     } catch (error) {
       throw new ErrorCustomFetch(

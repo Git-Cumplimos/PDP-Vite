@@ -18,13 +18,12 @@ import Select from "../../../../components/Base/Select/Select";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
 import {
-  useFetchTuLlave,
+  useFetchCreditoFacil,
   postDescargarSimulacion,
   postTerminosCondiciones,
   postEnviarCodigoOtp,
-} from "../../hooks/fetchTuLlave";
+} from "../../hooks/fetchCreditoFacil";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
-import { DAX } from "aws-sdk";
 
 const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
 const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
@@ -292,7 +291,7 @@ const RealizarCreditoFacil = () => {
                 navigate(-1);
                 return error?.message;
               } else {
-                navigate(-1);
+                // navigate(-1);
                 return error?.message;
               }
             } else {
@@ -304,9 +303,8 @@ const RealizarCreditoFacil = () => {
     },
     [navigate, roleInfo, pdpUser, dataCredito, numOtp, uniqueId, contador]
   );
-  console.log(contador);
   const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
-    useFetchTuLlave(
+    useFetchCreditoFacil(
       URL_REALIZAR_DESEMBOLSO_CREDITO,
       URL_CONSULTAR_ESTADO_SIMULACION,
       "Realizar simulación crédito"
