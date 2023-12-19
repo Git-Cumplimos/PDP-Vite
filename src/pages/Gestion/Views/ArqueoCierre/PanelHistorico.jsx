@@ -104,7 +104,9 @@ const PanelHistorico = () => {
         ["Id Comercio", data.id_comercio],
         ["No. Terminal", data.id_terminal],
         ["Id Cierre", data.pk_id_cierre],
+        ["", ""],
         ["Comercio", data.nombre_comercio],
+        ["", ""],
         ["Cajero",data.nombre_usuario],
         ["", ""],
       ],
@@ -113,9 +115,20 @@ const PanelHistorico = () => {
         ["", ""],
         ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior-Num)],
         ["", ""],
-        ["Efectivo en caja PDP",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+(-Num))],
+        ["Efectivo PDP - Consignaciones y Transportadora",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+(-Num)
+        + data?.total_recibido_transportadora + data?.total_notas 
+        - (data?.total_consignaciones>0?data?.total_consignaciones:data?.total_consignaciones*-1) 
+        - (data?.total_entregado_transportadora>0?data?.total_entregado_transportadora:data?.total_entregado_transportadora*-1)
+        - data?.total_consignaciones_externos - data?.total_entrega_externos
+        )
+        ],
         ["", ""],
-        ["Efectivo en caja PDP + Externos",formatMoney.format(data.total_efectivo_en_caja)],
+        ["Efectivo en caja PDP + Externos",formatMoney.format(data.total_efectivo_en_caja
+          + data?.total_recibido_transportadora + data?.total_notas 
+          - (data?.total_consignaciones>0?data?.total_consignaciones:data?.total_consignaciones*-1) 
+          - (data?.total_entregado_transportadora>0?data?.total_entregado_transportadora:data?.total_entregado_transportadora*-1)
+          - data?.total_consignaciones_externos - data?.total_entrega_externos)
+        ],
         ["", ""],
       ],
       trxInfo: [
@@ -125,9 +138,9 @@ const PanelHistorico = () => {
         ["", ""],
         ["Estimación faltante",formatMoney.format(data.total_estimacion_faltante)],
         ["", ""],
-        ["Consignaciones bancarias",formatMoney.format(data.total_consignaciones)],
+        ["Consignaciones bancarias PDP",formatMoney.format(data.total_consignaciones)],
         ["", ""],
-        ["Entregado a transportadora", formatMoney.format(data.total_entregado_transportadora)],
+        ["Entregado PDP a transportadora", formatMoney.format(data.total_entregado_transportadora)],
         ["", ""],
         ["Recibido de transportadora", formatMoney.format(data.total_recibido_transportadora)],
         ["", ""],
@@ -140,6 +153,8 @@ const PanelHistorico = () => {
         elemento?.pk_nombre_plataforma,
         formatMoney.format(elemento?.valor)],["", ""])
     )
+    tempTicket.trxInfo.push(["Consignaciones bancarias externos",formatMoney.format(data?.total_consignaciones_externos)],["", ""])
+    tempTicket.trxInfo.push(["Entregado a transportadora externos",formatMoney.format(data?.total_entrega_externos)],["", ""])
     setResumenCierre(tempTicket);
   }, []);
 

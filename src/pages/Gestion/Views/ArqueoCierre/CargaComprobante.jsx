@@ -117,82 +117,90 @@ const CargaComprobante = () => {
   const uploadComprobante = useCallback(async () => {
     try {
       if (movementType !== "Movimiento a bóveda") {
-        if (movementType !== "Recibido transportadora") {
-          var valores = await verValorBoveda({
-            id_usuario: roleInfo?.id_usuario,
+        var sumExter = 0
+        Object.values(valoresExternos).map((e)=> sumExter += e)
+        if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
+          if (movementType !== "Recibido transportadora") {          
+            var valores = await verValorBoveda({
+              id_usuario: roleInfo?.id_usuario,
+              id_comercio: roleInfo?.id_comercio,
+              id_terminal: roleInfo?.id_dispositivo,
+            });
+            var valor_Boveda = parseInt(valores?.obj[0]?.valor_boveda)
+            if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
+              throw new Error("Efectivo insuficiente en Caja", {
+                cause: "custom",
+              });
+            }
+            if (valor_Boveda < valorEfectivoBoveda) {
+              throw new Error("Efectivo insuficiente en boveda", {
+                cause: "custom",
+              });
+            }
+          }
+          if (!selectedEntity) {
+            throw new Error("No se ha seleccionado una entidad", {
+              cause: "custom",
+            });
+          }
+          if (!file) {
+            throw new Error("No se ha seleccionado un archivo", {
+              cause: "custom",
+            });
+          }
+    
+          /**
+           * Pedir url prefirmada
+           */
+          const resFile = await subirComprobante({
+            filename: `comprobantes/${roleInfo?.id_comercio};${
+              roleInfo?.id_comercio
+            }_${roleInfo?.id_usuario}_${roleInfo?.id_dispositivo}_comprobante.${
+              file?.name?.split(/\./)?.[1]
+            }`,
+            contentType: file?.type,
+          });
+    
+          /**
+           * Armar peticion para subir a s3
+           */
+          const { url, fields } = resFile.obj;
+          const filename = fields.key;
+    
+          const reqBody = {
+            fk_nombre_entidad: selectedEntity,
+            fk_tipo_comprobante: movementType,
             id_comercio: roleInfo?.id_comercio,
+            id_usuario: roleInfo?.id_usuario,
             id_terminal: roleInfo?.id_dispositivo,
+            nro_comprobante: comprobanteNumber,
+            valor_movimiento: valorComprobante,
+            observaciones: observaciones,
+            archivo: filename,
+            valor_efectivo_pdp: valorEfectivoPdp,
+            valor_efectivo_boveda: valorEfectivoBoveda,
+            valores_externos: valoresExternos,
+          };
+          if (movementType === "Consignación Bancaria") {
+            reqBody["nro_cuenta"] = accountNumber;
+          }
+          /* const resComprobante =  */ await agregarComprobante(reqBody);
+    
+          const formData = new FormData();
+          for (var key in fields) {
+            formData.append(key, fields[key]);
+          }
+          formData.set("file", file);
+          await fetch(url, {
+            method: "POST",
+            body: formData,
+            mode: "no-cors",
           });
-          var valor_Boveda = parseInt(valores?.obj[0]?.valor_boveda)
-          if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
-            throw new Error("Efectivo insuficiente en Caja", {
-              cause: "custom",
-            });
-          }
-          if (valor_Boveda < valorEfectivoBoveda) {
-            throw new Error("Efectivo insuficiente en boveda", {
-              cause: "custom",
-            });
-          }
-        }
-        if (!selectedEntity) {
-          throw new Error("No se ha seleccionado una entidad", {
+        }else{
+          throw new Error("Registre un valor para el comprobante", {
             cause: "custom",
           });
         }
-        if (!file) {
-          throw new Error("No se ha seleccionado un archivo", {
-            cause: "custom",
-          });
-        }
-  
-        /**
-         * Pedir url prefirmada
-         */
-        const resFile = await subirComprobante({
-          filename: `comprobantes/${roleInfo?.id_comercio};${
-            roleInfo?.id_comercio
-          }_${roleInfo?.id_usuario}_${roleInfo?.id_dispositivo}_comprobante.${
-            file?.name?.split(/\./)?.[1]
-          }`,
-          contentType: file?.type,
-        });
-  
-        /**
-         * Armar peticion para subir a s3
-         */
-        const { url, fields } = resFile.obj;
-        const filename = fields.key;
-  
-        const reqBody = {
-          fk_nombre_entidad: selectedEntity,
-          fk_tipo_comprobante: movementType,
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-          nro_comprobante: comprobanteNumber,
-          valor_movimiento: valorComprobante,
-          observaciones: observaciones,
-          archivo: filename,
-          valor_efectivo_pdp: valorEfectivoPdp,
-          valor_efectivo_boveda: valorEfectivoBoveda,
-          valores_externos: valoresExternos,
-        };
-        if (movementType === "Consignación Bancaria") {
-          reqBody["nro_cuenta"] = accountNumber;
-        }
-        /* const resComprobante =  */ await agregarComprobante(reqBody);
-  
-        const formData = new FormData();
-        for (var key in fields) {
-          formData.append(key, fields[key]);
-        }
-        formData.set("file", file);
-        await fetch(url, {
-          method: "POST",
-          body: formData,
-          mode: "no-cors",
-        });
       }else{
         const reqBody = {
           id_comercio: roleInfo?.id_comercio,
@@ -447,7 +455,7 @@ const CargaComprobante = () => {
                   maxLength={"13"}
                   onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
                   onBlur={valuesComprobante}
-                  required
+                  // required
                 />
                 <Input
                   id="valor_boveda"
