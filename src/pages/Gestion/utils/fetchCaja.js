@@ -48,7 +48,7 @@ const buildPostFunction = (url) => {
           throw new Error("Error incompatible entre datos del comercio", { cause: "custom" });
         }
         if (res?.msg === "Exception (decorated fcn): Efectivo insuficiente en boveda") {
-          throw new Error("Efectivo insuficiente en la boveda", { cause: "custom" });
+          throw new Error("Efectivo insuficiente en la bóveda", { cause: "custom" });
         }
         if (res?.msg) {
           throw new Error("Error en la peticion", { cause: "custom" });

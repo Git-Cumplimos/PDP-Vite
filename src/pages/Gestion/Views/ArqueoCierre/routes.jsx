@@ -62,7 +62,7 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/carga-comprobante",
-    label: <AppIcons Logo={"RECAUDO"} name="Transportadora y Consignaciones" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Bóveda, Consignaciones y Transportadora" />,
     component: CargaComprobante,
     permission: [PermissionsCaja.AgregaComprobantes],
   },

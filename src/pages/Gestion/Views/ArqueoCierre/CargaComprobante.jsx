@@ -116,17 +116,17 @@ const CargaComprobante = () => {
 
   const uploadComprobante = useCallback(async () => {
     try {
+      var valores = await verValorBoveda({
+        id_usuario: roleInfo?.id_usuario,
+        id_comercio: roleInfo?.id_comercio,
+        id_terminal: roleInfo?.id_dispositivo,
+      });
+      var valor_Boveda = parseInt(valores?.obj[0]?.valor_boveda)
       if (movementType !== "Movimiento a bóveda") {
         var sumExter = 0
         Object.values(valoresExternos).map((e)=> sumExter += e)
         if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
           if (movementType !== "Recibido transportadora") {          
-            var valores = await verValorBoveda({
-              id_usuario: roleInfo?.id_usuario,
-              id_comercio: roleInfo?.id_comercio,
-              id_terminal: roleInfo?.id_dispositivo,
-            });
-            var valor_Boveda = parseInt(valores?.obj[0]?.valor_boveda)
             if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
               throw new Error("Efectivo insuficiente en Caja", {
                 cause: "custom",
@@ -202,6 +202,13 @@ const CargaComprobante = () => {
           });
         }
       }else{
+        if(TipoMovimiento === "Ingreso a bóveda"){
+          if((quotaInfo?.quota-valor_Boveda) < valorComprobante) {
+            throw new Error("Efectivo insuficiente en Caja", {
+              cause: "custom",
+            });
+          }
+        }
         const reqBody = {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
@@ -337,7 +344,7 @@ const CargaComprobante = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-10 mb-8">Transportadora y Consignaciones</h1>
+      <h1 className="text-3xl mt-10 mb-8">Bóveda, Consignaciones y Transportadora</h1>
       <Form grid>
         <Select
           id="searchByType"
