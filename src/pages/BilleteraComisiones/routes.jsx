@@ -22,9 +22,8 @@ const HistorialDispersionesUsuarioPadreDetalle = lazy(() =>
 );
 const BilleteraComisiones = lazy(() => import("./BilleteraComisiones"));
 
-const listPermissions = Object.values(enumBilleteraComisiones);
-export const listPermissionsBilleteraComisiones = listPermissions.splice(
-  listPermissions.length / 2
+export const listPermissionsBilleteraComisiones = Object.values(
+  enumBilleteraComisiones
 );
 
 const rutasBilleteraComisiones = [
