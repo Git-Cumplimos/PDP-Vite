@@ -26,8 +26,6 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-var Idpermission = []
-
 
 const AdminLayout = () => {
   const {
@@ -145,8 +143,8 @@ const AdminLayout = () => {
 
   const handleCloseBoveda = useCallback(() => {
     setModalAlertBoveda(false)
-    var valorporcentajeAlerta1 = montoMaximoCaja*porcentajeAlerta1/100
-    var valorporcentajeAlerta2 = montoMaximoCaja*porcentajeAlerta2/100
+    let valorporcentajeAlerta1 = montoMaximoCaja*porcentajeAlerta1/100
+    let valorporcentajeAlerta2 = montoMaximoCaja*porcentajeAlerta2/100
     if (conteoAlertaBoveda === 1) {
       setMontoMaximoCaja(parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta1))
       setConteoAlertaBoveda(2)
@@ -159,9 +157,6 @@ const AdminLayout = () => {
   }, [porcentajeAlerta1,montoMaximoCaja,porcentajeAlerta2,conteoAlertaBoveda,navigate]);
 
   useEffect(() => {
-    userPermissions.forEach(function(val) {
-      Idpermission.push(val.id_permission)
-    })
     const conditions = [
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
@@ -169,7 +164,6 @@ const AdminLayout = () => {
       userPermissions?.map(({ id_permission }) => id_permission).includes(7012),
       userPermissions?.map(({ id_permission }) => id_permission).includes(7013),
     ];
-    // if (Idpermission.includes(7012) && Idpermission.includes(7013)) {
     if (conditions.every((val) => val)) {
       verValorBoveda({
         id_usuario: roleInfo?.id_usuario,
@@ -193,8 +187,13 @@ const AdminLayout = () => {
           console.error(error?.message);
         });
     }
-    // }
-  }, [userPermissions,roleInfo,quotaInfo,valorCaja,pathname,montoMaximoCaja]);
+  }, [userPermissions,
+      roleInfo?.id_usuario,
+      roleInfo?.id_comercio,
+      roleInfo?.id_dispositivo,
+      quotaInfo?.quota,
+      pathname,
+      montoMaximoCaja]);
 
   const showModalAlertBoveda = useMemo(() => {
     return (
