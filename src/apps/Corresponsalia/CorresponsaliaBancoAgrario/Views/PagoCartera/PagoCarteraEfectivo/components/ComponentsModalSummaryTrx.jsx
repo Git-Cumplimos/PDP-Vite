@@ -31,11 +31,7 @@ export const ComponentsModalSummaryTrx = ({
         "Valor a pagar para fecha de corte": formatMoney.format(
           summary[posicion]?.valor_pagar_fechaCorte
         ),
-        [documento === "LecturaNumeroObligacion"
-          ? "Número de obligación"
-          : documento === "LecturaNumeroCedula"
-          ? "Número de cédula"
-          : ""]: summary[posicion]?.numero_obligacion,
+        ["Número de obligación"]: summary[posicion]?.numero_obligacion,
         "Valor total de la deuda": formatMoney.format(
           summary[posicion]?.valor_deuda
         ),
