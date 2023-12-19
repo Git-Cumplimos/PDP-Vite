@@ -198,7 +198,9 @@ const Panel = () => {
               ["Id Comercio", cierre?.id_comercio],
               ["No. terminal", cierre?.id_terminal],
               ["Id Cierre", cierre?.pk_id_cierre],
+              ["", ""],
               ["Comercio", nombreComercio],
+              ["", ""],
               ["Cajero",cierre?.nombre_usuario],
               ["", ""],
             ],
@@ -214,13 +216,21 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Efectivo en caja PDP",
-                formatMoney.format(Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)),
+                "Efectivo PDP - Consignaciones y Transportadora",
+                formatMoney.format((Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)) 
+                + cierre?.total_recibido_transportadora + cierre?.total_notas 
+                - (cierre?.total_consignaciones>0?cierre?.total_consignaciones:cierre?.total_consignaciones*-1) 
+                - (cierre?.total_entregado_transportadora>0?cierre?.total_entregado_transportadora:cierre?.total_entregado_transportadora*-1)
+                - cierre?.total_consignaciones_externos - cierre?.total_entrega_externos),
               ],
               ["", ""],
               [
                 "Efectivo en caja PDP + Externos",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
+                formatMoney.format(cierre?.total_efectivo_en_caja 
+                + cierre?.total_recibido_transportadora + cierre?.total_notas 
+                - (cierre?.total_consignaciones>0?cierre?.total_consignaciones:cierre?.total_consignaciones*-1) 
+                - (cierre?.total_entregado_transportadora>0?cierre?.total_entregado_transportadora:cierre?.total_entregado_transportadora*-1)
+                - cierre?.total_consignaciones_externos - cierre?.total_entrega_externos),
               ],
               ["", ""],
             ],
@@ -235,12 +245,12 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Consignaciones bancarias",
+                "Consignaciones bancarias PDP",
                 formatMoney.format(cierre?.total_consignaciones),
               ],
               ["", ""],
               [
-                "Entregado a transportadora",
+                "Entregado PDP a transportadora",
                 formatMoney.format(cierre?.total_entregado_transportadora),
               ],
               ["", ""],
@@ -261,6 +271,8 @@ const Panel = () => {
               elemento.pk_nombre_plataforma,
               formatMoney.format(elemento.valor)],["", ""])
           )
+          tempTicket.trxInfo.push(["Consignaciones bancarias externos",formatMoney.format(cierre?.total_consignaciones_externos)],["", ""])
+          tempTicket.trxInfo.push(["Entregado a transportadora externos",formatMoney.format(cierre?.total_entrega_externos)],["", ""])
           setResumenCierre(tempTicket);
           return res?.msg;
         },
