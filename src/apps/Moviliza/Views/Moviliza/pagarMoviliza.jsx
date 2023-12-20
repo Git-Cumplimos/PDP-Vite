@@ -295,186 +295,74 @@ const PagarMoviliza = () => {
 
   const onSubmitConsultMoviliza = (e) => {
     e.preventDefault();
-    const data = {
+    const dataLoggin = {
       id_comercio: roleInfo.id_comercio,
       id_terminal: roleInfo.id_dispositivo,
       id_usuario: roleInfo.id_usuario,
-      nombre_usuario: pdpUser["uname"],
-      tipoRecaudo: 1,
-      idLiquidacion: numeroMoviliza,
-      token: token
+      nombre_usuario: pdpUser["uname"]
     };
-
-    // const response= {obj: {result: "quemado"}}
-    // setResConsultMoviliza(response?.obj?.result);
-    // setPaso("ResumenTrx");
-    // setShowModal(true);
-
-
-
-
-      // const data3 = {
-      //   comercio: {
-      //     id_comercio: roleInfo?.id_comercio,
-      //     id_usuario: roleInfo?.id_usuario,
-      //     id_terminal: roleInfo?.id_dispositivo,
-      //   },
-      //   oficina_propia:
-      //     roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-      //     roleInfo?.tipo_comercio === "KIOSCO",
-      //   valor_total_trx: 1500,
-      //   nombre_usuario: pdpUser?.uname ?? "",
-      //   nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
-      //   // ticket_init: [
-      //   //   ["Convenio", datosConvenio?.nombre_convenio],
-      //   //   ...Object.entries(userReferences).map(([, val], index) => [
-      //   //     datosConvenio[`referencia_${index + 1}`],
-      //   //     val,
-      //   //   ]),
-      //   //   ["Valor", formatMoney.format(valTrxRecaudo)],
-      //   // ].reduce((list, elem, i) => {
-      //   //   list.push(elem);
-      //   //   if ((i + 1) % 1 === 0) list.push(["", ""]);
-      //   //   return list;
-      //   // }, []),         
-
-      //   id_trx: 223023,//inquiryStatus?.id_trx,
-      //   // Datos trx colpatria
-      //   colpatria: {
-      //     codigo_convenio_pdp: "0004", //datosConvenio?.fk_id_convenio,
-      //     codigo_convenio: 2211, //datosConvenio?.pk_codigo_convenio,
-      //     //  ...userReferences,
-      //     referencia_1 : "123456789",
-      //     location: {
-      //       address: "roleInfo.address dir usuario",
-      //       dane_code: roleInfo?.codigo_dane,
-      //       city: roleInfo?.ciudad.substring(0, 7),
-      //     },
-      //   },
-      // };
-
-
-
-
-
-        // peticionConsultMoviliza({}, data)
-        // .then((response) => {
-        //   // notify(response.status);
-        //   if (response?.status == true) {
-        //     if (response?.obj?.object?.estado != "PAGADO"){
-        //     setResConsultMoviliza(response?.obj);
-        //     setPaso("ResumenTrx");
-        //     setShowModal(true);
-        //     notify("Consulta realizada");
-        //   }
-        //   else{
-        //     notify("Liquidación se encuentra en estado PAGADO");
-        //   }
-        // }
-        // if (response?.status == false){
-        //     notify("Consulta realizada: "+ toString("response.status"));
-        //   }
-        //   //return response
-        // }
-        // )
-        // .catch((error) => {
-        //   CallErrorPeticion(error);
-        //   console.log(error.message)
-        //   notifyError("Consulta realizada: "+ toString(resConsultMoviliza.mensaje));
-        // })
-
-        // notify("Respuesta PDP: Realizando consulta")
-      peticionConsultMoviliza({}, data)
-        .then((response) => {
-            if (response?.status === true) {
-              if (response?.obj?.object?.estado != "PAGADO"){
-              setResConsultMoviliza(response?.obj);
-              setPaso("ResumenTrx");
-              setShowModal(true);
-              // notify ("Respuesta PDP: Consulta realizada");
-              }
-              else{
-                notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
-                navigate("/");
-                navigate("/moviliza");
-              }
-            }
-            else if (response?.status === false){ 
-                  if (response?.obj?.mensaje != null){
-                    if (response?.obj?.mensaje=="Error autenticando adminot "){
-                      notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
-                      navigate("/");
-                      navigate("/moviliza");
-                    }
-                    else{
-                      notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
-                      navigate("/");
-                      navigate("/moviliza");
-                    }
-            }
-                else{
-                  notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                  navigate("/");
-                  navigate("/moviliza");
+    peticionJwt({}, dataLoggin)
+    .then((response) => {
+      if (response?.status === true) {
+        setToken(response?.obj?.object)
+        const data = {
+          id_comercio: roleInfo.id_comercio,
+          id_terminal: roleInfo.id_dispositivo,
+          id_usuario: roleInfo.id_usuario,
+          nombre_usuario: pdpUser["uname"],
+          tipoRecaudo: 1,
+          idLiquidacion: numeroMoviliza,
+          // token: token
+          token: response?.obj?.object
+        };
+          peticionConsultMoviliza({}, data)
+            .then((response) => {
+                if (response?.status === true) {
+                  if (response?.obj?.object?.estado != "PAGADO"){
+                  setResConsultMoviliza(response?.obj);
+                  setPaso("ResumenTrx");
+                  setShowModal(true);
+                  }
+                  else{
+                    notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
+                    navigate("/");
+                    navigate("/moviliza");
+                  }
                 }
-            }
-           }
-        )
-        .catch((error) => {
-          navigate("/");
-          navigate("/moviliza");
-          if (error?.cause === "custom") {
-            return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-          }
-          notifyError("Error respuesta PDP: Error al realizar consulta");
-        })
-
-      //   notifyPending(
-      //     ( peticionConsultMoviliza({}, data)),
-      //   {
-      //     render: () => {
-      //       return "Realizando consulta";
-      //     },
-      //   },
-      //   {
-      //     render: ({data: response}) => {
-      //       // setPaymentStatus(res?.obj?.ticket ?? {});
-      //     if (response?.status === true) {
-      //       if (response?.obj?.object?.estado != "PAGADO"){
-      //       setResConsultMoviliza(response?.obj);
-      //       setPaso("ResumenTrx");
-      //       setShowModal(true);
-      //       return "Respuesta PDP: Consulta realizada";
-      //       }
-      //       else{
-      //         return "Respuesta PDP: Liquidación se encuentra en estado PAGADO";
-      //       }
-      //     }
-      //     else if (response?.status === false){ 
-      //           if (response?.obj?.mensaje != null){
-      //             if (response?.obj?.mensaje=="Error autenticando adminot "){
-      //               return "Respuesta PDP: Recargar página";
-      //             }
-      //             else{
-      //               return "Respuesta Moviliza: "+response?.obj?.mensaje
-      //             }
-      //     }
-      //         else{
-      //           return "Respuesta PDP: Recargar página";
-      //         }
-      //     }
-      //     },
-      //   },
-      //   {
-      //     render: ({ data: error }) => {
-      //       navigate("/moviliza");
-      //       if (error?.cause === "custom") {
-      //         return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
-      //       }
-      //       return "Error respuesta PDP: Error al realizar consulta";
-      //     },
-      //   }
-      // )
+                else if (response?.status === false){ 
+                      if (response?.obj?.mensaje != null){
+                        if (response?.obj?.mensaje=="Error autenticando adminot "){
+                          notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
+                          navigate("/");
+                          navigate("/moviliza");
+                        }
+                        else{
+                          notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
+                          navigate("/");
+                          navigate("/moviliza");
+                        }
+                }
+                    else{
+                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                      navigate("/");
+                      navigate("/moviliza");
+                    }
+                }
+               }
+            )
+            .catch((error) => {
+              navigate("/");
+              navigate("/moviliza");
+              if (error?.cause === "custom") {
+                return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+              }
+              notifyError("Error respuesta PDP: Error al realizar consulta");
+            })
+      }
+    })
+    .catch((error) => {
+      CallErrorPeticion(error);
+    });
   };
 
   const onSubmitPayMoviliza = useCallback(
