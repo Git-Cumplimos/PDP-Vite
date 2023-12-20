@@ -455,9 +455,7 @@ const CrearComercios = () => {
         dispersionPagosEnvio["convenio_runt"] = dispersionPagosEnvio.convenio_runt;
         dispersionPagosEnvio["convenio_mt"] = dispersionPagosEnvio.convenio_mt;
       }
-      // if (dispersionPagosEnvio.autorizador_runt_mt) 
       delete dispersionPagosEnvio["autorizador_runt_mt"];
-      // if (dispersionPagosEnvio.convenio_runt_mt) 
       delete dispersionPagosEnvio["convenio_runt_mt"];
       postDispersionPagoComercio(dispersionPagosEnvio)
       .then((res) => {
