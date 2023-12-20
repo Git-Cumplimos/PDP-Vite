@@ -1,6 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlMoviliza = `${process.env.REACT_APP_URL_MOVILIZA}`;
 // const urlComercios = `http://127.0.0.1:5000`;
 
 export const postConsultaTipoNivelComercio = async (bodyObj) => {
@@ -134,6 +135,50 @@ export const postCambiarComercioGrupoComercio = async (bodyObj) => {
   try {
     const res = await fetchData(
       `${urlComercios}/comercios/modificar-comercio-grupo-comercio`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postDispersionPagoComercio = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlMoviliza}/moviliza/parametrizar`,
+      "POST",
+      {},
+      bodyObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postConsultaParametrizacionConvenios = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  try {
+    const res = await fetchData(
+      `${urlMoviliza}/moviliza/consulta_parametrizacion`,
       "POST",
       {},
       bodyObj,
