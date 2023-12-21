@@ -15,7 +15,7 @@ const DispersionButtons = ({ type, callback }: Props) => {
         } text-white rounded-full`}
         onClick={callback}
       >
-        <span className={`bi bi-${type} text-4xl font-bold block w-10 h-10`} />
+        <span className={`bi bi-${type} text-2xl font-bold flex w-6 h-6`} />
       </button>
     </div>
   );

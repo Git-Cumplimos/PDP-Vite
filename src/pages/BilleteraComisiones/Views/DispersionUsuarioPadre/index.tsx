@@ -16,7 +16,6 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Fieldset from "../../../../components/Base/Fieldset";
 import Select from "../../../../components/Base/Select";
 import Button from "../../../../components/Base/Button";
-import DispersionButtons from "./Buttons";
 import Modal from "../../../../components/Base/Modal";
 import {
   NumberString,
@@ -29,18 +28,20 @@ import useInterval from "./hooks/useInterval";
 import { toast } from "react-toastify";
 import useTimeout from "./hooks/useTimeout";
 import { notifyError } from "../../../../utils/notify";
+import IconSwap from "./IconSwap";
+import TicketBlock from "./TicketBlock";
 
 type Props = {};
 
 const toastIdLoading = "progress-trx-123";
 const limite_maximo_dispersion = 10_000_000;
 
-const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
-// const urlComisiones = "http://localhost:5000";
+// const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+const urlComisiones = "http://localhost:5000";
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
 const DispersionUsuarioPadre = (props: Props) => {
-  const { pdpUser } = useAuth();
+  const { pdpUser, quotaInfo } = useAuth();
   const navigate = useNavigate();
 
   const [comercios, setComercios] = useState<any[]>([]);
@@ -52,6 +53,9 @@ const DispersionUsuarioPadre = (props: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [trxState, setTrxState] = useState<boolean | undefined>();
 
+  const [idDispersionBack, setIdDispersionBack] = useState<
+    number | undefined
+  >();
   const [getDispersionData, setGetDispersionData] = useState<{
     url: string;
     method: string;
@@ -59,6 +63,8 @@ const DispersionUsuarioPadre = (props: Props) => {
   const [intervalDelay, setIntervalDelay] = useState<number | undefined>();
   const [timeoutDelay, setTimeoutDelay] = useState<number | undefined>();
   const [letExit, setLetExit] = useState(false);
+
+  const [ticketList, setTicketList] = useState<any[]>([]);
 
   const handleCloseModal = useCallback(() => setShowModal(false), []);
   const handleEndConsulta = useCallback(() => {
@@ -68,15 +74,11 @@ const DispersionUsuarioPadre = (props: Props) => {
     setLetExit(true);
   }, []);
 
-  const tsPdpUser = useMemo(
-    () => pdpUser ?? { uuid: 0, saldo: "0", uname: "" },
-    [pdpUser]
-  );
+  const tsQuotaInfo = useMemo(() => quotaInfo ?? { comision: 0 }, [quotaInfo]);
+
+  const tsPdpUser = useMemo(() => pdpUser ?? { uuid: 0, uname: "" }, [pdpUser]);
   const uuid = useMemo(() => tsPdpUser?.uuid ?? 0, [tsPdpUser]);
-  const saldoWalletUser = useMemo(
-    () => parseFloat(tsPdpUser?.saldo) ?? 0,
-    [tsPdpUser]
-  );
+  const saldoWalletUser = useMemo(() => tsQuotaInfo?.comision, [tsQuotaInfo]);
 
   useFetchDebounce(
     {
@@ -84,6 +86,7 @@ const DispersionUsuarioPadre = (props: Props) => {
         () => `${urlComercios}/comercios/usuario-padre?fk_id_user=${uuid}`,
         [uuid]
       ),
+      autoDispatch: !(uuid == null),
     },
     {
       onSuccess: useCallback(
@@ -91,9 +94,7 @@ const DispersionUsuarioPadre = (props: Props) => {
         []
       ),
       onError: useCallback((error) => console.error(error), []),
-    },
-    undefined,
-    !(uuid == null)
+    }
   );
 
   const allCommerces = useMemo(
@@ -135,7 +136,7 @@ const DispersionUsuarioPadre = (props: Props) => {
     [allCommerces, comerciosDispersion]
   );
 
-  const [loadingMakeDispersion, , makeDispersion] = useFetchDebounce(
+  const [makeDispersion, loadingMakeDispersion] = useFetchDebounce(
     {
       url: `${urlComisiones}/servicio-wallet-comisiones/transferencia-wallet-usuario-padre-cupo`,
       options: useMemo(
@@ -159,11 +160,13 @@ const DispersionUsuarioPadre = (props: Props) => {
         }),
         [uuid, comerciosDispersion]
       ),
+      autoDispatch: false,
     },
     {
       onPending: useCallback(() => "Procesando transaccion", []),
       onSuccess: useCallback((res) => {
         setTrxState(true);
+        setIdDispersionBack(res?.obj?.pk_id_dispersion);
         setGetDispersionData(res?.obj?.actions?.consulta_estado);
         setIntervalDelay(1000 * res?.obj?.time_delta_request);
         setTimeoutDelay(1000 * res?.obj?.timeout_request);
@@ -183,11 +186,10 @@ const DispersionUsuarioPadre = (props: Props) => {
         return "Transaccion fallida";
       }, []),
     },
-    { notify: true },
-    false
+    { notify: true }
   );
 
-  const [, , consultarDispersion] = useFetchDebounce(
+  const [consultarDispersion] = useFetchDebounce(
     {
       url: useMemo(
         () => `${urlComisiones}${getDispersionData?.url}`,
@@ -199,6 +201,7 @@ const DispersionUsuarioPadre = (props: Props) => {
         }),
         [getDispersionData?.method]
       ),
+      autoDispatch: false,
     },
     {
       onSuccess: useCallback(
@@ -218,14 +221,14 @@ const DispersionUsuarioPadre = (props: Props) => {
           });
           if (progreso >= 1) {
             handleEndConsulta();
+            setTicketList(res?.obj?.ticket_list ?? []);
           }
         },
         [handleEndConsulta]
       ),
       onError: useCallback((error) => console.error(error?.message), []),
     },
-    { delay: 50 },
-    false
+    { delay: 50 }
   );
 
   useInterval(
@@ -270,9 +273,54 @@ const DispersionUsuarioPadre = (props: Props) => {
         }}
         grid
       >
-        <Fieldset legend={"Dispersion"} className={"lg:col-span-2"}>
+        <Fieldset
+          legend={
+            <div className="flex gap-2 items-center">
+              <p>Tranferencias</p>
+              <IconSwap
+                bootstrapIcon="file-earmark-plus"
+                bootstrapIconHover="file-earmark-plus-fill"
+                colorName="text-primary"
+                className={
+                  comerciosDispersion.length === comercios.length
+                    ? "hidden"
+                    : ""
+                }
+                onClick={() =>
+                  dispatch({
+                    type: "ADD_COMMERCE",
+                    payload: {
+                      pk_commerce: "",
+                      commerce_name: "",
+                    },
+                  })
+                }
+              />
+            </div>
+          }
+          className={"lg:col-span-2"}
+        >
           {comerciosDispersion.map(({ pk_commerce, value }, index) => (
-            <Fragment key={index}>
+            <Fieldset
+              legend={
+                <div className="flex gap-2 items-center">
+                  <p>Tranferencia {index + 1}</p>
+                  <IconSwap
+                    bootstrapIcon="trash"
+                    bootstrapIconHover="trash-fill"
+                    colorName="text-red-700"
+                    onClick={() =>
+                      dispatch({
+                        type: "REMOVE_COMMERCE",
+                        payload: index,
+                      })
+                    }
+                  />
+                </div>
+              }
+              className={"lg:col-span-2"}
+              key={index}
+            >
               <Select
                 label={"Comercio seleccionado"}
                 options={[
@@ -312,35 +360,9 @@ const DispersionUsuarioPadre = (props: Props) => {
                 }
                 required
               />
-              <ButtonBar className="lg:col-span-2">
-                <DispersionButtons
-                  type="dash"
-                  callback={() =>
-                    dispatch({
-                      type: "REMOVE_COMMERCE",
-                      payload: index,
-                    })
-                  }
-                />
-              </ButtonBar>
-            </Fragment>
+            </Fieldset>
           ))}
-          <ButtonBar className="lg:col-span-2">
-            {comerciosDispersion.length !== comercios.length && (
-              <DispersionButtons
-                type="plus"
-                callback={() =>
-                  dispatch({
-                    type: "ADD_COMMERCE",
-                    payload: {
-                      pk_commerce: "",
-                      commerce_name: "",
-                    },
-                  })
-                }
-              />
-            )}
-          </ButtonBar>
+          <ButtonBar className="lg:col-span-2" children={false} />
         </Fieldset>
         <MoneyInput
           label="Valor total a transferir"
@@ -384,7 +406,9 @@ const DispersionUsuarioPadre = (props: Props) => {
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <ButtonBar>
               <Button
-                onClick={() => navigate("/billetera-comisiones")}
+                onClick={() =>
+                  navigate("/billetera-comisiones", { replace: true })
+                }
                 disabled={!letExit}
               >
                 Cerrar
@@ -393,7 +417,8 @@ const DispersionUsuarioPadre = (props: Props) => {
                 type="submit"
                 onClick={() =>
                   navigate(
-                    "/billetera-comisiones/historico-tranferencias-usuario-padre"
+                    `/billetera-comisiones/historico-tranferencias-usuario-padre/${idDispersionBack}`,
+                    { replace: true }
                   )
                 }
                 disabled={!letExit}
@@ -401,6 +426,13 @@ const DispersionUsuarioPadre = (props: Props) => {
                 Revisar transferencia
               </Button>
             </ButtonBar>
+            {!!ticketList.length && (
+              <div>
+                {ticketList.map((data) => (
+                  <TicketBlock ticketData={data} ticketType="Original" />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </Modal>

@@ -35,8 +35,6 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     diasSobregiro,
-    diasSobregiroD,
-    cargar,
   } = classes;
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
 
@@ -46,7 +44,6 @@ const AdminLayout = () => {
 
   const { urlsPrivate: urls } = useUrls();
 
-  const [showModal, setShowModal] = useState(false);
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
   const [cajaState, setCajaState] = useState("");
 
@@ -172,7 +169,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </div>
-        <ModalAlert/>
+        <ModalAlert />
         <HNavbar links={urls} isText />
       </header>
       <main className="container">

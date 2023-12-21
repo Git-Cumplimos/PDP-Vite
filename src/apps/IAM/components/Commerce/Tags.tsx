@@ -29,7 +29,7 @@ const CommerceTagsIam = ({
   setIsNotEmpty,
   setUpdateCommerces,
   uuid,
-  show = false
+  show = false,
 }: Props) => {
   const navigate = useNavigate();
   const [comercios, setComercios] = useState<any[]>([]);
@@ -47,6 +47,7 @@ const CommerceTagsIam = ({
         )}`;
         return url;
       }, [uuid]),
+      autoDispatch: !(uuid == null),
     },
     {
       onSuccess: useCallback(
@@ -58,9 +59,7 @@ const CommerceTagsIam = ({
         [setIsNotEmpty]
       ),
       onError: useCallback((error) => console.error(error), []),
-    },
-    undefined,
-    !(uuid == null)
+    }
   );
 
   const [putCommerces] = useFetchDispatchDebounce(
