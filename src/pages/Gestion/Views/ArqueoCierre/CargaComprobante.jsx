@@ -133,7 +133,7 @@ const CargaComprobante = () => {
               });
             }
             if (valor_Boveda < valorEfectivoBoveda) {
-              throw new Error("Efectivo insuficiente en boveda", {
+              throw new Error("Efectivo insuficiente en bóveda", {
                 cause: "custom",
               });
             }
@@ -578,14 +578,12 @@ const CargaComprobante = () => {
               )
             :null}
             <ButtonBar className="lg:col-span-2">
-              {movementType === "Movimiento a bóveda" ?
-                <ButtonLink
-                  to={"/gestion/arqueo"}
-                  onClick={() => { notifyError("Movimiento Cancelado") }}
-                >
-                  Cancelar
-                </ButtonLink>
-              :null}
+              <ButtonLink
+                to={"/gestion/arqueo"}
+                onClick={() => { notifyError("Movimiento Cancelado") }}
+              >
+                Cancelar
+              </ButtonLink>
               <Button type="submit" className="text-center">
                 Realizar movimiento
               </Button>
