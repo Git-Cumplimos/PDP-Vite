@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
   useState,
 } from "react";
 import { initialSearchObj, reducerCommerceFilters } from "./state/table";
@@ -14,11 +13,9 @@ import { makeDateFormatter } from "../../../../../utils/functions";
 import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { Navigate, useParams } from "react-router-dom";
 import Modal from "../../../../../components/Base/Modal";
-import { useReactToPrint } from "react-to-print";
-import Tickets from "../../../../../components/Base/Tickets";
-import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
 import { notify, notifyError } from "../../../../../utils/notify";
+import TicketBlock from "../../DispersionUsuarioPadre/TicketBlock";
 
 type Props = {};
 
@@ -43,15 +40,14 @@ const DetallesHistoricoDUP = (props: Props) => {
 
   const handleClose = useCallback(() => setCurrentInfo(undefined), []);
 
-  const printDiv = useRef(null);
-
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-  });
-
   const [searchFilters, dispatch] = useReducer(
     reducerCommerceFilters,
     initialSearchObj
+  );
+
+  const ts_pk_id_dispersion = useMemo(
+    () => parseInt(pk_id_dispersion ?? "") ?? 0,
+    [pk_id_dispersion]
   );
 
   const tableDispersiones = useMemo(
@@ -141,16 +137,20 @@ const DetallesHistoricoDUP = (props: Props) => {
   );
 
   useEffect(() => {
-    if (pk_id_dispersion) {
+    if (ts_pk_id_dispersion) {
       dispatch({
         type: "SET_PK_ID_DISPERSION",
-        value: parseFloat(pk_id_dispersion) ?? 0,
+        value: ts_pk_id_dispersion,
       });
     }
-  }, [pk_id_dispersion]);
+  }, [ts_pk_id_dispersion]);
 
-  if (!pk_id_dispersion) {
-    return <Navigate to={"/billetera-comisiones"} />;
+  if (!ts_pk_id_dispersion) {
+    return (
+      <Navigate
+        to={"/billetera-comisiones/historico-tranferencias-usuario-padre"}
+      />
+    );
   }
 
   return (
@@ -195,10 +195,7 @@ const DetallesHistoricoDUP = (props: Props) => {
           </Fragment>
         }
       />
-      <Modal
-        show={!!currentInfo}
-        handleClose={handleClose}
-      >
+      <Modal show={!!currentInfo} handleClose={handleClose}>
         {currentInfo?.type === "RESPONSE" && (
           <div className="flex gap-4">
             <div className="flex flex-col gap-2 w-full">
@@ -228,18 +225,9 @@ const DetallesHistoricoDUP = (props: Props) => {
           </div>
         )}
         {currentInfo?.type === "TICKET" && (
-          <div className="flex flex-col justify-center items-center">
-            <Tickets
-              refPrint={printDiv}
-              ticket={currentInfo.value}
-              type="Reimpresión"
-              stateTrx
-            />
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={handleClose}>Cerrar</Button>
-            </ButtonBar>
-          </div>
+          <TicketBlock ticketData={currentInfo.value}>
+            <Button onClick={handleClose}>Cerrar</Button>
+          </TicketBlock>
         )}
       </Modal>
     </Fragment>

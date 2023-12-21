@@ -36,8 +36,6 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     diasSobregiro,
-    diasSobregiroD,
-    cargar,
   } = classes;
 
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -49,6 +47,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { urlsPrivate: urls } = useUrls();
+
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
   const [ModalAlertBoveda, setModalAlertBoveda] = useState(true);
   const [cajaState, setCajaState] = useState("");
@@ -241,7 +240,7 @@ const AdminLayout = () => {
             </div>
           </div>
         </div>
-        <ModalAlert/>
+        <ModalAlert />
         <HNavbar links={urls} isText />
       </header>
       <main className="container">
