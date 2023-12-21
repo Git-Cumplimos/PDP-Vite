@@ -1,8 +1,9 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useRef } from "react";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Input from "../../../../../components/Base/Input";
 import classes from "../pagarMoviliza.module.css";
+import TextArea from "../../../../../components/Base/TextArea";
 import Form from "../../../../../components/Base/Form/Form";
 
 //Clases estilos
@@ -10,6 +11,7 @@ const { styleComponentsInput, formItem } = classes;
 
   export const LecturaBarcode = ({
     loadingPeticion,
+    loadingPeticionConsulta,
     onSubmit,
     handleClose,
     onChange,
@@ -21,17 +23,22 @@ const { styleComponentsInput, formItem } = classes;
     bloqueoInput,
     resetConsultaBarcode,
     token,
-    cambioBarcodeBoton
+    cambioBarcodeBoton,
+    datosTrans,
+    setDatosTrans,
+    onChangeFormat
   }) => {
+    const isAlt = useRef("");
+    const isAltCR = useRef({ data: "", state: false });
     return (
       <Fragment>
         <ButtonBar></ButtonBar>
-        <h2 className="text-xl mt-6">Escanee el código de barras</h2>
+        {/* <h2 className="text-xl mt-6">Escanee el código de barras</h2> */}
         <ButtonBar></ButtonBar>
 
         {procedimiento === option_barcode && (
-          
-          <Input
+          <>
+          {/* <Input
           required
           className={styleComponentsInput}
           type="text"
@@ -46,7 +53,62 @@ const { styleComponentsInput, formItem } = classes;
               ev.preventDefault();
             }
           }}
-          />
+          /> */}
+          <TextArea
+          className={styleComponentsInput}
+          disabled={bloqueoInput}
+          onChange={onChange}
+          id='codBarras'
+          label='Escanee el código de barras'
+          type='text'
+          name='codBarras'
+          required
+          value={datosTrans.codBarras}
+          autoFocus
+          autoComplete='off'
+          onInput={onChangeFormat}
+          onKeyDown={(ev) => {
+            if (ev.keyCode === 13 && ev.shiftKey === false) {
+              // ev.preventDefault();
+              onSubmitBarcode(ev);
+              return;
+            }
+            if (ev.altKey) {
+              if (isAltCR.current.state) {
+                isAltCR.current = {
+                  ...isAltCR.current,
+                  data: isAltCR.current.data + ev.key,
+                };
+              }
+              if (ev.keyCode !== 18) {
+                isAlt.current += ev.key;
+              } else {
+                isAltCR.current = { ...isAltCR.current, state: true };
+              }
+            }
+          }}
+          onKeyUp={(ev) => {
+            if (ev.altKey === false && isAlt.current !== "") {
+              let value = String.fromCharCode(parseInt(isAlt.current));
+              isAlt.current = "";
+              if (value === "\u001d") {
+                setDatosTrans((old) => {
+                  return { ...old, codBarras: old.codBarras + "\u001d" };
+                });
+              }
+            }
+            if (ev.keyCode === 18) {
+              if (isAltCR.current.data === "013") {
+                onSubmitBarcode(ev);
+              }
+              isAltCR.current = {
+                ...isAltCR.current,
+                state: false,
+                data: "",
+              };
+            }
+          }}></TextArea>
+          </>
         )}
         {procedimiento === option_manual && (
           <Input
@@ -61,14 +123,19 @@ const { styleComponentsInput, formItem } = classes;
           />
         )}
 
-        {!loadingPeticion ? (
+        {!(loadingPeticion || loadingPeticionConsulta) ? (
         <Fragment>
          <ButtonBar>
           {cambioBarcodeBoton?(
-          <Button  onClick={resetConsultaBarcode} disabled={loadingPeticion} >Volver a ingresar código de barras</Button>
-         ):(
-          <Button type={"submit"} onClick={onSubmitBarcode} disabled={loadingPeticion} >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consultar código de barras&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Button>
-         ) 
+          <Button  
+          onClick={resetConsultaBarcode} 
+          disabled={loadingPeticion} 
+          >Volver a ingresar código de barras</Button>
+         )
+         :<></>
+        //  (
+        //   <Button type={"submit"} onClick={onSubmitBarcode} disabled={loadingPeticion} >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consultar código de barras&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Button>
+        //  ) 
          }
          </ButtonBar>
           </Fragment>
@@ -81,7 +148,7 @@ const { styleComponentsInput, formItem } = classes;
         </Fragment>
       )}
 
-      <ButtonBar className="flex justify-center py-1">
+      {/* <ButtonBar className="flex justify-center py-1">
           <Button 
           className={formItem} 
           type={"submit"}  
@@ -103,7 +170,7 @@ const { styleComponentsInput, formItem } = classes;
           <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
             Cancelar
           </Button>
-        </ButtonBar>
+        </ButtonBar> */}
 
         {/* </Form> */}
 

@@ -199,7 +199,9 @@ const PanelConsignaciones = () => {
           "Tipo de movimiento",
           "Empresa",
           "Número comprobante",
-          "Valor registrado",
+          "Valor total PDP",
+          "Valor redes externas",
+          "Valor total",
           "Observaciones",
           "Fecha registro",
           "Estado",
@@ -217,14 +219,17 @@ const PanelConsignaciones = () => {
             valor_movimiento,
             created,
             observaciones_analisis,
+            total_externos
           }) => ({
             pk_id_comprobante,
             id_comercio,
             id_usuario,
-            fk_tipo_comprobante,
+            fk_tipo_comprobante, 
             fk_nombre_entidad,
             nro_comprobante: toAccountNumber(nro_comprobante),
             valor_movimiento: formatMoney.format(valor_movimiento),
+            total_externos: formatMoney.format(total_externos),
+            total_externos_pdp: formatMoney.format(total_externos+parseInt(valor_movimiento)),
             observaciones_analisis,
             created: dateFormatter.format(new Date(created)),
             fk_estado_revision: estadoRevision.get(fk_estado_revision) ?? "",
@@ -267,22 +272,22 @@ const PanelConsignaciones = () => {
           ]}
           defaultValue={"1"}
         />
-          <Input
-            id="id_comercio"
-            name={"id_comercio"}
-            label="Id comercio"
-            type="tel"
-            onChange={handleChangeNumber}
-            value={idComercio}
-          />
-          <Input
-            id="id_usuario"
-            name={"id_usuario"}
-            label="Id Cajero"
-            type="tel"
-            onChange={handleChangeNumber}
-            value={idCajero}
-          />
+        <Input
+          id="id_comercio"
+          name={"id_comercio"}
+          label="Id comercio"
+          type="tel"
+          onChange={handleChangeNumber}
+          value={idComercio}
+        />
+        <Input
+          id="id_usuario"
+          name={"id_usuario"}
+          label="Id Cajero"
+          type="tel"
+          onChange={handleChangeNumber}
+          value={idCajero}
+        />
         </>):<>
           <Input id="fecha_registro_inicial" label="Fecha inicial" name="fecha_registro_inicial" type="date" />
           <Input id="fecha_registro_final" label="Fecha Final" name="fecha_registro_final" type="date" />
@@ -293,6 +298,20 @@ const PanelConsignaciones = () => {
           Validar comprobante
         </h1>
         <Form onSubmit={handleSubmit} grid>
+          <Input
+            id="id_comercio"
+            label="Id comercio"
+            type="text"
+            value={selected?.id_comercio ?? ""}
+            disabled
+          />
+          <Input
+            id="id_usuario"
+            label="Id cajero"
+            type="text"
+            value={selected?.id_usuario ?? ""}
+            disabled
+          />
           <Input
             id="fk_nombre_entidad"
             label="Empresa"
@@ -332,6 +351,46 @@ const PanelConsignaciones = () => {
             label="Tipo de movimiento"
             type="text"
             value={selected?.fk_tipo_comprobante ?? ""}
+            disabled
+          />
+          <Input
+            id="valor_efectivo_pdp"
+            label="Valor efectivo caja PDP"
+            type="text"
+            value={formatMoney.format(selected?.valor_efectivo_pdp) ?? ""}
+            disabled
+          />
+          <Input
+            id="valor_efectivo_boveda"
+            label="Valor efectivo Bóveda"
+            type="text"
+            value={formatMoney.format(selected?.valor_efectivo_boveda) ?? ""}
+            disabled
+          />
+          <Input
+            id="valor_movimiento"
+            label="Valor total PDP"
+            type="text"
+            value={formatMoney.format(selected?.valor_movimiento) ?? ""}
+            disabled
+          />
+          {selected?.valores_externos && typeof selected.valores_externos === 'object' ? (
+            Object.entries(selected?.valores_externos).map(([banco, valor]) => (
+              <Input
+                key={banco}
+                id={`valor_movimiento_${banco}`}
+                label={`${banco}`}
+                type="text"
+                value={formatMoney.format(valor)}
+                disabled
+              />
+            )
+          )):null}
+          <Input
+            id="valor_total_pdp_externos"
+            label="Valor total PDP + Externos"
+            type="text"
+            value={formatMoney.format(selected?.total_externos+parseInt(selected?.valor_movimiento)) ?? ""}
             disabled
           />
           <Select

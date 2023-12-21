@@ -28,7 +28,7 @@ const TableEnterprise = ({
   onSubmit = (e) => e.preventDefault(),
   onSetPageData = (_) => {},
   onSetUtilsFuncs = () => {},
-  children = null,
+  children = <></>,
   actions = {},
 }) => {
   const [showFilters, setShowFilters] = useState(true);
@@ -83,7 +83,7 @@ const TableEnterprise = ({
               onClick={() => setShowFilters((old) => !old)}
             />
           ) : (
-            ""
+            <></>
           )}
           {Object.entries(actions).map(([item, action]) => (
             <span className={`bi bi-${item} ${iconBtn}`} onClick={action} />
@@ -101,7 +101,7 @@ const TableEnterprise = ({
           </Form>
         </div>
       ) : (
-        ""
+        <></>
       )}
       <div className="overflow-x-auto">
         <table className={`${tableEnterprise}`}>

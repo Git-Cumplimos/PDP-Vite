@@ -238,10 +238,10 @@ const RetiroEfectivo = () => {
             {!loadingPeticionRetiroEfectivo ? (
               <>
                 <ButtonBar>
-                  <Button type={"submit"} onClick={realizarRetiroEfectivo}>
-                    Aceptar
-                  </Button>
                   <Button onClick={handleCloseResumen}>Cancelar</Button>
+                  <Button type={"submit"} onClick={realizarRetiroEfectivo}>
+                    Realizar Retiro
+                  </Button>
                 </ButtonBar>
               </>
             ) : (

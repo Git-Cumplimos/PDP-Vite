@@ -37,6 +37,8 @@ const RecaudoDirecto = () => {
   const [showModal, setShowModal] = useState(false)
   const [isNextPage, setIsNextPage] = useState(false);
   const [permiteRefExtra, setPermiteRefExtra] = useState(false);
+  const [selecTipoConvenio, setSelecTipoConvenio] = useState();
+  const [correos, setCorreos] = useState([]);
   const [limites, setlimites] = useState({
     "Valor mínimo": "0",
     "Valor máximo": "0",
@@ -67,6 +69,7 @@ const RecaudoDirecto = () => {
     { label: "Interno", value: 1 },
     { label: "Con autorizador", value: 2 },
     { label: "Sin base de datos", value: 3 },
+    { label: "Interno sin valor a pagar", value: 4 },
   ]
   const tipoArchivoConciliacion = [
     { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
@@ -179,6 +182,8 @@ const RecaudoDirecto = () => {
       "Longitud mínima ext": "",
       "Longitud máxima ext": "",
     })
+    setCorreos([])
+    setSelecTipoConvenio()
   }, []);
 
   const crearModificarConvenioRecaudo = useCallback((e) => {
@@ -215,9 +220,15 @@ const RecaudoDirecto = () => {
       }
       delete data['Longitud mínima ext']; delete data['Longitud máxima ext'];
     }
+    const correos = Object.entries(data).filter(([key]) => key.startsWith('correo_')).map(([, value]) => value);
+    Object.entries(data)
+    .filter(([key]) => key.startsWith('correo_'))
+    .forEach(([key]) => delete data[key]);
+    if (correos.length > 0) {
+      data.correos = correos;
+    }
     const filteredBody = Object.entries(data).filter(([key, value]) => value !== "");
     const body = Object.fromEntries(filteredBody);
-
     if (validacion) {
       notifyPending(
         selected
@@ -252,6 +263,28 @@ const RecaudoDirecto = () => {
   const descargarPlantilla = useCallback(() => {
     descargarCSV('Ejemplo_de_archivo_recaudo', res)
   }, [res]);
+
+  const handleConvenio = useCallback((e) => {
+    setSelecTipoConvenio(e.target.value)
+  }, []);
+
+  const handleEliminarCorreo = (index) => {
+    const copyCorreos = [...correos];
+    copyCorreos.splice(index, 1);
+    setCorreos(copyCorreos);
+  };
+
+  const handleAgregarCorreo = () => {
+    if (correos.length < 12) {
+      setCorreos([...correos, '']);
+    }
+  };
+
+  const handleChangeCorreo = (index, value) => {
+    const copyCorreos = [...correos];
+    copyCorreos[index] = value;
+    setCorreos(copyCorreos);
+  };
 
   return (
     <Fragment>
@@ -290,6 +323,9 @@ const RecaudoDirecto = () => {
         onClickRow={(_, index) => {
           setShowModal(true);
           setSelected(listRecaudos[index]);
+          let strTipoConvenio = listRecaudos[index]?.fk_id_tipo_convenio.toString()
+          setSelecTipoConvenio(strTipoConvenio)
+          setCorreos(listRecaudos[index]["correos"] === null?[]:listRecaudos[index]["correos"])
         }}
         tblFooter={
           <Fragment>
@@ -397,6 +433,7 @@ const RecaudoDirecto = () => {
             name={"fk_id_tipo_convenio"}
             options={[{ label: "", value: "" }, ...tipoConvenio]}
             defaultValue={selected?.fk_id_tipo_convenio ?? ""}
+            onInput={(e) => {handleConvenio(e)}}
             // onInput={(e) => { setSinBaseDatos(e.target.value === 3 ? true : false) }}
             required
             disabled={selected ? true : false}
@@ -417,7 +454,7 @@ const RecaudoDirecto = () => {
               id={"Tipo modificación"}
               label={"Tipo modificación"}
               name={"fk_modificar_valor"}
-              options={[{ label: "", value: "" }, ...tipoModificacion]}
+              options={selecTipoConvenio !== "4" &&  selected?.fk_id_tipo_convenio !== 4? [{ label: "", value: "" }, ...tipoModificacion]:[{ label: "Valor mayor", value: 3 },]}
               defaultValue={selected?.fk_modificar_valor ?? ""}
               required
             />
@@ -540,6 +577,37 @@ const RecaudoDirecto = () => {
               );
             })}
           </Fieldset>
+          <Fieldset legend="Correos">
+            {correos.map((correo, index) => (
+              <div key={index}>
+                <Input
+                  className="mb-4"
+                  id={`correo_${index}`}
+                  name={`correo_${index}`}
+                  label={`Correo ${index + 1}`}
+                  type="email"
+                  autoComplete="off"
+                  value={correo}
+                  onInput={(ev) => handleChangeCorreo(index, ev.target.value)}
+                  required
+                />
+                {correos.length > 0 && (
+                  <ButtonBar>
+                    <Button type="button" onClick={() => handleEliminarCorreo(index)}>
+                      Eliminar correo
+                    </Button>
+                  </ButtonBar>
+                )}
+              </div>
+            ))}
+            {correos.length < 12 && (
+              <ButtonBar>
+                <Button type="button" onClick={handleAgregarCorreo}>
+                  Añadir correo
+                </Button>
+              </ButtonBar>
+            )}
+          </Fieldset>
           <Select
             className="place-self-stretch mb-1"
             id={"Tipo_archivo"}
@@ -564,15 +632,17 @@ const RecaudoDirecto = () => {
             name={"permite_vencidos"}
             defaultChecked={selected?.permite_vencidos ?? ""}
           />
-          <ToggleInput
-            id={"permite_referencia_extra"}
-            label={"Permite datos extra"}
-            name={"permite_referencia_extra"}
-            defaultChecked={selected?.permite_referencia_extra ?? ""}
-            onChange={() =>
-              setPermiteRefExtra((old) => !old)
-            }
-          />
+          {selecTipoConvenio !== "4"?
+            <ToggleInput
+              id={"permite_referencia_extra"}
+              label={"Permite datos extra"}
+              name={"permite_referencia_extra"}
+              defaultChecked={selected?.permite_referencia_extra ?? ""}
+              onChange={() =>
+                setPermiteRefExtra((old) => !old)
+              }
+            />
+          :null}
           {selected && (
             <ToggleInput
               id={"activo"}

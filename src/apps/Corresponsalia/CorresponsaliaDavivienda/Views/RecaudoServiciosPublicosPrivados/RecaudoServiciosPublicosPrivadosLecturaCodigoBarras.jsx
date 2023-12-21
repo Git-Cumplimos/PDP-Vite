@@ -434,6 +434,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
+        nomConvenio: datosEnvio?.datosConvenio?.nom_convenio_cnb,
       })
         .then((res) => {
           if (res?.status) {

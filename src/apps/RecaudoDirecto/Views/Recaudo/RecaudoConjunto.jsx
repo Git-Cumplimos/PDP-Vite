@@ -13,6 +13,7 @@ import Tickets from "../../../../components/Base/Tickets";
 import { searchConveniosRecaudoList, modRecaudo, getRecaudo } from "../../utils/fetchFunctions"
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { onChangeNumber } from "../../../../utils/functions";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 
 const limitesMontos = {
   max: 9999999,
@@ -98,8 +99,7 @@ const RecaudoConjunto = () => {
     }
   }, [navigate, pk_id_convenio])
 
-  const consultarRecaudoD =
-    useCallback(async (e) => {
+  const consultarRecaudoD = useCallback(async (e) => {
       e.preventDefault()
       const data = {
         consulta_recaudo: {
@@ -198,7 +198,7 @@ const RecaudoConjunto = () => {
       nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
       pk_id_recaudo: dataRecaudo.pk_id_recaudo,
       referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
-      referencia_extra:referenciaExtra ?? ''
+      referencia_extra: convenioRecaudo?.fk_id_tipo_convenio === 4?dataRecaudo.referencia_extra:referenciaExtra ?? ''
     }
     if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
       modRecaudo(data)
@@ -328,11 +328,86 @@ const RecaudoConjunto = () => {
         </Form>
       ) : (<> Cargando...</>)}
       <Modal show={showModal} handleClose={() => handleClose(true)}>
-        <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo {
+        {/* <h2 className="text-3xl mx-auto text-center mb-4"> Realizar recaudo {
           !dataRecaudo && convenioRecaudo?.fk_id_tipo_convenio === 3 ? 'no registrado' : ''
-        } </h2>
+        } </h2> */}
         <Form onSubmit={hacerRecaudo} grid >
+          <PaymentSummary summaryTrx={
+            convenioRecaudo?.fk_id_tipo_convenio !== 3 ? 
+              {
+                "Estado": dataRecaudo.nombre_estado ?? "",
+                ...(convenioRecaudo?.fk_id_tipo_convenio === 4 ?{"Referencia extra": dataRecaudo.referencia_extra} : {}),
+                ...(permiteRefExtra ? {[convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"]: referenciaExtra}:{}),
+                ...(convenioRecaudo?.referencias?.reduce((acc, dict, index) => {
+                  return {
+                    ...acc,
+                    [dict?.nombre_referencia ?? `Referencia ${index + 1}`]: dataReferencias['referencia' + (index + 1)],
+                  };
+                }, {}) || {}),
+              }
+            :
+              {
+                ...(convenioRecaudo?.referencias?.reduce((acc, dict, index) => {
+                  return {
+                    ...acc,
+                    [dict?.nombre_referencia ?? `Referencia ${index + 1}`]: dataReferencias['referencia' + (index + 1)],
+                  };
+                }, {}) || {}),
+                ...(permiteRefExtra ? {[convenioRecaudo['nombre_tipo_referencia_extra'] ?? "Referencia extra"]: referenciaExtra}:{}),
+              }
+          }>
+          </PaymentSummary>
           {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
+            dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
+              <MoneyInput
+                label="Valor a recaudar"
+                name="valor_total_trx"
+                autoComplete="off"
+                value={valorCodigoBarras ? valorRecibido.valor_total_trx : (dataRecaudo.valor - dataRecaudo.valor_pagado ?? 0)}
+                maxLength={"11"}
+                min={limitesMontos.min}
+                max={limitesMontos.max}
+                disabled
+                required
+              />
+            ) : (
+              <MoneyInput
+                label="Valor a recaudar"
+                name="valor_total_trx"
+                autoComplete="off"
+                min={validarLimites(dataRecaudo?.fk_modificar_valor, 'min')}
+                equalError={dataRecaudo?.fk_modificar_valor === 2 ? null : false}
+                maxLength={"11"}
+                max={validarLimites(dataRecaudo?.fk_modificar_valor, 'max')}
+                onInput={(e, valor) =>
+                  setValorRecibido({ ...valorRecibido, [e.target.name]: valor })
+                }
+                required
+              />
+            )
+          ):(
+              <MoneyInput
+                label="Valor a recaudar"
+                name="valor_total_trx"
+                autoComplete="off"
+                value={valorRecibido.valor_total_trx}
+                maxLength={"11"}
+                min={limitesMontos.min}
+                max={limitesMontos.max}
+                disabled
+                required
+              />
+            )
+          }
+          <ButtonBar>
+            <Button type={"submit"} disabled={disableBtn}>
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
+            </Button>
+            <Button onClick={() => handleClose(true)} >
+              Cancelar
+            </Button>
+          </ButtonBar>
+          {/* {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
             <>
               <Input
                 id={"Estado"}
@@ -343,6 +418,17 @@ const RecaudoConjunto = () => {
                 autoComplete="off"
                 disabled
               />
+              {convenioRecaudo?.fk_id_tipo_convenio === 4 ?(
+                <Input
+                  id={"nombre_tipo_referencia_extra"}
+                  label={"Referencia extra"}
+                  name={"nombre_tipo_referencia_extra"}
+                  type="tel"
+                  defaultValue={dataRecaudo.referencia_extra}
+                  autoComplete="off"
+                  disabled
+                />
+              ):null}
               {permiteRefExtra && (
                 <Input
                   id={"nombre_tipo_referencia_extra"}
@@ -429,7 +515,7 @@ const RecaudoConjunto = () => {
             <Button onClick={() => handleClose(true)} >
               Cancelar
             </Button>
-          </ButtonBar>
+          </ButtonBar> */}
         </Form>
       </Modal>
       <Modal show={pago !== false}>
