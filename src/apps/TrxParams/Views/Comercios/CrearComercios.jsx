@@ -457,6 +457,14 @@ const CrearComercios = () => {
       }
       delete dispersionPagosEnvio["autorizador_runt_mt"];
       delete dispersionPagosEnvio["convenio_runt_mt"];
+      if (
+        dispersionPagosEnvio["autorizador_runt"] != "" &&
+        dispersionPagosEnvio["autorizador_mt"] != "" &&
+        dispersionPagosEnvio["convenio_runt"] != "" &&
+        dispersionPagosEnvio["convenio_mt"] != "" &&
+        dispersionPagosEnvio["autorizador_local"] != "" &&
+        dispersionPagosEnvio["convenio_local"] != ""
+        ){
       postDispersionPagoComercio(dispersionPagosEnvio)
       .then((res) => {
         setIsUploading(false);
@@ -472,6 +480,7 @@ const CrearComercios = () => {
         notifyError("No se ha podido conectar al servidor");
         console.error(err);
       });
+        }
     },
     [comercio, pk_comercio_handled, navigate, dispersionPagos]
   );
@@ -1186,6 +1195,15 @@ const CrearComercios = () => {
                 autorizador_local: ev.target.value !== "" ? parseInt(ev.target.value) : ev.target.value,
               }})
             }
+            required={
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ?
+              true : false}
           />
           <Input
             key="convenio_local"
@@ -1198,6 +1216,15 @@ const CrearComercios = () => {
             value={dispersionPagos?.convenio_local}
             placeholder="Ingrese el convenio"
             autoComplete='off'
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ?
+              true : false}
           />
            <Select
             id="derechos_runt"
@@ -1220,6 +1247,15 @@ const CrearComercios = () => {
               }})
             }
             disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ?
+              true : false}
           />
           <Input
             key="convenio_runt"
@@ -1233,6 +1269,15 @@ const CrearComercios = () => {
             placeholder="Ingrese el convenio"
             autoComplete='off'
             disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ?
+              true : false}
           />
            <Select
             id="derechos_mt"
@@ -1255,6 +1300,15 @@ const CrearComercios = () => {
               }})
             }
             disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ?
+              true : false}
           />
           <Input
             key="convenio_mt"
@@ -1268,6 +1322,15 @@ const CrearComercios = () => {
             placeholder="Ingrese el convenio"
             autoComplete='off'
             disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ?
+              true : false}
           />
           <Select
             id="derechos_runt_mt"
@@ -1295,6 +1358,15 @@ const CrearComercios = () => {
               dispersionPagos?.convenio_mt !== '' || 
               dispersionPagos?.autorizador_mt !== '' ? 
               true : false}
+              required={
+                dispersionPagos?.autorizador_local !== '' || 
+                dispersionPagos?.autorizador_runt !== '' ||
+                dispersionPagos?.autorizador_mt !== '' ||
+                dispersionPagos?.convenio_local !== '' ||
+                dispersionPagos?.convenio_runt !== '' ||
+                dispersionPagos?.convenio_mt !== '' ||
+                dispersionPagos?.convenio_runt_mt !== '' ?
+                true : false}
           />
           <Input
             key="convenio_runt_mt"
@@ -1313,6 +1385,15 @@ const CrearComercios = () => {
               dispersionPagos?.convenio_mt !== '' || 
               dispersionPagos?.autorizador_mt !== '' ? 
               true : false}
+              required={
+                dispersionPagos?.autorizador_local !== '' || 
+                dispersionPagos?.autorizador_runt !== '' ||
+                dispersionPagos?.autorizador_mt !== '' ||
+                dispersionPagos?.autorizador_runt_mt !== '' ||
+                dispersionPagos?.convenio_local !== '' ||
+                dispersionPagos?.convenio_runt !== '' ||
+                dispersionPagos?.convenio_mt !== '' ?
+                true : false}
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
