@@ -171,7 +171,7 @@ const AdminLayout = () => {
       })
         .then((res) => {
           setModalAlertBoveda(true)
-          setValorBoveda(res?.obj[0]?.valor_boveda)
+          setValorBoveda(res?.obj[0]?.valor_boveda === undefined?0:res?.obj[0]?.valor_boveda)
           if (parseInt(quotaInfo?.quota)> 0) {
             if ((parseInt(quotaInfo?.quota) - parseInt(res?.obj[0]?.valor_boveda)) < montoMaximoCaja) {
               setConteoAlertaBoveda(1)
