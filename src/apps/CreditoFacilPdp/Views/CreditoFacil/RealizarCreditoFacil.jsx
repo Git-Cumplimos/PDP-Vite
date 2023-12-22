@@ -108,7 +108,7 @@ const RealizarCreditoFacil = () => {
     (ev) => {
       // ev.preventDefault();
       const data = {
-        id_comercio: 10106, //roleInfo?.id_comercio,
+        id_comercio: roleInfo?.id_comercio, //10106,
       };
       notifyPending(
         peticionConsultaPreaprobado({}, data),
@@ -194,7 +194,6 @@ const RealizarCreditoFacil = () => {
           id_terminal: roleInfo?.id_dispositivo,
         },
         Datos: {
-          fechaPago: dataCredito?.consultDecisor?.fecha_preaprobado,
           plazo: plazo_cuotas,
         },
       };
@@ -260,6 +259,9 @@ const RealizarCreditoFacil = () => {
         Datos: {
           codigo_otp: numOtp,
           reintento_otp: parseInt(contador),
+          plazo: dataCredito?.consultSiian?.plazo,
+          fechaPrimerPago: dataCredito?.consultSiian?.fechaPrimerPago,
+          fechaDesembolso: dataCredito?.consultSiian?.fechaDesembolso,
         },
       };
       const dataAditional = {
@@ -523,7 +525,9 @@ const RealizarCreditoFacil = () => {
           </Form>
           <Modal
             show={dataCredito?.showModal}
-            handleClose={handleClose}
+            handleClose={
+              loadingPeticionSimulacionCredito ? () => {} : handleClose
+            }
             className="flex align-middle"
           >
             <>
@@ -701,6 +705,7 @@ const RealizarCreditoFacil = () => {
                   type="checkbox"
                   checked={isChecked}
                   onClick={openModal}
+                  onChange={() => {}}
                   required
                 />
                 <span className="ml-2">Acepta Términos y Condiciones</span>
@@ -752,10 +757,14 @@ const RealizarCreditoFacil = () => {
               <>
                 <Modal
                   show={dataCredito?.showModal}
-                  handleClose={(e) => {
-                    navigate(-1);
-                    notifyError("Transacción cancelada por el usuario");
-                  }}
+                  handleClose={
+                    loadingPeticionDesembolsoCredito
+                      ? () => {}
+                      : (e) => {
+                          navigate(-1);
+                          notifyError("Transacción cancelada por el usuario");
+                        }
+                  }
                   className="flex align-middle"
                 >
                   <Form onSubmit={desembolsoCredito} grid>
