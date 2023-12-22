@@ -256,7 +256,7 @@ const AdminLayout = () => {
                   type="submit"
                   onClick={() => handleCloseBoveda()}
                 >
-                  {conteoAlertaBoveda !== 3 ?"Cerrar":"Movimiento Boveda"}
+                  {conteoAlertaBoveda !== 3 ?"Cerrar":"Movimiento Bóveda"}
                 </Button>
               </ButtonBar>
             </h1>
