@@ -61,7 +61,7 @@ const ReporteDeComercios = () => {
       <h1 className="text-3xl font-medium my-6">Reporte de comercios</h1>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre", "Tipo", "Última modificacion"]}
+        headers={["Nombre", "Tipo", "Última modificación"]}
         maxPage={maxPages}
         data={fileList}
         onSelectRow={(_, i) => {

@@ -24,7 +24,7 @@ const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/c
 const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/depositoCorresponsalPowwi`;
 
 const funcConsultaCosto = fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo");
-const funcDeposito = fetchCustom(URL_DEPOSITO, "POST", "Déposito");
+const funcDeposito = fetchCustom(URL_DEPOSITO, "POST", "Déposito", true, true, true);
 
 const Deposito = () => {
   const navigate = useNavigate();

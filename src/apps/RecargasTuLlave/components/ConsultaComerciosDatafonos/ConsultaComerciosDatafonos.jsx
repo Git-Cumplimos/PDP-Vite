@@ -19,7 +19,7 @@ const ConsultaComerciosDatafonos = ({
     page: 1,
     limit: 10,
   });
-
+  
   const tableComercios = useMemo(() => {
     return [
       ...comercios.map(({ nombre_comercio, pk_comercio }) => {
@@ -60,6 +60,7 @@ const ConsultaComerciosDatafonos = ({
       setDataDatafono((old) => ({
         ...old,
         fk_comercio_asociado: comercios[i].pk_comercio,
+        name_comercio: comercios[i].nombre_comercio,
       }));
       handleClose();
     },

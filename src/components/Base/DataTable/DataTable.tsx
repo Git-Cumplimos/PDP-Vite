@@ -20,8 +20,8 @@ type Props = {
   onSubmit?: (ev: FormEvent<HTMLFormElement>) => void;
   onChange?: (ev: ChangeEvent<HTMLFormElement>) => void;
   actions?: { [key: string]: (ev: MouseEvent<HTMLSpanElement>) => void };
-  onClickRow: (ev: MouseEvent<HTMLTableRowElement>, index: number) => void;
-  children: ReactNode;
+  onClickRow?: (ev: MouseEvent<HTMLTableRowElement>, index: number) => void;
+  children?: ReactNode;
   tblFooter: ReactNode;
 };
 

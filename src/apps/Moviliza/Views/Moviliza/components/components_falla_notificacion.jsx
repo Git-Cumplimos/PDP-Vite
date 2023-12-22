@@ -12,7 +12,7 @@ export const ComponentsMsgFallaNotificacion = (
     <Fragment>
       <PaymentSummary
         title=""
-        subtitle="La notificación de pago de Moviliza presento inconvenientes por favor realice el cambio de estado manualmente en Moviliza"
+        subtitle="La notificación de pago de Moviliza presento inconvenientes, por favor realice el cambio de estado manualmente en Moviliza"
       >
           <>
             <ButtonBar>

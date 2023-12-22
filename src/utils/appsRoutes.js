@@ -23,6 +23,8 @@ import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
+//Recaudo genérico
+import routesRecaudoGenerico from "../apps/RecaudoGenerico/routes";
 import routesOtrasEntidades from "../apps/OtrasEntidades/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
@@ -71,6 +73,7 @@ import rutasMoviliza from "../apps/Moviliza/routes";
 import routesRecargaCupo from "../apps/RecargaCupo/routes";
 import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
 import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
+import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 
 /**
 
@@ -1125,6 +1128,10 @@ const allUrlsPrivateApps = [
   // rutasSoat,
   rutasApuestas,
   rutasRecaudoDirecto,
+
+  //Módulo recaudo genérico
+  routesRecaudoGenerico,
+  
   rutasRecargasTullave,
   rutasPowwi,
 
@@ -1141,6 +1148,8 @@ const allUrlsPrivateApps = [
   rutasCorresponsaliaNequi,
   //Modulo creditos PDP
   rutasCreditosPdp,
+  //Modulo transcaribe
+  rutasRecargasTranscaribe,
 ];
 
 export { allUrlsPrivateApps };
