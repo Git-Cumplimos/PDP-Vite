@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
-// import { notifyError } from "../../../../utils/notify";
+import { notifyError } from "../../../../utils/notify";
 import { buscarPlataformaExt } from "../../utils/fetchCaja";
 
 const SearchEntidadesExternas = ({
@@ -62,12 +62,7 @@ const SearchEntidadesExternas = ({
         });
         handleClose();
       } else {
-        var dato = selectedEntidadesExt?.entidades_agregar?.find(
-          (a) => a?.id_plataforma === data[i].pk_id_plataforma
-        )
-        var posicion = selectedEntidadesExt?.entidades_agregar?.indexOf(dato);
-        selectedEntidadesExt?.entidades_agregar.splice(posicion, 1);
-        handleClose();
+        return notifyError("La entidad ya se ha agregado anteriormente");
       }
     },
     [selectedEntidadesExt,data,handleClose,setSelectedEntidadesExt]

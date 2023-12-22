@@ -248,7 +248,7 @@ const AdminLayout = () => {
         <Modal show={showModalAlertBoveda}>
           <div className="items-center text-center">
             <h1>
-              Señor usuario, ha superado el valor de efectivo en caja, Ingrese el efectivo de caja en boveda.
+            Señor usuario, ha superado el valor de efectivo en caja. Por favor realice el movimiento a bóveda
               <ButtonBar>
                 <Button
                   className="btn mx-auto d-block"

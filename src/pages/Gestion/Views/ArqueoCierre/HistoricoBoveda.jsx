@@ -122,7 +122,7 @@ const HistoricoBoveda = () => {
             id='total_valor'
             name='total_valor'
             label={"Total Valor Bóveda"}
-            value={formatMoney.format(boveda)}
+            value={formatMoney.format(boveda === undefined?0:boveda)}
             autoComplete='off'
             disabled
           />
