@@ -72,6 +72,7 @@ import rutasMovii from "../apps/Movii-pdp/routes";
 import rutasMoviliza from "../apps/Moviliza/routes";
 import routesRecargaCupo from "../apps/RecargaCupo/routes";
 import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
+import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
 import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 
 /**
@@ -1145,6 +1146,8 @@ const allUrlsPrivateApps = [
   routesRecargaCupo,
   //Modulo Nequi
   rutasCorresponsaliaNequi,
+  //Modulo creditos PDP
+  rutasCreditosPdp,
   //Modulo transcaribe
   rutasRecargasTranscaribe,
 ];
