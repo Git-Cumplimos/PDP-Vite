@@ -321,19 +321,42 @@ const CargaComprobante = () => {
   }, []);
 
   const renderInputs = () => {
-    return selectedEntidadesExt.entidades_agregar.map(entidad => (<>
-        <Input
-          id={`${entidad.nombre_plataforma}`}
-          name={`${entidad.nombre_plataforma}`}
-          label={`Valor efectivo ${entidad.nombre_plataforma}`}
-          autoComplete="off"
-          type="tel"
-          maxLength={"12"}
-          onInput={(ev) => handleInputChange(`${entidad.nombre_plataforma}`, onChangeMoney(ev))}
-        />
-      </>
+    return selectedEntidadesExt.entidades_agregar.map(entidad => (
+      <Input
+        id={`${entidad.nombre_plataforma}`}
+        name={`${entidad.nombre_plataforma}`}
+        label={`Valor efectivo ${entidad.nombre_plataforma}`}
+        autoComplete="off"
+        type="tel"
+        maxLength={"12"}
+        onInput={(ev) => handleInputChange(entidad.nombre_plataforma, onChangeMoney(ev))}
+        actionBtn = {{
+          callback: () => {onSelectComercioDeleteAgregar(entidad)},
+          label: <span className="bi bi-x-lg self-center cursor-pointer"/>
+        }}
+      />
     ));
   };
+
+  const onSelectComercioDeleteAgregar = useCallback((entidadToDelete) => {
+    let newList = []
+    selectedEntidadesExt?.entidades_agregar?.map((entidad) => {
+      if(entidad.id_plataforma !== entidadToDelete.id_plataforma) {
+        newList.push(entidad)
+      }else{
+        const nuevosValores = Object.fromEntries(
+          Object.entries(valoresExternos).filter(([key]) => key !== entidadToDelete.nombre_plataforma)
+        );
+        setValoresExternos(nuevosValores)
+      }
+    })
+    setSelectedEntidadesExt((old) => {
+      return {
+        ...old,
+        entidades_agregar: newList,
+      };
+    });
+  }, [setSelectedEntidadesExt,valoresExternos,selectedEntidadesExt]);
 
   const handleInputChange = (id, value) => {
     setValoresExternos({
