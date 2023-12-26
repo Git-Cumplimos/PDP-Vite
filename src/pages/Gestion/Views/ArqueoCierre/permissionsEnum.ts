@@ -9,5 +9,6 @@ export enum PermissionsCaja {
   AgregaComprobantes = 6101,
   RealizarArqueoCierre = 6100,
   ReporteSobrantesFaltantes = 6009,
-  ValidacionSobrantesFaltantes = 6008
+  ValidacionSobrantesFaltantes = 6008,
+  HistoricoBoveda = 6099
 }

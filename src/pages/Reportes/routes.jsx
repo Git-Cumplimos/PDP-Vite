@@ -16,7 +16,9 @@ const ReporteConsignacionesTransportadora = lazy(() =>
 const ReportesComisionesPadres = lazy(() =>
   import("./views/ReportesComisionesPadres")
 );
-
+const ReporteDeComercios = lazy(() =>
+  import("./views/ReporteDeComercios")
+);
 export const rutasReportes = [
   {
     link: "/reportes/koncilia",
@@ -68,6 +70,17 @@ export const rutasReportes = [
       />
     ),
     component: ReportesComisionesPadres,
+    permission: [25001],
+  },
+  {
+    link: "/reportes/comercios_general",
+    label: (
+      <AppIcons
+        Logo={"RECAUDO"}
+        name="Reporte de comercios"
+      />
+    ),
+    component: ReporteDeComercios,
     permission: [25001],
   },
 ];

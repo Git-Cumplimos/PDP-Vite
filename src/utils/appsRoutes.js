@@ -8,7 +8,9 @@ import rutasIAM from "../apps/IAM/routes";
 import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
 import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
 
-import rutasRecaudoDirecto,{rutasGestionRecaudoDirecto} from "../apps/RecaudoDirecto/routes";
+import rutasRecaudoDirecto, {
+  rutasGestionRecaudoDirecto,
+} from "../apps/RecaudoDirecto/routes";
 
 import rutasColpatria, {
   listPermissionsColpatria,
@@ -21,6 +23,8 @@ import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
+//Recaudo genérico
+import routesRecaudoGenerico from "../apps/RecaudoGenerico/routes";
 import routesOtrasEntidades from "../apps/OtrasEntidades/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
@@ -68,6 +72,7 @@ import rutasMovii from "../apps/Movii-pdp/routes";
 import rutasMoviliza from "../apps/Moviliza/routes";
 import routesRecargaCupo from "../apps/RecargaCupo/routes";
 import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
+import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 
 /**
 
@@ -1122,6 +1127,10 @@ const allUrlsPrivateApps = [
   // rutasSoat,
   rutasApuestas,
   rutasRecaudoDirecto,
+
+  //Módulo recaudo genérico
+  routesRecaudoGenerico,
+  
   rutasRecargasTullave,
   rutasPowwi,
 
@@ -1136,6 +1145,8 @@ const allUrlsPrivateApps = [
   routesRecargaCupo,
   //Modulo Nequi
   rutasCorresponsaliaNequi,
+  //Modulo transcaribe
+  rutasRecargasTranscaribe,
 ];
 
 export { allUrlsPrivateApps };

@@ -21,13 +21,19 @@ export const ComponentsModalSummaryTrxTarjCredito = ({
       {!loadingPeticion ? (
         <>
           <ButtonBar>
-            <Button type={"submit"} disabled={loadingPeticion} onClick={(e) => {
-              e.preventDefault();
-              peticion(e, numero_tarjcredito, valor_pagar)
-            }}>
-              Aceptar
+            <Button
+              type={"submit"}
+              disabled={loadingPeticion}
+              onClick={(e) => {
+                e.preventDefault();
+                peticion(e, numero_tarjcredito, valor_pagar);
+              }}
+            >
+              Realizar Pago
             </Button>
-            <Button disabled={loadingPeticion} onClick={handleClose}>Cancelar</Button>
+            <Button disabled={loadingPeticion} onClick={handleClose}>
+              Cancelar
+            </Button>
           </ButtonBar>
         </>
       ) : (

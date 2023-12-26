@@ -138,9 +138,6 @@ export const useBackendPaquetesDefault = (
           operador: name_operador,
         };
         const body = {
-          comercio: {
-            id_comercio: dataInputPromises.roleInfo?.id_comercio ?? 0,
-          },
           module_info: {
             limit: dataInputPromises.moduleInfo.limit,
             page: dataInputPromises.moduleInfo.page,

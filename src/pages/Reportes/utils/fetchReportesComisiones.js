@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlComisiones =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlComisiones = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlComisiones = "http://127.0.0.1:5000"
 const urlComercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
 export const descargarReporte = (url) => {
@@ -34,7 +34,7 @@ export const postObtenerReporteComisionesAplicadas = async (bodyObj) => {
       `${urlComisiones}/servicio-reporte-aplicacion-comision/reporte-aplicacion-comision`,
       "POST",
       {},
-      bodyObj
+      bodyObj,
     );
     if (!res?.status) {
       console.error(res?.msg);
@@ -44,6 +44,24 @@ export const postObtenerReporteComisionesAplicadas = async (bodyObj) => {
     throw err;
   }
 };
+
+export const getObtenerVerificacionArchivo = async (bodyObj) => {
+  try {
+    const res = await fetchData(
+      `${urlComisiones}/servicio-reporte-aplicacion-comision/reporte-aplicacion-comision-verify`,
+      "POST",
+      {},
+      bodyObj,
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const postObtenerReporteComisionesAplicadasComercio = async (
   bodyObj
 ) => {
