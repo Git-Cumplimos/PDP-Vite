@@ -221,7 +221,16 @@ const DispersionUsuarioPadre = (props: Props) => {
           });
           if (progreso >= 1) {
             handleEndConsulta();
-            setTicketList(res?.obj?.ticket_list ?? []);
+            if (totalFallidas > 0) {
+              notifyError(
+                "Transferencias fallidas ir a revisar transferencia",
+                5000,
+                { toastId: "failed-notify-456" }
+              );
+            }
+            setTicketList(
+              (res?.obj?.ticket_list ?? []).filter((val: any) => val)
+            );
           }
         },
         [handleEndConsulta]
@@ -382,6 +391,8 @@ const DispersionUsuarioPadre = (props: Props) => {
         handleClose={
           !trxState && !loadingMakeDispersion ? handleCloseModal : () => {}
         }
+        bigger
+        // bigger={!trxState}
       >
         {!trxState && (
           <PaymentSummary summaryTrx={summary}>
@@ -427,7 +438,7 @@ const DispersionUsuarioPadre = (props: Props) => {
               </Button>
             </ButtonBar>
             {!!ticketList.length && (
-              <div>
+              <div className="grid grid-flow-col auto-rows-max gap-8">
                 {ticketList.map((data) => (
                   <TicketBlock ticketData={data} ticketType="Original" />
                 ))}
