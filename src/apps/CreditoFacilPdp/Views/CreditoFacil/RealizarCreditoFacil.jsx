@@ -433,7 +433,7 @@ const RealizarCreditoFacil = () => {
             grid
           >
             <Fieldset
-              legend="Datos del credito pre aprobado"
+              legend="Datos del crédito Pre-aprobado"
               className="lg:col-span-2"
             >
               <Input
@@ -497,7 +497,7 @@ const RealizarCreditoFacil = () => {
                 label={"Estado"}
                 type="text"
                 autoComplete="off"
-                value={"Preaprobado"}
+                value={"Pre-aprobado"}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -604,6 +604,7 @@ const RealizarCreditoFacil = () => {
               data={tablaSimulacionCreditos}
               onSetPageData={setPageData}
               maxPage={maxPages}
+              children={false}
             ></TableEnterprise>
             <ButtonBar className="lg:col-span-2">
               <Button
