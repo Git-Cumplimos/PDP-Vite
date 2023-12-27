@@ -20,6 +20,8 @@ import {
   TypeInfTicket,
   TypeTransaccionPagoOutput,
 } from "../hook/useHookBackend";
+import TicketsAval from "../../Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
+import TicketsAgrario from "../../Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
 
 //------ typíng--------
 type TypeDataInput = {
@@ -387,7 +389,19 @@ const RecaudoTrx = () => {
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
           {proceso === "TrxExitosa" && (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-              <Tickets refPrint={printDiv} ticket={dataSee?.ticket ?? {}} />
+              {dataConsult?.autorizador.name === "AVAL" && (
+                <TicketsAval
+                  ticket={dataSee?.ticket ?? {}}
+                  refPrint={printDiv}
+                />
+              )}
+              {dataConsult?.autorizador.name === "AGRARIO" && (
+                <TicketsAgrario
+                  ticket={dataSee?.ticket ?? {}}
+                  refPrint={printDiv}
+                />
+              )}
+              {/* <Tickets refPrint={printDiv} ticket={dataSee?.ticket ?? {}} /> */}
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button

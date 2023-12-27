@@ -16,24 +16,10 @@ const RecaudoCodigo = () => {
   const navigateRecaudo = useCallback(
     (codigo_barras) => {
       const data = {
-        comercio: {
-          id_comercio: roleInfo.id_comercio,
-          id_usuario: roleInfo.id_usuario,
-          id_terminal: roleInfo.id_dispositivo,
-          nombre_comercio: roleInfo?.["nombre comercio"],
-          nombre_usuario: pdpUser?.uname,
-        },
-        ubicacion: {
-          address: roleInfo.direccion,
-          dane_code: roleInfo.codigo_dane,
-          city: roleInfo.ciudad,
-        },
-        info_transaccion: {
-          codigo_barras: codigo_barras,
-        },
+        codigo_barras: codigo_barras,
       };
       fetchData(
-        `${url}/backend/recaudo-generico/convenios/consulta-convenio-codigo-barras`,
+        `${url}/backend/recaudo-generico/convenios/consultar-convenios-codigo-barras`,
         "POST",
         {},
         data
@@ -42,13 +28,9 @@ const RecaudoCodigo = () => {
           if (res?.status) {
             navigate("../recaudo-generico/trx", {
               state: {
-                // autorizadores: res?.obj?.result?.autorizadores,
                 pk_id_convenio: res?.obj?.result?.pk_id_convenio,
-                convenio_name:
-                  res?.obj?.result?.data_codigo_barras?.nombre_convenio,
-                referencia:
-                  res?.obj?.result?.data_codigo_barras?.codigosReferencia[0],
-                // valor: res?.obj?.result?.data_codigo_barras?.pago,
+                convenio_name: res?.obj?.result?.nombre_convenio,
+                referencia: res?.obj?.result?.codigos_referencia[0],
               },
             });
           } else {
