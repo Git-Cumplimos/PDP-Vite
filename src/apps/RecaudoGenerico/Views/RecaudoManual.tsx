@@ -31,7 +31,7 @@ type TypeSearchFilters = {
 };
 
 //------ constantes generales --------
-const url = `${process.env.REACT_APP_URL_RECAUDO_GENERICO}/backend/recaudo-generico/convenios/manual/consultar-convenios`;
+const url = `${process.env.REACT_APP_URL_RECAUDO_GENERICO}/backend/recaudo-generico/convenios/consultar-convenios-manual`;
 const searchFiltersInitial: TypeSearchFilters = {
   id_relacion_convenio_autorizador: "",
   nombre_convenio: "",
@@ -104,25 +104,29 @@ const RecaudoManual = () => {
 
   useEffect(() => {
     PeticionSearchConvenios();
-
-    // navigate("/recaudo-generico/manual");
   }, [PeticionSearchConvenios, navigate]);
 
   return (
     <div className="py-10 flex items-center flex-col">
       <DataTable
         title="Recaudo Servicios Públicos y Privados Manual"
-        headers={["Código de convenio", "Nombre de convenio", "EAN"]}
+        headers={[
+          "Código de convenio",
+          "Código de convenio(autorizador)",
+          "Nombre de convenio",
+          "EAN",
+        ]}
         data={
           dataConsult?.map(
             ({
+              pk_id_convenio,
               id_relacion_convenio_autorizador,
               nombre_convenio,
               ean_convenio,
             }: TypeListaInd) => ({
-              "Código de convenio": (
-                <p>{id_relacion_convenio_autorizador.join("\n")}</p>
-              ),
+              "Código de convenio": pk_id_convenio,
+              "Código de convenio(autorizador)":
+                id_relacion_convenio_autorizador,
               "Nombre de convenio": nombre_convenio,
               EAN: ean_convenio,
             })
@@ -171,7 +175,7 @@ const RecaudoManual = () => {
         <Input
           id="id_relacion_convenio_autorizador"
           name="id_relacion_convenio_autorizador"
-          label="Código convenio - Nura"
+          label="Código de convenio (autorizador) - Nura"
           type="text"
           maxLength={30}
           value={searchFilters.id_relacion_convenio_autorizador}
