@@ -297,6 +297,7 @@ const RealizarCreditoFacil = () => {
                 return error?.message;
               }
             } else {
+              navigate(-1);
               return "Desembolso del Crédito fallido";
             }
           },
