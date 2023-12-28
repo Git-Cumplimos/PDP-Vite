@@ -16,13 +16,13 @@ export const listPermissionsCreditoPdp = Object.values(enumPermisosCreditoPdp);
 
 const rutasCreditosPdp = {
   link: "/creditos-pdp",
-  label: <AppIcons Logo={"CREDITOS_PDP"} name="Créditos PDP" />,
+  label: <AppIcons Logo={"RECARGA_CELULAR"} name="Créditos PDP" />,
   component: CreditosPDP,
   permission: listPermissionsCreditoPdp,
   subRoutes: [
     {
       link: "/creditos-pdp/credito-facil",
-      label: <AppIcons Logo={"CREDITOS_PDP"} name="Crédito Fácil" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Crédito Fácil" />,
       component: RealizarCreditoFacil,
       permission: [enumPermisosCreditoPdp.REALIZAR_CREDITO_FACIL],
     },
