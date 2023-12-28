@@ -293,7 +293,7 @@ const RealizarCreditoFacil = () => {
                 navigate(-1);
                 return error?.message;
               } else {
-                // navigate(-1);
+                navigate(-1);
                 return error?.message;
               }
             } else {
