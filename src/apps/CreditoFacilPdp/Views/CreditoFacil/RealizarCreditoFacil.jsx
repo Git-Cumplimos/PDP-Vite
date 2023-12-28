@@ -718,17 +718,13 @@ const RealizarCreditoFacil = () => {
                 handleClose={handleCloseSimulacion}
                 className="flex align-middle"
               >
-                <iframe
+                <object
                   title="PDF Viewer"
-                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-                    url
-                  )}&embedded=true`}
-                  style={{
-                    width: "100%",
-                    height: "530px",
-                    border: 0,
-                  }}
-                ></iframe>
+                  data={url}
+                  type="application/pdf"
+                  width="100%"
+                  height="500vh"
+                ></object>
                 <ButtonBar>
                   <Button type="submit" onClick={handleAccept}>
                     Aceptar
