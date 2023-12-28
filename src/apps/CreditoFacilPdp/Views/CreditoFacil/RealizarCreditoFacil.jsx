@@ -131,7 +131,7 @@ const RealizarCreditoFacil = () => {
               valorFinal < enumParametrosCreditosPDP.MINCREDITOPREAPROBADO ||
               valorFinal >= enumParametrosCreditosPDP.MAXCREDITOPREAPROBADO
             ) {
-              notifyError("El comercio no dispone de un Crédito Preaprobado");
+              notifyError("El comercio no dispone de un Crédito Pre-aprobado");
             } else {
               setDataCredito((old) => ({
                 ...old,
@@ -682,7 +682,7 @@ const RealizarCreditoFacil = () => {
                 label={"Estado"}
                 type="text"
                 autoComplete="off"
-                value={"Preaprobado"}
+                value={"Pre-aprobado"}
                 onChange={() => {}}
                 required
                 disabled={true}
@@ -771,7 +771,7 @@ const RealizarCreditoFacil = () => {
                   <Form onSubmit={desembolsoCredito} grid>
                     <h1 className="text-2xl font-semibold text-center">
                       ¿Está seguro de realizar el desembolso del crédito? Este
-                      será a su cupo
+                      se desembolsará a su cupo
                     </h1>
                     <Input
                       id="numOtp"
