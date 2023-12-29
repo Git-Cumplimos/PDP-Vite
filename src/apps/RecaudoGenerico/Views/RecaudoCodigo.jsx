@@ -6,6 +6,7 @@ import BarcodeReader from "../../../components/Base/BarcodeReader";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
 import { useAuth } from "../../../hooks/AuthHooks";
+import { notifyError } from "../../../utils/notify";
 
 const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
 
@@ -35,6 +36,10 @@ const RecaudoCodigo = () => {
             });
           } else {
             console.error(res?.msg);
+            notifyError(`${res?.msg}`, 5000, {
+              toastId: "notify-error",
+            });
+            navigate("../recaudo-generico");
           }
         })
         .catch(() => {});
