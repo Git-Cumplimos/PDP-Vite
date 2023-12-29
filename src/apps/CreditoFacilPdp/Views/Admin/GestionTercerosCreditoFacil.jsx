@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect, useMemo } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { notifyError, notifyPending, notify } from "../../../../utils/notify";
@@ -12,106 +12,147 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import MoneyInput, {
   formatMoney,
 } from "../../../../components/Base/MoneyInput/MoneyInput";
-import { enumParametrosCreditosPDP } from "../../utils/enumParametrosCreditosPdp";
-import { useReactToPrint } from "react-to-print";
-import Select from "../../../../components/Base/Select/Select";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
+import Select from "../../../../components/Base/Select";
+import InputSuggestions from "../../../../components/Base/InputSuggestions";
 import {
-  useFetchCreditoFacil,
-  postDescargarSimulacion,
-  postTerminosCondiciones,
-  postEnviarCodigoOtp,
-} from "../../hooks/fetchCreditoFacil";
-import TableEnterprise from "../../../../components/Base/TableEnterprise";
+  DEPARTAMENTOS_SIIAN,
+  MUNICIPIOS_SIIAN,
+} from "../../enumDataLocalizacionCredito";
 
-const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
-const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
-const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
-const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
+// const URL_CONSULTA_TERCEROS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/consulta-tercero`;
+const URL_CONSULTA_TERCEROS =
+  "http://127.0.0.1:5000/gestion-credito-facil/consulta-tercero";
+const URL_CREACION_TERCEROS =
+  "http://127.0.0.1:5000/gestion-credito-facil/creacion-tercero";
 
-const RealizarCreditoFacil = () => {
+const DATA_TIPO_ID = {
+  NIT: 2,
+  "CEDULA CIUDADANIA": 1,
+  "TARJETA DE IDENTIDAD": 4,
+  "REGISTRO CIVIL": 6,
+  "TARJETA DE EXTRANJERIA": 7,
+  "CEDULA EXTRANJERIA": 3,
+  PASAPORTE: 8,
+  "DEFINIDO POR LA DIAN": 10,
+  "TIPO DOCUMENTO EXTRANJERO PJURIDICA": 5,
+  "NIT PERSONA NATURAL": 11,
+};
+const DATA_SIIAN_ESTRATO = {
+  "POR VERIFICAR": 7,
+  "Estrato 1": 1,
+  "Estrato 2": 2,
+  "Estrato 3": 3,
+  "Estrato 4": 4,
+  "Estrato 5": 5,
+  "Estrato 6": 6,
+};
+
+const DATA_SIIAN_INIT = {
+  Apellido1: "",
+  Apellido2: "",
+  Digitoverificacion: 0,
+  Direcciondomicilio: "",
+  Esasociado: false,
+  Escliente: false,
+  Esempleado: false,
+  Esinformaciontributaria: false,
+  Esprovedor: false,
+  Esrural: false,
+  Fechacreacion: "",
+  Fechaexpedicion: "",
+  Fechanacimiento: "",
+  Id: 0,
+  Idbarriovereda: null,
+  Idciudadexpedicion: null,
+  Idcodigopostal: null,
+  Iddepartamentonacimiento: null,
+  Iddepartamentoubicacion: 1,
+  Identificacion: "",
+  Idestadocivil: 1,
+  Idestrato: 1,
+  Idgenero: 1,
+  Idmunicipionacimiento: null,
+  Idmunicipioubicacion: 1,
+  Idniveleducativo: null,
+  Idpaisdomicilio: null,
+  Idpaisnacimiento: null,
+  Idtipocliente: 12,
+  Idtipoidentificacion: 1,
+  Idtipovivienda: 1,
+  Idusuario: "",
+  Nombre1: "",
+  Nombre2: "",
+  Nombrecomercial: "",
+  Nombrepropietario: "",
+  Nombreunido: "",
+  Numeropersonasacargo: 0,
+  Razonsocial: "",
+  Referenciaubicacion: "",
+  Telefonopropietario: "",
+  Tiempopermanenciameses: 0,
+  Valoranticres: 0,
+  Valorarriendo: 0,
+  correocliente: "",
+};
+
+const GestionTercerosCreditoFacil = () => {
   const navigate = useNavigate();
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
-  const [isChecked, setChecked] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [url, setUrl] = useState("");
-  const [numOtp, setNumOtp] = useState("");
-  const [listadoCuotas, setListadoCuotas] = useState([]);
-  const [contador, setContador] = useState(0);
-  const [{ page, limit }, setPageData] = useState({
-    page: 1,
-    limit: 10,
-  });
-  const [maxPages, setMaxPages] = useState(0);
-  const [dataCredito, setDataCredito] = useState({
-    valorPreaprobado: 0,
-    valorSimulacion: 0,
-    validacionValor: false,
-    consultDecisor: {},
-    consultSiian: {},
-    estadoPeticion: 0,
-    formPeticion: 0,
-    showModal: false,
-    showModalOtp: false,
-    cosultEnvioOtp: {},
-  });
 
-  const handleClose = useCallback(() => {
-    setDataCredito((old) => ({
-      ...old,
-      showModal: false,
-    }));
-  }, []);
-
-  const handleCloseDecisor = useCallback(() => {
-    setDataCredito({
-      valorPreaprobado: 0,
-      valorSimulacion: 0,
-      validacionValor: false,
-      consultDecisor: {},
-      consultSiian: {},
-      estadoPeticion: 0,
-      formPeticion: 0,
-      showModal: false,
-      plazo: 0,
-      showModalOtp: false,
-      cosultEnvioOtp: {},
-    });
+  const [dataSiian, setDataSiian] = useState(DATA_SIIAN_INIT);
+  const [stateProc, setStateProc] = useState("consulta");
+  const [filterData, setFilterData] = useState({
+    Iddepartamentoubicacion: "",
+    IddepartamentoubicacionNoChanges: "",
+    Idmunicipioubicacion: "",
+    IdmunicipioubicacionNoChanges: "",
+    nombreEstrato: "",
+  });
+  const [loadingPeticionConsultaTerceros, peticionConsultaTercero] = useFetch(
+    fetchCustom(URL_CONSULTA_TERCEROS, "POST", "Consultar tercero")
+  );
+  const [loadingPeticionCreacionTerceros, peticionCreacionTercero] = useFetch(
+    fetchCustom(URL_CREACION_TERCEROS, "POST", "Creación tercero")
+  );
+  const dataDepartamento = useMemo(() => {
+    let filteredList = DEPARTAMENTOS_SIIAN.filter((item) =>
+      item.Nombre.toUpperCase().includes(filterData.Iddepartamentoubicacion)
+    );
+    filteredList = filteredList.slice(0, 10);
+    return {
+      dataRender: filteredList.map((data, index) => (
+        <h1 className="py-2">{data.Nombre}</h1>
+      )),
+      dataList: filteredList,
+    };
+  }, [filterData.Iddepartamentoubicacion]);
+  const dataMunicipio = useMemo(() => {
+    let filteredList = MUNICIPIOS_SIIAN.filter((item) =>
+      item.Nombre.toUpperCase().includes(filterData.Idmunicipioubicacion)
+    );
+    filteredList = filteredList.slice(0, 10);
+    return {
+      dataRender: filteredList.map((data, index) => (
+        <h1 className="py-2">{data.Nombre}</h1>
+      )),
+      dataList: filteredList,
+    };
+  }, [filterData.Idmunicipioubicacion]);
+  const closeModule = useCallback((e) => {
+    setDataSiian(DATA_SIIAN_INIT);
     navigate(-1);
-    notifyError("Transacción cancelada por el usuario");
   }, []);
-
-  const handleCloseSimulacion = useCallback(() => {
-    setModalOpen(false);
-  }, []);
-
-  const handleCloseCancelarSimulacion = useCallback(() => {
-    setDataCredito({
-      valorPreaprobado: 0,
-      valorSimulacion: 0,
-      validacionValor: false,
-      consultDecisor: {},
-      consultSiian: {},
-      estadoPeticion: 0,
-      formPeticion: 0,
-      showModal: false,
-      plazo: 0,
-      showModalOtp: false,
-      cosultEnvioOtp: {},
-    });
-    consultaDecisor();
-  }, []);
-
-  const consultaDecisor = useCallback(
+  const consultaTercero = useCallback(
     (ev) => {
-      // ev.preventDefault();
+      ev.preventDefault();
       const data = {
-        id_comercio: roleInfo?.id_comercio, //10106,
+        id_comercio: dataSiian?.Identificacion,
       };
       notifyPending(
-        peticionConsultaPreaprobado({}, data),
+        peticionConsultaTercero({}, data),
         {
           render: () => {
             return "Procesando consulta";
@@ -119,26 +160,26 @@ const RealizarCreditoFacil = () => {
         },
         {
           render: ({ data: res }) => {
-            const val = res?.obj?.Respuesta1;
-            const cadena = val.split(";");
-            const valorFinal = parseInt(cadena[2]);
-            setDataCredito((old) => ({
-              ...old,
-              valorPreaprobado: valorFinal,
-              consultDecisor: res?.obj,
-            }));
-            if (
-              valorFinal < enumParametrosCreditosPDP.MINCREDITOPREAPROBADO ||
-              valorFinal >= enumParametrosCreditosPDP.MAXCREDITOPREAPROBADO
-            ) {
-              notifyError("El comercio no dispone de un Crédito Preaprobado");
-            } else {
-              setDataCredito((old) => ({
-                ...old,
-                validacionValor: true,
-                estadoPeticion: 1,
-              }));
-            }
+            let dataTemp = res.obj.data;
+            setDataSiian(dataTemp);
+            let filteredListDepa = DEPARTAMENTOS_SIIAN.filter(
+              (item) => item.Id === dataTemp.Iddepartamentoubicacion
+            );
+            let filteredListMuni = MUNICIPIOS_SIIAN.filter(
+              (item) => item.Id === dataTemp.Idmunicipioubicacion
+            );
+            let filteredKeysEstrato = Object.keys(DATA_SIIAN_ESTRATO).filter(
+              (key) => DATA_SIIAN_ESTRATO[key] === dataSiian?.Idestrato
+            );
+            setFilterData({
+              Iddepartamentoubicacion: filteredListDepa[0].Nombre ?? "",
+              Idmunicipioubicacion: filteredListMuni[0].Nombre ?? "",
+              IddepartamentoubicacionNoChanges:
+                filteredListDepa[0].Nombre ?? "",
+              IdmunicipioubicacionNoChanges: filteredListMuni[0].Nombre ?? "",
+              nombreEstrato: filteredKeysEstrato[0] ?? "",
+            });
+            setStateProc("creacion");
             return "Consulta satisfactoria";
           },
         },
@@ -150,684 +191,343 @@ const RealizarCreditoFacil = () => {
         }
       );
     },
-    [navigate, roleInfo]
+    [navigate, dataSiian]
   );
-  const [loadingPeticionConsultaPreaprobado, peticionConsultaPreaprobado] =
-    useFetch(
-      fetchCustom(
-        URL_REALIZAR_CONSULTA_DECISOR,
-        "POST",
-        "Consultar crédito preaprobado"
-      )
-    );
-
-  const simulacionCredito = useCallback(
+  const creacionTercero = useCallback(
     (ev) => {
       ev.preventDefault();
-      let plazo_cuotas = 0;
-      const valorCredito = dataCredito?.valorSimulacion;
-      if (valorCredito >= enumParametrosCreditosPDP.MONTOMINIMOCAMBIOPLAZO) {
-        setDataCredito((old) => ({
-          ...old,
-          plazo: 90,
-        }));
-        plazo_cuotas = 90;
-      } else {
-        setDataCredito((old) => ({
-          ...old,
-          plazo: 30,
-        }));
-        plazo_cuotas = 30;
+      if (filterData.IddepartamentoubicacionNoChanges === "") {
+        return notifyError("Ingrese un departamento");
+      }
+      if (filterData.IdmunicipioubicacionNoChanges === "") {
+        return notifyError("Ingrese una ciudad");
+      }
+      if (filterData.nombreEstrato === "") {
+        return notifyError("Ingrese un estrato");
       }
       const data = {
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO"
-            ? true
-            : false,
-        valor_total_trx: dataCredito?.valorSimulacion,
-        nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-        },
-        Datos: {
-          plazo: plazo_cuotas,
-        },
+        id: dataSiian.Id,
+        identificacion: dataSiian.Identificacion,
+        razonsocial: dataSiian.Razonsocial,
+        apellido1: dataSiian.Apellido1,
+        apellido2: dataSiian.Apellido2,
+        nombre1: dataSiian.Nombre1,
+        nombre2: dataSiian.Nombre2,
+        direccion: dataSiian.Direcciondomicilio,
+        id_departamento: dataSiian.Iddepartamentoubicacion,
+        nombre_departamento: filterData.IddepartamentoubicacionNoChanges,
+        id_municipio: dataSiian.Idmunicipioubicacion,
+        nombre_municipio: filterData.IdmunicipioubicacionNoChanges,
+        id_estrato: dataSiian.Idestrato,
+        nombre_estrato: filterData.nombreEstrato,
+        email: dataSiian.correocliente,
+        telefono: dataSiian.Telefonopropietario,
       };
       notifyPending(
-        peticionSimulacionCredito({}, data),
+        peticionCreacionTercero({}, data),
         {
           render: () => {
-            return "Procesando Simulación Crédito";
+            return "Procesando creación";
           },
         },
         {
           render: ({ data: res }) => {
-            setDataCredito((old) => ({
-              ...old,
-              consultSiian: res?.obj,
-              formPeticion: 1,
-              showModal: false,
-            }));
-            setListadoCuotas(res?.obj?.listaCuotas);
-            return "Simulación Crédito satisfactoria";
+            console.log(res);
+            setStateProc("consulta");
+            return "Consulta satisfactoria";
           },
         },
         {
           render: ({ data: error }) => {
             navigate(-1);
-            return error?.message ?? "Simulación Crédito fallida";
+            return error?.message ?? "Consulta fallida";
           },
         }
       );
     },
-    [navigate, roleInfo, pdpUser, dataCredito]
+    [navigate, dataSiian, filterData]
   );
-  const [loadingPeticionSimulacionCredito, peticionSimulacionCredito] =
-    useFetch(
-      fetchCustom(
-        URL_REALIZAR_SIMULACION_CREDITO,
-        "POST",
-        "Realizar simulación crédito"
-      )
-    );
 
-  const desembolsoCredito = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      setContador(contador + 1);
-      const data = {
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO"
-            ? true
-            : false,
-        valor_total_trx: dataCredito?.valorSimulacion,
-        nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
-        address: roleInfo?.["direccion"],
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-          id_uuid_trx: uniqueId,
-        },
-        id_trx: dataCredito?.consultSiian?.id_trx,
-        Datos: {
-          codigo_otp: numOtp,
-          reintento_otp: parseInt(contador),
-          plazo: dataCredito?.consultSiian?.plazo,
-          fechaPrimerPago: dataCredito?.consultSiian?.fechaPrimerPago,
-          fechaDesembolso: dataCredito?.consultSiian?.fechaDesembolso,
-        },
-      };
-      const dataAditional = {
-        id_uuid_trx: uniqueId,
-      };
-      notifyPending(
-        peticionDesembolsoCredito(data, dataAditional),
-        {
-          render: () => {
-            return "Procesando Desembolso del Crédito";
-          },
-        },
-        {
-          render: ({ data: res }) => {
-            navigate(-1);
-            return "Crédito desembolsado al cupo satisfactoriamente";
-          },
-        },
-        {
-          render: ({ data: error }) => {
-            if (error?.message) {
-              if (error?.message === "Código OTP incorrecto") {
-                setNumOtp("");
-                return error?.message;
-              } else if (
-                error?.message ===
-                "Código OTP incorrecto - Reintentos superados"
-              ) {
-                navigate(-1);
-                return error?.message;
-              } else {
-                // navigate(-1);
-                return error?.message;
-              }
-            } else {
-              return "Desembolso del Crédito fallido";
-            }
-          },
-        }
-      );
-    },
-    [navigate, roleInfo, pdpUser, dataCredito, numOtp, uniqueId, contador]
-  );
-  const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
-    useFetchCreditoFacil(
-      URL_REALIZAR_DESEMBOLSO_CREDITO,
-      URL_CONSULTAR_ESTADO_SIMULACION,
-      "Realizar simulación crédito"
-    );
-
-  const fecthDescargarSimulacion = () => {
-    let obj = {
-      response: dataCredito?.consultSiian,
-      nombre_comercio: roleInfo?.nombre_comercio,
-    };
-    postDescargarSimulacion(obj)
-      .then(async (res) => {
-        if (res?.status) {
-          notify(res?.msg);
-          window.open(res?.obj?.url);
-        }
-      })
-      .catch((err) => {
-        notifyError("Error de conexion con el servicio");
-        console.error(err);
-      });
-  };
-
-  const fecthEnviarCodigoOtp = () => {
-    let obj = {
-      id_comercio: roleInfo?.id_comercio,
-    };
-    postEnviarCodigoOtp(obj)
-      .then(async (res) => {
-        if (res?.status) {
-          notify(res?.msg);
-          setDataCredito((old) => ({
-            ...old,
-            showModalOtp: true,
-            showModal: true,
-            cosultEnvioOtp: res?.obj,
-          }));
-        } else {
-          notifyError(res?.obj?.error);
-        }
-      })
-      .catch((err) => {
-        notifyError("Error al enviar código OTP");
-        console.error(err);
-      });
-  };
-
-  const openModal = async () => {
-    if (isChecked) {
-      setChecked(!isChecked);
-    } else {
-      postTerminosCondiciones().then((res) => {
-        if (!res?.status) {
-          notifyError(res?.msg);
-        } else {
-          setUrl(res?.obj?.url);
-          setModalOpen(true);
-          setDataCredito((old) => ({
-            ...old,
-            showModal: true,
-          }));
-        }
+  const onChangeFormat = useCallback((ev) => {
+    let value = ev.target.value;
+    if (ev.target.name === "Idestrato") {
+      let nombreEstrato =
+        Object.keys(DATA_SIIAN_ESTRATO).filter(
+          (key) => DATA_SIIAN_ESTRATO[key] === parseInt(value)
+        )[0] ?? "";
+      setFilterData((old) => ({
+        ...old,
+        nombreEstrato: nombreEstrato,
+      }));
+    }
+    setDataSiian((old) => {
+      return { ...old, [ev.target.name]: value };
+    });
+  }, []);
+  const onChangeFormatNumber = useCallback((ev) => {
+    const valor = ev.target.value;
+    let num = valor.replace(/[\s\.\-+eE]/g, "");
+    if (!isNaN(num)) {
+      setDataSiian((old) => {
+        return { ...old, [ev.target.name]: num };
       });
     }
-  };
-
-  const handleAccept = () => {
-    setModalOpen(false);
-    setChecked(true);
-  };
-
-  useEffect(() => {
-    consultaDecisor();
   }, []);
-
-  const tablaSimulacionCreditos = useMemo(() => {
-    const startIndex = (page - 1) * limit;
-    const endIndex = Math.min(startIndex + limit, listadoCuotas.length);
-    const currentPageCuotas = listadoCuotas.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(listadoCuotas.length / limit);
-
-    setMaxPages(totalPages);
-    setPageData({ page, limit });
-
-    return [
-      ...currentPageCuotas.map(
-        ({
-          cuota,
-          fechaPago,
-          valorCuota,
-          abonoCapital,
-          abonoIntereses,
-          saldoCapital,
-        }) => {
+  const onSelectSuggestion = useCallback(
+    (i, el, name) => {
+      if (name === "Iddepartamentoubicacion") {
+        let dataDepa = dataDepartamento.dataList[i];
+        setDataSiian((old) => {
+          return { ...old, [name]: dataDepa.Id };
+        });
+        setFilterData((old) => {
           return {
-            Cuota: cuota,
-            FechaPago: new Date(fechaPago).toLocaleDateString("es-ES", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }),
-            ValorCuota: formatMoney.format(valorCuota),
-            AbonoCapital: formatMoney.format(abonoCapital),
-            AbonoInteres: formatMoney.format(abonoIntereses),
-            SaldoCapital: formatMoney.format(saldoCapital),
+            ...old,
+            [name]: dataDepa.Nombre,
+            IddepartamentoubicacionNoChanges: dataDepa.Nombre,
           };
-        }
-      ),
-    ];
-  }, [listadoCuotas, page, limit]);
-
+        });
+      } else if (name === "Idmunicipioubicacion") {
+        let dataMuni = dataMunicipio.dataList[i];
+        setDataSiian((old) => {
+          return { ...old, [name]: dataMuni.Id };
+        });
+        setFilterData((old) => {
+          return {
+            ...old,
+            [name]: dataMuni.Nombre,
+            IddepartamentoubicacionNoChanges: dataMuni.Nombre,
+          };
+        });
+      }
+    },
+    [dataDepartamento, dataMunicipio]
+  );
   return (
     <>
-      {dataCredito?.formPeticion === 0 ? (
+      {stateProc === "consulta" ? (
         <>
-          <h1 className="text-3xl">Crédito Fácil</h1>
-          <Form
-            onSubmit={() => {
-              setDataCredito((old) => ({
-                ...old,
-                showModal: true,
-              }));
-            }}
-            grid
-          >
-            <Fieldset
-              legend="Datos del credito pre aprobado"
-              className="lg:col-span-2"
-            >
+          <h1 className="text-3xl">Gestión de Terceros</h1>
+          <Form onSubmit={consultaTercero} grid>
+            <Fieldset legend="Datos del tercero" className="lg:col-span-2">
               <Input
-                id="idComercio"
-                name="idComercio"
-                label={"Id comercio"}
+                id="Identificacion"
+                name="Identificacion"
+                label={"ID Comercio"}
                 type="text"
                 autoComplete="off"
-                value={roleInfo?.id_comercio}
-                onChange={() => {}}
+                minLength={0}
+                maxLength={20}
+                value={dataSiian?.Identificacion}
+                onChange={onChangeFormatNumber}
                 required
-                disabled={true}
-              />
-              <Input
-                id="nombreComercio"
-                name="nombreComercio"
-                label={"Nombre comercio"}
-                type="text"
-                autoComplete="off"
-                value={roleInfo?.["nombre comercio"]}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="valorCredito"
-                name="valorCredito"
-                label={"Valor del crédito"}
-                type="text"
-                autoComplete="off"
-                value={formatMoney.format(dataCredito?.valorPreaprobado)}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="numeroCuotas"
-                name="numeroCuotas"
-                label={"No. Cuotas"}
-                type="text"
-                autoComplete="off"
-                value={dataCredito?.consultDecisor?.plazo}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="fechaPreAprobado"
-                name="fechaPreAprobado"
-                label={"Fecha de Preaprobado"}
-                type="text"
-                autoComplete="off"
-                value={dataCredito?.consultDecisor?.fecha_preaprobado}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="estadoCredito"
-                name="estadoCredito"
-                label={"Estado"}
-                type="text"
-                autoComplete="off"
-                value={"Preaprobado"}
-                onChange={() => {}}
-                required
-                disabled={true}
               />
             </Fieldset>
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
-                onClick={handleCloseDecisor}
-                disabled={loadingPeticionConsultaPreaprobado}
+                onClick={closeModule}
+                disabled={loadingPeticionConsultaTerceros}
               >
                 Cancelar
               </Button>
-              {dataCredito?.validacionValor && (
-                <ButtonBar>
-                  <Button
-                    type="submit"
-                    disabled={loadingPeticionConsultaPreaprobado}
-                  >
-                    Simular crédito
-                  </Button>
-                </ButtonBar>
-              )}
+              <Button type="submit" disabled={loadingPeticionConsultaTerceros}>
+                Consultar tercero
+              </Button>
             </ButtonBar>
           </Form>
-          <Modal
-            show={dataCredito?.showModal}
-            handleClose={
-              loadingPeticionSimulacionCredito ? () => {} : handleClose
-            }
-            className="flex align-middle"
-          >
-            <>
-              <Form onSubmit={simulacionCredito}>
-                {dataCredito?.estadoPeticion === 1 ? (
-                  <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
-                    <h1 className="text-2xl text-center mb-5 font-semibold">
-                      Simulación de Crédito
-                    </h1>
-                    <MoneyInput
-                      id="valor"
-                      name="valor"
-                      label="Valor a simular"
-                      type="text"
-                      min={enumParametrosCreditosPDP.MINCREDITOPREAPROBADO}
-                      max={dataCredito?.valorPreaprobado}
-                      autoComplete="off"
-                      maxLength={"12"}
-                      value={dataCredito?.valorSimulacion}
-                      required
-                      onInput={(e, val) => {
-                        setDataCredito((old) => ({
-                          ...old,
-                          valorSimulacion: val,
-                        }));
-                      }}
-                      equalError={false}
-                      equalErrorMin={false}
-                    />
-                    <>
-                      <ButtonBar>
-                        <Button
-                          type="submit"
-                          disabled={loadingPeticionSimulacionCredito}
-                        >
-                          Realizar Simulación
-                        </Button>
-                      </ButtonBar>
-                    </>
-                  </div>
-                ) : (
-                  <></>
-                )}
-              </Form>
-            </>
-          </Modal>
         </>
-      ) : dataCredito?.formPeticion === 1 ? (
+      ) : stateProc === "creacion" ? (
         <>
-          <div className="flex flex-col justify-center ">
-            <h1 className="text-4xl text-center">Simulación de Crédito</h1>
-            <br />
-            <div className="grid grid-cols-3 gap-4">
-              <h2 className="text-xl ml-10">{`Comercio: ${
-                dataCredito?.consultSiian?.nombre ?? ""
-              }`}</h2>
-              <h2 className="text-xl ml-10">{`Monto del Crédito: ${
-                formatMoney.format(dataCredito?.consultSiian?.monto) ?? ""
-              }`}</h2>
-              <h2 className="text-xl ml-10">{`Plazo Crédito en Días: ${
-                dataCredito?.plazo ?? ""
-              }`}</h2>
-            </div>
-            <TableEnterprise
-              title=""
-              headers={[
-                "Cuota",
-                "Fecha de Pago",
-                "Valor Cuota",
-                "Abono Capital",
-                "Abono Interés",
-                "Saldo Capital",
-              ]}
-              data={tablaSimulacionCreditos}
-              onSetPageData={setPageData}
-              maxPage={maxPages}
-            ></TableEnterprise>
+          <h1 className="text-3xl">Creación de Terceros</h1>
+          <Form onSubmit={consultaTercero} grid>
+            <Fieldset legend="Datos del tercero" className="lg:col-span-2">
+              <Input
+                id="Identificacion"
+                name="Identificacion"
+                label={"ID Comercio"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={20}
+                value={dataSiian?.Identificacion}
+                onChange={() => {}}
+                disabled={true}
+                required
+              />
+              <Input
+                id="Razonsocial"
+                name="Razonsocial"
+                label={"Razón social"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={100}
+                value={dataSiian?.Razonsocial ?? ""}
+                onChange={onChangeFormat}
+                required
+              />
+              <Input
+                id="Nombre1"
+                name="Nombre1"
+                label={"Primer nombre"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={50}
+                value={dataSiian?.Nombre1 ?? ""}
+                onChange={onChangeFormat}
+                required
+              />
+              <Input
+                id="Nombre2"
+                name="Nombre2"
+                label={"Segundo nombre"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={50}
+                value={dataSiian?.Nombre2 ?? ""}
+                onChange={onChangeFormat}
+              />
+              <Input
+                id="Apellido1"
+                name="Apellido1"
+                label={"Primer apellido"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={50}
+                value={dataSiian?.Apellido1 ?? ""}
+                onChange={onChangeFormat}
+                required
+              />
+              <Input
+                id="Apellido2"
+                name="Apellido2"
+                label={"Segundo apellido"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={50}
+                value={dataSiian?.Apellido2 ?? ""}
+                onChange={onChangeFormat}
+              />
+              <Input
+                id="correocliente"
+                name="correocliente"
+                label={"Email"}
+                type="email"
+                autoComplete="off"
+                minLength={0}
+                maxLength={50}
+                value={dataSiian?.correocliente ?? ""}
+                onChange={onChangeFormat}
+              />
+              <Input
+                id="Direcciondomicilio"
+                name="Direcciondomicilio"
+                label={"Dirección"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={250}
+                value={dataSiian?.Direcciondomicilio ?? ""}
+                onChange={onChangeFormat}
+              />
+              <InputSuggestions
+                id="Idmunicipioubicacion"
+                name="Idmunicipioubicacion"
+                label={"Ciudad"}
+                type="search"
+                autoComplete="off"
+                suggestions={dataMunicipio.dataRender || []}
+                onSelectSuggestion={(i, el) =>
+                  onSelectSuggestion(i, el, "Idmunicipioubicacion")
+                }
+                value={filterData.Idmunicipioubicacion || ""}
+                onChange={(e) => {
+                  setFilterData((old) => ({
+                    ...old,
+                    Idmunicipioubicacion: e.target.value.toUpperCase(),
+                  }));
+                }}
+                maxLength={50}
+                required
+              />
+              <InputSuggestions
+                id="Iddepartamentoubicacion"
+                name=""
+                label={"Departamento"}
+                type="search"
+                autoComplete="off"
+                suggestions={dataDepartamento.dataRender || []}
+                onSelectSuggestion={(i, el) =>
+                  onSelectSuggestion(i, el, "Iddepartamentoubicacion")
+                }
+                value={filterData.Iddepartamentoubicacion || ""}
+                onChange={(e) => {
+                  setFilterData((old) => ({
+                    ...old,
+                    Iddepartamentoubicacion: e.target.value.toUpperCase(),
+                  }));
+                }}
+                maxLength={50}
+                required
+              />
+              <Input
+                id="Telefonopropietario"
+                name="Telefonopropietario"
+                label={"Número de teléfono"}
+                type="text"
+                autoComplete="off"
+                minLength={0}
+                maxLength={20}
+                value={dataSiian?.Telefonopropietario}
+                onChange={onChangeFormatNumber}
+                required
+              />
+              <Select
+                id="Idestrato"
+                name="Idestrato"
+                label="Estrato"
+                options={DATA_SIIAN_ESTRATO}
+                value={dataSiian?.Idestrato}
+                onChange={onChangeFormat}
+                required
+              />
+            </Fieldset>
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
-                onClick={handleCloseCancelarSimulacion}
-                disabled={loadingPeticionConsultaPreaprobado}
+                onClick={(e) => {
+                  notifyError("Creación cancelada por el usuario");
+                  closeModule(e);
+                }}
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               >
-                Regresar
-              </Button>
-              <Button type="submit" onClick={fecthDescargarSimulacion}>
-                Descargar Simulación
+                Cancelar
               </Button>
               <Button
                 type="submit"
-                onClick={() => {
-                  setDataCredito((old) => ({
-                    ...old,
-                    formPeticion: 2,
-                  }));
-                }}
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               >
-                Desembolsar
+                Consultar tercero
               </Button>
             </ButtonBar>
-          </div>
+          </Form>
         </>
       ) : (
-        <>
-          <div className="flex flex-col justify-center ">
-            <h1 className="text-4xl text-center">Desembolso de Crédito</h1>
-            <br />
-            <Fieldset legend=" Datos del crédito " className="lg:col-span-2">
-              <Input
-                id="creditoPreaprobado"
-                name="idComercio"
-                label={"Crédito Preaprobado"}
-                type="text"
-                autoComplete="off"
-                value={formatMoney.format(dataCredito?.valorPreaprobado)}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="numCuotas"
-                name="numCuotas"
-                label={"No. de Cuotas"}
-                type="text"
-                autoComplete="off"
-                value={dataCredito?.consultSiian?.plazo}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="fechaPreaprobado"
-                name="fechaPreaprobado"
-                label={"Fecha de Preaprobado"}
-                type="text"
-                autoComplete="off"
-                value={new Date(
-                  dataCredito?.consultSiian?.fechaDesembolso
-                ).toLocaleDateString("es-ES", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="estadoCredito"
-                name="estadoCredito"
-                label={"Estado"}
-                type="text"
-                autoComplete="off"
-                value={"Preaprobado"}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-              <Input
-                id="valorSolicitud"
-                name="valorSolicitud"
-                label={"Valor a solicitar"}
-                type="text"
-                autoComplete="off"
-                value={formatMoney.format(dataCredito?.consultSiian?.monto)}
-                onChange={() => {}}
-                required
-                disabled={true}
-              />
-            </Fieldset>
-            <br />
-            <div className="text-center">
-              <label className="text-2xl">
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onClick={openModal}
-                  onChange={() => {}}
-                  required
-                />
-                <span className="ml-2">Acepta Términos y Condiciones</span>
-              </label>
-            </div>
-            {isModalOpen ? (
-              <Modal
-                show={dataCredito?.showModal}
-                handleClose={handleCloseSimulacion}
-                className="flex align-middle"
-              >
-                <iframe
-                  title="PDF Viewer"
-                  src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-                    url
-                  )}&embedded=true`}
-                  style={{
-                    width: "100%",
-                    height: "530px",
-                    border: 0,
-                  }}
-                ></iframe>
-                <ButtonBar>
-                  <Button type="submit" onClick={handleAccept}>
-                    Aceptar
-                  </Button>
-                </ButtonBar>
-              </Modal>
-            ) : (
-              <></>
-            )}
-            <ButtonBar className="lg:col-span-2">
-              <Button
-                type="button"
-                onClick={handleCloseCancelarSimulacion}
-                disabled={loadingPeticionConsultaPreaprobado}
-              >
-                Cancelar
-              </Button>
-              {isChecked && (
-                <ButtonBar>
-                  <Button type="submit" onClick={fecthEnviarCodigoOtp}>
-                    Desembolsar Crédito
-                  </Button>
-                </ButtonBar>
-              )}
-            </ButtonBar>
-            {dataCredito?.showModalOtp ? (
-              <>
-                <Modal
-                  show={dataCredito?.showModal}
-                  handleClose={
-                    loadingPeticionDesembolsoCredito
-                      ? () => {}
-                      : (e) => {
-                          navigate(-1);
-                          notifyError("Transacción cancelada por el usuario");
-                        }
-                  }
-                  className="flex align-middle"
-                >
-                  <Form onSubmit={desembolsoCredito} grid>
-                    <h1 className="text-2xl font-semibold text-center">
-                      ¿Está seguro de realizar el desembolso del crédito? Este
-                      será a su cupo
-                    </h1>
-                    <Input
-                      id="numOtp"
-                      label="Ingresar Código OTP"
-                      type="text"
-                      name="numOtp"
-                      minLength="6"
-                      maxLength="6"
-                      required
-                      autoComplete="off"
-                      value={numOtp}
-                      onInput={(e) => {
-                        let valor = e.target.value;
-                        let num = valor.replace(/[\s\.\-+eE]/g, "");
-                        if (!isNaN(num)) {
-                          setNumOtp(num);
-                        }
-                      }}
-                    />
-                    <ButtonBar>
-                      <Button
-                        type="button"
-                        onClick={(e) => {
-                          navigate(-1);
-                          notifyError("Transacción cancelada por el usuario");
-                        }}
-                        disabled={loadingPeticionDesembolsoCredito}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={loadingPeticionDesembolsoCredito}
-                      >
-                        Aceptar
-                      </Button>
-                    </ButtonBar>
-                  </Form>
-                  <ButtonBar>
-                    <Button
-                      type="submit"
-                      disabled={loadingPeticionDesembolsoCredito}
-                      onClick={fecthEnviarCodigoOtp}
-                    >
-                      Reenviar OTP
-                    </Button>
-                  </ButtonBar>
-                </Modal>
-              </>
-            ) : (
-              <></>
-            )}
-          </div>
-        </>
+        <></>
       )}
     </>
   );
 };
 
-export default RealizarCreditoFacil;
+export default GestionTercerosCreditoFacil;
