@@ -22,6 +22,8 @@ import {
 } from "../hook/useHookBackend";
 import TicketsAval from "../../Corresponsalia/CorresponsaliaGrupoAval/components/TicketsAval";
 import TicketsAgrario from "../../Corresponsalia/CorresponsaliaBancoAgrario/components/TicketsBancoAgrario/TicketsAgrario";
+import TicketsDavivienda from "../../Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
+import TicketColpatria from "../../Colpatria/components/TicketColpatria";
 
 //------ typíng--------
 type TypeDataInput = {
@@ -54,6 +56,29 @@ const dataInputInitial: TypeDataInput = {
 };
 const dataSeeInitial: TypeDataSee = {
   summaryTrx: {},
+};
+
+const InfTicketInitial: TypeInfTicket = {
+  title: "Recibo de pago",
+  timeInfo: {
+    "Fecha de venta": "28/01/2022",
+    Hora: "12:22:00",
+  },
+  commerceInfo: [
+    ["Id Comercio", 2],
+    ["No. terminal", 233],
+    ["Municipio", "Bogota"],
+    ["Dirección", "Calle 11 # 11 - 2"],
+    ["Id Trx", 233],
+    ["Id Transacción", 99],
+  ],
+  commerceName: "Loteria de bogotá",
+  trxInfo: [
+    ["Billete", "0222"],
+    ["Serie", "231"],
+    ["Valor pago", 20000.0],
+  ],
+  disclamer: "Para quejas o reclamos comuniquese al *num PDP*",
 };
 
 const RecaudoTrx = () => {
@@ -112,7 +137,7 @@ const RecaudoTrx = () => {
         validNavigate(valueNavigate);
       }
       if (cancelada === true) {
-        notifyError("Transacción cancelada");
+        notifyError("Transacción cancelada por el usuario");
       }
     },
     [validNavigate]
@@ -399,6 +424,18 @@ const RecaudoTrx = () => {
                 <TicketsAgrario
                   ticket={dataSee?.ticket ?? {}}
                   refPrint={printDiv}
+                />
+              )}
+              {dataConsult?.autorizador.name === "DAVIVIENDA" && (
+                <TicketsDavivienda
+                  ticket={dataSee?.ticket ?? InfTicketInitial}
+                  refPrint={printDiv}
+                />
+              )}
+              {dataConsult?.autorizador.name === "COLPATRIA" && (
+                <TicketColpatria
+                  refPrint={printDiv}
+                  ticket={dataSee?.ticket ?? {}}
                 />
               )}
               {/* <Tickets refPrint={printDiv} ticket={dataSee?.ticket ?? {}} /> */}

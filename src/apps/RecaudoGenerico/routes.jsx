@@ -12,7 +12,7 @@ const routesRecaudoGenerico = {
   label: (
     <AppIcons
       Logo={"RECAUDO"}
-      name="Recaudo Servicio Públicos y Privados Genérico"
+      name="Recaudo Servicios Públicos y Privados Genérico"
     />
   ),
   component: ({ subRoutes }) => <HNavbar links={subRoutes} />,
