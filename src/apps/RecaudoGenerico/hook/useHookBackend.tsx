@@ -50,7 +50,17 @@ export type TypeInformacionTransaccionPagoInput = {
   datos_adicionales: { [key: string]: any };
 };
 
-export type TypeInfTicket = { [key: string]: any };
+export type TypeInfTicket = {
+  title: string;
+  timeInfo: {
+    "Fecha de venta": string;
+    Hora: string;
+  };
+  commerceInfo: (string | number)[][];
+  commerceName: string;
+  trxInfo: (string | number)[][];
+  disclamer: string;
+};
 
 export type TypeTransaccionPagoOutput = {
   status: boolean;
