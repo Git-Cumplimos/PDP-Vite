@@ -96,6 +96,13 @@ const DATA_SIIAN_INIT = {
   Valorarriendo: 0,
   correocliente: "",
 };
+const DATA_FILTER_SIIAN = {
+  Iddepartamentoubicacion: "",
+  IddepartamentoubicacionNoChanges: "",
+  Idmunicipioubicacion: "",
+  IdmunicipioubicacionNoChanges: "",
+  nombreEstrato: "",
+};
 
 const GestionTercerosCreditoFacil = () => {
   const navigate = useNavigate();
@@ -104,13 +111,7 @@ const GestionTercerosCreditoFacil = () => {
 
   const [dataSiian, setDataSiian] = useState(DATA_SIIAN_INIT);
   const [stateProc, setStateProc] = useState("consulta");
-  const [filterData, setFilterData] = useState({
-    Iddepartamentoubicacion: "",
-    IddepartamentoubicacionNoChanges: "",
-    Idmunicipioubicacion: "",
-    IdmunicipioubicacionNoChanges: "",
-    nombreEstrato: "",
-  });
+  const [filterData, setFilterData] = useState(DATA_FILTER_SIIAN);
   const [loadingPeticionConsultaTerceros, peticionConsultaTercero] = useFetch(
     fetchCustom(URL_CONSULTA_TERCEROS, "POST", "Consultar tercero")
   );
@@ -143,6 +144,7 @@ const GestionTercerosCreditoFacil = () => {
   }, [filterData.Idmunicipioubicacion]);
   const closeModule = useCallback((e) => {
     setDataSiian(DATA_SIIAN_INIT);
+    setFilterData(DATA_FILTER_SIIAN);
     navigate(-1);
   }, []);
   const consultaTercero = useCallback(
@@ -234,13 +236,14 @@ const GestionTercerosCreditoFacil = () => {
           render: ({ data: res }) => {
             console.log(res);
             setStateProc("consulta");
-            return "Consulta satisfactoria";
+            closeModule();
+            return "Creación satisfactoria";
           },
         },
         {
           render: ({ data: error }) => {
             navigate(-1);
-            return error?.message ?? "Consulta fallida";
+            return error?.message ?? "Creación fallida";
           },
         }
       );
@@ -259,6 +262,10 @@ const GestionTercerosCreditoFacil = () => {
         ...old,
         nombreEstrato: nombreEstrato,
       }));
+    }
+    const dataNames = ["Nombre1", "Nombre2", "Apellido1", "Apellido2"];
+    if (dataNames.includes(ev.target.name)) {
+      value = value.toUpperCase();
     }
     setDataSiian((old) => {
       return { ...old, [ev.target.name]: value };
@@ -320,6 +327,7 @@ const GestionTercerosCreditoFacil = () => {
                 maxLength={20}
                 value={dataSiian?.Identificacion}
                 onChange={onChangeFormatNumber}
+                disabled={loadingPeticionConsultaTerceros}
                 required
               />
             </Fieldset>
@@ -340,7 +348,7 @@ const GestionTercerosCreditoFacil = () => {
       ) : stateProc === "creacion" ? (
         <>
           <h1 className="text-3xl">Creación de Terceros</h1>
-          <Form onSubmit={consultaTercero} grid>
+          <Form onSubmit={creacionTercero} grid>
             <Fieldset legend="Datos del tercero" className="lg:col-span-2">
               <Input
                 id="Identificacion"
@@ -366,6 +374,10 @@ const GestionTercerosCreditoFacil = () => {
                 value={dataSiian?.Razonsocial ?? ""}
                 onChange={onChangeFormat}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="Nombre1"
@@ -378,6 +390,10 @@ const GestionTercerosCreditoFacil = () => {
                 value={dataSiian?.Nombre1 ?? ""}
                 onChange={onChangeFormat}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="Nombre2"
@@ -389,6 +405,10 @@ const GestionTercerosCreditoFacil = () => {
                 maxLength={50}
                 value={dataSiian?.Nombre2 ?? ""}
                 onChange={onChangeFormat}
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="Apellido1"
@@ -401,6 +421,10 @@ const GestionTercerosCreditoFacil = () => {
                 value={dataSiian?.Apellido1 ?? ""}
                 onChange={onChangeFormat}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="Apellido2"
@@ -412,6 +436,10 @@ const GestionTercerosCreditoFacil = () => {
                 maxLength={50}
                 value={dataSiian?.Apellido2 ?? ""}
                 onChange={onChangeFormat}
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="correocliente"
@@ -423,6 +451,10 @@ const GestionTercerosCreditoFacil = () => {
                 maxLength={50}
                 value={dataSiian?.correocliente ?? ""}
                 onChange={onChangeFormat}
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="Direcciondomicilio"
@@ -434,6 +466,10 @@ const GestionTercerosCreditoFacil = () => {
                 maxLength={250}
                 value={dataSiian?.Direcciondomicilio ?? ""}
                 onChange={onChangeFormat}
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <InputSuggestions
                 id="Idmunicipioubicacion"
@@ -454,6 +490,10 @@ const GestionTercerosCreditoFacil = () => {
                 }}
                 maxLength={50}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <InputSuggestions
                 id="Iddepartamentoubicacion"
@@ -474,6 +514,10 @@ const GestionTercerosCreditoFacil = () => {
                 }}
                 maxLength={50}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Input
                 id="Telefonopropietario"
@@ -486,6 +530,10 @@ const GestionTercerosCreditoFacil = () => {
                 value={dataSiian?.Telefonopropietario}
                 onChange={onChangeFormatNumber}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
               <Select
                 id="Idestrato"
@@ -495,6 +543,10 @@ const GestionTercerosCreditoFacil = () => {
                 value={dataSiian?.Idestrato}
                 onChange={onChangeFormat}
                 required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
               />
             </Fieldset>
             <ButtonBar className="lg:col-span-2">
@@ -518,7 +570,7 @@ const GestionTercerosCreditoFacil = () => {
                   loadingPeticionCreacionTerceros
                 }
               >
-                Consultar tercero
+                Crear tercero
               </Button>
             </ButtonBar>
           </Form>
