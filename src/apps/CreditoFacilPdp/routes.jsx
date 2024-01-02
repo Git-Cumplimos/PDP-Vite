@@ -37,7 +37,7 @@ const rutasCreditosPdp = {
     },
     {
       link: "/creditos-pdp/gestion-terceros",
-      label: <AppIcons Logo={"CREDITOS_PDP"} name="Gestión de Terceros" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Gestión de Terceros" />,
       component: GestionTercerosCreditoFacil,
       permission: [enumPermisosCreditoPdpAdmin.GESTION_TERCEROS_CREDITO_FACIL],
     },
