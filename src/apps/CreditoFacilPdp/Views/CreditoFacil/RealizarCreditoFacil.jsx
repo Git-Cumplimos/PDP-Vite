@@ -383,6 +383,37 @@ const RealizarCreditoFacil = () => {
     consultaDecisor();
   }, []);
 
+  useEffect(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      navigate("/");
+    } else {
+      fetchComercio();
+    }
+  }, []);
+  const fetchComercio = useCallback(() => {
+    let hasKeys = true;
+    const keys = [
+      "id_comercio",
+      "id_usuario",
+      "tipo_comercio",
+      "id_dispositivo",
+      "ciudad",
+      "direccion",
+    ];
+    for (const key of keys) {
+      if (!(key in roleInfo)) {
+        hasKeys = false;
+        break;
+      }
+    }
+    if (!hasKeys) {
+      notifyError(
+        "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      );
+      navigate("/");
+    }
+  }, [roleInfo, navigate]);
+
   const tablaSimulacionCreditos = useMemo(() => {
     const startIndex = (page - 1) * limit;
     const endIndex = Math.min(startIndex + limit, listadoCuotas.length);
