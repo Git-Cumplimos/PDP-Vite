@@ -1,17 +1,11 @@
-import { useCallback, useState, useEffect, useMemo } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { v4 } from "uuid";
-import { notifyError, notifyPending, notify } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
-import Modal from "../../../../components/Base/Modal/Modal";
 import Form from "../../../../components/Base/Form/Form";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import MoneyInput, {
-  formatMoney,
-} from "../../../../components/Base/MoneyInput/MoneyInput";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
 import Select from "../../../../components/Base/Select";
@@ -21,11 +15,8 @@ import {
   MUNICIPIOS_SIIAN,
 } from "../../enumDataLocalizacionCredito";
 
-// const URL_CONSULTA_TERCEROS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/consulta-tercero`;
-const URL_CONSULTA_TERCEROS =
-  "http://127.0.0.1:5000/gestion-credito-facil/consulta-tercero";
-const URL_CREACION_TERCEROS =
-  "http://127.0.0.1:5000/gestion-credito-facil/creacion-tercero";
+const URL_CONSULTA_TERCEROS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/consulta-tercero`;
+const URL_CREACION_TERCEROS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/creacion-tercero`;
 
 const DATA_TIPO_ID = {
   NIT: 2,
@@ -106,9 +97,6 @@ const DATA_FILTER_SIIAN = {
 
 const GestionTercerosCreditoFacil = () => {
   const navigate = useNavigate();
-  const uniqueId = v4();
-  const { roleInfo, pdpUser } = useAuth();
-
   const [dataSiian, setDataSiian] = useState(DATA_SIIAN_INIT);
   const [stateProc, setStateProc] = useState("consulta");
   const [filterData, setFilterData] = useState(DATA_FILTER_SIIAN);
