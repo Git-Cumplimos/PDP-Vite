@@ -15,6 +15,9 @@ const RealizarCreditoFacil = lazy(() =>
 const GestionTercerosCreditoFacil = lazy(() =>
   import("./Views/Admin/GestionTercerosCreditoFacil")
 );
+const PagoCreditoFacilPDP = lazy(() =>
+  import("./Views/CreditoFacil/PagoCreditoFacilPDP")
+);
 
 const CreditosPDP = lazy(() => import("./CreditosPDP"));
 
@@ -34,6 +37,12 @@ const rutasCreditosPdp = {
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Crédito Fácil" />,
       component: RealizarCreditoFacil,
       permission: [enumPermisosCreditoPdp.REALIZAR_CREDITO_FACIL],
+    },
+    {
+      link: "/creditos-pdp/pago-credito-facil",
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Pago de Crédito" />,
+      component: PagoCreditoFacilPDP,
+      permission: [enumPermisosCreditoPdp.PAGO_CREDITO_FACIL],
     },
     {
       link: "/creditos-pdp/gestion-terceros",
