@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   useState,
@@ -36,8 +37,8 @@ type Props = {};
 const toastIdLoading = "progress-trx-123";
 const limite_maximo_dispersion = 10_000_000;
 
-const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
-// const urlComisiones = "http://localhost:5000";
+// const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+const urlComisiones = "http://localhost:5000";
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
 const DispersionUsuarioPadre = (props: Props) => {
@@ -163,7 +164,7 @@ const DispersionUsuarioPadre = (props: Props) => {
       autoDispatch: false,
     },
     {
-      onPending: useCallback(() => "Procesando transaccion", []),
+      onPending: useCallback(() => "Procesando Transacción", []),
       onSuccess: useCallback((res) => {
         setTrxState(true);
         setIdDispersionBack(res?.obj?.pk_id_dispersion);
@@ -183,7 +184,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
         }
         console.error(error?.message);
-        return "Transaccion fallida";
+        return "Transacción fallida";
       }, []),
     },
     { notify: true }
@@ -258,6 +259,12 @@ const DispersionUsuarioPadre = (props: Props) => {
     intervalDelay != null ? intervalDelay * 2 : intervalDelay
   );
 
+  useEffect(() => {
+    return () => {
+      toast.done(toastIdLoading);
+    };
+  }, []);
+
   return (
     <Fragment>
       <h1 className="text-3xl mb-10 text-center">
@@ -285,7 +292,7 @@ const DispersionUsuarioPadre = (props: Props) => {
         <Fieldset
           legend={
             <div className="flex gap-2 items-center">
-              <p>Tranferencias</p>
+              <p>Transferencias</p>
               <IconSwap
                 bootstrapIcon="file-earmark-plus"
                 bootstrapIconHover="file-earmark-plus-fill"
@@ -313,7 +320,7 @@ const DispersionUsuarioPadre = (props: Props) => {
             <Fieldset
               legend={
                 <div className="flex gap-2 items-center">
-                  <p>Tranferencia {index + 1}</p>
+                  <p>Transferencia {index + 1}</p>
                   <IconSwap
                     bootstrapIcon="trash"
                     bootstrapIconHover="trash-fill"
@@ -383,7 +390,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Button type="submit">Aplicar dispersion</Button>
+          <Button type="submit">Aplicar dispersión</Button>
         </ButtonBar>
       </Form>
       <Modal

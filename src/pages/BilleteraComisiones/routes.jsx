@@ -57,7 +57,7 @@ const rutasBilleteraComisiones = [
         label: (
           <AppIcons
             Logo={"RETIRO"}
-            name={"Historico movimiento comisiones cupo usuario padre"}
+            name={"Histórico movimiento comisiones cupo usuario padre"}
           />
         ),
         component: HistorialDispersionesUsuarioPadre,
@@ -72,7 +72,7 @@ const rutasBilleteraComisiones = [
               <AppIcons
                 Logo={"RETIRO"}
                 name={
-                  "Historico movimiento comisiones cupo usuario padre detalle"
+                  "Histórico movimiento comisiones cupo usuario padre detalle"
                 }
               />
             ),
