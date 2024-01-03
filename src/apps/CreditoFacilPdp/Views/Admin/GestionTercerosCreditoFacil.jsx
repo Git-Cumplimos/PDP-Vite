@@ -93,6 +93,14 @@ const DATA_FILTER_SIIAN = {
   Idmunicipioubicacion: "",
   IdmunicipioubicacionNoChanges: "",
   nombreEstrato: "",
+  nombreCliente: "",
+};
+
+const DATA_TIPO_CLIENTE_SIIAN = {
+  COMERCIOS: 12,
+  OAT: 10,
+  "PEQUEÑOS PRODUCTORES": 11,
+  EMPLEADOS: 13,
 };
 
 const GestionTercerosCreditoFacil = () => {
@@ -161,13 +169,21 @@ const GestionTercerosCreditoFacil = () => {
             let filteredKeysEstrato = Object.keys(DATA_SIIAN_ESTRATO).filter(
               (key) => DATA_SIIAN_ESTRATO[key] === dataSiian?.Idestrato
             );
+            let filteredKeysCliente = Object.keys(
+              DATA_TIPO_CLIENTE_SIIAN
+            ).filter(
+              (key) => DATA_TIPO_CLIENTE_SIIAN[key] === dataSiian?.Idtipocliente
+            );
             setFilterData({
-              Iddepartamentoubicacion: filteredListDepa[0].Nombre ?? "",
-              Idmunicipioubicacion: filteredListMuni[0].Nombre ?? "",
+              Iddepartamentoubicacion: filteredListDepa[0].Nombre ?? "BOGOTA",
+              Idmunicipioubicacion:
+                filteredListMuni[0].Nombre ?? "BOGOTA, D.C.",
               IddepartamentoubicacionNoChanges:
-                filteredListDepa[0].Nombre ?? "",
-              IdmunicipioubicacionNoChanges: filteredListMuni[0].Nombre ?? "",
-              nombreEstrato: filteredKeysEstrato[0] ?? "",
+                filteredListDepa[0].Nombre ?? "BOGOTA",
+              IdmunicipioubicacionNoChanges:
+                filteredListMuni[0].Nombre ?? "BOGOTA, D.C.",
+              nombreEstrato: filteredKeysEstrato[0] ?? "Estrato 1",
+              nombreCliente: filteredKeysCliente[0] ?? "COMERCIOS",
             });
             setStateProc("creacion");
             return "Consulta satisfactoria";
@@ -195,6 +211,9 @@ const GestionTercerosCreditoFacil = () => {
       if (filterData.nombreEstrato === "") {
         return notifyError("Ingrese un estrato");
       }
+      if (filterData.nombreCliente === "") {
+        return notifyError("Ingrese un tipo de cliente");
+      }
       const data = {
         id: dataSiian.Id,
         identificacion: dataSiian.Identificacion,
@@ -212,6 +231,8 @@ const GestionTercerosCreditoFacil = () => {
         nombre_estrato: filterData.nombreEstrato,
         email: dataSiian.correocliente,
         telefono: dataSiian.Telefonopropietario,
+        id_tipo_cliente: dataSiian.Idtipocliente,
+        nombre_cliente: filterData.nombreCliente,
       };
       notifyPending(
         peticionCreacionTercero({}, data),
@@ -222,7 +243,6 @@ const GestionTercerosCreditoFacil = () => {
         },
         {
           render: ({ data: res }) => {
-            console.log(res);
             setStateProc("consulta");
             closeModule();
             return "Creación satisfactoria";
@@ -249,6 +269,16 @@ const GestionTercerosCreditoFacil = () => {
       setFilterData((old) => ({
         ...old,
         nombreEstrato: nombreEstrato,
+      }));
+    }
+    if (ev.target.name === "Idtipocliente") {
+      let nombreCliente =
+        Object.keys(DATA_TIPO_CLIENTE_SIIAN).filter(
+          (key) => DATA_TIPO_CLIENTE_SIIAN[key] === parseInt(value)
+        )[0] ?? "";
+      setFilterData((old) => ({
+        ...old,
+        nombreCliente: nombreCliente,
       }));
     }
     const dataNames = ["Nombre1", "Nombre2", "Apellido1", "Apellido2"];
@@ -529,6 +559,19 @@ const GestionTercerosCreditoFacil = () => {
                 label="Estrato"
                 options={DATA_SIIAN_ESTRATO}
                 value={dataSiian?.Idestrato}
+                onChange={onChangeFormat}
+                required
+                disabled={
+                  loadingPeticionConsultaTerceros ||
+                  loadingPeticionCreacionTerceros
+                }
+              />
+              <Select
+                id="Idtipocliente"
+                name="Idtipocliente"
+                label="Tipo cliente"
+                options={DATA_TIPO_CLIENTE_SIIAN}
+                value={dataSiian?.Idtipocliente}
                 onChange={onChangeFormat}
                 required
                 disabled={
