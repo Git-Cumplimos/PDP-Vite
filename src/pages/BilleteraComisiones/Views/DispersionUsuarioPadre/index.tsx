@@ -164,7 +164,7 @@ const DispersionUsuarioPadre = (props: Props) => {
       autoDispatch: false,
     },
     {
-      onPending: useCallback(() => "Procesando transaccion", []),
+      onPending: useCallback(() => "Procesando Transacción", []),
       onSuccess: useCallback((res) => {
         setTrxState(true);
         setIdDispersionBack(res?.obj?.pk_id_dispersion);
@@ -184,7 +184,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
         }
         console.error(error?.message);
-        return "Transaccion fallida";
+        return "Transacción fallida";
       }, []),
     },
     { notify: true }
@@ -292,7 +292,7 @@ const DispersionUsuarioPadre = (props: Props) => {
         <Fieldset
           legend={
             <div className="flex gap-2 items-center">
-              <p>Tranferencias</p>
+              <p>Transferencias</p>
               <IconSwap
                 bootstrapIcon="file-earmark-plus"
                 bootstrapIconHover="file-earmark-plus-fill"
@@ -320,7 +320,7 @@ const DispersionUsuarioPadre = (props: Props) => {
             <Fieldset
               legend={
                 <div className="flex gap-2 items-center">
-                  <p>Tranferencia {index + 1}</p>
+                  <p>Transferencia {index + 1}</p>
                   <IconSwap
                     bootstrapIcon="trash"
                     bootstrapIconHover="trash-fill"
@@ -390,7 +390,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Button type="submit">Aplicar dispersion</Button>
+          <Button type="submit">Aplicar dispersión</Button>
         </ButtonBar>
       </Form>
       <Modal
