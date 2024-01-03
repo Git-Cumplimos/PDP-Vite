@@ -380,10 +380,6 @@ const DesembolsoCEACRC = () => {
   };
 
   useEffect(() => {
-    consultaDecisor();
-  }, []);
-
-  useEffect(() => {
     if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
       navigate("/");
     } else {
@@ -452,9 +448,49 @@ const DesembolsoCEACRC = () => {
 
   return (
     <>
+      <TableEnterprise
+        title=""
+        headers={[
+          "Id Comercio",
+          "Nombre Comercio",
+          "No. Solicitud",
+          "Valor Crédito",
+          "No. Cuotas",
+          "Fecha Pre-aprobado",
+          "Estado",
+          "Usuario Aprueba",
+          "Fecha Aprobación",
+        ]}
+        data={tablaSimulacionCreditos}
+        onSetPageData={setPageData}
+        maxPage={maxPages}
+      >
+        <Input
+          id="idComercio"
+          name="idComercio"
+          label={"ID Comercio"}
+          minLength="1"
+          maxLength="20"
+          type="text"
+          autoComplete="off"
+          onInput={(e) => {}}
+        />
+        <Input
+          type="month"
+          id="fecha"
+          name="fecha"
+          label="Fecha"
+          autoComplete="off"
+          value={`10-2024`}
+          onChange={(e) => {
+            const [year, month] = e.target.value.split("-");
+          }}
+          required
+        />
+      </TableEnterprise>
       {dataCredito?.formPeticion === 0 ? (
         <>
-          <h1 className="text-3xl">Crédito Fácil</h1>
+          <h1 className="text-3xl">Desembolso de Créditos</h1>
           <Form
             onSubmit={() => {
               setDataCredito((old) => ({
@@ -473,6 +509,7 @@ const DesembolsoCEACRC = () => {
                 name="idComercio"
                 label={"Id comercio"}
                 type="text"
+                maxLength={20}
                 autoComplete="off"
                 value={roleInfo?.id_comercio}
                 onChange={() => {}}
