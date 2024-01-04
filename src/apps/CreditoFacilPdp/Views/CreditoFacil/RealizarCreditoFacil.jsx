@@ -288,12 +288,6 @@ const RealizarCreditoFacil = () => {
                 return error?.message;
               } else if (
                 error?.message ===
-                "Código OTP ha caducado, solicita un nuevo código en Reenviar OTP"
-              ) {
-                setNumOtp("");
-                return error?.message;
-              } else if (
-                error?.message ===
                 "Código OTP incorrecto - Reintentos superados"
               ) {
                 navigate(-1);
