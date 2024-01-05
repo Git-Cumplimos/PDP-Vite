@@ -28,8 +28,8 @@ import TicketColpatria from "../../Colpatria/components/TicketColpatria";
 //------ typíng--------
 type TypeDataInput = {
   referencia: string; //string de solo numeros
-  pk_id_convenio: number;
-  convenio_name: string;
+  id_pdp_convenio: number;
+  name_pdp_convenio: string;
   valor_total_trx: string;
 };
 type TypeProceso = "Ninguno" | "Consulta" | "Resumen" | "TrxExitosa";
@@ -50,8 +50,8 @@ type TypeDataSee = {
 const valor_total_trx_maximo = 10000000;
 const dataInputInitial: TypeDataInput = {
   referencia: "",
-  pk_id_convenio: 0,
-  convenio_name: "",
+  id_pdp_convenio: 0,
+  name_pdp_convenio: "",
   valor_total_trx: "",
 };
 const dataSeeInitial: TypeDataSee = {
@@ -86,8 +86,9 @@ const RecaudoTrx = () => {
   const { roleInfo, pdpUser }: any = useAuth();
   const [dataInput, setDataInput] = useState<TypeDataInput>({
     referencia: state.referencia ?? dataInputInitial.referencia,
-    pk_id_convenio: state.pk_id_convenio,
-    convenio_name: state.convenio_name ?? dataInputInitial.convenio_name,
+    id_pdp_convenio: state.id_pdp_convenio,
+    name_pdp_convenio:
+      state.name_pdp_convenio ?? dataInputInitial.name_pdp_convenio,
     valor_total_trx: "",
   });
 
@@ -159,7 +160,7 @@ const RecaudoTrx = () => {
     (ev) => {
       ev.preventDefault();
       notifyPending(
-        PeticionConsulta(dataInput.pk_id_convenio, {
+        PeticionConsulta(dataInput.id_pdp_convenio, {
           referencia: dataInput.referencia,
         }),
         {
@@ -176,9 +177,10 @@ const RecaudoTrx = () => {
               summaryTrx: {
                 ...old.summaryTrx,
                 Autorizador: dataResponse.autorizador.name,
-                "Nombre convenio": dataResponse.convenio.convenio_name,
+                "Nombre convenio":
+                  dataResponse.convenio.name_especifico_convenio_autorizador,
                 "Número convenio":
-                  dataResponse.convenio.id_especifico_convenio_autorizador,
+                  dataResponse.convenio.id_relacion_convenio_autorizador,
                 "Referencia 1": dataResponse.referencia,
               },
             }));
@@ -216,7 +218,7 @@ const RecaudoTrx = () => {
       );
     },
     [
-      dataInput.pk_id_convenio,
+      dataInput.id_pdp_convenio,
       dataInput.referencia,
       PeticionConsulta,
       handleCloseNinguno,
@@ -243,7 +245,6 @@ const RecaudoTrx = () => {
       ev.preventDefault();
       const info_transaccion: TypeInformacionTransaccionPagoInput = {
         referencia: dataInput.referencia,
-        convenio_name: dataConsult?.convenio?.convenio_name ?? "",
         datos_adicionales: dataConsult?.datos_adicionales ?? {},
       };
       if (dataInput.valor_total_trx !== "") {
@@ -256,7 +257,7 @@ const RecaudoTrx = () => {
       }
 
       notifyPending(
-        PeticionPago(dataInput.pk_id_convenio, info_transaccion),
+        PeticionPago(dataInput.id_pdp_convenio, info_transaccion),
         {
           render: () => {
             return "Procesando transacción";
@@ -282,7 +283,7 @@ const RecaudoTrx = () => {
       );
     },
     [
-      dataInput.pk_id_convenio,
+      dataInput.id_pdp_convenio,
       dataInput.referencia,
       dataInput.valor_total_trx,
       dataConsult,
@@ -303,7 +304,7 @@ const RecaudoTrx = () => {
       <h1 className="text-3xl text-center mb-10 mt-5">
         Recaudo servicios públicos y privados
       </h1>
-      <h1 className="text-2xl text-center mb-10">{`Convenio: ${dataInput.convenio_name}`}</h1>
+      <h1 className="text-2xl text-center mb-10">{`Convenio: ${dataInput.name_pdp_convenio}`}</h1>
       <Form onSubmit={onSubmitConsult} grid>
         <div className="col-span-2">
           <div className=" grid grid-cols-4  grid-rows-4">
