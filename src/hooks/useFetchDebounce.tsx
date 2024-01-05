@@ -5,11 +5,15 @@ import useFetchDispatchDebounce, {
   HookOptions,
 } from "./useFetchDispatchDebounce";
 
+type FetchPropsAuto = FetchProps & {
+  autoDispatch?: boolean;
+  fetchIf?: boolean;
+};
+
 const useFetchDebounce = (
-  { url, options }: FetchProps,
+  { url, options, autoDispatch = true, fetchIf = true }: FetchPropsAuto,
   responseCallbacks: ResponseCallbacks,
-  hookOptions?: HookOptions,
-  autoDispatch: boolean = true
+  hookOptions?: HookOptions
 ) => {
   const [dispatcher, loading, abort] = useFetchDispatchDebounce(
     responseCallbacks,
@@ -75,8 +79,8 @@ const useFetchDebounce = (
   ]);
 
   const wholeDispacher = useCallback(
-    () => dispatcher(url, copyOptions),
-    [dispatcher, url, copyOptions]
+    () => fetchIf && dispatcher(url, copyOptions),
+    [dispatcher, url, copyOptions, fetchIf]
   );
 
   useEffect(() => {
@@ -85,7 +89,7 @@ const useFetchDebounce = (
     }
   }, [wholeDispacher, autoDispatch]);
 
-  return [loading, abort, wholeDispacher] as const;
+  return [wholeDispacher, loading, abort] as const;
 };
 
 export default useFetchDebounce;

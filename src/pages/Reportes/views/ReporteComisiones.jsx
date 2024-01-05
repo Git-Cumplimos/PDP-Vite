@@ -9,12 +9,15 @@ import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { notify, notifyError } from "../../../utils/notify";
 import SearchAutorizador from "../components/SearchAutorizador";
 import SearchTipoOperacion from "../components/SearchTipoOperacion";
-import { postObtenerReporteComisionesAplicadas } from "../utils/fetchReportesComisiones";
+import { postObtenerReporteComisionesAplicadas,
+          getObtenerVerificacionArchivo,
+} from "../utils/fetchReportesComisiones";
 
 const ReporteComisiones = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOpt, setSelectedOpt] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [createdfile, setCreatedfile] = useState(true);
   const [report, setReport] = useState({
     id_comercio: "",
     id_tipo_transaccion: "",
@@ -83,15 +86,46 @@ const ReporteComisiones = () => {
         obj["id_trx"] = report["id_trx"];
       }
       setIsUploading(true);
+      const datefile = new Date()
+      obj["fileDate"] = datefile.toString();
+      var fileDate = obj["fileDate"]
       postObtenerReporteComisionesAplicadas(obj)
-        .then((res) => {
-          if (res?.status) {
-            notify(res?.msg);
-            window.open(res?.obj?.url);
-            setIsUploading(false);
-          } else {
-            notifyError(res?.msg);
-            setIsUploading(false);
+        .then(async(res) => {
+          if (res?.message === "Endpoint request timed out") {
+            while (createdfile) {
+              try {
+                const verificationResponse = await getObtenerVerificacionArchivo({"fileDate":fileDate})
+                if (verificationResponse?.obj?.res === true) {
+                  window.open(verificationResponse?.obj?.url);
+                  setIsUploading(false);
+                  setCreatedfile(verificationResponse?.obj?.res)
+                  notify(verificationResponse?.msg);
+                  break;
+                }
+              } catch (error) {
+                console.error(error);
+                notifyError("No se pudo verificar el archivo");
+                setIsUploading(false);
+                break;
+              }
+              await wait(7000);
+              notify("Procesando la informacion...");
+            }
+          }else{
+            if (res?.codigo === 0) {
+              setIsUploading(false);
+              notifyError(res?.msg);
+            }
+            if (res["body"] !== undefined) {
+              if (res?.body?.status) {
+                notify(res?.body?.msg);
+                window.open(res?.body?.obj?.url);
+                setIsUploading(false);
+              } else {
+                notifyError(res?.body?.msg);
+                setIsUploading(false);
+              }
+            }
           }
         })
         .catch((err) => {
@@ -100,8 +134,13 @@ const ReporteComisiones = () => {
           setIsUploading(false);
         });
     },
-    [report]
+    [report,createdfile]
   );
+
+  async function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   return (
     <>
       <SimpleLoading show={isUploading} />

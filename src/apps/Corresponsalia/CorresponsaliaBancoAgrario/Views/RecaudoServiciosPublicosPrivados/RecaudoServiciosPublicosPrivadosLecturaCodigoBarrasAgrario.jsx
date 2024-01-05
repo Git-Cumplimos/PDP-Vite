@@ -17,6 +17,7 @@ import {
   postConsultaCodigoBarrasConveniosEspecifico,
   postRecaudoConveniosAgrario,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const { roleInfo, pdpUser } = useAuth();
@@ -155,6 +156,26 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         return notifyError("La referencia no puede ser 0");
       }
     }
+    if (
+      parseInt(datosTransaccion.valorSinModificar) >
+      enumParametrosBancoAgrario.maxRecaudo
+    ) {
+      return notifyError(
+        `El valor de la transacción es superior a ${formatMoney.format(
+          enumParametrosBancoAgrario.maxRecaudo
+        )}`
+      );
+    }
+    if (
+      parseInt(datosTransaccion.valorSinModificar) <
+      enumParametrosBancoAgrario.minRecaudo
+    ) {
+      return notifyError(
+        `El valor de la transacción es inferior a ${formatMoney.format(
+          enumParametrosBancoAgrario.minRecaudo
+        )}`
+      );
+    }
     setPeticion(1);
     setShowModal(true);
   };
@@ -232,21 +253,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10 mt-5'>
+      <h1 className="text-3xl text-center mb-10 mt-5">
         Recaudo servicios públicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
           <Form>
             <TextArea
-              id='codBarras'
-              label='Escanee el código de barras'
-              type='text'
-              name='codBarras'
+              id="codBarras"
+              label="Escanee el código de barras"
+              type="text"
+              name="codBarras"
               required
               value={datosTrans.codBarras}
               autoFocus
-              autoComplete='off'
+              autoComplete="off"
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
@@ -288,14 +309,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                     data: "",
                   };
                 }
-              }}></TextArea>
+              }}
+            ></TextArea>
             {datosTrans.codBarras !== "" && (
               <ButtonBar>
                 <Button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
-                  }}>
+                  }}
+                >
                   Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
@@ -304,17 +327,17 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
         </>
       ) : (
         <>
-          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
+          <h1 className="text-3xl text-center  mb-10">{`Convenio: ${
             datosEnvio?.datosConvenio?.nombre_convenio ?? ""
           }`}</h1>
           <Form grid onSubmit={onSubmitConfirm}>
             {datosEnvio?.datosConvenio?.nombre_ref1 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref1?.match(/-/g) && (
                 <Input
-                  id='ref1'
+                  id="ref1"
                   label={datosEnvio?.datosConvenio?.nombre_ref1}
-                  type='text'
-                  name='ref1'
+                  type="text"
+                  name="ref1"
                   minLength={datosEnvio?.datosConvenio?.longitud_min_ref1}
                   maxLength={datosEnvio?.datosConvenio?.longitud_max_ref1}
                   required
@@ -322,7 +345,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   value={
                     datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
                   }
-                  autoComplete='off'
+                  autoComplete="off"
                   onInput={onChangeFormat}
                 />
               )}
@@ -330,10 +353,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
                 <Input
-                  id='ref2'
+                  id="ref2"
                   label={datosEnvio?.datosConvenio?.nombre_ref2}
-                  type='text'
-                  name='ref2'
+                  type="text"
+                  name="ref2"
                   minLength={datosEnvio?.datosConvenio?.longitud_min_ref2}
                   maxLength={datosEnvio?.datosConvenio?.longitud_max_ref2}
                   required
@@ -341,17 +364,18 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   value={
                     datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
                   }
-                  autoComplete='off'
-                  onInput={onChangeFormat}></Input>
+                  autoComplete="off"
+                  onInput={onChangeFormat}
+                ></Input>
               )}
             {datosEnvio?.datosConvenio?.nombre_ref3 &&
               datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
               !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
                 <Input
-                  id='ref3'
+                  id="ref3"
                   label={datosEnvio?.datosConvenio?.nombre_ref3}
-                  type='text'
-                  name='ref3'
+                  type="text"
+                  name="ref3"
                   minLength={datosEnvio?.datosConvenio?.longitud_min_ref3}
                   maxLength={datosEnvio?.datosConvenio?.longitud_max_ref3}
                   required
@@ -359,31 +383,33 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   value={
                     datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
                   }
-                  autoComplete='off'
-                  onInput={onChangeFormat}></Input>
+                  autoComplete="off"
+                  onInput={onChangeFormat}
+                ></Input>
               )}
             {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
             datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
               <Input
-                id='fechaCaducidad'
-                label='Fecha de caducidad'
-                type='text'
-                name='fechaCaducidad'
-                minLength='0'
-                maxLength='32'
+                id="fechaCaducidad"
+                label="Fecha de caducidad"
+                type="text"
+                name="fechaCaducidad"
+                minLength="0"
+                maxLength="32"
                 disabled={true}
                 value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
-                onInput={(e) => {}}></Input>
+                onInput={(e) => {}}
+              ></Input>
             ) : (
               <></>
             )}
             {datosEnvio.datosCodigoBarras.pago[0] && (
               <MoneyInputDec
-                id='valCashOut'
-                name='valCashOut'
-                label='Valor a pagar original'
-                type='text'
-                autoComplete='off'
+                id="valCashOut"
+                name="valCashOut"
+                label="Valor a pagar original"
+                type="text"
+                autoComplete="off"
                 maxLength={"15"}
                 disabled={true}
                 value={datosTransaccion.valorSinModificar ?? ""}
@@ -392,27 +418,31 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                     const num = valor;
                   }
                 }}
-                required></MoneyInputDec>
+                required
+              ></MoneyInputDec>
             )}
-            <ButtonBar className='lg:col-span-2'>
+            <ButtonBar className="lg:col-span-2">
               <Button
-                type='button'
+                type="button"
                 onClick={() => {
                   notifyError("Transacción cancelada por el usuario");
                   hideModalReset();
-                }}>
+                }}
+              >
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type='submit' disabled={showModal}>Realizar pago</Button>
+                <Button type="submit" disabled={showModal}>
+                  Realizar pago
+                </Button>
               )}
             </ButtonBar>
           </Form>
           <Modal show={showModal} handleClose={hideModalReset}>
             <>
               {peticion === 1 && (
-                <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-                  <h1 className='text-2xl text-center mb-5 font-semibold'>
+                <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                  <h1 className="text-2xl text-center mb-5 font-semibold">
                     ¿Está seguro de realizar el recaudo?
                   </h1>
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.nombre_convenio}`}</h2>
@@ -437,21 +467,29 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                         datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
                       }`}</h2>
                     )}
-                  <h2 className='text-base'>
+                  <h2 className="text-base">
                     {`Valor a pagar: ${formatMoney.format(
                       datosTransaccion.valorSinModificar
                     )} `}
                   </h2>
-                  <Form grid onSubmit={onSubmitPago} className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                  <Form
+                    grid
+                    onSubmit={onSubmitPago}
+                    className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center"
+                  >
                     <ButtonBar>
                       <Button
                         onClick={() => {
                           notifyError("Transacción cancelada por el usuario");
                           hideModalReset();
-                        }}>
+                        }}
+                      >
                         Cancelar
                       </Button>
-                      <Button type='submit' disabled={peticion !== 1 && showModal}>
+                      <Button
+                        type="submit"
+                        disabled={peticion !== 1 && showModal}
+                      >
                         Realizar pago
                       </Button>
                     </ButtonBar>
@@ -459,7 +497,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 </div>
               )}
               {peticion === 2 && (
-                <div className='flex flex-col justify-center items-center'>
+                <div className="flex flex-col justify-center items-center">
                   <TicketsAgrario
                     ticket={objTicketActual}
                     refPrint={printDiv}
@@ -468,11 +506,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                     <ButtonBar>
                       <Button onClick={handlePrint}>Imprimir</Button>
                       <Button
-                        type='submit'
+                        type="submit"
                         onClick={() => {
                           hideModalReset();
                           navigate(-1);
-                        }}>
+                        }}
+                      >
                         Aceptar
                       </Button>
                     </ButtonBar>

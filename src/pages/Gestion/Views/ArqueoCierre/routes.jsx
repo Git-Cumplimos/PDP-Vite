@@ -14,7 +14,7 @@ const CargaComprobante = lazy(() => import("./CargaComprobante"));
 const NotasCD = lazy(() => import("./Notas"));
 const Notas = lazy(() => import("./Notas/Notas"));
 const ReporteSobranteFaltantes = lazy(() => import("./ReporteArqueoCaja/ReporteSobranteFaltantes"));
-
+const HistoricoBoveda = lazy(() => import("./HistoricoBoveda"));
 
 /**
  * COMPONENTES ROL ANALISTA
@@ -62,7 +62,7 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/carga-comprobante",
-    label: <AppIcons Logo={"RECAUDO"} name="Transportadora y Consignaciones" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Bóveda, Consignaciones y Transportadora" />,
     component: CargaComprobante,
     permission: [PermissionsCaja.AgregaComprobantes],
   },
@@ -129,11 +129,18 @@ export const rutasArqueo = [
     permission: [PermissionsCaja.ValidacionSobrantesFaltantes],
   },
   {
+    link: "/gestion/arqueo/historico-boveda",
+    label: <AppIcons Logo={"RECAUDO"} name="Histórico Movimiento Bóveda" />,
+    component: HistoricoBoveda,
+    permission: [PermissionsCaja.HistoricoBoveda],
+  },
+  {
     link: "/gestion/arqueo/reporte-sobrantes-faltantes",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte de sobrantes/faltantes" />,
     component: ReporteSobranteFaltantes,
     permission: [PermissionsCaja.ReporteSobrantesFaltantes],
   },
+
 
 ];
 

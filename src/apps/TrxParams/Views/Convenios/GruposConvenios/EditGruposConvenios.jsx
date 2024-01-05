@@ -292,10 +292,7 @@ const EditGruposConvenios = () => {
       };
     });
   }, [convenios]);
-
-  console.log(convenios)
-
-  console.log(selectedGruposConvenios)
+  
   return (
     <Fragment>
       <SimpleLoading show={isUploading} />

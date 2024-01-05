@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../../components/Base/Button";
@@ -45,7 +45,6 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       navigate("../");
     }
   }, [state?.id]);
-
   const fecthTablaConveniosEspecificoFunc = () => {
     postConsultaTablaConveniosEspecifico({
       pk_tbl_convenios_banco_agrario: state?.id,
@@ -63,25 +62,28 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   });
   const onSubmit = (e) => {
     e.preventDefault();
-
-    if (
-      parseInt(datosTrans?.ref1) <= 0 ||
-      parseInt(datosTrans?.ref2) <= 0 ||
-      parseInt(datosTrans?.ref3) <= 0
-    ) {
-      return notifyError("La referencia no puede ser 0");
+    if (convenio?.algoritmo_ref1?.match(/(numerico)|(base9)/g)) {
+      if (parseInt(datosTrans?.ref1) <= 0)
+        return notifyError("La referencia no puede ser 0");
     }
-
+    if (convenio?.algoritmo_ref2?.match(/(numerico)|(base9)/g)) {
+      if (parseInt(datosTrans?.ref2) <= 0)
+        return notifyError("La referencia no puede ser 0");
+    }
+    if (convenio?.algoritmo_ref3?.match(/(numerico)|(base9)/g)) {
+      if (parseInt(datosTrans?.ref3) <= 0)
+        return notifyError("La referencia no puede ser 0");
+    }
     //Valdicacion de luhm
-    if (convenio?.algoritmo_ref1?.match(/(Q 108)/g)) {
+    if (convenio?.algoritmo_ref1?.match(/(modlo10)/g)) {
       if (!checkLuhn(datosTrans?.ref1))
         return notifyError("Validación de la referencia 1 erronea");
     }
-    if (convenio?.algoritmo_ref2?.match(/(Q 108)/g)) {
+    if (convenio?.algoritmo_ref2?.match(/(modlo10)/g)) {
       if (!checkLuhn(datosTrans?.ref2))
         return notifyError("Validación de la referencia 2 erronea");
     }
-    if (convenio?.algoritmo_ref3?.match(/(Q 108)/g)) {
+    if (convenio?.algoritmo_ref3?.match(/(modlo10)/g)) {
       if (!checkLuhn(datosTrans?.ref3))
         return notifyError("Validación de la referencia 3 erronea");
     }
@@ -97,18 +99,10 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       codigoConvenio: convenio?.codigo,
       referencia1: datosTrans?.ref1,
     };
-    if (
-      convenio?.nombre_ref2 &&
-      convenio?.nombre_ref2 !== "" &&
-      !convenio?.nombre_ref2?.match(/-/g)
-    ) {
+    if (convenio?.nombre_ref2 && convenio?.nombre_ref2 !== "") {
       objRecaudo["referencia2"] = datosTrans?.ref2;
     }
-    if (
-      convenio?.nombre_ref3 &&
-      convenio?.nombre_ref3 !== "" &&
-      !convenio?.nombre_ref3?.match(/-/g)
-    ) {
+    if (convenio?.nombre_ref3 && convenio?.nombre_ref3 !== "") {
       objRecaudo["referencia3"] = datosTrans?.ref3;
     }
 
@@ -167,26 +161,38 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       valorVar: "",
     }));
     setObjTicketActual({});
-  }, [roleInfo]);
+  }, []);
   const onChangeFormat = useCallback(
     (ev) => {
-      let valor = ev.target.value.replace(/[\s\.\-+eE]/g, "");
+      let valor = ev.target.value;
       if (ev.target.name === "ref1") {
-        if (convenio?.algoritmo_ref1?.match(/(N 010)|(Q 108)/g)) {
+        if (convenio?.algoritmo_ref1?.match(/(caracteres)/g)) {
+          valor = valor.replace(/\d/g, "");
+        }
+        if (convenio?.algoritmo_ref1?.match(/(numerico)|(modlo10)|(base9)/g)) {
+          valor = ev.target.value.replace(/[\s\.\-+eE]/g, "");
           if (isNaN(valor)) {
             valor = datosTrans[ev.target.name];
           }
         }
       }
       if (ev.target.name === "ref2") {
-        if (convenio?.algoritmo_ref2?.match(/(N 010)|(Q 108)/g)) {
+        if (convenio?.algoritmo_ref2?.match(/(caracteres)/g)) {
+          valor = valor.replace(/\d/g, "");
+        }
+        if (convenio?.algoritmo_ref2?.match(/(numerico)|(modlo10)|(base9)/g)) {
+          valor = ev.target.value.replace(/[\s\.\-+eE]/g, "");
           if (isNaN(valor)) {
             valor = datosTrans[ev.target.name];
           }
         }
       }
       if (ev.target.name === "ref3") {
-        if (convenio?.algoritmo_ref3?.match(/(N 010)|(Q 108)/g)) {
+        if (convenio?.algoritmo_ref3?.match(/(caracteres)/g)) {
+          valor = valor.replace(/\d/g, "");
+        }
+        if (convenio?.algoritmo_ref3?.match(/(numerico)|(modlo10)|(base9)/g)) {
+          valor = valor.replace(/[\s\.\-+eE]/g, "");
           if (isNaN(valor)) {
             valor = datosTrans[ev.target.name];
           }
@@ -201,10 +207,10 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10 mt-5'>
+      <h1 className="text-3xl text-center mb-10 mt-5">
         Recaudo servicios públicos y privados
       </h1>
-      <h1 className='text-2xl text-center mb-10'>{`Convenio: ${
+      <h1 className="text-2xl text-center mb-10">{`Convenio: ${
         convenio?.nombre_convenio ?? ""
       }`}</h1>
 
@@ -214,59 +220,58 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
             !convenio?.nombre_ref2?.match(/-/g)) ||
           (convenio?.nombre_ref3 !== "" && !convenio?.nombre_ref3?.match(/-/g))
         }
-        onSubmit={onSubmit}>
-        {convenio?.nombre_ref1 !== "" &&
-          !convenio?.nombre_ref1?.match(/-/g) && (
-            <Input
-              id='ref1'
-              label={convenio?.nombre_ref1}
-              type='text'
-              name='ref1'
-              minLength={convenio?.longitud_min_ref1}
-              maxLength={convenio?.longitud_max_ref1}
-              required
-              value={datosTrans.ref1}
-              autoComplete='off'
-              onInput={onChangeFormat}></Input>
-          )}
-        {convenio?.nombre_ref2 &&
-          convenio?.nombre_ref2 !== "" &&
-          !convenio?.nombre_ref2?.match(/-/g) && (
-            <Input
-              id='ref2'
-              label={convenio?.nombre_ref2}
-              type='text'
-              name='ref2'
-              minLength={convenio?.longitud_min_ref2}
-              maxLength={convenio?.longitud_max_ref2}
-              required
-              value={datosTrans.ref2}
-              autoComplete='off'
-              onInput={onChangeFormat}></Input>
-          )}
-        {convenio?.nombre_ref3 &&
-          convenio?.nombre_ref3 !== "" &&
-          !convenio?.nombre_ref3?.match(/-/g) && (
-            <Input
-              id='ref3'
-              label={convenio?.nombre_ref3}
-              type='text'
-              name='ref3'
-              minLength={convenio?.longitud_min_ref3}
-              maxLength={convenio?.longitud_max_ref3}
-              required
-              value={datosTrans.ref3}
-              autoComplete='off'
-              onInput={onChangeFormat}></Input>
-          )}
+        onSubmit={onSubmit}
+      >
+        {convenio?.nombre_ref1 !== "" && (
+          <Input
+            id="ref1"
+            label={convenio?.nombre_ref1}
+            type="text"
+            name="ref1"
+            minLength={convenio?.longitud_min_ref1}
+            maxLength={convenio?.longitud_max_ref1}
+            required
+            value={datosTrans.ref1}
+            autoComplete="off"
+            onInput={onChangeFormat}
+          ></Input>
+        )}
+        {convenio?.nombre_ref2 && convenio?.nombre_ref2 !== "" && (
+          <Input
+            id="ref2"
+            label={convenio?.nombre_ref2}
+            type="text"
+            name="ref2"
+            minLength={convenio?.longitud_min_ref2}
+            maxLength={convenio?.longitud_max_ref2}
+            required
+            value={datosTrans.ref2}
+            autoComplete="off"
+            onInput={onChangeFormat}
+          ></Input>
+        )}
+        {convenio?.nombre_ref3 && convenio?.nombre_ref3 !== "" && (
+          <Input
+            id="ref3"
+            label={convenio?.nombre_ref3}
+            type="text"
+            name="ref3"
+            minLength={convenio?.longitud_min_ref3}
+            maxLength={convenio?.longitud_max_ref3}
+            required
+            value={datosTrans.ref3}
+            autoComplete="off"
+            onInput={onChangeFormat}
+          ></Input>
+        )}
         <MoneyInput
-          id='valCashOut'
-          name='valCashOut'
-          label='Valor a pagar'
-          type='text'
+          id="valCashOut"
+          name="valCashOut"
+          label="Valor a pagar"
+          type="text"
           min={enumParametrosBancoAgrario.minRecaudo}
           max={enumParametrosBancoAgrario.maxRecaudo}
-          autoComplete='off'
+          autoComplete="off"
           maxLength={"12"}
           value={parseInt(datosTrans.valor)}
           onInput={(e, val) => {
@@ -284,34 +289,30 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
               !convenio?.nombre_ref3?.match(/-/g))
               ? "lg:col-span-2"
               : ""
-          }>
-          <Button type='submit'>Realizar pago</Button>
+          }
+        >
+          <Button type="submit">Realizar pago</Button>
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
         <>
           {estadoPeticion === 0 ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
-              <h1 className='text-2xl text-center mb-5 font-semibold'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+              <h1 className="text-2xl text-center mb-5 font-semibold">
                 ¿Está seguro de realizar el recaudo?
               </h1>
               <h2>{`Nombre convenio: ${convenio?.nombre_convenio}`}</h2>
               <h2>{`Número convenio: ${convenio?.codigo}`}</h2>
-              {convenio?.nombre_ref1 !== "" &&
-                !convenio?.nombre_ref1?.match(/-/g) && (
-                  <h2>{`Referencia 1: ${datosTrans.ref1}`}</h2>
-                )}
-              {convenio?.nombre_ref2 &&
-                convenio?.nombre_ref2 !== "" &&
-                !convenio?.nombre_ref2?.match(/-/g) && (
-                  <h2>{`Referencia 2: ${datosTrans.ref2}`}</h2>
-                )}
-              {convenio?.nombre_ref3 &&
-                convenio?.nombre_ref3 !== "" &&
-                !convenio?.nombre_ref3?.match(/-/g) && (
-                  <h2>{`Referencia 3: ${datosTrans.ref3}`}</h2>
-                )}
-              <h2 className='text-base'>
+              {convenio?.nombre_ref1 !== "" && (
+                <h2>{`${convenio?.nombre_ref1}: ${datosTrans.ref1}`}</h2>
+              )}
+              {convenio?.nombre_ref2 && convenio?.nombre_ref2 !== "" && (
+                <h2>{`${convenio?.nombre_ref2}: ${datosTrans.ref2}`}</h2>
+              )}
+              {convenio?.nombre_ref3 && convenio?.nombre_ref3 !== "" && (
+                <h2>{`${convenio?.nombre_ref3}: ${datosTrans.ref3}`}</h2>
+              )}
+              <h2 className="text-base">
                 {`Valor a pagar: ${formatMoney.format(
                   datosTrans.valor ?? "0"
                 )} `}
@@ -322,27 +323,29 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
                     onClick={() => {
                       handleClose();
                       notifyError("Transacción cancelada por el usuario");
-                    }}>
+                    }}
+                  >
                     Cancelar
                   </Button>
-                  <Button type='submit' onClick={onSubmitValidacion}>
+                  <Button type="submit" onClick={onSubmitValidacion}>
                     Realizar pago
                   </Button>
                 </ButtonBar>
               </>
             </div>
           ) : estadoPeticion === 1 ? (
-            <div className='flex flex-col justify-center items-center'>
+            <div className="flex flex-col justify-center items-center">
               <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
                   <Button
-                    type='submit'
+                    type="submit"
                     onClick={() => {
                       handleClose();
                       navigate(-1);
-                    }}>
+                    }}
+                  >
                     Aceptar
                   </Button>
                 </ButtonBar>
