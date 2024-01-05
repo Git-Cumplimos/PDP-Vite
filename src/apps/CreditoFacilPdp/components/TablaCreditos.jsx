@@ -1,12 +1,24 @@
 import { useCallback, useMemo, useState } from "react";
 import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
+import { formatMoney } from "../../../components/Base/MoneyInput";
 
-const TablaCreditos = ({ dataCreditos, onSelectItem }) => {
+const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
   const [maxPages, setMaxPages] = useState(0);
-  const [pageData, setPageData] = useState(1);
+  const [{ page, limit }, setPageData] = useState({
+    page: 1,
+    limit: 10,
+  });
   const dataTable = useMemo(() => {
-    return dataCreditos.map(
+    const startIndex = (page - 1) * limit;
+    const endIndex = Math.min(startIndex + limit, dataCreditos.length);
+    const currentPageCuotas = dataCreditos.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(dataCreditos.length / limit);
+
+    setMaxPages(totalPages);
+    setPageData({ page, limit });
+
+    return currentPageCuotas.map(
       ({
         Agrupacion,
         Calificacion,
@@ -44,47 +56,59 @@ const TablaCreditos = ({ dataCreditos, onSelectItem }) => {
         Valorparaestaraldia,
       }) => {
         return {
-          Id: Id,
+          id: Id,
+          estado: Estado,
+          valorCuota: formatMoney.format(Valorcuotaactual),
+          saldo: formatMoney.format(Saldo),
+          desembolso: new Date(Fechadesembolso).toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }),
+          ultimoPago: new Date(Fechadeultimopago).toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }),
+          proximoPago: new Date(Fechavencimientoproximo).toLocaleDateString(
+            "es-ES",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }
+          ),
         };
       }
     );
-  }, [dataCreditos]);
+  }, [dataCreditos, page, limit]);
   const onChange = useCallback((ev) => {}, []);
+  const onSelect = useCallback(
+    (ev, i) => {
+      const idData = dataTable[i]?.id;
+      const dataCredito = dataCreditos.filter((data) => data.Id === idData);
+      setDataCreditoUnique(dataCredito[0] ?? {});
+    },
+    [dataTable, dataCreditos]
+  );
   return (
-    <>
-      {/* <Pagination maxPage={maxPages} onChange={onChange} grid></Pagination> */}
-      <TableEnterprise
-        title={"Créditos activos comercio"}
-        maxPage={maxPages}
-        onChange={onChange}
-        headers={["id"]}
-        data={dataTable}
-        onSelectRow={onSelectItem}
-        onSetPageData={setPageData}
-      >
-        <>
-          <Input
-            id={"nombre_asignacion_comision"}
-            label={"Nombre asignación"}
-            name={"nombre_asignacion_comision"}
-            type={"text"}
-            maxLength={50}
-            autoComplete="off"
-            //   defaultValue={nombre_asignacion_comision}
-          />
-          <Input
-            id={"fk_tipo_op"}
-            label={"Tipo de transacción"}
-            name={"fk_tipo_op"}
-            type={"tel"}
-            autoComplete="off"
-            maxLength={30}
-            // onChange={(ev) => (ev.target.value = onChangeNumber(ev))}
-            //   defaultValue={fk_tipo_op}
-          />
-        </>
-      </TableEnterprise>
-    </>
+    <TableEnterprise
+      title={"Créditos activos comercio"}
+      maxPage={maxPages}
+      onChange={onChange}
+      headers={[
+        "Crédito",
+        "Estado",
+        "Cuota",
+        "Saldo",
+        "Desembolso",
+        "Último pago",
+        "Proximo pago",
+      ]}
+      data={dataTable}
+      onSelectRow={onSelect}
+      onSetPageData={setPageData}
+    ></TableEnterprise>
   );
 };
 
