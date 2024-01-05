@@ -28,7 +28,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import useInterval from "./hooks/useInterval";
 import { toast } from "react-toastify";
 import useTimeout from "./hooks/useTimeout";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 import IconSwap from "./IconSwap";
 import TicketBlock from "./TicketBlock";
 
@@ -64,6 +64,14 @@ const DispersionUsuarioPadre = (props: Props) => {
   const [intervalDelay, setIntervalDelay] = useState<number | undefined>();
   const [timeoutDelay, setTimeoutDelay] = useState<number | undefined>();
   const [letExit, setLetExit] = useState(false);
+  const [showEspecialNotify, setShowEspecialNotify] = useState<boolean | undefined>(false);
+  const [details, setDetails] = useState({
+    "total":0,
+    "exitosas":0,
+    "fallidas":0,
+    "procesadas":0,
+    "faltantes":0,
+  });
 
   const [ticketList, setTicketList] = useState<any[]>([]);
 
@@ -211,6 +219,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           const totalExitosas = res?.obj?.total_finalizadas_ok ?? 0;
           const totalFallidas = res?.obj?.total_finalizadas_error ?? 0;
           const totalProcesando = res?.obj?.total_procesando ?? 0;
+          const totalPorIniciar = res?.obj?.total_por_iniciar ?? 0;
           const progreso =
             (totalExitosas + totalFallidas + totalProcesando * 0.25) /
             totalDispersion;
@@ -220,6 +229,15 @@ const DispersionUsuarioPadre = (props: Props) => {
             render: "Transferencia en progreso",
             progress: progreso || 0.01,
           });
+          let data = {
+            "total":totalDispersion,
+            "exitosas":totalExitosas,
+            "fallidas":totalFallidas,
+            "procesadas":totalProcesando,
+            "faltantes":totalPorIniciar,
+          }          
+          if (data !== details) setDetails(data)
+
           if (progreso >= 1) {
             handleEndConsulta();
             if (totalFallidas > 0) {
@@ -234,7 +252,7 @@ const DispersionUsuarioPadre = (props: Props) => {
             );
           }
         },
-        [handleEndConsulta]
+        [handleEndConsulta,details]
       ),
       onError: useCallback((error) => console.error(error?.message), []),
     },
@@ -246,12 +264,37 @@ const DispersionUsuarioPadre = (props: Props) => {
     intervalDelay
   );
 
+  const showDetails = useCallback(() =>{
+    let notifyEspecial = `Transferencias exitosas: ${details.exitosas}/${details.total}`
+    if (details.total !== details.faltantes && (details.faltantes >= 1 || details.procesadas >= 1)){
+      notify(
+        notifyEspecial +
+        `. Las transacciones pendientes (${details.faltantes}) se completarán próximamente y estarán disponibles`+
+        `, junto con las ya procesadas ((${details.procesadas})), en el módulo 'Histórico de Movimientos de Comisiones en el Cupo del Usuario Padre'. ¡Agradecemos su paciencia!`
+      )
+      setShowEspecialNotify(undefined)
+    }
+  },[details])
+
+  useEffect(()=>{
+    setTimeout(()=>{
+      if (showEspecialNotify && letExit) showDetails() 
+    },10)
+  },[showEspecialNotify,letExit,showDetails])
+
   useTimeout(
     useCallback(() => {
       handleEndConsulta();
       notifyError("Timeout en consulta");
     }, [handleEndConsulta]),
     timeoutDelay
+  );
+
+  useTimeout(
+    useCallback(() => {
+      if (showEspecialNotify === false) setShowEspecialNotify(true)
+    }, [showEspecialNotify]),
+    intervalDelay != null ? intervalDelay * 2 : intervalDelay
   );
 
   useTimeout(
