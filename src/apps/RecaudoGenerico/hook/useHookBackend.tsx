@@ -17,8 +17,9 @@ export type TypeConfiguracion = {
 };
 
 export type TypeConvenio = {
-  convenio_name: string;
-  pk_id_convenio: number;
+  name_pdp_convenio: string;
+  name_especifico_convenio_autorizador: string;
+  id_pdp_convenio: number;
   id_relacion_convenio_autorizador: number;
   id_especifico_convenio_autorizador: number;
 };
@@ -44,7 +45,6 @@ export type TypeTransaccionConsultaOutput = {
 
 export type TypeInformacionTransaccionPagoInput = {
   referencia: string; //string de solo numeros
-  convenio_name: string;
   id_trx?: number;
   valor_total_trx?: number;
   datos_adicionales: { [key: string]: any };
@@ -127,7 +127,7 @@ export const useBackendRecaudoGenerico = (
 
   const PeticionConsulta = useCallback(
     async (
-      pk_id_convenio: number,
+      id_pdp_convenio: number,
       info_transaccion: TypeInformacionTransaccionConsultaInput
     ): Promise<TypeTransaccionConsultaOutput> => {
       const function_name = "PeticionConsulta";
@@ -140,7 +140,7 @@ export const useBackendRecaudoGenerico = (
           `${url}/consulta`,
           "PUT",
           name_service,
-          { pk_id_convenio: pk_id_convenio },
+          { id_pdp_convenio: id_pdp_convenio },
           body,
           ParamsErrorRecaudoGenerico
         );
@@ -149,8 +149,10 @@ export const useBackendRecaudoGenerico = (
         const dataResponse: TypeTransaccionConsultaOutput = {
           referencia: result?.referencia ?? "",
           convenio: {
-            convenio_name: result?.convenio?.convenio_name ?? "",
-            pk_id_convenio: result?.convenio?.pk_id_convenio ?? 0,
+            name_pdp_convenio: result?.convenio?.name_pdp_convenio ?? "",
+            name_especifico_convenio_autorizador:
+              result?.convenio?.name_especifico_convenio_autorizador ?? "",
+            id_pdp_convenio: result?.convenio?.id_pdp_convenio ?? 0,
             id_relacion_convenio_autorizador:
               result?.convenio?.id_relacion_convenio_autorizador ?? 0,
             id_especifico_convenio_autorizador:
@@ -194,7 +196,7 @@ export const useBackendRecaudoGenerico = (
 
   const PeticionPago = useCallback(
     async (
-      pk_id_convenio: number,
+      id_pdp_convenio: number,
       info_transaccion: TypeInformacionTransaccionPagoInput
     ): Promise<TypeTransaccionPagoOutput> => {
       const function_name = "PeticionPago";
@@ -207,7 +209,7 @@ export const useBackendRecaudoGenerico = (
           `${url}/pago`,
           "PUT",
           name_service,
-          { pk_id_convenio: pk_id_convenio },
+          { id_pdp_convenio: id_pdp_convenio },
           body,
           ParamsErrorRecaudoGenerico
         );
