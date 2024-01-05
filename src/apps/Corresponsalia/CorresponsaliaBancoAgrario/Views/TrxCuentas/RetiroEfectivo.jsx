@@ -21,11 +21,7 @@ import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario/
 import { useReactToPrint } from "react-to-print";
 import HideInput from "../../../../../components/Base/HideInput/HideInput";
 import { pinBlock } from "../../../CorresponsaliaGrupoAval/utils/pinBlock";
-
-const limitesMontos = {
-  max: 500000,
-  min: 10000,
-};
+import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
 
 const optionsSelect = [
   { value: "Ahorros", label: "Cuenta Ahorros" },
@@ -205,10 +201,11 @@ const RetiroEfectivo = () => {
           name="amount"
           label="Valor a retirar"
           autoComplete="off"
-          min={limitesMontos?.min}
-          max={limitesMontos?.max}
+          min={enumParametrosBancoAgrario?.MIN_RETIRO_CUENTAS_OTP_AGRARIO}
+          max={enumParametrosBancoAgrario?.MAX_RETIRO_CUENTAS_OTP_AGRARIO}
           equalError={false}
           equalErrorMin={false}
+          maxLength={"9"}
           value={dataInput.amount}
           onInput={(e, value) =>
             setDataInput((anterior) => ({
@@ -222,7 +219,7 @@ const RetiroEfectivo = () => {
           <Button type={"submit"}>Continuar</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={handleCloseModal}>
+      <Modal show={showModal}>
         {/******************************Resumen trx*******************************************************/}
         {tipoModal === "ResumenTrx" && (
           <PaymentSummary
