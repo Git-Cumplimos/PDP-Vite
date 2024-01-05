@@ -165,7 +165,7 @@ const RetiroEfectivo = () => {
         />
         <Input
           name="cuenta"
-          label="Cuenta"
+          label="Cuenta / Documento"
           type="text"
           minLength="1"
           maxLength="12"
@@ -227,7 +227,7 @@ const RetiroEfectivo = () => {
             subtitle="Resumen de transacción"
             summaryTrx={{
               "Tipo de Cuenta": `Cuenta ${dataInput.tipoCuenta}`,
-              Cuenta: dataInput?.cuenta,
+              "Cuenta / Documento": dataInput?.cuenta,
               OTP: "*".repeat(dataInput?.OTP.length),
               Valor: formatMoney.format(dataInput?.amount),
             }}
