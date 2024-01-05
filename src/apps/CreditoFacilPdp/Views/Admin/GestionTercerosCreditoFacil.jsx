@@ -584,7 +584,11 @@ const GestionTercerosCreditoFacil = () => {
               <Button
                 type="button"
                 onClick={(e) => {
-                  notifyError("Creación cancelada por el usuario");
+                  notifyError(
+                    dataSiian.Id === 0
+                      ? "Creación cancelada por el usuario"
+                      : "Actualización cancelada por el usuario"
+                  );
                   closeModule(e);
                 }}
                 disabled={
