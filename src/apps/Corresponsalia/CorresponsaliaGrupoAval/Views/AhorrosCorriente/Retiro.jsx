@@ -29,10 +29,22 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
 import HideInput from "../../../../../components/Base/HideInput";
-import { makeMoneyFormatter } from "../../../../../utils/functions";
-import useMoney from "../../../../../hooks/useMoney";
 import { pinBlock } from "../../utils/pinBlock";
 import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
+
+const optionsBanco = [
+  { value: "", label: "" },
+  { value: "0052", label: "Banco AvVillas" },
+  { value: "0001", label: "Banco Bogotá" },
+  { value: "0023", label: "Banco Occidente" },
+  { value: "0002", label: "Banco Popular" },
+  // { value: "0054", label: "ATH" },
+];
+
+const optionsTipoCuenta = [
+  { value: "01", label: "Ahorros" },
+  { value: "02", label: "Corriente" },
+];
 
 const Retiro = () => {
   const navigate = useNavigate();
@@ -44,18 +56,11 @@ const Retiro = () => {
     min: enumParametrosGrupoAval.minRetiroCuentas,
   });
 
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
-  });
-
   const [loadingRetiroCorresponsalGrupoAval, fetchRetiroCorresponsalGrupoAval] =
     useFetch(retiroCorresponsalGrupoAval);
   const [loadingConsultaCostoGrupoAval, fetchConsultaCostoGrupoAval] = useFetch(
     consultaCostoGrupoAval
   );
-  const [, fetchTypes] = useFetch();
-
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
@@ -71,42 +76,23 @@ const Retiro = () => {
   const [showBTNConsulta, setShowBTNConsulta] = useState(true);
 
   const otpEncrip = useMemo(() => {
-    let x;
-    if (otp.length === 6) {
-      x = pinBlock(otp, process.env.REACT_APP_PAN_AVAL);
-    } else {
-      x = "";
-    }
+    let x = pinBlock(otp, process.env.REACT_APP_PAN_AVAL);
     return x;
   }, [otp]);
-
-  const optionsBanco = [
-    { value: "", label: "" },
-    { value: "0052", label: "Banco AvVillas" },
-    { value: "0001", label: "Banco Bogotá" },
-    { value: "0023", label: "Banco Occidente" },
-    { value: "0002", label: "Banco Popular" },
-    // { value: "0054", label: "ATH" },
-  ];
 
   const DataBanco = useMemo(() => {
     const resp = optionsBanco?.filter((id) => id.value === banco);
     const DataBanco = { nombre: resp[0]?.label, idBanco: resp[0]?.value };
     return DataBanco;
-  }, [optionsBanco, banco]);
+  }, [banco]);
 
-  const optionsTipoCuenta = [
-    { value: "01", label: "Ahorros" },
-    { value: "02", label: "Corriente" },
-  ];
-
-  const optionsDocumento = [
-    { value: "", label: "" },
-    { value: "01", label: "Cédula Ciudadanía" },
-    { value: "02", label: "Cédula Extranjería" },
-    { value: "04", label: "Tarjeta Identidad" },
-    { value: "13", label: "Registro Civil" },
-  ];
+  // const optionsDocumento = [
+  //   { value: "", label: "" },
+  //   { value: "01", label: "Cédula Ciudadanía" },
+  //   { value: "02", label: "Cédula Extranjería" },
+  //   { value: "04", label: "Tarjeta Identidad" },
+  //   { value: "13", label: "Registro Civil" },
+  // ];
 
   const printDiv = useRef();
 
@@ -215,14 +201,7 @@ const Retiro = () => {
           notifyError("No se ha podido conectar al servidor");
         });
     },
-    [valor, DataBanco, roleInfo, tipoCuenta]
-  );
-
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setValor(valor);
-    },
-    [valor]
+    [valor, DataBanco, roleInfo, tipoCuenta, phone, userDoc]
   );
 
   const goToRecaudo = useCallback(() => {
@@ -232,7 +211,7 @@ const Retiro = () => {
   const onSubmitModal = useCallback(
     (e) => {
       e.preventDefault();
-      if (otp.length <= 6 && otp.length >= 3) {
+      if (otp.length <= 10 && otp.length >= 4) {
         const { min, max } = limitesMontos;
         if (valor >= min && valor <= max) {
           const summary = {
@@ -324,6 +303,7 @@ const Retiro = () => {
     DataBanco,
     phone,
     pdpUser?.uname,
+    tipoCuenta,
   ]);
 
   return (
@@ -339,6 +319,7 @@ const Retiro = () => {
             value={banco}
             onChange={(e) => {
               setBanco(e.target.value);
+              setOtp("");
             }}
             required
           />
@@ -397,8 +378,8 @@ const Retiro = () => {
             label="Número OTP"
             type="text"
             name="otp"
-            minLength={"3"}
-            maxLength={"6"}
+            minLength={"4"}
+            maxLength={"10"}
             autoComplete="off"
             value={otp}
             onInput={(e, valor) => {
