@@ -215,6 +215,8 @@ const svgs = {
   //APUESTAS DEPORTIVAS
   APUESTAS_DEPORTIVAS: `${urlAssets}/assets/svg/recaudo/APUESTAS_DEPORTIVAS/APUESTAS_DEPORTIVAS.svg`,
 
+  //TRANSCARIBE
+  TRANSCARIBE: `${urlAssets}/assets/svg/recaudo/TRANSCARIBE/TRANSCARIBE.png`,
   // Recaudo Y OTROS
   IMPUESTO: `${urlAssets}/assets/svg/recaudo/IMPUESTO.svg`,
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
