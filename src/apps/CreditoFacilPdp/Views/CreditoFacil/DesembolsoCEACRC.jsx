@@ -27,9 +27,6 @@ const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSA
 
 const DesembolsoCEACRC = () => {
   const navigate = useNavigate();
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, "0");
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -39,31 +36,36 @@ const DesembolsoCEACRC = () => {
     limit: 10,
   });
   const [maxPages, setMaxPages] = useState(0);
-  const [dataCredito, setDataCredito] = useState({
-    valorPreaprobado: 0,
-    valorSimulacion: 0,
-    validacionValor: false,
-    consultDecisor: {},
-    consultSiian: {},
-    estadoPeticion: 0,
-    formPeticion: 0,
-    showModal: false,
-    showModalOtp: false,
-    cosultEnvioOtp: {},
-  });
+  // const [dataCredito, setDataCredito] = useState({
+  //   valorPreaprobado: 0,
+  //   valorSimulacion: 0,
+  //   validacionValor: false,
+  //   consultDecisor: {},
+  //   consultSiian: {},
+  //   estadoPeticion: 0,
+  //   formPeticion: 0,
+  //   showModal: false,
+  //   showModalOtp: false,
+  //   cosultEnvioOtp: {},
+  // });
   const [filteredComercio, setFilteredComercio] = useState(listadoCuotas);
-  const [datosTrx, setDatosTrx] = useState({
-    year: currentYear,
-    month: currentMonth,
-  });
+  const [filtroBusqueda, setFiltroBusqueda] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState("");
+  const [dataCredito, setDataCredito] = useState({});
+  const [formasPago, setFormasPago] = useState("19");
+
+  const optionsFormasPago = [
+    { value: "19", label: "Cuenta Corriente Banco Colpatria" },
+    { value: "20", label: "Cuenta Ahorros Banco Agrario" },
+    { value: "22", label: "Cuenta Corriente Bancolombia" },
+    { value: "23", label: "Cuenta Corriente Davivienda" },
+    { value: "24", label: "Cuenta Corriente Itau" },
+    { value: "28", label: "Desembolso Crédito Comercios" },
+  ];
 
   useEffect(() => {
     consultaCreditos();
   }, []);
-
-  useEffect(() => {
-    handleSearchComercioChange({ target: { value: "" } });
-  }, [listadoCuotas]);
 
   const consultaCreditos = async () => {
     postConsultaCreditosCEACRC().then((res) => {
@@ -75,18 +77,41 @@ const DesembolsoCEACRC = () => {
     });
   };
 
-  const handleSearchComercioChange = useCallback(
-    (e) => {
-      const searchTerm = e.target.value.trim().toLowerCase();
-      const filteredResults = listadoCuotas.filter((cuota) =>
-        cuota.Idtercero.toString().toLowerCase().includes(searchTerm)
+  const handleSearchComercioChange = useCallback((e) => {
+    const searchTerm = e.target.value.trim().toLowerCase();
+    setFiltroBusqueda(searchTerm);
+  }, []);
+
+  const handleFechaChange = useCallback((e) => {
+    const newFecha = e.target.value;
+    setFiltroFecha(newFecha);
+  }, []);
+
+  useEffect(() => {
+    let filteredResults = listadoCuotas;
+
+    if (filtroBusqueda) {
+      filteredResults = filteredResults.filter((cuota) =>
+        cuota.Idtercero.toString().toLowerCase().includes(filtroBusqueda)
       );
-      setFilteredComercio(filteredResults);
-      setMaxPages(Math.ceil(filteredResults.length / limit));
-      setPageData({ page: 1, limit });
-    },
-    [listadoCuotas, limit]
-  );
+    }
+
+    if (filtroFecha) {
+      filteredResults = filteredResults.filter((cuota) =>
+        cuota.Fechadesembolso.includes(filtroFecha)
+      );
+    }
+
+    setFilteredComercio(filteredResults);
+    setMaxPages(Math.ceil(filteredResults.length / limit));
+    setPageData({ page: 1, limit });
+  }, [listadoCuotas, limit, filtroBusqueda, filtroFecha]);
+
+  useEffect(() => {
+    setFilteredComercio(listadoCuotas);
+    setMaxPages(Math.ceil(listadoCuotas.length / limit));
+    setPageData({ page: 1, limit });
+  }, [listadoCuotas, limit]);
 
   const tablaSimulacionCreditos = useMemo(() => {
     const startIndex = (page - 1) * limit;
@@ -134,40 +159,50 @@ const DesembolsoCEACRC = () => {
         <Modal show={isModalOpen} className="flex align-middle">
           <>
             <Form>
-              {dataCredito?.estadoPeticion === 1 ? (
-                <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
-                  <h1 className="text-2xl text-center mb-5 font-semibold">
-                    Simulación de Crédito
-                  </h1>
-                  <MoneyInput
-                    id="valor"
-                    name="valor"
-                    label="Valor a simular"
-                    type="text"
-                    min={enumParametrosCreditosPDP.MINCREDITOPREAPROBADO}
-                    max={dataCredito?.valorPreaprobado}
-                    autoComplete="off"
-                    maxLength={"12"}
-                    value={dataCredito?.valorSimulacion}
-                    required
-                    onInput={(e, val) => {
-                      setDataCredito((old) => ({
-                        ...old,
-                        valorSimulacion: val,
-                      }));
-                    }}
-                    equalError={false}
-                    equalErrorMin={false}
-                  />
-                  <>
-                    <ButtonBar>
-                      <Button type="submit">Realizar Simulación</Button>
-                    </ButtonBar>
-                  </>
-                </div>
-              ) : (
-                <></>
-              )}
+              <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+                <h1 className="text-2xl text-center mb-5 font-semibold">
+                  Desembolso de Crédito
+                </h1>
+                <h2 className="text-xl ml-10">{`Nombre del comercio: ${
+                  dataCredito?.NombreComercio ?? ""
+                }`}</h2>
+                <h2 className="text-xl ml-10">{`Valor a desembolsar: ${
+                  dataCredito?.ValorCredito ?? ""
+                }`}</h2>
+                <h2 className="text-xl ml-10">{`Estado del crédito: ${
+                  dataCredito?.EstadoCredito ?? ""
+                }`}</h2>
+                <h2 className="text-xl ml-10">{`Usuario que aprueba: ${
+                  dataCredito?.NombreAsesor ?? ""
+                }`}</h2>
+                <Select
+                  id="formasPagoCredito"
+                  label="Forma de desembolso"
+                  options={optionsFormasPago}
+                  value={formasPago}
+                  onChange={(e) => {
+                    setFormasPago(e.target.value);
+                  }}
+                  required
+                />
+                <h2 className="text-xl ml-10">{`Usuario que aprueba: ${
+                  pdpUser?.uname ?? ""
+                }`}</h2>
+                <>
+                  <ButtonBar>
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        navigate(-1);
+                        notifyError("Transacción cancelada por el usuario");
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button type="submit">Desembolsar </Button>
+                  </ButtonBar>
+                </>
+              </div>
             </Form>
           </>
         </Modal>
@@ -190,7 +225,7 @@ const DesembolsoCEACRC = () => {
           maxPage={maxPages}
           onSelectRow={(e, i) => {
             setModalOpen(true);
-            console.log(tablaSimulacionCreditos[i]);
+            setDataCredito(tablaSimulacionCreditos[i]);
           }}
         >
           <Input
@@ -201,7 +236,11 @@ const DesembolsoCEACRC = () => {
             maxLength="20"
             type="text"
             autoComplete="off"
+            value={filtroBusqueda}
             onInput={handleSearchComercioChange}
+            onBlur={() =>
+              handleSearchComercioChange({ target: { value: filtroBusqueda } })
+            }
           />
           <Input
             type="month"
@@ -209,15 +248,8 @@ const DesembolsoCEACRC = () => {
             name="fecha"
             label="Fecha"
             autoComplete="off"
-            value={`${datosTrx?.year}-${datosTrx?.month}`}
-            onChange={(e) => {
-              const [year, month] = e.target.value.split("-");
-              setDatosTrx((prevState) => ({
-                ...prevState,
-                year: year,
-                month: month,
-              }));
-            }}
+            value={filtroFecha}
+            onChange={handleFechaChange}
             required
           />
         </TableEnterprise>
