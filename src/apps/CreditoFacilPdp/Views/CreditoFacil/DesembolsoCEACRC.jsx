@@ -72,7 +72,7 @@ const DesembolsoCEACRC = () => {
       if (!res?.status) {
         notifyError(res?.msg);
       } else {
-        setListadoCuotas(res?.obj);
+        setListadoCuotas(res?.obj?.data);
       }
     });
   };
@@ -120,21 +120,21 @@ const DesembolsoCEACRC = () => {
 
     return currentPageCuotas.map(
       ({
-        Idtercero,
+        Identificacion,
         Sucursal,
         Id,
-        Valordesembolso,
+        Monto,
         Cuotasmora,
-        Fechadesembolso,
-        Estado,
+        FechaSolicitud,
+        Etapa,
         Nombreasesor,
       }) => ({
-        IdComercio: Idtercero,
+        IdComercio: Identificacion,
         NombreComercio: Sucursal,
         NroSolicitud: Id,
-        ValorCredito: formatMoney.format(Valordesembolso),
+        ValorCredito: formatMoney.format(Monto),
         Cuotas: Cuotasmora,
-        FechaPreaprobado: new Date(Fechadesembolso).toLocaleDateString(
+        FechaPreaprobado: new Date(FechaSolicitud).toLocaleDateString(
           "es-ES",
           {
             day: "2-digit",
@@ -142,9 +142,9 @@ const DesembolsoCEACRC = () => {
             year: "numeric",
           }
         ),
-        EstadoCredito: Estado,
+        EstadoCredito: Etapa,
         NombreAsesor: Nombreasesor,
-        Fechadesembolso: new Date(Fechadesembolso).toLocaleDateString("es-ES", {
+        Fechadesembolso: new Date(FechaSolicitud).toLocaleDateString("es-ES", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
