@@ -17,13 +17,14 @@ import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
-import { postConsultaCreditosCEACRC } from "../../hooks/fetchCreditoFacil";
+import {
+  postConsultaCreditosCEACRC,
+  useFetchCreditoFacil,
+} from "../../hooks/fetchCreditoFacil";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 
-const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
-const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
-const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
-const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
+const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/check-estado-desembolso-credito-facil`;
+const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/desembolso`;
 
 const DesembolsoCEACRC = () => {
   const navigate = useNavigate();
@@ -92,13 +93,13 @@ const DesembolsoCEACRC = () => {
 
     if (filtroBusqueda) {
       filteredResults = filteredResults.filter((cuota) =>
-        cuota.Idtercero.toString().toLowerCase().includes(filtroBusqueda)
+        cuota.Identificacion.toString().toLowerCase().includes(filtroBusqueda)
       );
     }
 
     if (filtroFecha) {
       filteredResults = filteredResults.filter((cuota) =>
-        cuota.Fechadesembolso.includes(filtroFecha)
+        cuota.FechaSolicitud.includes(filtroFecha)
       );
     }
 
@@ -121,7 +122,7 @@ const DesembolsoCEACRC = () => {
     return currentPageCuotas.map(
       ({
         Identificacion,
-        Sucursal,
+        NombreComercio,
         Id,
         Monto,
         Cuotasmora,
@@ -130,18 +131,15 @@ const DesembolsoCEACRC = () => {
         Nombreasesor,
       }) => ({
         IdComercio: Identificacion,
-        NombreComercio: Sucursal,
+        NombreComercio: NombreComercio,
         NroSolicitud: Id,
         ValorCredito: formatMoney.format(Monto),
         Cuotas: Cuotasmora,
-        FechaPreaprobado: new Date(FechaSolicitud).toLocaleDateString(
-          "es-ES",
-          {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }
-        ),
+        FechaPreaprobado: new Date(FechaSolicitud).toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }),
         EstadoCredito: Etapa,
         NombreAsesor: Nombreasesor,
         Fechadesembolso: new Date(FechaSolicitud).toLocaleDateString("es-ES", {
@@ -153,31 +151,96 @@ const DesembolsoCEACRC = () => {
     );
   }, [filteredComercio, page, limit]);
 
+  const desembolsoCredito = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      let valor_trx = dataCredito?.ValorCredito;
+      const data = {
+        oficina_propia:
+          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+          roleInfo?.tipo_comercio === "KIOSCO"
+            ? true
+            : false,
+        valor_total_trx: parseInt(valor_trx.replace(/[$\s]/g, '').split('.').join('')),
+        nombre_comercio: dataCredito?.NombreComercio,
+        nombre_usuario: pdpUser?.uname ?? "",
+        address: roleInfo?.["direccion"],
+        comercio: {
+          id_comercio: parseInt(dataCredito?.IdComercio),
+          id_usuario: roleInfo?.id_usuario,
+          id_terminal: roleInfo?.id_dispositivo,
+          id_uuid_trx: uniqueId,
+        },
+        Datos: {
+          data: dataCredito,
+          forma_pago: formasPago,
+        },
+      };
+      console.log(data);
+      const dataAditional = {
+        id_uuid_trx: uniqueId,
+      };
+      notifyPending(
+        peticionDesembolsoCredito(data, dataAditional),
+        {
+          render: () => {
+            return "Procesando Desembolso del Crédito";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            navigate("/creditos-pdp");
+            return "Crédito desembolsado al cupo del comercio satisfactoriamente";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            if (error?.message) {
+              navigate(-1);
+              return error?.message;
+            } else {
+              navigate(-1);
+              return "Desembolso del Crédito fallido";
+            }
+          },
+        }
+      );
+    },
+    [navigate, roleInfo, pdpUser, dataCredito, uniqueId, formasPago]
+  );
+  const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
+    useFetchCreditoFacil(
+      URL_REALIZAR_DESEMBOLSO_CREDITO,
+      URL_CONSULTAR_ESTADO_SIMULACION,
+      "Realizar simulación crédito"
+    );
+
   return (
     <>
       {isModalOpen ? (
         <Modal show={isModalOpen} className="flex align-middle">
           <>
-            <Form>
+            <Form onSubmit={desembolsoCredito}>
               <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
                 <h1 className="text-2xl text-center mb-5 font-semibold">
                   Desembolso de Crédito
                 </h1>
-                <h2 className="text-xl ml-10">{`Nombre del comercio: ${
+                <h2 className="text-l ml-10">{`Nombre del comercio: ${
                   dataCredito?.NombreComercio ?? ""
                 }`}</h2>
-                <h2 className="text-xl ml-10">{`Valor a desembolsar: ${
+                <h2 className="text-l ml-10">{`Valor a desembolsar: ${
                   dataCredito?.ValorCredito ?? ""
                 }`}</h2>
-                <h2 className="text-xl ml-10">{`Estado del crédito: ${
+                <h2 className="text-l ml-10">{`Estado del crédito: ${
                   dataCredito?.EstadoCredito ?? ""
                 }`}</h2>
-                <h2 className="text-xl ml-10">{`Usuario que aprueba: ${
+                <h2 className="text-l ml-10">{`Usuario que aprueba: ${
                   dataCredito?.NombreAsesor ?? ""
                 }`}</h2>
                 <Select
                   id="formasPagoCredito"
-                  label="Forma de desembolso"
+                  style={{ fontSize: 'medium' }} 
+                  label={<span style={{ fontSize: 'medium' }}>Forma de desembolso</span>}
                   options={optionsFormasPago}
                   value={formasPago}
                   onChange={(e) => {
@@ -185,7 +248,7 @@ const DesembolsoCEACRC = () => {
                   }}
                   required
                 />
-                <h2 className="text-xl ml-10">{`Usuario que aprueba: ${
+                <h2 className="text-x ml-10">{`Usuario que aprueba: ${
                   pdpUser?.uname ?? ""
                 }`}</h2>
                 <>
@@ -196,10 +259,16 @@ const DesembolsoCEACRC = () => {
                         navigate(-1);
                         notifyError("Transacción cancelada por el usuario");
                       }}
+                      disabled={loadingPeticionDesembolsoCredito}
                     >
                       Cancelar
                     </Button>
-                    <Button type="submit">Desembolsar </Button>
+                    <Button
+                      type="submit"
+                      disabled={loadingPeticionDesembolsoCredito}
+                    >
+                      Desembolsar
+                    </Button>
                   </ButtonBar>
                 </>
               </div>
@@ -224,6 +293,7 @@ const DesembolsoCEACRC = () => {
           onSetPageData={setPageData}
           maxPage={maxPages}
           onSelectRow={(e, i) => {
+            console.log(tablaSimulacionCreditos[i]);
             setModalOpen(true);
             setDataCredito(tablaSimulacionCreditos[i]);
           }}
