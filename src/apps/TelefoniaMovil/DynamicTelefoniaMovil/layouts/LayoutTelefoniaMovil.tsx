@@ -35,7 +35,6 @@ const LayoutTelefoniaMovil = ({
               <li className={li_css}>
                 <img
                   className={zoom}
-                  // className="w-24 transition duration-150 ease-out hover:ease-in"
                   src={`${svgs?.TELEFONIA_MOVIL}${operadorInd?.logo}`}
                   alt={operadorInd?.name}
                 />
