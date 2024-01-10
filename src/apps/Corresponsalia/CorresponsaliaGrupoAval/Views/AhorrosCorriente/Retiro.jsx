@@ -141,69 +141,6 @@ const Retiro = () => {
     setSummary([]);
   }, []);
 
-  const consultaCosto = useCallback(
-    (e) => {
-      e.preventDefault();
-      setIsUploading(true);
-
-      const body = {
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-        },
-
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO"
-            ? true
-            : false,
-        nombre_comercio: roleInfo?.["nombre comercio"],
-        valor_total_trx: valor,
-
-        consultaCosto: {
-          idBancoAdquiriente: DataBanco?.idBanco,
-          numNumeroDocumento: userDoc,
-          numValorTransaccion: valor,
-
-          location: {
-            codDane: roleInfo?.codigo_dane,
-            ciudad: roleInfo?.ciudad,
-            direccion: roleInfo?.direccion,
-          },
-        },
-      };
-      fetchConsultaCostoGrupoAval(body)
-        .then((res) => {
-          setIsUploading(false);
-          if (!res?.status) {
-            notifyError(res?.msg);
-            handleClose();
-          } else {
-            setDatosConsulta(res?.obj?.Data);
-            const summary = {
-              Banco: DataBanco?.nombre,
-              "Tipo de cuenta": tipoCuenta === "01" ? "Ahorros" : "Corriente",
-              Documento: userDoc,
-              "Número celular": phone,
-              "Valor retiro": formatMoney.format(valor),
-              "Costo transacción": formatMoney.format(res?.obj?.costoTrx),
-            };
-            setSummary(summary);
-            setShowBTNConsulta(false);
-            setShowModal(true);
-            notify("Transacción satisfactoria");
-          }
-        })
-        .catch((err) => {
-          setIsUploading(false);
-          console.error(err);
-          notifyError("No se ha podido conectar al servidor");
-        });
-    },
-    [valor, DataBanco, roleInfo, tipoCuenta, phone, userDoc]
-  );
-
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
@@ -235,7 +172,9 @@ const Retiro = () => {
         }
       } else {
         setIsUploading(false);
-        notifyError("La longitud del OTP no es correcta");
+        notifyError(
+          "La longitud del OTP es incorrecta. Por favor, ingrese un còdigo OTP vàlido entre 4 y 10 dìgitos"
+        );
       }
     },
     [userDoc, phone, valor, DataBanco, tipoCuenta, limitesMontos, otp]
@@ -378,8 +317,8 @@ const Retiro = () => {
             label="Número OTP"
             type="text"
             name="otp"
-            minLength={"4"}
-            maxLength={"10"}
+            minLength={4}
+            maxLength={10}
             autoComplete="off"
             value={otp}
             onInput={(e, valor) => {
@@ -437,24 +376,6 @@ const Retiro = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type="submit"
-                  onClick={onMakePayment}
-                  disabled={loadingRetiroCorresponsalGrupoAval}
-                >
-                  Realizar retiro
-                </Button>
-                {/* {showBTNConsulta ? (
-                  <Button
-                    type="submit"
-                    onClick={consultaCosto}
-                    disabled={loadingRetiroCorresponsalGrupoAval}
-                  >
-                    Consultar costo
-                  </Button>
-                ) : (
-                  ""
-                )} */}
-                <Button
                   onClick={(e) => {
                     handleClose();
                     notifyError("Transacción cancelada por el usuario");
@@ -462,6 +383,13 @@ const Retiro = () => {
                   disabled={loadingRetiroCorresponsalGrupoAval}
                 >
                   Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  onClick={onMakePayment}
+                  disabled={loadingRetiroCorresponsalGrupoAval}
+                >
+                  Realizar retiro
                 </Button>
               </ButtonBar>
             </PaymentSummary>
