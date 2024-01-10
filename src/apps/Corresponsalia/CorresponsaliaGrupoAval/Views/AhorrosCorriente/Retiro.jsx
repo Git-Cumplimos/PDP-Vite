@@ -170,7 +170,7 @@ const Retiro = () => {
       } else {
         setIsUploading(false);
         notifyError(
-          "La longitud del OTP es incorrecta. Por favor, ingrese un còdigo OTP vàlido entre 4 y 10 dìgitos"
+          "La longitud del OTP es incorrecta. Por favor, ingrese un còdigo OTP vàlido entre 4 y 9 dìgitos"
         );
       }
     },
