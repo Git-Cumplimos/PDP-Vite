@@ -58,9 +58,6 @@ const Retiro = () => {
 
   const [loadingRetiroCorresponsalGrupoAval, fetchRetiroCorresponsalGrupoAval] =
     useFetch(retiroCorresponsalGrupoAval);
-  const [loadingConsultaCostoGrupoAval, fetchConsultaCostoGrupoAval] = useFetch(
-    consultaCostoGrupoAval
-  );
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
