@@ -439,7 +439,11 @@ const DispersionUsuarioPadre = (props: Props) => {
       <Modal
         show={showModal}
         handleClose={
-          !trxState && !loadingMakeDispersion ? handleCloseModal : () => {}
+          !trxState && !loadingMakeDispersion 
+          ? handleCloseModal 
+          : () => trxState && letExit && !loadingMakeDispersion 
+            ? navigate("/billetera-comisiones", { replace: true }) 
+            : () => {}
         }
         bigger
         // bigger={!trxState}
