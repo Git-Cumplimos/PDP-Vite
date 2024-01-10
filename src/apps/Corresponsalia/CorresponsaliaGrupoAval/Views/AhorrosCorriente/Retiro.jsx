@@ -315,7 +315,7 @@ const Retiro = () => {
             type="text"
             name="otp"
             minLength={4}
-            maxLength={10}
+            maxLength={9}
             autoComplete="off"
             value={otp}
             onInput={(e, valor) => {
