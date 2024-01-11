@@ -180,19 +180,19 @@ const RealizarCreditoFacil = () => {
         plazo_cuotas = 30;
       }
       const data = {
-        oficina_propia:
-          roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
-          roleInfo?.tipo_comercio === "KIOSCO"
-            ? true
-            : false,
+        // oficina_propia:
+        //   roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        //   roleInfo?.tipo_comercio === "KIOSCO"
+        //     ? true
+        //     : false,
         valor_total_trx: dataCredito?.valorSimulacion,
         nombre_comercio: roleInfo?.["nombre comercio"],
-        nombre_usuario: pdpUser?.uname ?? "",
-        comercio: {
-          id_comercio: roleInfo?.id_comercio,
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-        },
+        // nombre_usuario: pdpUser?.uname ?? "",
+        // comercio: {
+        //   id_comercio: roleInfo?.id_comercio,
+        //   id_usuario: roleInfo?.id_usuario,
+        //   id_terminal: roleInfo?.id_dispositivo,
+        // },
         Datos: {
           plazo: plazo_cuotas,
         },
@@ -255,7 +255,7 @@ const RealizarCreditoFacil = () => {
           id_terminal: roleInfo?.id_dispositivo,
           id_uuid_trx: uniqueId,
         },
-        id_trx: dataCredito?.consultSiian?.id_trx,
+        // id_trx: dataCredito?.consultSiian?.id_trx,
         Datos: {
           codigo_otp: numOtp,
           reintento_otp: parseInt(contador),
