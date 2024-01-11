@@ -32,10 +32,10 @@ const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSA
 const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
 
 const RealizarCreditoFacil = () => {
-  const { submitEventSetter } = useMFA();
   const navigate = useNavigate();
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
+  const { submitEventSetter } = useMFA();
   const [isChecked, setChecked] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [url, setUrl] = useState("");
@@ -152,7 +152,7 @@ const RealizarCreditoFacil = () => {
         }
       );
     },
-    [navigate, roleInfo]
+    [roleInfo]
   );
   const [loadingPeticionConsultaPreaprobado, peticionConsultaPreaprobado] =
     useFetch(
@@ -226,7 +226,7 @@ const RealizarCreditoFacil = () => {
         }
       );
     },
-    [navigate, roleInfo, pdpUser, dataCredito]
+    [roleInfo, pdpUser, dataCredito]
   );
   const [loadingPeticionSimulacionCredito, peticionSimulacionCredito] =
     useFetch(
@@ -238,9 +238,9 @@ const RealizarCreditoFacil = () => {
     );
 
   const desembolsoCredito = useCallback(
-    () => {
-      // ev.preventDefault();
-      setContador(contador + 1);
+    (ev) => {
+      ev.preventDefault();
+      // setContador(contador + 1);
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -295,7 +295,7 @@ const RealizarCreditoFacil = () => {
         }
       );
     },
-    [navigate, roleInfo, pdpUser, dataCredito, uniqueId, contador]
+    [roleInfo, pdpUser, dataCredito, uniqueId, contador]
   );
   const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
     useFetchCreditoFacil(
@@ -404,7 +404,7 @@ const RealizarCreditoFacil = () => {
       );
       navigate("/");
     }
-  }, [roleInfo, navigate]);
+  }, [roleInfo]);
 
   const tablaSimulacionCreditos = useMemo(() => {
     const startIndex = (page - 1) * limit;
@@ -736,7 +736,7 @@ const RealizarCreditoFacil = () => {
                 <span className="ml-2">Acepta Términos y Condiciones</span>
               </label>
             </div>
-            {isModalOpen ? (
+            {isModalOpen && (
               <Modal
                 show={dataCredito?.showModal}
                 handleClose={handleCloseSimulacion}
@@ -755,8 +755,6 @@ const RealizarCreditoFacil = () => {
                   </Button>
                 </ButtonBar>
               </Modal>
-            ) : (
-              <></>
             )}
             <ButtonBar className="lg:col-span-2">
               <Button
@@ -783,7 +781,7 @@ const RealizarCreditoFacil = () => {
                 </ButtonBar>
               )}
             </ButtonBar>
-            {dataCredito?.showModalOtp ? (
+            {dataCredito?.showModalOtp && (
               <>
                 <Modal
                   show={dataCredito?.showModal}
@@ -797,7 +795,7 @@ const RealizarCreditoFacil = () => {
                   }
                   className="flex align-middle"
                 >
-                  <Form onSubmit={submitEventSetter(desembolsoCredito)} grid>
+                  <>
                     <h1 className="text-2xl font-semibold text-center">
                       ¿Está seguro de realizar el desembolso del crédito? Este
                       se desembolsará a su cupo
@@ -834,11 +832,12 @@ const RealizarCreditoFacil = () => {
                       <Button
                         type="submit"
                         disabled={loadingPeticionDesembolsoCredito}
+                        onClick={submitEventSetter(desembolsoCredito)}
                       >
                         Aceptar
                       </Button>
                     </ButtonBar>
-                  </Form>
+                  </>
                   {/* <ButtonBar>
                     <Button
                       type="submit"
@@ -850,8 +849,6 @@ const RealizarCreditoFacil = () => {
                   </ButtonBar> */}
                 </Modal>
               </>
-            ) : (
-              <></>
             )}
           </div>
         </>
