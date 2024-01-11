@@ -24,6 +24,7 @@ import {
   postEnviarCodigoOtp,
 } from "../../hooks/fetchCreditoFacil";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import { useMFA } from "../../../../components/Base/MFAScreen";
 
 const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
 const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
@@ -31,6 +32,7 @@ const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSA
 const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
 
 const RealizarCreditoFacil = () => {
+  const { submitEventSetter } = useMFA();
   const navigate = useNavigate();
   const uniqueId = v4();
   const { roleInfo, pdpUser } = useAuth();
@@ -236,8 +238,8 @@ const RealizarCreditoFacil = () => {
     );
 
   const desembolsoCredito = useCallback(
-    (ev) => {
-      ev.preventDefault();
+    () => {
+      // ev.preventDefault();
       setContador(contador + 1);
       const data = {
         oficina_propia:
@@ -257,7 +259,7 @@ const RealizarCreditoFacil = () => {
         },
         // id_trx: dataCredito?.consultSiian?.id_trx,
         Datos: {
-          codigo_otp: numOtp,
+          codigo_otp: 0,
           reintento_otp: parseInt(contador),
           plazo: dataCredito?.consultSiian?.plazo,
           fechaPrimerPago: dataCredito?.consultSiian?.fechaPrimerPago,
@@ -283,19 +285,8 @@ const RealizarCreditoFacil = () => {
         {
           render: ({ data: error }) => {
             if (error?.message) {
-              if (error?.message === "Código OTP incorrecto") {
-                setNumOtp("");
-                return error?.message;
-              } else if (
-                error?.message ===
-                "Código OTP incorrecto - Reintentos superados"
-              ) {
-                navigate(-1);
-                return error?.message;
-              } else {
-                navigate(-1);
-                return error?.message;
-              }
+              navigate(-1);
+              return error?.message;
             } else {
               navigate(-1);
               return "Desembolso del Crédito fallido";
@@ -304,13 +295,14 @@ const RealizarCreditoFacil = () => {
         }
       );
     },
-    [navigate, roleInfo, pdpUser, dataCredito, numOtp, uniqueId, contador]
+    [navigate, roleInfo, pdpUser, dataCredito, uniqueId, contador]
   );
   const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
     useFetchCreditoFacil(
       URL_REALIZAR_DESEMBOLSO_CREDITO,
       URL_CONSULTAR_ESTADO_SIMULACION,
-      "Realizar simulación crédito"
+      "Realizar desembolso crédito",
+      true
     );
 
   const fecthDescargarSimulacion = () => {
@@ -331,29 +323,29 @@ const RealizarCreditoFacil = () => {
       });
   };
 
-  const fecthEnviarCodigoOtp = () => {
-    let obj = {
-      id_comercio: roleInfo?.id_comercio,
-    };
-    postEnviarCodigoOtp(obj)
-      .then(async (res) => {
-        if (res?.status) {
-          notify(res?.msg);
-          setDataCredito((old) => ({
-            ...old,
-            showModalOtp: true,
-            showModal: true,
-            cosultEnvioOtp: res?.obj,
-          }));
-        } else {
-          notifyError(res?.obj?.error);
-        }
-      })
-      .catch((err) => {
-        notifyError("Error al enviar código OTP");
-        console.error(err);
-      });
-  };
+  // const fecthEnviarCodigoOtp = () => {
+  //   let obj = {
+  //     id_comercio: roleInfo?.id_comercio,
+  //   };
+  //   postEnviarCodigoOtp(obj)
+  //     .then(async (res) => {
+  //       if (res?.status) {
+  //         notify(res?.msg);
+  //         setDataCredito((old) => ({
+  //           ...old,
+  //           showModalOtp: true,
+  //           showModal: true,
+  //           cosultEnvioOtp: res?.obj,
+  //         }));
+  //       } else {
+  //         notifyError(res?.obj?.error);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       notifyError("Error al enviar código OTP");
+  //       console.error(err);
+  //     });
+  // };
 
   const openModal = async () => {
     if (isChecked) {
@@ -776,7 +768,16 @@ const RealizarCreditoFacil = () => {
               </Button>
               {isChecked && (
                 <ButtonBar>
-                  <Button type="submit" onClick={fecthEnviarCodigoOtp}>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      setDataCredito((old) => ({
+                        ...old,
+                        showModalOtp: true,
+                        showModal: true,
+                      }));
+                    }}
+                  >
                     Desembolsar Crédito
                   </Button>
                 </ButtonBar>
@@ -796,12 +797,12 @@ const RealizarCreditoFacil = () => {
                   }
                   className="flex align-middle"
                 >
-                  <Form onSubmit={desembolsoCredito} grid>
+                  <Form onSubmit={submitEventSetter(desembolsoCredito)} grid>
                     <h1 className="text-2xl font-semibold text-center">
                       ¿Está seguro de realizar el desembolso del crédito? Este
                       se desembolsará a su cupo
                     </h1>
-                    <Input
+                    {/* <Input
                       id="numOtp"
                       label="Ingresar Código OTP"
                       type="text"
@@ -818,7 +819,7 @@ const RealizarCreditoFacil = () => {
                           setNumOtp(num);
                         }
                       }}
-                    />
+                    /> */}
                     <ButtonBar>
                       <Button
                         type="button"
@@ -838,7 +839,7 @@ const RealizarCreditoFacil = () => {
                       </Button>
                     </ButtonBar>
                   </Form>
-                  <ButtonBar>
+                  {/* <ButtonBar>
                     <Button
                       type="submit"
                       disabled={loadingPeticionDesembolsoCredito}
@@ -846,7 +847,7 @@ const RealizarCreditoFacil = () => {
                     >
                       Reenviar OTP
                     </Button>
-                  </ButtonBar>
+                  </ButtonBar> */}
                 </Modal>
               </>
             ) : (
