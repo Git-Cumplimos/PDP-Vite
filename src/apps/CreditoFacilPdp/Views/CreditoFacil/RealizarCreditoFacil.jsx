@@ -51,7 +51,10 @@ const RealizarCreditoFacil = () => {
     valorPreaprobado: 0,
     valorSimulacion: 0,
     validacionValor: false,
-    consultDecisor: {},
+    consultDecisor: {
+      plazo: "",
+      fecha_preaprobado: ""
+    },
     consultSiian: {},
     estadoPeticion: 0,
     formPeticion: 0,
@@ -72,7 +75,10 @@ const RealizarCreditoFacil = () => {
       valorPreaprobado: 0,
       valorSimulacion: 0,
       validacionValor: false,
-      consultDecisor: {},
+      consultDecisor: {
+        plazo: "",
+        fecha_preaprobado: ""
+      },
       consultSiian: {},
       estadoPeticion: 0,
       formPeticion: 0,
@@ -94,7 +100,10 @@ const RealizarCreditoFacil = () => {
       valorPreaprobado: 0,
       valorSimulacion: 0,
       validacionValor: false,
-      consultDecisor: {},
+      consultDecisor: {
+        plazo: "",
+        fecha_preaprobado: ""
+      },
       consultSiian: {},
       estadoPeticion: 0,
       formPeticion: 0,
@@ -238,9 +247,9 @@ const RealizarCreditoFacil = () => {
     );
 
   const desembolsoCredito = useCallback(
-    () => {
-      // ev.preventDefault();
-      setContador(contador + 1);
+    (ev) => {
+      ev.preventDefault();
+      // setContador(contador + 1);
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -260,7 +269,7 @@ const RealizarCreditoFacil = () => {
         // id_trx: dataCredito?.consultSiian?.id_trx,
         Datos: {
           codigo_otp: 0,
-          reintento_otp: parseInt(contador),
+          reintento_otp: parseInt(0),
           plazo: dataCredito?.consultSiian?.plazo,
           fechaPrimerPago: dataCredito?.consultSiian?.fechaPrimerPago,
           fechaDesembolso: dataCredito?.consultSiian?.fechaDesembolso,
@@ -295,14 +304,13 @@ const RealizarCreditoFacil = () => {
         }
       );
     },
-    [navigate, roleInfo, pdpUser, dataCredito, uniqueId, contador]
+    [navigate, roleInfo, pdpUser, dataCredito, uniqueId]
   );
   const [loadingPeticionDesembolsoCredito, peticionDesembolsoCredito] =
     useFetchCreditoFacil(
       URL_REALIZAR_DESEMBOLSO_CREDITO,
       URL_CONSULTAR_ESTADO_SIMULACION,
-      "Realizar desembolso crédito",
-      true
+      "Realizar desembolso crédito"
     );
 
   const fecthDescargarSimulacion = () => {
@@ -797,7 +805,7 @@ const RealizarCreditoFacil = () => {
                   }
                   className="flex align-middle"
                 >
-                  <Form onSubmit={submitEventSetter(desembolsoCredito)} grid>
+                  <>
                     <h1 className="text-2xl font-semibold text-center">
                       ¿Está seguro de realizar el desembolso del crédito? Este
                       se desembolsará a su cupo
@@ -833,12 +841,13 @@ const RealizarCreditoFacil = () => {
                       </Button>
                       <Button
                         type="submit"
+                        onClick={submitEventSetter(desembolsoCredito)}
                         disabled={loadingPeticionDesembolsoCredito}
                       >
                         Aceptar
                       </Button>
                     </ButtonBar>
-                  </Form>
+                  </>
                   {/* <ButtonBar>
                     <Button
                       type="submit"
