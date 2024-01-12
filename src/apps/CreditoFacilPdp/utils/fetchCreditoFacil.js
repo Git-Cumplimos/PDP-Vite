@@ -9,7 +9,6 @@ export const fetchCustom = (
   name_,
   evaluate = true,
   notificacion = true,
-  totp = false
 ) => {
   return async (params_ = {}, data_ = {}) => {
     let urlCompleto = url_;
@@ -43,13 +42,12 @@ export const fetchCustom = (
       ),
     };
     try {
-      const fetchFunc = totp ? fetchDataTotp : fetchData;
       if (metodo_ === "GET") {
-        Peticion = await fetchFunc(urlCompleto, "GET", {}, {}, {}, true);
+        Peticion = await fetchData(urlCompleto, "GET", {}, {}, {}, true);
       } else if (metodo_ === "PUT") {
-        Peticion = await fetchFunc(urlCompleto, "PUT", {}, dataObj, {}, true);
+        Peticion = await fetchData(urlCompleto, "PUT", {}, dataObj, {}, true);
       } else if (metodo_ === "POST") {
-        Peticion = await fetchFunc(urlCompleto, "POST", {}, dataObj, true);
+        Peticion = await fetchData(urlCompleto, "POST", {}, dataObj, true);
         const dataDecrypt = Peticion?.obj?.data ?? "";
         const obj = decryptAES(
           `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
