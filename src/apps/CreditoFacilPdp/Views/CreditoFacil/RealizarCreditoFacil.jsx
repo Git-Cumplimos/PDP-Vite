@@ -841,7 +841,6 @@ const RealizarCreditoFacil = () => {
                         type="submit"
                         onClick={submitEventSetter(desembolsoCredito)}
                         disabled={loadingPeticionDesembolsoCredito}
-                        onClick={submitEventSetter(desembolsoCredito)}
                       >
                         Aceptar
                       </Button>
