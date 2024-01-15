@@ -7,8 +7,7 @@ import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
 import FormPagoCreditoPdp from "../../components/FormPagoCreditoPdp";
 
-const URL_CONSULTA_CREDITO = `http://127.0.0.1:5000/pago-credito-facil/consulta-credito`;
-// const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-credito`;
+const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-credito`;
 
 const DATA_CREDITO_UNIQUE_SIIAN_INI = {
   Agrupacion: "",
