@@ -1,14 +1,10 @@
-import { useCallback, useRef, useState, useEffect, useMemo } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { v4 } from "uuid";
-import { notifyError, notifyPending, notify } from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import TablaCreditos from "../../components/TablaCreditos";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
-import Form from "../../../../components/Base/Form";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Input from "../../../../components/Base/Input";
 import FormPagoCreditoPdp from "../../components/FormPagoCreditoPdp";
 
 const URL_CONSULTA_CREDITO = `http://127.0.0.1:5000/pago-credito-facil/consulta-credito`;
@@ -53,7 +49,7 @@ const DATA_CREDITO_UNIQUE_SIIAN_INI = {
 
 const PagoCreditoFacilPDP = () => {
   const navigate = useNavigate();
-  const { roleInfo, pdpUser } = useAuth();
+  const { roleInfo } = useAuth();
   const [dataCreditos, setDataCreditos] = useState([]);
   const [dataCreditoUnique, setDataCreditoUnique] = useState(
     DATA_CREDITO_UNIQUE_SIIAN_INI
@@ -100,8 +96,7 @@ const PagoCreditoFacilPDP = () => {
   }, [roleInfo, navigate]);
   const consultaCredito = useCallback(() => {
     const data = {
-      // id_comercio: roleInfo?.id_comercio,
-      id_comercio: 10166,
+      id_comercio: roleInfo?.id_comercio,
     };
     notifyPending(
       peticionConsultaCredito({}, data),

@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { formatMoney } from "../../../components/Base/MoneyInput";
 

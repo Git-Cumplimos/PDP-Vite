@@ -7,20 +7,21 @@ import Fieldset from "../../../components/Base/Fieldset";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import { enumParametrosCreditosPDP } from "../utils/enumParametrosCreditosPdp";
-import { useFetch } from "../../../hooks/useFetch";
-import { fetchCustom } from "../utils/fetchCreditoFacil";
 import { notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useReactToPrint } from "react-to-print";
 import Modal from "../../../components/Base/Modal";
 import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
+import { useNavigate } from "react-router-dom";
+import { useFetchCreditoFacil } from "../hooks/fetchCreditoFacil";
 
-const URL_PAGO_CREDITO = `http://127.0.0.1:5000/pago-credito-facil/consulta-credito`;
-// const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-credito`;
+const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
+const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
 
 const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
   const uniqueId = v4();
+  const validNavigate = useNavigate();
   const [dataInput, setDataInput] = useState({
     valor: 0,
     observaciones: "",
@@ -33,9 +34,16 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
-  const [loadingPeticionPagoCredito, peticionPagoCredito] = useFetch(
-    fetchCustom(URL_PAGO_CREDITO, "POST", "Pago crédito")
-  );
+  const [loadingPeticionPagoCredito, peticionPagoCredito] =
+    useFetchCreditoFacil(
+      URL_PAGO_CREDITO,
+      URL_CONSULTA_PAGO_CREDITO,
+      "Pago crédito"
+    );
+  const showModalFunc = useCallback((ev) => {
+    ev.preventDefault();
+    setShowModal(true);
+  }, []);
   const pagoCredito = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -76,19 +84,21 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
         },
         {
           render: ({ data: res }) => {
-            const dataTemp = res.obj.data;
+            const dataTemp = res.obj;
+            setObjTicketActual(dataTemp.ticket ?? {});
+            setEstadoPeticion(1);
             return "Pago satisfactorio";
           },
         },
         {
           render: ({ data: error }) => {
-            closeModule();
+            validNavigate(-1);
             return error?.message ?? "Pago fallido";
           },
         }
       );
     },
-    [dataCreditoUnique, pdpUser, dataInput, roleInfo, uniqueId]
+    [dataCreditoUnique, pdpUser, dataInput, roleInfo]
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
@@ -106,7 +116,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
 
   return (
     <>
-      <Form onSubmit={pagoCredito} grid>
+      <Form onSubmit={showModalFunc} grid>
         <Fieldset legend="Datos del crédito" className="lg:col-span-2">
           <Input
             id="Id"
@@ -226,7 +236,6 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
                 <Button
                   onClick={() => {
                     closeModule();
-                    // notifyError("Transacción cancelada por el usuario");
                   }}
                   disabled={loadingPeticionPagoCredito}
                 >
@@ -237,7 +246,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
                   onClick={pagoCredito}
                   disabled={loadingPeticionPagoCredito}
                 >
-                  Realizar recarga
+                  Realizar pago
                 </Button>
               </ButtonBar>
             </PaymentSummary>
@@ -250,7 +259,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
                   <Button
                     type="submit"
                     onClick={() => {
-                      closeModule();
+                      validNavigate(-1);
                     }}
                   >
                     Aceptar
