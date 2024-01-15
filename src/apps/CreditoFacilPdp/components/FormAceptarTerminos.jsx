@@ -42,7 +42,7 @@ const FormAceptarTerminos = ({ dataCredito, setDataCredito }) => {
   };
 
   const handleCloseCancelarSimulacion = useCallback(() => {
-    setDataCredito(oldData => ({
+    setDataCredito((oldData) => ({
       ...oldData,
       valorPreaprobado: 0,
       valorSimulacion: 0,
@@ -59,8 +59,8 @@ const FormAceptarTerminos = ({ dataCredito, setDataCredito }) => {
       showModalOtp: false,
       cosultEnvioOtp: {},
     }));
-  }, [setDataCredito]);
-  
+  }, []);
+
   return (
     <>
       <Fieldset legend=" Datos del crédito " className="lg:col-span-2">

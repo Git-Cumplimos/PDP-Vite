@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { notifyError} from "../../../../utils/notify";
+import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import FormDecisorRealizarCredito from "../../components/FormDecisorRealizarCredito";
 import ModalSimulacionCredito from "../../components/ModalSimulacionCredito";
