@@ -18,11 +18,11 @@ import {
 import { makeMoneyFormatter } from "../../../../../../utils/functions";
 import classes from "../../Runt/PagarRunt.module.css";
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
-import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
 import { v4 } from "uuid";
 import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
 import TableEnterprise from "../../../../../../components/Base/TableEnterprise/TableEnterprise";
+import { enumParametrosBancoAgrario } from "../../../utils/enumParametrosBancoAgrario";
 const { styleComponents } = classes;
 const url_consult_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/consulta_pago_cartera`;
 const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera`;
@@ -225,19 +225,23 @@ const PagoCarteraEfectivo = () => {
       if (isNaN(pagoTotal)) {
         setLoadingPayCartera(false);
         return notifyError("El valor no es un numero");
-      } else if (pagoTotal > enumParametrosPagoCartera.maxPagoCartera) {
+      } else if (
+        pagoTotal > enumParametrosBancoAgrario.MAX_PAGO_CARTERA_AGRARIO
+      ) {
         setLoadingPayCartera(false);
         return notifyError(
           `Supera el valor máximo de ${makeMoneyFormatter(0).format(
-            enumParametrosPagoCartera.maxPagoCartera
+            enumParametrosBancoAgrario.MAX_PAGO_CARTERA_AGRARIO
           )} para pago cartera.`
         );
-      } else if (pagoTotal < enumParametrosPagoCartera.minPagoCartera) {
+      } else if (
+        pagoTotal < enumParametrosBancoAgrario.MIN_PAGO_CARTERA_AGRARIO
+      ) {
         setLoadingPayCartera(false);
         return notifyError(
           `El valor mínimo para pago cartera es de ${makeMoneyFormatter(
             0
-          ).format(enumParametrosPagoCartera.minPagoCartera)}.`
+          ).format(enumParametrosBancoAgrario.MIN_PAGO_CARTERA_AGRARIO)}.`
         );
       }
       const data = {
@@ -311,6 +315,7 @@ const PagoCarteraEfectivo = () => {
       roleInfo,
       peticionPayCartera,
       CallErrorPeticion,
+      uniqueId,
     ]
   );
 
@@ -358,37 +363,6 @@ const PagoCarteraEfectivo = () => {
     setInfTicket(null);
     validNavigate(-1);
   }, [validNavigate]);
-
-  const HandleCloseModal = useCallback(() => {
-    setShowModalGenerico((old) => {
-      return {
-        ...old,
-        showModal: false,
-        showModalTicket: false,
-        showModalObligacion: false,
-      };
-    });
-    if (
-      datosPagoEfectivo?.confirmacionTicket === "ResumenTrx" &&
-      !loadingPeticionPayCartera
-    ) {
-      HandleCloseTrx();
-    } else if (datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa") {
-      HandleCloseTrxExitosa();
-    } else if (
-      datosPagoEfectivo?.confirmacionTicket !== "TransaccionExitosa" &&
-      datosPagoEfectivo?.confirmacionTicket !== "ResumenTrx"
-    ) {
-      notifyError("Transacción cancelada por el usuario");
-    }
-    validNavigate(-1);
-  }, [
-    datosPagoEfectivo,
-    HandleCloseTrx,
-    HandleCloseTrxExitosa,
-    loadingPeticionPayCartera,
-    validNavigate,
-  ]);
 
   const tableObligacion = useMemo(() => {
     if (datosPagoEfectivo?.resConsultCartera?.length > 0) {
@@ -463,10 +437,7 @@ const PagoCarteraEfectivo = () => {
         ></TableEnterprise>
       )}
       {showModalGenerico?.showModalObligacion === true && (
-        <Modal
-          show={showModalGenerico?.showModal}
-          handleClose={HandleCloseModal}
-        >
+        <Modal show={showModalGenerico?.showModal}>
           <ComponentsModalSummaryTrx
             documento={datosPagoEfectivo?.documento}
             numero_obligacion={numero_obligacion}
@@ -482,10 +453,7 @@ const PagoCarteraEfectivo = () => {
       )}
       {infTicket &&
         datosPagoEfectivo?.confirmacionTicket === "TransaccionExitosa" && (
-          <Modal
-            show={showModalGenerico?.showModalTicket}
-            handleClose={HandleCloseModal}
-          >
+          <Modal show={showModalGenerico?.showModalTicket}>
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
               <ButtonBar>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 import { PropOperadoresComponent } from "../TypeDinamic";
 import { useImgs } from "../../../../hooks/ImgsHooks";
@@ -15,14 +15,10 @@ const {
 
 const LayoutTelefoniaMovil = ({
   operadores,
-  operadorCurrent,
   setOperadorCurrent,
-  setStateComponectBody,
 }: {
   operadores: PropOperadoresComponent[];
-  operadorCurrent: PropOperadoresComponent;
-  setOperadorCurrent: any;
-  setStateComponectBody: any;
+  setOperadorCurrent: Dispatch<SetStateAction<PropOperadoresComponent | null>>;
 }) => {
   const { svgs }: any = useImgs();
   return (
@@ -32,7 +28,6 @@ const LayoutTelefoniaMovil = ({
           className={contenedorImg}
           onClick={() => {
             setOperadorCurrent(operadorInd);
-            setStateComponectBody(true);
           }}
         >
           <nav>
@@ -40,7 +35,6 @@ const LayoutTelefoniaMovil = ({
               <li className={li_css}>
                 <img
                   className={zoom}
-                  // className="w-24 transition duration-150 ease-out hover:ease-in"
                   src={`${svgs?.TELEFONIA_MOVIL}${operadorInd?.logo}`}
                   alt={operadorInd?.name}
                 />

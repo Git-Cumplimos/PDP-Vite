@@ -1,13 +1,14 @@
 import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
+import { fetchDataTotp } from "../../../utils/MFA";
 
 export const fetchCustom = (
   url_,
   metodo_,
   name_,
   evaluate = true,
-  notificacion = true
+  notificacion = true,
 ) => {
   return async (params_ = {}, data_ = {}) => {
     let urlCompleto = url_;

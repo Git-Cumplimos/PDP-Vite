@@ -72,7 +72,6 @@ const get_status_cycle_consult_trx = (
               (value: string) => value === error_msg_name
             )
         );
-        console.log(error_msg_equal);
         if (error_msg_equal !== undefined) {
           if (
             error_.res_obj?.ids?.autorizador?.id_trx !== undefined &&
@@ -156,7 +155,6 @@ export const useBackendPaquetesDefault = (
           maxPages: responseFetch?.obj?.result?.maxPages ?? 1,
           results: responseFetch?.obj?.result?.paquetes ?? [],
         };
-        console.log(responseFetch);
       } catch (error: any) {
         setLoadingPeticionGetPaquetes(false);
         throw error;
@@ -315,7 +313,6 @@ export const useBackendPaquetesDefault = (
       } catch (error: any) {
         const status_cycle_consult_trx: TypingOutputGetStatusCycleConsultTrx =
           get_status_cycle_consult_trx(error, id_trx, error_previous);
-        console.log(status_cycle_consult_trx);
         if (status_cycle_consult_trx.status === true) {
           response = await CyclePeticionConsultaTimeout(
             suburl,

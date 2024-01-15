@@ -5,14 +5,12 @@ import Form from "../../../components/Base/Form";
 import BarcodeReader from "../../../components/Base/BarcodeReader";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
-import { useAuth } from "../../../hooks/AuthHooks";
 import { notifyError } from "../../../utils/notify";
 
 const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
 
 const RecaudoCodigo = () => {
   const navigate = useNavigate();
-  const { pdpUser, roleInfo } = useAuth();
 
   const navigateRecaudo = useCallback(
     (codigo_barras) => {
@@ -29,8 +27,8 @@ const RecaudoCodigo = () => {
           if (res?.status) {
             navigate("../recaudo-generico/trx", {
               state: {
-                pk_id_convenio: res?.obj?.result?.pk_id_convenio,
-                convenio_name: res?.obj?.result?.nombre_convenio,
+                id_pdp_convenio: res?.obj?.result?.id_pdp_convenio,
+                name_pdp_convenio: res?.obj?.result?.name_pdp_convenio,
                 referencia: res?.obj?.result?.codigos_referencia[0],
               },
             });
