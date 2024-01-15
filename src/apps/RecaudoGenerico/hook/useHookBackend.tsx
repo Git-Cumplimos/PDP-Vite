@@ -31,6 +31,7 @@ export type TypeAutorizador = {
 
 export type TypeInformacionTransaccionConsultaInput = {
   referencia: string; //string de solo numeros
+  datos_adicionales: { [key: string]: any };
 };
 
 export type TypeTransaccionConsultaOutput = {
