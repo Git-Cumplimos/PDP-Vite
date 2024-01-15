@@ -158,21 +158,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     }
     if (
       parseInt(datosTransaccion.valorSinModificar) >
-      enumParametrosBancoAgrario.maxRecaudo
+      enumParametrosBancoAgrario.MAX_RECAUDO_AGRARIO
     ) {
       return notifyError(
         `El valor de la transacción es superior a ${formatMoney.format(
-          enumParametrosBancoAgrario.maxRecaudo
+          enumParametrosBancoAgrario.MAX_RECAUDO_AGRARIO
         )}`
       );
     }
     if (
       parseInt(datosTransaccion.valorSinModificar) <
-      enumParametrosBancoAgrario.minRecaudo
+      enumParametrosBancoAgrario.MIN_RECAUDO_AGRARIO
     ) {
       return notifyError(
         `El valor de la transacción es inferior a ${formatMoney.format(
-          enumParametrosBancoAgrario.minRecaudo
+          enumParametrosBancoAgrario.MIN_RECAUDO_AGRARIO
         )}`
       );
     }
@@ -438,7 +438,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               )}
             </ButtonBar>
           </Form>
-          <Modal show={showModal} handleClose={hideModalReset}>
+          <Modal show={showModal}>
             <>
               {peticion === 1 && (
                 <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">

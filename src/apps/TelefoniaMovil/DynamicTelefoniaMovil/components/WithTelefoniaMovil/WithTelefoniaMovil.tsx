@@ -1,4 +1,4 @@
-import React, { Fragment, FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { notifyError } from "../../../../../utils/notify";
@@ -25,7 +25,6 @@ const WithTelefoniaMovil = (
   const [loadingPeticionOperadores, peticionOperadores] = useHookFetchLayouts(
     componectName.toLowerCase()
   );
-  const [stateComponectBody, setStateComponectBody] = useState<boolean>(false);
 
   const validNavigate = useNavigate();
 
@@ -43,7 +42,6 @@ const WithTelefoniaMovil = (
           validNavigate("/telefonia-movil");
         } else {
           setOperadores(resPromise);
-          setOperadorCurrent(resPromise?.[0]);
         }
       })
       .catch((error: any) => {
@@ -62,12 +60,10 @@ const WithTelefoniaMovil = (
 
   return (
     <div>
-      {operadores.length > 0 && operadorCurrent !== null ? (
+      {operadores.length > 0 ? (
         <LayoutTelefoniaMovil
           operadores={operadores}
-          operadorCurrent={operadorCurrent}
           setOperadorCurrent={setOperadorCurrent}
-          setStateComponectBody={setStateComponectBody}
         />
       ) : (
         <></>
@@ -80,9 +76,7 @@ const WithTelefoniaMovil = (
       )}
 
       <div className={Lineadivisora}></div>
-      {operadores.length > 0 &&
-      operadorCurrent !== null &&
-      stateComponectBody === true ? (
+      {operadores.length > 0 && operadorCurrent !== null ? (
         <ComponectBody operadorCurrent={operadorCurrent}>
           <img
             className="w-24 "
