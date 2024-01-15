@@ -30,6 +30,7 @@ const RecaudoCodigo = () => {
                 id_pdp_convenio: res?.obj?.result?.id_pdp_convenio,
                 name_pdp_convenio: res?.obj?.result?.name_pdp_convenio,
                 referencia: res?.obj?.result?.codigos_referencia[0],
+                datos_adicionales: res?.obj?.result,
               },
             });
           } else {
