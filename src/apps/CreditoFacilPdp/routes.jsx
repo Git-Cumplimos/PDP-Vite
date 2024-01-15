@@ -34,7 +34,7 @@ const rutasCreditosPdp = {
   subRoutes: [
     {
       link: "/creditos-pdp/credito-facil",
-      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Crédito Fácil" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Solicitud de Crédito" />,
       component: RealizarCreditoFacil,
       permission: [enumPermisosCreditoPdp.REALIZAR_CREDITO_FACIL],
     },

@@ -14,10 +14,9 @@ const sleep = (millisecons) => {
 export const useFetchCreditoFacil = (
   url_trx_ = "",
   url_consulta_ = "",
-  name_ = ""
+  name_ = "",
 ) => {
   const [state, setState] = useState(false);
-
   const fetchCreditoFacilTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(
