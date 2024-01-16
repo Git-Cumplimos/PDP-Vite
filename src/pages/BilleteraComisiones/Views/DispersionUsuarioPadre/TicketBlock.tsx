@@ -19,7 +19,7 @@ const TicketBlock = ({ ticketData, title, children, ticketType = "Reimpresión" 
   });
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="grid grid-flow-row auto-rows-max place-content-between justify-center items-center h-full">
       {title}
       <Tickets
         refPrint={printDiv}

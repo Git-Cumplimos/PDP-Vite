@@ -14,8 +14,9 @@ import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { Navigate, useParams } from "react-router-dom";
 import Modal from "../../../../../components/Base/Modal";
 import Button from "../../../../../components/Base/Button";
-import { notify, notifyError } from "../../../../../utils/notify";
+import { notifyError } from "../../../../../utils/notify";
 import TicketBlock from "../../DispersionUsuarioPadre/TicketBlock";
+import SimpleBlockCode from "../../../components/SimpleBlockCode";
 
 type Props = {};
 
@@ -24,18 +25,13 @@ const dateFormatter = makeDateFormatter(true);
 const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
 // const urlComisiones = "http://localhost:5000";
 
-const classesCopyBtn =
-  "absolute right-4 top-4 bi bi-clipboard p-1 border border-white " +
-  "rounded-md w-9 h-9 text-center hover:border-coolGray-700 hover:bg-white " +
-  "hover:text-coolGray-700 font-semibold cursor-pointer text-xl";
-
 const DetallesHistoricoDUP = (props: Props) => {
   const { pk_id_dispersion } = useParams();
   const [dispersiones, setDispersiones] = useState<any[]>([]);
   const [isNextPage, setIsNextPage] = useState(false);
 
   const [currentInfo, setCurrentInfo] = useState<
-    undefined | { type: "RESPONSE" | "TICKET"; value: any }
+    undefined | { type: "RESPONSE" | "TICKET" | "LOGS"; value: any }
   >();
 
   const handleClose = useCallback(() => setCurrentInfo(undefined), []);
@@ -95,16 +91,32 @@ const DetallesHistoricoDUP = (props: Props) => {
           setCurrentInfo({ type: "TICKET", value: currentDisp?.ticket });
         } else if (currentDisp?.response) {
           setCurrentInfo({ type: "RESPONSE", value: currentDisp?.response });
+        } else if (currentDisp?.msgs || currentDisp?.records) {
+          setCurrentInfo({
+            type: "LOGS",
+            value: {
+              msgs: currentDisp?.msgs ?? [],
+              records: currentDisp?.records ?? [],
+            },
+          });
         } else {
-          notifyError("Transaccion sin finalizar");
+          notifyError("Transacción sin finalizar");
         }
       } else {
         if (currentDisp?.estado === "ERROR") {
           setCurrentInfo({ type: "RESPONSE", value: currentDisp?.response });
         } else if (currentDisp?.estado === "FINALIZADO") {
           setCurrentInfo({ type: "TICKET", value: currentDisp?.ticket });
+        } else if (currentDisp?.msgs || currentDisp?.records) {
+          setCurrentInfo({
+            type: "LOGS",
+            value: {
+              msgs: currentDisp?.msgs ?? [],
+              records: currentDisp?.records ?? [],
+            },
+          });
         } else {
-          notifyError("Estado de la transaccion invalido");
+          notifyError("Estado de la transacción invalido");
         }
       }
     },
@@ -159,7 +171,7 @@ const DetallesHistoricoDUP = (props: Props) => {
         title="Transferencias"
         headers={[
           "Id comercio",
-          "Id transaccion",
+          "Id transacción",
           "Estado",
           "Valor",
           "Fecha de inicio",
@@ -200,27 +212,26 @@ const DetallesHistoricoDUP = (props: Props) => {
           <div className="flex gap-4">
             <div className="flex flex-col gap-2 w-full">
               <h1 className="text-2xl font-semibold">Response</h1>
-              <pre className="whitespace-pre-wrap">
-                <code className="block p-4 rounded-md border bg-coolGray-700 text-white relative">
-                  {JSON.stringify(currentInfo.value, null, 2)}
-                  <span
-                    className={`${classesCopyBtn}`}
-                    onClick={() => {
-                      if (navigator) {
-                        navigator.clipboard.writeText(
-                          JSON.stringify(currentInfo.value, null, 2)
-                        );
-                        notify(
-                          "Response copiado al portapapeles satisfactoriamente",
-                          {
-                            toastId: "copy-response",
-                          }
-                        );
-                      }
-                    }}
-                  />
-                </code>
-              </pre>
+              <SimpleBlockCode json={currentInfo.value} />
+            </div>
+          </div>
+        )}
+        {currentInfo?.type === "LOGS" && (
+          <div className="flex gap-4">
+            <div className="flex flex-col gap-4 w-full">
+              <h1 className="text-2xl font-semibold">Logs</h1>
+              <div className="grid grid-cols-8">
+                {(currentInfo.value?.msgs ?? []).map((msg: string) => (
+                  <Fragment>
+                    <p className="col-span-3">
+                      <span className="bi bi-dot text-xl block" />
+                      {msg.slice(0, 23)}
+                    </p>
+                    <p className="col-span-5">{msg.split(" -> ")[1]}</p>
+                  </Fragment>
+                ))}
+              </div>
+              <SimpleBlockCode json={currentInfo.value?.records} />
             </div>
           </div>
         )}

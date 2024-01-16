@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   Fragment,
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   useState,
@@ -27,7 +28,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import useInterval from "./hooks/useInterval";
 import { toast } from "react-toastify";
 import useTimeout from "./hooks/useTimeout";
-import { notifyError } from "../../../../utils/notify";
+import { notify, notifyError } from "../../../../utils/notify";
 import IconSwap from "./IconSwap";
 import TicketBlock from "./TicketBlock";
 
@@ -63,6 +64,14 @@ const DispersionUsuarioPadre = (props: Props) => {
   const [intervalDelay, setIntervalDelay] = useState<number | undefined>();
   const [timeoutDelay, setTimeoutDelay] = useState<number | undefined>();
   const [letExit, setLetExit] = useState(false);
+  const [showEspecialNotify, setShowEspecialNotify] = useState<boolean | undefined>(false);
+  const [details, setDetails] = useState({
+    "total":0,
+    "exitosas":0,
+    "fallidas":0,
+    "procesadas":0,
+    "faltantes":0,
+  });
 
   const [ticketList, setTicketList] = useState<any[]>([]);
 
@@ -163,7 +172,7 @@ const DispersionUsuarioPadre = (props: Props) => {
       autoDispatch: false,
     },
     {
-      onPending: useCallback(() => "Procesando transaccion", []),
+      onPending: useCallback(() => "Procesando Transacción", []),
       onSuccess: useCallback((res) => {
         setTrxState(true);
         setIdDispersionBack(res?.obj?.pk_id_dispersion);
@@ -183,7 +192,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
         }
         console.error(error?.message);
-        return "Transaccion fallida";
+        return "Transacción fallida";
       }, []),
     },
     { notify: true }
@@ -210,6 +219,7 @@ const DispersionUsuarioPadre = (props: Props) => {
           const totalExitosas = res?.obj?.total_finalizadas_ok ?? 0;
           const totalFallidas = res?.obj?.total_finalizadas_error ?? 0;
           const totalProcesando = res?.obj?.total_procesando ?? 0;
+          const totalPorIniciar = res?.obj?.total_por_iniciar ?? 0;
           const progreso =
             (totalExitosas + totalFallidas + totalProcesando * 0.25) /
             totalDispersion;
@@ -219,12 +229,30 @@ const DispersionUsuarioPadre = (props: Props) => {
             render: "Transferencia en progreso",
             progress: progreso || 0.01,
           });
+          let data = {
+            "total":totalDispersion,
+            "exitosas":totalExitosas,
+            "fallidas":totalFallidas,
+            "procesadas":totalProcesando,
+            "faltantes":totalPorIniciar,
+          }          
+          if (data !== details) setDetails(data)
+
           if (progreso >= 1) {
             handleEndConsulta();
-            setTicketList(res?.obj?.ticket_list ?? []);
+            if (totalFallidas > 0) {
+              notifyError(
+                "Transferencias fallidas ir a revisar transferencia",
+                5000,
+                { toastId: "failed-notify-456" }
+              );
+            }
+            setTicketList(
+              (res?.obj?.ticket_list ?? []).filter((val: any) => val)
+            );
           }
         },
-        [handleEndConsulta]
+        [handleEndConsulta,details]
       ),
       onError: useCallback((error) => console.error(error?.message), []),
     },
@@ -236,6 +264,24 @@ const DispersionUsuarioPadre = (props: Props) => {
     intervalDelay
   );
 
+  const showDetails = useCallback(() =>{
+    let notifyEspecial = `Transferencias exitosas: ${details.exitosas}/${details.total}`
+    if (details.total !== details.faltantes && (details.faltantes >= 1 || details.procesadas >= 1)){
+      notify(
+        notifyEspecial +
+        `. Las transacciones pendientes (${details.faltantes}) se completarán próximamente y estarán disponibles`+
+        `, junto con las ya procesadas ((${details.procesadas})), en el módulo 'Histórico de Movimientos de Comisiones en el Cupo del Usuario Padre'. ¡Agradecemos su paciencia!`
+      )
+      setShowEspecialNotify(undefined)
+    }
+  },[details])
+
+  useEffect(()=>{
+    setTimeout(()=>{
+      if (showEspecialNotify && letExit) showDetails() 
+    },10)
+  },[showEspecialNotify,letExit,showDetails])
+
   useTimeout(
     useCallback(() => {
       handleEndConsulta();
@@ -245,9 +291,22 @@ const DispersionUsuarioPadre = (props: Props) => {
   );
 
   useTimeout(
+    useCallback(() => {
+      if (showEspecialNotify === false) setShowEspecialNotify(true)
+    }, [showEspecialNotify]),
+    intervalDelay != null ? intervalDelay * 2 : intervalDelay
+  );
+
+  useTimeout(
     useCallback(() => setLetExit(true), []),
     intervalDelay != null ? intervalDelay * 2 : intervalDelay
   );
+
+  useEffect(() => {
+    return () => {
+      toast.done(toastIdLoading);
+    };
+  }, []);
 
   return (
     <Fragment>
@@ -276,7 +335,7 @@ const DispersionUsuarioPadre = (props: Props) => {
         <Fieldset
           legend={
             <div className="flex gap-2 items-center">
-              <p>Tranferencias</p>
+              <p>Transferencias</p>
               <IconSwap
                 bootstrapIcon="file-earmark-plus"
                 bootstrapIconHover="file-earmark-plus-fill"
@@ -304,7 +363,7 @@ const DispersionUsuarioPadre = (props: Props) => {
             <Fieldset
               legend={
                 <div className="flex gap-2 items-center">
-                  <p>Tranferencia {index + 1}</p>
+                  <p>Transferencia {index + 1}</p>
                   <IconSwap
                     bootstrapIcon="trash"
                     bootstrapIconHover="trash-fill"
@@ -374,14 +433,20 @@ const DispersionUsuarioPadre = (props: Props) => {
           required
         />
         <ButtonBar className="lg:col-span-2">
-          <Button type="submit">Aplicar dispersion</Button>
+          <Button type="submit">Aplicar dispersión</Button>
         </ButtonBar>
       </Form>
       <Modal
         show={showModal}
         handleClose={
-          !trxState && !loadingMakeDispersion ? handleCloseModal : () => {}
+          !trxState && !loadingMakeDispersion 
+          ? handleCloseModal 
+          : () => trxState && letExit && !loadingMakeDispersion 
+            ? navigate("/billetera-comisiones", { replace: true }) 
+            : () => {}
         }
+        bigger
+        // bigger={!trxState}
       >
         {!trxState && (
           <PaymentSummary summaryTrx={summary}>
@@ -427,7 +492,7 @@ const DispersionUsuarioPadre = (props: Props) => {
               </Button>
             </ButtonBar>
             {!!ticketList.length && (
-              <div>
+              <div className="grid grid-flow-col auto-rows-max gap-8">
                 {ticketList.map((data) => (
                   <TicketBlock ticketData={data} ticketType="Original" />
                 ))}

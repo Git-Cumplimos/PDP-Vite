@@ -5,35 +5,20 @@ import Form from "../../../components/Base/Form";
 import BarcodeReader from "../../../components/Base/BarcodeReader";
 import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
-import { useAuth } from "../../../hooks/AuthHooks";
+import { notifyError } from "../../../utils/notify";
 
 const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
 
 const RecaudoCodigo = () => {
   const navigate = useNavigate();
-  const { pdpUser, roleInfo } = useAuth();
 
   const navigateRecaudo = useCallback(
     (codigo_barras) => {
       const data = {
-        comercio: {
-          id_comercio: roleInfo.id_comercio,
-          id_usuario: roleInfo.id_usuario,
-          id_terminal: roleInfo.id_dispositivo,
-          nombre_comercio: roleInfo?.["nombre comercio"],
-          nombre_usuario: pdpUser?.uname,
-        },
-        ubicacion: {
-          address: roleInfo.direccion,
-          dane_code: roleInfo.codigo_dane,
-          city: roleInfo.ciudad,
-        },
-        info_transaccion: {
-          codigo_barras: codigo_barras,
-        },
+        codigo_barras: codigo_barras,
       };
       fetchData(
-        `${url}/backend/recaudo-generico/convenios/consulta-convenio-codigo-barras`,
+        `${url}/backend/recaudo-generico/convenios/consultar-convenios-codigo-barras`,
         "POST",
         {},
         data
@@ -42,17 +27,18 @@ const RecaudoCodigo = () => {
           if (res?.status) {
             navigate("../recaudo-generico/trx", {
               state: {
-                // autorizadores: res?.obj?.result?.autorizadores,
-                pk_id_convenio: res?.obj?.result?.pk_id_convenio,
-                convenio_name:
-                  res?.obj?.result?.data_codigo_barras?.nombre_convenio,
-                referencia:
-                  res?.obj?.result?.data_codigo_barras?.codigosReferencia[0],
-                // valor: res?.obj?.result?.data_codigo_barras?.pago,
+                id_pdp_convenio: res?.obj?.result?.id_pdp_convenio,
+                name_pdp_convenio: res?.obj?.result?.name_pdp_convenio,
+                referencia: res?.obj?.result?.codigos_referencia[0],
+                datos_adicionales: res?.obj?.result,
               },
             });
           } else {
             console.error(res?.msg);
+            notifyError(`${res?.msg}`, 5000, {
+              toastId: "notify-error",
+            });
+            navigate("../recaudo-generico");
           }
         })
         .catch(() => {});
