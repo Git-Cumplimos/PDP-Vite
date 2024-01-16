@@ -124,7 +124,7 @@ const PanelHistorico = () => {
         ["", ""],
         ["Saldo PDP Fin del Día",formatMoney.format(data?.total_efectivo_en_caja)],
         ["", ""],
-        ["Saldo Externos Fin del Dia",formatMoney.format(Num)],
+        ["Saldo Externos Fin del Día",formatMoney.format(Num)],
         ["", ""],
         ["Saldo Total del Día",formatMoney.format(data?.total_efectivo_en_caja+Num)],
         ["", ""],
@@ -154,8 +154,6 @@ const PanelHistorico = () => {
         elemento?.pk_nombre_plataforma,
         formatMoney.format(elemento?.valor)],["", ""])
     )
-    tempTicket.trxInfo.push(["Consignaciones bancarias externos",formatMoney.format(data?.total_consignaciones_externos)],["", ""])
-    tempTicket.trxInfo.push(["Entregado a transportadora externos",formatMoney.format(data?.total_entrega_externos)],["", ""])
     setResumenCierre(tempTicket);
   }, []);
 
