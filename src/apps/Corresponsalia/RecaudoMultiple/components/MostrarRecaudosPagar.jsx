@@ -140,6 +140,7 @@ const MostrarRecaudosPagar = ({
         city: roleInfo?.ciudad,
       },
     };
+    console.log(obj)
     postConsultaRecaudoMultipleComercios(obj)
       .then((res) => {
         if (!res?.status) {
