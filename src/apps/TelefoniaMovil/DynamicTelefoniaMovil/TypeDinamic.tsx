@@ -29,8 +29,18 @@ export type TypeInputDataGetPaquetesInsert = {
   page: number;
   limit: number;
 };
+
+export type TypeInputDataGetPaquetesFilters = {
+  page: number;
+  limit: number;
+  codigo?: string; //number
+  tipo?: string;
+  descripcion_corta?: string;
+  valor?: number;
+};
+
 export type TypeInputDataGetPaquetes =
-  TypeInputPromises<TypeInputDataGetPaquetesInsert>;
+  TypeInputPromises<TypeInputDataGetPaquetesFilters>;
 
 export type TypeTableDataGetPaquetes = {
   codigo: number;
