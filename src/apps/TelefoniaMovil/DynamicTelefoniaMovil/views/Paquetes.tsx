@@ -327,7 +327,7 @@ const Paquetes = ({
         onSetPageData={setDataFilters}
       >
         <Fragment>
-          {/* <Input
+          <Input
             name="codigo"
             label="Código Paquete"
             type="text"
@@ -367,7 +367,7 @@ const Paquetes = ({
               }));
             }}
             required
-          /> */}
+          />
         </Fragment>
       </TableEnterprise>
 
