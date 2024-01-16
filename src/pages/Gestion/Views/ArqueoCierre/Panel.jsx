@@ -230,7 +230,7 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Saldo Externos Fin del Dia",
+                "Saldo Externos Fin del Día",
                 formatMoney.format(Num),
               ],
               ["", ""],

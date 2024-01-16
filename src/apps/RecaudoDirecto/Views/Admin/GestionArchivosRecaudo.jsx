@@ -128,6 +128,7 @@ const GestionArchivosRecaudo = () => {
       const body = {
         convenio_id: selected.pk_id_convenio_directo,
         nombre_convenio:selected.nombre_convenio,
+        tipo_archivo:selected.fk_nombre_tipo_archivo,
         ...timebody
       }
       const tipoArchivo = {
@@ -135,7 +136,6 @@ const GestionArchivosRecaudo = () => {
         'Asobancaria 2001': downloadTxtRecaudo,
         'Asobancaria 2011': downloadTxtRecaudo,
       };
-      console.log(body)
       try {
         tipoArchivo[selected.fk_nombre_tipo_archivo](body)
           .then(async (res) => {
@@ -144,6 +144,10 @@ const GestionArchivosRecaudo = () => {
               return;
             }
             if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
+              descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+              return;
+            }
+            if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2011') {
               descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
               return;
             }
