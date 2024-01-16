@@ -84,7 +84,7 @@ export const onChangeNumber = (ev) => {
 };
 
 export const toPhoneNumber = (num = "") => {
-  let reg = /(\d{1,3}[-.\s]?)?(\d{1,3}[-.\s]?)?(\d{1,4})/;
+  let reg = /(\d{1,3}[-.\s]?)?(\d{1,3}[-.\s]?)?(\d{1,4})?(\d{1,4})/;
   return (
     num
       .match(reg)
