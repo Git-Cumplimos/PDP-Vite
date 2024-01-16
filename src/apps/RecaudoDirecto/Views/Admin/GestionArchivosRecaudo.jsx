@@ -132,8 +132,10 @@ const GestionArchivosRecaudo = () => {
       }
       const tipoArchivo = {
         'Reporte Generico csv': downloadCsvRecaudo,
-        'Asobancaria 2001': downloadTxtRecaudo
+        'Asobancaria 2001': downloadTxtRecaudo,
+        'Asobancaria 2011': downloadTxtRecaudo,
       };
+      console.log(body)
       try {
         tipoArchivo[selected.fk_nombre_tipo_archivo](body)
           .then(async (res) => {
@@ -156,7 +158,6 @@ const GestionArchivosRecaudo = () => {
             handleClose();
           });
       } catch (e) { console.log(e) }
-
       handleClose();
     }, [handleClose, selected]);
 
@@ -180,11 +181,9 @@ const GestionArchivosRecaudo = () => {
           return null
         })
       }
-
       descargarCSV('Errores_del_archivo', errores)
       handleClose();
     }, [handleClose, showModalErrors]);
-
 
   return (
     <Fragment>
