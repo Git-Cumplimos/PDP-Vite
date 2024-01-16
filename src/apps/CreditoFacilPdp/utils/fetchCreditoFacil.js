@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
-import { fetchDataTotp } from "../../../utils/MFA";
+import { fetchDataTotpNoMsg } from "../../../utils/MFA";
 
 export const fetchCustom = (
   url_,
@@ -43,7 +43,7 @@ export const fetchCustom = (
       ),
     };
     try {
-      const fetchFunc = totp ? fetchDataTotp : fetchData;
+      const fetchFunc = totp ? fetchDataTotpNoMsg : fetchData;
       if (metodo_ === "GET") {
         Peticion = await fetchFunc(urlCompleto, "GET", {}, {}, {}, true);
       } else if (metodo_ === "PUT") {
@@ -59,6 +59,12 @@ export const fetchCustom = (
         Peticion.obj = JSON.parse(obj);
       }
     } catch (error) {
+      if (error.message.includes("La OTP no es válida")){
+        throw new ErrorCustomFetch(
+          error.message,
+          error.message
+        );
+      }
       throw new ErrorCustomFetch(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
