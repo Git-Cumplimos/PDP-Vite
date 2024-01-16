@@ -18,6 +18,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const dateFormatter = makeDateFormatter(true);
 let Num = 0;
+let totalExtrdiaAnterior = 0;
 
 const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
@@ -92,7 +93,11 @@ const PanelHistorico = () => {
   });
 
   const cierreCaja = useCallback((data) => {
-    data?.entidades_externas?.data.map((elemento) => Num=Num+elemento?.valor)
+    console.log(data)
+    data?.entidades_externas?.data?.map((elemento) => Num=Num+elemento?.valor)
+    if (data?.externos_día_anterior !== null) {
+      data?.externos_día_anterior?.data?.map((elemento) => totalExtrdiaAnterior=totalExtrdiaAnterior+elemento?.valor)
+    }
     setLoading(false)
     const tempTicket = {
       title: "Cierre de caja",
@@ -111,40 +116,36 @@ const PanelHistorico = () => {
         ["", ""],
       ],
       cajaInfo: [
-        ["Movimientos del día",formatMoney.format(data.total_movimientos)],
+        ["Saldo PDP Día Anterior",formatMoney.format(data?.total_efectivo_cierre_día_anterior)],
         ["", ""],
-        ["Efectivo cierre día anterior",formatMoney.format(data.total_efectivo_cierre_día_anterior-Num)],
+        ["Saldo Externos Día Anterior",formatMoney.format(totalExtrdiaAnterior)],
         ["", ""],
-        ["Efectivo PDP - Consignaciones y Transportadora",formatMoney.format(Num>=0?data.total_efectivo_en_caja-Num:data.total_efectivo_en_caja+(-Num)
-        + data?.total_recibido_transportadora + data?.total_notas 
-        - (data?.total_consignaciones>0?data?.total_consignaciones:data?.total_consignaciones*-1) 
-        - (data?.total_entregado_transportadora>0?data?.total_entregado_transportadora:data?.total_entregado_transportadora*-1)
-        - data?.total_consignaciones_externos - data?.total_entrega_externos
-        )
-        ],
+        ["Saldo Cierre Día Anterior",formatMoney.format(data?.total_efectivo_cierre_día_anterior + totalExtrdiaAnterior)],
         ["", ""],
-        ["Efectivo en caja PDP + Externos",formatMoney.format(data.total_efectivo_en_caja
-          + data?.total_recibido_transportadora + data?.total_notas 
-          - (data?.total_consignaciones>0?data?.total_consignaciones:data?.total_consignaciones*-1) 
-          - (data?.total_entregado_transportadora>0?data?.total_entregado_transportadora:data?.total_entregado_transportadora*-1)
-          - data?.total_consignaciones_externos - data?.total_entrega_externos)
-        ],
+        ["Saldo PDP Fin del Día",formatMoney.format(data?.total_efectivo_en_caja)],
         ["", ""],
+        ["Saldo Externos Fin del Dia",formatMoney.format(Num)],
+        ["", ""],
+        ["Saldo Total del Día",formatMoney.format(data?.total_efectivo_en_caja+Num)],
+        ["", ""],
+        ["Efectivo en Caja",formatMoney.format(data?.total_arqueo)],
       ],
       trxInfo: [
-        ["Sobrante", formatMoney.format(data.total_sobrante)],
+        ["Sobrante", formatMoney.format(data?.total_sobrante)],
         ["", ""],
-        ["Faltante", formatMoney.format(data.total_faltante)],
+        ["Faltante", formatMoney.format(data?.total_faltante)],
         ["", ""],
-        ["Estimación faltante",formatMoney.format(data.total_estimacion_faltante)],
+        ["Pendiente Consignaciones Bancarias y Transportadora PDP",formatMoney.format(data?.total_consignaciones_transportadora_pendiente)],
         ["", ""],
-        ["Consignaciones bancarias PDP",formatMoney.format(data.total_consignaciones)],
+        ["Pendiente Recibido Transportadora",formatMoney.format(data?.total_recibido_transportadora_pendiente)],
         ["", ""],
-        ["Entregado PDP a transportadora", formatMoney.format(data.total_entregado_transportadora)],
+        ["Consignaciones Bancarias y Transportadora PDP", formatMoney.format(data?.total_consignaciones_transportadora)],
         ["", ""],
-        ["Recibido de transportadora", formatMoney.format(data.total_recibido_transportadora)],
+        ["Consignaciones Bancarias y Transportadora Externos", formatMoney.format(data?.total_consignaciones_transportadora_externos)],
         ["", ""],
-        ["Notas débito o crédito",formatMoney.format(data.total_notas)],
+        ["Recibido Transportadora", formatMoney.format(data?.total_recibido_transportadora)],
+        ["", ""],
+        ["Notas Débito o Crédito",formatMoney.format(data?.total_notas)],
         ["", ""],
       ],
     };
