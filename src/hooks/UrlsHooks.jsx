@@ -1,4 +1,11 @@
-import { createContext, lazy, useContext, useMemo } from "react";
+import {
+  createContext,
+  lazy,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Route, Routes } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
 import { allUrlsPrivateApps } from "../utils/appsRoutes";
@@ -13,6 +20,11 @@ import { privateUrls } from "../pages/routes";
 import PrivateRoute from "../components/Compound/PrivateRoute";
 import SubPage from "../components/Base/SubPage";
 import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
+// Categorias
+import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
+
+// Categorias
+const Categoria = lazy(() => import("../pages/Categorias/Categorias"));
 
 const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
@@ -176,6 +188,39 @@ export const useProvideUrls = () => {
     }
   }, [userPermissions, commerceInfo?.estado, pdpUser?.fk_id_comercio]);
 
+  const [urlsCategorias, setUrlsCategorias] = useState([]);
+
+  useEffect(() => {
+    const fetchUrlsCategorias = async (id_zona) => {
+      const formData = new FormData();
+      formData.append("id_zona", id_zona);
+      const res = await fetchCategoriasByZona(formData);
+      if (res?.status) {
+        const urlsCategoriasFiltrado = res?.obj.map(
+          ({ nombre, img_url, id_categoria, subcategorias }) => {
+            const link = `/categoria/${nombre.replace(/\s+/g, "-")}`;
+            return {
+              link,
+              label: <AppIcons Logo={img_url} name={nombre} />,
+              component: (props) => (
+                <Categoria {...props} subcategorias={subcategorias} />
+              ),
+              props: { nombre, img_url, id_categoria },
+            };
+          }
+        );
+        // console.log("urlsCategoriasFiltrado", urlsCategoriasFiltrado);
+        setUrlsCategorias(urlsCategoriasFiltrado);
+      } else {
+        setUrlsCategorias([]);
+      }
+    };
+
+    // Validar que esté autenticado para hacer la petición
+    if (urlsCategorias?.length === 0 && userPermissions?.length > 0)
+      fetchUrlsCategorias(2);
+  }, [userPermissions, urlsCategorias?.length]);
+
   const urlsGestion = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
       return [...filterPermissions(rutasGestion, userPermissions)];
@@ -225,6 +270,9 @@ export const useProvideUrls = () => {
         <Route path="/public" element={<PublicLayout />}>
           {toRoute(publicUrls, false)}
         </Route>
+        <Route path="/categoria" element={<AdminLayout />}>
+          {toRoute(urlsCategorias, true, SubPage)}
+        </Route>
       </Routes>
     );
   }, [
@@ -233,6 +281,7 @@ export const useProvideUrls = () => {
     urlsReportes,
     urlsInformacionGeneral,
     urlsBilleteraComisiones,
+    urlsCategorias,
   ]);
 
   return {
@@ -244,5 +293,6 @@ export const useProvideUrls = () => {
     urlsReportes,
     urlsInformacionGeneral,
     urlsBilleteraComisiones,
+    urlsCategorias,
   };
 };
