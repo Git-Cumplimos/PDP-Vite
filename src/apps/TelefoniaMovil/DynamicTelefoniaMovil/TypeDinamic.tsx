@@ -25,12 +25,17 @@ export type TypeInputPromisesRecargas =
 
 export type TypeBackendRecargas = any;
 //------------paquetes ------------------------
-export type TypeInputDataGetPaquetesInsert = {
+export type TypeInputDataGetPaquetesFilters = {
   page: number;
   limit: number;
+  codigo?: string; //number
+  tipo?: string;
+  descripcion_corta?: string;
+  valor?: number;
 };
+
 export type TypeInputDataGetPaquetes =
-  TypeInputPromises<TypeInputDataGetPaquetesInsert>;
+  TypeInputPromises<TypeInputDataGetPaquetesFilters>;
 
 export type TypeTableDataGetPaquetes = {
   codigo: number;
@@ -96,8 +101,9 @@ export type PropOperadoresComponent = {
   autorizador: string;
   name: string;
   logo: string;
+  operador: string;
   backend: TypeBackend;
   permission: number[];
-  parameters_operador: [key: string | any] | {};
-  parameters_submodule: [key: string | any] | {};
+  parameters_operador: { [key: string]: any };
+  parameters_submodule: { [key: string]: any };
 };

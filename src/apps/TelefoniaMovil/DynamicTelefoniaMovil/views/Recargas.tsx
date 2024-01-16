@@ -2,6 +2,7 @@ import React, {
   FormEvent,
   ReactNode,
   useCallback,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -67,27 +68,36 @@ const Recargas = ({
   const { roleInfo, pdpUser }: any = useAuth();
   const useHookDynamic = operadorCurrent?.backend;
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
-    operadorCurrent.name,
+    operadorCurrent.operador,
     operadorCurrent.autorizador,
     component_name.toLowerCase()
   );
+  useEffect(() => {
+    setDataRecarga(dataRecargaInitial);
+  }, [operadorCurrent.name]);
 
-  const onCelChange = (e: any) => {
-    let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    if (valueInput[0] != 3) {
-      if (valueInput != "") {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3",
-          5000,
-          {
-            toastId: "notify-lot-celular",
-          }
-        );
-        valueInput = "";
+  const onChangeInput = useCallback(
+    (e) => {
+      let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+      if (
+        valueInput[0] !== "3" &&
+        (operadorCurrent?.parameters_operador["celular_check"] ?? true) === true
+      ) {
+        if (valueInput !== "") {
+          notifyError(
+            "Número inválido, el No. de celular debe comenzar con el número 3",
+            5000,
+            {
+              toastId: "notify-lot-celular",
+            }
+          );
+          valueInput = "";
+        }
       }
-    }
-    setDataRecarga((old) => ({ ...old, celular: valueInput }));
-  };
+      setDataRecarga((old) => ({ ...old, [e.target.name]: valueInput }));
+    },
+    [operadorCurrent?.parameters_operador]
+  );
 
   const onMoneyChange = (ev: FormEvent<HTMLInputElement>, valor: number) => {
     setDataRecarga((old) => ({ ...old, valor_total_trx: valor }));
@@ -224,10 +234,14 @@ const Recargas = ({
                 label="Número de celular"
                 type="tel"
                 autoComplete="off"
-                minLength={10}
-                maxLength={10}
+                minLength={
+                  operadorCurrent?.parameters_operador["celular_tam_min"] ?? 10
+                }
+                maxLength={
+                  operadorCurrent?.parameters_operador["celular_tam_max"] ?? 10
+                }
                 value={dataRecarga.celular}
-                onChange={onCelChange}
+                onChange={onChangeInput}
                 required
                 info={""}
                 invalid={""}
