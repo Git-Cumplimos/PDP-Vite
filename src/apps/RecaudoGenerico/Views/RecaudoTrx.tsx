@@ -31,6 +31,7 @@ type TypeDataInput = {
   id_pdp_convenio: number;
   name_pdp_convenio: string;
   valor_total_trx: string;
+  datos_adicionales: { [key: string]: any };
 };
 type TypeProceso = "Ninguno" | "Consulta" | "Resumen" | "TrxExitosa";
 type TypeSummaryTrx = {
@@ -53,6 +54,7 @@ const dataInputInitial: TypeDataInput = {
   id_pdp_convenio: 0,
   name_pdp_convenio: "",
   valor_total_trx: "",
+  datos_adicionales: {},
 };
 const dataSeeInitial: TypeDataSee = {
   summaryTrx: {},
@@ -90,6 +92,7 @@ const RecaudoTrx = () => {
     name_pdp_convenio:
       state.name_pdp_convenio ?? dataInputInitial.name_pdp_convenio,
     valor_total_trx: "",
+    datos_adicionales: state.datos_adicionales,
   });
 
   const [
@@ -162,6 +165,7 @@ const RecaudoTrx = () => {
       notifyPending(
         PeticionConsulta(dataInput.id_pdp_convenio, {
           referencia: dataInput.referencia,
+          datos_adicionales: dataInput.datos_adicionales,
         }),
         {
           render: () => {

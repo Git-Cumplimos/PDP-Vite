@@ -80,7 +80,8 @@ const ModalDesembolso = ({ dataCredito }) => {
     useFetchCreditoFacil(
       URL_REALIZAR_DESEMBOLSO_CREDITO,
       URL_CONSULTAR_ESTADO_SIMULACION,
-      "Realizar desembolso crédito"
+      "Realizar desembolso crédito",
+      true
     );
 
   return (
