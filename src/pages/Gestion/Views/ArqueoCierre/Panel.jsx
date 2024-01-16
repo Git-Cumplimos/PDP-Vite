@@ -18,6 +18,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","DROGUERIA"];
 let Num = 0;
+let totalExtrdiaAnterior = 0;
 
 const Panel = () => {
   const navigate = useNavigate();
@@ -180,6 +181,9 @@ const Panel = () => {
         render: ({ data: res }) => {
           setLoading(false);
           const cierre = res?.obj;
+          cierre?.externos_día_anterior?.data.map((elemento) => {
+            totalExtrdiaAnterior=totalExtrdiaAnterior+elemento.valor;
+          })
           const tempTicket = {
             title: "Cierre de caja",
             timeInfo: {
@@ -206,33 +210,39 @@ const Panel = () => {
             ],
             cajaInfo: [
               [
-                "Movimientos del día",
-                formatMoney.format(cierre?.total_movimientos),
-              ],
-              ["", ""],
-              [
-                "Efectivo cierre día anterior",
+                "Saldo PDP Día Anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],
               [
-                "Efectivo PDP - Consignaciones y Transportadora",
-                formatMoney.format((Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)) 
-                + cierre?.total_recibido_transportadora + cierre?.total_notas 
-                - (cierre?.total_consignaciones>0?cierre?.total_consignaciones:cierre?.total_consignaciones*-1) 
-                - (cierre?.total_entregado_transportadora>0?cierre?.total_entregado_transportadora:cierre?.total_entregado_transportadora*-1)
-                - cierre?.total_consignaciones_externos - cierre?.total_entrega_externos),
+                "Saldo Externos Día Anterior",
+                formatMoney.format(totalExtrdiaAnterior),
               ],
               ["", ""],
               [
-                "Efectivo en caja PDP + Externos",
-                formatMoney.format(cierre?.total_efectivo_en_caja 
-                + cierre?.total_recibido_transportadora + cierre?.total_notas 
-                - (cierre?.total_consignaciones>0?cierre?.total_consignaciones:cierre?.total_consignaciones*-1) 
-                - (cierre?.total_entregado_transportadora>0?cierre?.total_entregado_transportadora:cierre?.total_entregado_transportadora*-1)
-                - cierre?.total_consignaciones_externos - cierre?.total_entrega_externos),
+                "Saldo Cierre Día Anterior",
+                formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
               ],
               ["", ""],
+              [
+                "Saldo PDP Fin del Día",
+                formatMoney.format(cierre?.total_efectivo_en_caja),
+              ],
+              ["", ""],
+              [
+                "Saldo Externos Fin del Dia",
+                formatMoney.format(Num),
+              ],
+              ["", ""],
+              [
+                "Saldo Total del Día",
+                formatMoney.format(cierre?.total_efectivo_en_caja+Num),
+              ],
+              ["", ""],
+              [
+                "Efectivo en Caja",
+                formatMoney.format(totalArqueo),
+              ],
             ],
             trxInfo: [
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
@@ -240,27 +250,32 @@ const Panel = () => {
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Estimación faltante",
-                formatMoney.format(cierre?.total_estimacion_faltante),
+                "Pendiente Consignaciones Bancarias y Transportadora PDP",
+                formatMoney.format(cierre?.total_consignaciones_transportadora_pendiente),
               ],
               ["", ""],
               [
-                "Consignaciones bancarias PDP",
-                formatMoney.format(cierre?.total_consignaciones),
+                "Pendiente Recibido Transportadora",
+                formatMoney.format(cierre?.total_recibido_transportadora_pendiente),
               ],
               ["", ""],
               [
-                "Entregado PDP a transportadora",
-                formatMoney.format(cierre?.total_entregado_transportadora),
+                "Consignaciones Bancarias y Transportadora PDP",
+                formatMoney.format(cierre?.total_consignaciones_transportadora),
               ],
               ["", ""],
               [
-                "Recibido de transportadora",
+                "Consignaciones Bancarias y Transportadora Externos",
+                formatMoney.format(cierre?.total_consignaciones_transportadora_externos),
+              ],
+              ["", ""],
+              [
+                "Recibido Transportadora",
                 formatMoney.format(cierre?.total_recibido_transportadora),
               ],
               ["", ""],
               [
-                "Notas débito o crédito",
+                "Notas Débito o Crédito",
                 formatMoney.format(cierre?.total_notas),
               ],
               ["", ""],
@@ -271,8 +286,6 @@ const Panel = () => {
               elemento.pk_nombre_plataforma,
               formatMoney.format(elemento.valor)],["", ""])
           )
-          tempTicket.trxInfo.push(["Consignaciones bancarias externos",formatMoney.format(cierre?.total_consignaciones_externos)],["", ""])
-          tempTicket.trxInfo.push(["Entregado a transportadora externos",formatMoney.format(cierre?.total_entrega_externos)],["", ""])
           setResumenCierre(tempTicket);
           return res?.msg;
         },
