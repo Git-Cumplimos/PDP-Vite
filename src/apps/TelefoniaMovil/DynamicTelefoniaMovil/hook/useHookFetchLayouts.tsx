@@ -96,6 +96,7 @@ const useHookFetchLayouts = (nameSubModule: string) => {
               autorizador: operador?.autorizador ?? "desconocido",
               name: operador?.front_name ?? "desconocido",
               logo: operador?.front_logo ?? "desconocido",
+              operador: operador?.operador ?? "",
               backend: backend,
               permission: permission,
               parameters_operador: operador?.parameters ?? {},

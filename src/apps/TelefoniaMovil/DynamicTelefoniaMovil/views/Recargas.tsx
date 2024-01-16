@@ -68,7 +68,7 @@ const Recargas = ({
   const { roleInfo, pdpUser }: any = useAuth();
   const useHookDynamic = operadorCurrent?.backend;
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
-    operadorCurrent.name,
+    operadorCurrent.operador,
     operadorCurrent.autorizador,
     component_name.toLowerCase()
   );

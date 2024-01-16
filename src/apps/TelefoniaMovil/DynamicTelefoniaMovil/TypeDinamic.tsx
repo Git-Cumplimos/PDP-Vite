@@ -101,6 +101,7 @@ export type PropOperadoresComponent = {
   autorizador: string;
   name: string;
   logo: string;
+  operador: string;
   backend: TypeBackend;
   permission: number[];
   parameters_operador: { [key: string]: any };

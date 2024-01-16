@@ -95,7 +95,7 @@ const Paquetes = ({
     loadingPeticionTrx,
     PeticionTrx,
   ] = useHookDynamic(
-    operadorCurrent.name,
+    operadorCurrent.operador,
     operadorCurrent.autorizador,
     component_name.toLowerCase()
   );

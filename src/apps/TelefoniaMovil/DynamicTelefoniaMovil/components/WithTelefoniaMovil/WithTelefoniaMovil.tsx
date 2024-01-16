@@ -41,6 +41,7 @@ const WithTelefoniaMovil = (
           );
           validNavigate("/telefonia-movil");
         } else {
+          console.log(resPromise);
           setOperadores(resPromise);
         }
       })
