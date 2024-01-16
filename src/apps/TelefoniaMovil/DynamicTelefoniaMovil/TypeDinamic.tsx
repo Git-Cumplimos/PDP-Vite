@@ -25,11 +25,6 @@ export type TypeInputPromisesRecargas =
 
 export type TypeBackendRecargas = any;
 //------------paquetes ------------------------
-export type TypeInputDataGetPaquetesInsert = {
-  page: number;
-  limit: number;
-};
-
 export type TypeInputDataGetPaquetesFilters = {
   page: number;
   limit: number;
