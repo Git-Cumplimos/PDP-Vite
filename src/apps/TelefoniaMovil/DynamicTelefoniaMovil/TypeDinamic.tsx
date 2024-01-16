@@ -108,6 +108,6 @@ export type PropOperadoresComponent = {
   logo: string;
   backend: TypeBackend;
   permission: number[];
-  parameters_operador: [key: string | any] | {};
-  parameters_submodule: [key: string | any] | {};
+  parameters_operador: { [key: string]: any };
+  parameters_submodule: { [key: string]: any };
 };

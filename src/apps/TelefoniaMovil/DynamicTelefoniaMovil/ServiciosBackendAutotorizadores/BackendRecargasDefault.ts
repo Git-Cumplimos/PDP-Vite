@@ -72,7 +72,6 @@ const get_status_cycle_consult_trx = (
               (value: string) => value === error_msg_name
             )
         );
-        console.log(error_msg_equal);
         if (error_msg_equal !== undefined) {
           if (
             error_.res_obj?.ids?.autorizador?.id_trx !== undefined &&
@@ -225,7 +224,6 @@ export const useBackendRecargasDefault = (
         error_previous = response?.obj?.paso_next_output?.error_next ?? null;
         id_trx = response?.obj?.ids?.autorizador?.id_trx ?? null;
 
-        console.log("ddd", response?.obj?.paso_next_output?.inf);
         let paso_next_input_ = {};
         if (
           response?.obj?.paso_next_output?.inf !== undefined &&
@@ -271,7 +269,7 @@ export const useBackendRecargasDefault = (
       } catch (error: any) {
         const status_cycle_consult_trx: TypingOutputGetStatusCycleConsultTrx =
           get_status_cycle_consult_trx(error, id_trx, error_previous);
-        console.log(status_cycle_consult_trx);
+
         if (status_cycle_consult_trx.status === true) {
           response = await CyclePeticionConsultaTimeout(
             suburl,

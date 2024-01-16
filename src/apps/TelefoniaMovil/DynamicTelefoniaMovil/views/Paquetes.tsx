@@ -105,7 +105,7 @@ const Paquetes = ({
 
   useEffect(() => {
     setDataFilters(dataFiltersInitial);
-  }, [operadorCurrent]);
+  }, [operadorCurrent.name]);
 
   useEffect(() => {
     PeticionGetPaquetes({
@@ -182,25 +182,31 @@ const Paquetes = ({
     HandleCloseTrxExitosa,
   ]);
 
-  const onChangeInput = useCallback((e) => {
-    let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    if (valueInput[0] !== "3") {
-      if (valueInput !== "") {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3",
-          5000,
-          {
-            toastId: "notify-lot-celular",
-          }
-        );
-        valueInput = "";
+  const onChangeInput = useCallback(
+    (e) => {
+      let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+      if (
+        valueInput[0] !== "3" &&
+        (operadorCurrent?.parameters_operador["celular_check"] ?? true) === true
+      ) {
+        if (valueInput !== "") {
+          notifyError(
+            "Número inválido, el No. de celular debe comenzar con el número 3",
+            5000,
+            {
+              toastId: "notify-lot-celular",
+            }
+          );
+          valueInput = "";
+        }
       }
-    }
-    setDataPackageInput((anterior) => ({
-      ...anterior,
-      [e.target.name]: valueInput,
-    }));
-  }, []);
+      setDataPackageInput((anterior) => ({
+        ...anterior,
+        [e.target.name]: valueInput,
+      }));
+    },
+    [operadorCurrent?.parameters_operador]
+  );
 
   const ValidarAntesCompraPaquete = useCallback((e) => {
     e.preventDefault();
@@ -388,8 +394,12 @@ const Paquetes = ({
                 label="Número de celular"
                 type="tel"
                 autoComplete="off"
-                minLength={10}
-                maxLength={10}
+                minLength={
+                  operadorCurrent?.parameters_operador["celular_tam_min"] ?? 10
+                }
+                maxLength={
+                  operadorCurrent?.parameters_operador["celular_tam_max"] ?? 10
+                }
                 value={dataPackageInput.celular}
                 required
               />
