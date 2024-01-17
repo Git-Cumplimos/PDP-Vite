@@ -243,6 +243,7 @@ const Panel = () => {
                 "Efectivo en Caja",
                 formatMoney.format(totalArqueo),
               ],
+              ["", ""],
             ],
             trxInfo: [
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
