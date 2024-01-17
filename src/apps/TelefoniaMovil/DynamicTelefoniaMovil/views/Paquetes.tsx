@@ -42,6 +42,16 @@ type TypeDataInput = {
   celular: string;
 };
 type TypeInfTicket = { [key: string]: any } | null;
+type TypyDataPagination = {
+  limit: number;
+  page: number;
+};
+type TypeFiltersSinPagination = {
+  codigo?: string; //number
+  tipo?: string;
+  descripcion_corta?: string;
+  valor?: number;
+};
 
 //------ constantes generales--------
 const dataPackageInputInitial = {
@@ -57,7 +67,7 @@ const dataTableInitial = [
   },
 ];
 
-const dataFiltersInitial: TypeInputDataGetPaquetesFilters = {
+const dataPaginationInitial: TypyDataPagination = {
   limit: 10,
   page: 1,
 };
@@ -80,11 +90,13 @@ const Paquetes = ({
   const [dataGetPackages, setDataGetPackages] = useState<any>([]);
   const [dataPackage, setDataPackage] =
     useState<TypeTableDataGetPaquetes | null>(null);
-  const [dataFilters, setDataFilters] =
-    useState<TypeInputDataGetPaquetesFilters>(dataFiltersInitial);
+  const [dataFilters, setDataFilters] = useState<TypeFiltersSinPagination>({});
   const [showModal, setShowModal] = useState<boolean>(false);
   const [typeInfo, setTypeInfo] = useState<TypeInfo>("Ninguno");
   const [infTicket, setInfTicket] = useState<TypeInfTicket>(null);
+  const [dataPagination, setDataPagination] = useState<TypyDataPagination>(
+    dataPaginationInitial
+  );
   const [maxPages, setMaxPages] = useState<number>(1);
   const printDiv = useRef(null);
   const useHookDynamic = operadorCurrent?.backend;
@@ -104,14 +116,15 @@ const Paquetes = ({
   const { roleInfo, pdpUser }: any = useAuth();
 
   useEffect(() => {
-    setDataFilters(dataFiltersInitial);
+    setDataFilters({});
+    setDataPagination(dataPaginationInitial);
   }, [operadorCurrent.name]);
 
   useEffect(() => {
     PeticionGetPaquetes({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
-      moduleInfo: { ...dataFilters },
+      moduleInfo: { ...dataFilters, ...dataPagination },
       parameters_operador: {},
       parameters_submodule: {},
     })
@@ -135,6 +148,7 @@ const Paquetes = ({
     pdpUser,
     PeticionGetPaquetes,
     dataFilters,
+    dataPagination,
     component_name,
     msg,
   ]);
@@ -324,7 +338,7 @@ const Paquetes = ({
           setShowModal(true);
           setTypeInfo("Informacion");
         }}
-        onSetPageData={setDataFilters}
+        onSetPageData={setDataPagination}
       >
         <Fragment>
           <Input
