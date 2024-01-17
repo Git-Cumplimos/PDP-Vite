@@ -121,7 +121,7 @@ const CargaComprobante = () => {
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
       });
-      var valor_Boveda = parseInt(valores?.obj[0]?.valor_boveda)
+      var valor_Boveda = valores?.obj[0]?.valor_boveda !== undefined?parseInt(valores?.obj[0]?.valor_boveda):0
       if (movementType !== "Movimiento a bóveda") {
         var sumExter = 0
         Object.values(valoresExternos).map((e)=> sumExter += e)
@@ -138,6 +138,7 @@ const CargaComprobante = () => {
               });
             }
           }
+
           if (!selectedEntity) {
             throw new Error("No se ha seleccionado una entidad", {
               cause: "custom",

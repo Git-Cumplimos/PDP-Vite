@@ -1,8 +1,4 @@
 import { TypeSubModules } from "../DynamicTelefoniaMovil/TypeDinamic";
-import { useBackendPaquetesMovistar } from "./Movistar/BackendPaquetes";
-import { useBackendRecargasMovistar } from "./Movistar/BackendRecargas";
-import { useBackendPaquetesPractisistemas } from "./Practisistemas/BackendPaquetes";
-import { useBackendRecargasPractisistemas } from "./Practisistemas/BackendRecargas";
 
 export type TypeDictServiciosBackendAurorizadores = {
   [key: string]: TypeSubModules<any>;
@@ -11,15 +7,15 @@ export type TypeDictServiciosBackendAurorizadores = {
 const DictServiciosBackendAurorizadores: TypeDictServiciosBackendAurorizadores =
   {
     movistar: {
-      recargas: useBackendRecargasMovistar,
-      paquetes: useBackendPaquetesMovistar,
+      recargas: async () => {},
+      paquetes: async () => {},
       cargarPaquetes: async () => {},
       cargarConciliacion: async () => {},
       descargarConciliacion: async () => {},
     },
     practisistemas: {
-      recargas: useBackendRecargasPractisistemas,
-      paquetes: useBackendPaquetesPractisistemas,
+      recargas: async () => {},
+      paquetes: async () => {},
       cargarPaquetes: async () => {},
       cargarConciliacion: async () => {},
       descargarConciliacion: async () => {},

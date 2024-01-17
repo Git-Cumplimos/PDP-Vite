@@ -4,7 +4,7 @@ import {
   TypeInputTrxPaquetes,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
-  TypeTableDataGetPaquetes,
+  TypeInputDataGetPaquetesFilters,
 } from "../../DynamicTelefoniaMovil/TypeDinamic";
 import {
   ErrorCustomApiGatewayTimeout,
@@ -136,11 +136,26 @@ export const useBackendPaquetesDefault = (
         const params = {
           operador: name_operador,
         };
+        const module_info: TypeInputDataGetPaquetesFilters = {
+          limit: dataInputPromises.moduleInfo.limit,
+          page: dataInputPromises.moduleInfo.page,
+        };
+        if (dataInputPromises.moduleInfo.codigo) {
+          module_info.codigo = dataInputPromises.moduleInfo.codigo;
+        }
+        if (dataInputPromises.moduleInfo.tipo) {
+          module_info.tipo = dataInputPromises.moduleInfo.tipo;
+        }
+        if (dataInputPromises.moduleInfo.descripcion_corta) {
+          module_info.descripcion_corta =
+            dataInputPromises.moduleInfo.descripcion_corta;
+        }
+        if (dataInputPromises.moduleInfo.valor) {
+          module_info.valor = dataInputPromises.moduleInfo.valor;
+        }
+
         const body = {
-          module_info: {
-            limit: dataInputPromises.moduleInfo.limit,
-            page: dataInputPromises.moduleInfo.page,
-          },
+          module_info: module_info,
           parameters_operador: dataInputPromises.parameters_operador,
           parameters_submodule: dataInputPromises.parameters_submodule,
         };

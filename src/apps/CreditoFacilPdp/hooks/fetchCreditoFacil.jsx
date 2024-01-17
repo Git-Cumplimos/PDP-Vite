@@ -16,10 +16,10 @@ const sleep = (millisecons) => {
 export const useFetchCreditoFacil = (
   url_trx_ = "",
   url_consulta_ = "",
-  name_ = ""
+  name_ = "",
+  cod_otp = false,
 ) => {
   const [state, setState] = useState(false);
-
   const fetchCreditoFacilTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(
@@ -27,7 +27,8 @@ export const useFetchCreditoFacil = (
         "POST",
         `'Trx ${name_}'`,
         true,
-        false
+        false,
+        cod_otp
       );
       const fetchConsulta = fetchCustom(
         url_consulta_,
@@ -116,7 +117,7 @@ export const useFetchCreditoFacil = (
       setState(false);
       return response;
     },
-    [setState, url_trx_, url_consulta_, name_]
+    [setState, cod_otp, url_trx_, url_consulta_, name_]
   );
 
   return [state, fetchCreditoFacilTrx];
