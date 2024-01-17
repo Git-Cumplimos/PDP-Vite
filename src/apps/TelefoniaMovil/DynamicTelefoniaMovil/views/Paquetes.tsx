@@ -358,7 +358,7 @@ const Paquetes = ({
             label="Valor"
             autoComplete="off"
             value={dataFilters.valor ?? ""}
-            maxLength={13}
+            maxLength={9}
             onInput={(ev, value) => {
               setDataFilters((old) => ({
                 ...old,
