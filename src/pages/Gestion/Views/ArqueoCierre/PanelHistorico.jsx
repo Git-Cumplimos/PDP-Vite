@@ -129,6 +129,7 @@ const PanelHistorico = () => {
         ["Saldo Total del Día",formatMoney.format(data?.total_efectivo_en_caja+Num)],
         ["", ""],
         ["Efectivo en Caja",formatMoney.format(data?.total_arqueo)],
+        ["", ""],
       ],
       trxInfo: [
         ["Sobrante", formatMoney.format(data?.total_sobrante)],
