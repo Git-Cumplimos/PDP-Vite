@@ -34,9 +34,9 @@ import {
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
   TypeTableDataGetPaquetes,
-  TypeInputDataGetPaquetesFilters,
 } from "../TypeDinamic";
 
+//FRAGMENT ********** TYPING ***********
 type TypeInfo = "Ninguno" | "Informacion" | "Resumen" | "TrxExitosa";
 type TypeDataInput = {
   celular: string;
@@ -53,25 +53,17 @@ type TypeFiltersSinPagination = {
   valor?: number;
 };
 
-//------ constantes generales--------
+//FRAGMENT ********* CONST ***********
 const dataPackageInputInitial = {
   celular: "",
 };
-
-const dataTableInitial = [
-  {
-    Código: "Buscando ... ",
-    Tipo: "",
-    Descripción: "",
-    Valor: "",
-  },
-];
 
 const dataPaginationInitial: TypyDataPagination = {
   limit: 10,
   page: 1,
 };
 
+//FRAGMENT ********* COMPONENTE ***********
 const Paquetes = ({
   operadorCurrent,
   children,
@@ -101,16 +93,12 @@ const Paquetes = ({
   const printDiv = useRef(null);
   const useHookDynamic = operadorCurrent?.backend;
 
-  const [
-    loadingPeticionGetPaquetes,
-    PeticionGetPaquetes,
-    loadingPeticionTrx,
-    PeticionTrx,
-  ] = useHookDynamic(
-    operadorCurrent.operador,
-    operadorCurrent.autorizador,
-    component_name.toLowerCase()
-  );
+  const [, PeticionGetPaquetes, loadingPeticionTrx, PeticionTrx] = //esta bien la coma inicial, es para no tomar el valor inicial, por que no lo uso
+    useHookDynamic(
+      operadorCurrent.operador,
+      operadorCurrent.autorizador,
+      component_name.toLowerCase()
+    );
   const validNavigate = useNavigate();
   const id_uuid = v4();
   const { roleInfo, pdpUser }: any = useAuth();
@@ -118,6 +106,7 @@ const Paquetes = ({
   useEffect(() => {
     setDataFilters({});
     setDataPagination(dataPaginationInitial);
+    setDataGetPackages([]);
   }, [operadorCurrent.name]);
 
   useEffect(() => {
@@ -321,18 +310,11 @@ const Paquetes = ({
         title={"Paquetes"}
         maxPage={maxPages}
         headers={["Código", "Tipo", "Descripción", "Valor"]}
-        data={
-          loadingPeticionGetPaquetes
-            ? dataTableInitial
-            : dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
-                return {
-                  Código: inf.codigo,
-                  Tipo: inf.tipo,
-                  Descripción: inf.descripcion_corta,
-                  Valor: inf.valor,
-                };
-              })
-        }
+        data={[
+          ...dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
+            return [inf.codigo, inf.tipo, inf.descripcion_corta, inf.valor];
+          }),
+        ]}
         onSelectRow={(e: any, i: number) => {
           setDataPackage(dataGetPackages?.[i]);
           setShowModal(true);
@@ -346,6 +328,7 @@ const Paquetes = ({
             label="Código Paquete"
             type="text"
             autoComplete="off"
+            maxLength={10}
             value={dataFilters.codigo ?? ""}
             onChange={(ev) => {
               setDataFilters((old) => ({
@@ -361,6 +344,7 @@ const Paquetes = ({
             label="Descripción Paquete"
             type="text"
             autoComplete="off"
+            maxLength={30}
             value={dataFilters.descripcion_corta ?? ""}
             onChange={(e) => {
               setDataFilters((old) => ({
@@ -374,6 +358,7 @@ const Paquetes = ({
             label="Valor"
             autoComplete="off"
             value={dataFilters.valor ?? ""}
+            maxLength={13}
             onInput={(ev, value) => {
               setDataFilters((old) => ({
                 ...old,
