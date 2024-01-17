@@ -102,7 +102,9 @@ const CrearComercios = () => {
     convenio_mt: "",
     convenio_local: "",
     convenio_runt_mt: "",
-    trx_unica_runt_mt: false
+    trx_unica_runt_mt: false,
+    usuario_jwt: "",
+    contrasena_jwt: ""
   });
 
   const handleChangeDispersionPagos = (e) => {
@@ -137,7 +139,20 @@ const CrearComercios = () => {
         trx_unica_runt_mt: true
       }})
     }
-
+    else if (e.target.name === 'usuario_jwt') {
+      setDispersionPagos((old) => {
+        return {
+        ...old,
+        usuario_jwt: e.target.value.replace(/[^0-9]/g, '').slice(0, 30),
+      }})
+    }
+    else if (e.target.name === 'contrasena_jwt') {
+      setDispersionPagos((old) => {
+        return {
+        ...old,
+        contrasena_jwt: e.target.value.slice(0, 100),
+      }})
+    }
   };
 
   const pk_comercio_handled = useMemo(() => {
@@ -463,7 +478,9 @@ const CrearComercios = () => {
         dispersionPagosEnvio["convenio_runt"] != "" &&
         dispersionPagosEnvio["convenio_mt"] != "" &&
         dispersionPagosEnvio["autorizador_local"] != "" &&
-        dispersionPagosEnvio["convenio_local"] != ""
+        dispersionPagosEnvio["convenio_local"] != "" &&
+        dispersionPagosEnvio["usuario_jwt"] != "" &&
+        dispersionPagosEnvio["contrasena_jwt"] != ""
         ){
       postDispersionPagoComercio(dispersionPagosEnvio)
       .then((res) => {
@@ -508,6 +525,8 @@ const CrearComercios = () => {
             convenio_local: res?.obj["convenio_local"],
             convenio_runt_mt: res?.obj["convenio_runt"],
             trx_unica_runt_mt: res?.obj["trx_unica_runt_mt"],
+            usuario_jwt: res?.obj["usuario_jwt"],
+            contrasena_jwt: res?.obj["contrasena_jwt"]
           }})
         }
         else{
@@ -524,6 +543,8 @@ const CrearComercios = () => {
             convenio_local: res?.obj["convenio_local"],
             convenio_runt_mt: "",
             trx_unica_runt_mt: res?.obj["trx_unica_runt_mt"],
+            usuario_jwt: res?.obj["usuario_jwt"],
+            contrasena_jwt: res?.obj["contrasena_jwt"]
           }})
         }
         } 
@@ -1202,7 +1223,9 @@ const CrearComercios = () => {
               dispersionPagos?.convenio_local !== '' ||
               dispersionPagos?.convenio_runt !== '' ||
               dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ?
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
               true : false}
           />
           <Input
@@ -1223,7 +1246,9 @@ const CrearComercios = () => {
               dispersionPagos?.autorizador_runt_mt !== '' ||
               dispersionPagos?.convenio_runt !== '' ||
               dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ?
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
               true : false}
           />
            <Select
@@ -1254,7 +1279,9 @@ const CrearComercios = () => {
               dispersionPagos?.convenio_local !== '' ||
               dispersionPagos?.convenio_runt !== '' ||
               dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ?
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
               true : false}
           />
           <Input
@@ -1276,7 +1303,9 @@ const CrearComercios = () => {
               dispersionPagos?.autorizador_runt_mt !== '' ||
               dispersionPagos?.convenio_local !== '' ||
               dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ?
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
               true : false}
           />
            <Select
@@ -1307,7 +1336,9 @@ const CrearComercios = () => {
               dispersionPagos?.convenio_local !== '' ||
               dispersionPagos?.convenio_runt !== '' ||
               dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ?
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
               true : false}
           />
           <Input
@@ -1329,7 +1360,9 @@ const CrearComercios = () => {
               dispersionPagos?.autorizador_runt_mt !== '' ||
               dispersionPagos?.convenio_local !== '' ||
               dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ?
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
               true : false}
           />
           <Select
@@ -1365,7 +1398,9 @@ const CrearComercios = () => {
                 dispersionPagos?.convenio_local !== '' ||
                 dispersionPagos?.convenio_runt !== '' ||
                 dispersionPagos?.convenio_mt !== '' ||
-                dispersionPagos?.convenio_runt_mt !== '' ?
+                dispersionPagos?.convenio_runt_mt !== '' ||
+                dispersionPagos?.usuario_jwt !== '' ||
+                dispersionPagos?.contrasena_jwt !== '' ?
                 true : false}
           />
           <Input
@@ -1392,8 +1427,56 @@ const CrearComercios = () => {
                 dispersionPagos?.autorizador_runt_mt !== '' ||
                 dispersionPagos?.convenio_local !== '' ||
                 dispersionPagos?.convenio_runt !== '' ||
-                dispersionPagos?.convenio_mt !== '' ?
+                dispersionPagos?.convenio_mt !== '' ||
+                dispersionPagos?.usuario_jwt !== '' ||
+                dispersionPagos?.contrasena_jwt !== '' ?
                 true : false}
+          />
+          <Input
+            key="usuario_jwt"
+            name="usuario_jwt"
+            label="Usuario autenticación"
+            onChange={handleChangeDispersionPagos}
+            type="text"
+            minLength="1"
+            maxLength="30"
+            value={dispersionPagos?.usuario_jwt}
+            placeholder="Ingrese el usuario"
+            autoComplete='off'
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.contrasena_jwt !== '' ?
+              true : false}
+          />
+          <Input
+            key="contrasena_jwt"
+            name="contrasena_jwt"
+            label="Contraseña autenticación"
+            onChange={handleChangeDispersionPagos}
+            type="text"
+            minLength="1"
+            maxLength="100"
+            value={dispersionPagos?.contrasena_jwt}
+            placeholder="Ingrese la contraseña"
+            autoComplete='off'
+            required={
+              dispersionPagos?.autorizador_local !== '' || 
+              dispersionPagos?.autorizador_runt !== '' ||
+              dispersionPagos?.autorizador_mt !== '' ||
+              dispersionPagos?.autorizador_runt_mt !== '' ||
+              dispersionPagos?.convenio_runt !== '' ||
+              dispersionPagos?.convenio_mt !== '' ||
+              dispersionPagos?.convenio_runt_mt !== '' ||
+              dispersionPagos?.convenio_local !== '' ||
+              dispersionPagos?.usuario_jwt !== '' ?
+              true : false}
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
