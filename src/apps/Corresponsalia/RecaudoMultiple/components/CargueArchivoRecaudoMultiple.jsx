@@ -19,6 +19,7 @@ const CargueArchivoRecaudoMultiple = ({
   const [file, setFile] = useState({});
 
   const onChangeFile = (files) => {
+    const selectedFile = files.target.files[0];
     if (Array.isArray(Array.from(files))) {
       files = Array.from(files);
       if (files.length === 1) {
@@ -28,6 +29,18 @@ const CargueArchivoRecaudoMultiple = ({
         if (files.length > 1) {
           notifyError("Se debe ingresar un solo archivo para subir");
         }
+      }
+    }
+    console.log("aqui")
+    if (selectedFile) {
+      const fileName = selectedFile.name.toLowerCase();
+      if (!fileName.endsWith(".csv")) {
+        // Mostrar un mensaje de error o realizar alguna acción
+        notifyError("El archivo seleccionado no es un archivo CSV.");
+        // También podrías limpiar el campo de entrada para que el usuario seleccione otro archivo
+      } else {
+        // Procesar el archivo, por ejemplo, almacenarlo en el estado del componente
+        setFile({ file: selectedFile });
       }
     }
   };
@@ -102,7 +115,7 @@ const CargueArchivoRecaudoMultiple = ({
           setIsUploading(false);
         }); /* notify("Se ha comenzado la carga"); */
     },
-    [file, roleInfo]
+    [file, roleInfo, pdpUser]
   );
   return (
     <>
