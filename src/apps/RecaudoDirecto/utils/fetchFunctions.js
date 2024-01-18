@@ -39,6 +39,28 @@ const buildPostFunction = (url) => {
     }
   };
 };
+
+const buildPostFunctionRecaudo = (url) => {
+  return async (body) => {
+    if (!body) {
+      throw new Error("Sin datos en el body", { cause: "custom" });
+    }
+    try {
+      const newurl = url + '/' + body.recaudo.convenio_id
+      const res = await fetchData(newurl, "POST", {}, body);
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+        throw new Error(res, { cause: "custom" });
+      }
+      return res;
+    } catch (err) {
+      throw err
+    }
+  };
+};
+
 const buildPutFunction = (url) => {
   return async (args, body) => {
     if (!args || !body) {
@@ -98,6 +120,9 @@ export const descargarReporteP = (url) => {
     }
   };
 };
+
+
+
 export const cargueArchivo = (url_cargar, url_verificar) => {
   return async (file, nombre_convenio, convenio_id) => {
 
@@ -168,7 +193,9 @@ export const getRecaudo = () => {
 export const modRecaudo = buildPostFunction(
   `${url}/recaudo/hacer-recaudo`
 );
-
+export const modRecaudoDeposito = buildPostFunctionRecaudo(
+  `${url}/recaudo/hacer-recaudo`
+);
 
 /*--- Convenios Retiro ---*/
 export const getUrlRetirosList = () =>{

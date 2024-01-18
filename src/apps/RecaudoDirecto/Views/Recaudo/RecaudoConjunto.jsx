@@ -10,7 +10,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets";
-import { searchConveniosRecaudoList, modRecaudo, getRecaudo } from "../../utils/fetchFunctions"
+import { searchConveniosRecaudoList, modRecaudo, getRecaudo,modRecaudoDeposito } from "../../utils/fetchFunctions"
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { onChangeNumber } from "../../../../utils/functions";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
@@ -200,23 +200,35 @@ const RecaudoConjunto = () => {
       referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
       referencia_extra: convenioRecaudo?.fk_id_tipo_convenio === 4?dataRecaudo.referencia_extra:referenciaExtra ?? ''
     }
-    if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
-      modRecaudo(data)
-        .then((data) => {
-          data?.status && notify(data?.msg)
-          setPago(data?.obj?.ticket)
-          handleClose()
-        })
-        .catch((err) => {
-          notifyError(String(err));
-          handleClose()
-        });
+    if (pk_id_convenio !== '2') { //ID_CONVENIO_DIRECTO ACUAGYR
+      if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
+        modRecaudo(data)
+          .then((data) => {
+            data?.status && notify(data?.msg)
+            setPago(data?.obj?.ticket)
+            handleClose()
+          })
+          .catch((err) => {
+            notifyError(String(err));
+            handleClose()
+          });
+      }
+      else {
+        setDisableBtn(false);
+        notifyError("El valor recibido no cumple con los limites establecidos")
+      }
+    }else{
+      modRecaudoDeposito(data)
+      .then((data) => {
+        data?.status && notify(data?.msg)
+        setPago(data?.obj?.ticket)
+        handleClose()
+      })
+      .catch((err) => {
+        notifyError(String(err));
+        handleClose()
+      });
     }
-    else {
-      setDisableBtn(false);
-      notifyError("El valor recibido no cumple con los limites establecidos")
-    }
-
   }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites,referenciaExtra])
 
@@ -245,7 +257,7 @@ const RecaudoConjunto = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Recaudos</h1>
       {cargando ? (
-        <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio === 1 || convenioRecaudo?.fk_id_tipo_convenio === 4?
+        <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio !== 3?
           consultarRecaudoD : (e) => { setShowModal(true); e.preventDefault() }} grid>
           <Input
             label='Número de convenio'
@@ -302,7 +314,7 @@ const RecaudoConjunto = () => {
               required />
           )}
           {
-            (convenioRecaudo?.fk_id_tipo_convenio === 3 || convenioRecaudo?.fk_id_tipo_convenio === 2 || valorCodigoBarras) &&
+            (convenioRecaudo?.fk_id_tipo_convenio === 3 || valorCodigoBarras) &&
             <MoneyInput
               label="Valor a recaudar"
               name="valor_total_trx"
@@ -321,7 +333,7 @@ const RecaudoConjunto = () => {
           }
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>
-              {convenioRecaudo?.fk_id_tipo_convenio === 3 || convenioRecaudo?.fk_id_tipo_convenio === 2? "Realizar recaudo" : "Realizar consulta"}
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Realizar recaudo" : "Realizar consulta"}
             </Button>
           </ButtonBar>
         </Form>
@@ -332,7 +344,7 @@ const RecaudoConjunto = () => {
         } </h2> */}
         <Form onSubmit={hacerRecaudo} grid >
           <PaymentSummary summaryTrx={
-            convenioRecaudo?.fk_id_tipo_convenio === 1 || convenioRecaudo?.fk_id_tipo_convenio === 4? 
+            convenioRecaudo?.fk_id_tipo_convenio !== 3? 
               {
                 "Estado": dataRecaudo.nombre_estado ?? "",
                 ...(convenioRecaudo?.fk_id_tipo_convenio === 4 ?{"Referencia extra": dataRecaudo.referencia_extra} : {}),
@@ -356,7 +368,7 @@ const RecaudoConjunto = () => {
               }
           }>
           </PaymentSummary>
-          {convenioRecaudo?.fk_id_tipo_convenio === 1 || convenioRecaudo?.fk_id_tipo_convenio === 4? (
+          {convenioRecaudo?.fk_id_tipo_convenio !== 3? (
             dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
               <MoneyInput
                 label="Valor a recaudar"
@@ -400,7 +412,7 @@ const RecaudoConjunto = () => {
           }
           <ButtonBar>
             <Button type={"submit"} disabled={disableBtn}>
-              {convenioRecaudo?.fk_id_tipo_convenio === 3 || convenioRecaudo?.fk_id_tipo_convenio === 2 ? "Confirmar" : "Aceptar"}
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
             </Button>
             <Button onClick={() => handleClose(true)} >
               Cancelar

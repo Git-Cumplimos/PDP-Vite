@@ -75,9 +75,9 @@ const RecaudoManual = () => {
         )}
         onClickRow={(_, index) => {
           if (listRecaudos[index].estado) {
-            // if (listRecaudos[index].fk_id_tipo_convenio !== 2) {
+            if (listRecaudos[index].fk_id_tipo_convenio !== 2) {
               navigate(`/recaudo-directo/recaudo/${listRecaudos[index].pk_id_convenio_directo}`)
-            // } else { notifyError("Error, convenio con autorizador esta en desarrollo!") }
+            } else { notifyError("Error, convenio con autorizador esta en desarrollo!") }
           } else { notifyError("Error, convenio no activo!") }
         }}
         tblFooter={
