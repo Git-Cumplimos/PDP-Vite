@@ -88,7 +88,7 @@ const Paquetes = ({
     dataPackageInputInitial
   );
   const [dataGetPackages, setDataGetPackages] = useState<
-    TypeTableDataGetPaquetes[] | any
+    TypeTableDataGetPaquetes[]
   >(dataGetPackagesInitial);
   const [dataPackage, setDataPackage] =
     useState<TypeTableDataGetPaquetes | null>(null);
@@ -248,7 +248,7 @@ const Paquetes = ({
     })
       .then((result: TypeOutputTrxPaquetes) => {
         if (result?.status === true) {
-          notify(`Recarga ${operadorCurrent.name} exitosa`);
+          notify(`Compra paquete ${operadorCurrent.name} exitosa`);
           if (result?.ticket !== null) {
             setInfTicket(result?.ticket);
             setTypeInfo("TrxExitosa");
