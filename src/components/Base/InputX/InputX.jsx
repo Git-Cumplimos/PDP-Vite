@@ -87,7 +87,6 @@ const InputX = ({
   );
 
   if (type === "file") {
-    console.log("2")
     input.onChange = (e) => {
       onGetFile?.(e.target.files);
     };
