@@ -18,7 +18,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const dateFormatter = makeDateFormatter(true);
 let Num = 0;
-let totalExtrdiaAnterior = 0;
+
 
 const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
@@ -95,6 +95,7 @@ const PanelHistorico = () => {
   const cierreCaja = useCallback((data) => {
     console.log(data)
     data?.entidades_externas?.data?.map((elemento) => Num=Num+elemento?.valor)
+    let totalExtrdiaAnterior = 0
     if (data?.externos_día_anterior !== null) {
       data?.externos_día_anterior?.data?.map((elemento) => totalExtrdiaAnterior=totalExtrdiaAnterior+elemento?.valor)
     }
@@ -102,8 +103,16 @@ const PanelHistorico = () => {
     const tempTicket = {
       title: "Cierre de caja",
       timeInfo: {
-        "Fecha de pago":new Date(data.created).toLocaleDateString(),
-        Hora: new Date(data.created).toLocaleTimeString('en-CO'),
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date(data.created)),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(new Date(data.created)),
       },
       commerceInfo: [
         ["Id Comercio", data.id_comercio],
@@ -124,11 +133,12 @@ const PanelHistorico = () => {
         ["", ""],
         ["Saldo PDP Fin del Día",formatMoney.format(data?.total_efectivo_en_caja)],
         ["", ""],
-        ["Saldo Externos Fin del Dia",formatMoney.format(Num)],
+        ["Saldo Externos Fin del Día",formatMoney.format(Num)],
         ["", ""],
         ["Saldo Total del Día",formatMoney.format(data?.total_efectivo_en_caja+Num)],
         ["", ""],
         ["Efectivo en Caja",formatMoney.format(data?.total_arqueo)],
+        ["", ""],
       ],
       trxInfo: [
         ["Sobrante", formatMoney.format(data?.total_sobrante)],
@@ -154,8 +164,6 @@ const PanelHistorico = () => {
         elemento?.pk_nombre_plataforma,
         formatMoney.format(elemento?.valor)],["", ""])
     )
-    tempTicket.trxInfo.push(["Consignaciones bancarias externos",formatMoney.format(data?.total_consignaciones_externos)],["", ""])
-    tempTicket.trxInfo.push(["Entregado a transportadora externos",formatMoney.format(data?.total_entrega_externos)],["", ""])
     setResumenCierre(tempTicket);
   }, []);
 

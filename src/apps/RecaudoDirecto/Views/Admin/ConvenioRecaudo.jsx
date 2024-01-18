@@ -73,7 +73,8 @@ const RecaudoDirecto = () => {
   ]
   const tipoArchivoConciliacion = [
     { label: "Reporte Genérico csv", value: "Reporte Generico csv" },
-    { label: "Asobancaria 2001", value: "Asobancaria 2001" }
+    { label: "Asobancaria 2001", value: "Asobancaria 2001" },
+    { label: "Asobancaria 2011", value: "Asobancaria 2011" }
   ]
   const tipoReferenciaExtra = [
     { label: "Número Documento", value: 1 },

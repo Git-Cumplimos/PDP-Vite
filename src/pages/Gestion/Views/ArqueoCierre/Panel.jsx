@@ -230,7 +230,7 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Saldo Externos Fin del Dia",
+                "Saldo Externos Fin del Día",
                 formatMoney.format(Num),
               ],
               ["", ""],
@@ -243,6 +243,7 @@ const Panel = () => {
                 "Efectivo en Caja",
                 formatMoney.format(totalArqueo),
               ],
+              ["", ""],
             ],
             trxInfo: [
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],

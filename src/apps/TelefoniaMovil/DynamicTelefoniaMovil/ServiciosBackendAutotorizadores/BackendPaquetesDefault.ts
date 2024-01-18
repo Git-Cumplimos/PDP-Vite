@@ -1,10 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   TypeInputDataGetPaquetes,
   TypeInputTrxPaquetes,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
-  TypeTableDataGetPaquetes,
+  TypeInputDataGetPaquetesFilters,
+  TypeUseBackendPaquetes,
 } from "../../DynamicTelefoniaMovil/TypeDinamic";
 import {
   ErrorCustomApiGatewayTimeout,
@@ -111,10 +112,11 @@ const get_status_cycle_consult_trx = (
   return status_cycle_consult_trx;
 };
 
-export const useBackendPaquetesDefault = (
-  name_operador: string,
-  autorizador: string,
-  module_: string
+export const useBackendPaquetesDefault: TypeUseBackendPaquetes = (
+  name_operador,
+  autorizador,
+  module_,
+  setLoadingPeticionGlobal
 ) => {
   const hook_name = "useBackendPaquetesDefaul";
   const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
@@ -122,6 +124,10 @@ export const useBackendPaquetesDefault = (
     useState<boolean>(false);
   const [loadingPeticionTrx, setLoadingPeticionTrx] = useState<boolean>(false);
   const [startTimer, stopTimer] = useTimerCustom();
+
+  useEffect(() => {
+    setLoadingPeticionGlobal(loadingPeticionGetPaquetes);
+  }, [loadingPeticionGetPaquetes, setLoadingPeticionGlobal]);
 
   const PeticionGetPaquetes = useCallback(
     async (
@@ -136,11 +142,26 @@ export const useBackendPaquetesDefault = (
         const params = {
           operador: name_operador,
         };
+        const module_info: TypeInputDataGetPaquetesFilters = {
+          limit: dataInputPromises.moduleInfo.limit,
+          page: dataInputPromises.moduleInfo.page,
+        };
+        if (dataInputPromises.moduleInfo.codigo) {
+          module_info.codigo = dataInputPromises.moduleInfo.codigo;
+        }
+        if (dataInputPromises.moduleInfo.tipo) {
+          module_info.tipo = dataInputPromises.moduleInfo.tipo;
+        }
+        if (dataInputPromises.moduleInfo.descripcion_corta) {
+          module_info.descripcion_corta =
+            dataInputPromises.moduleInfo.descripcion_corta;
+        }
+        if (dataInputPromises.moduleInfo.valor) {
+          module_info.valor = dataInputPromises.moduleInfo.valor;
+        }
+
         const body = {
-          module_info: {
-            limit: dataInputPromises.moduleInfo.limit,
-            page: dataInputPromises.moduleInfo.page,
-          },
+          module_info: module_info,
           parameters_operador: dataInputPromises.parameters_operador,
           parameters_submodule: dataInputPromises.parameters_submodule,
         };
@@ -434,5 +455,6 @@ export const useBackendPaquetesDefault = (
     PeticionGetPaquetes,
     loadingPeticionTrx,
     PeticionTrx,
-  ] as const;
+  ];
+  //as const
 };

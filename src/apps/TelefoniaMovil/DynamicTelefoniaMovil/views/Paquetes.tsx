@@ -1,5 +1,5 @@
 import React, {
-  ReactNode,
+  Fragment,
   useCallback,
   useEffect,
   useRef,
@@ -22,45 +22,63 @@ import {
   ErrorCustomFetch,
   descriptionErrorFront,
 } from "../utils/fetchUtils";
-import { formatMoney } from "../../../../components/Base/MoneyInput";
+import MoneyInput, {
+  formatMoney,
+} from "../../../../components/Base/MoneyInput";
 import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
 import {
-  PropOperadoresComponent,
-  TypeInputDataPaquetes,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
+  TypePropsComponentBody,
   TypeTableDataGetPaquetes,
 } from "../TypeDinamic";
 
+//FRAGMENT ********** TYPING ***********
 type TypeInfo = "Ninguno" | "Informacion" | "Resumen" | "TrxExitosa";
 type TypeDataInput = {
   celular: string;
 };
 type TypeInfTicket = { [key: string]: any } | null;
+type TypyDataPagination = {
+  limit: number;
+  page: number;
+};
+type TypeFiltersSinPagination = {
+  codigo?: string; //number
+  tipo?: string;
+  descripcion_corta?: string;
+  valor?: number;
+};
 
-//------ constantes generales--------
+//FRAGMENT ********* CONST ***********
 const dataPackageInputInitial = {
   celular: "",
 };
 
-const dataTableInitial = [
+const dataPaginationInitial: TypyDataPagination = {
+  limit: 10,
+  page: 1,
+};
+const dataGetPackagesInitial: TypeTableDataGetPaquetes[] = [
   {
-    Código: "Buscando ... ",
-    Tipo: "",
-    Descripción: "",
-    Valor: "",
+    codigo: "Buscando ... ",
+    nombre: "",
+    tipo: "",
+    descripcion_corta: "",
+    descripcion_completa: "",
+    valor: "",
   },
 ];
 
+//FRAGMENT ********* COMPONENTE ***********
 const Paquetes = ({
   operadorCurrent,
+  setLoadingPeticionGlobal,
+  loadingPeticionGlobal,
   children,
-}: {
-  operadorCurrent: PropOperadoresComponent;
-  children: ReactNode;
-}) => {
+}: TypePropsComponentBody) => {
   const component_name = "Paquetes";
   const msg = descriptionErrorFront.replace(
     "%s",
@@ -69,41 +87,46 @@ const Paquetes = ({
   const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
     dataPackageInputInitial
   );
-  const [dataGetPackages, setDataGetPackages] = useState<any>([]);
+  const [dataGetPackages, setDataGetPackages] = useState<
+    TypeTableDataGetPaquetes[]
+  >(dataGetPackagesInitial);
   const [dataPackage, setDataPackage] =
     useState<TypeTableDataGetPaquetes | null>(null);
+  const [dataFilters, setDataFilters] = useState<TypeFiltersSinPagination>({});
   const [showModal, setShowModal] = useState<boolean>(false);
   const [typeInfo, setTypeInfo] = useState<TypeInfo>("Ninguno");
   const [infTicket, setInfTicket] = useState<TypeInfTicket>(null);
-  const [pageTable, setPageTable] = useState<{ limit: number; page: number }>({
-    limit: 10,
-    page: 1,
-  });
+  const [dataPagination, setDataPagination] = useState<TypyDataPagination>(
+    dataPaginationInitial
+  );
   const [maxPages, setMaxPages] = useState<number>(1);
   const printDiv = useRef(null);
   const useHookDynamic = operadorCurrent?.backend;
 
-  const [
-    loadingPeticionGetPaquetes,
-    PeticionGetPaquetes,
-    loadingPeticionTrx,
-    PeticionTrx,
-  ] = useHookDynamic(
-    operadorCurrent.name,
-    operadorCurrent.autorizador,
-    component_name.toLowerCase()
-  );
+  const [, PeticionGetPaquetes, loadingPeticionTrx, PeticionTrx] = //esta bien la coma inicial, es para no tomar el valor inicial, por que no lo uso
+    useHookDynamic(
+      operadorCurrent.operador,
+      operadorCurrent.autorizador,
+      component_name.toLowerCase(),
+      setLoadingPeticionGlobal
+    );
   const validNavigate = useNavigate();
   const id_uuid = v4();
   const { roleInfo, pdpUser }: any = useAuth();
 
   useEffect(() => {
+    setDataFilters({});
+    setDataPagination(dataPaginationInitial);
+    setDataGetPackages(dataGetPackagesInitial);
+  }, [operadorCurrent.name]);
+
+  useEffect(() => {
     PeticionGetPaquetes({
       roleInfo: roleInfo,
       pdpUser: pdpUser,
-      moduleInfo: { page: pageTable.page, limit: pageTable.limit },
-      parameters_operador: operadorCurrent.parameters_operador,
-      parameters_submodule: operadorCurrent.parameters_submodule,
+      moduleInfo: { ...dataFilters, ...dataPagination },
+      parameters_operador: {},
+      parameters_submodule: {},
     })
       .then((response: TypeOutputDataGetPaquetes) => {
         setDataGetPackages(response?.results);
@@ -121,12 +144,11 @@ const Paquetes = ({
         setDataGetPackages([]);
       });
   }, [
-    operadorCurrent,
     roleInfo,
     pdpUser,
     PeticionGetPaquetes,
-    pageTable.limit,
-    pageTable.page,
+    dataFilters,
+    dataPagination,
     component_name,
     msg,
   ]);
@@ -174,35 +196,34 @@ const Paquetes = ({
     HandleCloseTrxExitosa,
   ]);
 
-  const onChangeInput = useCallback((e) => {
-    let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
-    if (valueInput[0] !== "3") {
-      if (valueInput !== "") {
-        notifyError(
-          "Número inválido, el No. de celular debe comenzar con el número 3",
-          5000,
-          {
-            toastId: "notify-lot-celular",
-          }
-        );
-        valueInput = "";
+  const onChangeInput = useCallback(
+    (e) => {
+      let valueInput = ((e.target.value ?? "").match(/\d/g) ?? []).join("");
+      if (
+        valueInput[0] !== "3" &&
+        (operadorCurrent?.parameters_operador["celular_check"] ?? true) === true
+      ) {
+        if (valueInput !== "") {
+          notifyError(
+            "Número inválido, el No. de celular debe comenzar con el número 3",
+            5000,
+            {
+              toastId: "notify-lot-celular",
+            }
+          );
+          valueInput = "";
+        }
       }
-    }
-    setDataPackageInput((anterior) => ({
-      ...anterior,
-      [e.target.name]: valueInput,
-    }));
-  }, []);
+      setDataPackageInput((anterior) => ({
+        ...anterior,
+        [e.target.name]: valueInput,
+      }));
+    },
+    [operadorCurrent?.parameters_operador]
+  );
 
   const ValidarAntesCompraPaquete = useCallback((e) => {
     e.preventDefault();
-    // if (statePermissionTrx === false) {
-    //   notify(
-    //     "No se podra realizar la compra de paquetes a movistar porque el usuario no es un comercio, ni oficina propia o kiosko."
-    //   );
-    //   return;
-    // }
-    //RealizarCompra
     setShowModal(true);
     setTypeInfo("Resumen");
   }, []);
@@ -227,7 +248,7 @@ const Paquetes = ({
     })
       .then((result: TypeOutputTrxPaquetes) => {
         if (result?.status === true) {
-          notify(`Recarga ${operadorCurrent.name} exitosa`);
+          notify(`Compra paquete ${operadorCurrent.name} exitosa`);
           if (result?.ticket !== null) {
             setInfTicket(result?.ticket);
             setTypeInfo("TrxExitosa");
@@ -300,25 +321,65 @@ const Paquetes = ({
         title={"Paquetes"}
         maxPage={maxPages}
         headers={["Código", "Tipo", "Descripción", "Valor"]}
-        data={
-          loadingPeticionGetPaquetes
-            ? dataTableInitial
-            : dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
-                return {
-                  Código: inf.codigo,
-                  Tipo: inf.tipo,
-                  Descripción: inf.descripcion_corta,
-                  Valor: inf.valor,
-                };
-              })
-        }
+        data={[
+          ...dataGetPackages?.map((inf: TypeTableDataGetPaquetes) => {
+            return [inf.codigo, inf.tipo, inf.descripcion_corta, inf.valor];
+          }),
+        ]}
         onSelectRow={(e: any, i: number) => {
           setDataPackage(dataGetPackages?.[i]);
           setShowModal(true);
           setTypeInfo("Informacion");
         }}
-        onSetPageData={setPageTable}
-      ></TableEnterprise>
+        onSetPageData={setDataPagination}
+      >
+        <Fragment>
+          <Input
+            name="codigo"
+            label="Código Paquete"
+            type="text"
+            autoComplete="off"
+            maxLength={10}
+            value={dataFilters.codigo ?? ""}
+            onChange={(ev) => {
+              setDataFilters((old) => ({
+                ...old,
+                [ev.target.name]: (
+                  (ev.target.value ?? "").match(/\d/g) ?? []
+                ).join(""),
+              }));
+            }}
+          />
+          <Input
+            name="descripcion_corta"
+            label="Descripción Paquete"
+            type="text"
+            autoComplete="off"
+            maxLength={30}
+            value={dataFilters.descripcion_corta ?? ""}
+            onChange={(e) => {
+              setDataFilters((old) => ({
+                ...old,
+                [e.target.name]: e.target.value,
+              }));
+            }}
+          />
+          <MoneyInput
+            name="valor"
+            label="Valor"
+            autoComplete="off"
+            value={dataFilters.valor ?? ""}
+            maxLength={9}
+            onInput={(ev, value) => {
+              setDataFilters((old) => ({
+                ...old,
+                valor: value,
+              }));
+            }}
+            required
+          />
+        </Fragment>
+      </TableEnterprise>
 
       <Modal show={showModal} handleClose={handleCloseModal}>
         {/******************************ResumenPaquete*******************************************************/}
@@ -331,7 +392,9 @@ const Paquetes = ({
               {dataPackage?.descripcion_completa}
             </label>
             <label>
-              {`Valor: ${formatMoney.format(dataPackage?.valor ?? 0)}`}
+              {`Valor: ${formatMoney.format(
+                parseInt(dataPackage?.valor ?? "0")
+              )}`}
             </label>
             <Form
               onChange={onChangeInput}
@@ -343,8 +406,12 @@ const Paquetes = ({
                 label="Número de celular"
                 type="tel"
                 autoComplete="off"
-                minLength={10}
-                maxLength={10}
+                minLength={
+                  operadorCurrent?.parameters_operador["celular_tam_min"] ?? 10
+                }
+                maxLength={
+                  operadorCurrent?.parameters_operador["celular_tam_max"] ?? 10
+                }
                 value={dataPackageInput.celular}
                 required
               />
@@ -363,7 +430,7 @@ const Paquetes = ({
             subtitle="Resumen de transacción"
             summaryTrx={{
               Celular: toPhoneNumber(dataPackageInput.celular),
-              Valor: formatMoney.format(dataPackage?.valor ?? 0),
+              Valor: formatMoney.format(parseInt(dataPackage?.valor ?? "0")),
               "Tipo de Oferta": dataPackage?.tipo,
               "Descripción Corta": dataPackage?.descripcion_corta,
               "Código de la Oferta": dataPackage?.codigo,

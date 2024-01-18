@@ -10,7 +10,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets";
-import { searchConveniosRecaudoList, modRecaudo, getRecaudo } from "../../utils/fetchFunctions"
+import { searchConveniosRecaudoList, modRecaudo, getRecaudo,modRecaudoDeposito } from "../../utils/fetchFunctions"
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { onChangeNumber } from "../../../../utils/functions";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
@@ -193,31 +193,42 @@ const RecaudoConjunto = () => {
     let tipo = dataRecaudo?.fk_modificar_valor !== 1 ? 2 : 1
     resp = ValidacionTRX[tipo]?.() || { estado: false };
 
-    data.recaudo = {
+    data.recaudo = {  
       convenio_id: pk_id_convenio,
       nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
       pk_id_recaudo: dataRecaudo.pk_id_recaudo,
       referencias: Object.values(dataReferencias).filter((ref) => ref !== ''),
       referencia_extra: convenioRecaudo?.fk_id_tipo_convenio === 4?dataRecaudo.referencia_extra:referenciaExtra ?? ''
     }
-    if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
-      modRecaudo(data)
-        .then((data) => {
-          data?.status && notify(data?.msg)
-          setPago(data?.obj?.ticket)
-          handleClose()
-        })
-        .catch((err) => {
-          notifyError(String(err));
-          handleClose()
-        });
-
+    if (pk_id_convenio !== '2') { //ID_CONVENIO_DIRECTO ACUAGYR
+      if ((convenioRecaudo?.fk_id_tipo_convenio !== 3 && resp.estado) || convenioRecaudo?.fk_id_tipo_convenio === 3) {
+        modRecaudo(data)
+          .then((data) => {
+            data?.status && notify(data?.msg)
+            setPago(data?.obj?.ticket)
+            handleClose()
+          })
+          .catch((err) => {
+            notifyError(String(err));
+            handleClose()
+          });
+      }
+      else {
+        setDisableBtn(false);
+        notifyError("El valor recibido no cumple con los limites establecidos")
+      }
+    }else{
+      modRecaudoDeposito(data)
+      .then((data) => {
+        data?.status && notify(data?.msg)
+        setPago(data?.obj?.ticket)
+        handleClose()
+      })
+      .catch((err) => {
+        notifyError(String(err));
+        handleClose()
+      });
     }
-    else {
-      setDisableBtn(false);
-      notifyError("El valor recibido no cumple con los limites establecidos")
-    }
-
   }, [roleInfo, pdpUser, valorRecibido, dataRecaudo, id_trx,
     pk_id_convenio, convenioRecaudo, dataReferencias, handleClose, validarLimites,referenciaExtra])
 
@@ -246,7 +257,7 @@ const RecaudoConjunto = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Recaudos</h1>
       {cargando ? (
-        <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio !== 3 ?
+        <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio !== 3?
           consultarRecaudoD : (e) => { setShowModal(true); e.preventDefault() }} grid>
           <Input
             label='Número de convenio'
@@ -333,7 +344,7 @@ const RecaudoConjunto = () => {
         } </h2> */}
         <Form onSubmit={hacerRecaudo} grid >
           <PaymentSummary summaryTrx={
-            convenioRecaudo?.fk_id_tipo_convenio !== 3 ? 
+            convenioRecaudo?.fk_id_tipo_convenio !== 3? 
               {
                 "Estado": dataRecaudo.nombre_estado ?? "",
                 ...(convenioRecaudo?.fk_id_tipo_convenio === 4 ?{"Referencia extra": dataRecaudo.referencia_extra} : {}),
@@ -357,7 +368,7 @@ const RecaudoConjunto = () => {
               }
           }>
           </PaymentSummary>
-          {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
+          {convenioRecaudo?.fk_id_tipo_convenio !== 3? (
             dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
               <MoneyInput
                 label="Valor a recaudar"
