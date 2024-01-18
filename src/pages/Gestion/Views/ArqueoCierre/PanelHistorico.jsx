@@ -102,8 +102,16 @@ const PanelHistorico = () => {
     const tempTicket = {
       title: "Cierre de caja",
       timeInfo: {
-        "Fecha de pago":new Date(data.created).toLocaleDateString(),
-        Hora: new Date(data.created).toLocaleTimeString('en-CO'),
+        "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date(data.created)),
+        Hora: Intl.DateTimeFormat("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(new Date(data.created)),
       },
       commerceInfo: [
         ["Id Comercio", data.id_comercio],
