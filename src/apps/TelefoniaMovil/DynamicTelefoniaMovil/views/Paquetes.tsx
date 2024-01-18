@@ -87,9 +87,9 @@ const Paquetes = ({
   const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
     dataPackageInputInitial
   );
-  const [dataGetPackages, setDataGetPackages] = useState<any>(
-    dataGetPackagesInitial
-  );
+  const [dataGetPackages, setDataGetPackages] = useState<
+    TypeTableDataGetPaquetes[] | any
+  >(dataGetPackagesInitial);
   const [dataPackage, setDataPackage] =
     useState<TypeTableDataGetPaquetes | null>(null);
   const [dataFilters, setDataFilters] = useState<TypeFiltersSinPagination>({});

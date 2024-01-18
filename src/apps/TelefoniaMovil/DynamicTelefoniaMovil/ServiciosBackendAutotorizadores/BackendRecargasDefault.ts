@@ -1,7 +1,8 @@
-import { useCallback, useState, Dispatch, SetStateAction } from "react";
+import { useCallback, useState } from "react";
 import {
   TypeInputPromisesRecargas,
   TypeOutputDataRecargas,
+  TypeUseBackendRecargas,
 } from "../TypeDinamic";
 import {
   ErrorCustomApiGatewayTimeout,
@@ -111,11 +112,11 @@ const get_status_cycle_consult_trx = (
   return status_cycle_consult_trx;
 };
 
-export const useBackendRecargasDefault = (
-  name_operador: string,
-  autorizador: string,
-  module_: string,
-  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>
+export const useBackendRecargasDefault: TypeUseBackendRecargas = (
+  name_operador,
+  autorizador,
+  module_,
+  setLoadingPeticionGlobal
 ) => {
   const hook_name = "useBackendRecargasDefault";
   const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
@@ -369,8 +370,17 @@ export const useBackendRecargasDefault = (
       stopTimer();
       return response;
     },
-    [autorizador, module_, name_operador, startTimer, stopTimer, CyclePeticion]
+    [
+      autorizador,
+      module_,
+      name_operador,
+      startTimer,
+      stopTimer,
+      CyclePeticion,
+      name_service,
+    ]
   );
 
-  return [statePeticion, PeticionRecargar] as const;
+  return [statePeticion, PeticionRecargar];
+  //as const;
 };

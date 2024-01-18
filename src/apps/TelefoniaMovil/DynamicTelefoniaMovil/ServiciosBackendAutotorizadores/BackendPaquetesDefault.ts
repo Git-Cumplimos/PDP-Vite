@@ -1,16 +1,11 @@
-import {
-  useCallback,
-  useState,
-  useEffect,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { useCallback, useState, useEffect } from "react";
 import {
   TypeInputDataGetPaquetes,
   TypeInputTrxPaquetes,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
   TypeInputDataGetPaquetesFilters,
+  TypeUseBackendPaquetes,
 } from "../../DynamicTelefoniaMovil/TypeDinamic";
 import {
   ErrorCustomApiGatewayTimeout,
@@ -117,11 +112,11 @@ const get_status_cycle_consult_trx = (
   return status_cycle_consult_trx;
 };
 
-export const useBackendPaquetesDefault = (
-  name_operador: string,
-  autorizador: string,
-  module_: string,
-  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>
+export const useBackendPaquetesDefault: TypeUseBackendPaquetes = (
+  name_operador,
+  autorizador,
+  module_,
+  setLoadingPeticionGlobal
 ) => {
   const hook_name = "useBackendPaquetesDefaul";
   const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
@@ -460,5 +455,6 @@ export const useBackendPaquetesDefault = (
     PeticionGetPaquetes,
     loadingPeticionTrx,
     PeticionTrx,
-  ] as const;
+  ];
+  //as const
 };

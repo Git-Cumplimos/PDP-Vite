@@ -18,7 +18,7 @@ const { Lineadivisora, Mensaje } = classes;
 const WithTelefoniaMovil = (
   ComponectBody: FunctionComponent<any>,
   componectName: string
-) => {
+): JSX.Element => {
   const [operadores, setOperadores] = useState<PropOperadoresComponent[]>([]);
   const [operadorCurrent, setOperadorCurrent] =
     useState<PropOperadoresComponent | null>(null);

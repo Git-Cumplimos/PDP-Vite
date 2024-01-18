@@ -16,7 +16,11 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary/Payme
 import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { PropComponectBody, TypeOutputDataRecargas } from "../TypeDinamic";
+import {
+  PropComponectBody,
+  TypeInputDataRecargas,
+  TypeOutputDataRecargas,
+} from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 import {
@@ -30,16 +34,12 @@ import { v4 } from "uuid";
 
 //FRAGMENT ********** TYPING ***********
 type TypeInfo = "Ninguno" | "Resumen" | "TrxExitosa";
-type TypeDataRecarga = {
-  celular: string;
-  valor_total_trx: number;
-};
 type TypeInfTicket = { [key: string]: any } | null;
 
 //FRAGMENT ********* CONST ***********
 const minValor = 1000;
 const maxValor = 100000;
-const dataRecargaInitial = {
+const dataRecargaInitial: TypeInputDataRecargas = {
   celular: "",
   valor_total_trx: 0,
 };
@@ -53,7 +53,7 @@ const Recargas = ({
 }: PropComponectBody): JSX.Element => {
   const component_name = "Recargas";
   const [dataRecarga, setDataRecarga] =
-    useState<TypeDataRecarga>(dataRecargaInitial);
+    useState<TypeInputDataRecargas>(dataRecargaInitial);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [infTicket, setInfTicket] = useState<TypeInfTicket>(null);
   const [typeInfo, setTypeInfo] = useState<TypeInfo>("Ninguno");
