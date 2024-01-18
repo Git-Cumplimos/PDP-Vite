@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { notifyError } from "../../../../../utils/notify";
 import { useImgs } from "../../../../../hooks/ImgsHooks";
 
-import { PropOperadoresComponent } from "../../TypeDinamic";
+import {
+  PropOperadoresComponent,
+  TypePropsComponentBody,
+} from "../../TypeDinamic";
 import useHookFetchLayouts, {
   errorFront_servicio,
 } from "../../hook/useHookFetchLayouts";
@@ -16,8 +19,8 @@ import { ErrorCustomFetch } from "../../utils/fetchUtils";
 const { Lineadivisora, Mensaje } = classes;
 
 const WithTelefoniaMovil = (
-  ComponectBody: FunctionComponent<any>,
-  componectName: string
+  ComponectBody: FunctionComponent<TypePropsComponentBody>,
+  componectName: "Recargas" | "Paquetes"
 ): JSX.Element => {
   const [operadores, setOperadores] = useState<PropOperadoresComponent[]>([]);
   const [operadorCurrent, setOperadorCurrent] =

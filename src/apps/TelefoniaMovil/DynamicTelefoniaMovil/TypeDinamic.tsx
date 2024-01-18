@@ -125,7 +125,7 @@ export type PropOperadoresComponent = {
   parameters_submodule: { [key: string]: any };
 };
 
-export type PropComponectBody = {
+export type TypePropsComponentBody = {
   operadorCurrent: PropOperadoresComponent;
   setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>;
   loadingPeticionGlobal: Boolean;

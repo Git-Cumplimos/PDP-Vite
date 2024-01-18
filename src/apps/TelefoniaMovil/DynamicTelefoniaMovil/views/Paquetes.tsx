@@ -29,9 +29,9 @@ import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
 import {
-  PropComponectBody,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
+  TypePropsComponentBody,
   TypeTableDataGetPaquetes,
 } from "../TypeDinamic";
 
@@ -78,7 +78,7 @@ const Paquetes = ({
   setLoadingPeticionGlobal,
   loadingPeticionGlobal,
   children,
-}: PropComponectBody): JSX.Element => {
+}: TypePropsComponentBody) => {
   const component_name = "Paquetes";
   const msg = descriptionErrorFront.replace(
     "%s",

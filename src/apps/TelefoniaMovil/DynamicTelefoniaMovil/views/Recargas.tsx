@@ -17,9 +17,9 @@ import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import {
-  PropComponectBody,
   TypeInputDataRecargas,
   TypeOutputDataRecargas,
+  TypePropsComponentBody,
 } from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
@@ -50,7 +50,7 @@ const Recargas = ({
   setLoadingPeticionGlobal,
   loadingPeticionGlobal,
   children,
-}: PropComponectBody): JSX.Element => {
+}: TypePropsComponentBody) => {
   const component_name = "Recargas";
   const [dataRecarga, setDataRecarga] =
     useState<TypeInputDataRecargas>(dataRecargaInitial);
