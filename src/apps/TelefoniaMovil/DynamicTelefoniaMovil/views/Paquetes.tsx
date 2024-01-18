@@ -248,7 +248,7 @@ const Paquetes = ({
     })
       .then((result: TypeOutputTrxPaquetes) => {
         if (result?.status === true) {
-          notify(`Recarga ${operadorCurrent.name} exitosa`);
+          notify(`Compra paquete ${operadorCurrent.name} exitosa`);
           if (result?.ticket !== null) {
             setInfTicket(result?.ticket);
             setTypeInfo("TrxExitosa");
