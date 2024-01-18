@@ -193,7 +193,7 @@ const RecaudoConjunto = () => {
     let tipo = dataRecaudo?.fk_modificar_valor !== 1 ? 2 : 1
     resp = ValidacionTRX[tipo]?.() || { estado: false };
 
-    data.recaudo = {
+    data.recaudo = {  
       convenio_id: pk_id_convenio,
       nombre_convenio: convenioRecaudo?.nombre_convenio ?? "",
       pk_id_recaudo: dataRecaudo.pk_id_recaudo,
@@ -211,7 +211,6 @@ const RecaudoConjunto = () => {
           notifyError(String(err));
           handleClose()
         });
-
     }
     else {
       setDisableBtn(false);
@@ -246,7 +245,7 @@ const RecaudoConjunto = () => {
     <Fragment>
       <h1 className="text-3xl mt-6">Recaudos</h1>
       {cargando ? (
-        <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio !== 3 ?
+        <Form onSubmit={convenioRecaudo?.fk_id_tipo_convenio === 1 || convenioRecaudo?.fk_id_tipo_convenio === 4?
           consultarRecaudoD : (e) => { setShowModal(true); e.preventDefault() }} grid>
           <Input
             label='Número de convenio'
@@ -303,7 +302,7 @@ const RecaudoConjunto = () => {
               required />
           )}
           {
-            (convenioRecaudo?.fk_id_tipo_convenio === 3 || valorCodigoBarras) &&
+            (convenioRecaudo?.fk_id_tipo_convenio === 3 || convenioRecaudo?.fk_id_tipo_convenio === 2 || valorCodigoBarras) &&
             <MoneyInput
               label="Valor a recaudar"
               name="valor_total_trx"
@@ -322,7 +321,7 @@ const RecaudoConjunto = () => {
           }
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>
-              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Realizar recaudo" : "Realizar consulta"}
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 || convenioRecaudo?.fk_id_tipo_convenio === 2? "Realizar recaudo" : "Realizar consulta"}
             </Button>
           </ButtonBar>
         </Form>
@@ -333,7 +332,7 @@ const RecaudoConjunto = () => {
         } </h2> */}
         <Form onSubmit={hacerRecaudo} grid >
           <PaymentSummary summaryTrx={
-            convenioRecaudo?.fk_id_tipo_convenio !== 3 ? 
+            convenioRecaudo?.fk_id_tipo_convenio === 1 || convenioRecaudo?.fk_id_tipo_convenio === 4? 
               {
                 "Estado": dataRecaudo.nombre_estado ?? "",
                 ...(convenioRecaudo?.fk_id_tipo_convenio === 4 ?{"Referencia extra": dataRecaudo.referencia_extra} : {}),
@@ -357,7 +356,7 @@ const RecaudoConjunto = () => {
               }
           }>
           </PaymentSummary>
-          {convenioRecaudo?.fk_id_tipo_convenio !== 3 ? (
+          {convenioRecaudo?.fk_id_tipo_convenio === 1 || convenioRecaudo?.fk_id_tipo_convenio === 4? (
             dataRecaudo?.fk_modificar_valor === 1 || valorCodigoBarras ? (
               <MoneyInput
                 label="Valor a recaudar"
@@ -401,7 +400,7 @@ const RecaudoConjunto = () => {
           }
           <ButtonBar>
             <Button type={"submit"} disabled={disableBtn}>
-              {convenioRecaudo?.fk_id_tipo_convenio === 3 ? "Confirmar" : "Aceptar"}
+              {convenioRecaudo?.fk_id_tipo_convenio === 3 || convenioRecaudo?.fk_id_tipo_convenio === 2 ? "Confirmar" : "Aceptar"}
             </Button>
             <Button onClick={() => handleClose(true)} >
               Cancelar
