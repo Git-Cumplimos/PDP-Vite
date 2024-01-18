@@ -18,7 +18,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const dateFormatter = makeDateFormatter(true);
 let Num = 0;
-let totalExtrdiaAnterior = 0;
+
 
 const PanelHistorico = () => {
   const [receipt, setReceipt] = useState([]);
@@ -95,6 +95,7 @@ const PanelHistorico = () => {
   const cierreCaja = useCallback((data) => {
     console.log(data)
     data?.entidades_externas?.data?.map((elemento) => Num=Num+elemento?.valor)
+    let totalExtrdiaAnterior = 0
     if (data?.externos_día_anterior !== null) {
       data?.externos_día_anterior?.data?.map((elemento) => totalExtrdiaAnterior=totalExtrdiaAnterior+elemento?.valor)
     }
