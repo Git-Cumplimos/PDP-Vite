@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from "react";
-import HNavbar from "../../components/Base/HNavbar";
 import { useUrls } from "../../hooks/UrlsHooks";
 import Error403 from "../Error403";
 import classes from "./Subcategorias.module.css";
@@ -22,7 +21,7 @@ const Subcategorias = ({ comercios = [], title = "" }) => {
     let matchingApps = [];
 
     apps.forEach((app) => {
-      if (comercios.includes(app?.label?.props?.name)) {
+      if (comercios.includes(app?.link)) {
         matchingApps.push(app);
       }
 
