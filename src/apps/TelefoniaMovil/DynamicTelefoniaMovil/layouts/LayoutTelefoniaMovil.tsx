@@ -4,7 +4,9 @@ import { PropOperadoresComponent } from "../TypeDinamic";
 import { useImgs } from "../../../../hooks/ImgsHooks";
 
 import classes from "./LayoutTelefoniaMovil.module.css";
+import { notifyError } from "../../../../utils/notify";
 
+//FRAGMENT ********* CONST PARA CSS ***********
 const {
   contenedorLayoutTelefoniaMovil,
   zoom,
@@ -13,12 +15,15 @@ const {
   contenedorImg,
 } = classes;
 
+//FRAGMENT ********* COMPONENTE ***********
 const LayoutTelefoniaMovil = ({
   operadores,
   setOperadorCurrent,
+  loadingPeticionGlobal,
 }: {
   operadores: PropOperadoresComponent[];
   setOperadorCurrent: Dispatch<SetStateAction<PropOperadoresComponent | null>>;
+  loadingPeticionGlobal: Boolean;
 }) => {
   const { svgs }: any = useImgs();
   return (
@@ -26,9 +31,18 @@ const LayoutTelefoniaMovil = ({
       {operadores.map((operadorInd) => (
         <div
           className={contenedorImg}
-          onClick={() => {
-            setOperadorCurrent(operadorInd);
-          }}
+          onClick={
+            loadingPeticionGlobal
+              ? () =>
+                  notifyError(
+                    "No puede seleccionar un nuevo operador, hasta que termine la búsqueda del anterior operador",
+                    1000,
+                    {
+                      toastId: "notify-lot-busqueda",
+                    }
+                  )
+              : () => setOperadorCurrent(operadorInd)
+          }
         >
           <nav>
             <ul>

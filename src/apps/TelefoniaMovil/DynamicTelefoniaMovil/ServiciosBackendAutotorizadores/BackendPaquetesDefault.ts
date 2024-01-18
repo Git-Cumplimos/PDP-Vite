@@ -1,4 +1,10 @@
-import { useCallback, useState } from "react";
+import {
+  useCallback,
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import {
   TypeInputDataGetPaquetes,
   TypeInputTrxPaquetes,
@@ -114,7 +120,8 @@ const get_status_cycle_consult_trx = (
 export const useBackendPaquetesDefault = (
   name_operador: string,
   autorizador: string,
-  module_: string
+  module_: string,
+  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>
 ) => {
   const hook_name = "useBackendPaquetesDefaul";
   const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
@@ -122,6 +129,10 @@ export const useBackendPaquetesDefault = (
     useState<boolean>(false);
   const [loadingPeticionTrx, setLoadingPeticionTrx] = useState<boolean>(false);
   const [startTimer, stopTimer] = useTimerCustom();
+
+  useEffect(() => {
+    setLoadingPeticionGlobal(loadingPeticionGetPaquetes);
+  }, [loadingPeticionGetPaquetes, setLoadingPeticionGlobal]);
 
   const PeticionGetPaquetes = useCallback(
     async (

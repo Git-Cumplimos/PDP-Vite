@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Dispatch, SetStateAction } from "react";
 
 export type TypeInputPromises<TypeDependsModule> = {
   roleInfo: { [key: string]: any };
@@ -38,12 +38,12 @@ export type TypeInputDataGetPaquetes =
   TypeInputPromises<TypeInputDataGetPaquetesFilters>;
 
 export type TypeTableDataGetPaquetes = {
-  codigo: number;
+  codigo: string; //str-number
   nombre: string;
   tipo: string;
   descripcion_corta: string;
   descripcion_completa: string;
-  valor: number;
+  valor: string; //str-number
 };
 
 export type TypeOutputDataGetPaquetes = {
@@ -70,6 +70,7 @@ export type TypeOutputTrxPaquetes = {
   ticket: { [key: string]: any } | null;
 };
 
+//----------------------------------
 export type TypeBackendPaquetes = any;
 
 export type TypeBackendCargarPaquetes = {
@@ -89,14 +90,6 @@ export type TypeSubModules<_TypeSubModules_> = {
   descargarConciliacion: _TypeSubModules_;
 } & { [key: string]: _TypeSubModules_ };
 
-export type TypeRouteModule = {
-  link: string;
-  label: ReactNode;
-  component: ReactNode;
-  permission: number[];
-  subRoutes?: TypeRouteModule[];
-};
-
 export type PropOperadoresComponent = {
   autorizador: string;
   name: string;
@@ -106,4 +99,11 @@ export type PropOperadoresComponent = {
   permission: number[];
   parameters_operador: { [key: string]: any };
   parameters_submodule: { [key: string]: any };
+};
+
+export type PropComponectBody = {
+  operadorCurrent: PropOperadoresComponent;
+  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>;
+  loadingPeticionGlobal: Boolean;
+  children: ReactNode;
 };

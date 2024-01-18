@@ -1,6 +1,5 @@
 import React, {
   Fragment,
-  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -30,7 +29,7 @@ import { useNavigate } from "react-router-dom";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
 import {
-  PropOperadoresComponent,
+  PropComponectBody,
   TypeOutputDataGetPaquetes,
   TypeOutputTrxPaquetes,
   TypeTableDataGetPaquetes,
@@ -62,15 +61,24 @@ const dataPaginationInitial: TypyDataPagination = {
   limit: 10,
   page: 1,
 };
+const dataGetPackagesInitial: TypeTableDataGetPaquetes[] = [
+  {
+    codigo: "Buscando ... ",
+    nombre: "",
+    tipo: "",
+    descripcion_corta: "",
+    descripcion_completa: "",
+    valor: "",
+  },
+];
 
 //FRAGMENT ********* COMPONENTE ***********
 const Paquetes = ({
   operadorCurrent,
+  setLoadingPeticionGlobal,
+  loadingPeticionGlobal,
   children,
-}: {
-  operadorCurrent: PropOperadoresComponent;
-  children: ReactNode;
-}) => {
+}: PropComponectBody): JSX.Element => {
   const component_name = "Paquetes";
   const msg = descriptionErrorFront.replace(
     "%s",
@@ -79,7 +87,9 @@ const Paquetes = ({
   const [dataPackageInput, setDataPackageInput] = useState<TypeDataInput>(
     dataPackageInputInitial
   );
-  const [dataGetPackages, setDataGetPackages] = useState<any>([]);
+  const [dataGetPackages, setDataGetPackages] = useState<any>(
+    dataGetPackagesInitial
+  );
   const [dataPackage, setDataPackage] =
     useState<TypeTableDataGetPaquetes | null>(null);
   const [dataFilters, setDataFilters] = useState<TypeFiltersSinPagination>({});
@@ -97,7 +107,8 @@ const Paquetes = ({
     useHookDynamic(
       operadorCurrent.operador,
       operadorCurrent.autorizador,
-      component_name.toLowerCase()
+      component_name.toLowerCase(),
+      setLoadingPeticionGlobal
     );
   const validNavigate = useNavigate();
   const id_uuid = v4();
@@ -106,7 +117,7 @@ const Paquetes = ({
   useEffect(() => {
     setDataFilters({});
     setDataPagination(dataPaginationInitial);
-    setDataGetPackages([]);
+    setDataGetPackages(dataGetPackagesInitial);
   }, [operadorCurrent.name]);
 
   useEffect(() => {
@@ -381,7 +392,9 @@ const Paquetes = ({
               {dataPackage?.descripcion_completa}
             </label>
             <label>
-              {`Valor: ${formatMoney.format(dataPackage?.valor ?? 0)}`}
+              {`Valor: ${formatMoney.format(
+                parseInt(dataPackage?.valor ?? "0")
+              )}`}
             </label>
             <Form
               onChange={onChangeInput}
@@ -417,7 +430,7 @@ const Paquetes = ({
             subtitle="Resumen de transacción"
             summaryTrx={{
               Celular: toPhoneNumber(dataPackageInput.celular),
-              Valor: formatMoney.format(dataPackage?.valor ?? 0),
+              Valor: formatMoney.format(parseInt(dataPackage?.valor ?? "0")),
               "Tipo de Oferta": dataPackage?.tipo,
               "Descripción Corta": dataPackage?.descripcion_corta,
               "Código de la Oferta": dataPackage?.codigo,

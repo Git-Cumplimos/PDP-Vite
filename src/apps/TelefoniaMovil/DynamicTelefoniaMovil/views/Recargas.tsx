@@ -1,6 +1,5 @@
 import React, {
   FormEvent,
-  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -17,10 +16,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary/Payme
 import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import {
-  PropOperadoresComponent,
-  TypeOutputDataRecargas,
-} from "../TypeDinamic";
+import { PropComponectBody, TypeOutputDataRecargas } from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
 import {
@@ -32,7 +28,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 
-//------ typíng--------
+//FRAGMENT ********** TYPING ***********
 type TypeInfo = "Ninguno" | "Resumen" | "TrxExitosa";
 type TypeDataRecarga = {
   celular: string;
@@ -40,7 +36,7 @@ type TypeDataRecarga = {
 };
 type TypeInfTicket = { [key: string]: any } | null;
 
-//------ constantes generales--------
+//FRAGMENT ********* CONST ***********
 const minValor = 1000;
 const maxValor = 100000;
 const dataRecargaInitial = {
@@ -48,13 +44,13 @@ const dataRecargaInitial = {
   valor_total_trx: 0,
 };
 
+//FRAGMENT ********* COMPONENTE ***********
 const Recargas = ({
   operadorCurrent,
+  setLoadingPeticionGlobal,
+  loadingPeticionGlobal,
   children,
-}: {
-  operadorCurrent: PropOperadoresComponent;
-  children: ReactNode;
-}) => {
+}: PropComponectBody): JSX.Element => {
   const component_name = "Recargas";
   const [dataRecarga, setDataRecarga] =
     useState<TypeDataRecarga>(dataRecargaInitial);
@@ -70,7 +66,8 @@ const Recargas = ({
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
     operadorCurrent.operador,
     operadorCurrent.autorizador,
-    component_name.toLowerCase()
+    component_name.toLowerCase(),
+    setLoadingPeticionGlobal
   );
   useEffect(() => {
     setDataRecarga(dataRecargaInitial);

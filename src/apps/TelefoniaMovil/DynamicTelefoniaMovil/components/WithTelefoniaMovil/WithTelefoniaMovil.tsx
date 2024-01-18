@@ -22,6 +22,8 @@ const WithTelefoniaMovil = (
   const [operadores, setOperadores] = useState<PropOperadoresComponent[]>([]);
   const [operadorCurrent, setOperadorCurrent] =
     useState<PropOperadoresComponent | null>(null);
+  const [loadingPeticionGlobal, setLoadingPeticionGlobal] =
+    useState<Boolean>(false);
   const [loadingPeticionOperadores, peticionOperadores] = useHookFetchLayouts(
     componectName.toLowerCase()
   );
@@ -64,6 +66,7 @@ const WithTelefoniaMovil = (
         <LayoutTelefoniaMovil
           operadores={operadores}
           setOperadorCurrent={setOperadorCurrent}
+          loadingPeticionGlobal={loadingPeticionGlobal}
         />
       ) : (
         <></>
@@ -77,7 +80,11 @@ const WithTelefoniaMovil = (
 
       <div className={Lineadivisora}></div>
       {operadores.length > 0 && operadorCurrent !== null ? (
-        <ComponectBody operadorCurrent={operadorCurrent}>
+        <ComponectBody
+          operadorCurrent={operadorCurrent}
+          setLoadingPeticionGlobal={setLoadingPeticionGlobal}
+          loadingPeticionGlobal={loadingPeticionGlobal}
+        >
           <img
             className="w-24 "
             src={`${svgs?.TELEFONIA_MOVIL}${operadorCurrent?.logo}`}

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, Dispatch, SetStateAction } from "react";
 import {
   TypeInputPromisesRecargas,
   TypeOutputDataRecargas,
@@ -114,7 +114,8 @@ const get_status_cycle_consult_trx = (
 export const useBackendRecargasDefault = (
   name_operador: string,
   autorizador: string,
-  module_: string
+  module_: string,
+  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>
 ) => {
   const hook_name = "useBackendRecargasDefault";
   const name_service = `Telefonia movil - ${autorizador} - ${module_}`;
