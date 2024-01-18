@@ -1,17 +1,24 @@
-import { ReactNode } from "react";
+import { ReactNode, Dispatch, SetStateAction } from "react";
 
 export type TypeInputPromises<TypeDependsModule> = {
   roleInfo: { [key: string]: any };
   pdpUser: { [key: string]: any };
   moduleInfo: TypeDependsModule;
-  id_uuid?: any;
+  id_uuid?: string;
   parameters_operador?: { [key: string]: any };
   parameters_submodule?: { [key: string]: any };
 };
 
+export type TypeUseBackend<TypeOutputUseBackend_> = (
+  name_operador: string,
+  autorizador: string,
+  module_: string,
+  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>
+) => TypeOutputUseBackend_;
+
 //------------recargas ------------------------
 export type TypeInputDataRecargas = {
-  celular: number;
+  celular: string;
   valor_total_trx: number;
 };
 export type TypeOutputDataRecargas = {
@@ -23,7 +30,17 @@ export type TypeOutputDataRecargas = {
 export type TypeInputPromisesRecargas =
   TypeInputPromises<TypeInputDataRecargas>;
 
-export type TypeBackendRecargas = any;
+//tipado UseBackendRecargas
+export type TypeOutputUseBackendRecargas = [
+  boolean,
+  (
+    dataInputPromises: TypeInputPromisesRecargas
+  ) => Promise<TypeOutputDataRecargas> //funcion
+];
+
+export type TypeUseBackendRecargas =
+  TypeUseBackend<TypeOutputUseBackendRecargas>;
+
 //------------paquetes ------------------------
 export type TypeInputDataGetPaquetesFilters = {
   page: number;
@@ -38,12 +55,12 @@ export type TypeInputDataGetPaquetes =
   TypeInputPromises<TypeInputDataGetPaquetesFilters>;
 
 export type TypeTableDataGetPaquetes = {
-  codigo: number;
+  codigo: string; //str-number
   nombre: string;
   tipo: string;
   descripcion_corta: string;
   descripcion_completa: string;
-  valor: number;
+  valor: string; //str-number
 };
 
 export type TypeOutputDataGetPaquetes = {
@@ -69,17 +86,25 @@ export type TypeOutputTrxPaquetes = {
   id_trx: number | null;
   ticket: { [key: string]: any } | null;
 };
+//tipado UseBackendPaquetes
+export type TypeOutputUseBackendPaquetes = [
+  boolean,
+  (
+    dataInputPromises: TypeInputDataGetPaquetes
+  ) => Promise<TypeOutputDataGetPaquetes>, //funcion
+  boolean,
+  (dataInputPromises: TypeInputTrxPaquetes) => Promise<TypeOutputTrxPaquetes> //funcion
+];
 
-export type TypeBackendPaquetes = any;
+export type TypeUseBackendPaquetes =
+  TypeUseBackend<TypeOutputUseBackendPaquetes>;
+//-------------------------------------
 
 export type TypeBackendCargarPaquetes = {
   [key: number | string]: ReactNode;
 };
 
-export type TypeBackend =
-  | TypeBackendRecargas
-  | TypeBackendPaquetes
-  | TypeBackendCargarPaquetes;
+export type TypeBackend = TypeUseBackendRecargas | TypeUseBackendPaquetes;
 
 export type TypeSubModules<_TypeSubModules_> = {
   recargas: _TypeSubModules_;
@@ -89,21 +114,20 @@ export type TypeSubModules<_TypeSubModules_> = {
   descargarConciliacion: _TypeSubModules_;
 } & { [key: string]: _TypeSubModules_ };
 
-export type TypeRouteModule = {
-  link: string;
-  label: ReactNode;
-  component: ReactNode;
-  permission: number[];
-  subRoutes?: TypeRouteModule[];
-};
-
 export type PropOperadoresComponent = {
   autorizador: string;
   name: string;
   logo: string;
   operador: string;
-  backend: TypeBackend;
+  backend: any;
   permission: number[];
   parameters_operador: { [key: string]: any };
   parameters_submodule: { [key: string]: any };
+};
+
+export type TypePropsComponentBody = {
+  operadorCurrent: PropOperadoresComponent;
+  setLoadingPeticionGlobal: Dispatch<SetStateAction<Boolean>>;
+  loadingPeticionGlobal: Boolean;
+  children: ReactNode;
 };

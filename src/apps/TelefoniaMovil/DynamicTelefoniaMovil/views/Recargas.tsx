@@ -1,6 +1,5 @@
 import React, {
   FormEvent,
-  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -18,8 +17,9 @@ import { formatMoney } from "../../../../components/Base/MoneyInputDec";
 import { toPhoneNumber } from "../../../../utils/functions";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import {
-  PropOperadoresComponent,
+  TypeInputDataRecargas,
   TypeOutputDataRecargas,
+  TypePropsComponentBody,
 } from "../TypeDinamic";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useReactToPrint } from "react-to-print";
@@ -32,32 +32,28 @@ import {
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 
-//------ typíng--------
+//FRAGMENT ********** TYPING ***********
 type TypeInfo = "Ninguno" | "Resumen" | "TrxExitosa";
-type TypeDataRecarga = {
-  celular: string;
-  valor_total_trx: number;
-};
 type TypeInfTicket = { [key: string]: any } | null;
 
-//------ constantes generales--------
+//FRAGMENT ********* CONST ***********
 const minValor = 1000;
 const maxValor = 100000;
-const dataRecargaInitial = {
+const dataRecargaInitial: TypeInputDataRecargas = {
   celular: "",
   valor_total_trx: 0,
 };
 
+//FRAGMENT ********* COMPONENTE ***********
 const Recargas = ({
   operadorCurrent,
+  setLoadingPeticionGlobal,
+  loadingPeticionGlobal,
   children,
-}: {
-  operadorCurrent: PropOperadoresComponent;
-  children: ReactNode;
-}) => {
+}: TypePropsComponentBody) => {
   const component_name = "Recargas";
   const [dataRecarga, setDataRecarga] =
-    useState<TypeDataRecarga>(dataRecargaInitial);
+    useState<TypeInputDataRecargas>(dataRecargaInitial);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [infTicket, setInfTicket] = useState<TypeInfTicket>(null);
   const [typeInfo, setTypeInfo] = useState<TypeInfo>("Ninguno");
@@ -70,7 +66,8 @@ const Recargas = ({
   const [statePeticionRecargar, PeticionRecargar] = useHookDynamic(
     operadorCurrent.operador,
     operadorCurrent.autorizador,
-    component_name.toLowerCase()
+    component_name.toLowerCase(),
+    setLoadingPeticionGlobal
   );
   useEffect(() => {
     setDataRecarga(dataRecargaInitial);
