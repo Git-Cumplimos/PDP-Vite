@@ -10,7 +10,6 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Modal from "../../../components/Base/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import { useFetch } from "../../../hooks/useFetch";
 import { enumParametrosColpatria } from "../utils/enumParametrosColpatria";
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
@@ -20,9 +19,8 @@ import { useFetchcolpatria } from "../hooks/fetchColpatria";
 import TicketColpatria from "../components/TicketColpatria";
 import { useReactToPrint } from "react-to-print";
 
-// const URL_GENERACION_PIN = `${process.env.REACT_APP_URL_COLPATRIA}/soap/generacion-pin-pago`;
-const URL_GENERACION_PIN = `http://127.0.0.1:5000/soap/generacion-pin-pago`;
-const URL_CONSULTA_GENERACION_PIN = `${process.env.REACT_APP_URL_COLPATRIA}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
+const URL_GENERACION_PIN = `${process.env.REACT_APP_URL_COLPATRIA}/soap/generacion-pin-pago`;
+const URL_CONSULTA_GENERACION_PIN = `${process.env.REACT_APP_URL_COLPATRIA}/soap/consulta-estado-generacion-pin-pago`;
 
 const DATA_INICIAL_PIN = {
   referencia_1: "",
