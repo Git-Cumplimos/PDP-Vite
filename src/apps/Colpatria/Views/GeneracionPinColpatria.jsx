@@ -164,11 +164,16 @@ const GeneracionPinColpatria = () => {
     [dataUsuario, validNavigate, roleInfo, pdpUser]
   );
 
-  const handleShow = useCallback((ev) => {
-    ev.preventDefault();
-    setEstadoPeticion(0);
-    setShowModal(true);
-  }, []);
+  const handleShow = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      if (dataUsuario.cod_ciudad_domicilio === "")
+        return notifyError("Seleccione la ciudad en la que se crea el pin");
+      setEstadoPeticion(0);
+      setShowModal(true);
+    },
+    [dataUsuario.cod_ciudad_domicilio]
+  );
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
