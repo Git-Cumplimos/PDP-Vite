@@ -174,7 +174,9 @@ const RecaudoConjunto = () => {
       ...valorRecibido,
       nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
       nombre_usuario: pdpUser?.uname ?? "",
-      direccion: roleInfo?.direccion ?? ""
+      direccion: roleInfo?.direccion ?? "",
+      codDane: roleInfo?.codigo_dane ?? "",
+      ciudad: roleInfo?.ciudad ?? ""
     };
 
     let valoresRecibido = parseInt(valorRecibido.valor_total_trx) ?? 0
@@ -225,6 +227,7 @@ const RecaudoConjunto = () => {
         handleClose()
       })
       .catch((err) => {
+        console.log(err)
         notifyError(String(err));
         handleClose()
       });

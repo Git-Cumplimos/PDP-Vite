@@ -93,7 +93,6 @@ const PanelHistorico = () => {
   });
 
   const cierreCaja = useCallback((data) => {
-    console.log(data)
     data?.entidades_externas?.data?.map((elemento) => Num=Num+elemento?.valor)
     let totalExtrdiaAnterior = 0
     if (data?.externos_día_anterior !== null) {
@@ -186,7 +185,6 @@ const PanelHistorico = () => {
         .then((res) => {
           const newData = []
           res?.obj?.results?.map((itemData)=>{
-
             var totalvalorEntidades = 0
             itemData?.entidades_externas?.data.map((val) => {
               totalvalorEntidades+=val.valor
@@ -195,8 +193,8 @@ const PanelHistorico = () => {
               'Idcierre': itemData?.pk_id_cierre,
               'Idcomercio': itemData?.id_comercio,
               'Idusuario': itemData?.id_usuario,
-              'TotalmovimientosDía': Math.round(itemData?.total_movimientos),
-              'EfectivoCierre': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
+              'TotalmovimientosDía': Math.round(itemData?.total_efectivo_cierre_día_anterior),
+              'ExternosDiaAnterior': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
               'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+(-totalvalorEntidades)),
               'EfectivoCajaPDPExt': Math.round(itemData?.total_efectivo_en_caja),
               'Sobrante': Math.round(itemData?.total_sobrante),
@@ -223,7 +221,8 @@ const PanelHistorico = () => {
           })
           const concatenadosParcil = entidades
           const concatenadosFinal = concatenadosParcil.join(',');
-          const headers = 'Id cierre,Id comercio,Id usuario,Total movimientos dia,Efectivo cierre dia anterior,Efectivo en caja PDP,Efectivo en caja PDP + Externos,Sobrante,Faltante,Estimacion faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas debito o credito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
+          const headers = 'Id cierre,Id comercio,Id usuario,Saldo PDP Día Anterior,Saldo Externos Día Anterior,  Efectivo en caja PDP,Efectivo en caja PDP + Externos,Sobrante,Faltante,Estimacion faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas debito o credito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
+
           const main = newData.map((item)=>{
             return Object.values(item).toString();
           })
@@ -266,64 +265,64 @@ const PanelHistorico = () => {
           "Id cierre",
           "Id comercio",
           "Id usuario",
-          "Total movimientos día",
-          "Total efectivo cierre día anterior",
-          "Total efectivo en caja",
-          "Total sobrante",
-          "Total faltante",
-          "Total estimación faltante",
-          "Total entregado transportadora",
-          "Total recibido transportadora",
-          "Total consignaciones bancarias",
-          "Total transferencias cajeros",
-          "Total notas débito o crédito",
+          "Saldo PDP Día Anterior",
+          "Saldo Externos Día Anterior",
+          "Saldo Cierre Día Anterior",
+          "Saldo PDP Fin del día",
+          "Saldo Externos Fin del Día",
+          "Saldo Total del Día",
+          "Efectivo en Caja",
+          "Sobrante",
+          "Faltante",
+          "Pendiente Consignaciones Bancarias y Transportadora PDP",
+          "Pendiente Recibido Transportadora",
+          "Consignaciones Bancarias y Transportadora PDP",
+          "Consignaciones Bancarias y Transportadora Externos",
+          "Recibido Transportadora",
+          "Notas Débito o Crédito",
           "Estado Cierre",
-          "Fecha y hora cierre",
+          "Fecha y hora cierre"
         ]}
         maxPage={maxPages}
         data={receipt?.map(
           ({
             created,
-            fecha_cierre,
             id_comercio,
-            id_terminal,
             id_usuario,
             pk_id_cierre,
             total_arqueo,
-            total_consignaciones,
             total_efectivo_cierre_día_anterior,
             total_efectivo_en_caja,
-            total_entregado_transportadora,
-            total_estimacion_faltante,
             total_faltante,
-            total_movimientos,
             total_notas,
             total_recibido_transportadora,
             total_sobrante,
-            state,
-            total_transferencias,
+            externos_día_anterior,
+            Saldo_Cierre_Dia_Anterior,
+            entidades_externas,
+            Saldo_Total_Dia,
+            total_consignaciones_transportadora_pendiente,
+            total_recibido_transportadora_pendiente,
+            total_consignaciones_transportadora,
+            total_consignaciones_transportadora_externos,
           }) => ({
             pk_id_cierre,
             id_comercio,
             id_usuario,
-            total_movimientos: formatMoney.format(total_movimientos),
-            total_efectivo_cierre_día_anterior: formatMoney.format(
-              total_efectivo_cierre_día_anterior-(total_efectivo_en_caja-total_movimientos)
-            ),
+            total_efectivo_cierre_día_anterior: formatMoney.format(total_efectivo_cierre_día_anterior),
+            externos_día_anterior:formatMoney.format((externos_día_anterior?.data ?? []).reduce((total,val) =>  total+val.valor,0)),
+            Saldo_Cierre_Dia_Anterior: formatMoney.format(total_efectivo_cierre_día_anterior+((externos_día_anterior?.data ?? []).reduce((total,val) => total+val.valor,0)||0)),
             total_efectivo_en_caja: formatMoney.format(total_efectivo_en_caja),
+            entidades_externas: formatMoney.format((entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0)),
+            Saldo_Total_Dia: formatMoney.format(total_efectivo_en_caja+((entidades_externas?.data ?? []).reduce((total,val) =>  total+val.valor,0)||0)),
+            total_arqueo: formatMoney.format(total_arqueo),
             total_sobrante: formatMoney.format(total_sobrante),
             total_faltante: formatMoney.format(total_faltante),
-            total_estimacion_faltante: formatMoney.format(
-              total_estimacion_faltante
-            ),
-            total_entregado_transportadora: formatMoney.format(
-              total_entregado_transportadora
-            ),
-            total_recibido_transportadora: formatMoney.format(
-              total_recibido_transportadora
-            ),
-            total_consignaciones: formatMoney.format(total_consignaciones),
-            total_transferencias: formatMoney.format(total_transferencias),
+            total_consignaciones_transportadora_pendiente: formatMoney.format(total_consignaciones_transportadora_pendiente),
+            total_recibido_transportadora_pendiente: formatMoney.format(total_recibido_transportadora_pendiente),
+            total_consignaciones_transportadora: formatMoney.format(total_consignaciones_transportadora),
+            total_consignaciones_transportadora_externos: formatMoney.format(total_consignaciones_transportadora_externos),
+            total_recibido_transportadora: formatMoney.format(total_recibido_transportadora),
             total_notas: formatMoney.format(total_notas),
             state:"Realizado",
             created: dateFormatter.format(new Date(created)),
