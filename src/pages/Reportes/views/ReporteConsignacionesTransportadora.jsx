@@ -16,10 +16,6 @@ const ReporteConsignacionesTransportadora = () => {
   const [loadingList, fetchList] = useFetch();
   const [loadingFile, fetchFile] = useFetch();
 
-  useEffect(() => {
-    getFile()
-  }, [fetchList, pageData,]);
-
   const getFile = useCallback((date) => {
     pageData.date=date
     fetchList(`${url}/reportes/read-files-comprobantes`, "GET", { ...pageData })
@@ -46,6 +42,11 @@ const ReporteConsignacionesTransportadora = () => {
       })
       .catch((err) => console.error(err));
   }, [fetchList, pageData,]);
+  
+  useEffect(() => {
+    getFile()
+  }, [fetchList, pageData,getFile]);
+
 
   const isLoading = useMemo(
     () => loadingList || loadingFile,
