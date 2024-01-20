@@ -186,32 +186,28 @@ const PanelHistorico = () => {
           const newData = []
           res?.obj?.results?.map((itemData)=>{
             var totalvalorEntidades = 0
-            itemData?.entidades_externas?.data.map((val) => {
-              totalvalorEntidades+=val.valor
-            })
+            var totalvalorEntidadesDiaAnterior = 0
+            itemData?.entidades_externas?.data?? [].map((val) =>  totalvalorEntidades+=val.valor)
+            itemData?.externos_día_anterior?.data?? [].map((val) => totalvalorEntidadesDiaAnterior+=val.valor)
             const valJson = {
               'Idcierre': itemData?.pk_id_cierre,
               'Idcomercio': itemData?.id_comercio,
               'Idusuario': itemData?.id_usuario,
-              'TotalmovimientosDía': Math.round(itemData?.total_efectivo_cierre_día_anterior),
-              'ExternosDiaAnterior': Math.round(itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
-              'EfectivoCajaPDP': Math.round(totalvalorEntidades >= 0 ?itemData?.total_efectivo_en_caja-totalvalorEntidades:itemData?.total_efectivo_en_caja+(-totalvalorEntidades)),
-              'EfectivoCajaPDPExt': Math.round(itemData?.total_efectivo_en_caja),
+              'SaldoCierreDíaAnterior': Math.round(itemData?.total_efectivo_cierre_día_anterior),
+              'SaldoTotalDía': Math.round(itemData?.total_efectivo_en_caja+totalvalorEntidades),
+              'EfectivoCaja': Math.round(itemData?.total_arqueo),
               'Sobrante': Math.round(itemData?.total_sobrante),
               'Faltante': Math.round(itemData?.total_faltante),
-              'estimacion': itemData?.total_estimacion_faltante,
-              'Consignaciones': itemData?.total_consignaciones,
-              'outransportadora': itemData?.total_entregado_transportadora,
-              'intransportadora': itemData?.total_recibido_transportadora,
+              'PendienteConsignacionTransportadoraPDP': Math.round(itemData?.total_consignaciones_transportadora_pendiente),
+              'PendienteRecibidoTrnasportadora': Math.round(itemData?.total_recibido_transportadora_pendiente),
+              'ConsignacionTransportadoraPDP': Math.round(itemData?.total_consignaciones_transportadora),
+              'ConsignacionTransportadoraExternos': Math.round(itemData?.total_consignaciones_transportadora_externos),
+              'RecubidoTransportadora': Math.round(itemData?.total_recibido_transportadora),
               'notas': itemData?.total_notas,
             }
-            entidades.map((val)=>{
-              valJson[val]='0'
-            })
+            entidades.map((val)=>valJson[val]='0')
             if (itemData.hasOwnProperty('entidades_externas')) {
-              itemData?.entidades_externas?.data.map((val)=>{
-                valJson[val.pk_nombre_plataforma]=val.valor
-              })
+              itemData?.entidades_externas?.data.map((val)=>valJson[val.pk_nombre_plataforma]=val.valor)
             }
             valJson['Estado Cierre']='Realizado'
             valJson['Fecha_hora_cierre'] = dateFormatter.format(new Date(itemData.created)).replace(",", "");
@@ -221,8 +217,7 @@ const PanelHistorico = () => {
           })
           const concatenadosParcil = entidades
           const concatenadosFinal = concatenadosParcil.join(',');
-          const headers = 'Id cierre,Id comercio,Id usuario,Saldo PDP Día Anterior,Saldo Externos Día Anterior,  Efectivo en caja PDP,Efectivo en caja PDP + Externos,Sobrante,Faltante,Estimacion faltante,Consignaciones bancarias,Entregado transportadora,Recibido transportadora,Notas debito o credito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
-
+          const headers = 'Id cierre,Id comercio,Id usuario,Saldo Cierre Dia Anterior,Saldo Total del Dia,Efectivo en Caja,Sobrante,Faltante,Pendiente Consignaciones Bancarias y Transportadora PDP,Pendiente Recibido Transportadora,Consignaciones Bancarias y Transportadora PDP,Consignaciones Bancarias y Transportadora Externos,Recibido Transportadora,Notas Debito o Credito,'+concatenadosFinal+',Estado Cierre,Fecha y hora cierre'
           const main = newData.map((item)=>{
             return Object.values(item).toString();
           })
