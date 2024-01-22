@@ -187,13 +187,13 @@ const PanelHistorico = () => {
           res?.obj?.results?.map((itemData)=>{
             var totalvalorEntidades = 0
             var totalvalorEntidadesDiaAnterior = 0
-            itemData?.entidades_externas?.data?? [].map((val) =>  totalvalorEntidades+=val.valor)
-            itemData?.externos_día_anterior?.data?? [].map((val) => totalvalorEntidadesDiaAnterior+=val.valor)
+            totalvalorEntidades = (itemData?.entidades_externas?.data?? []).reduce((total,val) =>  total+val.valor,0)
+            totalvalorEntidadesDiaAnterior= (itemData?.externos_día_anterior?.data?? []).reduce((total,val) => total+val.valor,0)
             const valJson = {
               'Idcierre': itemData?.pk_id_cierre,
               'Idcomercio': itemData?.id_comercio,
               'Idusuario': itemData?.id_usuario,
-              'SaldoCierreDíaAnterior': Math.round(itemData?.total_efectivo_cierre_día_anterior),
+              'SaldoCierreDíaAnterior': Math.round(itemData?.total_efectivo_cierre_día_anterior + totalvalorEntidadesDiaAnterior),
               'SaldoTotalDía': Math.round(itemData?.total_efectivo_en_caja+totalvalorEntidades),
               'EfectivoCaja': Math.round(itemData?.total_arqueo),
               'Sobrante': Math.round(itemData?.total_sobrante),
