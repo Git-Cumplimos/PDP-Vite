@@ -233,11 +233,48 @@ export const postEnviarCodigoOtp = async (bodyObj) => {
   }
 };
 
-export const postConsultaCreditosPendienteDesembolsar = async () => {
+// export const postConsultaCreditosPendienteDesembolsar = async () => {
+//   try {
+//     const res = await fetchData(URL_CONSULTAR_CREDITOS_BD, "POST");
+//     return res;
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+export const postConsultaCreditosPendienteDesembolsar = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      parseObj
+    ),
+  };
   try {
-    const res = await fetchData(URL_CONSULTAR_CREDITOS_BD, "GET");
+    const res = await fetchData(
+      `${URL_CONSULTAR_CREDITOS_BD}`,
+      "POST",
+      {},
+      dataObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
     return res;
   } catch (err) {
-    console.error(err);
+    throw err;
   }
 };

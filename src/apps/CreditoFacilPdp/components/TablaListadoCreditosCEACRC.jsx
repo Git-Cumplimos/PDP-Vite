@@ -10,26 +10,28 @@ import Modal from "../../../components/Base/Modal";
 import { useFetch } from "../../../hooks/useFetch";
 import { fetchCustom } from "../utils/fetchCreditoFacil";
 import { notifyError } from "../../../utils/notify";
+import useDelayedCallback from "../../../hooks/useDelayedCallback";
+import { postConsultaCreditosPendienteDesembolsar } from "../hooks/fetchCreditoFacil";
 
 const URL_RECHAZAR_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/rechazar-creditos`;
 
 const TablaListadoCreditosCEACRC = ({
-  listadoCreditos,
+  // listadoCreditos,
   setDataCredito,
   dataCredito,
   setModalOpen,
-  consultaCreditos,
 }) => {
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
-  const [filteredComercio, setFilteredComercio] = useState(listadoCreditos);
+  // const [filteredComercio, setFilteredComercio] = useState(listadoCreditos?.results);
   const [maxPages, setMaxPages] = useState(0);
-  const [filtroBusqueda, setFiltroBusqueda] = useState("");
-  const [filtroFecha, setFiltroFecha] = useState("");
+  // const [filtroBusqueda, setFiltroBusqueda] = useState("");
+  // const [filtroFecha, setFiltroFecha] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [filtroEstado, setFiltroEstado] = useState("");
+  // const [filtroEstado, setFiltroEstado] = useState("");
+  const [listadoCreditos, setListadoCreditos] = useState([]);
   const optionsEstados = [
     { value: "1", label: "Seleccione el estado" },
     { value: "Rechazado", label: "Rechazado" },
@@ -37,62 +39,92 @@ const TablaListadoCreditosCEACRC = ({
     { value: "Aprobado", label: "Aprobado" },
     { value: "Desembolsado", label: "Desembolsado" },
   ];
+  const [datosTrans, setDatosTrans] = useState({
+    estado: "",
+    idComercio: "",
+    year: "",
+    month: "",
+  });
 
-  const handleSearchComercioChange = useCallback((e) => {
-    const searchTerm = e.target.value.trim().toLowerCase();
-    setFiltroBusqueda(searchTerm);
-  }, []);
+  // const handleSearchComercioChange = useCallback((e) => {
+  //   const searchTerm = e.target.value.trim().toLowerCase();
+  //   setFiltroBusqueda(searchTerm);
+  // }, []);
 
-  const handleFechaChange = useCallback((e) => {
-    const newFecha = e.target.value;
-    setFiltroFecha(newFecha);
-  }, []);
+  // const handleFechaChange = useCallback((e) => {
+  //   const newFecha = e.target.value;
+  //   // setFiltroFecha(newFecha);
+  // }, []);
 
-  const handleEstadoChange = useCallback((e) => {
-    const serchStatus = e.target.value;
-    setFiltroEstado(serchStatus);
-  }, []);
+  // const handleEstadoChange = useCallback((e) => {
+  //   const serchStatus = e.target.value;
+  //   // setFiltroEstado(serchStatus);
+  // }, []);
+
+  // useEffect(() => {
+  //   let filteredResults = listadoCreditos;
+
+  //   if (filtroBusqueda) {
+  //     filteredResults = filteredResults.filter((cuota) =>
+  //       cuota.id_comercio.toString().toLowerCase().includes(filtroBusqueda)
+  //     );
+  //   }
+
+  //   if (filtroFecha) {
+  //     const [filtroAnio, filtroMes] = filtroFecha.split("-");
+
+  //     filteredResults = filteredResults.filter((cuota) => {
+  //       const fechaIngreso = new Date(cuota.fecha_ingreso);
+  //       const anioIngreso = fechaIngreso.getFullYear();
+  //       const mesIngreso = fechaIngreso.getMonth() + 1;
+
+  //       return (
+  //         anioIngreso.toString() === filtroAnio &&
+  //         mesIngreso.toString().padStart(2, "0") === filtroMes
+  //       );
+  //     });
+  //   }
+
+  //   if (filtroEstado && filtroEstado !== "1") {
+  //     filteredResults = filteredResults.filter(
+  //       (cuota) => cuota.estado.toString() === filtroEstado
+  //     );
+  //   }
+
+  //   setFilteredComercio(filteredResults);
+  //   setMaxPages(Math.ceil(filteredResults.length / limit));
+  //   setPageData({ page: 1, limit });
+  // }, [listadoCreditos, limit, filtroBusqueda, filtroFecha, filtroEstado]);
 
   useEffect(() => {
-    let filteredResults = listadoCreditos;
+    consultaCreditos();
+  }, [datosTrans, page, limit]);
 
-    if (filtroBusqueda) {
-      filteredResults = filteredResults.filter((cuota) =>
-        cuota.id_comercio.toString().toLowerCase().includes(filtroBusqueda)
-      );
-    }
-
-    if (filtroFecha) {
-      const [filtroAnio, filtroMes] = filtroFecha.split("-");
-
-      filteredResults = filteredResults.filter((cuota) => {
-        const fechaIngreso = new Date(cuota.fecha_ingreso);
-        const anioIngreso = fechaIngreso.getFullYear();
-        const mesIngreso = fechaIngreso.getMonth() + 1;
-
-        return (
-          anioIngreso.toString() === filtroAnio &&
-          mesIngreso.toString().padStart(2, "0") === filtroMes
-        );
-      });
-    }
-
-    if (filtroEstado && filtroEstado !== "1") {
-      filteredResults = filteredResults.filter(
-        (cuota) => cuota.estado.toString() === filtroEstado
-      );
-    }
-
-    setFilteredComercio(filteredResults);
-    setMaxPages(Math.ceil(filteredResults.length / limit));
-    setPageData({ page: 1, limit });
-  }, [listadoCreditos, limit, filtroBusqueda, filtroFecha, filtroEstado]);
-
-  useEffect(() => {
-    setFilteredComercio(listadoCreditos);
-    setMaxPages(Math.ceil(listadoCreditos.length / limit));
-    setPageData({ page: 1, limit });
-  }, [listadoCreditos, limit]);
+  const consultaCreditos = useDelayedCallback(
+    useCallback(() => {
+      const body = {
+        limit: limit,
+        page: page,
+      }
+      if (datosTrans?.estado !== "" && datosTrans?.estado !== "1"){
+        body.estado = datosTrans?.estado
+      }
+      if (datosTrans?.year !== "" && datosTrans?.month !== ""){
+        body.year = parseInt(datosTrans?.year)
+        body.month = parseInt(datosTrans?.month)
+      }
+      if (datosTrans?.idComercio !== ""){
+        body.id_comercio = parseInt(datosTrans?.idComercio)
+      }
+      postConsultaCreditosPendienteDesembolsar(body)
+        .then((autoArr) => {
+          setListadoCreditos(autoArr?.obj?.results);
+          setMaxPages(autoArr?.obj?.maxPages);
+        })
+        .catch((err) => console.error(err));
+    }, [datosTrans, limit, page]),
+    500
+  );
 
   const [loadingPeticionRechazoCredito, peticionRechazoCredito] = useFetch(
     fetchCustom(URL_RECHAZAR_CREDITOS, "POST", "Rechazar Créditos")
@@ -133,48 +165,49 @@ const TablaListadoCreditosCEACRC = ({
   };
 
   const tablaListadoCreditos = useMemo(() => {
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const currentPageCreditos = filteredComercio.slice(startIndex, endIndex);
-
-    return currentPageCreditos.map(
-      ({
-        id_comercio,
-        NombreComercio,
-        pk_tbl_creditos_pdp_validacion_documentos,
-        valor_credito,
-        plazo,
-        fecha_ingreso,
-        estado,
-        NombreUsuario,
-      }) => ({
-        IdComercio: id_comercio,
-        NombreComercio: NombreComercio,
-        NroSolicitud: pk_tbl_creditos_pdp_validacion_documentos,
-        ValorCredito: formatMoney.format(valor_credito),
-        Cuotas: plazo,
-        FechaPreaprobado: new Date(fecha_ingreso).toLocaleDateString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }),
-        EstadoCredito: estado,
-        NombreAsesor: NombreUsuario,
-        FechaCreacion: new Date(fecha_ingreso).toLocaleDateString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        }),
-        Acciones: estado !== "Rechazado" && (
-          <ButtonBar>
-            <Button type="submit" onClick={() => setShowModal(true)}>
-              Rechazar
-            </Button>
-          </ButtonBar>
-        ),
-      })
-    );
-  }, [filteredComercio, page, limit]);
+    return [
+      ...listadoCreditos.map(
+        ({
+          id_comercio,
+          nombre_comercio,
+          pk_tbl_creditos_pdp_validacion_documentos,
+          valor_credito,
+          plazo,
+          fecha_ingreso,
+          estado,
+          uname,
+        }) => ({
+          IdComercio: id_comercio,
+          NombreComercio: nombre_comercio,
+          NroSolicitud: pk_tbl_creditos_pdp_validacion_documentos,
+          ValorCredito: formatMoney.format(valor_credito),
+          Cuotas: plazo,
+          FechaPreaprobado: new Date(fecha_ingreso).toLocaleDateString(
+            "es-ES",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }
+          ),
+          EstadoCredito: estado,
+          NombreAsesor: uname,
+          FechaCreacion: new Date(fecha_ingreso).toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }),
+          Acciones: estado !== "Rechazado" && (
+            <ButtonBar>
+              <Button type="submit" onClick={() => setShowModal(true)}>
+                Rechazar
+              </Button>
+            </ButtonBar>
+          ),
+        })
+      ),
+    ];
+  }, [listadoCreditos]);
 
   return (
     <>
@@ -207,20 +240,25 @@ const TablaListadoCreditosCEACRC = ({
           maxLength="20"
           type="text"
           autoComplete="off"
-          value={filtroBusqueda}
-          onInput={handleSearchComercioChange}
-          onBlur={() =>
-            handleSearchComercioChange({
-              target: { value: filtroBusqueda },
-            })
-          }
+          onInput={(e) => {
+            let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+            if (!isNaN(num)) {
+              setDatosTrans((old) => {
+                return { ...old, idComercio: num };
+              });
+            }
+          }}
         />
         <Select
           id="estadoCredito"
           label="Estado crédito"
           options={optionsEstados}
-          value={filtroEstado}
-          onChange={handleEstadoChange}
+          // onChange={handleEstadoChange}
+          onChange={(e) => {
+            setDatosTrans((old) => {
+              return { ...old, estado: e.target.value };
+            });
+          }}
           // style={{ width: '20vh' }}
         />
         <Input
@@ -229,8 +267,15 @@ const TablaListadoCreditosCEACRC = ({
           name="fecha"
           label="Fecha"
           autoComplete="off"
-          value={filtroFecha}
-          onChange={handleFechaChange}
+          onChange={(e) => {
+            const [year, month] = e.target.value.split('-');
+            console.log(e.target.value)
+            setDatosTrans((prevState) => ({
+              ...prevState,
+              year: year,
+              month: month,
+            }));
+          }}
         />
         <ButtonBar>
           <Button
