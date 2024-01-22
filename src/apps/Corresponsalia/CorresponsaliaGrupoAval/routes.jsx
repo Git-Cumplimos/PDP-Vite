@@ -178,7 +178,7 @@ const rutasAvalCB = {
     },
     {
       link: "/corresponsalia/CorresponsaliaGrupoAval/recaudoPila",
-      label: <AppIcons Logo={"RECAUDO_PILA"} name="Recaudo Pila" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recaudo Pila" />,
       component: TransaccionRecaudoPila,
       permission: [enumPermisosAval.RECAUDO_PILA],
     },
