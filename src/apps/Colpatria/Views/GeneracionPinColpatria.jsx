@@ -265,7 +265,7 @@ const GeneracionPinColpatria = () => {
           <Input
             id="razon_social"
             name="razon_social"
-            label={"Razon social"}
+            label={"Razón social"}
             type="text"
             autoComplete="off"
             value={dataUsuario?.["razon_social"]}
@@ -299,7 +299,7 @@ const GeneracionPinColpatria = () => {
           <MoneyInput
             id="valor"
             name="valor"
-            label="Valor a recargar"
+            label="Valor del pin"
             type="text"
             min={enumParametrosColpatria.MINGENERACIONPIN}
             max={enumParametrosColpatria.MAXGENERACIONPIN}
@@ -425,7 +425,7 @@ const GeneracionPinColpatria = () => {
           <Input
             id="tel_fijo_comprador"
             name="tel_fijo_comprador"
-            label={"Telefono fijo comprador"}
+            label={"Teléfono fijo comprador"}
             type="text"
             autoComplete="off"
             value={dataUsuario?.["tel_fijo_comprador"]}
@@ -511,7 +511,7 @@ const GeneracionPinColpatria = () => {
                 "Código convenio": dataUsuario?.codigo_convenio,
                 "Código pin": dataUsuario?.codigo_pin,
                 "Código ciudad": roleInfo?.codigo_dane,
-                "Razon social": dataUsuario?.razon_social,
+                "Razón social": dataUsuario?.razon_social,
                 "Identificación cliente":
                   dataUsuario?.num_identificacion_cliente,
                 "Identificación beneficiario":
@@ -525,7 +525,7 @@ const GeneracionPinColpatria = () => {
                 "Nombre comprador": dataUsuario?.nombre_comprador,
                 "Apellido comprador": dataUsuario?.apellidos_comprador,
                 Dirección: roleInfo?.["direccion"],
-                "telefono fijo comprador": dataUsuario?.tel_fijo_comprador,
+                "teléfono fijo comprador": dataUsuario?.tel_fijo_comprador,
                 "Celular comprador": dataUsuario?.num_cel_comprador,
                 "Email comprador": dataUsuario?.email_comprador,
                 "Código ciudad domicilio": dataUsuario?.cod_ciudad_domicilio,
