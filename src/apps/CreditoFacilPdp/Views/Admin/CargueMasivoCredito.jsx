@@ -97,7 +97,7 @@ const CargueMasivoCredito = () => {
             month: "2-digit",
             year: "numeric",
           }),
-          Acciones: estado !== "Rechazado" && (
+          Acciones: (estado !== "Rechazado" && estado !== "Desembolsado") && (
             <ButtonBar>
               <Button type="submit" onClick={() => setShowModal(true)}>
                 Rechazar
