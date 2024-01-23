@@ -72,7 +72,7 @@ const ModalRechazarCreditos = ({
               disabled={loadingPeticionRechazoCredito}
               onClick={() => {
                 setShowModal(false);
-                notifyError("Transacción cancelada por el usuario");
+                notifyError("La anulación del crédito fue cancelada por el usuario");
               }}
             >
               Cancelar
