@@ -7,8 +7,14 @@ import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
 import FormPagoCreditoPdp from "../../components/FormPagoCreditoPdp";
 import TablaExtractoCreditos from "../../components/TablaExtractoCreditos";
+import Modal from "../../../../components/Base/Modal";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
 
-const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-credito`;
+// const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-credito`;
+const URL_CONSULTA_CREDITO = `http://127.0.0.1:5000/extractos-credito-facil/consulta-creditos`;
+const URL_GENERAR_EXTRACTOS = `http://127.0.0.1:5000/extractos-credito-facil/generacion-extracto`;
 
 const DATA_CREDITO_UNIQUE_SIIAN_INI = {
   Agrupacion: "",
@@ -45,12 +51,14 @@ const DATA_CREDITO_UNIQUE_SIIAN_INI = {
   Valorpagototal: 0,
   Valorpagototalcausado: 0,
   Valorparaestaraldia: 0,
+  cuotas: 30,
 };
 
 const ExtractosCreditosComerciosPDP = () => {
-  const navigate = useNavigate();
+  const validNavigate = useNavigate();
   const { roleInfo } = useAuth();
   const [dataCreditos, setDataCreditos] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [dataCreditoUnique, setDataCreditoUnique] = useState(
     DATA_CREDITO_UNIQUE_SIIAN_INI
   );
@@ -58,18 +66,30 @@ const ExtractosCreditosComerciosPDP = () => {
   const [loadingPeticionConsultaCredito, peticionConsultaCredito] = useFetch(
     fetchCustom(URL_CONSULTA_CREDITO, "POST", "Consultar credito")
   );
+  const [loadingPeticionGeneracionExtractos, peticionGeneracionExtractos] =
+    useFetch(
+      fetchCustom(URL_GENERAR_EXTRACTOS, "POST", "Generación extractos")
+    );
   const closeModule = useCallback(() => {
     setDataCreditoUnique(DATA_CREDITO_UNIQUE_SIIAN_INI);
     setDataCreditos([]);
-    notifyError("Pago cancelado por el usuario");
-    navigate(-1);
-  }, [navigate]);
+    setShowModal(false);
+    validNavigate(-1);
+  }, [validNavigate]);
+  const closeModal = useCallback(() => {
+    setDataCreditoUnique(DATA_CREDITO_UNIQUE_SIIAN_INI);
+    setShowModal(false);
+  }, []);
   useEffect(() => {
     if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
-      navigate("/");
+      validNavigate("/");
     } else {
       fetchComercio();
     }
+  }, []);
+  useEffect(() => {
+    consultaCredito();
+    return () => {};
   }, []);
   const fetchComercio = useCallback(() => {
     let hasKeys = true;
@@ -91,9 +111,9 @@ const ExtractosCreditosComerciosPDP = () => {
       notifyError(
         "El usuario no cuenta con datos de comercio, no se permite la transaccion"
       );
-      navigate("/");
+      validNavigate("/");
     }
-  }, [roleInfo, navigate]);
+  }, [roleInfo, validNavigate]);
   const consultaCredito = useCallback(() => {
     const data = {
       id_comercio: roleInfo?.id_comercio,
@@ -118,16 +138,47 @@ const ExtractosCreditosComerciosPDP = () => {
       },
       {
         render: ({ data: error }) => {
-          navigate(-1);
+          validNavigate(-1);
           return error?.message ?? "Consulta fallida";
         },
       }
     );
-  }, [navigate, roleInfo.id_comercio]);
-  useEffect(() => {
-    consultaCredito();
-    return () => {};
-  }, []);
+  }, [validNavigate, roleInfo.id_comercio]);
+  const generacionExtractos = useCallback(
+    (tipo_extracto) => (ev) => {
+      const data = {
+        // id_credito: dataCreditoUnique.Id,
+        id_credito: 50,
+        tipo_extracto: tipo_extracto,
+      };
+      notifyPending(
+        peticionGeneracionExtractos({}, data),
+        {
+          render: () => {
+            return "Generando reporte";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            console.log(res.obj);
+            // if (dataTemp.length === 1) {
+            //   setDataCreditoUnique(dataTemp[0]);
+            // }
+            // setDataCreditos(res.obj.data ?? []);
+            // setEstadoProceso("inicio");
+            return "Reporte exitoso";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            validNavigate(-1);
+            return error?.message ?? "Reporte fallido";
+          },
+        }
+      );
+    },
+    [validNavigate, roleInfo.id_comercio]
+  );
 
   return (
     <>
@@ -135,7 +186,38 @@ const ExtractosCreditosComerciosPDP = () => {
       <TablaExtractoCreditos
         dataCreditos={dataCreditos}
         setDataCreditoUnique={setDataCreditoUnique}
+        setShowModal={setShowModal}
       />
+      <Modal
+        show={showModal}
+        handleClose={() => {
+          if (!loadingPeticionGeneracionExtractos) closeModal();
+        }}
+        className="flex align-middle"
+      >
+        <PaymentSummary
+          title="Descargar extractos de crédito"
+          subtitle="Seleccione en que formato los desea descargar"
+          // summaryTrx={{}}
+        >
+          <ButtonBar>
+            <Button
+              type="submit"
+              onClick={generacionExtractos("pdf")}
+              disabled={loadingPeticionGeneracionExtractos}
+            >
+              Descargar extractos PDF
+            </Button>
+            <Button
+              type="submit"
+              onClick={generacionExtractos("excel")}
+              disabled={loadingPeticionGeneracionExtractos}
+            >
+              Descargar extractos Excel
+            </Button>
+          </ButtonBar>
+        </PaymentSummary>
+      </Modal>
     </>
   );
 };

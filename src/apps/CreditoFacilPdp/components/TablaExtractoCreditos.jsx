@@ -2,7 +2,11 @@ import { useCallback, useMemo, useState } from "react";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { formatMoney } from "../../../components/Base/MoneyInput";
 
-const TablaExtractoCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
+const TablaExtractoCreditos = ({
+  dataCreditos,
+  setDataCreditoUnique,
+  setShowModal,
+}) => {
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
@@ -53,23 +57,14 @@ const TablaExtractoCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
         Valorpagototal,
         Valorpagototalcausado,
         Valorparaestaraldia,
+        cuotas,
       }) => {
         return {
-          id: Id,
+          desembolso: Id,
+          valorCredito: formatMoney.format(Saldo),
+          cuotas: cuotas,
           estado: Estado,
-          valorCuota: formatMoney.format(Valorcuotaactual),
-          saldo: formatMoney.format(Saldo),
-          desembolso: new Date(Fechadesembolso).toLocaleDateString("es-ES", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }),
-          ultimoPago: new Date(Fechadeultimopago).toLocaleDateString("es-ES", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }),
-          proximoPago: new Date(Fechavencimientoproximo).toLocaleDateString(
+          fechaDesembolso: new Date(Fechadesembolso).toLocaleDateString(
             "es-ES",
             {
               day: "2-digit",
@@ -87,22 +82,21 @@ const TablaExtractoCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
       const idData = dataTable[i]?.id;
       const dataCredito = dataCreditos.filter((data) => data.Id === idData);
       setDataCreditoUnique(dataCredito[0] ?? {});
+      setShowModal(true);
     },
     [dataTable, dataCreditos]
   );
   return (
     <TableEnterprise
-      title={"Créditos activos comercio"}
+      title={"Créditos comercio"}
       maxPage={maxPages}
       onChange={onChange}
       headers={[
-        "Crédito",
+        "No. Desembolso",
+        "Valor del crédito",
+        "No. cuotas",
         "Estado",
-        "Cuota",
-        "Saldo",
-        "Desembolso",
-        "Último pago",
-        "Proximo pago",
+        "Fecha Desembolso",
       ]}
       data={dataTable}
       onSelectRow={onSelect}
