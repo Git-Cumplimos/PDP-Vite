@@ -1,6 +1,6 @@
 import classes from "./Fieldset.module.css";
 
-const Fieldset = ({ legend, children, className }) => {
+const Fieldset = ({ legend, children, className = "" }) => {
   const { Fieldset } = classes;
   return (
     <fieldset className={`${Fieldset} ${className ?? ""}`}>
