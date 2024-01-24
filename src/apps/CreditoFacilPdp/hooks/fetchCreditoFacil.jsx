@@ -7,6 +7,8 @@ import fetchData from "../../../utils/fetchData";
 const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
 const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
 const URL_ENVIAR_CODIGO_OTP = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/generar-codigo-otp`;
+const URL_CONSULTAR_CREDITOS_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/consulta-creditos`;
+
 
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
@@ -209,6 +211,52 @@ export const postEnviarCodigoOtp = async (bodyObj) => {
   try {
     const res = await fetchData(
       `${URL_ENVIAR_CODIGO_OTP}`,
+      "POST",
+      {},
+      dataObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// export const postConsultaCreditosPendienteDesembolsar = async () => {
+//   try {
+//     const res = await fetchData(URL_CONSULTAR_CREDITOS_BD, "POST");
+//     return res;
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+export const postConsultaCreditosPendienteDesembolsar = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      parseObj
+    ),
+  };
+  try {
+    const res = await fetchData(
+      `${URL_CONSULTAR_CREDITOS_BD}`,
       "POST",
       {},
       dataObj
