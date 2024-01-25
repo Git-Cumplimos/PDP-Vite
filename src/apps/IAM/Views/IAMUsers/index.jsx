@@ -11,6 +11,7 @@ import Modal from "../../../../components/Base/Modal";
 import Form from "../../../../components/Base/Form";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {updateUserMassive} from "../../utils/fetchFunctions";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -23,8 +24,8 @@ const initialSearchFilters = new Map([
 ]);
 
 const IAMUsers = () => {
+  const { pdpUser } = useAuth();
   const navigate = useNavigate();
-
   const [userData, setUserData] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -70,9 +71,13 @@ const IAMUsers = () => {
         notifyError('Tipo de archivo incorrecto')
         return;
       }
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('usuario_ultima_actualizacion', pdpUser?.uuid);
+      
       notifyPending(
         updateUserMassive(
-          file,
+          formData
         ),
         {
           render() {
@@ -81,12 +86,19 @@ const IAMUsers = () => {
         },
         {
           render({ data: res }) {
+            console.log(res)
             handleClose();
             return res?.msg;
           },
         },
         {
+          render({ data: response }) {
+            console.log(response)
+          },
+        },
+        {
           render({ data: err }) {
+            console.log(err)
             if (err.msg !== "Error: Archivo vacio"){
               setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
               return `Archivo erróneo`;
@@ -101,7 +113,6 @@ const IAMUsers = () => {
   const DescargarErrores = useCallback(
     async () => {
       let errores = []
-
       if (Array.isArray(showModalErrors?.errores)) {
         errores.push(['Linea', 'Columna', 'Descripcion'])
         showModalErrors?.errores.map((err_esp) => {
@@ -121,7 +132,6 @@ const IAMUsers = () => {
       // descargarCSV('Errores_del_archivo', errores)
       handleClose();
     }, [handleClose, showModalErrors]);
-
 
   return (
     <Fragment>

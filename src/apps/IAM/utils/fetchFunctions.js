@@ -47,13 +47,23 @@ const buildPutFunction = (url) => {
   };
 };
 
-export const cargueArchivoUsers = (url) => {
+const buildPostFunctionMassive = (url) => {
   return async (body) => {
-    if (!body) {
-      throw new Error("Sin datos en el body", { cause: "custom" });
-    }
     try {
-      const res = await fetchData(url, "POST", {}, body);
+      console.log(body)
+      // const response = await fetchData(url, "POST", {}, body);
+      const response = await fetchSecure(url,
+        {
+          headers: {'Content-Type': 'multipart/form-data'},
+          method: 'POST',
+          // body,
+          body: JSON.stringify(body)
+          // JSON.stringify(body)
+        });
+      if (response.ok) {
+        return response;
+      }
+      const res = await response.json();
       if (!res?.status) {
         if (res?.msg) {
           throw new Error(res?.msg, { cause: "custom" });
@@ -61,7 +71,7 @@ export const cargueArchivoUsers = (url) => {
 
         throw new Error(res, { cause: "custom" });
       }
-      return res;
+      throw new Error({ message: "Unhandled error" }, { cause: "custom" });
     } catch (err) {
       throw err;
     }
@@ -71,4 +81,4 @@ export const cargueArchivoUsers = (url) => {
 export const createUser = buildPostFunction(`${urlIam}/users`);
 export const updateUser = buildPutFunction(`${urlIam}/users`);
 export const updateUserGroups = buildPostFunction(`${urlIam}/user-groups`);
-export const updateUserMassive = cargueArchivoUsers(`${urlIam}/users-massive`);
+export const updateUserMassive = buildPostFunctionMassive(`${urlIam}/users-massive`);
