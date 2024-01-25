@@ -1,20 +1,17 @@
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-import TablaCreditos from "../../components/TablaCreditos";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCreditoFacil";
-import FormPagoCreditoPdp from "../../components/FormPagoCreditoPdp";
 import TablaExtractoCreditos from "../../components/TablaExtractoCreditos";
 import Modal from "../../../../components/Base/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 
-// const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-credito`;
-const URL_CONSULTA_CREDITO = `http://127.0.0.1:5000/extractos-credito-facil/consulta-creditos`;
-const URL_GENERAR_EXTRACTOS = `http://127.0.0.1:5000/extractos-credito-facil/generacion-extracto`;
+const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/consulta-creditos`;
+const URL_GENERAR_EXTRACTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/generacion-extracto`;
 
 const DATA_CREDITO_UNIQUE_SIIAN_INI = {
   Agrupacion: "",
@@ -56,13 +53,12 @@ const DATA_CREDITO_UNIQUE_SIIAN_INI = {
 
 const ExtractosCreditosComerciosPDP = () => {
   const validNavigate = useNavigate();
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [dataCreditos, setDataCreditos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [dataCreditoUnique, setDataCreditoUnique] = useState(
     DATA_CREDITO_UNIQUE_SIIAN_INI
   );
-  const [estadoProceso, setEstadoProceso] = useState("consulta");
   const [loadingPeticionConsultaCredito, peticionConsultaCredito] = useFetch(
     fetchCustom(URL_CONSULTA_CREDITO, "POST", "Consultar credito")
   );
@@ -128,17 +124,13 @@ const ExtractosCreditosComerciosPDP = () => {
       {
         render: ({ data: res }) => {
           const dataTemp = res.obj.data;
-          if (dataTemp.length === 1) {
-            setDataCreditoUnique(dataTemp[0]);
-          }
-          setDataCreditos(res.obj.data ?? []);
-          setEstadoProceso("inicio");
+          setDataCreditos(dataTemp ?? []);
           return "Consulta satisfactoria";
         },
       },
       {
         render: ({ data: error }) => {
-          validNavigate(-1);
+          closeModule();
           return error?.message ?? "Consulta fallida";
         },
       }
@@ -147,9 +139,21 @@ const ExtractosCreditosComerciosPDP = () => {
   const generacionExtractos = useCallback(
     (tipo_extracto) => (ev) => {
       const data = {
-        // id_credito: dataCreditoUnique.Id,
+        // id_credito: dataCreditoUnique?.cuotas,
         id_credito: 50,
         tipo_extracto: tipo_extracto,
+        nombre_comercio: roleInfo?.["nombre comercio"],
+        ciudad: roleInfo?.["ciudad"],
+        direccion: roleInfo?.["direccion"],
+        email: pdpUser?.email,
+        nombre_usuario: pdpUser?.uname,
+        telefono: roleInfo?.["telefono"],
+        cuotas: dataCreditoUnique?.cuotas,
+        estado_credito: dataCreditoUnique?.Estado,
+        valor_desembolso: dataCreditoUnique?.Valordesembolso,
+        saldo_credito: dataCreditoUnique?.Saldo,
+        valor_pagado:
+          dataCreditoUnique?.Valordesembolso - dataCreditoUnique?.Saldo,
       };
       notifyPending(
         peticionGeneracionExtractos({}, data),
@@ -160,24 +164,20 @@ const ExtractosCreditosComerciosPDP = () => {
         },
         {
           render: ({ data: res }) => {
-            console.log(res.obj);
-            // if (dataTemp.length === 1) {
-            //   setDataCreditoUnique(dataTemp[0]);
-            // }
-            // setDataCreditos(res.obj.data ?? []);
-            // setEstadoProceso("inicio");
+            window.open(res?.obj?.url);
+            closeModal();
             return "Reporte exitoso";
           },
         },
         {
           render: ({ data: error }) => {
-            validNavigate(-1);
+            closeModule();
             return error?.message ?? "Reporte fallido";
           },
         }
       );
     },
-    [validNavigate, roleInfo.id_comercio]
+    [validNavigate, roleInfo, dataCreditoUnique, pdpUser]
   );
 
   return (
@@ -198,7 +198,6 @@ const ExtractosCreditosComerciosPDP = () => {
         <PaymentSummary
           title="Descargar extractos de crédito"
           subtitle="Seleccione en que formato los desea descargar"
-          // summaryTrx={{}}
         >
           <ButtonBar>
             <Button

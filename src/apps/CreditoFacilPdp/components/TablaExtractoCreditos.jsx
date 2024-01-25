@@ -79,7 +79,7 @@ const TablaExtractoCreditos = ({
   const onChange = useCallback((ev) => {}, []);
   const onSelect = useCallback(
     (ev, i) => {
-      const idData = dataTable[i]?.id;
+      const idData = dataTable[i]?.desembolso;
       const dataCredito = dataCreditos.filter((data) => data.Id === idData);
       setDataCreditoUnique(dataCredito[0] ?? {});
       setShowModal(true);
