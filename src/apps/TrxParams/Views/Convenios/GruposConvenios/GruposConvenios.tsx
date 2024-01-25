@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 import useFetchDebounce from "../../../../../hooks/useFetchDebounce";
 import TablaGruposConvenios from "./components/TablaGruposConvenios";
 
-const urlGruposConvenios = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlGruposConvenios =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const GruposConvenios = () => {
   const navigate = useNavigate();
@@ -58,7 +59,8 @@ const GruposConvenios = () => {
           return "Error creando el grupo de convenio";
         }
       }, []),
-    }
+    },
+    { notify: true }
   );
 
   const onSubmit = useCallback(

@@ -1,7 +1,7 @@
 import classes from "./Select.module.css";
 import classes2 from "../Form/Form.module.css";
 
-const Select = ({ label, options, self = false, info = "", ...select }) => {
+const Select = ({ label = "", options, self = false, info = "", ...select }) => {
   const { formItem } = classes;
   const { div_input_form_item } = classes2;
   const { id: _id } = select;

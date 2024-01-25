@@ -40,6 +40,7 @@ const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
 const AdminConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin"));
+const AdminUpdateConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin/UpdateConvenio"));
 const ConveniosAutorizadoresRecaudo = lazy(() =>
   import("./Views/ConveniosPDP/AutorizadoresRecaudo")
 );
@@ -283,6 +284,13 @@ const rutasConfiguraciones = {
           label: <AppIcons Logo={"RECAUDO"} name={"Administrar convenios"} />,
           component: AdminConveniosPDP,
           permission: [20],
+        },
+        {
+          link: "/params-operations/convenios-recaudo/administrar/:pk_id_conv",
+          label: <AppIcons Logo={"RECAUDO"} name={"Administrar convenios"} />,
+          component: AdminUpdateConveniosPDP,
+          permission: [20],
+          show: false,
         },
         {
           link: "/params-operations/convenios-recaudo/autorizadores-recaudo",
