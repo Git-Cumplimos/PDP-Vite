@@ -18,6 +18,9 @@ const GestionTercerosCreditoFacil = lazy(() =>
 const PagoCreditoFacilPDP = lazy(() =>
   import("./Views/CreditoFacil/PagoCreditoFacilPDP")
 );
+const ExtractosCreditosComerciosPDP = lazy(() =>
+  import("./Views/CreditoFacil/ExtractosCreditosComerciosPDP")
+);
 
 const CargueMasivoCredito = lazy(() =>
   import("./Views/Admin/CargueMasivoCredito")
@@ -56,9 +59,20 @@ const rutasCreditosPdp = {
     },
     {
       link: "/creditos-pdp/cargue-masivo-creditos",
-      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Consulta y Cargue Masivo de Créditos" />,
+      label: (
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Consulta y Cargue Masivo de Créditos"
+        />
+      ),
       component: CargueMasivoCredito,
       permission: [enumPermisosCreditoPdpAdmin.CARGUE_MASIVO_CREDITO_FACIL],
+    },
+    {
+      link: "/creditos-pdp/extracto-creditos",
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Extracto Créditos" />,
+      component: ExtractosCreditosComerciosPDP,
+      permission: [enumPermisosCreditoPdp.EXTRACTOS_CREDITOS_COMERCIO],
     },
   ],
 };
