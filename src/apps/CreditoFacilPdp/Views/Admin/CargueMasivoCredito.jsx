@@ -140,6 +140,7 @@ const CargueMasivoCredito = () => {
             minLength="1"
             maxLength="20"
             type="text"
+            value={datosTrans?.idComercio}
             autoComplete="off"
             onInput={(e) => {
               let num = e.target.value.replace(/[\s\.\-+eE]/g, "");

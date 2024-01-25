@@ -80,7 +80,6 @@ const HandleUser = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
       const bodyData = isCreate
         ? {
             email: selected?.email,
@@ -92,6 +91,7 @@ const HandleUser = () => {
             is_comercio_padre: selected?.is_comercio_padre,
           }
         : {
+            email: selected?.email,
             uuid: selected?.uuid,
             uname: selected?.uname,
             phone: selected?.phone,
@@ -101,6 +101,7 @@ const HandleUser = () => {
           };
       if (isCreate) {
         const formData = new FormData(ev.target);
+        bodyData.nameList = formData.getAll("u_name")
         bodyData.uname = formData
           .getAll("u_name")
           .filter((val) => val)
