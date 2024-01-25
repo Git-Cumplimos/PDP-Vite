@@ -315,20 +315,20 @@ const rutasConfiguraciones = {
         },
       ],
     },
-    {
-      link: "/params-operations/navconvenios",
-      label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
-      component: navConvenios,
-      permission: [enumPermisosTrx.convenios, enumPermisosTrx.grupos_comercios],
-      subRoutes: [
-        {
-          link: "/params-operations/convenios",
-          label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
-          component: Convenios,
-          permission: [enumPermisosTrx.tipo_nivel_comercio],
-        },
-      ],
-    },
+    // {
+    //   link: "/params-operations/navconvenios",
+    //   label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
+    //   component: navConvenios,
+    //   permission: [enumPermisosTrx.convenios, enumPermisosTrx.grupos_comercios],
+    //   subRoutes: [
+    //     {
+    //       link: "/params-operations/convenios",
+    //       label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
+    //       component: Convenios,
+    //       permission: [enumPermisosTrx.tipo_nivel_comercio],
+    //     },
+    //   ],
+    // },
 
     {
       link: "/params-operations/autorizadores",
