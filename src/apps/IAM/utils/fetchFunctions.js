@@ -50,28 +50,14 @@ const buildPutFunction = (url) => {
 const buildPostFunctionMassive = (url) => {
   return async (body) => {
     try {
-      console.log(body)
-      // const response = await fetchData(url, "POST", {}, body);
       const response = await fetchSecure(url,
         {
-          headers: {'Content-Type': 'multipart/form-data'},
           method: 'POST',
-          // body,
-          body: JSON.stringify(body)
-          // JSON.stringify(body)
+          body,
         });
       if (response.ok) {
         return response;
       }
-      const res = await response.json();
-      if (!res?.status) {
-        if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
-        }
-
-        throw new Error(res, { cause: "custom" });
-      }
-      throw new Error({ message: "Unhandled error" }, { cause: "custom" });
     } catch (err) {
       throw err;
     }
