@@ -11,6 +11,7 @@ import Modal from "../../../../components/Base/Modal";
 import Form from "../../../../components/Base/Form";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import {updateUserMassive} from "../../utils/fetchFunctions";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -23,15 +24,17 @@ const initialSearchFilters = new Map([
 ]);
 
 const IAMUsers = () => {
+  const { pdpUser } = useAuth();
   const navigate = useNavigate();
-
   const [userData, setUserData] = useState([]);
   const [isNextPage, setIsNextPage] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showMainModal, setShowMainModal] = useState(false);
   const [showModalErrors, setShowModalErrors] = useState(false);
+  const [showModalReport, setShowModalReport] = useState(false);
   const [file, setFile] = useState(null);
   const typoArchivos = ["text/csv"] 
+  const [filerror, setFilerror] = useState(false);
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
@@ -70,9 +73,12 @@ const IAMUsers = () => {
         notifyError('Tipo de archivo incorrecto')
         return;
       }
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('usuario_ultima_actualizacion', pdpUser?.uuid);
       notifyPending(
         updateUserMassive(
-          file,
+          formData
         ),
         {
           render() {
@@ -81,14 +87,27 @@ const IAMUsers = () => {
         },
         {
           render({ data: res }) {
-            handleClose();
-            return res?.msg;
+            const filename = res.headers
+            .get("Content-Disposition")
+            .split("; ")?.[1]
+            .split("=")?.[1];
+            if (filename !== 'Reporte_usuarios.csv') {
+              setFilerror(res)
+              setShowModalErrors(true)
+              setShowModalReport(false)
+              return 'Archivo erróneo'
+            }else{
+              setFilerror(res)
+              setShowModalErrors(true)
+              setShowModalReport(true)
+              return 'Usuarios Creados Exitosamente'
+            }
           },
         },
         {
           render({ data: err }) {
             if (err.msg !== "Error: Archivo vacio"){
-              setShowModalErrors({ msg: err.msg, errores: err.obj?.error[0].complete_info })
+              handleClose()
               return `Archivo erróneo`;
             }
             handleClose()
@@ -96,32 +115,30 @@ const IAMUsers = () => {
           },
         }
       );
-  }, [handleClose, file]);
+  }, [handleClose, file, pdpUser?.uuid]);
 
   const DescargarErrores = useCallback(
     async () => {
-      let errores = []
-
-      if (Array.isArray(showModalErrors?.errores)) {
-        errores.push(['Linea', 'Columna', 'Descripcion'])
-        showModalErrors?.errores.map((err_esp) => {
-          Object.keys(err_esp.error).map((item) => {
-            errores.push([err_esp.line, item, err_esp.error[item]])
-            return null
-          })
-          return null
-        })
-      } else {
-        errores.push(['ERRORES EN HEADERS', ''], ['Columna', 'Descripcion'])
-        Object.keys(showModalErrors?.errores).map((item) => {
-          errores.push([item, showModalErrors?.errores[item]])
-          return null
-        })
-      }
-      // descargarCSV('Errores_del_archivo', errores)
+      const filename = filerror.headers
+      .get("Content-Disposition")
+      .split("; ")?.[1]
+      .split("=")?.[1];
+      filerror.blob().then((blob) => {
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          window.navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+          const exportUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = exportUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          URL.revokeObjectURL(exportUrl);
+          document.body.removeChild(a);
+        }
+      });
       handleClose();
-    }, [handleClose, showModalErrors]);
-
+    }, [filerror,handleClose]);
 
   return (
     <Fragment>
@@ -133,7 +150,6 @@ const IAMUsers = () => {
           type={"button"}
           onClick={() => {
             setShowModal(true);
-            // setMassiveUpload(true);
           }}
         >
           Creacion masiva de usuarios
@@ -222,7 +238,6 @@ const IAMUsers = () => {
           <Button
             onClick={() => {
               setShowMainModal(true);
-              // setShowModalOptions(true);
             }}
           >
             Cargar Archivo
@@ -252,11 +267,11 @@ const IAMUsers = () => {
       </Modal>
       <Modal show={showModalErrors} handleClose={handleClose}>
         <h2 className="text-2xl mx-auto text-center mb-4">
-          {showModalErrors?.msg ?? "Errores en el archivo"}
+        {showModalReport?'Reporte de usuarios':'Errores en el archivo'}
         </h2>
         <ButtonBar>
           <Button onClick={() => { DescargarErrores() }}>
-            Descargar errores del archivo
+            {showModalReport?'Descargar Reporte de usuarios':'Descargar errores del archivo'}
           </Button>
         </ButtonBar>
       </Modal >
