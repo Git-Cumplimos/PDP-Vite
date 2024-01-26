@@ -48,7 +48,7 @@ const DATA_INICIAL_PIN = {
 
 const DATA_TIPO_ID = {
   "CEDULA CIUDADANIA": "C",
-  "CEDULA EXTRANJERIA": "CE",
+  "CEDULA EXTRANJERIA": "E",
   PASAPORTE: "P",
 };
 
@@ -206,7 +206,7 @@ const GeneracionPinColpatria = () => {
       if (name === "cod_ciudad_domicilio") {
         let dataMuni = dataMunicipio.dataList[i];
         setDataUsuario((old) => {
-          return { ...old, [name]: dataMuni.Id };
+          return { ...old, [name]: dataMuni.Codigo };
         });
         setFilterData((old) => {
           return {
@@ -338,7 +338,7 @@ const GeneracionPinColpatria = () => {
             autoComplete="off"
             value={dataUsuario?.["num_identificacion_cliente"]}
             maxLength={17}
-            minLength={1}
+            minLength={4}
             onChange={onChangeFormatNumber}
             required
             disabled={loadingPeticionGeneracionPin}
@@ -363,7 +363,7 @@ const GeneracionPinColpatria = () => {
             autoComplete="off"
             value={dataUsuario?.["num_identificacion_beneficiario"]}
             maxLength={19}
-            minLength={1}
+            minLength={4}
             onChange={onChangeFormatNumber}
             required
             disabled={loadingPeticionGeneracionPin}
@@ -466,7 +466,7 @@ const GeneracionPinColpatria = () => {
             autoComplete="off"
             value={dataUsuario?.["num_identificacion_comprador"]}
             maxLength={19}
-            minLength={1}
+            minLength={4}
             onChange={onChangeFormatNumber}
             required
             disabled={loadingPeticionGeneracionPin}
