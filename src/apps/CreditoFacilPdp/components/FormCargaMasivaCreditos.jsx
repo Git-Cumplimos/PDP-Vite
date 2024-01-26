@@ -84,10 +84,10 @@ const FormCargaMasivaCreditos = ({ setModalOpen, consultaCreditos }) => {
                     const data = {
                       filename: name_file,
                       comercio: {
-                        id_comercio: roleInfo?.id_comercio,
-                        id_usuario: roleInfo?.id_usuario,
-                        id_terminal: roleInfo?.id_dispositivo,
-                        nombre_comercio: roleInfo?.["nombre comercio"],
+                        // id_comercio: roleInfo?.id_comercio,
+                        id_usuario: pdpUser?.uuid,
+                        // id_terminal: roleInfo?.id_dispositivo,
+                        // nombre_comercio: roleInfo?.["nombre comercio"],
                         nombre_usuario: pdpUser?.uname,
                       },
                     };
