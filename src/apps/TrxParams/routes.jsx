@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import { enumPermisosTrx } from "./enumPermisosTrx";
+import ParametrosZonas from "./Views/Comercios/ParametrosZonas";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../components/Base/AppIcons"));
@@ -26,6 +27,12 @@ const CreatePlanComisionCampana = lazy(() =>
 
 const ParametrosAutorizadores = lazy(() =>
   import("./Views/ParametrosAutorizadores")
+);
+const ParametrosCategorizacion = lazy(() =>
+  import("./Views/ParametrosCategorizacion")
+);
+const AsignacionCategorias = lazy(() =>
+  import("./Views/AsignacionCategorias")
 );
 const TipoContratoComisiones = lazy(() =>
   import("./Views/TipoContratoComisiones")
@@ -105,6 +112,18 @@ const rutasConfiguraciones = {
   component: ParamsOperations,
   permission: listPermissionsTrx,
   subRoutes: [
+    {
+      link: "/params-operations/parametros-categorizacion",
+      label: <AppIcons Logo={"RECAUDO"} name={"Parametros categorización"} />,
+      component: ParametrosCategorizacion,
+      permission: [enumPermisosTrx.parametros_autorizadores], // Cambiar permiso
+    },
+    {
+      link: "/params-operations/asignacion-categorias",
+      label: <AppIcons Logo={"RECAUDO"} name={"Asignación Categorías"} />,
+      component: AsignacionCategorias,
+      permission: [enumPermisosTrx.parametros_autorizadores], // Cambiar permiso
+    },
     {
       link: "/params-operations/parametros-autorizadores",
       label: <AppIcons Logo={"RECAUDO"} name={"Parametros por autorizador"} />,
@@ -398,6 +417,12 @@ const rutasConfiguraciones = {
           component: EditGruposComercios,
           permission: [enumPermisosTrx.grupos_comercios],
           show: false,
+        },
+        {
+          link: "/params-operations/comercios-params/gestion-zonas",
+          label: <AppIcons Logo={"RECAUDO"} name={"Gestion zonas"} />,
+          component: ParametrosZonas,
+          permission: [enumPermisosTrx.parametros_autorizadores], // Cambiar permiso
         },
       ],
     },
