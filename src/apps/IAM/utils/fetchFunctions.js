@@ -47,21 +47,17 @@ const buildPutFunction = (url) => {
   };
 };
 
-export const cargueArchivoUsers = (url) => {
+const buildPostFunctionMassive = (url) => {
   return async (body) => {
-    if (!body) {
-      throw new Error("Sin datos en el body", { cause: "custom" });
-    }
     try {
-      const res = await fetchData(url, "POST", {}, body);
-      if (!res?.status) {
-        if (res?.msg) {
-          throw new Error(res?.msg, { cause: "custom" });
-        }
-
-        throw new Error(res, { cause: "custom" });
+      const response = await fetchSecure(url,
+        {
+          method: 'POST',
+          body,
+        });
+      if (response.ok) {
+        return response;
       }
-      return res;
     } catch (err) {
       throw err;
     }
@@ -71,4 +67,4 @@ export const cargueArchivoUsers = (url) => {
 export const createUser = buildPostFunction(`${urlIam}/users`);
 export const updateUser = buildPutFunction(`${urlIam}/users`);
 export const updateUserGroups = buildPostFunction(`${urlIam}/user-groups`);
-export const updateUserMassive = cargueArchivoUsers(`${urlIam}/users-massive`);
+export const updateUserMassive = buildPostFunctionMassive(`${urlIam}/users-massive`);

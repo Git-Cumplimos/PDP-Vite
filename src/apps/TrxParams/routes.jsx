@@ -47,6 +47,7 @@ const Com2Collect = lazy(() => import("./Views/Comisiones/Com2Collect"));
 const Convenios = lazy(() => import("./Views/Convenios/Convenios"));
 const ConveniosPDP = lazy(() => import("./Views/ConveniosPDP"));
 const AdminConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin"));
+const AdminUpdateConveniosPDP = lazy(() => import("./Views/ConveniosPDP/Admin/UpdateConvenio"));
 const ConveniosAutorizadoresRecaudo = lazy(() =>
   import("./Views/ConveniosPDP/AutorizadoresRecaudo")
 );
@@ -304,6 +305,13 @@ const rutasConfiguraciones = {
           permission: [20],
         },
         {
+          link: "/params-operations/convenios-recaudo/administrar/:pk_id_conv",
+          label: <AppIcons Logo={"RECAUDO"} name={"Administrar convenios"} />,
+          component: AdminUpdateConveniosPDP,
+          permission: [20],
+          show: false,
+        },
+        {
           link: "/params-operations/convenios-recaudo/autorizadores-recaudo",
           label: (
             <AppIcons Logo={"RECAUDO"} name={"Autorizadores de recaudo"} />
@@ -311,28 +319,14 @@ const rutasConfiguraciones = {
           component: ConveniosAutorizadoresRecaudo,
           permission: [20],
         },
-      ],
-    },
-    {
-      link: "/params-operations/navconvenios",
-      label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
-      component: navConvenios,
-      permission: [enumPermisosTrx.convenios, enumPermisosTrx.grupos_comercios],
-      subRoutes: [
         {
-          link: "/params-operations/convenios",
-          label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
-          component: Convenios,
-          permission: [enumPermisosTrx.tipo_nivel_comercio],
-        },
-        {
-          link: "/params-operations/grupos-convenios",
+          link: "/params-operations/convenios-recaudo/grupos-convenios",
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
           component: GruposConvenios,
           permission: [enumPermisosTrx.convenios],
         },
         {
-          link: "/params-operations/grupos-convenios/edit/:id",
+          link: "/params-operations/convenios-recaudo/grupos-convenios/edit/:id",
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
           component: EditGruposConvenios,
           permission: [enumPermisosTrx.grupos_comercios],
@@ -340,6 +334,20 @@ const rutasConfiguraciones = {
         },
       ],
     },
+    // {
+    //   link: "/params-operations/navconvenios",
+    //   label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
+    //   component: navConvenios,
+    //   permission: [enumPermisosTrx.convenios, enumPermisosTrx.grupos_comercios],
+    //   subRoutes: [
+    //     {
+    //       link: "/params-operations/convenios",
+    //       label: <AppIcons Logo={"RECAUDO"} name={"Convenios"} />,
+    //       component: Convenios,
+    //       permission: [enumPermisosTrx.tipo_nivel_comercio],
+    //     },
+    //   ],
+    // },
 
     {
       link: "/params-operations/autorizadores",
