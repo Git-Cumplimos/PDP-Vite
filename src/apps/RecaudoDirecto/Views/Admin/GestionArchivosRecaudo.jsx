@@ -197,39 +197,7 @@ const GestionArchivosRecaudo = () => {
         } catch (e) { console.log(e) }
         handleClose();
       }
-      // const tipoArchivo = {
-      //   'Reporte Generico csv': downloadCsvRecaudo,
-      //   'Asobancaria 2001': downloadTxtRecaudo,
-      //   'Asobancaria 2011': downloadTxtRecaudo,
-      // };
-      // try {
-      //   tipoArchivo[selected.fk_nombre_tipo_archivo](body)
-      //     .then(async (res) => {
-      //       if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
-      //         descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
-      //         return;
-      //       }
-      //       if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
-      //         descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
-      //         return;
-      //       }
-      //       if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2011') {
-      //         descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
-      //         return;
-      //       }
-      //       notifyError('Funcion para este archivo en desarrollo')
-      //     })
-      //     .catch((err) => {
-      //       if (err?.cause === "custom") {
-      //         notifyError(err?.message);
-      //         return;
-      //       }
-      //       notifyError(err);
-      //       handleClose();
-      //     });
-      // } catch (e) { console.log(e) }
-      // handleClose();
-    }, [handleClose, selected]);
+  }, [handleClose, selected]);
 
   const DescargarErrores = useCallback(
     async () => {
