@@ -139,8 +139,7 @@ const ExtractosCreditosComerciosPDP = () => {
   const generacionExtractos = useCallback(
     (tipo_extracto) => (ev) => {
       const data = {
-        // id_credito: dataCreditoUnique?.cuotas,
-        id_credito: 50,
+        id_credito: dataCreditoUnique?.Id,
         tipo_extracto: tipo_extracto,
         nombre_comercio: roleInfo?.["nombre comercio"],
         ciudad: roleInfo?.["ciudad"],
