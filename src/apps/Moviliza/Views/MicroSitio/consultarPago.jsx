@@ -8,18 +8,14 @@ import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input"
 import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading"
 import Table from "../../../../components/Base/Table";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import { notify, notifyError} from "../../../../utils/notify";
+import {notifyError} from "../../../../utils/notify";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../utils/fetchMoviliza";
-import { ComponentsMsgFallaNotificacion } from "./components/components_falla_notificacion";
 import classes from "./pagarMoviliza.module.css";
 import TicketMoviliza from "../../components/TicketsMoviliza/TicketMoviliza";
-import { useFetchMoviliza } from "../../hooks/hookMoviliza";
 
 //Constantes Style
 const { styleComponents } = classes;
-
 //Constantes
 const url_consult_pago = `${process.env.REACT_APP_URL_PASARELA_GOU}/backend/pasarela-pagos/consultar-pago`;
 
@@ -28,20 +24,14 @@ const ConsultarPago = () => {
   const [paso, setPaso] = useState("LecturaLiquidacion");
   const [respLiquidacion, setRespLiquidacion] = useState([]);
   const [infTicket, setInfTicket] = useState(null);
-  const navigate = useNavigate();
   const validNavigate = useNavigate();
-
   const [showModal, setShowModal] = useState(false);
-  const [showModalMsg, setShowModalMsg] = useState(false);
+  const [enable, setEnable] = useState(false);
   const printDiv = useRef();
 
   const [loadingPeticionMicrositio, peticionConsultMoviliza] = useFetch(
     fetchCustom(url_consult_pago, "POST", "Consultar pago")
   );
-
-  useEffect(() => {
-    console.log("loadingPeticionMicrositio-->",loadingPeticionMicrositio)
-  }, [loadingPeticionMicrositio]);
 
   const CallErrorPeticion = useCallback((error) => {
     let msg = "Error respuesta PDP: Consulta de pago no exitoso";
@@ -68,51 +58,37 @@ const ConsultarPago = () => {
         notifyError(msg);
       }
     }
-    setPaso("LecturaLiquidacion");
-    setShowModal(false);
   }, []);
 
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback(() => {
-    setPaso("LecturaLiquidacion")
-    setShowModal(false)
     notifyError("Respuesta PDP: Transacción cancelada")
-    validNavigate("/moviliza")
-  }, []);
-
-  const HandleCloseMsg = useCallback(() => {
-    setShowModalMsg(false);
+    validNavigate("/moviliza")    
   }, []);
 
   const HandleCloseTrxExitosa = useCallback(() => {
-    setPaso("LecturaLiquidacion");
-    setShowModal(false);
-    setNumLiquidacion("");
-    setInfTicket(null);
-    validNavigate("/moviliza")
+    validNavigate("/moviliza/consultar_pago")
+    setPaso("LecturaLiquidacion")
+    setShowModal(false)
+    setNumLiquidacion("")
+    setEnable(false)
   }, [validNavigate]);
-
-  const HandleCloseModal = useCallback(() => {
-    if (paso === "LecturaLiquidacion" && !loadingPeticionMicrositio) {
-      HandleCloseTrx(true);
-    } 
-  }, [paso, HandleCloseTrx, loadingPeticionMicrositio]);
 
   const onSubmitConsulta = useCallback(
     (e) => {
-      e.preventDefault();
+      e.preventDefault()
       const data = {
         numLiquidacion:numLiquidacion,
       };
       peticionConsultMoviliza({},data)
         .then((response) => {
-          console.log("response-->",response)
           if (response?.status === true) {
-            setPaso("showLiquidacion");
+            setPaso("showLiquidacion")
             setRespLiquidacion(response?.obj?.result?.info)
+            setInfTicket(response?.obj?.result?.ticket[0])
+            setEnable(true)
           } else {
             const msg_error=response?.obj?.error_msg?.ErrorBuscandoLiquidacion?.error_context
-            console.log("msg_error-->",msg_error)
             notifyError(msg_error)
             setNumLiquidacion("")                       
           }        
@@ -122,6 +98,14 @@ const ConsultarPago = () => {
         });
     },
     [CallErrorPeticion,peticionConsultMoviliza,numLiquidacion]
+  );
+
+  const onSubmitSelect = useCallback(
+    (e) => {
+      e.preventDefault()
+      setPaso("TrxExitosa")
+      setShowModal(true)
+    }, [infTicket]
   );
 
   const handlePrint = useReactToPrint({
@@ -143,6 +127,7 @@ const ConsultarPago = () => {
             required={true}
             autoComplete="off"
             value={numLiquidacion}
+            disabled={enable}
             onInput={(e) => {
               if (!isNaN(e.target.value)) {
                 const num = e.target.value;
@@ -155,7 +140,7 @@ const ConsultarPago = () => {
           <Button 
             type="submit"
             onClick={onSubmitConsulta}
-            disabled={loadingPeticionMicrositio}
+            disabled={loadingPeticionMicrositio || enable}
             >
               Realizar consulta
             </Button>
@@ -176,9 +161,10 @@ const ConsultarPago = () => {
               return { liquidacion, valor, fecha_hora };
             }
           )}
+          onSelectRow={onSubmitSelect}
         />
       )}
-      <Modal show={showModal} handleClose={HandleCloseModal}>        
+      <Modal show={showModal} handleClose={HandleCloseTrxExitosa}>        
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TrxExitosa" && (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
@@ -191,15 +177,6 @@ const ConsultarPago = () => {
         )}
         {/*************** Recarga Exitosa **********************/}
       </Modal>
-
-      {/**************** Transaccion Fallida por notificación **********************/}
-      <Modal show={showModalMsg} handleClose={HandleCloseMsg}>
-      {(
-          <ComponentsMsgFallaNotificacion
-          handleClose={HandleCloseMsg}
-          ></ComponentsMsgFallaNotificacion>
-          )}
-          </Modal>
     </Fragment>
   );
 };
