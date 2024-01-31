@@ -163,7 +163,18 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 disabled={true}
                 required
               />
-              <Input
+              <MoneyInput
+                id="deuda"
+                name="deuda"
+                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio":"Deuda del comercio"}
+                autoComplete="off"
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
+                value={parseInt(cupoComer[0]?.deuda)}
+                disabled={true}
+                required
+              />
+              {/* <Input
                 id="deuda"
                 name="deuda"
                 label="Deuda del comercio"
@@ -173,7 +184,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
                 disabled={true}
                 required
-              />
+              /> */}
               <MoneyInput
                 id="cupo_en_canje"
                 name="cupo_en_canje"

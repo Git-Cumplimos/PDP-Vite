@@ -44,23 +44,23 @@ const CrearCupo = () => {
   const onSubmitComercio = useCallback(
     (e) => {
       e.preventDefault();
-      if (
-        sobregiro !== 0 && deuda !== 0 && canje !== 0
-      ) {
-        setShowModal(true);
-        setSummary({
-          "Id del comercio": idComercio,
-          "Sobregiro": formatMoney.format(sobregiro),
-          Deuda: formatMoney.format(deuda),
-          "Cupo en canje": formatMoney.format(canje),
-          "Base de caja": formatMoney.format(baseCaja),
-          "Dias máximos de sobregiro": diasMaxSobregiro,
-        });
-      } else {
-        notifyError(
-          "Los campos sobregiro, deuda o cupo en canje no pueden ser cero"
-        );
-      }
+      // if (
+      //   sobregiro !== 0 && deuda !== 0 && canje !== 0
+      // ) {
+      setShowModal(true);
+      setSummary({
+        "Id del comercio": idComercio,
+        "Sobregiro": formatMoney.format(sobregiro),
+        Deuda: formatMoney.format(deuda),
+        "Cupo en canje": formatMoney.format(canje),
+        "Base de caja": formatMoney.format(baseCaja),
+        "Dias máximos de sobregiro": diasMaxSobregiro,
+      });
+      // } else {
+      //   notifyError(
+      //     "Los campos sobregiro, deuda o cupo en canje no pueden ser cero"
+      //   );
+      // }
     },
     [idComercio, deuda, canje, sobregiro, baseCaja, diasMaxSobregiro]
   );
@@ -101,7 +101,7 @@ const CrearCupo = () => {
     ]
   );
 
-  const onMoneyChange = useCallback((e, valor) => {
+  const onMoneyChange = useCallback((e, valor = 0) => {
     const setValues = {
       "sobregiro": () => setSobregiro(valor),
       "deuda": () => setDeuda(valor),
@@ -137,6 +137,7 @@ const CrearCupo = () => {
           max={limitesMontos?.max}
           value={sobregiro ?? 0}
           onInput={onMoneyChange}
+          equalErrorMin = {false}
           required
         />
         <MoneyInput
@@ -148,6 +149,7 @@ const CrearCupo = () => {
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           value={deuda ?? 0}
+          equalErrorMin = {false}
           onInput={onMoneyChange}
           required
         />
@@ -160,6 +162,7 @@ const CrearCupo = () => {
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           value={canje ?? 0}
+          equalErrorMin = {false}
           onInput={onMoneyChange}
           required
         />
