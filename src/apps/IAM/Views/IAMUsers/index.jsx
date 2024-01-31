@@ -148,8 +148,8 @@ const IAMUsers = () => {
     "Tipo_documento","Numero_documento",
     "Numero_telefono","Direccion","Estado",
     "Grupo_usuarios","Comercio_relacionado"],
-    ["desarrollador.web@gmail.com","ANDRES", "FELIPE","GUZMAN","MARTINEZ","CC",1032147425,3165788259,"Cr 100 # 45A Sur- 30","True","[]",59],
-    ["desarrollador@cumplimos.co","ANDRES","FELIPE","GUZMAN","HERRERA","CC",1031147427,3165788250,"Cr 100 # 45A Sur- 30","True","[1]",1],
+    ["desarrollador.web@gmail.com","ANDRES", "FELIPE","GUZMAN","MARTINEZ","CC",1032147425,3165788259,"Cr 100 # 45A Sur- 30","True","[]",],
+    ["desarrollador@cumplimos.co","ANDRES","FELIPE","GUZMAN","HERRERA","CC",1031147427,3165788250,"Cr 100 # 45A Sur- 30","True",["[1,2]"],1],
   ])
   
   const descargarPlantilla = useCallback(() => {
