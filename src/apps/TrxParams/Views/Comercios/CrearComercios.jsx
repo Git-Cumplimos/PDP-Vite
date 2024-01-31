@@ -1157,9 +1157,10 @@ const CrearComercios = () => {
             label="Pago comisión cada:"
             options={{
               "": "",
-              Transacción: "Transaccion",
-              Mensual: "Mensual",
-              Directo: "Directo",
+              "Transacción": "Transaccion",
+              "Transferencia Mensual": "Transferencia_Mensual",
+              "Mensual": "Mensual",
+              "Directo": "Directo",
             }}
             value={comercio?.tipo_pago_comision}
             onChange={(ev) =>
