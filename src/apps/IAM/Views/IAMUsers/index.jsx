@@ -4,6 +4,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import Input from "../../../../components/Base/Input";
 import { onChangeNumber } from "../../../../utils/functions";
+import { descargarCSV } from "../../utils/functions";
 import { useNavigate } from "react-router-dom";
 import useMap from "../../../../hooks/useMap";
 import DataTable from "../../../../components/Base/DataTable/DataTable";
@@ -140,6 +141,21 @@ const IAMUsers = () => {
       handleClose();
     }, [filerror,handleClose]);
 
+  const [res] = useState([
+    ["Correo", 
+    "Primer_nombre","Segundo_nombre", 
+    "Primer_apellido","Segundo_apellido",
+    "Tipo_documento","Numero_documento",
+    "Numero_telefono","Direccion","Estado",
+    "Grupo_usuarios","Comercio_relacionado"],
+    ["desarrollador.web@gmail.com","ANDRES", "FELIPE","GUZMAN","MARTINEZ","CC",1032147425,3165788259,"Cr 100 # 45A Sur- 30","True","[]",""],
+    ["desarrollado@cumplimos.co","ANDRES","FELIPE","GUZMAN","HERRERA","CC",1031147427,3165788250,"Cr 100 # 45A Sur- 30","True",["[1,2]"],"59"],
+  ])
+  
+  const descargarPlantilla = useCallback(() => {
+    descargarCSV('Ejemplo_de_archivo_usuarios_masivo', res)
+  }, [res]);
+
   return (
     <Fragment>
       <ButtonBar>
@@ -147,7 +163,7 @@ const IAMUsers = () => {
           Nuevo usuario
         </Button>
         <Button
-          type={"button"}
+          type={"submit"}
           onClick={() => {
             setShowModal(true);
           }}
@@ -242,6 +258,13 @@ const IAMUsers = () => {
           >
             Cargar Archivo
           </Button>
+          <Button
+            onClick={() => {
+              descargarPlantilla();
+            }}
+          >
+            Formato de Archivo
+          </Button>
         </ButtonBar>
       </Modal>
       <Modal show={showMainModal} handleClose={handleClose}>
@@ -271,7 +294,7 @@ const IAMUsers = () => {
         </h2>
         <ButtonBar>
           <Button onClick={() => { DescargarErrores() }}>
-            {showModalReport?'Descargar Reporte de usuarios':'Descargar errores del archivo'}
+            {showModalReport?'Descargar Reporte de Usuarios':'Descargar errores del archivo'}
           </Button>
         </ButtonBar>
       </Modal >
