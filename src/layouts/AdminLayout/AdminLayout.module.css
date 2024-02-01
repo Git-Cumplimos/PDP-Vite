@@ -34,7 +34,7 @@ header.headerPDP .usrData > .diasSobregiro {
 
 header.headerPDP .usrData > .saldoCupo {
   max-width: 12.75rem;
-  @apply rounded-full px-6 bg-primary text-white mx-2 text-center;
+  @apply rounded-full px-6 bg-primary text-white mx-2 text-center cursor-pointer;
 }
 
 header.headerPDP .usrData > .comision {
