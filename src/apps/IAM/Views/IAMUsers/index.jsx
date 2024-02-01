@@ -294,7 +294,7 @@ const IAMUsers = () => {
         </h2>
         <ButtonBar>
           <Button onClick={() => { DescargarErrores() }}>
-            {showModalReport?'Descargar Reporte de usuarios':'Descargar errores del archivo'}
+            {showModalReport?'Descargar Reporte de Usuarios':'Descargar errores del archivo'}
           </Button>
         </ButtonBar>
       </Modal >
