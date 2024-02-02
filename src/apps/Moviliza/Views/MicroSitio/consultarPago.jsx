@@ -1,14 +1,14 @@
-import { useState, useCallback, Fragment, useRef, useEffect } from "react";
+import { useState, useCallback, Fragment, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Form from "../../../../components/Base/Form";
 import Modal from "../../../../components/Base/Modal";
-import Input from "../../../../components/Base/Input"
-import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading"
+import Input from "../../../../components/Base/Input";
+import SimpleLoading from "../../../../components/Base/SimpleLoading/SimpleLoading";
 import Table from "../../../../components/Base/Table";
-import {notifyError} from "../../../../utils/notify";
+import { notifyError } from "../../../../utils/notify";
 import { useFetch } from "../../../../hooks/useFetch";
 import { fetchCustom, ErrorCustom } from "../../utils/fetchMoviliza";
 import classes from "./pagarMoviliza.module.css";
@@ -62,51 +62,50 @@ const ConsultarPago = () => {
 
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback(() => {
-    notifyError("Respuesta PDP: Transacción cancelada")
-    validNavigate("/moviliza")    
+    notifyError("Respuesta PDP: Transacción cancelada");
+    validNavigate("/moviliza");
   }, [validNavigate]);
 
   const HandleCloseTrxExitosa = useCallback(() => {
-    validNavigate("/moviliza/consultar_pago")
-    setPaso("LecturaLiquidacion")
-    setShowModal(false)
-    setNumLiquidacion("")
-    setEnable(false)
+    validNavigate("/moviliza/consultar_pago");
+    setPaso("LecturaLiquidacion");
+    setShowModal(false);
+    setNumLiquidacion("");
+    setEnable(false);
   }, [validNavigate]);
 
   const onSubmitConsulta = useCallback(
     (e) => {
-      e.preventDefault()
+      e.preventDefault();
       const data = {
-        numLiquidacion:numLiquidacion,
+        numLiquidacion: numLiquidacion,
       };
-      peticionConsultMoviliza({},data)
+      peticionConsultMoviliza({}, data)
         .then((response) => {
           if (response?.status === true) {
-            setPaso("showLiquidacion")
-            setRespLiquidacion(response?.obj?.result?.info)
-            setInfTicket(response?.obj?.result?.ticket[0])
-            setEnable(true)
+            setPaso("showLiquidacion");
+            setRespLiquidacion(response?.obj?.result?.info);
+            setInfTicket(response?.obj?.result?.ticket[0]);
+            setEnable(true);
           } else {
-            const msg_error=response?.obj?.error_msg?.ErrorBuscandoLiquidacion?.error_context
-            notifyError(msg_error)
-            setNumLiquidacion("")                       
-          }        
+            const msg_error =
+              response?.obj?.error_msg?.ErrorBuscandoLiquidacion?.error_context;
+            notifyError(msg_error);
+            setNumLiquidacion("");
+          }
         })
         .catch((error) => {
           CallErrorPeticion(error);
         });
     },
-    [CallErrorPeticion,peticionConsultMoviliza,numLiquidacion]
+    [CallErrorPeticion, peticionConsultMoviliza, numLiquidacion]
   );
 
-  const onSubmitSelect = useCallback(
-    (e) => {
-      e.preventDefault()
-      setPaso("TrxExitosa")
-      setShowModal(true)
-    }, [infTicket]
-  );
+  const onSubmitSelect = useCallback((e) => {
+    e.preventDefault();
+    setPaso("TrxExitosa");
+    setShowModal(true);
+  }, []);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -135,17 +134,17 @@ const ConsultarPago = () => {
               }
             }}
           />
-        </div>  
+        </div>
         <ButtonBar className="flex justify-center py-6">
-          <Button 
+          <Button
             type="submit"
             onClick={onSubmitConsulta}
             disabled={loadingPeticionMicrositio || enable}
-            >
-              Realizar consulta
-            </Button>
-          <Button 
-            type={"button"} 
+          >
+            Realizar consulta
+          </Button>
+          <Button
+            type={"button"}
             onClick={() => HandleCloseTrx(true)}
             disabled={loadingPeticionMicrositio}
           >
@@ -156,18 +155,16 @@ const ConsultarPago = () => {
       {paso === "showLiquidacion" && (
         <Table
           headers={["Número de liquidación", "Valor", "Fecha y hora"]}
-          data={respLiquidacion.map(
-            ({ liquidacion, valor, fecha_hora }) => {
-              return { liquidacion, valor, fecha_hora };
-            }
-          )}
+          data={respLiquidacion.map(({ liquidacion, valor, fecha_hora }) => {
+            return { liquidacion, valor, fecha_hora };
+          })}
           onSelectRow={onSubmitSelect}
         />
       )}
-      <Modal show={showModal} handleClose={HandleCloseTrxExitosa}>        
+      <Modal show={showModal} handleClose={HandleCloseTrxExitosa}>
         {/**************** TransaccionExitosa **********************/}
         {infTicket && paso === "TrxExitosa" && (
-          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketMoviliza refPrint={printDiv} ticket={infTicket} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
