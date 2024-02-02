@@ -64,7 +64,7 @@ const ConsultarPago = () => {
   const HandleCloseTrx = useCallback(() => {
     notifyError("Respuesta PDP: Transacción cancelada")
     validNavigate("/moviliza")    
-  }, []);
+  }, [validNavigate]);
 
   const HandleCloseTrxExitosa = useCallback(() => {
     validNavigate("/moviliza/consultar_pago")
