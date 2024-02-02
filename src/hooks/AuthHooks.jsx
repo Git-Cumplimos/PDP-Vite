@@ -504,12 +504,14 @@ export const useProvideAuth = () => {
           sobregiro: 0,
           sobregirovalue: 0,
           alerta: "",
+          tipo_pago_comision: "",
         };
         tempRole.quota = quota["cupo disponible"];
         tempRole.comision = quota["comisiones"];
         tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
         tempRole.sobregirovalue = quota["sobregiro"];
         tempRole.alerta = quota["alerta cupo"];
+        tempRole.tipo_pago_comision = quota["tipo pago comision"] ?? "";
         dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
       }, []),
       onError: useCallback((error) => {
