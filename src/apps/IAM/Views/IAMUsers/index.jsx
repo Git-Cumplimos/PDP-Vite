@@ -10,9 +10,10 @@ import useMap from "../../../../hooks/useMap";
 import DataTable from "../../../../components/Base/DataTable/DataTable";
 import Modal from "../../../../components/Base/Modal";
 import Form from "../../../../components/Base/Form";
-import { notifyError, notifyPending } from "../../../../utils/notify";
-import {updateUserMassive} from "../../utils/fetchFunctions";
+import { notifyError,notify } from "../../../../utils/notify";
+import {updateUserMassive,verifyFileUserMassive} from "../../utils/fetchFunctions";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -33,9 +34,14 @@ const IAMUsers = () => {
   const [showMainModal, setShowMainModal] = useState(false);
   const [showModalErrors, setShowModalErrors] = useState(false);
   const [showModalReport, setShowModalReport] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [file, setFile] = useState(null);
   const typoArchivos = ["text/csv"] 
   const [filerror, setFilerror] = useState(false);
+  const [createdfile, setCreatedfile] = useState(true);
+  let fechaActual = new Date();
+  let fechaIso = fechaActual.toISOString();
+  let fechaHoraFormateada = fechaIso.replace(/[-:T.]/g, '').slice(0, 14);
   const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
@@ -74,49 +80,62 @@ const IAMUsers = () => {
         notifyError('Tipo de archivo incorrecto')
         return;
       }
+      const nombreArchivo = `Reporte_usuarios_${fechaHoraFormateada}.csv`
       const formData = new FormData();
       formData.append('file', file);
       formData.append('usuario_ultima_actualizacion', pdpUser?.uuid);
-      notifyPending(
-        updateUserMassive(
-          formData
-        ),
-        {
-          render() {
-            return "Enviando solicitud";
-          },
-        },
-        {
-          render({ data: res }) {
-            const filename = res.headers
-            .get("Content-Disposition")
-            .split("; ")?.[1]
-            .split("=")?.[1];
-            if (filename !== 'Reporte_usuarios.csv') {
+      formData.append('fecha_actual', fechaHoraFormateada);
+      setIsUploading(true);
+      updateUserMassive(formData)
+        .then(async(res) => {
+          if (res.status !== 504) {
+              const filename = res.headers
+              .get("Content-Disposition")
+              .split("; ")?.[1]
+              .split("=")?.[1];
+            if (filename !== nombreArchivo) {
               setFilerror(res)
               setShowModalErrors(true)
               setShowModalReport(false)
-              return 'Archivo erróneo'
+              notifyError('Archivo erróneo');
+              setIsUploading(false);
             }else{
               setFilerror(res)
               setShowModalErrors(true)
               setShowModalReport(true)
-              return 'Usuarios Creados Exitosamente'
+              notify('Usuarios Creados Exitosamente');
+              setIsUploading(false);
             }
-          },
-        },
-        {
-          render({ data: err }) {
-            if (err.msg !== "Error: Archivo vacio"){
-              handleClose()
-              return `Archivo erróneo`;
+          }else{
+            while (createdfile) {
+              try {
+                const verificationResponse = await verifyFileUserMassive({filename: nombreArchivo})
+                if (verificationResponse?.obj !== false) {
+                  window.open(verificationResponse?.obj);
+                  setIsUploading(false);
+                  setCreatedfile(false);
+                  handleClose()
+                  notify('Usuarios Creados Exitosamente');
+                  break;
+                }
+              } catch (error) {
+                console.error(error);
+                handleClose()
+                notifyError("Errores al crear masivo");
+                setIsUploading(false);
+                break;
+              }
+              await wait(7000);
+              notify("Procesando los usuarios...");
             }
-            handleClose()
-            return err.msg
-          },
-        }
-      );
-  }, [handleClose, file, pdpUser?.uuid]);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          notifyError("No se pudo conectar al servidor");
+          setIsUploading(false);
+        });
+  }, [handleClose, file, pdpUser?.uuid,fechaHoraFormateada,createdfile]);
 
   const DescargarErrores = useCallback(
     async () => {
@@ -156,8 +175,15 @@ const IAMUsers = () => {
     descargarCSV('Ejemplo_de_archivo_usuarios_masivo', res)
   }, [res]);
 
+  async function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+
+
   return (
     <Fragment>
+      <SimpleLoading show={isUploading} />
       <ButtonBar>
         <Button type={"submit"} onClick={() => navigate("/iam/users/new-user")}>
           Nuevo usuario
