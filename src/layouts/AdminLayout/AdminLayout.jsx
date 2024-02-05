@@ -89,7 +89,7 @@ const AdminLayout = () => {
   }, [navigate]);
 
   const consultaCupoComercios = useCallback((id_comercio) => {
-    if (!showModalCupo) {
+    if (!showModalCupo && roleInfo?.id_comercio) {
       getConsultaCupoComercio({'pk_id_comercio':id_comercio ?? roleInfo?.id_comercio})
       .then((res) => {
         if (!res?.obj || res?.obj?.length === 0) {
@@ -344,13 +344,13 @@ const AdminLayout = () => {
             }}
             grid
           >
-            <Fieldset legend={"Cupo Disponible"} className={"lg:col-span-2"}>
+            <Fieldset legend={"Detalles"} className={"lg:col-span-2"}>
               <Input
                 id="sobregiro"
                 name="sobregiro"
                 label="Sobregiro"
                 autoComplete="off"
-                value={`$ ${(parseInt(cupoComercio[0]?.sobregiro) * 1).toLocaleString() ?? 0}`}
+                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.sobregiro)).toLocaleString() ?? 0}`}
                 disabled={true}
               />
               <Input
@@ -358,17 +358,15 @@ const AdminLayout = () => {
                 name="deuda"
                 label={parseInt(cupoComercio[0]?.deuda) >= 1 ? "Deuda al comercio":"Deuda del comercio"}
                 autoComplete="off"
-                value={`$ ${(parseInt(cupoComercio[0]?.deuda) * 1).toLocaleString() ?? 0}`}
+                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.deuda)).toLocaleString() ?? 0}`}
                 disabled={true}
-                />
-            </Fieldset>
-            <Fieldset legend={"Detalles"} className={"lg:col-span-2"}>
+              />      
               <Input
                 id="cupo_en_canje"
                 name="cupo_en_canje"
                 label="Cupo en canje"
                 autoComplete="off"
-                value={`$ ${(parseInt(cupoComercio[0]?.cupo_en_canje) * 1).toLocaleString() ?? 0}`}
+                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.cupo_en_canje)).toLocaleString() ?? 0}`}
                 disabled={true}
               />
               <Input
@@ -376,7 +374,7 @@ const AdminLayout = () => {
                 name="base_caja"
                 label="Base caja"
                 autoComplete="off"
-                value={`$ ${(parseInt(cupoComercio[0]?.base_caja) * 1).toLocaleString() ?? 0}`}
+                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.base_caja)).toLocaleString() ?? 0}`}
                 disabled={true}
               />
             </Fieldset>
