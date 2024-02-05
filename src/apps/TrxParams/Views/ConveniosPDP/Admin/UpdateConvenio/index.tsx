@@ -330,7 +330,7 @@ const UpdateConvenio = () => {
               minLength={13}
               maxLength={13}
               onChange={(ev) =>
-                dispatch({ type: "EAN_EDIT", index, value: ev.target.value })
+                dispatch({ type: "EAN_EDIT", index, value: onChangeNumber(ev) })
               }
               required
               actionBtn={{
