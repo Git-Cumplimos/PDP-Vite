@@ -60,7 +60,7 @@ const ConsultarPago = () => {
     }
   }, []);
 
-  //********************Funciones para cerrar el Modal**************************
+  //******************** Funciones para cerrar el Modal **************************
   const HandleCloseTrx = useCallback(() => {
     notifyError("Respuesta PDP: Transacción cancelada")
     validNavigate("/moviliza")    
@@ -165,7 +165,7 @@ const ConsultarPago = () => {
         />
       )}
       <Modal show={showModal} handleClose={HandleCloseTrxExitosa}>        
-        {/**************** TransaccionExitosa **********************/}
+        {/***************** TransaccionExitosa ***********************/}
         {infTicket && paso === "TrxExitosa" && (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketMoviliza refPrint={printDiv} ticket={infTicket} />
