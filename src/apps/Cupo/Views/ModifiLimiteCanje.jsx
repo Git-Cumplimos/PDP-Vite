@@ -226,7 +226,7 @@ const ModifiLimiteCanje = () => {
             <Input
               id="dias_max_sobregiro"
               name="dias_max_sobregiro"
-              label="Dias máximos sobregiro"
+              label="Días máximos sobregiro"
               type="tel"
               autoComplete="off"
               minLength={0}

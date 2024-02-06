@@ -380,7 +380,7 @@ const AdminLayout = () => {
               <Input
                 id="dias_max_sobregiro"
                 name="dias_max_sobregiro"
-                label="Dias máximos sobregiro"
+                label="Días máximos sobregiro"
                 autoComplete="off"
                 value={cupoComercio[0]?.dias_max_sobregiro ?? 0}
                 disabled={true}
