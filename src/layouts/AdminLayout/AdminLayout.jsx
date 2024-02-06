@@ -377,6 +377,14 @@ const AdminLayout = () => {
                 value={`$ ${Math.abs(parseInt(cupoComercio[0]?.base_caja)).toLocaleString() ?? 0}`}
                 disabled={true}
               />
+              <Input
+                id="dias_max_sobregiro"
+                name="dias_max_sobregiro"
+                label="Dias máximos sobregiro"
+                autoComplete="off"
+                value={cupoComercio[0]?.dias_max_sobregiro ?? 0}
+                disabled={true}
+              />
             </Fieldset>
           </Form>
         </Modal>

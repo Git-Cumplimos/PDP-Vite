@@ -180,11 +180,11 @@ const ModifiLimiteCanje = () => {
             <Input
               id="deuda"
               name="deuda"
-              label="Deuda del comercio"
+              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
+              value={`$ ${Math.abs(parseInt(cupoComer[0]?.deuda)).toLocaleString() ?? 0}`}
               disabled={true}
               required
               />
