@@ -32,8 +32,8 @@ const DATA_INICIAL_PIN = {
   num_identificacion_comprador: "",
   tipo_doc_comprador: "C",
   fec_expedicion_comprador: "",
-  codigo_convenio: "68335",
-  codigo_pin: "003",
+  codigo_convenio: "068335",
+  codigo_pin: "0003",
   cod_ciudad_transaccion: "",
   nombre_comprador: "",
   apellidos_comprador: "",
@@ -47,9 +47,11 @@ const DATA_INICIAL_PIN = {
 };
 
 const DATA_TIPO_ID = {
-  "CEDULA CIUDADANIA": "C",
-  "CEDULA EXTRANJERIA": "E",
-  PASAPORTE: "P",
+  "NIT": "N",
+  "CEDULA DE CIUDADANIA": "C",
+  "CEDULA DE EXTRANJERIA": "E",
+  // "PASAPORTE": "P",
+  "TARJETA DE IDENTIDAD": "T"
 };
 
 const GeneracionPinColpatria = () => {
@@ -242,10 +244,10 @@ const GeneracionPinColpatria = () => {
             label={"Código convenio"}
             type="text"
             autoComplete="off"
-            value={dataUsuario?.["codigo_convenio"]}
+            value={dataUsuario?.codigo_convenio}
             maxLength={6}
             minLength={1}
-            onChange={onChangeFormat}
+            // onChange={onChangeFormat}
             required
             disabled={loadingPeticionGeneracionPin}
           />
@@ -258,7 +260,7 @@ const GeneracionPinColpatria = () => {
             value={dataUsuario?.["codigo_pin"]}
             maxLength={4}
             minLength={1}
-            onChange={onChangeFormat}
+            // onChange={onChangeFormat}
             required
             disabled={loadingPeticionGeneracionPin}
           />
