@@ -11,7 +11,6 @@ import {
   editarExterno,
 } from "../../utils/fetchCaja";
 import { notifyError, notifyPending } from "../../../../utils/notify";
-// import { useAuth } from "../../../../hooks/AuthHooks";
 
 
 const ParametrizacionRecaudo = () => {
@@ -21,7 +20,6 @@ const ParametrizacionRecaudo = () => {
   const [data, setData] = useState([]);
   const [searchFilters, setSearchFilters] = useState({ pk_nombre_plataforma: "" });
   const [selectedEntity, setSelectedEntity] = useState(null);
-  // const { roleInfo} = useAuth();
 
   const buscarPlataforma = useCallback(() => {
     buscarPlataformaExt({ ...pageData, ...searchFilters })
@@ -43,7 +41,7 @@ const ParametrizacionRecaudo = () => {
     buscarPlataforma();
     setShowModal(false);
     setSelectedEntity(null);
-  }, []);
+  }, [buscarPlataforma]);
 
   const handleSubmit = useCallback(
     (ev) => {

@@ -318,7 +318,7 @@ const Panel = () => {
     if (isNegative) {
       numericValue = numericValue.slice(1); // Elimina el signo "-" para el formato interno
     }
-    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const updateData = dataPlfExt.map((value,i) => {
         if(value.pk_nombre_plataforma !== key.pk_nombre_plataforma){
           return value
