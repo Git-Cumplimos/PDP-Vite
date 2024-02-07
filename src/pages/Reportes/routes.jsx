@@ -3,6 +3,7 @@ import { lazy } from "react";
 
 const Koncilia = lazy(() => import("./views/Koncilia"));
 const ReporteComercios = lazy(() => import("./views/ReporteComercios"));
+const ReporteUsuarios = lazy(() => import("./views/ReporteUsuarios"));
 const ReporteComisiones = lazy(() => import("./views/ReporteComisiones"));
 const ReporteConteoComisiones = lazy(() =>
   import("./views/ReporteConteoComisiones")
@@ -82,5 +83,16 @@ export const rutasReportes = [
     ),
     component: ReporteDeComercios,
     permission: [25001],
+  },
+  {
+    link: "/reportes/usuarios",
+    label: (
+      <AppIcons
+        Logo={"RECAUDO"}
+        name="Reporte usuarios"
+      />
+    ),
+    component: ReporteUsuarios,
+    permission: [25002],
   },
 ];

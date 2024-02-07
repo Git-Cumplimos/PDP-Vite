@@ -44,8 +44,8 @@ const buildPostFunction = (url) => {
     try {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
-        if (res?.msg === "Error incompatible entre datos del comercio") {
-          throw new Error("Error incompatible entre datos del comercio", { cause: "custom" });
+        if (res?.msg === "Los datos ingresados del comercio y usuario no existen") {
+          throw new Error("Los datos ingresados del comercio y usuario no existen", { cause: "custom" });
         }
         if (res?.msg === "Exception (decorated fcn): Efectivo insuficiente en boveda") {
           throw new Error("Efectivo insuficiente en la bóveda", { cause: "custom" });
