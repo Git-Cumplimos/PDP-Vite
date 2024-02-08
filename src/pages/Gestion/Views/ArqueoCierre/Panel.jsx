@@ -152,8 +152,8 @@ const Panel = () => {
       if (typeof(elemento.valor) === "string") {
         if (elemento.valor.includes("$")) {
           originalData[i].valor = elemento.valor.replace("$","");
-        }while (elemento.valor.includes(",")) {
-          originalData[i].valor = elemento.valor.replace(",","");
+        }while (elemento.valor.includes(".")) {
+          originalData[i].valor = elemento.valor.replace(".","");
         }
         originalData[i].valor = parseInt(originalData[i].valor)
       }
@@ -187,7 +187,7 @@ const Panel = () => {
           const tempTicket = {
             title: "Cierre de caja",
             timeInfo: {
-              "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+              "Fecha de cierre": Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
@@ -210,48 +210,45 @@ const Panel = () => {
             ],
             cajaInfo: [
               [
-                "Saldo PDP Día Anterior",
+                "Saldo Cierre día Anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],
+              // [
+              //   "Saldo Externos Día Anterior",
+              //   formatMoney.format(totalExtrdiaAnterior),
+              // ],
+              // ["", ""],
+              // [
+              //   "Saldo Cierre Día Anterior",
+              //   formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
+              // ],
+              // ["", ""],
               [
-                "Saldo Externos Día Anterior",
-                formatMoney.format(totalExtrdiaAnterior),
+                "Saldo PDP + Externos Del Día",
+                formatMoney.format(cierre?.total_movimientos+cierre?.total_notas+cierre?.total_recibido_transportadora-cierre?.total_consignaciones_transportadora+Num),
               ],
               ["", ""],
+              // [
+              //   "Saldo Externos Fin del Día",
+              //   formatMoney.format(Num),
+              // ],
+              // ["", ""],
               [
-                "Saldo Cierre Día Anterior",
-                formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
-              ],
-              ["", ""],
-              [
-                "Saldo PDP Fin del Día",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
-              ],
-              ["", ""],
-              [
-                "Saldo Externos Fin del Día",
-                formatMoney.format(Num),
-              ],
-              ["", ""],
-              [
-                "Saldo Total del Día",
+                "Total Saldo Total Del Día",
                 formatMoney.format(cierre?.total_efectivo_en_caja+Num),
-              ],
-              ["", ""],
-              [
-                "Efectivo en Caja",
-                formatMoney.format(totalArqueo),
               ],
               ["", ""],
             ],
             trxInfo: [
+              ["Total Arqueo de Caja", formatMoney.format(totalArqueo+Num)],
+              ["", ""],
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Pendiente Consignaciones Bancarias y Transportadora PDP",
+                "Pendiente Consignaciones Bancarias y Transportadora",
                 formatMoney.format(cierre?.total_consignaciones_transportadora_pendiente),
               ],
               ["", ""],
@@ -261,15 +258,15 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Consignaciones Bancarias y Transportadora PDP",
+                "Consignaciones Bancarias y Transportadora",
                 formatMoney.format(cierre?.total_consignaciones_transportadora),
               ],
               ["", ""],
-              [
-                "Consignaciones Bancarias y Transportadora Externos",
-                formatMoney.format(cierre?.total_consignaciones_transportadora_externos),
-              ],
-              ["", ""],
+              // [
+              //   "Consignaciones Bancarias y Transportadora Externos",
+              //   formatMoney.format(cierre?.total_consignaciones_transportadora_externos),
+              // ],
+              // ["", ""],
               [
                 "Recibido Transportadora",
                 formatMoney.format(cierre?.total_recibido_transportadora),
@@ -280,13 +277,18 @@ const Panel = () => {
                 formatMoney.format(cierre?.total_notas),
               ],
               ["", ""],
+              [
+                "Total Plataformas Externa",
+                formatMoney.format(Num),
+              ],
+              ["", ""],
             ],
           };
-          dataPlfExt.map((elemento) => 
-            tempTicket.trxInfo.push([
-              elemento.pk_nombre_plataforma,
-              formatMoney.format(elemento.valor)],["", ""])
-          )
+          // dataPlfExt.map((elemento) => 
+          //   tempTicket.trxInfo.push([
+          //     elemento.pk_nombre_plataforma,
+          //     formatMoney.format(elemento.valor)],["", ""])
+          // )
           setResumenCierre(tempTicket);
           return res?.msg;
         },
@@ -303,7 +305,14 @@ const Panel = () => {
       },
       { toastId: "busqueda-cierre-123" }
     );
-  }, [denominaciones, nombreComercio, roleInfo, userInfo?.attributes?.name]);
+  }, [
+    denominaciones, 
+    nombreComercio, 
+    roleInfo, 
+    userInfo?.attributes?.name,
+    totalCierres,
+    totalArqueo
+  ]);
 
   const printDiv = useRef();
 
