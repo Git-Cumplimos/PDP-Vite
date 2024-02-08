@@ -380,7 +380,7 @@ const GeneracionPinColpatria = () => {
             maxLength={20}
             minLength={1}
             onChange={onChangeFormat}
-            required
+            // required
             disabled={loadingPeticionGeneracionPin}
           />
         </Fieldset>
@@ -434,7 +434,7 @@ const GeneracionPinColpatria = () => {
             maxLength={12}
             minLength={1}
             onChange={onChangeFormatNumber}
-            required
+            // required
             disabled={loadingPeticionGeneracionPin}
           />
           <Input
@@ -483,7 +483,6 @@ const GeneracionPinColpatria = () => {
             maxLength={20}
             minLength={1}
             onChange={onChangeFormat}
-            required
             disabled={loadingPeticionGeneracionPin}
           />
         </Fieldset>
