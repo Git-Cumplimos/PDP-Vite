@@ -60,7 +60,7 @@ const CargaComprobante = () => {
   const [selectedEntidadesExt, setSelectedEntidadesExt] = useState({
     entidades_agregar: [],
   });
-  const [valoresExternos, setValoresExternos] = useState({});
+  // const [valoresExternos, setValoresExternos] = useState({});
 
   const [limitesMontos, setLimitesMontos] = useState({
     max: 100000000,
@@ -123,9 +123,10 @@ const CargaComprobante = () => {
       });
       var valor_Boveda = valores?.obj[0]?.valor_boveda !== undefined?parseInt(valores?.obj[0]?.valor_boveda):0
       if (movementType !== "Movimiento a bóveda") {
-        var sumExter = 0
-        Object.values(valoresExternos).map((e)=> sumExter += e)
-        if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
+        // var sumExter = 0
+        // Object.values(valoresExternos).map((e)=> sumExter += e)
+        // if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
+        if (parseInt(valorComprobante) !== 0) {
           if (movementType !== "Recibido transportadora") {          
             if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
               throw new Error("Efectivo insuficiente en Caja", {
@@ -180,7 +181,7 @@ const CargaComprobante = () => {
             archivo: filename,
             valor_efectivo_pdp: valorEfectivoPdp,
             valor_efectivo_boveda: valorEfectivoBoveda,
-            valores_externos: valoresExternos,
+            // valores_externos: valoresExternos,
           };
           if (movementType === "Consignación Bancaria") {
             reqBody["nro_cuenta"] = accountNumber;
@@ -238,7 +239,7 @@ const CargaComprobante = () => {
     quotaInfo,
     valorEfectivoPdp,
     valorEfectivoBoveda,
-    valoresExternos,
+    // valoresExternos,
   ]);
 
   const onFileChange = useCallback((files) => {   
@@ -313,58 +314,58 @@ const CargaComprobante = () => {
       });
   }, [userPermissions]);
 
-  const EntityExt = useCallback(() =>{
-    setShowModal(true);
-  }, []);
+  // const EntityExt = useCallback(() =>{
+  //   setShowModal(true);
+  // }, []);
 
   const handleClose2 = useCallback(() => {
     setShowModal(false);
   }, []);
 
-  const renderInputs = () => {
-    return selectedEntidadesExt.entidades_agregar.map(entidad => (
-      <Input
-        id={`${entidad.nombre_plataforma}`}
-        name={`${entidad.nombre_plataforma}`}
-        label={`Valor efectivo ${entidad.nombre_plataforma}`}
-        autoComplete="off"
-        type="tel"
-        maxLength={"12"}
-        onInput={(ev) => handleInputChange(entidad.nombre_plataforma, onChangeMoney(ev))}
-        actionBtn = {{
-          callback: () => {onSelectComercioDeleteAgregar(entidad)},
-          label: <span className="bi bi-x-lg self-center cursor-pointer"/>
-        }}
-      />
-    ));
-  };
+  // const renderInputs = () => {
+  //   return selectedEntidadesExt.entidades_agregar.map(entidad => (
+  //     <Input
+  //       id={`${entidad.nombre_plataforma}`}
+  //       name={`${entidad.nombre_plataforma}`}
+  //       label={`Valor efectivo ${entidad.nombre_plataforma}`}
+  //       autoComplete="off"
+  //       type="tel"
+  //       maxLength={"12"}
+  //       onInput={(ev) => handleInputChange(entidad.nombre_plataforma, onChangeMoney(ev))}
+  //       actionBtn = {{
+  //         callback: () => {onSelectComercioDeleteAgregar(entidad)},
+  //         label: <span className="bi bi-x-lg self-center cursor-pointer"/>
+  //       }}
+  //     />
+  //   ));
+  // };
 
-  const onSelectComercioDeleteAgregar = useCallback((entidadToDelete) => {
-    let newList = []
-    selectedEntidadesExt?.entidades_agregar?.map((entidad) => {
-      if(entidad.id_plataforma !== entidadToDelete.id_plataforma) {
-        newList.push(entidad)
-      }else{
-        const nuevosValores = Object.fromEntries(
-          Object.entries(valoresExternos).filter(([key]) => key !== entidadToDelete.nombre_plataforma)
-        );
-        setValoresExternos(nuevosValores)
-      }
-    })
-    setSelectedEntidadesExt((old) => {
-      return {
-        ...old,
-        entidades_agregar: newList,
-      };
-    });
-  }, [setSelectedEntidadesExt,valoresExternos,selectedEntidadesExt]);
+  // const onSelectComercioDeleteAgregar = useCallback((entidadToDelete) => {
+  //   let newList = []
+  //   selectedEntidadesExt?.entidades_agregar?.map((entidad) => {
+  //     if(entidad.id_plataforma !== entidadToDelete.id_plataforma) {
+  //       newList.push(entidad)
+  //     }else{
+  //       const nuevosValores = Object.fromEntries(
+  //         Object.entries(valoresExternos).filter(([key]) => key !== entidadToDelete.nombre_plataforma)
+  //       );
+  //       setValoresExternos(nuevosValores)
+  //     }
+  //   })
+  //   setSelectedEntidadesExt((old) => {
+  //     return {
+  //       ...old,
+  //       entidades_agregar: newList,
+  //     };
+  //   });
+  // }, [setSelectedEntidadesExt,valoresExternos,selectedEntidadesExt]);
 
-  const handleInputChange = (id, value) => {
-    setValoresExternos({
-      ...valoresExternos,
-      [id]: value,
-    });
-  };
+  // const handleInputChange = (id, value) => {
+  //   setValoresExternos({
+  //     ...valoresExternos,
+  //     [id]: value,
+  //   });
+  // };
 
   return (
     <Fragment>
@@ -387,7 +388,7 @@ const CargaComprobante = () => {
             setFile(null)
             setImage(null)
             setSelectedEntidadesExt((old) => {return {...old,entidades_agregar: [],};});
-            setValoresExternos({})
+            // setValoresExternos({})
           }}
         />
         <ButtonBar />
@@ -479,7 +480,7 @@ const CargaComprobante = () => {
                 <Input
                   id="valor_caja_pdp"
                   name="valor_caja_pdp"  
-                  label={`Valor efectivo Caja PDP`}
+                  label={`Valor efectivo Caja`}
                   autoComplete="off"
                   type="tel"
                   minLength={"5"}
@@ -501,17 +502,17 @@ const CargaComprobante = () => {
                 <Input
                   id="valor"
                   name="valor"  
-                  label={`Valor total PDP`}
+                  label={`Valor total`}
                   type="tel"
                   value={formatMoney.format(valorComprobante)}
                   disabled
                 />
-                {renderInputs()}
-                <ButtonBar>
+                {/* {renderInputs()} */}
+                {/* <ButtonBar>
                   <Button type="button" onClick={() => EntityExt()}>
                     Agregar valores redes externas
                   </Button>
-                </ButtonBar>
+                </ButtonBar> */}
               </>):(
                 <Input
                   id="valor"
