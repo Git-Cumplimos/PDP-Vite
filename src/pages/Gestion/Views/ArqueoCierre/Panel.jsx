@@ -236,7 +236,7 @@ const Panel = () => {
               // ["", ""],
               [
                 "Total Saldo Total Del Día",
-                formatMoney.format(cierre?.total_efectivo_en_caja+Num),
+                formatMoney.format(cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
             ],
