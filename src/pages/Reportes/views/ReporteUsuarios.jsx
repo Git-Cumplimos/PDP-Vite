@@ -1,100 +1,100 @@
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useEffect, useMemo, useState, useCallback, } from "react";
+import Input from "../../../components/Base/Input";
+import TableEnterprise from "../../../components/Base/TableEnterprise";
 // import { useAuth } from "../../../hooks/AuthHooks";
-import Button from "../../../components/Base/Button";
-import ButtonBar from "../../../components/Base/ButtonBar";
-import {makeDateFormatter} from "../../../utils/functions";
-// import {fetchReporteUsuario} from "../utils/fechReporte";
-import * as XLSX from "xlsx";
-import { notifyError } from "../../../utils/notify";
-import useFetchDispatchDebounce from "../../../hooks/useFetchDispatchDebounce";
+import { useFetch } from "../../../hooks/useFetch";
+import { notifyError,notify } from "../../../utils/notify";
 
-const url = `${process.env.REACT_APP_URL_CAJA}/reportes`;
-// const url = `http://127.0.0.1:5000/reportes`;
-
-const dateFormatter = makeDateFormatter(true);
+const url = process.env.REACT_APP_URL_CAJA;
 
 const ReporteUsuarios = () => {
-  const [disablereport, setDisablereport] = useState(false);
-  // const [userData, setUserData] = useState(null);
+  // const { userPermissions } = useAuth();
+  const [fileList, setFileList] = useState([]);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10, date: undefined});
+  const [maxPages, setMaxPages] = useState(1);
+  const [loadingList, fetchList] = useFetch();
+  const [loadingFile, fetchFile] = useFetch();
 
-  const [getUser] = useFetchDispatchDebounce(
-    {
-      onSuccess: useCallback((res) => handle(res)),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          notifyError(error.message);
-        } else {
-          console.error(error);
+  const getFile = useCallback((date) => {
+    pageData.date=date
+    fetchList(`${url}/reportes/read-file-usuarios`, "GET", { ...pageData })
+      .then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+          return;
         }
-      }, []),
-    },
-    { delay: 100 }
+        const listOfFiles = (res?.obj?.results || []).map(
+          ({ name, type, date }) => ({
+            name,
+            type,
+            date: date
+              ? Intl.DateTimeFormat("es-CO", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "numeric",
+                }).format(new Date(date))
+              : "",
+          })
+        );
+        setFileList(listOfFiles);
+        setMaxPages(res?.obj?.maxpages || 1);
+      })
+      .catch((err) => console.error(err));
+  }, [fetchList, pageData,]);
+  
+  useEffect(() => {
+    getFile()
+  }, [fetchList, pageData,getFile]);
+
+
+  const isLoading = useMemo(
+    () => loadingList || loadingFile,
+    [loadingList, loadingFile]
   );
 
-  const handle = useCallback((data) => {
-    setDisablereport(true)
-    let listValue = []
-    listValue.push([
-      'ID USUARIO',
-      'CORREO',
-      'NOMBRE',
-      'NUMERO DOCUMENTO',
-      'TIPO DOCUMENTO',
-      'TELEFONO',
-      'DIRECCION',
-      'ESTADO',
-      "ID COMERCIO ASOCIADO",
-      'ID TERMINAL',
-      'OTP VERIFICADO',
-      'ID USUARIO ULTIMA ACTUALIZACION',
-      'ID USUARIO SUSER',
-      'COMERCIO PADRE',
-      'FECHA DE ACTUALIZACION',
-      'FECHA DE REGISTRO',
-    ])
-    data?.obj?.results.map((e)=>listValue.push([
-    e.uuid,
-    e.email,
-    e.uname,
-    e.doc_id,
-    e.tipo_doc,
-    e.phone,
-    e.direccion,
-    e.estado,
-    e.fk_id_comercio,
-    e.id_terminal,
-    e.otp_verifed,
-    e.usuario_ultima_actualizacion,
-    e.id_usuario_suser,
-    e.is_comercio_padre,
-    dateFormatter.format(new Date(e.fecha_registro)),
-    dateFormatter.format(new Date(e.fecha_actualizacion)),
-    ]))
-    var today = new Date()
-    var year = today.getFullYear();
-    var month = String(today.getMonth() + 1).padStart(2, '0');
-    var day = String(today.getDate()).padStart(2, '0');
-    var formattedDate = year + month + day;
-    var file_name = `REPORTE USUARIOS ${formattedDate}.xlsx`
-    var libro = XLSX.utils.book_new();
-    libro.SheetNames.push("Usuarios");
-    libro.Sheets["Usuarios"] = XLSX.utils.aoa_to_sheet(listValue);
-    setTimeout(() => {
-      XLSX.writeFile(libro,file_name)
-      setDisablereport(false)
-    },1000);
-  },[]);
+  const searchDate = (ev) => {
+    getFile(ev.target.value)
+  };
 
   return (
     <Fragment>
-      <h1 className="text-3xl ">Reporte Usuarios</h1>
-        <ButtonBar>
-          <Button onClick={() => {getUser(`${url}/file-usuarios`);setDisablereport(true)}} type='submit' disabled={disablereport}>
-            Generar reporte
-          </Button>
-        </ButtonBar>
+      <h1 className="text-3xl font-medium my-6">Reporte Usuarios</h1>
+      <TableEnterprise
+        title="Vista de reportes"
+        headers={["Nombre", "Tipo", "Última modificacion"]}
+        maxPage={maxPages}
+        data={fileList}
+        onSelectRow={(_, i) => {
+          if (!isLoading) {
+              if (fileList[i]?.type === "Archivo") {
+              fetchFile(`${url}/reportes/file-url-usuarios`, "GET", {
+                filename: `PDP-BK-Lambda-reporte-usuarios/${fileList[i]?.name}`,
+              })
+                .then((res) => {
+                  if (!res?.status) {
+                    notifyError(res?.msg);
+                    return;
+                  }
+                  window.open(res?.obj, "_blank");
+                  notify('El reporte de usuarios ha sido creado exitosamente')
+                })
+                .catch((err) => console.error(err));
+            }
+          }
+        }}
+        onSetPageData={setPageData}
+      >
+        <Input
+          id={"date_report"}
+          name={"date_ini"}
+          label={"Fecha"}
+          type={"date"}
+          onChange={(ev) =>searchDate(ev)}
+        />
+      </TableEnterprise>
     </Fragment>
-  )
-}
+  );
+};
+
 
 export default ReporteUsuarios
