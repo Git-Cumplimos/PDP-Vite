@@ -33,7 +33,7 @@ const CrearCupo = () => {
     max: 9999999999,
     min: 0,
   };
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
 
   const onChangeId = useCallback((ev) => {
@@ -133,7 +133,7 @@ const CrearCupo = () => {
       notifyPending(
         cargarArchivoCupoMasivo(
           file,
-          roleInfo?.id_usuario,
+          roleInfo?.id_usuario ?? pdpUser?.uuid,
           roleInfo?.id_comercio ?? 0,
           roleInfo?.id_dispositivo ?? 0,
         ),
@@ -162,7 +162,7 @@ const CrearCupo = () => {
         }
       );
 
-    }, [handleCloseCargaMasiva, file, typoArchivos, roleInfo]);
+    }, [handleCloseCargaMasiva, file, typoArchivos, roleInfo,pdpUser]);
 
   return (
     <Fragment>
