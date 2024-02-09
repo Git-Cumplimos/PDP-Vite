@@ -10,7 +10,11 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Modal from "../../../components/Base/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import { enumParametrosColpatria } from "../utils/enumParametrosColpatria";
+import {
+  enumParametrosColpatria,
+  enumCodigoConvenioPines,
+  enumCodigoPinPines,
+} from "../utils/enumParametrosColpatria";
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
@@ -42,7 +46,7 @@ const DATA_INICIAL_PIN = {
   num_cel_comprador: "",
   cod_ciudad_domicilio: "",
   email_comprador: "",
-  razon_social: "",
+  razon_social: "Universidad de los Andes",
   valorPin: 0,
 };
 
@@ -51,7 +55,11 @@ const DATA_TIPO_ID = {
   "CEDULA DE CIUDADANIA": "C",
   "CEDULA DE EXTRANJERIA": "E",
   // "PASAPORTE": "P",
-  "TARJETA DE IDENTIDAD": "T"
+  "TARJETA DE IDENTIDAD": "T",
+};
+
+const DATA_RAZON_SOCIAL = {
+  "Universidad de los Andes": "UNIANDES",
 };
 
 const GeneracionPinColpatria = () => {
@@ -129,7 +137,7 @@ const GeneracionPinColpatria = () => {
           num_cel_comprador: dataUsuario.num_cel_comprador,
           cod_ciudad_domicilio: dataUsuario.cod_ciudad_domicilio,
           email_comprador: dataUsuario.email_comprador,
-          razon_social: dataUsuario.razon_social,
+          razon_social: Object.keys(DATA_RAZON_SOCIAL).find(key => DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social),
           location: {
             address: roleInfo?.["direccion"],
             dane_code: roleInfo?.codigo_dane,
@@ -186,6 +194,17 @@ const GeneracionPinColpatria = () => {
       return { ...old, [ev.target.name]: value };
     });
   }, []);
+  const onChangeRazonSocial = useCallback((ev) => {
+    let value = ev.target.value;
+    const codigoConvenio = enumCodigoConvenioPines[value];
+    const codigoPin = enumCodigoPinPines[value];
+    setDataUsuario((old) => ({
+      ...old,
+      codigo_pin: codigoPin,
+      codigo_convenio: codigoConvenio,
+      razon_social: value,
+    }));
+  }, []);
   const onChangeFormatNumber = useCallback(
     (ev) => {
       const valor = ev.target.value;
@@ -238,6 +257,16 @@ const GeneracionPinColpatria = () => {
             required
             disabled={loadingPeticionGeneracionPin}
           />
+          <Select
+            id="razon_social"
+            name="razon_social"
+            label={"Razón social"}
+            options={DATA_RAZON_SOCIAL}
+            value={dataUsuario?.razon_social}
+            onChange={onChangeRazonSocial}
+            required
+            disabled={loadingPeticionGeneracionPin}
+          />
           <Input
             id="codigo_convenio"
             name="codigo_convenio"
@@ -247,9 +276,8 @@ const GeneracionPinColpatria = () => {
             value={dataUsuario?.codigo_convenio}
             maxLength={6}
             minLength={1}
-            // onChange={onChangeFormat}
             required
-            disabled={loadingPeticionGeneracionPin}
+            disabled
           />
           <Input
             id="codigo_pin"
@@ -257,25 +285,11 @@ const GeneracionPinColpatria = () => {
             label={"Código pin"}
             type="text"
             autoComplete="off"
-            value={dataUsuario?.["codigo_pin"]}
+            value={dataUsuario?.codigo_pin}
             maxLength={4}
             minLength={1}
-            // onChange={onChangeFormat}
             required
-            disabled={loadingPeticionGeneracionPin}
-          />
-          <Input
-            id="razon_social"
-            name="razon_social"
-            label={"Razón social"}
-            type="text"
-            autoComplete="off"
-            value={dataUsuario?.["razon_social"]}
-            maxLength={50}
-            minLength={1}
-            onChange={onChangeFormat}
-            required
-            disabled={loadingPeticionGeneracionPin}
+            disabled
           />
           <InputSuggestions
             id="cod_ciudad_domicilio"
@@ -512,7 +526,7 @@ const GeneracionPinColpatria = () => {
                 "Código convenio": dataUsuario?.codigo_convenio,
                 "Código pin": dataUsuario?.codigo_pin,
                 "Código ciudad": roleInfo?.codigo_dane,
-                "Razón social": dataUsuario?.razon_social,
+                "Razón social": Object.keys(DATA_RAZON_SOCIAL).find(key => DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social),
                 "Identificación cliente":
                   dataUsuario?.num_identificacion_cliente,
                 "Identificación beneficiario":
