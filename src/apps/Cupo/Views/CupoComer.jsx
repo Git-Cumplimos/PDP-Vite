@@ -103,7 +103,7 @@ const CupoComer = () => {
             }) => ({
               pk_id_comercio,
               sobregiro: formatMoney.format(sobregiro),
-              base_caja
+              base_caja: formatMoney.format(base_caja)
             }) 
           ) ?? []
         }
