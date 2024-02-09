@@ -192,11 +192,18 @@ const Panel = () => {
                 month: "2-digit",
                 day: "2-digit",
               }).format(new Date()),
-              Hora: Intl.DateTimeFormat("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(new Date()),
+              Hora: (() => {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+                return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+              })(),
+              // Hora: Intl.DateTimeFormat("es-CO", {
+              //   hour: "2-digit",
+              //   minute: "2-digit",
+              //   second: "2-digit",
+              // }).format(new Date()),
             },
             commerceInfo: [
               ["Id Comercio", cierre?.id_comercio],
@@ -226,7 +233,7 @@ const Panel = () => {
               // ["", ""],
               [
                 "Saldo PDP + Externos Del Día",
-                formatMoney.format(cierre?.total_movimientos+cierre?.total_notas+cierre?.total_recibido_transportadora-cierre?.total_consignaciones_transportadora+Num),
+                formatMoney.format(cierre?.total_movimientos+Num),
               ],
               ["", ""],
               // [
@@ -235,13 +242,13 @@ const Panel = () => {
               // ],
               // ["", ""],
               [
-                "Total Saldo Total Del Día",
+                "Total Saldo Fin Del Día",
                 formatMoney.format(cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
             ],
             trxInfo: [
-              ["Total Arqueo de Caja", formatMoney.format(totalArqueo+Num)],
+              ["Total Arqueo de Caja", formatMoney.format(totalArqueo)],
               ["", ""],
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],

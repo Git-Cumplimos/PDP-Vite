@@ -98,6 +98,11 @@ const PanelHistorico = () => {
     // if (data?.externos_día_anterior !== null) {
     //   data?.externos_día_anterior?.data?.map((elemento) => totalExtrdiaAnterior=totalExtrdiaAnterior+elemento?.valor)
     // }
+    const fecha = new Date(data.created);
+    const hora = fecha.getHours();
+    const minutos = fecha.getMinutes();
+    const segundos = fecha.getSeconds();
+    const horaMilitar = `${hora < 10 ? '0' : ''}${hora}:${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
     setLoading(false)
     const tempTicket = {
       title: "Cierre de caja",
@@ -107,11 +112,7 @@ const PanelHistorico = () => {
           month: "2-digit",
           day: "2-digit",
         }).format(new Date(data.created)),
-        Hora: Intl.DateTimeFormat("es-CO", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }).format(new Date(data.created)),
+        Hora: horaMilitar
       },
       commerceInfo: [
         ["Id Comercio", data.id_comercio],
@@ -124,23 +125,23 @@ const PanelHistorico = () => {
         ["", ""],
       ],
       cajaInfo: [
-        ["Saldo Cierre día Anterior",formatMoney.format(data?.total_efectivo_cierre_día_anterior)],
+        ["Saldo Cierre día Anterior",formatMoney.format(Num<=0?data?.total_efectivo_cierre_día_anterior+Num:data?.total_efectivo_cierre_día_anterior-Num)],
         ["", ""],
         // ["Saldo Externos Día Anterior",formatMoney.format(totalExtrdiaAnterior)],
         // ["", ""],
         // ["Saldo Cierre Día Anterior",formatMoney.format(data?.total_efectivo_cierre_día_anterior + totalExtrdiaAnterior)],
         // ["", ""],
-        ["Saldo PDP + Externos Del Día",formatMoney.format(data?.total_movimientos+data?.total_notas+data?.total_recibido_transportadora-data?.total_consignaciones_transportadora+Num)],
+        ["Saldo PDP + Externos Del Día",formatMoney.format(data?.total_movimientos+Num)],
         ["", ""],
         // ["Saldo Externos Fin del Día",formatMoney.format(Num)],
         // ["", ""],
         // ["Saldo Total del Día",formatMoney.format(data?.total_efectivo_en_caja+Num)],
         // ["", ""],
-        ["Efectivo en Caja",formatMoney.format(data?.total_efectivo_en_caja)],
+        ["Total Saldo Fin Del Día",formatMoney.format(data?.total_efectivo_en_caja)],
         ["", ""],
       ],
       trxInfo: [
-        ["Total Arqueo de Caja", formatMoney.format(data?.total_arqueo+Num)],
+        ["Total Arqueo de Caja", formatMoney.format(data?.total_arqueo)],
         ["", ""],
         ["Sobrante", formatMoney.format(data?.total_sobrante)],
         ["", ""],
@@ -195,10 +196,10 @@ const PanelHistorico = () => {
               'Idcierre': itemData?.pk_id_cierre,
               'Idcomercio': itemData?.id_comercio,
               'Idusuario': itemData?.id_usuario,
-              'SaldoCierreDíaAnterior': Math.round(itemData?.total_efectivo_cierre_día_anterior),
-              'SaldoPDPExternosDia': Math.round(itemData?.total_movimientos+itemData?.total_notas+itemData?.total_recibido_transportadora-itemData?.total_consignaciones_transportadora+totalvalorEntidades),
+              'SaldoCierreDíaAnterior': Math.round(totalvalorEntidades<=0?itemData?.total_efectivo_cierre_día_anterior+totalvalorEntidades:itemData?.total_efectivo_cierre_día_anterior-totalvalorEntidades),
+              'SaldoPDPExternosDia': Math.round(itemData?.total_movimientos+totalvalorEntidades),
               'TotalSaldoFinDia': Math.round(itemData?.total_efectivo_en_caja),
-              'TotalArqueoCaja': Math.round(itemData?.total_arqueo+totalvalorEntidades),
+              'TotalArqueoCaja': Math.round(itemData?.total_arqueo),
               'Sobrante': Math.round(itemData?.total_sobrante),
               'Faltante': Math.round(itemData?.total_faltante),
               'PendienteConsignacionTransportadoraPDP': Math.round(itemData?.total_consignaciones_transportadora_pendiente),
@@ -305,10 +306,10 @@ const PanelHistorico = () => {
             pk_id_cierre,
             id_comercio,
             id_usuario,
-            total_efectivo_cierre_día_anterior: formatMoney.format(total_efectivo_cierre_día_anterior),
-            Saldo_PDP_mas_Externos_Día: formatMoney.format(total_movimientos+total_notas+total_recibido_transportadora-total_consignaciones_transportadora+(entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0)),
+            total_efectivo_cierre_día_anterior: formatMoney.format((entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0)<=0?total_efectivo_cierre_día_anterior+(entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0):total_efectivo_cierre_día_anterior-(entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0)),
+            Saldo_PDP_mas_Externos_Día: formatMoney.format(total_movimientos+(entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0)),
             total_efectivo_en_caja: formatMoney.format(total_efectivo_en_caja),
-            total_arqueo: formatMoney.format(total_arqueo+(entidades_externas?.data ?? []).reduce((total,val) => total+val.valor,0)),
+            total_arqueo: formatMoney.format(total_arqueo),
             total_sobrante: formatMoney.format(total_sobrante),
             total_faltante: formatMoney.format(total_faltante),
             total_consignaciones_transportadora_pendiente: formatMoney.format(total_consignaciones_transportadora_pendiente),
