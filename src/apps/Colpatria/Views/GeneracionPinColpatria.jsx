@@ -69,22 +69,22 @@ const GeneracionPinColpatria = () => {
   const [dataUsuario, setDataUsuario] = useState(DATA_INICIAL_PIN);
   const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [objTicketActual, setObjTicketActual] = useState({});
-  const [filterData, setFilterData] = useState({
-    cod_ciudad_domicilio: "",
-  });
+  // const [filterData, setFilterData] = useState({
+  //   cod_ciudad_domicilio: "",
+  // });
   const [showModal, setShowModal] = useState(false);
-  const dataMunicipio = useMemo(() => {
-    let filteredList = MUNICIPIOS_SIIAN.filter((item) =>
-      item.Nombre.toUpperCase().includes(filterData.cod_ciudad_domicilio)
-    );
-    filteredList = filteredList.slice(0, 10);
-    return {
-      dataRender: filteredList.map((data, index) => (
-        <h1 className="py-2">{data.Nombre}</h1>
-      )),
-      dataList: filteredList,
-    };
-  }, [filterData.cod_ciudad_domicilio]);
+  // const dataMunicipio = useMemo(() => {
+  //   let filteredList = MUNICIPIOS_SIIAN.filter((item) =>
+  //     item.Nombre.toUpperCase().includes(filterData.cod_ciudad_domicilio)
+  //   );
+  //   filteredList = filteredList.slice(0, 10);
+  //   return {
+  //     dataRender: filteredList.map((data, index) => (
+  //       <h1 className="py-2">{data.Nombre}</h1>
+  //     )),
+  //     dataList: filteredList,
+  //   };
+  // }, [filterData.cod_ciudad_domicilio]);
   const [loadingPeticionGeneracionPin, peticionGeneracionPin] =
     useFetchcolpatria(
       URL_GENERACION_PIN,
@@ -135,9 +135,14 @@ const GeneracionPinColpatria = () => {
           dir_domicilio_ppal: dataUsuario.dir_domicilio_ppal,
           tel_fijo_comprador: dataUsuario.tel_fijo_comprador,
           num_cel_comprador: dataUsuario.num_cel_comprador,
-          cod_ciudad_domicilio: dataUsuario.cod_ciudad_domicilio,
+          cod_ciudad_domicilio: roleInfo?.codigo_dane,
           email_comprador: dataUsuario.email_comprador,
-          razon_social: Object.keys(DATA_RAZON_SOCIAL).find(key => DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social),
+          razon_social:
+            dataUsuario?.razon_social === "Universidad de los Andes"
+              ? dataUsuario?.razon_social
+              : Object.keys(DATA_RAZON_SOCIAL).find(
+                  (key) => DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social
+                ),
           location: {
             address: roleInfo?.["direccion"],
             dane_code: roleInfo?.codigo_dane,
@@ -173,16 +178,11 @@ const GeneracionPinColpatria = () => {
     [dataUsuario, validNavigate, roleInfo, pdpUser]
   );
 
-  const handleShow = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      if (dataUsuario.cod_ciudad_domicilio === "")
-        return notifyError("Seleccione la ciudad en la que se crea el pin");
-      setEstadoPeticion(0);
-      setShowModal(true);
-    },
-    [dataUsuario.cod_ciudad_domicilio]
-  );
+  const handleShow = useCallback((ev) => {
+    ev.preventDefault();
+    setEstadoPeticion(0);
+    setShowModal(true);
+  }, []);
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
@@ -222,23 +222,23 @@ const GeneracionPinColpatria = () => {
     },
     [dataUsuario.num_cel_comprador]
   );
-  const onSelectSuggestion = useCallback(
-    (i, el, name) => {
-      if (name === "cod_ciudad_domicilio") {
-        let dataMuni = dataMunicipio.dataList[i];
-        setDataUsuario((old) => {
-          return { ...old, [name]: dataMuni.Codigo };
-        });
-        setFilterData((old) => {
-          return {
-            ...old,
-            [name]: dataMuni.Nombre,
-          };
-        });
-      }
-    },
-    [dataMunicipio]
-  );
+  // const onSelectSuggestion = useCallback(
+  //   (i, el, name) => {
+  //     if (name === "cod_ciudad_domicilio") {
+  //       let dataMuni = dataMunicipio.dataList[i];
+  //       setDataUsuario((old) => {
+  //         return { ...old, [name]: dataMuni.Codigo };
+  //       });
+  //       setFilterData((old) => {
+  //         return {
+  //           ...old,
+  //           [name]: dataMuni.Nombre,
+  //         };
+  //       });
+  //     }
+  //   },
+  //   [dataMunicipio]
+  // );
   return (
     <>
       <h1 className="text-3xl">Generación de Pin</h1>
@@ -291,7 +291,19 @@ const GeneracionPinColpatria = () => {
             required
             disabled
           />
-          <InputSuggestions
+          <Input
+            id="cod_ciudad_domicilio"
+            name="cod_ciudad_domicilio"
+            label={"Ciudad"}
+            type="text"
+            autoComplete="off"
+            value={roleInfo?.ciudad.toUpperCase()}
+            maxLength={4}
+            minLength={1}
+            required
+            disabled
+          />
+          {/* <InputSuggestions
             id="cod_ciudad_domicilio"
             name="cod_ciudad_domicilio"
             label={"Ciudad"}
@@ -311,7 +323,7 @@ const GeneracionPinColpatria = () => {
             maxLength={50}
             required
             disabled={loadingPeticionGeneracionPin}
-          />
+          /> */}
           <MoneyInput
             id="valor"
             name="valor"
@@ -526,7 +538,13 @@ const GeneracionPinColpatria = () => {
                 "Código convenio": dataUsuario?.codigo_convenio,
                 "Código pin": dataUsuario?.codigo_pin,
                 "Código ciudad": roleInfo?.codigo_dane,
-                "Razón social": Object.keys(DATA_RAZON_SOCIAL).find(key => DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social),
+                "Razón social":
+                  dataUsuario?.razon_social === "Universidad de los Andes"
+                    ? dataUsuario?.razon_social
+                    : Object.keys(DATA_RAZON_SOCIAL).find(
+                        (key) =>
+                          DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social
+                      ),
                 "Identificación cliente":
                   dataUsuario?.num_identificacion_cliente,
                 "Identificación beneficiario":
@@ -543,7 +561,7 @@ const GeneracionPinColpatria = () => {
                 "teléfono fijo comprador": dataUsuario?.tel_fijo_comprador,
                 "Celular comprador": dataUsuario?.num_cel_comprador,
                 "Email comprador": dataUsuario?.email_comprador,
-                "Código ciudad domicilio": dataUsuario?.cod_ciudad_domicilio,
+                "Código ciudad domicilio": roleInfo?.codigo_dane,
                 "Valor del pin": formatMoney.format(dataUsuario?.valorPin),
               }}
             >
