@@ -102,6 +102,9 @@ export const listPermissionsTrx = listPermissions.splice(
   listPermissions.length / 2
 );
 
+console.log("listPermissionsTrx", listPermissionsTrx);
+console.log("enumPermisosTrx", enumPermisosTrx);
+
 const rutasConfiguraciones = {
   link: "/params-operations",
   label: (
@@ -117,13 +120,13 @@ const rutasConfiguraciones = {
       link: "/params-operations/parametros-categorizacion",
       label: <AppIcons Logo={"RECAUDO"} name={"Parametros categorización"} />,
       component: ParametrosCategorizacion,
-      permission: [enumPermisosTrx.parametros_autorizadores], // Cambiar permiso
+      permission: [enumPermisosTrx.categorizacion],
     },
     {
       link: "/params-operations/asignacion-categorias",
       label: <AppIcons Logo={"RECAUDO"} name={"Asignación Categorías"} />,
       component: AsignacionCategorias,
-      permission: [enumPermisosTrx.parametros_autorizadores], // Cambiar permiso
+      permission: [enumPermisosTrx.categorizacion],
     },
     {
       link: "/params-operations/parametros-autorizadores",
@@ -430,7 +433,7 @@ const rutasConfiguraciones = {
           link: "/params-operations/comercios-params/gestion-zonas",
           label: <AppIcons Logo={"RECAUDO"} name={"Gestion zonas"} />,
           component: ParametrosZonas,
-          permission: [enumPermisosTrx.parametros_autorizadores], // Cambiar permiso
+          permission: [enumPermisosTrx.comercios],
         },
       ],
     },
