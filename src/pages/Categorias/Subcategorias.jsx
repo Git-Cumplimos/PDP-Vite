@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useUrls } from "../../hooks/UrlsHooks";
 import Error403 from "../Error403";
 import classes from "./Subcategorias.module.css";
@@ -6,18 +6,63 @@ import { Link } from "react-router-dom";
 
 const Subcategorias = ({ comercios = [], title = "" }) => {
   const { navbar, list, text, icon } = classes;
-  const { urlsPrivateApps } = useUrls();
+  const { allRoutes, urlsPrivateApps } = useUrls();
 
-  // console.log("urlsPrivateApps", urlsPrivateApps);
+  const [allRoutesArray, setAllRoutesArray] = useState([]);
+  // Chatgpt me ayudó
+  const hasExtractedData = useRef(false);
+  const extractData = useCallback(() => {
+    // console.log("private", urlsPrivateApps);
+    if (
+      !hasExtractedData.current &&
+      allRoutes?.props?.children?.[0]?.props?.children
+    ) {
+      const extractedData = allRoutes.props.children[0].props.children.reduce(
+        (accumulator, currentArray) => {
+          const arrayData = currentArray.map((route) => ({
+            link: route.props.path ?? "",
+            label: route.props.element?.props?.children?.props?.label ?? "",
+            show: route.props.element?.props?.children?.props?.show ?? true,
+            extern:
+              route.props.element?.props?.children?.props?.extern ?? false,
+          }));
+          return [...accumulator, ...arrayData];
+        },
+        []
+      );
+      // console.log("allRoutes", allRoutes);
+      // console.log("extractedData", extractedData);
+      setAllRoutesArray([
+        {
+          link: "https://portal.solucionesenred.co/",
+          extern: true,
+          label:
+            urlsPrivateApps?.find(
+              (app) => app.link === "https://portal.solucionesenred.co/"
+            )?.label ?? "SUSER",
+        },
+        ...extractedData,
+      ]);
 
-  // const filteredComerciosUrls = useMemo(() => {
-  //   const filtrados = urlsPrivateApps.filter((app) =>
-  //     comercios.includes(app?.label?.props?.name)
-  //   );
-  //   return filtrados;
-  // }, [comercios, urlsPrivateApps]);
+      // Marcar como ejecutado para evitar futuras ejecuciones
+      hasExtractedData.current = true;
+    }
+  }, [allRoutes, setAllRoutesArray, urlsPrivateApps]);
+
+  useEffect(() => {
+    extractData();
+  }, [extractData]); // Solo depende de extractData
 
   const findMatchingApps = useCallback((apps, comercios) => {
+    if (!Array.isArray(apps)) {
+      console.error("apps debe ser un array");
+      return [];
+    }
+    if (!Array.isArray(comercios)) {
+      console.error("comercios debe ser un array");
+      return [];
+    }
+
     let matchingApps = [];
 
     apps.forEach((app) => {
@@ -25,23 +70,24 @@ const Subcategorias = ({ comercios = [], title = "" }) => {
         matchingApps.push(app);
       }
 
-      if (app.subRoutes && app.subRoutes.length > 0) {
-        const matchingSubroutes = findMatchingApps(app.subRoutes, comercios);
-        matchingApps = matchingApps.concat(matchingSubroutes);
-      }
+      // if (app.subRoutes && app.subRoutes.length > 0) {
+      //   const matchingSubroutes = findMatchingApps(app.subRoutes, comercios);
+      //   matchingApps = matchingApps.concat(matchingSubroutes);
+      // }
     });
 
     return matchingApps;
   }, []);
 
   const filteredComerciosUrls = useMemo(() => {
-    return findMatchingApps(urlsPrivateApps, comercios);
-  }, [comercios, findMatchingApps, urlsPrivateApps]);
+    return findMatchingApps(allRoutesArray, comercios);
+  }, [comercios, findMatchingApps, allRoutesArray]);
 
-  if (comercios.length === 0) return <Error403 />;
+  console.log("filteredComerciosUrls", filteredComerciosUrls);
+
+  if (comercios && comercios.length === 0) return <Error403 />;
   return (
     <>
-      <Bar>{title}</Bar>
       <nav className={navbar}>
         <ul className={`${list} ${text} ${icon}`}>
           {filteredComerciosUrls

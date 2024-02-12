@@ -22,6 +22,7 @@ import SubPage from "../components/Base/SubPage";
 import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 // Categorias
 import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
+import Subcategorias from "../pages/Categorias/Subcategorias";
 
 // Categorias
 const Categoria = lazy(() => import("../pages/Categorias/Categorias"));
@@ -195,21 +196,52 @@ export const useProvideUrls = () => {
       const formData = new FormData();
       formData.append("id_zona", id_zona);
       const res = await fetchCategoriasByZona(formData);
+      console.log("categorias encontradas por zona", res);
       if (res?.status) {
         const urlsCategoriasFiltrado = res?.obj.map(
           ({ nombre, img_url, id_categoria, subcategorias }) => {
             const link = `/categoria/${nombre.replace(/\s+/g, "-")}`;
+            const subcategoriasFiltradas = subcategorias.filter(
+              (subcategoria) =>
+                subcategoria.status || subcategoria.comercios?.length > 0
+            );
+            const subcats = subcategoriasFiltradas.map(
+              ({ nombre, img_url, id_subcategoria, comercios }) => {
+                return {
+                  link: `${link}/${nombre.replace(/\s+/g, "-")}`,
+                  label: <AppIcons Logo={img_url} name={nombre} />,
+                  component: (props) => (
+                    <Subcategorias
+                      {...props}
+                      comercios={comercios}
+                      title={nombre}
+                    />
+                  ),
+                  props: { nombre, img_url, id_categoria, id_subcategoria },
+                };
+              }
+            );
+            if (subcategoriasFiltradas.length === 0) {
+              // Si no hay subcategorias, no se muestra la categoría
+              return {
+                link: null,
+                label: null,
+                component: null,
+                props: null,
+                subRoutes: null,
+              };
+            }
             return {
               link,
               label: <AppIcons Logo={img_url} name={nombre} />,
               component: (props) => (
-                <Categoria {...props} subcategorias={subcategorias} />
+                <Categoria {...props} subcategorias={subcats} />
               ),
               props: { nombre, img_url, id_categoria },
+              subRoutes: subcats,
             };
           }
         );
-        // console.log("urlsCategoriasFiltrado", urlsCategoriasFiltrado);
         setUrlsCategorias(urlsCategoriasFiltrado);
       } else {
         setUrlsCategorias([]);
@@ -217,9 +249,12 @@ export const useProvideUrls = () => {
     };
 
     // Validar que esté autenticado para hacer la petición
-    if (urlsCategorias?.length === 0 && userPermissions?.length > 0)
-      fetchUrlsCategorias(2);
-  }, [userPermissions, urlsCategorias?.length]);
+    if (urlsCategorias?.length === 0 && userPermissions?.length > 0) {
+      console.log("fetchUrlsCategorias", commerceInfo?.zona_comercio);
+      console.log("userPermissions", userPermissions);
+      fetchUrlsCategorias(commerceInfo?.zona_comercio);
+    }
+  }, [userPermissions, urlsCategorias?.length, commerceInfo?.zona_comercio]);
 
   const urlsGestion = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {

@@ -45,6 +45,7 @@ const Home = () => {
         })}
       </Carousel>
       <HNavbar links={urlsPrivateApps} isIcon title="General" />
+{/*      {JSON.stringify(urlsCategorias)}*/}
       <HNavbar links={urlsCategorias} isIcon title="Productos" />
       {/* <ReconoSERID /> */}
     </>
