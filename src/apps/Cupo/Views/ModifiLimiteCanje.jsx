@@ -35,6 +35,12 @@ const ModifiLimiteCanje = () => {
   const { roleInfo } = useAuth();
   const navegateValid = useNavigate();
 
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   // useEffect(() => {
   //   if (cupoComer?.length === 0) {
   //     notifyError("ID de comercio incorrecto");
@@ -184,7 +190,7 @@ const ModifiLimiteCanje = () => {
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={`$ ${Math.abs(parseInt(cupoComer[0]?.deuda)).toLocaleString() ?? 0}`}
+              value={formatMoney.format(Math.abs(parseInt(cupoComer[0]?.deuda))) ?? 0}
               disabled={true}
               required
               />

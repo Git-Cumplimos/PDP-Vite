@@ -193,15 +193,15 @@ const PanelConsignaciones = () => {
       <TableEnterprise
         title="Comprobantes"
         headers={[
-          "Id",
+          // "Id",
           "Id comercio",
           "Id Cajero",
           "Tipo de movimiento",
           "Empresa",
           "Número comprobante",
-          "Valor total PDP",
-          "Valor redes externas",
           "Valor total",
+          // "Valor redes externas",
+          // "Valor total",
           "Observaciones",
           "Fecha registro",
           "Estado",
@@ -209,7 +209,7 @@ const PanelConsignaciones = () => {
         maxPage={maxPages}
         data={comprobantes.map(
           ({
-            pk_id_comprobante,
+            // pk_id_comprobante,
             fk_tipo_comprobante,
             id_usuario,
             fk_nombre_entidad,
@@ -221,15 +221,15 @@ const PanelConsignaciones = () => {
             observaciones_analisis,
             total_externos
           }) => ({
-            pk_id_comprobante,
+            // pk_id_comprobante,
             id_comercio,
             id_usuario,
             fk_tipo_comprobante, 
             fk_nombre_entidad,
             nro_comprobante: toAccountNumber(nro_comprobante),
             valor_movimiento: formatMoney.format(valor_movimiento),
-            total_externos: formatMoney.format(total_externos),
-            total_externos_pdp: formatMoney.format(total_externos+parseInt(valor_movimiento)),
+            // total_externos: formatMoney.format(total_externos),
+            // total_externos_pdp: formatMoney.format(total_externos+parseInt(valor_movimiento)),
             observaciones_analisis,
             created: dateFormatter.format(new Date(created)),
             fk_estado_revision: estadoRevision.get(fk_estado_revision) ?? "",
@@ -355,26 +355,26 @@ const PanelConsignaciones = () => {
           />
           <Input
             id="valor_efectivo_pdp"
-            label="Valor efectivo caja PDP"
+            label="Valor efectivo caja"
             type="text"
             value={formatMoney.format(selected?.valor_efectivo_pdp) ?? ""}
             disabled
           />
           <Input
             id="valor_efectivo_boveda"
-            label="Valor efectivo Bóveda"
+            label="Valor efectivo bóveda"
             type="text"
             value={formatMoney.format(selected?.valor_efectivo_boveda) ?? ""}
             disabled
           />
           <Input
             id="valor_movimiento"
-            label="Valor total PDP"
+            label="Valor total"
             type="text"
             value={formatMoney.format(selected?.valor_movimiento) ?? ""}
             disabled
           />
-          {selected?.valores_externos && typeof selected.valores_externos === 'object' ? (
+          {/* {selected?.valores_externos && typeof selected.valores_externos === 'object' ? (
             Object.entries(selected?.valores_externos).map(([banco, valor]) => (
               <Input
                 key={banco}
@@ -385,14 +385,14 @@ const PanelConsignaciones = () => {
                 disabled
               />
             )
-          )):null}
-          <Input
+          )):null} */}
+          {/* <Input
             id="valor_total_pdp_externos"
             label="Valor total PDP + Externos"
             type="text"
             value={formatMoney.format(selected?.total_externos+parseInt(selected?.valor_movimiento)) ?? ""}
             disabled
-          />
+          /> */}
           <Select
             id="searchByStatus"
             label="Estado"

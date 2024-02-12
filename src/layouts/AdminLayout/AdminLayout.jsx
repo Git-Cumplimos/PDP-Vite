@@ -350,7 +350,7 @@ const AdminLayout = () => {
                 name="sobregiro"
                 label="Sobregiro"
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.sobregiro)).toLocaleString() ?? 0}`}
+                value={formatMoney.format(Math.abs(parseInt(cupoComercio[0]?.sobregiro))) ?? 0}
                 disabled={true}
               />
               <Input
@@ -358,7 +358,7 @@ const AdminLayout = () => {
                 name="deuda"
                 label={parseInt(cupoComercio[0]?.deuda) >= 1 ? "Deuda al comercio":"Deuda del comercio"}
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.deuda)).toLocaleString() ?? 0}`}
+                value={formatMoney.format(Math.abs(parseInt(cupoComercio[0]?.deuda))) ?? 0}
                 disabled={true}
               />      
               <Input
@@ -366,7 +366,7 @@ const AdminLayout = () => {
                 name="cupo_en_canje"
                 label="Cupo en canje"
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.cupo_en_canje)).toLocaleString() ?? 0}`}
+                value={formatMoney.format(Math.abs(parseInt(cupoComercio[0]?.cupo_en_canje))) ?? 0}
                 disabled={true}
               />
               <Input
@@ -374,7 +374,7 @@ const AdminLayout = () => {
                 name="base_caja"
                 label="Base caja"
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.base_caja)).toLocaleString() ?? 0}`}
+                value={formatMoney.format(Math.abs(parseInt(cupoComercio[0]?.base_caja))) ?? 0}
                 disabled={true}
               />
               <Input
