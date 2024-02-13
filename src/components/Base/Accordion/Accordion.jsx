@@ -11,6 +11,7 @@ const Accordion = ({ children, titulo }) => {
       <button
         className={`${accordion} ${activo ? active : ""}`}
         onClick={(ev) => setActivo((old) => !old)}
+        type="button"
       >
         {titulo}
       </button>

@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import classes from "./HNavbar.module.css";
 
-const HNavbar = ({ links = [], isText = true, isIcon = false }) => {
-  const { navbar, list, text, icon, lineaSup, lineaInf } = classes;
+const HNavbar = ({ links = [], isText = true, isIcon = false, title = "" }) => {
+  const { navbar, list, text, icon } = classes;
   return (
     <>
-      <div className={lineaSup}></div>
+      <Bar>{title}</Bar>
       <nav className={navbar}>
         <ul className={`${list} ${isText ? text : ""} ${isIcon ? icon : ""}`}>
           {links
@@ -33,9 +33,19 @@ const HNavbar = ({ links = [], isText = true, isIcon = false }) => {
             })}
         </ul>
       </nav>
-      <div className={lineaInf}></div>
+      {/* <Bar /> */}
     </>
   );
 };
 
 export default HNavbar;
+
+const Bar = ({ children }) => {
+  return (
+    <div className="flex justify-center my-5 mx-20">
+      <span className="w-full h-0.5 my-auto bg-gradient-to-r from-red-500 to-rose-600"></span>
+      {children ? <h2 className="px-2 text-2xl">{children}</h2> : null}
+      <span className="w-full h-0.5 my-auto bg-gradient-to-r from-red-500 to-rose-600"></span>
+    </div>
+  );
+};
