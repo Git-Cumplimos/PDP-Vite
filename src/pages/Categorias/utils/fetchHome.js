@@ -12,7 +12,7 @@ export const fetchCategoriasByZona = async (obj) => {
       obj
     );
     if (res?.status) {
-      return { ...res };
+      return res;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };
@@ -26,12 +26,12 @@ export const fetchAllCategorias = async (obj) => {
   try {
     const res = await fetchData(
       `${urlParametrizacion}/categorias/all`,
-      "GET",
+      "POST",
       {},
       obj
     );
     if (res?.status) {
-      return { ...res };
+      return res?.obj;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

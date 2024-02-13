@@ -41,12 +41,12 @@ export const fetchCategorias = async (obj) => {
   try {
     const res = await fetchData(
       `${urlParametrizacion}/categorias/all`,
-      "GET",
+      "POST",
       {},
       obj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return res.obj;
     } else {
       console.error(res);
       return { maxPages: 0, results: [] };
@@ -65,7 +65,7 @@ export const fetchCategoriaById = async (obj) => {
       obj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return res?.obj;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

@@ -196,7 +196,7 @@ export const useProvideUrls = () => {
       const formData = new FormData();
       formData.append("id_zona", id_zona);
       const res = await fetchCategoriasByZona(formData);
-      console.log("categorias encontradas por zona", res);
+      // console.log("categorias encontradas por zona", res);
       if (res?.status) {
         const urlsCategoriasFiltrado = res?.obj.map(
           ({ nombre, img_url, id_categoria, subcategorias }) => {

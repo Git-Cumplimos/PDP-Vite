@@ -138,16 +138,16 @@ const AsignacionCategorias = () => {
       edit: false,
     });
   }, []);
-  const handleShowModal = useCallback(() => {
-    setShowModal(true);
-    setSelectedAsignacion({
-      app: "",
-      id_categoria: "",
-      id_subcategoria: "",
-      subcategorias: [],
-      edit: false,
-    });
-  }, []);
+  // const handleShowModal = useCallback(() => {
+  //   setShowModal(true);
+  //   setSelectedAsignacion({
+  //     app: "",
+  //     id_categoria: "",
+  //     id_subcategoria: "",
+  //     subcategorias: [],
+  //     edit: false,
+  //   });
+  // }, []);
 
   const onSelectCategorias = useCallback(
     async (e, i) => {
@@ -238,22 +238,21 @@ const AsignacionCategorias = () => {
   const fetchAllCategoriasFunc = useCallback(() => {
     fetchAllCategorias({ page, limit })
       .then((res) => {
-        if (res?.status) {
-          setCategorias(res.obj);
-        }
+        console.log(res);
+        setCategorias(res?.results);
         setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   }, [page, limit]);
 
   const fetchAllZonas = useCallback(() => {
-    fetchZonas({ page, limit })
+    fetchZonas()
       .then((res) => {
-        setZonas(Object.values(res));
+        setZonas(res?.results);
         // setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
-  }, [page, limit]);
+  }, []);
 
   useEffect(() => {
     fetchAllZonas();
@@ -294,15 +293,15 @@ const AsignacionCategorias = () => {
         </Button>
       </ButtonBar> */}
       <TableEnterprise
-        title="Categorias"
+        title="Asignación Categorias"
         maxPage={maxPages}
         headers={["Id categoria", "Nombre Categoria", "Zona"]}
         data={tableCategorias}
         onSelectRow={onSelectCategorias}
-        // onSetPageData={setPageData}
+        onSetPageData={setPageData}
         onChange={onChange}
       >
-        <Input
+        {/* <Input
           id="searchAuto"
           name="searchAuto"
           label={"Id categoria"}
@@ -310,7 +309,7 @@ const AsignacionCategorias = () => {
           autoComplete="off"
           defaultValue={searchAuto}
           maxLength={100}
-        />
+        /> */}
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={() => asignCommerces()} grid>

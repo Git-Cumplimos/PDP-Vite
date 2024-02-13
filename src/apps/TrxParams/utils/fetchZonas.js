@@ -7,12 +7,12 @@ export const fetchZonas = async (obj) => {
   try {
     const res = await fetchData(
       `${urlParametrizacion}/zonas/all`,
-      "GET",
+      "POST",
       {},
       obj
     );
     if (res?.status) {
-      return { ...res?.obj };
+      return res?.obj;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

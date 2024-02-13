@@ -122,22 +122,20 @@ const ParametrosCategorizacion = () => {
   const fetchAllCategorias = useCallback(() => {
     fetchCategorias({ page, limit })
       .then((res) => {
-        console.log("categorias", Object.values(res));
-        setCategorias(Object.values(res));
+        setCategorias(res?.results);
         setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   }, [page, limit]);
 
   const fetchAllZonas = useCallback(() => {
-    fetchZonas({ page, limit })
+    fetchZonas()
       .then((res) => {
-        console.log("zonas", Object.values(res));
-        setZonas(Object.values(res));
+        setZonas(res?.results);
         // setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
-  }, [page, limit]);
+  }, []);
 
   useEffect(() => {
     fetchAllZonas();
@@ -264,21 +262,11 @@ const ParametrosCategorizacion = () => {
         headers={["Id categoria", "Nombre Categoria", "Zona"]}
         data={tableCategorias}
         onSelectRow={onSelectCategorias}
-        // onSetPageData={setPageData}
+        onSetPageData={setPageData}
         onChange={onChange}
-      >
-        <Input
-          id="searchAuto"
-          name="searchAuto"
-          label={"Id categoria"}
-          type="number"
-          autoComplete="off"
-          defaultValue={searchAuto}
-          maxLength={100}
-        />
-      </TableEnterprise>
+      ></TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
-        {JSON.stringify(selectedCategoria)}
+        {/* {JSON.stringify(selectedCategoria)} */}
         <Form
           onSubmit={() =>
             selectedCategoria.edit ? editCategoria() : createCategoria()

@@ -102,9 +102,6 @@ export const listPermissionsTrx = listPermissions.splice(
   listPermissions.length / 2
 );
 
-console.log("listPermissionsTrx", listPermissionsTrx);
-console.log("enumPermisosTrx", enumPermisosTrx);
-
 const rutasConfiguraciones = {
   link: "/params-operations",
   label: (

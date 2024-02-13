@@ -82,9 +82,9 @@ const ParametrosZonas = () => {
   const fetchAllZonas = useCallback(() => {
     fetchZonas({ page, limit })
       .then((res) => {
-        console.log("zonas", Object.values(res));
-        setZonas(Object.values(res));
-        // setMaxPages(res?.maxPages);
+        console.log("zonas", res);
+        setZonas(res?.results);
+        setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   }, [page, limit]);
@@ -166,19 +166,9 @@ const ParametrosZonas = () => {
         headers={["Id zona", "Nombre Zona"]}
         data={tableZonas}
         onSelectRow={onSelectZonas}
-        // onSetPageData={setPageData}
+        onSetPageData={setPageData}
         onChange={onChange}
-      >
-        <Input
-          id="searchAuto"
-          name="searchAuto"
-          label={"Id zona"}
-          type="number"
-          autoComplete="off"
-          defaultValue={searchAuto}
-          maxLength={100}
-        />
-      </TableEnterprise>
+      ></TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
         <Form
           onSubmit={() => (selectedZona.edit ? editZona() : createZona())}
