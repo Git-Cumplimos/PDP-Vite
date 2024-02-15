@@ -54,7 +54,7 @@ const DATA_TIPO_ID = {
   "NIT": "N",
   "CEDULA DE CIUDADANIA": "C",
   "CEDULA DE EXTRANJERIA": "E",
-  // "PASAPORTE": "P",
+  "PASAPORTE": "P",
   "TARJETA DE IDENTIDAD": "T",
 };
 
