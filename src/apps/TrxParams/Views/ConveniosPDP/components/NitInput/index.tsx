@@ -106,6 +106,8 @@ const NitInput = forwardRef<HTMLInputElement, Props>(
           } else {
             ev.target.setCustomValidity("");
           }
+        } else {
+          ev.target.setCustomValidity("");
         }
 
         ev.target.focus();
