@@ -27,12 +27,12 @@ const MovimientoComisionesCupo = () => {
   });
 
   useEffect(() => {
-    if (!quotaInfo || 
-      (quotaInfo && Object.keys(quotaInfo).length === 0) ||
-      (quotaInfo && Object.values(quotaInfo).every(val => [""," ",0].includes(val)) )
-    ) {
-      navigate("/");
-    } else {
+    // if (!quotaInfo || 
+    //   (quotaInfo && Object.keys(quotaInfo).length === 0) ||
+    //   (quotaInfo && Object.values(quotaInfo).every(val => [""," ",0].includes(val)) )
+    // ) {
+    //   navigate("/");
+    // } else {
       let hasKeys = true;
       if (["TRANSFERENCIA_MENSUAL"].includes(String(quotaInfo?.tipo_pago_comision).toUpperCase() ?? "")){
         hasKeys = false
@@ -43,7 +43,7 @@ const MovimientoComisionesCupo = () => {
         );
         navigate("/");
       }
-    }
+    // }
   }, [quotaInfo, navigate]);
 
   const isComercioPadre = useMemo(
