@@ -70,6 +70,7 @@ const HistoricoAnulaciones = () => {
           map.delete(key);
         }
       });
+      tempMap.set("nombre_archivo", ".archivoAnulacionesCea")
       if (
         !tempMap.has("fecha_ini") ||
         !tempMap.has("fecha_fin")
