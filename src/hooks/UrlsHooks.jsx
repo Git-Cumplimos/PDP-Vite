@@ -250,8 +250,6 @@ export const useProvideUrls = () => {
 
     // Validar que esté autenticado para hacer la petición
     if (urlsCategorias?.length === 0 && userPermissions?.length > 0) {
-      console.log("fetchUrlsCategorias", commerceInfo?.zona_comercio);
-      console.log("userPermissions", userPermissions);
       fetchUrlsCategorias(commerceInfo?.zona_comercio);
     }
   }, [userPermissions, urlsCategorias?.length, commerceInfo?.zona_comercio]);
