@@ -83,8 +83,6 @@ const Subcategorias = ({ comercios = [], title = "" }) => {
     return findMatchingApps(allRoutesArray, comercios);
   }, [comercios, findMatchingApps, allRoutesArray]);
 
-  console.log("filteredComerciosUrls", filteredComerciosUrls);
-
   if (comercios && comercios.length === 0) return <Error403 />;
   return (
     <>

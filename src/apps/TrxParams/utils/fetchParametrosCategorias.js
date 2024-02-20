@@ -91,3 +91,24 @@ export const postDeleteCategoria = async (obj) => {
     throw err;
   }
 };
+
+export const fetchCategoriasImgs = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlParametrizacion}/categorias/getAllImages`,
+      "POST",
+      {},
+      obj,
+      {},
+      false
+    );
+    if (res?.status) {
+      return res;
+    } else {
+      console.error(res);
+      return [];
+    }
+  } catch (err) {
+    throw err;
+  }
+};
