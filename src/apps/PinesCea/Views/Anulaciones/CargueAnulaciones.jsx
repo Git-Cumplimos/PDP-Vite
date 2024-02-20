@@ -100,7 +100,7 @@ const FileInputX = () => {
       setProcesandoValidacion(true);
       const presignedData = await Presigned_validar(
         archivo[0],
-        `${file_name}anulaciones/${f.getFullYear()}-${f.getMonth() + 1}-${f.getDate()}-${f.getHours()}-${f.getMinutes()}-${f.getSeconds()}-archivoAnulaciones.csv`
+        `${file_name}anulaciones/${f.getFullYear()}-${f.getMonth() + 1}-${f.getDate()}-${f.getHours()}-${f.getMinutes()}-${f.getSeconds()}-archivoAnulacionesCea.csv`
       );
       const nombreArchivoS3 = presignedData.nombre_archivo;
 
