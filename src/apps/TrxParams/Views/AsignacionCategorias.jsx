@@ -366,6 +366,7 @@ const AsignacionCategorias = () => {
                   const subcat = old.subcategorias.find((subcat) => {
                     return subcat.nombre === old.id_subcategoria;
                   });
+                  console.log(subcat);
                   if (subcat) {
                     return {
                       ...old,
@@ -373,7 +374,7 @@ const AsignacionCategorias = () => {
                         if (subcat.nombre === old.id_subcategoria) {
                           return {
                             ...subcat,
-                            comercios: [...subcat.comercios, old.app],
+                            comercios: [...subcat.comercios ?? [], old.app],
                           };
                         }
                         return subcat;
