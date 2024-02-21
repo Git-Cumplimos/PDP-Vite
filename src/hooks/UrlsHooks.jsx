@@ -194,57 +194,59 @@ export const useProvideUrls = () => {
   useEffect(() => {
     const fetchUrlsCategorias = async (id_zona) => {
       const formData = new FormData();
-      formData.append("id_zona", id_zona);
-      const res = await fetchCategoriasByZona(formData);
-      // console.log("categorias encontradas por zona", res);
-      if (res?.status) {
-        const urlsCategoriasFiltrado = res?.obj.map(
-          ({ nombre, img_url, id_categoria, subcategorias }) => {
-            const link = `/categoria/${nombre.replace(/\s+/g, "-")}`;
-            const subcategoriasFiltradas = subcategorias.filter(
-              (subcategoria) =>
-                subcategoria.status || subcategoria.comercios?.length > 0
-            );
-            const subcats = subcategoriasFiltradas.map(
-              ({ nombre, img_url, id_subcategoria, comercios }) => {
+      if (id_zona) {
+        formData.append("id_zona", id_zona);
+        const res = await fetchCategoriasByZona(formData);
+        // console.log("categorias encontradas por zona", res);
+        if (res?.status) {
+          const urlsCategoriasFiltrado = res?.obj.map(
+            ({ nombre, img_url, id_categoria, subcategorias }) => {
+              const link = `/categoria/${nombre.replace(/\s+/g, "-")}`;
+              const subcategoriasFiltradas = subcategorias.filter(
+                (subcategoria) =>
+                  subcategoria.status || subcategoria.comercios?.length > 0
+              );
+              const subcats = subcategoriasFiltradas.map(
+                ({ nombre, img_url, id_subcategoria, comercios }) => {
+                  return {
+                    link: `${link}/${nombre.replace(/\s+/g, "-")}`,
+                    label: <AppIcons Logo={img_url} name={nombre} />,
+                    component: (props) => (
+                      <Subcategorias
+                        {...props}
+                        comercios={comercios}
+                        title={nombre}
+                      />
+                    ),
+                    props: { nombre, img_url, id_categoria, id_subcategoria },
+                  };
+                }
+              );
+              if (subcategoriasFiltradas.length === 0) {
+                // Si no hay subcategorias, no se muestra la categoría
                 return {
-                  link: `${link}/${nombre.replace(/\s+/g, "-")}`,
-                  label: <AppIcons Logo={img_url} name={nombre} />,
-                  component: (props) => (
-                    <Subcategorias
-                      {...props}
-                      comercios={comercios}
-                      title={nombre}
-                    />
-                  ),
-                  props: { nombre, img_url, id_categoria, id_subcategoria },
+                  link: null,
+                  label: null,
+                  component: null,
+                  props: null,
+                  subRoutes: null,
                 };
               }
-            );
-            if (subcategoriasFiltradas.length === 0) {
-              // Si no hay subcategorias, no se muestra la categoría
               return {
-                link: null,
-                label: null,
-                component: null,
-                props: null,
-                subRoutes: null,
+                link,
+                label: <AppIcons Logo={img_url} name={nombre} />,
+                component: (props) => (
+                  <Categoria {...props} subcategorias={subcats} />
+                ),
+                props: { nombre, img_url, id_categoria },
+                subRoutes: subcats,
               };
             }
-            return {
-              link,
-              label: <AppIcons Logo={img_url} name={nombre} />,
-              component: (props) => (
-                <Categoria {...props} subcategorias={subcats} />
-              ),
-              props: { nombre, img_url, id_categoria },
-              subRoutes: subcats,
-            };
-          }
-        );
-        setUrlsCategorias(urlsCategoriasFiltrado);
-      } else {
-        setUrlsCategorias([]);
+          );
+          setUrlsCategorias(urlsCategoriasFiltrado);
+        } else {
+          setUrlsCategorias([]);
+        }
       }
     };
 

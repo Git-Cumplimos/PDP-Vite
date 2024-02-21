@@ -210,7 +210,7 @@ const ParametrosCategorizacion = () => {
     // for (const pair of formData.entries()) {
     //   console.log(pair[0] + ", " + pair[1]);
     // }
-    // console.log(Object.fromEntries(formData));
+    console.log(Object.fromEntries(formData));
     try {
       const res = await putEditCategoria(formData);
       // console.log(res);
