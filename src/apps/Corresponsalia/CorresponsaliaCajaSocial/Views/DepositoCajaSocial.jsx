@@ -21,9 +21,9 @@ import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
 import Tickets from "../../../../components/Base/Tickets";
 import { algoCheckCuentaDepositoCajaSocial } from "../utils/trxUtils";
 
-const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
-const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
-const URL_CONSULTA_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
+const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
+const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
+const URL_CONSULTA_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-pago-credito-pdp`;
 
 const DATA_DEPOSITO_INIT = {
   numeroCuenta: "",
@@ -37,6 +37,7 @@ const DepositoCajaSocial = () => {
   const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [estadoPeticion, setEstadoPeticion] = useState(0);
+  const [resConsulta, setResConsulta] = useState({});
   const { roleInfo, pdpUser } = useAuth();
   const printDiv = useRef();
   const handlePrint = useReactToPrint({
@@ -82,30 +83,32 @@ const DepositoCajaSocial = () => {
           numero_cuenta: dataDeposito?.numeroCuenta,
         },
       };
-      // notifyPending(
-      //   peticionConsultaTitular({}, data),
-      //   {
-      //     render: () => {
-      //       return "Procesando creación";
-      //     },
-      //   },
-      //   {
-      //     render: ({ data: res }) => {
-      //       setShowModal(true);
-      //       return res?.msg ?? "Consulta satisfactoria";
-      //     },
-      //   },
-      //   {
-      //     render: ({ data: error }) => {
-      //       validNavigate(-1);
-      //       return error?.message ?? "Consulta fallida";
-      //     },
-      //   }
-      // );
+      notifyPending(
+        peticionConsultaTitular({}, data),
+        {
+          render: () => {
+            return "Procesando consulta";
+          },
+        },
+        {
+          render: ({ data: res }) => {
+            setShowModal(true);
+            setResConsulta(res?.obj);
+            setEstadoPeticion(0);
+            return res?.msg ?? "Consulta satisfactoria";
+          },
+        },
+        {
+          render: ({ data: error }) => {
+            validNavigate(-1);
+            return error?.message ?? "Consulta fallida";
+          },
+        }
+      );
     },
     [dataDeposito, pdpUser, roleInfo]
   );
-  const pagoCredito = useCallback(
+  const pagoDeposito = useCallback(
     (ev) => {
       ev.preventDefault();
       const data = {
@@ -130,7 +133,9 @@ const DepositoCajaSocial = () => {
         },
         deposito_caja_social: {
           numero_cuenta: dataDeposito?.numeroCuenta,
+          nom_cliente: resConsulta?.personName?.fullName,
         },
+        id_trx: resConsulta?.id_trx,
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
@@ -158,7 +163,7 @@ const DepositoCajaSocial = () => {
         }
       );
     },
-    [pdpUser, dataDeposito, roleInfo]
+    [pdpUser, dataDeposito, roleInfo, resConsulta, uniqueId]
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
@@ -198,6 +203,7 @@ const DepositoCajaSocial = () => {
             maxLength={11}
             value={dataDeposito?.numeroCuenta}
             onChange={onChangeFormat}
+            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
             required
           />
           <MoneyInput
@@ -212,7 +218,7 @@ const DepositoCajaSocial = () => {
             max={enumParametrosCajaSocial?.MAX_DEPOSITO_CAJA_SOCIAL}
             value={dataDeposito?.valorDeposito ?? 0}
             onInput={onChangeFormatNum}
-            disabled={loadingPeticionDeposito}
+            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
             required
           />
         </Fieldset>
@@ -220,11 +226,14 @@ const DepositoCajaSocial = () => {
           <Button
             type="button"
             onClick={closeModule}
-            disabled={loadingPeticionDeposito}
+            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
           >
             Cancelar
           </Button>
-          <Button type="submit" disabled={loadingPeticionDeposito}>
+          <Button
+            type="submit"
+            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
+          >
             Realizar consulta
           </Button>
         </ButtonBar>
@@ -233,9 +242,10 @@ const DepositoCajaSocial = () => {
         <>
           {estadoPeticion === 0 ? (
             <PaymentSummary
-              title="¿Está seguro de realizar el pago?"
+              title="Respuesta de consulta depósito"
               subtitle="Resumen de transacción"
               summaryTrx={{
+                "Nombres titular": resConsulta?.personName?.fullName ?? "",
                 "Número de cuenta": dataDeposito?.numeroCuenta,
                 "Valor a depositar": formatMoney.format(
                   dataDeposito?.valorDeposito
@@ -245,14 +255,18 @@ const DepositoCajaSocial = () => {
               <ButtonBar>
                 <Button
                   onClick={closeModule}
-                  disabled={loadingPeticionDeposito}
+                  disabled={
+                    loadingPeticionDeposito || loadingPeticionConsultaTitular
+                  }
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  onClick={pagoCredito}
-                  disabled={loadingPeticionDeposito}
+                  onClick={pagoDeposito}
+                  disabled={
+                    loadingPeticionDeposito || loadingPeticionConsultaTitular
+                  }
                 >
                   Realizar depósito
                 </Button>
