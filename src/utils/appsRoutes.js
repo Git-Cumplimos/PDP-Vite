@@ -79,6 +79,7 @@ import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
 import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
 import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 
+import routesItau from "../apps/ConveniosItau/routes";
 /**
 
  * * Logos
@@ -476,6 +477,7 @@ const allUrlsPrivateApps = [
       rutasGestionRecaudoDirecto,
       rutasGestionGrupoAval,
       rutasGestionAgrario,
+      routesItau,
     ],
   },
   {
