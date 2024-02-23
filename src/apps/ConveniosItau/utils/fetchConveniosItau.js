@@ -3,8 +3,8 @@ import { notify, notifyError } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import { fetchDataTotpNoMsg } from "../../../utils/MFA";
 
-// const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}`;
-const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000`;
+const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}`;
+// const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000`;
 
 export const bloquearConveniosItau = async (bodyObj) => {
   if (!bodyObj) {

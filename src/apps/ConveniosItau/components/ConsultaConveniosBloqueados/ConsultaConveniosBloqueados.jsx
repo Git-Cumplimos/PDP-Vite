@@ -5,7 +5,7 @@ import Input from "../../../../components/Base/Input/Input";
 import { useFetch } from "../../../../hooks/useFetch";
 
 
-// const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/consulta-creditos`;
+// const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}/convenios_itau/consulta_bloqueos`;
 const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000/convenios_itau/consulta_bloqueos`;
 
 const ConsultaConveniosBloqueados = ({
