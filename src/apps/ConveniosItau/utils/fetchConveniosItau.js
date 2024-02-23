@@ -15,8 +15,8 @@ export const bloquearConveniosItau = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
       parseObj
     ),
   };
@@ -37,8 +37,8 @@ export const bloquearConveniosItau = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -84,8 +84,8 @@ export const fetchCustom = (
     let parseObj = JSON.stringify(data_);
     let dataObj = {
       data: cifrarAES(
-        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
+        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
         parseObj
       ),
     };
@@ -99,8 +99,8 @@ export const fetchCustom = (
         Peticion = await fetchFunc(urlCompleto, "POST", {}, dataObj, {}, true);
         const dataDecrypt = Peticion?.obj?.data ?? "";
         const obj = decryptAES(
-          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
+          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
           dataDecrypt
         );
         Peticion.obj = JSON.parse(obj);
