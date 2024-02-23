@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -18,8 +18,8 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
 import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
-import Tickets from "../../../../components/Base/Tickets";
 import { algoCheckCuentaDepositoCajaSocial } from "../utils/trxUtils";
+import TicketsCajaSocial from "../components/TicketsCajaSocial";
 
 const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
 const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
@@ -36,6 +36,7 @@ const DepositoCajaSocial = () => {
   const [dataDeposito, setDataDeposito] = useState(DATA_DEPOSITO_INIT);
   const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
+  const [stateTicketTrx, setStateTicketTrx] = useState(false);
   const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [resConsulta, setResConsulta] = useState({});
   const { roleInfo, pdpUser } = useAuth();
@@ -152,12 +153,19 @@ const DepositoCajaSocial = () => {
             const dataTemp = res.obj;
             setObjTicketActual(dataTemp.ticket ?? {});
             setEstadoPeticion(1);
+            setStateTicketTrx(true);
             return "Pago satisfactorio";
           },
         },
         {
           render: ({ data: error }) => {
-            validNavigate(-1);
+            if (error.hasOwnProperty("optionalObject")) {
+              if (error.optionalObject.hasOwnProperty("ticket")) {
+                setObjTicketActual(error.optionalObject.ticket ?? {});
+                setEstadoPeticion(1);
+                setStateTicketTrx(false);
+              } else validNavigate(-1);
+            } else validNavigate(-1);
             return error?.message ?? "Pago fallido";
           },
         }
@@ -170,11 +178,14 @@ const DepositoCajaSocial = () => {
     if (ev.target.name === "numeroCuenta") {
       if (!isNaN(value)) {
         value = value.replace(/[\s\.\-+eE]/g, "");
+        setDataDeposito((old) => {
+          return { ...old, [ev.target.name]: value };
+        });
       }
-    }
-    setDataDeposito((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
+    } else
+      setDataDeposito((old) => {
+        return { ...old, [ev.target.name]: value };
+      });
   }, []);
   const onChangeFormatNum = useCallback((ev, val) => {
     if (!isNaN(val)) {
@@ -274,7 +285,11 @@ const DepositoCajaSocial = () => {
             </PaymentSummary>
           ) : estadoPeticion === 1 ? (
             <div className="flex flex-col justify-center items-center">
-              <Tickets ticket={objTicketActual} refPrint={printDiv} />
+              <TicketsCajaSocial
+                stateTrx={stateTicketTrx}
+                ticket={objTicketActual}
+                refPrint={printDiv}
+              />
               <h2>
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>

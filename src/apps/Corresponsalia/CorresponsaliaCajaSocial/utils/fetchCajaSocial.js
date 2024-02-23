@@ -147,7 +147,13 @@ export const EvaluateResponse = (res, name_ = "") => {
   //para los errores customizados del backend
   try {
     if (res?.status === false) {
-      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`);
+      let tempObject = {};
+      if (res.hasOwnProperty("obj")) {
+        if (res.obj.hasOwnProperty("ticket")) {
+          tempObject["ticket"] = res.obj.ticket;
+        }
+      }
+      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`, tempObject);
     }
   } catch (error) {
     if (error instanceof ErrorCustomBackend) {
@@ -177,11 +183,12 @@ export const EvaluateResponse = (res, name_ = "") => {
 };
 
 export class ErrorCustom extends Error {
-  constructor(message, name, error_msg, notificacion) {
+  constructor(message, name, error_msg, notificacion, optionalObject) {
     super(message);
     this.name = name;
     this.error_msg = error_msg;
     this.notificacion = notificacion;
+    this.optionalObject = optionalObject;
     if (this.notificacion === "notifyError") {
       console.log(message);
     } else if (this.notificacion === "notify") {
@@ -198,31 +205,48 @@ export class ErrorCustom extends Error {
 }
 
 export class ErrorCustomFetch extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomFetch", error_msg, "notifyError");
+  constructor(message, error_msg, optionalObject = {}) {
+    super(
+      message,
+      "ErrorCustomFetch",
+      error_msg,
+      "notifyError",
+      optionalObject
+    );
   }
 }
 
 export class ErrorCustomTimeout extends ErrorCustom {
-  constructor(message, error_msg, notificacion = "notifyError") {
-    super(message, "ErrorCustomTimeout", error_msg, notificacion);
+  constructor(
+    message,
+    error_msg,
+    notificacion = "notifyError",
+    optionalObject = {}
+  ) {
+    super(
+      message,
+      "ErrorCustomTimeout",
+      error_msg,
+      notificacion,
+      optionalObject
+    );
   }
 }
 
 export class ErrorCustomBackend extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomBackend", error_msg, null);
+  constructor(message, error_msg, optionalObject = {}) {
+    super(message, "ErrorCustomBackend", error_msg, null, optionalObject);
   }
 }
 
 export class ErrorCustomBackendUser extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomBackendUser", error_msg, null);
+  constructor(message, error_msg, optionalObject = {}) {
+    super(message, "ErrorCustomBackendUser", error_msg, null, optionalObject);
   }
 }
 
 export class msgCustomBackend extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "msgCustomBackend", error_msg, null);
+  constructor(message, error_msg, optionalObject = {}) {
+    super(message, "msgCustomBackend", error_msg, null, optionalObject);
   }
 }
