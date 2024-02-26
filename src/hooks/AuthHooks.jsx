@@ -13,6 +13,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notify, notifyError } from "../utils/notify";
 import useFetchDebounce from "./useFetchDebounce";
+import controlgroup from "../layouts/AdminLayout/ControlGroup";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
@@ -41,24 +42,6 @@ const validateUser = async (email) => {
         cause: "custom",
       });
     }
-    return res;
-  } catch (err) {
-    throw err;
-  }
-};
-
-const userGroup = async (email) => {
-  const get = {
-    email: email,
-  };
-  if (!email) {
-    throw new Error("Sin datos de busqueda", {
-      cause: "custom",
-    });
-  }
-
-  try {
-    const res = await fetchData(url_device, "GET", get, {}, {}, false);
     return res;
   } catch (err) {
     throw err;
@@ -284,14 +267,19 @@ export const useProvideAuth = () => {
   const fetchDevice = useCallback(async () => {
     try {
       const user = await Auth.currentAuthenticatedUser();
-      const device_id =
-        user["signInUserSession"]["accessToken"]["payload"]["device_key"];
-      const devices = await Auth.fetchDevices();
-      const checkDevice = devices.some((item) => item?.id === device_id);
-      if (checkDevice) {
-        return false;
+      const email = user["attributes"]["email"];
+      const isControlGroup = controlgroup.includes(email);
+      if (isControlGroup) {
+        const device_id =
+          user["signInUserSession"]["accessToken"]["payload"]["device_key"];
+        const devices = await Auth.fetchDevices();
+        const checkDevice = devices.some((item) => item?.id === device_id);
+        if (checkDevice) {
+          return false;
+        }
+        return true;
       }
-      return true;
+      return false;
     } catch {}
   }, []);
 
@@ -757,7 +745,6 @@ export const useProvideAuth = () => {
     timer,
     parameters,
     infoTicket,
-    userGroup,
     validateUser,
     updateCommerceQuota,
     ...userState,

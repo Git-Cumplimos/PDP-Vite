@@ -228,7 +228,6 @@ const AdminLayout = () => {
     quotaInfo?.quota,
     pathname,
     montoMaximoCaja,
-    device,
   ]);
 
   const showModalAlertBoveda = useMemo(() => {
