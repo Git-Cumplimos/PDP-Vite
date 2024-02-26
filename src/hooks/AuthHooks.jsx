@@ -20,6 +20,7 @@ const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user = process.env.REACT_APP_URL_COGNITO;
+const url_device = process.env.REACT_APP_URL_COGNITO_DEVICE;
 const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
 const url_pdp_commerce = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
@@ -40,6 +41,24 @@ const validateUser = async (email) => {
         cause: "custom",
       });
     }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const userGroup = async (email) => {
+  const get = {
+    email: email,
+  };
+  if (!email) {
+    throw new Error("Sin datos de busqueda", {
+      cause: "custom",
+    });
+  }
+
+  try {
+    const res = await fetchData(url_device, "GET", get, {}, {}, false);
     return res;
   } catch (err) {
     throw err;
@@ -156,6 +175,8 @@ const reducerAuth = (userState, action) => {
 export const AuthContext = createContext({
   signIn: () => {},
   confirmSignIn: () => {},
+  registerDevice: () => {},
+  fetchDevice: () => {},
   signOut: () => {},
   infoTicket,
   handleverifyTotpToken: () => {},
@@ -239,6 +260,7 @@ export const useProvideAuth = () => {
           return null;
         });
       } catch (err) {
+        console.log(err);
         if (err.code === "NotAuthorizedException") {
           dispatchAuth({ type: SIGN_OUT });
         }
@@ -247,6 +269,31 @@ export const useProvideAuth = () => {
     },
     [cognitoUser, navigate, state, pathname]
   );
+
+  const registerDevice = useCallback(async (challengeParam) => {
+    try {
+      if (challengeParam) {
+        const response = await Auth.rememberDevice();
+        console.log(response);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const fetchDevice = useCallback(async () => {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      const device_id =
+        user["signInUserSession"]["accessToken"]["payload"]["device_key"];
+      const devices = await Auth.fetchDevices();
+      const checkDevice = devices.some((item) => item?.id === device_id);
+      if (checkDevice) {
+        return false;
+      }
+      return true;
+    } catch {}
+  }, []);
 
   const signOut = useCallback(() => {
     Auth.signOut()
@@ -701,6 +748,8 @@ export const useProvideAuth = () => {
     handleChangePass,
     signIn,
     confirmSignIn,
+    registerDevice,
+    fetchDevice,
     signOut,
     forgotPassword,
     forgotPasswordSubmit,
@@ -708,6 +757,7 @@ export const useProvideAuth = () => {
     timer,
     parameters,
     infoTicket,
+    userGroup,
     validateUser,
     updateCommerceQuota,
     ...userState,
