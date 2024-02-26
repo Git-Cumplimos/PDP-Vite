@@ -24,7 +24,9 @@ import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
 import MoneyInput from "../../../../components/Base/MoneyInput";
+import { onChangeNumber } from "../../../../utils/functions";
 import { fetchZonas } from "../../utils/fetchZonas";
+
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -94,7 +96,6 @@ const CrearComercios = () => {
   const [foundActivities, setFoundActivities] = useState([]);
   const [alertMonto, setAlertMonto] = useState("");
   const [alertPorcent, setAlertPorcent] = useState("");
-
   const [zonas, setZonas] = useState([]);
 
   const [dispersionPagos, setDispersionPagos] = useState({
@@ -515,14 +516,14 @@ const CrearComercios = () => {
       delete dispersionPagosEnvio["autorizador_runt_mt"];
       delete dispersionPagosEnvio["convenio_runt_mt"];
       if (
-        dispersionPagosEnvio["autorizador_runt"] != "" &&
-        dispersionPagosEnvio["autorizador_mt"] != "" &&
-        dispersionPagosEnvio["convenio_runt"] != "" &&
-        dispersionPagosEnvio["convenio_mt"] != "" &&
-        dispersionPagosEnvio["autorizador_local"] != "" &&
-        dispersionPagosEnvio["convenio_local"] != "" &&
-        dispersionPagosEnvio["usuario_jwt"] != "" &&
-        dispersionPagosEnvio["contrasena_jwt"] != ""
+        dispersionPagosEnvio["autorizador_runt"] !== "" &&
+        dispersionPagosEnvio["autorizador_mt"] !== "" &&
+        dispersionPagosEnvio["convenio_runt"] !== "" &&
+        dispersionPagosEnvio["convenio_mt"] !== "" &&
+        dispersionPagosEnvio["autorizador_local"] !== "" &&
+        dispersionPagosEnvio["convenio_local"] !== "" &&
+        dispersionPagosEnvio["usuario_jwt"] !== "" &&
+        dispersionPagosEnvio["contrasena_jwt"] !== ""
       ) {
         postDispersionPagoComercio(dispersionPagosEnvio)
           .then((res) => {
@@ -598,7 +599,7 @@ const CrearComercios = () => {
           console.error(err);
         });
     }
-  }, [comercio.pk_comercio, postConsultaParametrizacionConvenios]);
+  }, [comercio.pk_comercio]);
 
   if (pk_comercio_handled === -1) {
     <Navigate to={"/params-operations/comercios-params/comercios"} replace />;
@@ -682,19 +683,17 @@ const CrearComercios = () => {
           <Input
             id="numero_identificacion"
             label="Número de identificación"
-            type="text"
+            type="tel"
             name="numero_identificacion"
             minLength="1"
             maxLength="12"
             required
             value={comercio?.numero_identificacion}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, numero_identificacion: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                numero_identificacion: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -712,19 +711,17 @@ const CrearComercios = () => {
           <Input
             id="telefono_fijo_comercio"
             label="Teléfono fijo"
-            type="text"
+            type="tel"
             name="telefono_fijo_comercio"
             minLength="1"
             maxLength="12"
             required
             value={comercio?.telefono_fijo_comercio}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, telefono_fijo_comercio: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                telefono_fijo_comercio: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -824,7 +821,7 @@ const CrearComercios = () => {
           <Input
             id="latitud_comercio"
             label="Latitud comercio"
-            type="text"
+            type="tel"
             name="latitud_comercio"
             minLength="1"
             maxLength="12"
@@ -843,7 +840,7 @@ const CrearComercios = () => {
           <Input
             id="longitud_comercio"
             label="Longitud comercio"
-            type="text"
+            type="tel"
             name="longitud_comercio"
             minLength="1"
             maxLength="12"
@@ -864,57 +861,45 @@ const CrearComercios = () => {
           <Input
             id="dane_ciudad"
             label="Número Dane ciudad"
-            type="text"
+            type="tel"
             name="dane_ciudad"
             minLength="1"
             maxLength="5"
             required
             value={comercio?.dane_ciudad}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, dane_ciudad: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                dane_ciudad: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
           <Input
             id="dane_dpto"
             label="Número Dane departamento"
-            type="text"
+            type="tel"
             name="dane_dpto"
             minLength="1"
             maxLength="5"
             required
             value={comercio?.dane_dpto}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, dane_dpto: num };
-                });
-              }
+              setComercio((old) => ({ ...old, dane_dpto: onChangeNumber(e) }));
             }}
             autoComplete="off"
           />
           <Input
             id="dane_pais"
             label="Número Dane país"
-            type="text"
+            type="tel"
             name="dane_pais"
             minLength="1"
             maxLength="5"
             required
             value={comercio?.dane_pais}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, dane_pais: num };
-                });
-              }
+              setComercio((old) => ({ ...old, dane_pais: onChangeNumber(e) }));
             }}
             autoComplete="off"
           />
@@ -947,19 +932,17 @@ const CrearComercios = () => {
           <Input
             id="tel_contacto1_comercio"
             label="Teléfono"
-            type="text"
+            type="tel"
             name="tel_contacto1_comercio"
             minLength="1"
             maxLength="12"
             required
             value={comercio?.tel_contacto1_comercio}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, tel_contacto1_comercio: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                tel_contacto1_comercio: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -990,18 +973,16 @@ const CrearComercios = () => {
           <Input
             id="tel_contacto2_comercio"
             label="Teléfono"
-            type="text"
+            type="tel"
             name="tel_contacto2_comercio"
             minLength="1"
             maxLength="12"
             value={comercio?.tel_contacto2_comercio}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, tel_contacto2_comercio: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                tel_contacto2_comercio: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
