@@ -9,7 +9,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import SearchPlanesComisiones from "../../components/PlanesComisiones/SearchPlanesComisiones";
 import Fieldset from "../../../../components/Base/Fieldset";
 import SearchTipoOperacion from "../../components/AssignsComission/SearchTipoOperacion";
-import SearchGruposConvenios from "../../components/AssignsComission/SearchGruposConvenios";
+import TablaGruposConvenios from "../Convenios/GruposConvenios/components/TablaGruposConvenios"
 import {
   deleteAsignacionesComisiones,
   fetchAsignacionesComisiones,
@@ -121,10 +121,7 @@ const CreateAssigns = () => {
     [navigate, newComision]
   );
 
-  useEffect(() => {
-    fetchAssignsFunc();
-  }, [params.id]);
-  const fetchAssignsFunc = () => {
+  const fetchAssignsFunc = useCallback(() => {
     if (params.id) {
       setIsUploading(true);
       fetchAsignacionesComisiones({
@@ -159,7 +156,12 @@ const CreateAssigns = () => {
           navigate(-1);
         });
     }
-  };
+  }, [navigate, params.id]);
+
+  useEffect(() => {
+    fetchAssignsFunc();
+  }, [fetchAssignsFunc]);
+
   const handleShow = useCallback(
     (data) => (ev) => {
       ev.preventDefault();
@@ -172,19 +174,19 @@ const CreateAssigns = () => {
   return (
     <Fragment>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl'>
+      <h1 className="text-3xl">
         {newComision?.pk_asignacion_comisiones !== ""
           ? "Actualizar asignación comisión"
           : "Crear asignación comisión"}
       </h1>
       <Form onSubmit={createAssignComission} grid>
-        <Fieldset legend='Datos obligatorios' className='lg:col-span-2'>
+        <Fieldset legend="Datos obligatorios" className="lg:col-span-2">
           <Input
-            id='nombre_asignacion_comision'
-            name='nombre_asignacion_comision'
+            id="nombre_asignacion_comision"
+            name="nombre_asignacion_comision"
             label={"Nombre asignación de comisión"}
-            type='text'
-            autoComplete='off'
+            type="text"
+            autoComplete="off"
             value={newComision?.["nombre_asignacion_comision"]}
             onChange={(ev) => {
               setNewComision((old) => ({
@@ -195,38 +197,38 @@ const CreateAssigns = () => {
             maxLength={100}
             required
           />
-          <Fieldset legend='Plan de comisión' className='lg:col-span-2'>
+          <Fieldset legend="Plan de comisión" className="lg:col-span-2">
             <Input
-              id='nombre_plan'
-              name='nombre_plan'
+              id="nombre_plan"
+              name="nombre_plan"
               label={"Plan de comisión"}
-              type='text'
-              autoComplete='off'
+              type="text"
+              autoComplete="off"
               value={newComision?.nombre_plan}
               onChange={() => {}}
               disabled
             />
             <ButtonBar>
-              <Button type='button' onClick={handleShow("planComision")}>
+              <Button type="button" onClick={handleShow("planComision")}>
                 {newComision?.fk_planes_comisiones !== ""
                   ? "Actualizar plan de comisión"
                   : "Agregar plan de comisión"}
               </Button>
             </ButtonBar>
           </Fieldset>
-          <Fieldset legend='Tipo de operación' className='lg:col-span-2'>
+          <Fieldset legend="Tipo de operación" className="lg:col-span-2">
             <Input
-              id='nombre_tipo_operacion'
-              name='nombre_tipo_operacion'
+              id="nombre_tipo_operacion"
+              name="nombre_tipo_operacion"
               label={"Tipo de operación"}
-              type='text'
-              autoComplete='off'
+              type="text"
+              autoComplete="off"
               value={newComision?.["nombre_tipo_operacion"]}
               onChange={() => {}}
               disabled
             />
             <ButtonBar>
-              <Button type='button' onClick={handleShow("tipoOperacion")}>
+              <Button type="button" onClick={handleShow("tipoOperacion")}>
                 {newComision?.fk_tipo_op !== ""
                   ? "Actualizar tipo de operación"
                   : "Agregar tipo de operación"}
@@ -234,20 +236,20 @@ const CreateAssigns = () => {
             </ButtonBar>
           </Fieldset>
         </Fieldset>
-        <Fieldset legend='Datos opcionales' className='lg:col-span-2'>
-          <Fieldset legend='Grupo convenios' className='lg:col-span-2'>
+        <Fieldset legend="Datos opcionales" className="lg:col-span-2">
+          <Fieldset legend="Grupo convenios" className="lg:col-span-2">
             <Input
-              id='nombre_grupo_convenios'
-              name='nombre_grupo_convenios'
+              id="nombre_grupo_convenios"
+              name="nombre_grupo_convenios"
               label={"Grupo convenios"}
-              type='text'
-              autoComplete='off'
+              type="text"
+              autoComplete="off"
               value={newComision?.["nombre_grupo_convenios"]}
               onChange={() => {}}
               disabled
             />
             <ButtonBar>
-              <Button type='button' onClick={handleShow("grupoConvenios")}>
+              <Button type="button" onClick={handleShow("grupoConvenios")}>
                 {newComision?.fk_tbl_grupo_convenios !== ""
                   ? "Actualizar grupo convenios"
                   : "Agregar grupo convenios"}
@@ -255,34 +257,36 @@ const CreateAssigns = () => {
               {newComision?.fk_tbl_grupo_convenios !== "" &&
                 newComision?.pk_asignacion_comisiones === "" && (
                   <Button
-                    type='button'
+                    type="button"
                     onClick={() => {
                       setNewComision((old) => ({
                         ...old,
                         fk_tbl_grupo_convenios: "",
                         nombre_grupo_convenios: "Vacio",
                       }));
-                    }}>
+                    }}
+                  >
                     Eliminar grupo convenios
                   </Button>
                 )}
             </ButtonBar>
           </Fieldset>
         </Fieldset>
-        <ButtonBar className='lg:col-span-2'>
+        <ButtonBar className="lg:col-span-2">
           <Button
-            type='button'
+            type="button"
             onClick={() => {
               navigate(-1);
-            }}>
+            }}
+          >
             Cancelar
           </Button>
           {newComision?.pk_asignacion_comisiones !== "" && (
-            <Button type='button' onClick={handleShow("eliminarAsignacion")}>
+            <Button type="button" onClick={handleShow("eliminarAsignacion")}>
               Eliminar asignación de comisión
             </Button>
           )}
-          <Button type='submit'>
+          <Button type="submit">
             {newComision?.pk_asignacion_comisiones !== ""
               ? "Actualizar asignación comisión"
               : "Crear asignación comisión"}
@@ -292,7 +296,8 @@ const CreateAssigns = () => {
       <Modal
         show={showModal}
         handleClose={handleClose}
-        className='flex align-middle'>
+        className="flex align-middle"
+      >
         {selectedOpt === "planComision" ? (
           <SearchPlanesComisiones
             handleClose={handleClose}
@@ -306,21 +311,28 @@ const CreateAssigns = () => {
             newComision={newComision}
           />
         ) : selectedOpt === "grupoConvenios" ? (
-          <SearchGruposConvenios
-            handleClose={handleClose}
-            setNewComision={setNewComision}
-            newComision={newComision}
+          <TablaGruposConvenios
+            onSelect={(selectedConvGroup) => {
+              setNewComision((old) => ({
+                ...old,
+                fk_tbl_grupo_convenios:
+                  selectedConvGroup.pk_tbl_grupo_convenios,
+                nombre_grupo_convenios:
+                  selectedConvGroup.nombre_grupo_convenios,
+              }));
+              handleClose();
+            }}
           />
         ) : selectedOpt === "eliminarAsignacion" ? (
           <>
-            <h1 className='text-2xl text-center mb-5 font-semibold'>
+            <h1 className="text-2xl text-center mb-5 font-semibold">
               ¿Está seguro de eliminar la asignación?
             </h1>
-            <ButtonBar className='lg:col-span-2'>
-              <Button type='button' onClick={handleClose}>
+            <ButtonBar className="lg:col-span-2">
+              <Button type="button" onClick={handleClose}>
                 Cancelar
               </Button>
-              <Button type='submit' onClick={deleteAssignComission}>
+              <Button type="submit" onClick={deleteAssignComission}>
                 Eliminar asignación de comisión
               </Button>
             </ButtonBar>

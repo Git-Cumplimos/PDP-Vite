@@ -25,6 +25,27 @@ const MovimientoComisionesCupo = () => {
     superior: 1000000,
     inferior: 100,
   });
+
+  useEffect(() => {
+    // if (!quotaInfo || 
+    //   (quotaInfo && Object.keys(quotaInfo).length === 0) ||
+    //   (quotaInfo && Object.values(quotaInfo).every(val => [""," ",0].includes(val)) )
+    // ) {
+    //   navigate("/");
+    // } else {
+      let hasKeys = true;
+      if (["TRANSFERENCIA_MENSUAL"].includes(String(quotaInfo?.tipo_pago_comision).toUpperCase() ?? "")){
+        hasKeys = false
+      }
+      if (!hasKeys) {
+        notifyError(
+          "No se permite la transferencia de comisión, esta se realiza mensualmente"
+        );
+        navigate("/");
+      }
+    // }
+  }, [quotaInfo, navigate]);
+
   const isComercioPadre = useMemo(
     () => pdpUser?.is_comercio_padre ?? false,
     [pdpUser]

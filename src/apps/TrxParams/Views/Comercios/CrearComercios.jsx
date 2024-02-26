@@ -14,7 +14,7 @@ import {
   postCrearComercio,
   putModificarComercio,
   postDispersionPagoComercio,
-  postConsultaParametrizacionConvenios
+  postConsultaParametrizacionConvenios,
 } from "../../utils/fetchComercios";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
@@ -24,6 +24,9 @@ import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
 import MoneyInput from "../../../../components/Base/MoneyInput";
+import { onChangeNumber } from "../../../../utils/functions";
+import { fetchZonas } from "../../utils/fetchZonas";
+
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -41,7 +44,8 @@ const vectorCodigosInstitucionales = [
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 // const urlComercios = `http://127.0.0.1:5000`;
-const urlParametrizacion = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlParametrizacion =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
 
 const emptyCommerce = {
@@ -74,7 +78,8 @@ const emptyCommerce = {
   pk_tbl_grupo_comercios: init_grupo_comercio,
   ciiu: null,
   fk_id_tipo_contrato: 0,
-  alert_cupo: '',
+  alert_cupo: "",
+  zona_comercio: null,
 };
 
 const CrearComercios = () => {
@@ -89,8 +94,9 @@ const CrearComercios = () => {
   const [commerceType, setCommerceType] = useState({});
   const [actividad, setActividad] = useState("");
   const [foundActivities, setFoundActivities] = useState([]);
-  const [alertMonto, setAlertMonto] = useState('');
-  const [alertPorcent, setAlertPorcent] = useState('');
+  const [alertMonto, setAlertMonto] = useState("");
+  const [alertPorcent, setAlertPorcent] = useState("");
+  const [zonas, setZonas] = useState([]);
 
   const [dispersionPagos, setDispersionPagos] = useState({
     id_comercio: "",
@@ -104,54 +110,55 @@ const CrearComercios = () => {
     convenio_runt_mt: "",
     trx_unica_runt_mt: false,
     usuario_jwt: "",
-    contrasena_jwt: ""
+    contrasena_jwt: "",
   });
 
   const handleChangeDispersionPagos = (e) => {
-    if (e.target.name === 'convenio_local') {
+    if (e.target.name === "convenio_local") {
       setDispersionPagos((old) => {
         return {
-        ...old,
-        convenio_local: e.target.value.replace(/[^0-9]/g, '').slice(0, 13),
-      }})
-    }
-    else if (e.target.name === 'convenio_runt') {
+          ...old,
+          convenio_local: e.target.value.replace(/[^0-9]/g, "").slice(0, 13),
+        };
+      });
+    } else if (e.target.name === "convenio_runt") {
       setDispersionPagos((old) => {
         return {
-        ...old,
-        convenio_runt: e.target.value.replace(/[^0-9]/g, '').slice(0, 13),
-        trx_unica_runt_mt: false
-      }})
-    }
-    else if (e.target.name === 'convenio_mt') {
+          ...old,
+          convenio_runt: e.target.value.replace(/[^0-9]/g, "").slice(0, 13),
+          trx_unica_runt_mt: false,
+        };
+      });
+    } else if (e.target.name === "convenio_mt") {
       setDispersionPagos((old) => {
         return {
-        ...old,
-        convenio_mt: e.target.value.replace(/[^0-9]/g, '').slice(0, 13),
-        trx_unica_runt_mt: false
-      }})
-    }
-    else if (e.target.name === 'convenio_runt_mt') {
+          ...old,
+          convenio_mt: e.target.value.replace(/[^0-9]/g, "").slice(0, 13),
+          trx_unica_runt_mt: false,
+        };
+      });
+    } else if (e.target.name === "convenio_runt_mt") {
       setDispersionPagos((old) => {
         return {
-        ...old,
-        convenio_runt_mt: e.target.value.replace(/[^0-9]/g, '').slice(0, 13),
-        trx_unica_runt_mt: true
-      }})
-    }
-    else if (e.target.name === 'usuario_jwt') {
+          ...old,
+          convenio_runt_mt: e.target.value.replace(/[^0-9]/g, "").slice(0, 13),
+          trx_unica_runt_mt: true,
+        };
+      });
+    } else if (e.target.name === "usuario_jwt") {
       setDispersionPagos((old) => {
         return {
-        ...old,
-        usuario_jwt: e.target.value.replace(/[^0-9]/g, '').slice(0, 30),
-      }})
-    }
-    else if (e.target.name === 'contrasena_jwt') {
+          ...old,
+          usuario_jwt: e.target.value.replace(/[^0-9]/g, "").slice(0, 30),
+        };
+      });
+    } else if (e.target.name === "contrasena_jwt") {
       setDispersionPagos((old) => {
         return {
-        ...old,
-        contrasena_jwt: e.target.value.slice(0, 100),
-      }})
+          ...old,
+          contrasena_jwt: e.target.value.slice(0, 100),
+        };
+      });
     }
   };
 
@@ -171,10 +178,10 @@ const CrearComercios = () => {
         ...structuredClone(old),
         ...structuredClone(res?.obj),
       }));
-      if (res?.obj.alert_cupo.includes('%')) {
-        setAlertPorcent(res?.obj.alert_cupo.replace('%',''))
-      }else{
-        setAlertMonto(res?.obj.alert_cupo)
+      if (res?.obj.alert_cupo.includes("%")) {
+        setAlertPorcent(res?.obj.alert_cupo.replace("%", ""));
+      } else {
+        setAlertMonto(res?.obj.alert_cupo);
       }
       setCommerceType(
         Object.fromEntries(
@@ -287,6 +294,35 @@ const CrearComercios = () => {
       }));
     }
   }, [pdpUser?.uuid]);
+
+  const getAllZonas = useCallback(async () => {
+    try {
+      const res = await fetchZonas();
+      if (res) {
+        setZonas(res?.results);
+      } else {
+        console.error(res);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    getAllZonas();
+  }, [getAllZonas]);
+
+  const selectZonas = useMemo(() => {
+    return [
+      { label: "Seleccione una opción", value: "" },
+      ...zonas.map((zona) => {
+        return {
+          label: zona.nombre,
+          value: zona.id_zona,
+        };
+      }),
+    ];
+  }, [zonas]);
 
   const navigate = useNavigate();
 
@@ -411,7 +447,8 @@ const CrearComercios = () => {
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
-      if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0) dataOrg.alert_cupo = ''
+      if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0)
+        dataOrg.alert_cupo = "";
       if (pk_comercio_handled) {
         delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(structuredClone(dataOrg))
@@ -458,116 +495,130 @@ const CrearComercios = () => {
 
       const dispersionPagosEnvio = { ...dispersionPagos };
       dispersionPagosEnvio["id_comercio"] = parseInt(dataOrg.pk_comercio);
-      if (dispersionPagosEnvio.trx_unica_runt_mt==true) {
-        dispersionPagosEnvio["autorizador_runt"] = dispersionPagosEnvio.autorizador_runt_mt;
-        dispersionPagosEnvio["autorizador_mt"] = dispersionPagosEnvio.autorizador_runt_mt;
-        dispersionPagosEnvio["convenio_runt"] = dispersionPagosEnvio.convenio_runt_mt;
-        dispersionPagosEnvio["convenio_mt"] = dispersionPagosEnvio.convenio_runt_mt;
-      }
-      else {
-        dispersionPagosEnvio["autorizador_runt"] = dispersionPagosEnvio.autorizador_runt;
-        dispersionPagosEnvio["autorizador_mt"] = dispersionPagosEnvio.autorizador_mt;
-        dispersionPagosEnvio["convenio_runt"] = dispersionPagosEnvio.convenio_runt;
+      if (dispersionPagosEnvio.trx_unica_runt_mt == true) {
+        dispersionPagosEnvio["autorizador_runt"] =
+          dispersionPagosEnvio.autorizador_runt_mt;
+        dispersionPagosEnvio["autorizador_mt"] =
+          dispersionPagosEnvio.autorizador_runt_mt;
+        dispersionPagosEnvio["convenio_runt"] =
+          dispersionPagosEnvio.convenio_runt_mt;
+        dispersionPagosEnvio["convenio_mt"] =
+          dispersionPagosEnvio.convenio_runt_mt;
+      } else {
+        dispersionPagosEnvio["autorizador_runt"] =
+          dispersionPagosEnvio.autorizador_runt;
+        dispersionPagosEnvio["autorizador_mt"] =
+          dispersionPagosEnvio.autorizador_mt;
+        dispersionPagosEnvio["convenio_runt"] =
+          dispersionPagosEnvio.convenio_runt;
         dispersionPagosEnvio["convenio_mt"] = dispersionPagosEnvio.convenio_mt;
       }
       delete dispersionPagosEnvio["autorizador_runt_mt"];
       delete dispersionPagosEnvio["convenio_runt_mt"];
       if (
-        dispersionPagosEnvio["autorizador_runt"] != "" &&
-        dispersionPagosEnvio["autorizador_mt"] != "" &&
-        dispersionPagosEnvio["convenio_runt"] != "" &&
-        dispersionPagosEnvio["convenio_mt"] != "" &&
-        dispersionPagosEnvio["autorizador_local"] != "" &&
-        dispersionPagosEnvio["convenio_local"] != "" &&
-        dispersionPagosEnvio["usuario_jwt"] != "" &&
-        dispersionPagosEnvio["contrasena_jwt"] != ""
-        ){
-      postDispersionPagoComercio(dispersionPagosEnvio)
-      .then((res) => {
-        setIsUploading(false);
-        if (res?.status) {
-          notify(res?.msg);
-          navigate(-1);
-        } else {
-          notifyError(res?.msg);
-        }
-      })
-      .catch((err) => {
-        setIsUploading(false);
-        notifyError("No se ha podido conectar al servidor");
-        console.error(err);
-      });
-        }
+        dispersionPagosEnvio["autorizador_runt"] !== "" &&
+        dispersionPagosEnvio["autorizador_mt"] !== "" &&
+        dispersionPagosEnvio["convenio_runt"] !== "" &&
+        dispersionPagosEnvio["convenio_mt"] !== "" &&
+        dispersionPagosEnvio["autorizador_local"] !== "" &&
+        dispersionPagosEnvio["convenio_local"] !== "" &&
+        dispersionPagosEnvio["usuario_jwt"] !== "" &&
+        dispersionPagosEnvio["contrasena_jwt"] !== ""
+      ) {
+        postDispersionPagoComercio(dispersionPagosEnvio)
+          .then((res) => {
+            setIsUploading(false);
+            if (res?.status) {
+              notify(res?.msg);
+              navigate(-1);
+            } else {
+              notifyError(res?.msg);
+            }
+          })
+          .catch((err) => {
+            setIsUploading(false);
+            notifyError("No se ha podido conectar al servidor");
+            console.error(err);
+          });
+      }
     },
     [comercio, pk_comercio_handled, navigate, dispersionPagos]
   );
 
   useEffect(() => {
     const objConsulta = {
-      "id_comercio": parseInt(comercio.pk_comercio)
+      id_comercio: parseInt(comercio.pk_comercio),
+    };
+    if (comercio.pk_comercio !== "") {
+      postConsultaParametrizacionConvenios(objConsulta)
+        .then((res) => {
+          setIsUploading(false);
+          if (res?.status) {
+            if (res?.obj["trx_unica_runt_mt"] == true) {
+              setDispersionPagos((old) => {
+                return {
+                  ...old,
+                  id_comercio: res?.obj["id_comercio"],
+                  autorizador_runt: "",
+                  autorizador_mt: "",
+                  autorizador_local: res?.obj["autorizador_local"],
+                  autorizador_runt_mt: res?.obj["autorizador_runt"],
+                  convenio_runt: "",
+                  convenio_mt: "",
+                  convenio_local: res?.obj["convenio_local"],
+                  convenio_runt_mt: res?.obj["convenio_runt"],
+                  trx_unica_runt_mt: res?.obj["trx_unica_runt_mt"],
+                  usuario_jwt: res?.obj["usuario_jwt"],
+                  contrasena_jwt: res?.obj["contrasena_jwt"],
+                };
+              });
+            } else {
+              setDispersionPagos((old) => {
+                return {
+                  ...old,
+                  id_comercio: res?.obj["id_comercio"],
+                  autorizador_runt: res?.obj["autorizador_runt"],
+                  autorizador_mt: res?.obj["autorizador_mt"],
+                  autorizador_local: res?.obj["autorizador_local"],
+                  autorizador_runt_mt: "",
+                  convenio_runt: res?.obj["convenio_runt"],
+                  convenio_mt: res?.obj["convenio_mt"],
+                  convenio_local: res?.obj["convenio_local"],
+                  convenio_runt_mt: "",
+                  trx_unica_runt_mt: res?.obj["trx_unica_runt_mt"],
+                  usuario_jwt: res?.obj["usuario_jwt"],
+                  contrasena_jwt: res?.obj["contrasena_jwt"],
+                };
+              });
+            }
+          }
+        })
+        .catch((err) => {
+          setIsUploading(false);
+          // notifyError("No se ha podido conectar al servidor");
+          console.error(err);
+        });
     }
-    if (comercio.pk_comercio!==""){
-    postConsultaParametrizacionConvenios(objConsulta)
-      .then((res) => {
-        setIsUploading(false);
-        if (res?.status) {
-          if (res?.obj["trx_unica_runt_mt"]==true){
-          setDispersionPagos((old) => {
-            return {
-            ...old,
-            id_comercio: res?.obj["id_comercio"],
-            autorizador_runt: "",
-            autorizador_mt: "",
-            autorizador_local: res?.obj["autorizador_local"],
-            autorizador_runt_mt: res?.obj["autorizador_runt"],
-            convenio_runt: "",
-            convenio_mt: "",
-            convenio_local: res?.obj["convenio_local"],
-            convenio_runt_mt: res?.obj["convenio_runt"],
-            trx_unica_runt_mt: res?.obj["trx_unica_runt_mt"],
-            usuario_jwt: res?.obj["usuario_jwt"],
-            contrasena_jwt: res?.obj["contrasena_jwt"]
-          }})
-        }
-        else{
-          setDispersionPagos((old) => {
-            return {
-            ...old,
-            id_comercio: res?.obj["id_comercio"],
-            autorizador_runt: res?.obj["autorizador_runt"],
-            autorizador_mt: res?.obj["autorizador_mt"],
-            autorizador_local: res?.obj["autorizador_local"],
-            autorizador_runt_mt: "",
-            convenio_runt: res?.obj["convenio_runt"],
-            convenio_mt: res?.obj["convenio_mt"],
-            convenio_local: res?.obj["convenio_local"],
-            convenio_runt_mt: "",
-            trx_unica_runt_mt: res?.obj["trx_unica_runt_mt"],
-            usuario_jwt: res?.obj["usuario_jwt"],
-            contrasena_jwt: res?.obj["contrasena_jwt"]
-          }})
-        }
-        } 
-      })
-      .catch((err) => {
-        setIsUploading(false);
-        // notifyError("No se ha podido conectar al servidor");
-        console.error(err);
-      });
-    }
-  }, [comercio.pk_comercio, postConsultaParametrizacionConvenios]);
+  }, [comercio.pk_comercio]);
 
   if (pk_comercio_handled === -1) {
     <Navigate to={"/params-operations/comercios-params/comercios"} replace />;
   }
 
-  const handleChangeCurrenci = (e,valor) => {
-    if (e.target.name === 'configuración_porcentual') {
-      setAlertPorcent(e.target.value.replace(/[^0-9]/g, '').slice(0, 2))
-      setComercio((old)=>{return {...old,alert_cupo:(e.target.value.replace(/[^0-9]/g, '').slice(0, 2)+'%')}})
-    }else{
-      setAlertMonto(valor)
-      setComercio((old)=>{return {...old,alert_cupo:valor}})
+  const handleChangeCurrenci = (e, valor) => {
+    if (e.target.name === "configuración_porcentual") {
+      setAlertPorcent(e.target.value.replace(/[^0-9]/g, "").slice(0, 2));
+      setComercio((old) => {
+        return {
+          ...old,
+          alert_cupo: e.target.value.replace(/[^0-9]/g, "").slice(0, 2) + "%",
+        };
+      });
+    } else {
+      setAlertMonto(valor);
+      setComercio((old) => {
+        return { ...old, alert_cupo: valor };
+      });
     }
   };
 
@@ -578,7 +629,8 @@ const CrearComercios = () => {
         {pk_comercio_handled ? "Actualizar comercio" : "Crear comercio"}
       </h1>
       <Form grid onSubmit={onSubmit}>
-        <Fieldset legend="Información general comercio"
+        <Fieldset
+          legend="Información general comercio"
           className="lg:col-span-2"
         >
           {!pk_comercio_handled && (
@@ -631,19 +683,17 @@ const CrearComercios = () => {
           <Input
             id="numero_identificacion"
             label="Número de identificación"
-            type="text"
+            type="tel"
             name="numero_identificacion"
             minLength="1"
             maxLength="12"
             required
             value={comercio?.numero_identificacion}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, numero_identificacion: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                numero_identificacion: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -661,19 +711,17 @@ const CrearComercios = () => {
           <Input
             id="telefono_fijo_comercio"
             label="Teléfono fijo"
-            type="text"
+            type="tel"
             name="telefono_fijo_comercio"
             minLength="1"
             maxLength="12"
             required
             value={comercio?.telefono_fijo_comercio}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, telefono_fijo_comercio: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                telefono_fijo_comercio: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -773,7 +821,7 @@ const CrearComercios = () => {
           <Input
             id="latitud_comercio"
             label="Latitud comercio"
-            type="text"
+            type="tel"
             name="latitud_comercio"
             minLength="1"
             maxLength="12"
@@ -792,7 +840,7 @@ const CrearComercios = () => {
           <Input
             id="longitud_comercio"
             label="Longitud comercio"
-            type="text"
+            type="tel"
             name="longitud_comercio"
             minLength="1"
             maxLength="12"
@@ -813,57 +861,45 @@ const CrearComercios = () => {
           <Input
             id="dane_ciudad"
             label="Número Dane ciudad"
-            type="text"
+            type="tel"
             name="dane_ciudad"
             minLength="1"
             maxLength="5"
             required
             value={comercio?.dane_ciudad}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, dane_ciudad: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                dane_ciudad: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
           <Input
             id="dane_dpto"
             label="Número Dane departamento"
-            type="text"
+            type="tel"
             name="dane_dpto"
             minLength="1"
             maxLength="5"
             required
             value={comercio?.dane_dpto}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, dane_dpto: num };
-                });
-              }
+              setComercio((old) => ({ ...old, dane_dpto: onChangeNumber(e) }));
             }}
             autoComplete="off"
           />
           <Input
             id="dane_pais"
             label="Número Dane país"
-            type="text"
+            type="tel"
             name="dane_pais"
             minLength="1"
             maxLength="5"
             required
             value={comercio?.dane_pais}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, dane_pais: num };
-                });
-              }
+              setComercio((old) => ({ ...old, dane_pais: onChangeNumber(e) }));
             }}
             autoComplete="off"
           />
@@ -896,19 +932,17 @@ const CrearComercios = () => {
           <Input
             id="tel_contacto1_comercio"
             label="Teléfono"
-            type="text"
+            type="tel"
             name="tel_contacto1_comercio"
             minLength="1"
             maxLength="12"
             required
             value={comercio?.tel_contacto1_comercio}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, tel_contacto1_comercio: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                tel_contacto1_comercio: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -939,18 +973,16 @@ const CrearComercios = () => {
           <Input
             id="tel_contacto2_comercio"
             label="Teléfono"
-            type="text"
+            type="tel"
             name="tel_contacto2_comercio"
             minLength="1"
             maxLength="12"
             value={comercio?.tel_contacto2_comercio}
             onInput={(e) => {
-              const num = e.target.value;
-              if (!isNaN(num)) {
-                setComercio((old) => {
-                  return { ...old, tel_contacto2_comercio: num };
-                });
-              }
+              setComercio((old) => ({
+                ...old,
+                tel_contacto2_comercio: onChangeNumber(e),
+              }));
             }}
             autoComplete="off"
           />
@@ -1158,6 +1190,7 @@ const CrearComercios = () => {
             options={{
               "": "",
               Transacción: "Transaccion",
+              "Transferencia Mensual": "Transferencia_Mensual",
               Mensual: "Mensual",
               Directo: "Directo",
             }}
@@ -1171,7 +1204,10 @@ const CrearComercios = () => {
             required
           />
         </Fieldset>
-        <Fieldset legend="Parametrización alerta cupo" className="lg:col-span-2">
+        <Fieldset
+          legend="Parametrización alerta cupo"
+          className="lg:col-span-2"
+        >
           <MoneyInput
             key="configuración_monto"
             name="configuración_monto"
@@ -1180,9 +1216,9 @@ const CrearComercios = () => {
             placeholder="$0"
             maxLength={13}
             value={alertMonto}
-            autoComplete='off'
-            equalErrorMin = {false}
-            disabled={alertPorcent !== ''? true : false}
+            autoComplete="off"
+            equalErrorMin={false}
+            disabled={alertPorcent !== "" ? true : false}
           />
           <Input
             key="configuración_porcentual"
@@ -1190,14 +1226,14 @@ const CrearComercios = () => {
             label="Configuración porcentual"
             onChange={handleChangeCurrenci}
             type="text"
-            value={alertPorcent + '%'}
+            value={alertPorcent + "%"}
             placeholder="Ingrese el porcentaje"
-            autoComplete='off'
-            disabled={alertMonto !== '' && alertMonto !== 0 ? true : false}
+            autoComplete="off"
+            disabled={alertMonto !== "" && alertMonto !== 0 ? true : false}
           />
         </Fieldset>
         <Fieldset legend="Dispersión de pagos" className="lg:col-span-2">
-           <Select
+          <Select
             id="derechos_locales"
             name="derechos_locales"
             label="Derechos locales"
@@ -1206,27 +1242,33 @@ const CrearComercios = () => {
               Davivienda: 13,
               "Grupo Aval": 17,
               Colpatria: 14,
-              "Banco Agrario": 16
+              "Banco Agrario": 16,
             }}
             value={dispersionPagos?.autorizador_local}
             onChange={(ev) =>
               setDispersionPagos((old) => {
                 return {
-                ...old,
-                autorizador_local: ev.target.value !== "" ? parseInt(ev.target.value) : ev.target.value,
-              }})
+                  ...old,
+                  autorizador_local:
+                    ev.target.value !== ""
+                      ? parseInt(ev.target.value)
+                      : ev.target.value,
+                };
+              })
             }
             required={
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Input
             key="convenio_local"
@@ -1238,20 +1280,22 @@ const CrearComercios = () => {
             maxLength="13"
             value={dispersionPagos?.convenio_local}
             placeholder="Ingrese el convenio"
-            autoComplete='off'
+            autoComplete="off"
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
-           <Select
+          <Select
             id="derechos_runt"
             name="derechos_runt"
             label="Derechos RUNT"
@@ -1260,29 +1304,40 @@ const CrearComercios = () => {
               Davivienda: 13,
               "Grupo Aval": 17,
               Colpatria: 14,
-              "Banco Agrario": 16
+              "Banco Agrario": 16,
             }}
             value={dispersionPagos?.autorizador_runt}
             onChange={(ev) =>
               setDispersionPagos((old) => {
                 return {
-                ...old,
-                autorizador_runt: ev.target.value !== "" ? parseInt(ev.target.value) : ev.target.value,
-                trx_unica_runt_mt: false
-              }})
+                  ...old,
+                  autorizador_runt:
+                    ev.target.value !== ""
+                      ? parseInt(ev.target.value)
+                      : ev.target.value,
+                  trx_unica_runt_mt: false,
+                };
+              })
             }
-            disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            disabled={
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== ""
+                ? true
+                : false
+            }
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Input
             key="convenio_runt"
@@ -1294,21 +1349,28 @@ const CrearComercios = () => {
             maxLength="13"
             value={dispersionPagos?.convenio_runt}
             placeholder="Ingrese el convenio"
-            autoComplete='off'
-            disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            autoComplete="off"
+            disabled={
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== ""
+                ? true
+                : false
+            }
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
-           <Select
+          <Select
             id="derechos_mt"
             name="derechos_mt"
             label="Derechos MT"
@@ -1317,29 +1379,40 @@ const CrearComercios = () => {
               Davivienda: 13,
               "Grupo Aval": 17,
               Colpatria: 14,
-              "Banco Agrario": 16
+              "Banco Agrario": 16,
             }}
             value={dispersionPagos?.autorizador_mt}
             onChange={(ev) =>
               setDispersionPagos((old) => {
                 return {
-                ...old,
-                autorizador_mt: ev.target.value !== "" ? parseInt(ev.target.value) : ev.target.value,
-                trx_unica_runt_mt: false
-              }})
+                  ...old,
+                  autorizador_mt:
+                    ev.target.value !== ""
+                      ? parseInt(ev.target.value)
+                      : ev.target.value,
+                  trx_unica_runt_mt: false,
+                };
+              })
             }
-            disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            disabled={
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== ""
+                ? true
+                : false
+            }
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Input
             key="convenio_mt"
@@ -1351,19 +1424,26 @@ const CrearComercios = () => {
             maxLength="13"
             value={dispersionPagos?.convenio_mt}
             placeholder="Ingrese el convenio"
-            autoComplete='off'
-            disabled={dispersionPagos?.convenio_runt_mt !== '' || dispersionPagos?.autorizador_runt_mt !== '' ? true : false}
+            autoComplete="off"
+            disabled={
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== ""
+                ? true
+                : false
+            }
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Select
             id="derechos_runt_mt"
@@ -1374,34 +1454,42 @@ const CrearComercios = () => {
               Davivienda: 13,
               "Grupo Aval": 17,
               Colpatria: 14,
-              "Banco Agrario": 16
+              "Banco Agrario": 16,
             }}
             value={dispersionPagos?.autorizador_runt_mt}
             onChange={(ev) =>
               setDispersionPagos((old) => {
                 return {
-                ...old,
-                autorizador_runt_mt: ev.target.value !== "" ? parseInt(ev.target.value) : ev.target.value,
-                trx_unica_runt_mt: true
-              }})
+                  ...old,
+                  autorizador_runt_mt:
+                    ev.target.value !== ""
+                      ? parseInt(ev.target.value)
+                      : ev.target.value,
+                  trx_unica_runt_mt: true,
+                };
+              })
             }
             disabled={
-              dispersionPagos?.convenio_runt !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' || 
-              dispersionPagos?.autorizador_mt !== '' ? 
-              true : false}
-              required={
-                dispersionPagos?.autorizador_local !== '' || 
-                dispersionPagos?.autorizador_runt !== '' ||
-                dispersionPagos?.autorizador_mt !== '' ||
-                dispersionPagos?.convenio_local !== '' ||
-                dispersionPagos?.convenio_runt !== '' ||
-                dispersionPagos?.convenio_mt !== '' ||
-                dispersionPagos?.convenio_runt_mt !== '' ||
-                dispersionPagos?.usuario_jwt !== '' ||
-                dispersionPagos?.contrasena_jwt !== '' ?
-                true : false}
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.autorizador_mt !== ""
+                ? true
+                : false
+            }
+            required={
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Input
             key="convenio_runt_mt"
@@ -1413,24 +1501,28 @@ const CrearComercios = () => {
             maxLength="13"
             value={dispersionPagos?.convenio_runt_mt}
             placeholder="Ingrese el convenio"
-            autoComplete='off'
+            autoComplete="off"
             disabled={
-              dispersionPagos?.convenio_runt !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' || 
-              dispersionPagos?.autorizador_mt !== '' ? 
-              true : false}
-              required={
-                dispersionPagos?.autorizador_local !== '' || 
-                dispersionPagos?.autorizador_runt !== '' ||
-                dispersionPagos?.autorizador_mt !== '' ||
-                dispersionPagos?.autorizador_runt_mt !== '' ||
-                dispersionPagos?.convenio_local !== '' ||
-                dispersionPagos?.convenio_runt !== '' ||
-                dispersionPagos?.convenio_mt !== '' ||
-                dispersionPagos?.usuario_jwt !== '' ||
-                dispersionPagos?.contrasena_jwt !== '' ?
-                true : false}
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.autorizador_mt !== ""
+                ? true
+                : false
+            }
+            required={
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.usuario_jwt !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Input
             key="usuario_jwt"
@@ -1442,18 +1534,20 @@ const CrearComercios = () => {
             maxLength="30"
             value={dispersionPagos?.usuario_jwt}
             placeholder="Ingrese el usuario"
-            autoComplete='off'
+            autoComplete="off"
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.contrasena_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.contrasena_jwt !== ""
+                ? true
+                : false
+            }
           />
           <Input
             key="contrasena_jwt"
@@ -1465,18 +1559,36 @@ const CrearComercios = () => {
             maxLength="100"
             value={dispersionPagos?.contrasena_jwt}
             placeholder="Ingrese la contraseña"
-            autoComplete='off'
+            autoComplete="off"
             required={
-              dispersionPagos?.autorizador_local !== '' || 
-              dispersionPagos?.autorizador_runt !== '' ||
-              dispersionPagos?.autorizador_mt !== '' ||
-              dispersionPagos?.autorizador_runt_mt !== '' ||
-              dispersionPagos?.convenio_runt !== '' ||
-              dispersionPagos?.convenio_mt !== '' ||
-              dispersionPagos?.convenio_runt_mt !== '' ||
-              dispersionPagos?.convenio_local !== '' ||
-              dispersionPagos?.usuario_jwt !== '' ?
-              true : false}
+              dispersionPagos?.autorizador_local !== "" ||
+              dispersionPagos?.autorizador_runt !== "" ||
+              dispersionPagos?.autorizador_mt !== "" ||
+              dispersionPagos?.autorizador_runt_mt !== "" ||
+              dispersionPagos?.convenio_runt !== "" ||
+              dispersionPagos?.convenio_mt !== "" ||
+              dispersionPagos?.convenio_runt_mt !== "" ||
+              dispersionPagos?.convenio_local !== "" ||
+              dispersionPagos?.usuario_jwt !== ""
+                ? true
+                : false
+            }
+          />
+        </Fieldset>
+        <Fieldset legend="Parametrización zona" className="lg:col-span-2">
+          <Select
+            id="Zona comercio"
+            name="Zona comercio"
+            label="Zona: "
+            options={selectZonas}
+            value={comercio?.zona_comercio}
+            onChange={(ev) => {
+              setComercio((old) => ({
+                ...old,
+                zona_comercio: parseInt(ev.target.value),
+              }));
+            }}
+            required
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
@@ -1486,8 +1598,7 @@ const CrearComercios = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal} handleClose={handleClose}>
-        <CommerceTable 
-          onSelectComerce={onSelectComercios} />
+        <CommerceTable onSelectComerce={onSelectComercios} />
       </Modal>
       <Modal show={chooseContrato} handleClose={() => setChooseContrato(false)}>
         <TiposContratosTable onSelectContract={onSelectTipoContrato} />

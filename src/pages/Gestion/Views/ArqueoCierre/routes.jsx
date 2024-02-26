@@ -120,7 +120,7 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/reporte-arqueo",
     label: <AppIcons Logo={"RECAUDO"} name="Reportes arqueo y cierre de caja" />,
     component: ReportesCierre,
-    permission: [PermissionsCaja.VerHistoricoCierresCaja],
+    permission: [PermissionsCaja.VerArqueoCierresCaja],
   },
   {
     link: "/gestion/arqueo/validacion-sobrantes-faltantes",

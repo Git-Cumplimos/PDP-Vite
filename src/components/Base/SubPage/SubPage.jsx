@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../Button";
 
-const SubPage = ({ label, upperRoute, children }) => {
+const SubPage = ({ label, children }) => {
   const navigate = useNavigate();
 
   return (
@@ -9,7 +9,7 @@ const SubPage = ({ label, upperRoute, children }) => {
       <div className="flex flex-col mr-4">
         <div className="hidden md:block">{label}</div>
         <div>
-          <Button type={"button"} onClick={() => navigate(upperRoute || -1)}>
+          <Button type={"button"} onClick={() => navigate(-1)}>
             Volver
           </Button>
         </div>

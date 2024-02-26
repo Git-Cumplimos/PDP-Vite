@@ -43,6 +43,7 @@ const ModalDesembolso = ({ dataCredito }) => {
           plazo: dataCredito?.consultSiian?.plazo,
           fechaPrimerPago: dataCredito?.consultSiian?.fechaPrimerPago,
           fechaDesembolso: dataCredito?.consultSiian?.fechaDesembolso,
+          fechaPreaprobado: dataCredito?.consultDecisor?.fecha_preaprobado_hora,
         },
       };
       const dataAditional = {

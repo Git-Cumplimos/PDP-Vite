@@ -9,8 +9,10 @@ import Modal from "../../../components/Base/Modal";
 import MoneyInput, { formatMoney } from "../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify, notifyError, notifyPending} from "../../../utils/notify";
 import { postCupoComercio } from "../utils/fetchCupo";
+import { cargarArchivoCupoMasivo } from "../utils/fetchFunctions";
+import { descargarArchivo, descargarFormato } from "../utils/functions";
 
 const CrearCupo = () => {
   const [idComercio, setIdComercio] = useState(null);
@@ -22,11 +24,16 @@ const CrearCupo = () => {
   const [diasMaxSobregiro, setDiasMaxSobregiro] = useState(0);
   const [canje, setCanje] = useState(0);
   const [baseCaja, setBaseCaja] = useState(0);
+  const [showModalCargaMasiva, setShowModalCargaMasiva] = useState(false);
+  const [cargarArchivo, setCargarArchivo] = useState(false);
+  const [file, setFile] = useState(null);
+  const typoArchivos = ["text/csv"] 
+
   const limitesMontos = {
     max: 9999999999,
     min: 0,
   };
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navigate = useNavigate();
 
   const onChangeId = useCallback((ev) => {
@@ -40,27 +47,31 @@ const CrearCupo = () => {
   const handleClose = useCallback(() => {
     setShowModal(false);
   }, []);
+  const handleCloseCargaMasiva = useCallback(() => {
+    setShowModalCargaMasiva(false);
+    setCargarArchivo(false);
+  }, []);
 
   const onSubmitComercio = useCallback(
     (e) => {
       e.preventDefault();
-      if (
-        sobregiro !== 0 && deuda !== 0 && canje !== 0
-      ) {
-        setShowModal(true);
-        setSummary({
-          "Id del comercio": idComercio,
-          "Sobregiro": formatMoney.format(sobregiro),
-          Deuda: formatMoney.format(deuda),
-          "Cupo en canje": formatMoney.format(canje),
-          "Base de caja": formatMoney.format(baseCaja),
-          "Dias máximos de sobregiro": diasMaxSobregiro,
-        });
-      } else {
-        notifyError(
-          "Los campos sobregiro, deuda o cupo en canje no pueden ser cero"
-        );
-      }
+      // if (
+      //   sobregiro !== 0 && deuda !== 0 && canje !== 0
+      // ) {
+      setShowModal(true);
+      setSummary({
+        "Id del comercio": idComercio,
+        "Sobregiro": formatMoney.format(sobregiro),
+        Deuda: formatMoney.format(deuda),
+        "Cupo en canje": formatMoney.format(canje),
+        "Base de caja": formatMoney.format(baseCaja),
+        "Dias máximos de sobregiro": diasMaxSobregiro,
+      });
+      // } else {
+      //   notifyError(
+      //     "Los campos sobregiro, deuda o cupo en canje no pueden ser cero"
+      //   );
+      // }
     },
     [idComercio, deuda, canje, sobregiro, baseCaja, diasMaxSobregiro]
   );
@@ -101,7 +112,7 @@ const CrearCupo = () => {
     ]
   );
 
-  const onMoneyChange = useCallback((e, valor) => {
+  const onMoneyChange = useCallback((e, valor = 0) => {
     const setValues = {
       "sobregiro": () => setSobregiro(valor),
       "deuda": () => setDeuda(valor),
@@ -111,10 +122,60 @@ const CrearCupo = () => {
     setValues[e.target.name]?.()
   }, []);
 
+  const CargarArchivo = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!typoArchivos.includes(file.type)){
+        notifyError('Tipo de archivo incorrecto')
+        return;
+      }
+
+      notifyPending(
+        cargarArchivoCupoMasivo(
+          file,
+          roleInfo?.id_usuario ?? pdpUser?.uuid,
+          roleInfo?.id_comercio ?? 0,
+          roleInfo?.id_dispositivo ?? 0,
+        ),
+        {
+          render() {
+            return "Enviando solicitud";
+          },
+        },
+        {
+          render({ data: res }) {
+            handleCloseCargaMasiva();
+            return res?.msg;
+          },
+        },
+        {
+          render({ data: err }) {
+            if (err?.obj?.url && err.obj?.url !== ""){
+              descargarArchivo("Error-del-archivo.csv",err.obj?.url)
+            }
+            handleCloseCargaMasiva()
+            if (!err.msg || err.msg === ""){
+              return `Archivo erróneo`;
+            }
+            return err.msg
+          },
+        }
+      );
+
+    }, [handleCloseCargaMasiva, file, typoArchivos, roleInfo,pdpUser]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Crear cupo Comercios</h1>
       <Form onSubmit={onSubmitComercio} grid>
+        <ButtonBar  className={"lg  col-span-2"}>
+            <Button 
+              type="button"
+              onClick={()=>{setShowModalCargaMasiva(true)}}
+            >
+              Creación y/o actualización masiva de cupos
+            </Button>
+        </ButtonBar>
         <Input
           id="Id comercio"
           name="Id comercio"
@@ -137,6 +198,7 @@ const CrearCupo = () => {
           max={limitesMontos?.max}
           value={sobregiro ?? 0}
           onInput={onMoneyChange}
+          equalErrorMin = {false}
           required
         />
         <MoneyInput
@@ -148,6 +210,7 @@ const CrearCupo = () => {
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           value={deuda ?? 0}
+          equalErrorMin = {false}
           onInput={onMoneyChange}
           required
         />
@@ -160,6 +223,7 @@ const CrearCupo = () => {
           min={limitesMontos?.min}
           max={limitesMontos?.max}
           value={canje ?? 0}
+          equalErrorMin = {false}
           onInput={onMoneyChange}
           required
         />
@@ -206,6 +270,53 @@ const CrearCupo = () => {
             <Button onClick={handleClose}>Cancelar</Button>
           </ButtonBar>
         </PaymentSummary>
+      </Modal>
+      <Modal
+        show={showModalCargaMasiva}
+        handleClose={handleCloseCargaMasiva}
+        >
+          <h2 className="text-3xl mx-auto text-center mb-4">
+            Gestión de archivos carga masiva de cupo
+          </h2>
+          <Form onSubmit={CargarArchivo}>
+            {!cargarArchivo ? 
+              <ButtonBar>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setCargarArchivo(true);
+                  }}
+                >
+                  Cargar Archivo
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    descargarFormato("Ejemplo_cupo_masivo.csv")
+                    handleCloseCargaMasiva()
+                  }}
+                >
+                  Formato del archivo
+                </Button>
+              </ButtonBar>
+              :<>
+                <Input
+                  type="file"
+                  autoComplete="off"
+                  onChange={(e) => {
+                    setFile(e.target.files[0]);
+                  }}
+                  accept=".csv,.xlsx"
+                  required
+                />
+                <ButtonBar>
+                  <Button type="submit">
+                    Cargar Archivo
+                  </Button>
+                </ButtonBar>
+              </>
+            }
+        </Form>
       </Modal>
     </Fragment>
   );

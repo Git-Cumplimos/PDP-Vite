@@ -21,6 +21,10 @@ import {
 } from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
 import ButtonBar from "../../components/Base/ButtonBar";
+import Fieldset from "../../components/Base/Fieldset";
+import Input from "../../components/Base/Input";
+import Form from "../../components/Base/Form";
+import { getConsultaCupoComercio } from "../../apps/Cupo/utils/fetchFunctions";
 import ModalAlert from "./ModalAlert";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -61,6 +65,8 @@ const AdminLayout = () => {
   const [accept, setAccept] = useState(false);
   const [device, setDevice] = useState(false);
   const [showModalPublicidad, setShowModalPublicidad] = useState(true);
+  const [showModalCupo, setShowModalCupo] = useState(false);
+  const [cupoComercio, setCupoComercio] = useState(false);
   const [ModalAlertBoveda, setModalAlertBoveda] = useState(true);
   const [cajaState, setCajaState] = useState("");
   const [valorBoveda, setValorBoveda] = useState();
@@ -93,6 +99,30 @@ const AdminLayout = () => {
   const navigateCommission = useCallback(() => {
     navigate(`/billetera-comisiones`);
   }, [navigate]);
+
+  const consultaCupoComercios = useCallback(
+    (id_comercio) => {
+      if (!showModalCupo && roleInfo?.id_comercio) {
+        getConsultaCupoComercio({
+          pk_id_comercio: id_comercio ?? roleInfo?.id_comercio,
+        })
+          .then((res) => {
+            if (!res?.obj || res?.obj?.length === 0) {
+              setShowModalCupo(false);
+              notifyError("No se encontraron comercios con ese id");
+              return;
+            }
+            setShowModalCupo(true);
+            setCupoComercio(res?.obj ?? []);
+          })
+          .catch((reason) => {
+            setShowModalCupo(false);
+            notifyError("Error al cargar Datos del cupo");
+          });
+      }
+    },
+    [roleInfo?.id_comercio, showModalCupo]
+  );
 
   const {
     svgs: { backIcon2 },
@@ -246,6 +276,9 @@ const AdminLayout = () => {
     );
   }, [cajaState, pathname]);
 
+  const handleCloseCupo = useCallback(() => {
+    setShowModalCupo(false);
+  }, []);
   const handleClose = useCallback(() => {
     setShowModalPublicidad(false);
   }, []);
@@ -266,7 +299,12 @@ const AdminLayout = () => {
             <RightArrow small />
           </div>
           <div className={usrData}>
-            <div className={saldoCupo}>
+            <div
+              className={saldoCupo}
+              onClick={() => {
+                consultaCupoComercios(roleInfo?.id_comercio);
+              }}
+            >
               Cupo disponible {saldoDisponible || "$0.00"}
             </div>
           </div>
@@ -409,6 +447,77 @@ const AdminLayout = () => {
               </Button>
             </ButtonBar>
           </div>
+        </Modal>
+        <Modal show={showModalCupo} handleClose={handleCloseCupo}>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+            grid
+          >
+            <Fieldset legend={"Detalles"} className={"lg:col-span-2"}>
+              <Input
+                id="sobregiro"
+                name="sobregiro"
+                label="Sobregiro"
+                autoComplete="off"
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.sobregiro))
+                  ) ?? 0
+                }
+                disabled={true}
+              />
+              <Input
+                id="deuda"
+                name="deuda"
+                label={
+                  parseInt(cupoComercio[0]?.deuda) >= 1
+                    ? "Deuda al comercio"
+                    : "Deuda del comercio"
+                }
+                autoComplete="off"
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.deuda))
+                  ) ?? 0
+                }
+                disabled={true}
+              />
+              <Input
+                id="cupo_en_canje"
+                name="cupo_en_canje"
+                label="Cupo en canje"
+                autoComplete="off"
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.cupo_en_canje))
+                  ) ?? 0
+                }
+                disabled={true}
+              />
+              <Input
+                id="base_caja"
+                name="base_caja"
+                label="Base caja"
+                autoComplete="off"
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.base_caja))
+                  ) ?? 0
+                }
+                disabled={true}
+              />
+              <Input
+                id="dias_max_sobregiro"
+                name="dias_max_sobregiro"
+                label="Días máximos sobregiro"
+                autoComplete="off"
+                value={cupoComercio[0]?.dias_max_sobregiro ?? 0}
+                disabled={true}
+              />
+            </Fieldset>
+          </Form>
         </Modal>
       </main>
     </div>
