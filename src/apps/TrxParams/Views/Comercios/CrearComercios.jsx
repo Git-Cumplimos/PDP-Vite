@@ -14,7 +14,7 @@ import {
   postCrearComercio,
   putModificarComercio,
   postDispersionPagoComercio,
-  postConsultaParametrizacionConvenios
+  postConsultaParametrizacionConvenios,
 } from "../../utils/fetchComercios";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
@@ -25,6 +25,8 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import { onChangeNumber } from "../../../../utils/functions";
+import { fetchZonas } from "../../utils/fetchZonas";
+
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -77,6 +79,7 @@ const emptyCommerce = {
   ciiu: null,
   fk_id_tipo_contrato: 0,
   alert_cupo: "",
+  zona_comercio: null,
 };
 
 const CrearComercios = () => {
@@ -93,6 +96,7 @@ const CrearComercios = () => {
   const [foundActivities, setFoundActivities] = useState([]);
   const [alertMonto, setAlertMonto] = useState("");
   const [alertPorcent, setAlertPorcent] = useState("");
+  const [zonas, setZonas] = useState([]);
 
   const [dispersionPagos, setDispersionPagos] = useState({
     id_comercio: "",
@@ -290,6 +294,35 @@ const CrearComercios = () => {
       }));
     }
   }, [pdpUser?.uuid]);
+
+  const getAllZonas = useCallback(async () => {
+    try {
+      const res = await fetchZonas();
+      if (res) {
+        setZonas(res?.results);
+      } else {
+        console.error(res);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    getAllZonas();
+  }, [getAllZonas]);
+
+  const selectZonas = useMemo(() => {
+    return [
+      { label: "Seleccione una opción", value: "" },
+      ...zonas.map((zona) => {
+        return {
+          label: zona.nombre,
+          value: zona.id_zona,
+        };
+      }),
+    ];
+  }, [zonas]);
 
   const navigate = useNavigate();
 
@@ -1540,6 +1573,22 @@ const CrearComercios = () => {
                 ? true
                 : false
             }
+          />
+        </Fieldset>
+        <Fieldset legend="Parametrización zona" className="lg:col-span-2">
+          <Select
+            id="Zona comercio"
+            name="Zona comercio"
+            label="Zona: "
+            options={selectZonas}
+            value={comercio?.zona_comercio}
+            onChange={(ev) => {
+              setComercio((old) => ({
+                ...old,
+                zona_comercio: parseInt(ev.target.value),
+              }));
+            }}
+            required
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">

@@ -222,6 +222,9 @@ const svgs = {
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
   RETIRO: `${urlAssets}/assets/svg/recaudo/RETIROSYDEPOSITOS.svg`,
   DescargarReporte: `${urlAssets}/assets/img/descargar reporte.png`,
+
+  //ITAU
+  BLOQUEO_CONVENIOS_ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
 };
 
 const banners = {

@@ -10,7 +10,11 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Modal from "../../../components/Base/Modal";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
-import { enumParametrosColpatria } from "../utils/enumParametrosColpatria";
+import {
+  enumParametrosColpatria,
+  enumCodigoConvenioPines,
+  enumCodigoPinPines,
+} from "../utils/enumParametrosColpatria";
 import Fieldset from "../../../components/Base/Fieldset";
 import Select from "../../../components/Base/Select";
 import InputSuggestions from "../../../components/Base/InputSuggestions";
@@ -42,7 +46,7 @@ const DATA_INICIAL_PIN = {
   num_cel_comprador: "",
   cod_ciudad_domicilio: "",
   email_comprador: "",
-  razon_social: "",
+  razon_social: "Universidad de los Andes",
   valorPin: 0,
 };
 
@@ -50,8 +54,12 @@ const DATA_TIPO_ID = {
   "NIT": "N",
   "CEDULA DE CIUDADANIA": "C",
   "CEDULA DE EXTRANJERIA": "E",
-  // "PASAPORTE": "P",
-  "TARJETA DE IDENTIDAD": "T"
+  "PASAPORTE": "P",
+  "TARJETA DE IDENTIDAD": "T",
+};
+
+const DATA_RAZON_SOCIAL = {
+  "Universidad de los Andes": "UNIANDES",
 };
 
 const GeneracionPinColpatria = () => {
@@ -61,22 +69,22 @@ const GeneracionPinColpatria = () => {
   const [dataUsuario, setDataUsuario] = useState(DATA_INICIAL_PIN);
   const [estadoPeticion, setEstadoPeticion] = useState(0);
   const [objTicketActual, setObjTicketActual] = useState({});
-  const [filterData, setFilterData] = useState({
-    cod_ciudad_domicilio: "",
-  });
+  // const [filterData, setFilterData] = useState({
+  //   cod_ciudad_domicilio: "",
+  // });
   const [showModal, setShowModal] = useState(false);
-  const dataMunicipio = useMemo(() => {
-    let filteredList = MUNICIPIOS_SIIAN.filter((item) =>
-      item.Nombre.toUpperCase().includes(filterData.cod_ciudad_domicilio)
-    );
-    filteredList = filteredList.slice(0, 10);
-    return {
-      dataRender: filteredList.map((data, index) => (
-        <h1 className="py-2">{data.Nombre}</h1>
-      )),
-      dataList: filteredList,
-    };
-  }, [filterData.cod_ciudad_domicilio]);
+  // const dataMunicipio = useMemo(() => {
+  //   let filteredList = MUNICIPIOS_SIIAN.filter((item) =>
+  //     item.Nombre.toUpperCase().includes(filterData.cod_ciudad_domicilio)
+  //   );
+  //   filteredList = filteredList.slice(0, 10);
+  //   return {
+  //     dataRender: filteredList.map((data, index) => (
+  //       <h1 className="py-2">{data.Nombre}</h1>
+  //     )),
+  //     dataList: filteredList,
+  //   };
+  // }, [filterData.cod_ciudad_domicilio]);
   const [loadingPeticionGeneracionPin, peticionGeneracionPin] =
     useFetchcolpatria(
       URL_GENERACION_PIN,
@@ -127,9 +135,14 @@ const GeneracionPinColpatria = () => {
           dir_domicilio_ppal: dataUsuario.dir_domicilio_ppal,
           tel_fijo_comprador: dataUsuario.tel_fijo_comprador,
           num_cel_comprador: dataUsuario.num_cel_comprador,
-          cod_ciudad_domicilio: dataUsuario.cod_ciudad_domicilio,
+          cod_ciudad_domicilio: roleInfo?.codigo_dane,
           email_comprador: dataUsuario.email_comprador,
-          razon_social: dataUsuario.razon_social,
+          razon_social:
+            dataUsuario?.razon_social === "Universidad de los Andes"
+              ? dataUsuario?.razon_social
+              : Object.keys(DATA_RAZON_SOCIAL).find(
+                  (key) => DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social
+                ),
           location: {
             address: roleInfo?.["direccion"],
             dane_code: roleInfo?.codigo_dane,
@@ -165,16 +178,11 @@ const GeneracionPinColpatria = () => {
     [dataUsuario, validNavigate, roleInfo, pdpUser]
   );
 
-  const handleShow = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      if (dataUsuario.cod_ciudad_domicilio === "")
-        return notifyError("Seleccione la ciudad en la que se crea el pin");
-      setEstadoPeticion(0);
-      setShowModal(true);
-    },
-    [dataUsuario.cod_ciudad_domicilio]
-  );
+  const handleShow = useCallback((ev) => {
+    ev.preventDefault();
+    setEstadoPeticion(0);
+    setShowModal(true);
+  }, []);
   const printDiv = useRef();
 
   const handlePrint = useReactToPrint({
@@ -185,6 +193,17 @@ const GeneracionPinColpatria = () => {
     setDataUsuario((old) => {
       return { ...old, [ev.target.name]: value };
     });
+  }, []);
+  const onChangeRazonSocial = useCallback((ev) => {
+    let value = ev.target.value;
+    const codigoConvenio = enumCodigoConvenioPines[value];
+    const codigoPin = enumCodigoPinPines[value];
+    setDataUsuario((old) => ({
+      ...old,
+      codigo_pin: codigoPin,
+      codigo_convenio: codigoConvenio,
+      razon_social: value,
+    }));
   }, []);
   const onChangeFormatNumber = useCallback(
     (ev) => {
@@ -203,23 +222,23 @@ const GeneracionPinColpatria = () => {
     },
     [dataUsuario.num_cel_comprador]
   );
-  const onSelectSuggestion = useCallback(
-    (i, el, name) => {
-      if (name === "cod_ciudad_domicilio") {
-        let dataMuni = dataMunicipio.dataList[i];
-        setDataUsuario((old) => {
-          return { ...old, [name]: dataMuni.Codigo };
-        });
-        setFilterData((old) => {
-          return {
-            ...old,
-            [name]: dataMuni.Nombre,
-          };
-        });
-      }
-    },
-    [dataMunicipio]
-  );
+  // const onSelectSuggestion = useCallback(
+  //   (i, el, name) => {
+  //     if (name === "cod_ciudad_domicilio") {
+  //       let dataMuni = dataMunicipio.dataList[i];
+  //       setDataUsuario((old) => {
+  //         return { ...old, [name]: dataMuni.Codigo };
+  //       });
+  //       setFilterData((old) => {
+  //         return {
+  //           ...old,
+  //           [name]: dataMuni.Nombre,
+  //         };
+  //       });
+  //     }
+  //   },
+  //   [dataMunicipio]
+  // );
   return (
     <>
       <h1 className="text-3xl">Generación de Pin</h1>
@@ -238,6 +257,16 @@ const GeneracionPinColpatria = () => {
             required
             disabled={loadingPeticionGeneracionPin}
           />
+          <Select
+            id="razon_social"
+            name="razon_social"
+            label={"Razón social"}
+            options={DATA_RAZON_SOCIAL}
+            value={dataUsuario?.razon_social}
+            onChange={onChangeRazonSocial}
+            required
+            disabled={loadingPeticionGeneracionPin}
+          />
           <Input
             id="codigo_convenio"
             name="codigo_convenio"
@@ -247,9 +276,8 @@ const GeneracionPinColpatria = () => {
             value={dataUsuario?.codigo_convenio}
             maxLength={6}
             minLength={1}
-            // onChange={onChangeFormat}
             required
-            disabled={loadingPeticionGeneracionPin}
+            disabled
           />
           <Input
             id="codigo_pin"
@@ -257,27 +285,25 @@ const GeneracionPinColpatria = () => {
             label={"Código pin"}
             type="text"
             autoComplete="off"
-            value={dataUsuario?.["codigo_pin"]}
+            value={dataUsuario?.codigo_pin}
             maxLength={4}
             minLength={1}
-            // onChange={onChangeFormat}
             required
-            disabled={loadingPeticionGeneracionPin}
+            disabled
           />
           <Input
-            id="razon_social"
-            name="razon_social"
-            label={"Razón social"}
+            id="cod_ciudad_domicilio"
+            name="cod_ciudad_domicilio"
+            label={"Ciudad"}
             type="text"
             autoComplete="off"
-            value={dataUsuario?.["razon_social"]}
-            maxLength={50}
+            value={roleInfo?.ciudad.toUpperCase()}
+            maxLength={4}
             minLength={1}
-            onChange={onChangeFormat}
             required
-            disabled={loadingPeticionGeneracionPin}
+            disabled
           />
-          <InputSuggestions
+          {/* <InputSuggestions
             id="cod_ciudad_domicilio"
             name="cod_ciudad_domicilio"
             label={"Ciudad"}
@@ -297,7 +323,7 @@ const GeneracionPinColpatria = () => {
             maxLength={50}
             required
             disabled={loadingPeticionGeneracionPin}
-          />
+          /> */}
           <MoneyInput
             id="valor"
             name="valor"
@@ -380,7 +406,7 @@ const GeneracionPinColpatria = () => {
             maxLength={20}
             minLength={1}
             onChange={onChangeFormat}
-            required
+            // required
             disabled={loadingPeticionGeneracionPin}
           />
         </Fieldset>
@@ -434,7 +460,7 @@ const GeneracionPinColpatria = () => {
             maxLength={12}
             minLength={1}
             onChange={onChangeFormatNumber}
-            required
+            // required
             disabled={loadingPeticionGeneracionPin}
           />
           <Input
@@ -483,7 +509,6 @@ const GeneracionPinColpatria = () => {
             maxLength={20}
             minLength={1}
             onChange={onChangeFormat}
-            required
             disabled={loadingPeticionGeneracionPin}
           />
         </Fieldset>
@@ -513,7 +538,13 @@ const GeneracionPinColpatria = () => {
                 "Código convenio": dataUsuario?.codigo_convenio,
                 "Código pin": dataUsuario?.codigo_pin,
                 "Código ciudad": roleInfo?.codigo_dane,
-                "Razón social": dataUsuario?.razon_social,
+                "Razón social":
+                  dataUsuario?.razon_social === "Universidad de los Andes"
+                    ? dataUsuario?.razon_social
+                    : Object.keys(DATA_RAZON_SOCIAL).find(
+                        (key) =>
+                          DATA_RAZON_SOCIAL[key] === dataUsuario?.razon_social
+                      ),
                 "Identificación cliente":
                   dataUsuario?.num_identificacion_cliente,
                 "Identificación beneficiario":
@@ -530,7 +561,7 @@ const GeneracionPinColpatria = () => {
                 "teléfono fijo comprador": dataUsuario?.tel_fijo_comprador,
                 "Celular comprador": dataUsuario?.num_cel_comprador,
                 "Email comprador": dataUsuario?.email_comprador,
-                "Código ciudad domicilio": dataUsuario?.cod_ciudad_domicilio,
+                "Código ciudad domicilio": roleInfo?.codigo_dane,
                 "Valor del pin": formatMoney.format(dataUsuario?.valorPin),
               }}
             >

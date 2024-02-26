@@ -23,18 +23,29 @@ const Pines = () => {
   const tablePines = useMemo(() => {
     // Aplicamos los filtros
     const filteredPines = pines.filter((pin) => {
-      const nombrePinMatches = pin?.desc?.toLowerCase()?.includes(nombrePin?.toLowerCase());
+      const nombrePinMatches = pin?.desc
+        ?.toLowerCase()
+        ?.includes(nombrePin?.toLowerCase());
       const categoriaPinMatches =
-        pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido";
+        pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb"
+          ? "Pin de Servicio"
+          : "Pin de Contenido";
 
       if (!nombrePin && !categoriaPin) {
         return true;
       } else if (nombrePin && categoriaPin) {
-        return nombrePinMatches && categoriaPinMatches.toLowerCase()?.includes(categoriaPin?.toLowerCase());
+        return (
+          nombrePinMatches &&
+          categoriaPinMatches
+            .toLowerCase()
+            ?.includes(categoriaPin?.toLowerCase())
+        );
       } else if (nombrePin) {
         return nombrePinMatches;
       } else {
-        return categoriaPinMatches?.toLowerCase().includes(categoriaPin?.toLowerCase());
+        return categoriaPinMatches
+          ?.toLowerCase()
+          .includes(categoriaPin?.toLowerCase());
       }
     });
 
@@ -50,15 +61,35 @@ const Pines = () => {
 
     // Transformamos los datos de la página actual
     return currentPagePines.map((pin) => ({
-      NombrePin: pin?.op === "cb" ? "Certificado de Tradición y Libertad (SNR)" : pin?.op === "hv" ? "Histórico Vehicular" : pin?.op === "ff" ? "FreeFire Pines" : pin?.op === "ng" ? "Noggin Pines" : pin?.desc,
-      CategoriaPin: pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb" ? "Pin de Servicio" : "Pin de Contenido",
+      NombrePin:
+        pin?.op === "cb"
+          ? "Certificado de Tradición y Libertad (SNR)"
+          : pin?.op === "hv"
+          ? "Histórico Vehicular"
+          : pin?.op === "ff"
+          ? "FreeFire Pines"
+          : pin?.op === "ng"
+          ? "Noggin Pines"
+          : pin?.desc,
+      CategoriaPin:
+        pin?.op === "hv" || pin?.op === "em" || pin?.op === "cb"
+          ? "Pin de Servicio"
+          : "Pin de Contenido",
     }));
   }, [nombrePin, categoriaPin, pines, page, limit]);
 
   const onSelectAutorizador = useCallback(
     (e, i) => {
-      const nombrePin = tablePines[i]["NombrePin"] == "Certificado de Tradición y Libertad (SNR)" ? "Certificado TL" : tablePines[i]["NombrePin"] == "Histórico Vehicular" ? "Historico Vehicular" : tablePines[i]["NombrePin"]
-      const index = pines.findIndex(pin => pin?.desc === nombrePin);
+      const nombrePin =
+        tablePines[i]["NombrePin"] ==
+        "Certificado de Tradición y Libertad (SNR)"
+          ? "Certificado TL"
+          : tablePines[i]["NombrePin"] == "Histórico Vehicular"
+          ? "Historico Vehicular"
+          : tablePines[i]["NombrePin"];
+      const index = pines.findIndex(
+        (pin) => pin?.desc.toLowerCase() === nombrePin.toLowerCase()
+      );
       if (index !== -1) {
         fecthTablaConveniosPaginadoFunc2(pines[index]["op"], index);
       }
@@ -67,13 +98,13 @@ const Pines = () => {
   );
 
   const fecthTablaConveniosPaginadoFunc2 = (op, i) => {
-    setShowLoading(true)
+    setShowLoading(true);
     postConsultaPin({
       idcomercio: roleInfo?.["id_comercio"],
       producto: op,
     })
       .then((autoArr) => {
-        setShowLoading(false)
+        setShowLoading(false);
         setPines(autoArr?.results ?? []);
         if (i !== undefined) {
           if (autoArr?.results?.length == 0) {
@@ -91,7 +122,6 @@ const Pines = () => {
             });
           }
         }
-
       })
       .catch((err) => console.error(err));
   };
@@ -100,16 +130,16 @@ const Pines = () => {
   }, [limit]);
 
   const fecthTablaPines = () => {
-    setShowLoading(true)
+    setShowLoading(true);
     postConsultaPines({
       idcomercio: roleInfo?.["id_comercio"],
       page,
       limit,
       pin: nombrePin !== undefined || nombrePin !== "" ? nombrePin : "",
-      categoria: categoriaPin
+      categoria: categoriaPin,
     })
       .then((autoArr) => {
-        setShowLoading(false)
+        setShowLoading(false);
         setPines(autoArr?.results ?? []);
       })
       .catch((err) => console.error(err));

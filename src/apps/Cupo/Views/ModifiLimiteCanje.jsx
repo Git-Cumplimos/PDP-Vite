@@ -35,6 +35,12 @@ const ModifiLimiteCanje = () => {
   const { roleInfo } = useAuth();
   const navegateValid = useNavigate();
 
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
   // useEffect(() => {
   //   if (cupoComer?.length === 0) {
   //     notifyError("ID de comercio incorrecto");
@@ -180,11 +186,11 @@ const ModifiLimiteCanje = () => {
             <Input
               id="deuda"
               name="deuda"
-              label="Deuda del comercio"
+              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
+              value={formatMoney.format(Math.abs(parseInt(cupoComer[0]?.deuda))) ?? 0}
               disabled={true}
               required
               />
@@ -226,7 +232,7 @@ const ModifiLimiteCanje = () => {
             <Input
               id="dias_max_sobregiro"
               name="dias_max_sobregiro"
-              label="Dias máximos sobregiro"
+              label="Días máximos sobregiro"
               type="tel"
               autoComplete="off"
               minLength={0}

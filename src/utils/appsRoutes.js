@@ -42,6 +42,10 @@ import rutasPinesCrc, {
   listPermissionsPinesCrc,
 } from "../apps/PinesCrc/routes";
 
+import rutasPinesCea, {
+  listPermissionsPinesCea,
+} from "../apps/PinesCea/routes";
+
 /**
  * * Providers
  */
@@ -75,6 +79,7 @@ import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
 import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
 import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 
+import routesItau from "../apps/ConveniosItau/routes";
 /**
 
  * * Logos
@@ -352,6 +357,22 @@ const HistoricoAnulacionesPinesCRC = lazy(() =>
 );
 
 /**
+ * Gestion anulación pines CEA
+ */
+const AnulacionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/AnulacionesPines")
+);
+const CargueAnulacionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/Anulaciones/CargueAnulaciones")
+);
+const DescargaPeticionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/Anulaciones/DescargarArchivoPeticiones")
+);
+const HistoricoAnulacionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/Anulaciones/HistoricoAnulaciones")
+);
+
+/**
  * Pines Combinados -- CRC y Comsión premium
  */
 const PinesCombinados = lazy(() =>
@@ -414,11 +435,49 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      {
+        link: "/GestionTransaccional/AnulacionesPinesCEA",
+        label: (
+          <AppIcons Logo={"PINES_ADMINISTRAR"} name={"Anulaciones Pines CEA"} />
+        ),
+        component: AnulacionesPinesCEA,
+        permission: [63],
+        subRoutes: [
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCEA/CargueArchivo",
+            label: (
+              <AppIcons Logo={"CARGAR"} name={"Cargue Archivo Anulaciones"} />
+            ),
+            component: CargueAnulacionesPinesCEA,
+            permission: [63],
+          },
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCEA/DescargarPeticiones",
+            label: (
+              <AppIcons
+                Logo={"DESCARGAR"}
+                name={"Descarga Archivo Peticiones"}
+              />
+            ),
+            component: DescargaPeticionesPinesCEA,
+            permission: [63],
+          },
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCEA/Historico",
+            label: (
+              <AppIcons Logo={"DESCARGAR"} name={"Histórico Anulaciones"} />
+            ),
+            component: HistoricoAnulacionesPinesCEA,
+            permission: [63],
+          },
+        ],
+      },
       rutasGestionColpatria,
       rutasGestionRecargasTullave,
       rutasGestionRecaudoDirecto,
       rutasGestionGrupoAval,
       rutasGestionAgrario,
+      routesItau,
     ],
   },
   {
@@ -660,12 +719,14 @@ const allUrlsPrivateApps = [
       enumPermisosPinesVus.operarPinesVus,
       enumPermisosPractisistemas.practisistemasPines,
       ...listPermissionsPinesCrc,
+      ...listPermissionsPinesCea,
     ],
     provider: ProvidepinesVus,
     subRoutes: [
       rutasPines,
       rutasPinesVus,
       rutasPinesCrc,
+      rutasPinesCea,
       {
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
