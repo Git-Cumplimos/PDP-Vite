@@ -23,7 +23,7 @@ import TicketsCajaSocial from "../components/TicketsCajaSocial";
 
 const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
 const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
-const URL_CONSULTA_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-pago-credito-pdp`;
+const URL_CONSULTA_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-deposito`;
 
 const DATA_DEPOSITO_INIT = {
   numeroCuenta: "",
