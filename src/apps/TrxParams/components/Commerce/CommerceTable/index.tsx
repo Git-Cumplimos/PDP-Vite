@@ -1,7 +1,10 @@
 import React, {
+  Dispatch,
   Fragment,
   MouseEvent,
+  SetStateAction,
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   useState,
@@ -17,11 +20,12 @@ type Props = {
     comerce_data: any,
     ev: MouseEvent<HTMLTableRowElement>
   ) => void;
+  setSearchCommercesFn: Dispatch<SetStateAction<() => void | Promise<void>>>;
 };
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
-const CommerceTable = ({ onSelectComerce }: Props) => {
+const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
   const [comercios, setComercios] = useState<any[]>([]);
   const [isNextPage, setIsNextPage] = useState(false);
 
@@ -58,7 +62,7 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
     [comercios, onSelectComerce]
   );
 
-  useFetchDebounce(
+  const [searchCommercesFn] = useFetchDebounce(
     {
       url: useMemo(
         () =>
@@ -78,6 +82,10 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
       onError: useCallback((error) => console.error(error), []),
     }
   );
+
+  useEffect(() => {
+    setSearchCommercesFn(() => searchCommercesFn);
+  }, [setSearchCommercesFn, searchCommercesFn]);
 
   return (
     <Fragment>
@@ -115,9 +123,7 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
             type: "SET_ALL",
             value: (old) => ({
               ...old,
-              [ev.target.name]: ["pk_comercio"].includes(
-                ev.target.name
-              )
+              [ev.target.name]: ["pk_comercio"].includes(ev.target.name)
                 ? onChangeNumber(ev)
                 : ev.target.value,
               page: 1,

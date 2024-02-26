@@ -16,12 +16,13 @@ import Fieldset from "../../../../components/Base/Fieldset";
 type Props = {
   showMassive: boolean;
   setShowMassive: Dispatch<React.SetStateAction<boolean>>;
+  searchCommercesFn: () => void | Promise<void>;
 };
 
-// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const urlComercios = `http://localhost:5000`;
+const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const urlComercios = `http://localhost:5000`;
 
-const CrearComerciosMasivo = ({ showMassive, setShowMassive }: Props) => {
+const CrearComerciosMasivo = ({ showMassive, setShowMassive, searchCommercesFn }: Props) => {
   const [fileUpload, setFileUpload] = useState<File>();
 
   const handleClose = useCallback(() => {
@@ -50,7 +51,7 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive }: Props) => {
     { notify: true }
   );
 
-  const [uploadCommerceFile] = useFetchDebounce(
+  const [uploadCommerceFile, loadingUploadFile] = useFetchDebounce(
     {
       url: `${urlComercios}/comercios/masivo`,
       autoDispatch: false,
@@ -89,10 +90,13 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive }: Props) => {
               .then((res: any) => console.log(res))
               .catch((error: any) => console.error(error));
           }
+          // throw new Error("Error con archivo cargado", { cause: "custom" });
           return "Error con archivo cargado";
         }
+        searchCommercesFn?.();
+        handleClose();
         return "Carga satisfactoria";
-      }, []),
+      }, [handleClose, searchCommercesFn]),
       onError: useCallback((error) => {
         if (error?.cause === "custom") {
           // notifyError(error.message);
@@ -116,25 +120,30 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive }: Props) => {
 
   return (
     <Fragment>
-      <Modal show={showMassive} handleClose={handleClose}>
-        <ButtonBar>
-          <Button type="button" onClick={downloadFormatCommerce}>
-            Descargar archivo de comercios
-          </Button>
-          <Button type="button" onClick={handleClose}>
-            Cancelar
-          </Button>
-        </ButtonBar>
+      <Modal
+        show={showMassive}
+        handleClose={loadingUploadFile ? () => {} : handleClose}
+      >
         <Form onSubmit={onSubmit}>
-          <FileInput
-            label={"Adjuntar archivo de comercios a cargar"}
-            onGetFile={(files: Array<File>) => {
-              console.log(files);
-              setFileUpload(files[0]);
-            }}
-            accept=".csv"
-            allowDrop
-          />
+          <ButtonBar>
+            <Button type="button" onClick={downloadFormatCommerce}>
+              Descargar archivo de ejemplo
+            </Button>
+            <Button type="submit" disabled={!fileUpload || loadingUploadFile}>
+              Subir archivo
+            </Button>
+          </ButtonBar>
+          {!fileUpload && (
+            <FileInput
+              label={"Adjuntar archivo de comercios a cargar"}
+              onGetFile={(files: Array<File>) => {
+                // console.log(files);
+                setFileUpload(files[0]);
+              }}
+              accept=".csv"
+              allowDrop
+            />
+          )}
           {fileUpload && (
             <Fieldset legend={"Archivo cargado"}>
               <div>
@@ -143,15 +152,16 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive }: Props) => {
                   <p className="col-span-6 self-center">{fileUpload.name}</p>
                   <span
                     className="text-3xl text-red-700 col-span-1 bi bi-trash-fill cursor-pointer"
-                    onClick={() => setFileUpload(undefined)}
+                    onClick={
+                      loadingUploadFile
+                        ? () => {}
+                        : () => setFileUpload(undefined)
+                    }
                   />
                 </div>
               </div>
             </Fieldset>
           )}
-          <ButtonBar>
-            <Button type="submit">Subir archivo</Button>
-          </ButtonBar>
         </Form>
       </Modal>
     </Fragment>

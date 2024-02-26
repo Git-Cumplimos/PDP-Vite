@@ -9,6 +9,7 @@ import { useState } from "react";
 const ListarComercios = () => {
   const navigate = useNavigate();
   const [showMassive, setShowMassive] = useState(false);
+  const [searchCommercesFn, setSearchCommercesFn] = useState(() => () => undefined);
 
   const onSelectComercios = useCallback(
     (comercio) =>
@@ -33,10 +34,14 @@ const ListarComercios = () => {
           Crear comercios masivo
         </Button>
       </ButtonBar>
-      <CommerceTable onSelectComerce={onSelectComercios} />
+      <CommerceTable
+        onSelectComerce={onSelectComercios}
+        setSearchCommercesFn={setSearchCommercesFn}
+      />
       <CrearComerciosMasivo
         showMassive={showMassive}
         setShowMassive={setShowMassive}
+        searchCommercesFn={searchCommercesFn}
       />
     </Fragment>
   );
