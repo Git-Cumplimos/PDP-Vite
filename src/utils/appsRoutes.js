@@ -78,6 +78,9 @@ import routesRecargaCupo from "../apps/RecargaCupo/routes";
 import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
 import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
 import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
+import rutasCajaSocialCB, {
+  listPermissionsCajaSocial,
+} from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
 /**
@@ -849,6 +852,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsAval,
       ...listPermissionsAgrario,
       ...listPermissionsRecaudoMultiple,
+      ...listPermissionsCajaSocial,
     ],
     subRoutes: [
       rutasDaviviendaCB,
@@ -856,6 +860,7 @@ const allUrlsPrivateApps = [
       rutasAgrarioCB,
       rutasColpatria,
       rutasRecaudoMultiple,
+      rutasCajaSocialCB,
     ],
   },
   {
@@ -1192,7 +1197,7 @@ const allUrlsPrivateApps = [
 
   //Módulo recaudo genérico
   routesRecaudoGenerico,
-  
+
   rutasRecargasTullave,
   rutasPowwi,
 

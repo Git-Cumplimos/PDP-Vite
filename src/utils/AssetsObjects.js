@@ -9,6 +9,7 @@ const images = {
   PINVUS: `${urlAssets}/assets/img/LogoPinVus.jpg`,
   MiLicencia: `${urlAssets}/assets/img/logo-milicencia.jpg`,
   LogoOccidente: `${urlAssets}/assets/img/banco-de-occidente.png`,
+  logoCajaSocial: `${urlAssets}/assets/img/logo-Banco-Caja-Social.png`,
   LogoDale: `${urlAssets}/assets/img/Logo-Dale.png`,
   ScotiabankColpatria: `${urlAssets}/assets/img/ScotiabankColpatria.webp`,
   LogoAgrario: `${urlAssets}/assets/img/Banco-agrario.jpg`,
