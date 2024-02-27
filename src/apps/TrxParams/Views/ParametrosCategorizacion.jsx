@@ -151,7 +151,7 @@ const ParametrosCategorizacion = () => {
     if (selectedCategoria.subcategorias.length > 0) {
       selectedCategoria.subcategorias.forEach((sub, index) => {
         formData.append(`subcategorias[${index}][nombre]`, sub.nombre);
-        // Comentado por si se requiere subir imagenes de subcategorias
+        // Comentado por si se requiere subir imágenes de subcategorias
         formData.append(`subcategorias[${index}][img_url]`, sub.img_url[0]);
       });
     }
@@ -200,7 +200,7 @@ const ParametrosCategorizacion = () => {
           );
           formData.append(`subcategorias[${index}][status]`, sub.status);
         }
-        // Comentado por si se requiere subir imagenes de subcategorias
+        // Comentado por si se requiere subir imágenes de subcategorias
         typeof sub.img_url === "string"
           ? formData.append(`subcategorias[${index}][img_url]`, sub.img_url)
           : formData.append(`subcategorias[${index}][img_url]`, sub.img_url[0]);
@@ -252,14 +252,14 @@ const ParametrosCategorizacion = () => {
     <Fragment>
       <ButtonBar>
         <Button type="submit" onClick={handleShowModal}>
-          Crear categoria
+          Crear categoría
         </Button>
       </ButtonBar>
       {/* {JSON.stringify(categorias)} */}
       <TableEnterprise
-        title="Categorias"
+        title="Categorías"
         maxPage={maxPages}
-        headers={["Id categoria", "Nombre Categoria", "Zona"]}
+        headers={["ID", "Nombre Categoría", "Zona"]}
         data={tableCategorias}
         onSelectRow={onSelectCategorias}
         onSetPageData={setPageData}
@@ -583,7 +583,7 @@ const ParametrosCategorizacion = () => {
                 !selectedCategoria.fk_zona
               }
             >
-              {selectedCategoria.edit ? "Editar" : "Crear"}
+              {selectedCategoria.edit ? "Editar la información" : "Aceptar"}
             </Button>
           </ButtonBar>
         </Form>

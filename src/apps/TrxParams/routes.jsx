@@ -114,8 +114,8 @@ const rutasConfiguraciones = {
   permission: listPermissionsTrx,
   subRoutes: [
     {
-      link: "/params-operations/parametros-categorizacion",
-      label: <AppIcons Logo={"RECAUDO"} name={"Parametros categorización"} />,
+      link: "/params-operations/parametrizacion-categorizacion",
+      label: <AppIcons Logo={"RECAUDO"} name={"Parametrización categorización"} />,
       component: ParametrosCategorizacion,
       permission: [enumPermisosTrx.categorizacion],
     },
@@ -428,7 +428,7 @@ const rutasConfiguraciones = {
         },
         {
           link: "/params-operations/comercios-params/gestion-zonas",
-          label: <AppIcons Logo={"RECAUDO"} name={"Gestion zonas"} />,
+          label: <AppIcons Logo={"RECAUDO"} name={"Gestión zonas"} />,
           component: ParametrosZonas,
           permission: [enumPermisosTrx.comercios],
         },
