@@ -7,4 +7,5 @@ export const enumPermisosDavivienda = Object.freeze({
   davivienda_cb_recaudo: 5006,
   davivienda_cb_pago_productos_propios: 5007,
   davivienda_cb_recaudo_operaciones: 5008,
+  daviplata_pago: 1,
 });

@@ -26,6 +26,7 @@ import { decryptAES } from "../../../../../utils/cryptoUtils";
 import { useMFA } from "../../../../../components/Base/MFAScreen";
 
 const Deposito = () => {
+  console.log("33333333333333");
   const { submitEventSetter } = useMFA();
 
   const navigate = useNavigate();
@@ -218,9 +219,12 @@ const Deposito = () => {
       nomDepositante: summary["Nombre cliente"],
       numDaviplata: phone,
       valGiro: valor,
-      nomComercio: roleInfo?.["nombre comercio"] ? roleInfo?.["nombre comercio"]: "No hay datos",
+      nomComercio: roleInfo?.["nombre comercio"]
+        ? roleInfo?.["nombre comercio"]
+        : "No hay datos",
       nomMunicipio: roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos",
-      valCodigoConvenioDaviplata: datosConsulta?.Data?.valCodigoConvenioDaviplata,
+      valCodigoConvenioDaviplata:
+        datosConsulta?.Data?.valCodigoConvenioDaviplata,
       valTipoIdentificacionDepositante: tipoDocumento,
       valComisionGiroDaviplata: datosConsulta?.Data?.valComisionGiroDaviplata,
       id_transaccion: datosConsulta?.DataHeader?.idTransaccion,
@@ -259,15 +263,15 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depósito DaviPlata</h1>
+        <h1 className="text-3xl mt-6">Depósito DaviPlata</h1>
         <br></br>
         <Form onSubmit={onSubmitDeposit} grid>
           <Input
-            id='numCliente'
-            name='numCliente'
-            label='Número DaviPlata'
-            type='text'
-            autoComplete='off'
+            id="numCliente"
+            name="numCliente"
+            label="Número DaviPlata"
+            type="text"
+            autoComplete="off"
             minLength={"10"}
             maxLength={"10"}
             value={phone}
@@ -288,11 +292,11 @@ const Deposito = () => {
             required
           />
           <Input
-            id='numCliente'
-            name='numCliente'
-            label='Verificación No. DaviPlata'
-            type='text'
-            autoComplete='off'
+            id="numCliente"
+            name="numCliente"
+            label="Verificación No. DaviPlata"
+            type="text"
+            autoComplete="off"
             minLength={"10"}
             maxLength={"10"}
             value={verificacionTel}
@@ -320,9 +324,9 @@ const Deposito = () => {
             required
           />
           <Select
-            className='place-self-stretch'
-            id='tipoDocumento'
-            label='Tipo de documento'
+            className="place-self-stretch"
+            id="tipoDocumento"
+            label="Tipo de documento"
             options={options}
             value={tipoDocumento}
             required
@@ -331,11 +335,11 @@ const Deposito = () => {
             }}
           />
           <Input
-            id='docCliente'
-            name='docCliente'
-            label='Documento depositante'
-            type='text'
-            autoComplete='off'
+            id="docCliente"
+            name="docCliente"
+            label="Documento depositante"
+            type="text"
+            autoComplete="off"
             minLength={"5"}
             maxLength={"11"}
             value={userDoc}
@@ -348,11 +352,11 @@ const Deposito = () => {
             required
           />
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a depositar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a depositar"
+            autoComplete="off"
+            type="text"
             minLength={"1"}
             maxLength={"15"}
             min={limitesMontos?.min}
@@ -361,9 +365,9 @@ const Deposito = () => {
             equalErrorMin={false}
             value={parseInt(valor)}
             onInput={(e, valor) => {
-              if (!isNaN(valor)){
+              if (!isNaN(valor)) {
                 const num = valor;
-                setValor(num)
+                setValor(num);
               }
             }}
             required
@@ -378,9 +382,10 @@ const Deposito = () => {
           show={showModal}
           handleClose={
             paymentStatus ? goToRecaudo : loadingCashIn ? () => {} : handleClose
-          }>
+          }
+        >
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
@@ -391,9 +396,10 @@ const Deposito = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type='submit'
+                  type="submit"
                   onClick={submitEventSetter(onMakePayment)}
-                  disabled={loadingCashIn}>
+                  disabled={loadingCashIn}
+                >
                   Aceptar
                 </Button>
                 <Button onClick={handleClose} disabled={loadingCashIn}>
