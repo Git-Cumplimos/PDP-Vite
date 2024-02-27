@@ -23,6 +23,7 @@ import { onChangeNumber } from "../utils/functions";
 import MoneyRange from "../components/Compound/MoneyRange/MoneyRange";
 import TicketsDale from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsDale/TicketsDale";
 import TicketsEmcali from "../apps/Emcali/components/Tickets/TicketsEmcali";
+import TicketsCajaSocial from "../apps/Corresponsalia/CorresponsaliaCajaSocial/components/TicketsCajaSocial";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -447,6 +448,14 @@ const Transacciones = () => {
               />
             ) : selected?.id_autorizador === 56 ? (
               <TicketsEmcali
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 89 ||
+              selected?.id_autorizador === 89 ? (
+              <TicketsCajaSocial
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
