@@ -81,7 +81,7 @@ const AdminLayout = () => {
   const [clientWidth] = useWindowSize();
 
   const closeCash = useCallback(() => {
-    navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
+    navigate(`/gestion/arqueo/arqueo-cierre-reporte`);
   }, [navigate]);
 
   const navigateCommission = useCallback(() => {
