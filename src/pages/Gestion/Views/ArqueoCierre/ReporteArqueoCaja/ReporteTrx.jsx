@@ -528,7 +528,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
           </div>
         )}
       </Modal>
-      {pathname === "/gestion/arqueo/arqueo-cierre/reporte" && (
+      {pathname === "/gestion/arqueo/arqueo-cierre-reporte" && (
         <ButtonBar>
           <ButtonLink
             className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
