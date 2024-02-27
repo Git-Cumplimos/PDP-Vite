@@ -50,13 +50,6 @@ export const fetchCustom = (
         Peticion = await fetchFunc(urlCompleto, "PUT", {}, dataObj, {}, true);
       } else if (metodo_ === "POST") {
         Peticion = await fetchFunc(urlCompleto, "POST", {}, dataObj, {}, true);
-        const dataDecrypt = Peticion?.obj?.data ?? "";
-        const obj = decryptAES(
-          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-          dataDecrypt
-        );
-        Peticion.obj = JSON.parse(obj);
       }
     } catch (error) {
       if (error.message.includes("La OTP no es válida")) {
@@ -117,7 +110,18 @@ export const fetchCustom = (
         );
       }
     }
-
+    try {
+      const dataDecrypt = Peticion?.obj?.data ?? "";
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      Peticion.obj = JSON.parse(obj);
+    } catch (error) {
+      console.error(`No se puede desencriptar`);
+      throw error;
+    }
     //evaluar la respuesta que llega del backend
     try {
       if (evaluate === true) {

@@ -57,22 +57,7 @@ export const useFetchCajaSocial = (
             id_uuid_trx: data_additional_?.id_uuid_trx,
           };
           for (let i = 0; i <= 4; i++) {
-            let parseObjConsulta = JSON.stringify(data_consulta);
-            let dataObjConsulta = {
-              data: cifrarAES(
-                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-                parseObjConsulta
-              ),
-            };
-            PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
-            const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
-            const objConsulta = decryptAES(
-              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-              dataDecryptConsulta
-            );
-            PeticionConsulta.obj = JSON.parse(objConsulta);
+            PeticionConsulta = await fetchConsulta({}, data_consulta);
             if (PeticionConsulta?.msg.includes("No ha terminado")) {
               notify(
                 "Su transacción esta siendo procesada, no recargue la página"
