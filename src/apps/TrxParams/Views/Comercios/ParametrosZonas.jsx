@@ -163,7 +163,7 @@ const ParametrosZonas = () => {
       <TableEnterprise
         title="Zonas"
         maxPage={maxPages}
-        headers={["Id zona", "Nombre Zona"]}
+        headers={["ID", "Nombre Zona"]}
         data={tableZonas}
         onSelectRow={onSelectZonas}
         onSetPageData={setPageData}
@@ -200,7 +200,7 @@ const ParametrosZonas = () => {
               Cancelar
             </Button>
             <Button type="submit" disabled={!selectedZona.nombre}>
-              {selectedZona.edit ? "Editar" : "Crear"}
+              {selectedZona.edit ? "Editar la información" : "Crear zona"}
             </Button>
           </ButtonBar>
         </Form>
