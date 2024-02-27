@@ -36,7 +36,6 @@ const ParametrizacionRecaudo = () => {
         notifyError("Busqueda fallida");
       });
   }, [pageData, searchFilters]);
-
   const closeModal = useCallback(() => {
     buscarPlataforma();
     setShowModal(false);
