@@ -12,6 +12,7 @@ import FileInput from "../../../../components/Base/FileInput";
 import Modal from "../../../../components/Base/Modal";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import Fieldset from "../../../../components/Base/Fieldset";
+import { notifyError } from "../../../../utils/notify";
 
 type Props = {
   showMassive: boolean;
@@ -68,14 +69,6 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive, searchCommercesFn }
       onPending: useCallback(() => "Cargando archivo", []),
       onSuccess: useCallback((response) => {
         if (!response.ok) {
-          console.log(
-            "Has csv",
-            response.headers.get("Content-Type")?.includes("csv")
-          );
-          console.log(
-            "Has json",
-            response.headers.get("Content-Type")?.includes("json")
-          );
           if (response.headers.get("Content-Type")?.includes("csv")) {
             response
               .blob()
@@ -91,7 +84,9 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive, searchCommercesFn }
               .catch((error: any) => console.error(error));
           }
           // throw new Error("Error con archivo cargado", { cause: "custom" });
-          return "Error con archivo cargado";
+          notifyError("Error con archivo cargado");
+          // return "Error con archivo cargado";
+          return "Carga finalizada";
         }
         searchCommercesFn?.();
         handleClose();
