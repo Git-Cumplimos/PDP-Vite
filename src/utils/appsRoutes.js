@@ -18,6 +18,7 @@ import rutasColpatria, {
 } from "../apps/Colpatria/routes";
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
+  routesDaviplata,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
@@ -78,7 +79,6 @@ import routesRecargaCupo from "../apps/RecargaCupo/routes";
 import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
 import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
 import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
-
 import routesItau from "../apps/ConveniosItau/routes";
 /**
 
@@ -858,6 +858,7 @@ const allUrlsPrivateApps = [
       rutasRecaudoMultiple,
     ],
   },
+  routesDaviplata,
   {
     link: "/recaudoEmpresarial",
     label: <AppIcons Logo={"RECAUDO"} name="Recaudo Empresarial" />,
@@ -1192,7 +1193,7 @@ const allUrlsPrivateApps = [
 
   //Módulo recaudo genérico
   routesRecaudoGenerico,
-  
+
   rutasRecargasTullave,
   rutasPowwi,
 
