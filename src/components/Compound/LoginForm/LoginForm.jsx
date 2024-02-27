@@ -243,7 +243,6 @@ const LoginForm = () => {
       .handleverifyTotpToken(totp)
       .then()
       .catch((err) => {
-        console.log(err);
         if (err.cause === "unknown") {
           notifyError(err.message);
           return;

@@ -81,9 +81,9 @@ const AsignacionCategorias = () => {
     return [
       ...(categorias || []).map((cat) => {
         return {
-          "Id categoria": cat.id_categoria,
+          "ID": cat.id_categoria,
           // "Imagen categoria": cat.img_url,
-          "Nombre Categoria": cat.nombre,
+          "Nombre Categoría": cat.nombre,
           Zona:
             zonas.find((zona) => zona.id_zona === cat.fk_zona)?.nombre ??
             "No encontrado",
@@ -259,7 +259,7 @@ const AsignacionCategorias = () => {
     fetchAllCategoriasFunc();
   }, [page, limit, searchAuto, fetchAllCategoriasFunc, fetchAllZonas]);
 
-  const asignCommerces = useCallback(async () => {
+  const assignCategorias = useCallback(async () => {
     for (const subcat of selectedAsignacion.subcategorias) {
       const body = {
         id_categoria: subcat.id_categoria,
@@ -293,9 +293,9 @@ const AsignacionCategorias = () => {
         </Button>
       </ButtonBar> */}
       <TableEnterprise
-        title="Asignación Categorias"
+        title="Asignación Categorías"
         maxPage={maxPages}
-        headers={["Id categoria", "Nombre Categoria", "Zona"]}
+        headers={["ID", "Nombre Categoría", "Zona"]}
         data={tableCategorias}
         onSelectRow={onSelectCategorias}
         onSetPageData={setPageData}
@@ -312,7 +312,7 @@ const AsignacionCategorias = () => {
         /> */}
       </TableEnterprise>
       <Modal show={showModal} handleClose={handleClose}>
-        <Form onSubmit={() => asignCommerces()} grid>
+        <Form onSubmit={() => assignCategorias()} grid>
           <Fieldset legend="Asignación">
             <Input
               id="app"
@@ -502,7 +502,7 @@ const AsignacionCategorias = () => {
                     !selectedAsignacion.id_subcategoria
               }
             >
-              {selectedAsignacion.edit ? "Asignar" : "Crear"}
+              {selectedAsignacion.edit ? "Asignar Categoría" : "Crear"}
             </Button>
           </ButtonBar>
         </Form>

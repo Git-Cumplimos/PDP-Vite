@@ -1,7 +1,16 @@
-import { Fragment, useCallback, useEffect, useRef, useState,useMemo } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../../hooks/useFetchDispatchDebounce";
+import useFetchDispatchDebounce, {
+  ErrorPDPFetch,
+} from "../../../../../hooks/useFetchDispatchDebounce";
 import useMap from "../../../../../hooks/useMap";
 import TicketsDavivienda from "../../../../../apps/Corresponsalia/CorresponsaliaDavivienda/components/TicketsDavivienda";
 import TicketsPines from "../../../../../apps/PinesVus/components/TicketsPines";
@@ -21,10 +30,15 @@ import Tickets from "../../../../../components/Base/Tickets";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { makeMoneyFormatter } from "../../../../../utils/functions";
-import { notifyError,notifyPending } from "../../../../../utils/notify";
-import { buscarReporteTrxArqueo, buscarTicketReporte, searchCierre } from "../../../utils/fetchCaja";
+import { notifyError, notifyPending } from "../../../../../utils/notify";
+import {
+  buscarReporteTrxArqueo,
+  buscarTicketReporte,
+  searchCierre,
+} from "../../../utils/fetchCaja";
 import { validateDates } from "../../../utils/functions";
 import Input from "../../../../../components/Base/Input/Input";
+import TicketsCajaSocial from "../../../../../apps/Corresponsalia/CorresponsaliaCajaSocial/components/TicketsCajaSocial";
 
 const formatMoney = makeMoneyFormatter(2);
 
@@ -36,10 +50,11 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
   minute: "numeric",
 });
 
-const GridRow = ({ cols = [], self = false, onClick = () => { } }) => (
+const GridRow = ({ cols = [], self = false, onClick = () => {} }) => (
   <div
-    className={`grid gap-4 ${self ? "py-4 px-2 bg-secondary-light" : ""
-      } cursor-pointer`}
+    className={`grid gap-4 ${
+      self ? "py-4 px-2 bg-secondary-light" : ""
+    } cursor-pointer`}
     style={{
       gridTemplateColumns: `repeat(${cols?.length || 1}, minmax(0, 1fr))`,
     }}
@@ -51,15 +66,16 @@ const GridRow = ({ cols = [], self = false, onClick = () => { } }) => (
   </div>
 );
 
-const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => { } }) =>
+const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => {} }) =>
   Object.entries(tree).map(([key, info]) => {
     const cols = [
       key,
       info?.nombre ?? "",
       formatMoney.format(info?.monto) ?? "No data",
-      "status" in info ? info?.status === true
-        ? "Transacción exitosa"
-        : info?.status === false
+      "status" in info
+        ? info?.status === true
+          ? "Transacción exitosa"
+          : info?.status === false
           ? "Transacción fallida"
           : ""
         : info?.total_trxs,
@@ -86,19 +102,29 @@ const TreeView = ({ tree = {}, onClickLastChild = (info, ev) => { } }) =>
   });
 
 const ReporteTrx = ({ tipo_reporte = "" }) => {
-  const { roleInfo,userInfo } = useAuth();
+  const { roleInfo, userInfo } = useAuth();
   const { pathname } = useLocation();
 
   const initialSearchFilters = new Map([
     ["id_comercio", roleInfo?.id_comercio ?? ""],
     ["id_usuario", roleInfo?.id_usuario ?? ""],
-    ["type_report", tipo_reporte === 2 ? "Tarjeta": tipo_reporte === 1 ? "Efectivo" : ""],
+    [
+      "type_report",
+      tipo_reporte === 2 ? "Tarjeta" : tipo_reporte === 1 ? "Efectivo" : "",
+    ],
     ["status", "true"],
-    ["date",  Intl.DateTimeFormat("es-CO", {
+    [
+      "date",
+      Intl.DateTimeFormat("es-CO", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-      }).format(new Date()).split("/").reverse().join("-")],
+      })
+        .format(new Date())
+        .split("/")
+        .reverse()
+        .join("-"),
+    ],
   ]);
   const printDiv = useRef();
   const nombreComercio = useMemo(
@@ -108,10 +134,16 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   const [tipoReporte, setTipoReporte] = useState("");
 
   useEffect(() => {
-    setTipoReporte(tipo_reporte === 1 ? "Efectivo" :tipo_reporte === 2 ? "Tarjeta": "General")
-  }, [tipo_reporte])
+    setTipoReporte(
+      tipo_reporte === 1
+        ? "Efectivo"
+        : tipo_reporte === 2
+        ? "Tarjeta"
+        : "General"
+    );
+  }, [tipo_reporte]);
 
-  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter  }] =
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
     useMap(initialSearchFilters);
 
   useEffect(() => {
@@ -125,12 +157,11 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
     })
       .then((res) => {
         if (res?.obj === 1) {
-          setSearchFilters((old)=>{
-            const copy = new Map(old)
-              .set("date", res?.date_end_trx);
+          setSearchFilters((old) => {
+            const copy = new Map(old).set("date", res?.date_end_trx);
             return copy;
           });
-          setFecha(res?.date_end_trx)
+          setFecha(res?.date_end_trx);
         }
       })
       .catch((error) => {
@@ -139,13 +170,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
         }
         console.error(error?.message);
       });
-    },
-  [ 
-    roleInfo,
-    userInfo?.attributes?.name,
-    nombreComercio,
-    setSearchFilters,
-  ])
+  }, [roleInfo, userInfo?.attributes?.name, nombreComercio, setSearchFilters]);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -156,7 +181,12 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-  }).format(new Date()).split("/").reverse().join("-"));
+    })
+      .format(new Date())
+      .split("/")
+      .reverse()
+      .join("-")
+  );
 
   const [trxTree, setTrxTree] = useState({});
   const [montoTotal, setMontoTotal] = useState(0.0);
@@ -177,10 +207,10 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
   const getTicket = useCallback(() => {
     if (selectedInfo === false) return;
     const data = {
-      id_trx : selectedInfo?.id_trx,
-      id_comercio : roleInfo?.id_comercio,
-      id_tipo_transaccion : selectedInfo?.id_tipo_transaccion,
-    }
+      id_trx: selectedInfo?.id_trx,
+      id_comercio: roleInfo?.id_comercio,
+      id_tipo_transaccion: selectedInfo?.id_tipo_transaccion,
+    };
     notifyPending(
       buscarTicketReporte(data),
       {
@@ -190,21 +220,21 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       },
       {
         render({ data: res }) {
-          const data = res?.obj?.results ?? {}
+          const data = res?.obj?.results ?? {};
           const fecha = new Date(data?.created);
           fecha.setHours(fecha.getHours() + 5);
           setSummaryTrx({
             "Tipo transacción": data?.["Tipo transaccion"] ?? "",
             Fecha: dateFormatter.format(fecha),
-            "Mensaje de respuesta trx": data?.message_trx ??"",
-            Monto: data?.monto ? formatMoney.format(data?.monto): "",
-            "Estado de la transacción": (
-               searchFilters.get('status') === "true" ?
-                "Transacción aprobada" : "Transacción rechazada"
-              ),
-          })
+            "Mensaje de respuesta trx": data?.message_trx ?? "",
+            Monto: data?.monto ? formatMoney.format(data?.monto) : "",
+            "Estado de la transacción":
+              searchFilters.get("status") === "true"
+                ? "Transacción aprobada"
+                : "Transacción rechazada",
+          });
 
-          setSelected(data)
+          setSelected(data);
           return "Petición satisfactoria";
         },
       },
@@ -217,48 +247,58 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
     );
   }, [selectedInfo, searchFilters, roleInfo]);
 
-  const [fetchTrxs] = useFetchDispatchDebounce({
-    onSuccess: useCallback((res) => {
-      setTrxTree(res?.obj?.results);
-      setMontoTotal(res?.obj?.monto);
-      setTotal_monto_type(res?.obj?.total_monto_type ?? 0);
-      setTotalTransacciones(res?.obj?.total_trxs);
-      setTotalTrxType(res?.obj?.total_trxs_type ?? 0);
-      setLoading(false)
-    }, []),
-    onError: useCallback((error) => {
-      setLoading(false)
-      if (error instanceof ErrorPDPFetch) {
-        notifyError(error.message);
-      }
-      else if (!(error instanceof DOMException)) {
-        console.error(error);
-        notifyError("Error al cargar Datos ");
-      }
-    }, []),
-  },{delay:1100});
-  
+  const [fetchTrxs] = useFetchDispatchDebounce(
+    {
+      onSuccess: useCallback((res) => {
+        setTrxTree(res?.obj?.results);
+        setMontoTotal(res?.obj?.monto);
+        setTotal_monto_type(res?.obj?.total_monto_type ?? 0);
+        setTotalTransacciones(res?.obj?.total_trxs);
+        setTotalTrxType(res?.obj?.total_trxs_type ?? 0);
+        setLoading(false);
+      }, []),
+      onError: useCallback((error) => {
+        setLoading(false);
+        if (error instanceof ErrorPDPFetch) {
+          notifyError(error.message);
+        } else if (!(error instanceof DOMException)) {
+          console.error(error);
+          notifyError("Error al cargar Datos ");
+        }
+      }, []),
+    },
+    { delay: 1100 }
+  );
+
   const searchTrxs = useCallback(() => {
     setSingleFilter("id_comercio", (old) => roleInfo?.id_comercio ?? old);
     setSingleFilter("id_usuario", (old) => roleInfo?.id_usuario ?? old);
-    if(roleInfo?.id_comercio !== undefined && roleInfo?.id_usuario !== undefined){
+    if (
+      roleInfo?.id_comercio !== undefined &&
+      roleInfo?.id_usuario !== undefined
+    ) {
       const tempMap = new Map(searchFilters);
-      const url =buscarReporteTrxArqueo()
+      const url = buscarReporteTrxArqueo();
       const queries = new URLSearchParams(tempMap.entries()).toString();
       fetchTrxs(`${url}?${queries}`);
       setTimeout(() => {
         setLoading(true);
-      }, 1000)
+      }, 1000);
     }
-  }, [fetchTrxs,setSingleFilter,searchFilters,roleInfo]
-  );
+  }, [fetchTrxs, setSingleFilter, searchFilters, roleInfo]);
 
-  useEffect(() => { searchTrxs() }, [searchTrxs,roleInfo]);
-  useEffect(() => { getTicket() }, [selectedInfo, getTicket]);
+  useEffect(() => {
+    searchTrxs();
+  }, [searchTrxs, roleInfo]);
+  useEffect(() => {
+    getTicket();
+  }, [selectedInfo, getTicket]);
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Reporte {tipoReporte.toLocaleLowerCase()} arqueo de caja </h1>
+      <h1 className="text-3xl mt-6">
+        Reporte {tipoReporte.toLocaleLowerCase()} arqueo de caja{" "}
+      </h1>
       <div className="w-full px-10 my-10">
         <Form grid>
           <Select
@@ -271,9 +311,8 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
               { value: "false", label: "Fallida" },
             ]}
             onChange={(ev) => {
-              setSearchFilters((old)=>{
-                const copy = new Map(old)
-                  .set("status", ev.target.value);
+              setSearchFilters((old) => {
+                const copy = new Map(old).set("status", ev.target.value);
                 return copy;
               });
             }}
@@ -287,12 +326,11 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
             type="date"
             autoComplete="off"
             onChange={(e) => {
-              let bool = validateDates(e.target.value );    
-              if (bool && tipoReporte !== "General" ) {
-                setFecha(e.target.value)
-                setSearchFilters((old)=>{
-                  const copy = new Map(old)
-                    .set("date", e.target.value);
+              let bool = validateDates(e.target.value);
+              if (bool && tipoReporte !== "General") {
+                setFecha(e.target.value);
+                setSearchFilters((old) => {
+                  const copy = new Map(old).set("date", e.target.value);
                   return copy;
                 });
               }
@@ -301,80 +339,89 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
             disabled={tipoReporte === "General" || loading ? true : false}
             required
           />
- 
-          <Fieldset
-            legend={"Totales"}
-            className='lg:col-span-2'>
+
+          <Fieldset legend={"Totales"} className="lg:col-span-2">
             <Input
-              id='total_valor'
-              name='total_valor'
+              id="total_valor"
+              name="total_valor"
               label={"Total Valor General"}
               value={formatMoney.format(montoTotal)}
-              autoComplete='off'
+              autoComplete="off"
               disabled
             />
             <Input
-              id='total_trx'
-              name='total_trx'
+              id="total_trx"
+              name="total_trx"
               label={"Total Transacciones General"}
               value={totalTransacciones}
-              autoComplete='off'
+              autoComplete="off"
               disabled
             />
             {tipo_reporte !== "" ? (
               <>
                 <Input
-                  id='total_monto_type'
-                  name='total_monto_type'
+                  id="total_monto_type"
+                  name="total_monto_type"
                   label={`Total ${tipoReporte}`}
                   value={formatMoney.format(total_monto_type)}
-                  autoComplete='off'
+                  autoComplete="off"
                   disabled
                 />
                 <Input
-                  id='total_trx_type'
-                  name='total_trx_type'
+                  id="total_trx_type"
+                  name="total_trx_type"
                   label={`Total Transacciones ${tipoReporte}`}
                   value={totalTrxType}
-                  autoComplete='off'
+                  autoComplete="off"
                   disabled
                 />
               </>
-            ) : ("")}
+            ) : (
+              ""
+            )}
           </Fieldset>
         </Form>
         <Accordion
           titulo={
             <GridRow
-              cols={["Id", "Autorizador", `Total Valor ${tipoReporte}`, "No. Transacciones", ""]}
+              cols={[
+                "Id",
+                "Autorizador",
+                `Total Valor ${tipoReporte}`,
+                "No. Transacciones",
+                "",
+              ]}
             />
           }
         />
         <TreeView
           tree={trxTree}
           onClickLastChild={(info, ev) => {
-            setSelectedInfo(info)
+            setSelectedInfo(info);
           }}
         />
       </div>
       <Modal show={selected} handleClose={handleClose}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
           <div className="flex flex-col justify-center items-center">
-            {selected?.ticket.autorizador === 14 ||  selected?.id_autorizador === 14 ? (
+            {selected?.ticket.autorizador === 14 ||
+            selected?.id_autorizador === 14 ? (
               <TicketColpatria
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.ticket?.autorizador === 17 ||  selected?.id_autorizador === 17 ? (
+            ) : selected?.ticket?.autorizador === 17 ||
+              selected?.id_autorizador === 17 ? (
               <TicketsAval
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
-            ) : selected?.ticket?.autorizador === 16 ||  selected?.id_autorizador === 16 ? (
+            ) : selected?.ticket?.autorizador === 16 ||
+              selected?.id_autorizador === 16 ? (
               <TicketsAgrario
                 refPrint={printDiv}
                 type="Reimpresión"
@@ -443,6 +490,14 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
                 loteria={"Lotería de Cundinamarca"}
                 stateTrx={selected?.status_trx}
               />
+            ) : selected?.ticket?.autorizador === 89 ||
+              selected?.id_autorizador === 89 ? (
+              <TicketsCajaSocial
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
             ) : (
               <Tickets
                 refPrint={printDiv}
@@ -473,7 +528,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
           </div>
         )}
       </Modal>
-      {pathname === "/gestion/arqueo/arqueo-cierre/reporte" && (
+      {pathname === "/gestion/arqueo/arqueo-cierre-reporte" && (
         <ButtonBar>
           <ButtonLink
             className="px-4 py-2 bg-primary text-white rounded-full transition-opacity duration-300"
