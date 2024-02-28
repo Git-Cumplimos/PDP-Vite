@@ -114,8 +114,8 @@ const rutasConfiguraciones = {
   permission: listPermissionsTrx,
   subRoutes: [
     {
-      link: "/params-operations/parametrizacion-categorizacion",
-      label: <AppIcons Logo={"RECAUDO"} name={"Parametrización categorización"} />,
+      link: "/params-operations/parametros-categorizacion",
+      label: <AppIcons Logo={"RECAUDO"} name={"Parámetros categorización"} />,
       component: ParametrosCategorizacion,
       permission: [enumPermisosTrx.categorizacion],
     },
