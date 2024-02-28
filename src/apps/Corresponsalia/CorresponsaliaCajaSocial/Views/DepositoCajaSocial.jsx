@@ -225,7 +225,7 @@ const DepositoCajaSocial = () => {
             name="valorDeposito"
             label={"Valor a depositar"}
             type="tel"
-            minLength={5}
+            // minLength={5}
             maxLength={10}
             autoComplete="off"
             min={enumParametrosCajaSocial?.MIN_DEPOSITO_CAJA_SOCIAL}
@@ -234,6 +234,8 @@ const DepositoCajaSocial = () => {
             onInput={onChangeFormatNum}
             disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
             required
+            equalError={false}
+            equalErrorMin={false}
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
