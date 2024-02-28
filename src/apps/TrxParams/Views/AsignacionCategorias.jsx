@@ -22,6 +22,7 @@ import Accordion from "../../../components/Base/Accordion";
 import { fetchAllCategorias } from "../../../pages/Categorias/utils/fetchHome";
 import TextArea from "../../../components/Base/TextArea";
 import { postAssign } from "../utils/fetchParametrosAsignaciones";
+import { toast } from "react-toastify";
 
 const AsignacionCategorias = () => {
   const { allRoutes } = useUrls();
@@ -81,7 +82,7 @@ const AsignacionCategorias = () => {
     return [
       ...(categorias || []).map((cat) => {
         return {
-          "ID": cat.id_categoria,
+          ID: cat.id_categoria,
           // "Imagen categoria": cat.img_url,
           "Nombre Categoría": cat.nombre,
           Zona:
@@ -157,7 +158,7 @@ const AsignacionCategorias = () => {
         id_categoria: selected.id_categoria,
         id_subcategoria: "",
         subcategorias: selected.subcategorias,
-        edit: true,
+        edit: false,
       });
       const subcategorias = categorias.find(
         (cat) => cat.id_categoria === parseInt(selected.id_categoria)
@@ -285,6 +286,42 @@ const AsignacionCategorias = () => {
     handleClose();
   }, [selectedAsignacion, fetchAllCategoriasFunc, handleClose]);
 
+  const handleAsignacion = useCallback(
+    (e) => {
+      setSelectedAsignacion((old) => {
+        const subcat = old.subcategorias.find((subcat) => {
+          return subcat.nombre === old.id_subcategoria;
+        });
+        // console.log(subcat);
+        if (subcat) {
+          if (subcat.comercios && subcat.comercios.includes(old.app)) {
+            notifyError(
+              "La transacción ya está asignada a la subcategoría seleccionada."
+            );
+          } else {
+            return {
+              ...old,
+              subcategorias: old.subcategorias.map((subcat) => {
+                if (subcat.nombre === old.id_subcategoria) {
+                  return {
+                    ...subcat,
+                    comercios: [...(subcat.comercios ?? []), old.app],
+                  };
+                }
+                return subcat;
+              }),
+              app: "",
+              id_subcategoria: "",
+              edit: true,
+            };
+          }
+        }
+        return old;
+      });
+    },
+    [setSelectedAsignacion]
+  );
+
   return (
     <Fragment>
       {/* <ButtonBar>
@@ -348,7 +385,7 @@ const AsignacionCategorias = () => {
               label={"Categoría"}
               value={selectedAsignacion.id_categoria}
               onChange={onChangeForm}
-              disabled={selectedAsignacion.edit}
+              disabled
               options={selectCategorias}
             />
             <Select
@@ -361,29 +398,7 @@ const AsignacionCategorias = () => {
             />
             <Button
               type="button"
-              onClick={(e) => {
-                setSelectedAsignacion((old) => {
-                  const subcat = old.subcategorias.find((subcat) => {
-                    return subcat.nombre === old.id_subcategoria;
-                  });
-                  console.log(subcat);
-                  if (subcat) {
-                    return {
-                      ...old,
-                      subcategorias: old.subcategorias.map((subcat) => {
-                        if (subcat.nombre === old.id_subcategoria) {
-                          return {
-                            ...subcat,
-                            comercios: [...subcat.comercios ?? [], old.app],
-                          };
-                        }
-                        return subcat;
-                      }),
-                    };
-                  }
-                });
-                setSelectedAsignacion((old) => ({ ...old, app: "" }));
-              }}
+              onClick={() => handleAsignacion()}
               disabled={
                 !selectedAsignacion.app || !selectedAsignacion.id_subcategoria
               }
@@ -400,85 +415,92 @@ const AsignacionCategorias = () => {
                     titulo={subcat.nombre}
                     key={subcat.nombre}
                     type="button"
+                    activated
                   >
-                    <div className="overflow-x-auto">
-                      <table className="table table-auto border-collapse border border-black mx-auto">
-                        <thead>
-                          <tr>
-                            <th
-                              scope="col"
-                              className="border border-black px-2"
-                            >
-                              Ruta
-                            </th>
-                            <th
-                              scope="col"
-                              className="border border-black px-2"
-                            >
-                              Transacción
-                            </th>
-                            <th
-                              scope="col"
-                              className="border border-black px-2"
-                            >
-                              Acciones
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {subcat.comercios &&
-                            subcat.comercios.length > 0 &&
-                            subcat.comercios.map((campo) => {
-                              return (
-                                <tr key={campo}>
-                                  <td className="border border-black px-2">
-                                    {campo}
-                                  </td>
-                                  <td className="border border-black px-2">
-                                    {allRoutesArray.find(
-                                      (app) => app.link === campo
-                                    )?.label ?? "No encontrado"}
-                                  </td>
-                                  <td className="border border-black px-2">
-                                    <Button
-                                      type="button"
-                                      onClick={() => {
-                                        const nombreSubcat = subcat.nombre;
-                                        setSelectedAsignacion((old) => {
-                                          return {
-                                            ...old,
-                                            subcategorias:
-                                              old.subcategorias.map(
-                                                (subcat) => {
-                                                  if (
-                                                    subcat.nombre ===
-                                                    nombreSubcat
-                                                  ) {
-                                                    return {
-                                                      ...subcat,
-                                                      comercios:
-                                                        subcat.comercios.filter(
-                                                          (comercio) =>
-                                                            comercio !== campo
-                                                        ),
-                                                    };
+                    {subcat.comercios && subcat.comercios.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="table mx-auto border border-collapse border-black table-auto">
+                          <thead>
+                            <tr>
+                              <th
+                                scope="col"
+                                className="px-2 border border-black"
+                              >
+                                Ruta
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-2 border border-black"
+                              >
+                                Transacción
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-2 border border-black"
+                              >
+                                Acciones
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {subcat.comercios &&
+                              subcat.comercios.length > 0 &&
+                              subcat.comercios.map((campo) => {
+                                return (
+                                  <tr key={campo}>
+                                    <td className="px-2 border border-black">
+                                      {campo}
+                                    </td>
+                                    <td className="px-2 border border-black">
+                                      {allRoutesArray.find(
+                                        (app) => app.link === campo
+                                      )?.label ?? "No encontrado"}
+                                    </td>
+                                    <td className="px-2 border border-black">
+                                      <Button
+                                        type="button"
+                                        onClick={() => {
+                                          const nombreSubcat = subcat.nombre;
+                                          setSelectedAsignacion((old) => {
+                                            return {
+                                              ...old,
+                                              subcategorias:
+                                                old.subcategorias.map(
+                                                  (subcat) => {
+                                                    if (
+                                                      subcat.nombre ===
+                                                      nombreSubcat
+                                                    ) {
+                                                      return {
+                                                        ...subcat,
+                                                        comercios:
+                                                          subcat.comercios.filter(
+                                                            (comercio) =>
+                                                              comercio !== campo
+                                                          ),
+                                                      };
+                                                    }
+                                                    return subcat;
                                                   }
-                                                  return subcat;
-                                                }
-                                              ),
-                                          };
-                                        });
-                                      }}
-                                    >
-                                      Eliminar
-                                    </Button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                        </tbody>
-                      </table>
-                    </div>
+                                                ),
+                                            };
+                                          });
+                                        }}
+                                      >
+                                        Eliminar
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        No hay transacciones asignadas
+                      </div>
+                    )}
                   </Accordion>
                 );
               })}
@@ -492,17 +514,8 @@ const AsignacionCategorias = () => {
             <Button type="button" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={
-                selectedAsignacion.edit
-                  ? false
-                  : !selectedAsignacion.app ||
-                    !selectedAsignacion.id_categoria ||
-                    !selectedAsignacion.id_subcategoria
-              }
-            >
-              {selectedAsignacion.edit ? "Asignar Categoría" : "Crear"}
+            <Button type="submit" disabled={!selectedAsignacion.edit}>
+              Asignar Categoría
             </Button>
           </ButtonBar>
         </Form>
