@@ -96,7 +96,7 @@ const ParametrosCategorizacion = () => {
   const onSelectCategorias = useCallback(
     async (e, i) => {
       const selected = categorias[i];
-      console.log(selected);
+      // console.log(selected);
       setSelectedCategoria({
         id_categoria: selected.id_categoria,
         fk_zona: selected.fk_zona,
@@ -164,7 +164,7 @@ const ParametrosCategorizacion = () => {
 
     try {
       const res = await postCreateCategoria(formData);
-      console.log(res);
+      // console.log(res);
       if (res?.status) {
         notify("Categoria creada correctamente");
         fetchAllCategorias();
@@ -210,7 +210,7 @@ const ParametrosCategorizacion = () => {
     // for (const pair of formData.entries()) {
     //   console.log(pair[0] + ", " + pair[1]);
     // }
-    console.log(Object.fromEntries(formData));
+    // console.log(Object.fromEntries(formData));
     try {
       const res = await putEditCategoria(formData);
       // console.log(res);
@@ -308,7 +308,7 @@ const ParametrosCategorizacion = () => {
             autoComplete="off"
             required={selectedCategoria.edit ? false : true}
             onGetFile={(file) => {
-              console.log(file);
+              // console.log(file);
               if (file[0]?.size > 1000000) {
                 notifyError("El peso de la imagen no debe ser mayor a 1MB");
                 return;
@@ -384,7 +384,7 @@ const ParametrosCategorizacion = () => {
           )}
           <Fieldset legend="Sub-Categorias">
             {selectedCategoria.subcategorias?.map((subcategoria, index) => (
-              <div className="border border-black py-2 my-2" key={index}>
+              <div className="py-2 my-2 border border-black" key={index}>
                 <Input
                   key={index}
                   id="Nombre sub-categoria"
@@ -417,7 +417,7 @@ const ParametrosCategorizacion = () => {
                   autoComplete="off"
                   required={selectedCategoria.edit ? false : true}
                   onGetFile={(file) => {
-                    console.log(file);
+                    // console.log(file);
                     if (file[0]?.size > 1000000) {
                       notifyError(
                         "El peso de la imagen no debe ser mayor a 1MB"
@@ -557,6 +557,7 @@ const ParametrosCategorizacion = () => {
                       ...old.subcategorias,
                       {
                         nombre: "",
+                        status: true,
                       },
                     ],
                   }));
@@ -579,8 +580,12 @@ const ParametrosCategorizacion = () => {
               type="submit"
               disabled={
                 !selectedCategoria.nombre ||
-                Object.keys(selectedCategoria.img_url).length === 0 ||
-                !selectedCategoria.fk_zona
+                !selectedCategoria.img_url?.length ||
+                !selectedCategoria.fk_zona ||
+                selectedCategoria.subcategorias.length === 0 ||
+                selectedCategoria.subcategorias.some(
+                  (sub) => !sub.nombre || !sub.img_url?.length
+                )
               }
             >
               {selectedCategoria.edit ? "Editar la información" : "Aceptar"}
