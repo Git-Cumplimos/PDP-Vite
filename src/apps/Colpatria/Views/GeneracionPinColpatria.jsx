@@ -33,6 +33,7 @@ const DATA_INICIAL_PIN = {
   tipo_doc_beneficiario: "C",
   num_identificacion_beneficiario: "",
   fec_expedicion_beneficiario: "",
+  num_cel_beneficiario: "",
   num_identificacion_comprador: "",
   tipo_doc_comprador: "C",
   fec_expedicion_comprador: "",
@@ -46,15 +47,16 @@ const DATA_INICIAL_PIN = {
   num_cel_comprador: "",
   cod_ciudad_domicilio: "",
   email_comprador: "",
+  email_notif_pin: "",
   razon_social: "Universidad de los Andes",
   valorPin: 0,
 };
 
 const DATA_TIPO_ID = {
-  "NIT": "N",
+  NIT: "N",
   "CEDULA DE CIUDADANIA": "C",
   "CEDULA DE EXTRANJERIA": "E",
-  "PASAPORTE": "P",
+  PASAPORTE: "P",
   "TARJETA DE IDENTIDAD": "T",
 };
 
@@ -122,6 +124,8 @@ const GeneracionPinColpatria = () => {
             dataUsuario.num_identificacion_beneficiario,
           fec_expedicion_beneficiario:
             dataUsuario.fec_expedicion_beneficiario.replaceAll("-", ""),
+          num_cel_beneficiario: dataUsuario.num_cel_beneficiario,
+          email_notif_pin: dataUsuario.email_notif_pin,
           num_identificacion_comprador:
             dataUsuario.num_identificacion_comprador,
           tipo_doc_comprador: dataUsuario.tipo_doc_comprador,
@@ -351,7 +355,7 @@ const GeneracionPinColpatria = () => {
           <Select
             id="tipo_doc_cliente"
             name="tipo_doc_cliente"
-            label="Tipo documento"
+            label="Tipo documento cliente"
             options={DATA_TIPO_ID}
             value={dataUsuario?.["tipo_doc_cliente"]}
             onChange={onChangeFormat}
@@ -407,6 +411,32 @@ const GeneracionPinColpatria = () => {
             minLength={1}
             onChange={onChangeFormat}
             // required
+            disabled={loadingPeticionGeneracionPin}
+          />
+          <Input
+            id="num_cel_beneficiario"
+            name="num_cel_beneficiario"
+            label={"Celular beneficiario"}
+            type="text"
+            autoComplete="off"
+            value={dataUsuario?.["num_cel_beneficiario"]}
+            maxLength={10}
+            minLength={10}
+            onChange={onChangeFormatNumber}
+            required
+            disabled={loadingPeticionGeneracionPin}
+          />
+          <Input
+            id="email_notif_pin"
+            name="email_notif_pin"
+            label={"Email beneficiario"}
+            type="email"
+            autoComplete="off"
+            value={dataUsuario?.["email_notif_pin"]}
+            maxLength={80}
+            minLength={1}
+            onChange={onChangeFormat}
+            required
             disabled={loadingPeticionGeneracionPin}
           />
         </Fieldset>
