@@ -3,8 +3,8 @@ import classes from "./Accordion.module.css";
 
 const { accordion, active, panel } = classes;
 
-const Accordion = ({ children, titulo }) => {
-  const [activo, setActivo] = useState(false);
+const Accordion = ({ children, titulo, activated = false }) => {
+  const [activo, setActivo] = useState(activated);
 
   return (
     <Fragment>

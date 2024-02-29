@@ -201,7 +201,7 @@ export const useProvideUrls = () => {
         if (res?.status) {
           const urlsCategoriasFiltrado = res?.obj.map(
             ({ nombre, img_url, id_categoria, subcategorias }) => {
-              const link = `/categoria/${nombre.replace(/\s+/g, "-")}`;
+              const link = `/${nombre.replace(/\s+/g, "-")}`;
               const subcategoriasFiltradas = subcategorias.filter(
                 (subcategoria) =>
                   subcategoria.status || subcategoria.comercios?.length > 0
@@ -298,15 +298,13 @@ export const useProvideUrls = () => {
           {toRoute(urlsReportes, true, SubPage)}
           {toRoute(urlsInformacionGeneral, true, SubPage)}
           {toRoute(urlsBilleteraComisiones, true, SubPage)}
+          {toRoute(urlsCategorias, true, SubPage)}
         </Route>
         <Route path="/login" element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
         </Route>
         <Route path="/public" element={<PublicLayout />}>
           {toRoute(publicUrls, false)}
-        </Route>
-        <Route path="/categoria" element={<AdminLayout />}>
-          {toRoute(urlsCategorias, true, SubPage)}
         </Route>
       </Routes>
     );
