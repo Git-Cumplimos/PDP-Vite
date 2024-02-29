@@ -86,6 +86,7 @@ const DepositoCajaSocial = () => {
         deposito_caja_social: {
           numero_cuenta: dataDeposito?.numeroCuenta,
         },
+        id_user_pdp: pdpUser.uuid,
       };
       notifyPending(
         peticionConsultaTitular({}, data),
@@ -140,6 +141,7 @@ const DepositoCajaSocial = () => {
           nom_cliente: resConsulta?.personName?.fullName,
         },
         id_trx: resConsulta?.id_trx,
+        id_user_pdp: pdpUser.uuid,
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
