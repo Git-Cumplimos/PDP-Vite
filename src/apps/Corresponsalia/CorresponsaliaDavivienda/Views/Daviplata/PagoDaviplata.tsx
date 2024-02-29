@@ -140,6 +140,7 @@ const PagoDaviplata = () => {
 
   useEffect(() => {
     if (errorTimeout) {
+      notifyError("Transacción cancelada por vencimiento de OTP");
       handleCloseNinguno(false, "/");
       stopTimer();
     }
