@@ -15,13 +15,13 @@ export const listPermissionsCajaSocial = Object.values(enumPermisosCajaSocial);
 const rutasCajaSocialCB = {
   //corresponsaliaCajaSocial
   link: "/corresponsalia/corresponsalia-caja-social",
-  label: <AppIcons Logo={"CAJA-SOCIAL"} name="Corresponsalía BCSC" />,
+  label: <AppIcons Logo={"CAJA_SOCIAL"} name="Corresponsalía BCSC" />,
   component: CorresponsaliaCajaSocial,
   permission: listPermissionsCajaSocial,
   subRoutes: [
     {
       link: "/corresponsalia/corresponsalia-caja-social/deposito",
-      label: <AppIcons Logo={"CAJA-SOCIAL"} name="Depósitos" />,
+      label: <AppIcons Logo={"CAJA_SOCIAL_DEPOSITO"} name="Depósitos" />,
       component: DepositoCajaSocial,
       permission: [enumPermisosCajaSocial.DEPOSITO_CAJA_SOCIAL],
     },
