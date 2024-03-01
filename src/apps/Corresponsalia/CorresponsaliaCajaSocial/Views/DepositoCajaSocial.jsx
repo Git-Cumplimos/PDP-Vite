@@ -86,6 +86,7 @@ const DepositoCajaSocial = () => {
         deposito_caja_social: {
           numero_cuenta: dataDeposito?.numeroCuenta,
         },
+        id_user_pdp: pdpUser.uuid,
       };
       notifyPending(
         peticionConsultaTitular({}, data),
@@ -140,6 +141,7 @@ const DepositoCajaSocial = () => {
           nom_cliente: resConsulta?.personName?.fullName,
         },
         id_trx: resConsulta?.id_trx,
+        id_user_pdp: pdpUser.uuid,
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
@@ -204,7 +206,7 @@ const DepositoCajaSocial = () => {
   }, [validNavigate]);
   return (
     <>
-      <h1 className="text-3xl">Depósitos BCSC</h1>
+      <h1 className="text-3xl mt-10">Depósitos BCSC</h1>
       <Form onSubmit={consultaTitular} grid>
         <Fieldset legend="Datos del depósito" className="lg:col-span-2">
           <Input
