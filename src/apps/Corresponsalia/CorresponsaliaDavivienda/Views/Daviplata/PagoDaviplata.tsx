@@ -40,7 +40,7 @@ import {
 
 //FRAGMENT ******************** ENUM ***************************
 export enum NameVarSee {
-  tipoDocumento = "Tipo de documento",
+  tipoDocumento = "Tipo de Documento",
   numeroIdentificacion = "Número de documento",
   valor_total_trx = "Valor a pagar",
 }
