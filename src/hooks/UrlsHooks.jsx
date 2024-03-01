@@ -23,6 +23,7 @@ import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 // Categorias
 import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
 import Subcategorias from "../pages/Categorias/Subcategorias";
+import { useImgs } from "./ImgsHooks";
 
 // Categorias
 const Categoria = lazy(() => import("../pages/Categorias/Categorias"));
@@ -191,6 +192,7 @@ export const useProvideUrls = () => {
 
   const [urlsCategorias, setUrlsCategorias] = useState([]);
 
+  const { imgs } = useImgs();
   useEffect(() => {
     const fetchUrlsCategorias = async (id_zona) => {
       const formData = new FormData();
@@ -210,15 +212,39 @@ export const useProvideUrls = () => {
                 ({ nombre, img_url, id_subcategoria, comercios }) => {
                   return {
                     link: `${link}/${nombre.replace(/\s+/g, "-")}`,
-                    label: <AppIcons Logo={img_url} name={nombre} />,
+                    label: (
+                      <AppIcons
+                        Logo={
+                          imgs?.[nombre]
+                            ? imgs?.[nombre]
+                            : imgs["MARKETPLACE"]
+                        }
+                        name={nombre}
+                      />
+                    ),
                     component: (props) => (
                       <Subcategorias
                         {...props}
                         comercios={comercios}
                         title={nombre}
+                        label={
+                          <AppIcons
+                            Logo={
+                              imgs?.[nombre]
+                                ? imgs?.[nombre]
+                                : imgs["MARKETPLACE"]
+                            }
+                            name={nombre}
+                          />
+                        }
                       />
                     ),
-                    props: { nombre, img_url, id_categoria, id_subcategoria },
+                    props: {
+                      nombre,
+                      img_url,
+                      id_categoria,
+                      id_subcategoria,
+                    },
                   };
                 }
               );

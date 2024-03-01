@@ -83,7 +83,13 @@ const Subcategorias = ({ comercios = [], title = "" }) => {
     return findMatchingApps(allRoutesArray, comercios);
   }, [comercios, findMatchingApps, allRoutesArray]);
 
-  if (comercios && comercios.length === 0) return <Error403 />;
+  if (comercios && comercios.length === 0)
+    return (
+      <h2 className="text-xl">
+        La subcategoría no tiene transacciones asignadas o el usuario no tiene
+        permiso para verlas.
+      </h2>
+    );
   return (
     <>
       <nav className={navbar}>
