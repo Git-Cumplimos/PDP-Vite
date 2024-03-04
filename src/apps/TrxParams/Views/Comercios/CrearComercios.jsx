@@ -41,8 +41,8 @@ const vectorCodigosInstitucionales = [
   ),
 ];
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-// const urlComercios = `http://127.0.0.1:5000`;
+// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `http://127.0.0.1:5000`;
 const urlParametrizacion =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
@@ -178,8 +178,8 @@ const CrearComercios = () => {
         ...structuredClone(old),
         ...structuredClone(res?.obj),
       }));
-      if (res?.obj.alert_cupo.includes("%")) {
-        setAlertPorcent(res?.obj.alert_cupo.replace("%", ""));
+      if (res?.obj.alert_cupo?.includes("%")) {
+        setAlertPorcent(res?.obj.alert_cupo?.replace("%", ""));
       } else {
         setAlertMonto(res?.obj.alert_cupo);
       }
