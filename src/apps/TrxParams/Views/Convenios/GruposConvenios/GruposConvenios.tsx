@@ -82,7 +82,7 @@ const GruposConvenios = () => {
         onSelect={useCallback(
           (convGroup) =>
             navigate(
-              `/params-operations/convenios-recaudo/grupos-convenios/edit/${convGroup.pk_tbl_grupo_convenios}`
+              `/params-operations/convenios-recaudo/grupos-convenios/${convGroup.pk_tbl_grupo_convenios}`
             ),
           [navigate]
         )}
