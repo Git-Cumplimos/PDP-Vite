@@ -138,7 +138,7 @@ const DepositoCajaSocial = () => {
         },
         deposito_caja_social: {
           numero_cuenta: dataDeposito?.numeroCuenta,
-          nom_cliente: resConsulta?.personName?.fullName,
+          nom_cliente: resConsulta?.trn?.personName?.fullName,
         },
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
@@ -263,7 +263,7 @@ const DepositoCajaSocial = () => {
               title="Respuesta de consulta depósito"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                "Nombres titular": resConsulta?.personName?.fullName ?? "",
+                "Nombres titular": resConsulta?.trn?.personName?.fullName ?? "",
                 "Número de cuenta": dataDeposito?.numeroCuenta,
                 "Valor a depositar": formatMoney.format(
                   dataDeposito?.valorDeposito
