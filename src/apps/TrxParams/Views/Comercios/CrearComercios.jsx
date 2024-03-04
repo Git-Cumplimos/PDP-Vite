@@ -41,8 +41,8 @@ const vectorCodigosInstitucionales = [
   ),
 ];
 
-// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const urlComercios = `http://127.0.0.1:5000`;
+const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const urlComercios = `http://127.0.0.1:5000`;
 const urlParametrizacion =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
