@@ -34,7 +34,7 @@ const Home = () => {
         showThumbs={false}
         showStatus={false}
         showIndicators={width > 1024}
-        className="w-3/4 mx-auto hidden md:block"
+        className="hidden w-3/4 mx-auto md:block"
       >
         {imgsCarousel.map(({ name, url }) => {
           return (
