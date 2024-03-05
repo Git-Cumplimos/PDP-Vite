@@ -208,7 +208,7 @@ const rutasConfiguraciones = {
               permission: [enumPermisosTrx.asignacion_comision],
             },
             {
-              link: "/params-operations/comisiones/asignaciones/edit/:id",
+              link: "/params-operations/comisiones/asignaciones/:id",
               label: (
                 <AppIcons Logo={"RECAUDO"} name={"Asignación de comisiones"} />
               ),
@@ -267,7 +267,7 @@ const rutasConfiguraciones = {
           permission: [enumPermisosTrx.planes_comision],
         },
         {
-          link: "/params-operations/grupos-planes-comisiones/edit/:id",
+          link: "/params-operations/grupos-planes-comisiones/:id",
           label: (
             <AppIcons
               Logo={"RECAUDO"}
@@ -326,7 +326,7 @@ const rutasConfiguraciones = {
           permission: [enumPermisosTrx.convenios],
         },
         {
-          link: "/params-operations/convenios-recaudo/grupos-convenios/edit/:id",
+          link: "/params-operations/convenios-recaudo/grupos-convenios/:id",
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de convenios"} />,
           component: EditGruposConvenios,
           permission: [enumPermisosTrx.grupos_comercios],
@@ -420,7 +420,7 @@ const rutasConfiguraciones = {
           permission: [enumPermisosTrx.grupos_comercios],
         },
         {
-          link: "/params-operations/comercios-params/grupos-comercio/edit/:id",
+          link: "/params-operations/comercios-params/grupos-comercio/:id",
           label: <AppIcons Logo={"RECAUDO"} name={"Grupos de comercios"} />,
           component: EditGruposComercios,
           permission: [enumPermisosTrx.grupos_comercios],

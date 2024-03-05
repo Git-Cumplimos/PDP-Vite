@@ -178,8 +178,8 @@ const CrearComercios = () => {
         ...structuredClone(old),
         ...structuredClone(res?.obj),
       }));
-      if (res?.obj.alert_cupo.includes("%")) {
-        setAlertPorcent(res?.obj.alert_cupo.replace("%", ""));
+      if (res?.obj.alert_cupo?.includes("%")) {
+        setAlertPorcent(res?.obj.alert_cupo?.replace("%", ""));
       } else {
         setAlertMonto(res?.obj.alert_cupo);
       }
