@@ -219,7 +219,7 @@ export const useProvideUrls = () => {
               const logo = (
                 <AppIcons
                   Logo={
-                    subcategoria.img_url ? subcategoria.img_url : "MARKETPLACE"
+                    subcategoria.nombre ? subcategoria.nombre : "MARKETPLACE"
                   }
                   name={subcategoria.nombre}
                 />
@@ -256,7 +256,7 @@ export const useProvideUrls = () => {
               link,
               label: (
                 <AppIcons
-                  Logo={props.img_url ? props.img_url : "MARKETPLACE"}
+                  Logo={props.nombre ? props.nombre : "MARKETPLACE"}
                   name={props.nombre}
                 />
               ),
