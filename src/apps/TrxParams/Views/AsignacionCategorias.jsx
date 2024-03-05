@@ -337,17 +337,8 @@ const AsignacionCategorias = () => {
         onSelectRow={onSelectCategorias}
         onSetPageData={setPageData}
         onChange={onChange}
-      >
-        {/* <Input
-          id="searchAuto"
-          name="searchAuto"
-          label={"Id categoria"}
-          type="number"
-          autoComplete="off"
-          defaultValue={searchAuto}
-          maxLength={100}
-        /> */}
-      </TableEnterprise>
+        children={null}
+      />
       <Modal show={showModal} handleClose={handleClose}>
         <Form onSubmit={() => assignCategorias()} grid>
           <Fieldset legend="Asignación">

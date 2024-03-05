@@ -200,6 +200,7 @@ const ParametrosCategorizacion = () => {
           );
           formData.append(`subcategorias[${index}][status]`, sub.status);
         }
+        formData.append(`subcategorias[${index}][comercios]`, sub.comercios);
         // Comentado por si se requiere subir imágenes de subcategorias
         typeof sub.img_url === "string"
           ? formData.append(`subcategorias[${index}][img_url]`, sub.img_url)
@@ -264,7 +265,8 @@ const ParametrosCategorizacion = () => {
         onSelectRow={onSelectCategorias}
         onSetPageData={setPageData}
         onChange={onChange}
-      ></TableEnterprise>
+        children={null}
+      />
       <Modal show={showModal} handleClose={handleClose}>
         {/* {JSON.stringify(selectedCategoria)} */}
         <Form

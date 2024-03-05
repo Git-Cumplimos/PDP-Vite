@@ -168,7 +168,8 @@ const ParametrosZonas = () => {
         onSelectRow={onSelectZonas}
         onSetPageData={setPageData}
         onChange={onChange}
-      ></TableEnterprise>
+        children={null}
+      />
       <Modal show={showModal} handleClose={handleClose}>
         <Form
           onSubmit={() => (selectedZona.edit ? editZona() : createZona())}
