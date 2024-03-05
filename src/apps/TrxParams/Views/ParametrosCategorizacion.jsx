@@ -264,7 +264,8 @@ const ParametrosCategorizacion = () => {
         onSelectRow={onSelectCategorias}
         onSetPageData={setPageData}
         onChange={onChange}
-      ></TableEnterprise>
+        children={null}
+      />
       <Modal show={showModal} handleClose={handleClose}>
         {/* {JSON.stringify(selectedCategoria)} */}
         <Form
