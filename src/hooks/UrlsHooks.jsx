@@ -289,6 +289,7 @@ export const useProvideUrls = () => {
               });
             });
           });
+          dispatchImgs({ type: "FETCH_IMGS", payload: { dispatch: dispatchImgs } });
         } else {
           setUrlsCategorias([]);
         }
