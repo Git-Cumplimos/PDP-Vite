@@ -54,6 +54,23 @@ export const putEditCategoria = async (obj) => {
   }
 };
 
+export const putEditSubCategoria = async (obj) => {
+  try {
+    const res = await fetchData(
+      `${urlParametrizacion}/categorias/updateSubCat`,
+      "PUT",
+      {},
+      obj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const fetchCategorias = async (obj) => {
   try {
     const res = await fetchData(

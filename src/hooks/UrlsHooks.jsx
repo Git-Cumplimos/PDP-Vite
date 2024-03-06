@@ -211,7 +211,6 @@ export const useProvideUrls = () => {
                 subcategoria.comercios?.length > 0
             );
             const subcats = subcategoriasFiltradas.map((subcategoria) => {
-              console.log("subcategoria", subcategoria);
               const linkSubcat = `${link}/${subcategoria.nombre.replace(
                 /\s+/g,
                 "-"
