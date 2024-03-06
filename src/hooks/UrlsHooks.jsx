@@ -24,6 +24,7 @@ import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
 import Subcategorias from "../pages/Categorias/Subcategorias";
 import { useImgs, useProvideImgsWithDispatch } from "./ImgsHooks";
+import { fetchCategoriasImgs } from "../apps/TrxParams/utils/fetchParametrosCategorias";
 
 // Categorias
 const Categoria = lazy(() => import("../pages/Categorias/Categorias"));
@@ -196,6 +197,26 @@ export const useProvideUrls = () => {
   const { imgs, svgs, dispatchImgs } = useProvideImgsWithDispatch();
 
   useEffect(() => {
+    const fetchImgs = async () => {
+      const res = await fetchCategoriasImgs();
+      console.log("res", res);
+      if (res?.status) {
+        // Actualizar imágenes en el contexto
+        res?.obj.forEach(({ nombre, img_url }) => {
+          dispatchImgs({
+            type: "SET_IMGS",
+            payload: { name: nombre, img: img_url },
+          });
+        });
+        dispatchImgs({
+          type: "FETCH_IMGS",
+          payload: { dispatch: dispatchImgs },
+        });
+      } else {
+        setUrlsCategorias([]);
+      }
+    };
+
     const fetchUrlsCategorias = async (id_zona) => {
       const formData = new FormData();
       if (id_zona) {
@@ -218,7 +239,7 @@ export const useProvideUrls = () => {
               const logo = (
                 <AppIcons
                   Logo={
-                    subcategoria.img_url ? subcategoria.img_url : "MARKETPLACE"
+                    subcategoria.nombre ? subcategoria.nombre : "MARKETPLACE"
                   }
                   name={subcategoria.nombre}
                 />
@@ -271,24 +292,6 @@ export const useProvideUrls = () => {
             };
           });
           setUrlsCategorias(urlsCategoriasFiltrado);
-
-          // Actualizar imágenes en el contexto
-          res?.obj.forEach(({ nombre, img_url }) => {
-            dispatchImgs({
-              type: "SET_IMGS",
-              payload: { name: nombre, img: img_url },
-            });
-          });
-          // Añadir imagenes de subcategorias
-          res?.obj.forEach(({ subcategorias }) => {
-            subcategorias.forEach(({ nombre, img_url }) => {
-              dispatchImgs({
-                type: "SET_IMGS",
-                payload: { name: nombre, img: img_url },
-              });
-            });
-          });
-          dispatchImgs({ type: "FETCH_IMGS", payload: { dispatch: dispatchImgs } });
         } else {
           setUrlsCategorias([]);
         }
@@ -297,6 +300,7 @@ export const useProvideUrls = () => {
 
     // Validar que esté autenticado para hacer la petición
     if (urlsCategorias?.length === 0 && userPermissions?.length > 0) {
+      fetchImgs();
       fetchUrlsCategorias(commerceInfo?.zona_comercio);
     }
   }, [

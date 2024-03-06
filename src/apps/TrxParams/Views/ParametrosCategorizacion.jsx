@@ -617,12 +617,14 @@ const ParametrosCategorizacion = () => {
                       }}
                       accept="image/png, image/jpeg, image/jpg"
                     />
-                    {!selectedCategoria.edit && subcategoria.img_url && (
+                    {selectedCategoria.edit && subcategoria.img_url && (
                       <div className="flex flex-col items-center justify-center">
                         <img
                           src={
-                            subcategoria?.img_url[0]
-                              ? URL.createObjectURL(subcategoria?.img_url[0])
+                            typeof subcategoria.img_url === "string"
+                              ? subcategoria.img_url
+                              : subcategoria.img_url[0]
+                              ? URL.createObjectURL(subcategoria.img_url[0])
                               : ""
                           }
                           alt="Imagen sub-categoria"
@@ -630,46 +632,21 @@ const ParametrosCategorizacion = () => {
                           height="100"
                           className="max-w-xs"
                         />
-                        Peso de la imagen:{" "}
-                        {subcategoria.img_url[0]?.size
-                          ? subcategoria.img_url[0]?.size / 1000000
-                          : 0}{" "}
-                        MB
+                        {subcategoria.img_url && (
+                          <p>
+                            Peso de la imagen:{" "}
+                            {subcategoria.img_url[0]?.size
+                              ? (
+                                  subcategoria.img_url[0].size / 1000000
+                                ).toFixed(2)
+                              : 0}{" "}
+                            MB
+                          </p>
+                        )}
                       </div>
                     )}
-                    {selectedCategoria.edit &&
-                    typeof subcategoria.img_url === "string" ? (
-                      <div className="flex flex-col items-center justify-center">
-                        <img
-                          src={subcategoria.img_url}
-                          alt="Imagen sub-categoria"
-                          width="100"
-                          height="100"
-                          className="max-w-xs"
-                        />
-                      </div>
-                    ) : selectedCategoria.edit &&
-                      subcategoria.img_url &&
-                      subcategoria.img_url[0] ? (
-                      <div className="flex flex-col items-center justify-center">
-                        <img
-                          src={
-                            subcategoria?.img_url[0]
-                              ? URL.createObjectURL(subcategoria?.img_url[0])
-                              : ""
-                          }
-                          alt="Imagen sub-categoria"
-                          width="100"
-                          height="100"
-                          className="max-w-xs"
-                        />
-                        Peso de la imagen:{" "}
-                        {subcategoria.img_url[0]?.size
-                          ? subcategoria.img_url[0]?.size / 1000000
-                          : 0}{" "}
-                        MB
-                      </div>
-                    ) : (
+
+                    {!selectedCategoria.edit && (
                       <p className="text-center">
                         La imagen no debe superar los 1MB y debe tener formato
                         PNG, JPEG o JPG

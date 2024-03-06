@@ -174,8 +174,7 @@ export const fetchCategoriasImgs = async (obj) => {
       "POST",
       {},
       obj,
-      {},
-      false
+      {}
     );
     if (res?.status) {
       return res;
