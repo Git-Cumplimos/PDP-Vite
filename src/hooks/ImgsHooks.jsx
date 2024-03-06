@@ -1,18 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 
 import { images, svgs, banners } from "../utils/AssetsObjects";
-// import { fetchCategoriasImgs } from "../apps/TrxParams/utils/fetchParametrosCategorias";
-
-// const getCategoriesImages = async () => {
-//   const res = await fetchCategoriasImgs({});
-//   console.log("res", res);
-//   if (res?.status) {
-//     return res.obj;
-//   } else {
-//     console.error(res);
-//     return [];
-//   }
-// };
 
 const initialImgs = {
   imgs: images,
@@ -122,11 +110,6 @@ export const useImgs = () => {
 export const useProvideImgs = () => {
   const [assets, dispatchImgs] = useReducer(reducerImgs, initialImgs);
   useEffect(() => {
-    // getCategoriesImages().then((categoriesImages) => {
-    //   categoriesImages.forEach((category) => {
-    //     dispatchImgs({ type: SET_IMGS, payload: { name: category.nombre, img: category.img_url } });
-    //   });
-    // });
     dispatchImgs({ type: FETCH_IMGS, payload: { dispatch: dispatchImgs } });
     dispatchImgs({ type: FETCH_SVGS, payload: { dispatch: dispatchImgs } });
     dispatchImgs({ type: FETCH_BANNERS, payload: { dispatch: dispatchImgs } });
@@ -137,6 +120,11 @@ export const useProvideImgs = () => {
 export const useProvideImgsWithDispatch = () => {
   const assets = useProvideImgs();
   const [_, dispatchImgs] = useReducer(reducerImgs, initialImgs);
+  useEffect(() => {
+    dispatchImgs({ type: FETCH_IMGS, payload: { dispatch: dispatchImgs } });
+    dispatchImgs({ type: FETCH_SVGS, payload: { dispatch: dispatchImgs } });
+    dispatchImgs({ type: FETCH_BANNERS, payload: { dispatch: dispatchImgs } });
+  }, []);
 
   return { assets, dispatchImgs };
 };
