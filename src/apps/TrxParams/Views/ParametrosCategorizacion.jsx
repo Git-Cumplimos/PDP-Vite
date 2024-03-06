@@ -11,9 +11,12 @@ import FileInput from "../../../components/Base/FileInput";
 import {
   // fetchCategoriaById,
   fetchCategorias,
+  fetchCreatePresignedUrl,
   postCreateCategoria,
+  postCreateSubCategoria,
   // postDeleteCategoria,
   putEditCategoria,
+  uploadFilePresignedUrl,
 } from "../utils/fetchParametrosCategorias";
 import Select from "../../../components/Base/Select";
 import { fetchZonas } from "../utils/fetchZonas";
@@ -146,29 +149,90 @@ const ParametrosCategorizacion = () => {
     const formData = new FormData();
     formData.append("nombre", selectedCategoria.nombre);
     formData.append("fk_zona", selectedCategoria.fk_zona);
-    formData.append("img_url", selectedCategoria.img_url[0]);
 
-    if (selectedCategoria.subcategorias.length > 0) {
-      selectedCategoria.subcategorias.forEach((sub, index) => {
-        formData.append(`subcategorias[${index}][nombre]`, sub.nombre);
-        // Comentado por si se requiere subir imágenes de subcategorias
-        formData.append(`subcategorias[${index}][img_url]`, sub.img_url[0]);
-      });
+    // Cargar imagen de categoria
+    const formImgCategoria = new FormData();
+    formImgCategoria.append("img_name", selectedCategoria.img_url[0].name);
+    formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
+
+    try {
+      const data = await fetchCreatePresignedUrl(formImgCategoria);
+      const response = await uploadFilePresignedUrl(
+        data?.obj,
+        selectedCategoria.img_url[0]
+      );
+      if (response.ok) {
+        console.log("Archivo cargado exitosamente.", response);
+        formData.append(
+          "img_url",
+          selectedCategoria.img_url[0].name
+            .replace(/ /g, "-")
+            .replace(/\//g, "-")
+        );
+      } else {
+        console.error("Error al cargar el archivo:", response.statusText);
+        // Detener la ejecución si hay un error
+        return;
+      }
+    } catch (error) {
+      console.error("Error al procesar la solicitud:", error);
     }
 
     // Iterar sobre FormData y mostrar en la consola
-    // for (const pair of formData.entries()) {
-    //   console.log(pair[0] + ", " + pair[1]);
-    // }
-    // console.log(Object.fromEntries(formData));
+    for (const pair of formData.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
+    console.log(Object.fromEntries(formData));
 
     try {
       const res = await postCreateCategoria(formData);
-      // console.log(res);
+      console.log("CREACION DE CATEGORIA", res);
       if (res?.status) {
-        notify("Categoria creada correctamente");
-        fetchAllCategorias();
-        handleClose();
+        notify("Categoria creada correctamente. Creando subcategorias...");
+        if (selectedCategoria.subcategorias.length > 0) {
+          selectedCategoria.subcategorias.forEach(async (sub) => {
+            const formSubcat = new FormData();
+            formSubcat.append(`nombre`, sub.nombre);
+            formSubcat.append(`pk_padre`, res?.obj?.id_categoria);
+            formSubcat.append(`fk_zona`, selectedCategoria.fk_zona);
+            // Cargar imagen de cada subcategoria
+            const formImgSubCategoria = new FormData();
+            formImgSubCategoria.append("img_name", sub.img_url[0].name);
+            formImgSubCategoria.append("img_type", sub.img_url[0].type);
+
+            try {
+              const data = await fetchCreatePresignedUrl(formImgSubCategoria);
+              const response = await uploadFilePresignedUrl(
+                data?.obj,
+                sub.img_url[0]
+              );
+              if (response.ok) {
+                console.log("Archivo cargado exitosamente.", response);
+                formSubcat.append(
+                  `img_url`,
+                  sub.img_url[0].name.replace(/ /g, "-").replace(/\//g, "-")
+                );
+              } else {
+                console.error(
+                  "Error al cargar el archivo:",
+                  response.statusText
+                );
+                notifyError(
+                  `Error al cargar imagen de subcategoria ${sub.nombre}`
+                );
+              }
+              const resSub = await postCreateSubCategoria(formSubcat);
+              console.log("CREACION DE SUBCATEGORIA", resSub);
+              if (resSub?.status) {
+                notify(`Subcategoria ${sub.nombre} creada correctamente`);
+              } else {
+                notifyError(`Error al crear subcategoria ${sub.nombre}`);
+              }
+            } catch (error) {
+              console.error("Error al procesar la solicitud:", error);
+            }
+          });
+        }
       } else {
         notifyError("Error al crear categoria");
       }
@@ -176,6 +240,8 @@ const ParametrosCategorizacion = () => {
       notifyError("Error al crear categoria");
       console.error(err);
     }
+    fetchAllCategorias();
+    handleClose();
   }, [selectedCategoria, fetchAllCategorias, handleClose]);
 
   const editCategoria = useCallback(async () => {
@@ -208,10 +274,10 @@ const ParametrosCategorizacion = () => {
       });
     }
     // Iterar sobre FormData y mostrar en la consola
-    // for (const pair of formData.entries()) {
-    //   console.log(pair[0] + ", " + pair[1]);
-    // }
-    // console.log(Object.fromEntries(formData));
+    for (const pair of formData.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
+    console.log(Object.fromEntries(formData));
     try {
       const res = await putEditCategoria(formData);
       // console.log(res);
