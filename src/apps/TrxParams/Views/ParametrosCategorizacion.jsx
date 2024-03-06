@@ -743,7 +743,7 @@ const ParametrosCategorizacion = () => {
               </Button>
             </ButtonBar>
           </Fieldset>
-          {JSON.stringify(selectedCategoria)}
+          {/* {JSON.stringify(selectedCategoria)} */}
           <ButtonBar>
             {/* {selectedCategoria.edit && (
               <Button type="button" onClick={deleteCategoria}>
