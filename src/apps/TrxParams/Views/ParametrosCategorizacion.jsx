@@ -14,8 +14,10 @@ import {
   fetchCreatePresignedUrl,
   postCreateCategoria,
   postCreateSubCategoria,
+  postDeleteCategoria,
   // postDeleteCategoria,
   putEditCategoria,
+  putEditSubCategoria,
   uploadFilePresignedUrl,
 } from "../utils/fetchParametrosCategorias";
 import Select from "../../../components/Base/Select";
@@ -105,7 +107,14 @@ const ParametrosCategorizacion = () => {
         fk_zona: selected.fk_zona,
         nombre: selected.nombre,
         img_url: selected.img_url,
-        subcategorias: selected.subcategorias,
+        subcategorias: [
+          ...selected.subcategorias.map((sub) => {
+            return {
+              ...sub,
+              deletion: false,
+            };
+          }),
+        ],
         edit: true,
       });
       setShowModal(true);
@@ -152,7 +161,10 @@ const ParametrosCategorizacion = () => {
 
     // Cargar imagen de categoria
     const formImgCategoria = new FormData();
-    formImgCategoria.append("img_name", selectedCategoria.img_url[0].name);
+    const img_name = selectedCategoria.img_url[0].name
+      .replace(/ /g, "-")
+      .replace(/\//g, "-");
+    formImgCategoria.append("img_name", img_name);
     formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
 
     try {
@@ -163,12 +175,7 @@ const ParametrosCategorizacion = () => {
       );
       if (response.ok) {
         console.log("Archivo cargado exitosamente.", response);
-        formData.append(
-          "img_url",
-          selectedCategoria.img_url[0].name
-            .replace(/ /g, "-")
-            .replace(/\//g, "-")
-        );
+        formData.append("img_url", img_name);
       } else {
         console.error("Error al cargar el archivo:", response.statusText);
         // Detener la ejecución si hay un error
@@ -197,7 +204,10 @@ const ParametrosCategorizacion = () => {
             formSubcat.append(`fk_zona`, selectedCategoria.fk_zona);
             // Cargar imagen de cada subcategoria
             const formImgSubCategoria = new FormData();
-            formImgSubCategoria.append("img_name", sub.img_url[0].name);
+            const img_name = sub.img_url[0].name
+              .replace(/ /g, "-")
+              .replace(/\//g, "-");
+            formImgSubCategoria.append("img_name", img_name);
             formImgSubCategoria.append("img_type", sub.img_url[0].type);
 
             try {
@@ -208,10 +218,7 @@ const ParametrosCategorizacion = () => {
               );
               if (response.ok) {
                 console.log("Archivo cargado exitosamente.", response);
-                formSubcat.append(
-                  `img_url`,
-                  sub.img_url[0].name.replace(/ /g, "-").replace(/\//g, "-")
-                );
+                formSubcat.append(`img_url`, img_name);
               } else {
                 console.error(
                   "Error al cargar el archivo:",
@@ -239,9 +246,10 @@ const ParametrosCategorizacion = () => {
     } catch (err) {
       notifyError("Error al crear categoria");
       console.error(err);
+    } finally {
+      fetchAllCategorias();
+      handleClose();
     }
-    fetchAllCategorias();
-    handleClose();
   }, [selectedCategoria, fetchAllCategorias, handleClose]);
 
   const editCategoria = useCallback(async () => {
@@ -249,48 +257,139 @@ const ParametrosCategorizacion = () => {
     formData.append("id_categoria", selectedCategoria.id_categoria);
     formData.append("nombre", selectedCategoria.nombre);
     formData.append("fk_zona", selectedCategoria.fk_zona);
-    formData.append("status", selectedCategoria.status);
     formData.append("comercios", selectedCategoria.comercios);
     if (typeof selectedCategoria.img_url === "string") {
       formData.append("img_url", selectedCategoria.img_url);
     } else {
-      formData.append("img_url", selectedCategoria.img_url[0]);
-    }
-    if (selectedCategoria.subcategorias.length > 0) {
-      selectedCategoria.subcategorias.forEach((sub, index) => {
-        formData.append(`subcategorias[${index}][nombre]`, sub.nombre);
-        if (sub.id_categoria) {
-          formData.append(
-            `subcategorias[${index}][id_categoria]`,
-            sub.id_categoria
-          );
-          formData.append(`subcategorias[${index}][status]`, sub.status);
+      const formImgCategoria = new FormData();
+      const img_name = selectedCategoria.img_url[0].name
+        .replace(/ /g, "-")
+        .replace(/\//g, "-");
+      formImgCategoria.append("img_name", img_name);
+      formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
+
+      // Iterar sobre FormData y mostrar en la consola
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ", " + pair[1]);
+      }
+      console.log(Object.fromEntries(formData));
+      try {
+        const data = await fetchCreatePresignedUrl(formImgCategoria);
+        const response = await uploadFilePresignedUrl(
+          data?.obj,
+          selectedCategoria.img_url[0]
+        );
+        if (response.ok) {
+          console.log("Archivo cargado exitosamente.", response);
+          formData.append("img_url", img_name);
+        } else {
+          console.error("Error al cargar el archivo:", response.statusText);
+          // Detener la ejecución si hay un error
+          return;
         }
-        formData.append(`subcategorias[${index}][comercios]`, sub.comercios);
-        // Comentado por si se requiere subir imágenes de subcategorias
-        typeof sub.img_url === "string"
-          ? formData.append(`subcategorias[${index}][img_url]`, sub.img_url)
-          : formData.append(`subcategorias[${index}][img_url]`, sub.img_url[0]);
-      });
+      } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+      }
     }
-    // Iterar sobre FormData y mostrar en la consola
-    for (const pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
-    console.log(Object.fromEntries(formData));
     try {
       const res = await putEditCategoria(formData);
       // console.log(res);
       if (res?.status) {
-        notify("Categoria editada correctamente");
-        fetchAllCategorias();
-        handleClose();
+        if (selectedCategoria.subcategorias.length > 0) {
+          selectedCategoria.subcategorias.forEach(async (sub) => {
+            let creation = false;
+            const formSubcat = new FormData();
+            formSubcat.append(`nombre`, sub.nombre);
+            formSubcat.append(`pk_padre`, selectedCategoria.id_categoria);
+            formSubcat.append(`fk_zona`, selectedCategoria.fk_zona);
+            if (sub.id_categoria) {
+              formSubcat.append(`id_categoria`, sub.id_categoria);
+              formSubcat.append(`status`, sub.status);
+            } else {
+              creation = true;
+            }
+            formSubcat.append(`comercios`, sub.comercios);
+            // Comentado por si se requiere subir imágenes de subcategorias
+            if (typeof sub.img_url === "string") {
+              formSubcat.append(`img_url`, sub.img_url);
+            } else {
+              const formImgSubCategoria = new FormData();
+              const img_name = sub.img_url[0].name
+                .replace(/ /g, "-")
+                .replace(/\//g, "-");
+              formImgSubCategoria.append("img_name", img_name);
+              formImgSubCategoria.append("img_type", sub.img_url[0].type);
+
+              try {
+                const data = await fetchCreatePresignedUrl(formImgSubCategoria);
+                const response = await uploadFilePresignedUrl(
+                  data?.obj,
+                  sub.img_url[0]
+                );
+                if (response.ok) {
+                  console.log("Archivo cargado exitosamente.", response);
+                  formSubcat.append(`img_url`, img_name);
+                } else {
+                  console.error(
+                    "Error al cargar el archivo:",
+                    response.statusText
+                  );
+                  notifyError(
+                    `Error al cargar imagen de subcategoria ${sub.nombre}`
+                  );
+                }
+              } catch (error) {
+                console.error("Error al procesar la solicitud:", error);
+              }
+            }
+
+            // Iterar sobre FormData y mostrar en la consola
+            for (const pair of formSubcat.entries()) {
+              console.log(pair[0] + ", " + pair[1]);
+            }
+
+            try {
+              if (sub.deletion) {
+                const body = {
+                  id_categoria: parseInt(sub.id_categoria),
+                };
+                const res = await postDeleteCategoria(body);
+                console.log("ELIMINACIÓN DE SUBCATEGORIA", res);
+                if (res?.status) {
+                  // notify("Categoria eliminada correctamente");
+                }
+              } else if (creation) {
+                const resSub = await postCreateSubCategoria(formSubcat);
+                console.log("CREACION DE SUBCATEGORIA", resSub);
+                if (resSub?.status) {
+                  notify(`Subcategoria ${sub.nombre} creada correctamente`);
+                } else {
+                  notifyError(`Error al crear subcategoria ${sub.nombre}`);
+                }
+              } else {
+                const resSub = await putEditSubCategoria(formSubcat);
+                console.log("EDICION DE SUBCATEGORIA", resSub);
+                if (resSub?.status) {
+                  notify(`Subcategoria ${sub.nombre} editada correctamente`);
+                } else {
+                  notifyError(`Error al editar subcategoria ${sub.nombre}`);
+                }
+              }
+            } catch (error) {
+              console.error("Error al procesar la solicitud:", error);
+            }
+          });
+        }
       } else {
         notifyError("Error al editar categoria");
       }
     } catch (err) {
       notifyError("Error al editar categoria");
       console.error(err);
+    } finally {
+      notify("Categoria editada correctamente");
+      fetchAllCategorias();
+      handleClose();
     }
   }, [selectedCategoria, fetchAllCategorias, handleClose]);
 
@@ -451,170 +550,179 @@ const ParametrosCategorizacion = () => {
             </p>
           )}
           <Fieldset legend="Sub-Categorias">
-            {selectedCategoria.subcategorias?.map((subcategoria, index) => (
-              <div className="py-2 my-2 border border-black" key={index}>
-                <Input
-                  key={index}
-                  id="Nombre sub-categoria"
-                  name="nombre"
-                  label={"Nombre sub-categoria"}
-                  type="text"
-                  autoComplete="off"
-                  value={subcategoria.nombre}
-                  onChange={(e) => {
-                    setSelectedCategoria((old) => ({
-                      ...old,
-                      subcategorias: old.subcategorias.map((sub) => {
-                        if (sub === subcategoria) {
-                          return {
-                            ...sub,
-                            nombre: e.target.value,
-                          };
+            {selectedCategoria.subcategorias?.map(
+              (subcategoria, index) =>
+                !subcategoria.deletion && (
+                  <div className="py-2 my-2 border border-black" key={index}>
+                    <Input
+                      key={index}
+                      id="Nombre sub-categoria"
+                      name="nombre"
+                      label={"Nombre sub-categoria"}
+                      type="text"
+                      autoComplete="off"
+                      value={subcategoria.nombre}
+                      onChange={(e) => {
+                        setSelectedCategoria((old) => ({
+                          ...old,
+                          subcategorias: old.subcategorias.map((sub) => {
+                            if (sub === subcategoria) {
+                              return {
+                                ...sub,
+                                nombre: e.target.value,
+                              };
+                            }
+                            return sub;
+                          }),
+                        }));
+                      }}
+                      maxLength={100}
+                    />
+                    <FileInput
+                      id={`Imagen sub-categoria ${subcategoria.nombre}`}
+                      name="img_url"
+                      label={"Seleccionar imagen"}
+                      type="file"
+                      autoComplete="off"
+                      required={selectedCategoria.edit ? false : true}
+                      onGetFile={(file) => {
+                        // console.log(file);
+                        if (file[0]?.size > 1000000) {
+                          notifyError(
+                            "El peso de la imagen no debe ser mayor a 1MB"
+                          );
+                          return;
+                        } else if (
+                          file[0]?.type !== "image/png" &&
+                          file[0]?.type !== "image/jpeg" &&
+                          file[0]?.type !== "image/jpg"
+                        ) {
+                          notifyError(
+                            "El formato de la imagen debe ser PNG, JPG o JPEG"
+                          );
+                          return;
                         }
-                        return sub;
-                      }),
-                    }));
-                  }}
-                  maxLength={100}
-                />
-                <FileInput
-                  id={`Imagen sub-categoria ${subcategoria.nombre}`}
-                  name="img_url"
-                  label={"Seleccionar imagen"}
-                  type="file"
-                  autoComplete="off"
-                  required={selectedCategoria.edit ? false : true}
-                  onGetFile={(file) => {
-                    // console.log(file);
-                    if (file[0]?.size > 1000000) {
-                      notifyError(
-                        "El peso de la imagen no debe ser mayor a 1MB"
-                      );
-                      return;
-                    } else if (
-                      file[0]?.type !== "image/png" &&
-                      file[0]?.type !== "image/jpeg" &&
-                      file[0]?.type !== "image/jpg"
-                    ) {
-                      notifyError(
-                        "El formato de la imagen debe ser PNG, JPG o JPEG"
-                      );
-                      return;
-                    }
-                    setSelectedCategoria((old) => ({
-                      ...old,
-                      subcategorias: old.subcategorias.map((sub) => {
-                        if (sub.nombre === subcategoria.nombre) {
-                          return {
-                            ...sub,
-                            img_url: file,
-                          };
-                        }
-                        return sub;
-                      }),
-                    }));
-                  }}
-                  accept="image/png, image/jpeg, image/jpg"
-                />
-                {!selectedCategoria.edit && subcategoria.img_url && (
-                  <div className="flex flex-col items-center justify-center">
-                    <img
-                      src={
-                        subcategoria?.img_url[0]
-                          ? URL.createObjectURL(subcategoria?.img_url[0])
-                          : ""
-                      }
-                      alt="Imagen sub-categoria"
-                      width="100"
-                      height="100"
-                      className="max-w-xs"
+                        setSelectedCategoria((old) => ({
+                          ...old,
+                          subcategorias: old.subcategorias.map((sub) => {
+                            if (sub.nombre === subcategoria.nombre) {
+                              return {
+                                ...sub,
+                                img_url: file,
+                              };
+                            }
+                            return sub;
+                          }),
+                        }));
+                      }}
+                      accept="image/png, image/jpeg, image/jpg"
                     />
-                    Peso de la imagen:{" "}
-                    {subcategoria.img_url[0]?.size
-                      ? subcategoria.img_url[0]?.size / 1000000
-                      : 0}{" "}
-                    MB
-                  </div>
-                )}
-                {selectedCategoria.edit &&
-                typeof subcategoria.img_url === "string" ? (
-                  <div className="flex flex-col items-center justify-center">
-                    <img
-                      src={subcategoria.img_url}
-                      alt="Imagen sub-categoria"
-                      width="100"
-                      height="100"
-                      className="max-w-xs"
-                    />
-                  </div>
-                ) : selectedCategoria.edit &&
-                  subcategoria.img_url &&
-                  subcategoria.img_url[0] ? (
-                  <div className="flex flex-col items-center justify-center">
-                    <img
-                      src={
-                        subcategoria?.img_url[0]
-                          ? URL.createObjectURL(subcategoria?.img_url[0])
-                          : ""
-                      }
-                      alt="Imagen sub-categoria"
-                      width="100"
-                      height="100"
-                      className="max-w-xs"
-                    />
-                    Peso de la imagen:{" "}
-                    {subcategoria.img_url[0]?.size
-                      ? subcategoria.img_url[0]?.size / 1000000
-                      : 0}{" "}
-                    MB
-                  </div>
-                ) : (
-                  <p className="text-center">
-                    La imagen no debe superar los 1MB y debe tener formato PNG,
-                    JPEG o JPG
-                  </p>
-                )}
-                {selectedCategoria.edit && (
-                  <ToggleInput
-                    id="status"
-                    name="status"
-                    label={"Activo"}
-                    type="checkbox"
-                    autoComplete="off"
-                    checked={subcategoria.status}
-                    onChange={(e) => {
-                      setSelectedCategoria((old) => ({
-                        ...old,
-                        subcategorias: old.subcategorias.map((sub) => {
-                          if (sub === subcategoria) {
-                            return {
-                              ...sub,
-                              status: !sub.status,
-                            };
+                    {!selectedCategoria.edit && subcategoria.img_url && (
+                      <div className="flex flex-col items-center justify-center">
+                        <img
+                          src={
+                            subcategoria?.img_url[0]
+                              ? URL.createObjectURL(subcategoria?.img_url[0])
+                              : ""
                           }
-                          return sub;
-                        }),
-                      }));
-                    }}
-                  />
-                )}
-                <div className="flex justify-center">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setSelectedCategoria((old) => ({
-                        ...old,
-                        subcategorias: old.subcategorias.filter(
-                          (sub) => sub !== subcategoria
-                        ),
-                      }));
-                    }}
-                  >
-                    Eliminar
-                  </Button>
-                </div>
-              </div>
-            ))}
+                          alt="Imagen sub-categoria"
+                          width="100"
+                          height="100"
+                          className="max-w-xs"
+                        />
+                        Peso de la imagen:{" "}
+                        {subcategoria.img_url[0]?.size
+                          ? subcategoria.img_url[0]?.size / 1000000
+                          : 0}{" "}
+                        MB
+                      </div>
+                    )}
+                    {selectedCategoria.edit &&
+                    typeof subcategoria.img_url === "string" ? (
+                      <div className="flex flex-col items-center justify-center">
+                        <img
+                          src={subcategoria.img_url}
+                          alt="Imagen sub-categoria"
+                          width="100"
+                          height="100"
+                          className="max-w-xs"
+                        />
+                      </div>
+                    ) : selectedCategoria.edit &&
+                      subcategoria.img_url &&
+                      subcategoria.img_url[0] ? (
+                      <div className="flex flex-col items-center justify-center">
+                        <img
+                          src={
+                            subcategoria?.img_url[0]
+                              ? URL.createObjectURL(subcategoria?.img_url[0])
+                              : ""
+                          }
+                          alt="Imagen sub-categoria"
+                          width="100"
+                          height="100"
+                          className="max-w-xs"
+                        />
+                        Peso de la imagen:{" "}
+                        {subcategoria.img_url[0]?.size
+                          ? subcategoria.img_url[0]?.size / 1000000
+                          : 0}{" "}
+                        MB
+                      </div>
+                    ) : (
+                      <p className="text-center">
+                        La imagen no debe superar los 1MB y debe tener formato
+                        PNG, JPEG o JPG
+                      </p>
+                    )}
+                    {selectedCategoria.edit && (
+                      <ToggleInput
+                        id="status"
+                        name="status"
+                        label={"Activo"}
+                        type="checkbox"
+                        autoComplete="off"
+                        checked={subcategoria.status}
+                        onChange={(e) => {
+                          setSelectedCategoria((old) => ({
+                            ...old,
+                            subcategorias: old.subcategorias.map((sub) => {
+                              if (sub === subcategoria) {
+                                return {
+                                  ...sub,
+                                  status: !sub.status,
+                                };
+                              }
+                              return sub;
+                            }),
+                          }));
+                        }}
+                      />
+                    )}
+                    <div className="flex justify-center">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategoria((old) => ({
+                            ...old,
+                            subcategorias: old.subcategorias.map((sub) => {
+                              if (sub === subcategoria) {
+                                return {
+                                  ...sub,
+                                  deletion: true,
+                                };
+                              }
+                              return sub;
+                            }),
+                          }));
+                        }}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                )
+            )}
             <ButtonBar>
               <Button
                 type="button"
@@ -635,6 +743,7 @@ const ParametrosCategorizacion = () => {
               </Button>
             </ButtonBar>
           </Fieldset>
+          {JSON.stringify(selectedCategoria)}
           <ButtonBar>
             {/* {selectedCategoria.edit && (
               <Button type="button" onClick={deleteCategoria}>
@@ -652,7 +761,7 @@ const ParametrosCategorizacion = () => {
                 !selectedCategoria.fk_zona ||
                 selectedCategoria.subcategorias.length === 0 ||
                 selectedCategoria.subcategorias.some(
-                  (sub) => !sub.nombre || !sub.img_url?.length
+                  (sub) => !sub.nombre || !sub.img_url
                 )
               }
             >
