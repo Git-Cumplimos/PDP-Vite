@@ -431,7 +431,7 @@ const CrearComercios = () => {
       const dataOrg = structuredClone(comercio);
       if (!dataOrg.ciiu || !dataOrg.ciiu.length) {
         notifyError(
-          "Debe elegir al menos una actividad economica para el comercio"
+          "Debe elegir al menos una actividad económica para el comercio"
         );
         return;
       }
