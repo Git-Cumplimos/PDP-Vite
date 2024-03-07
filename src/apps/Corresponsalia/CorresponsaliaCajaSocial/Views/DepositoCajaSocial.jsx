@@ -20,6 +20,7 @@ import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
 import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
 import { algoCheckCuentaDepositoCajaSocial } from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
+import { useMFA } from "../../../../components/Base/MFAScreen";
 
 const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
 const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
@@ -32,6 +33,7 @@ const DATA_DEPOSITO_INIT = {
 
 const DepositoCajaSocial = () => {
   const uniqueId = v4();
+  const { submitEventSetter } = useMFA();
   const validNavigate = useNavigate();
   const [dataDeposito, setDataDeposito] = useState(DATA_DEPOSITO_INIT);
   const [objTicketActual, setObjTicketActual] = useState({});
@@ -47,7 +49,8 @@ const DepositoCajaSocial = () => {
   const [loadingPeticionDeposito, peticionPagoDeposito] = useFetchCajaSocial(
     URL_DEPOSITO_CAJA_SOCIAL,
     URL_CONSULTA_DEPOSITO,
-    "Pago depósito"
+    "Pago depósito",
+    true
   );
   const [loadingPeticionConsultaTitular, peticionConsultaTitular] = useFetch(
     fetchCustom(URL_CONSULTA_TITULAR_DEPOSITO, "POST", "Consulta titular")
@@ -83,6 +86,7 @@ const DepositoCajaSocial = () => {
         deposito_caja_social: {
           numero_cuenta: dataDeposito?.numeroCuenta,
         },
+        id_user_pdp: pdpUser.uuid,
       };
       notifyPending(
         peticionConsultaTitular({}, data),
@@ -134,9 +138,10 @@ const DepositoCajaSocial = () => {
         },
         deposito_caja_social: {
           numero_cuenta: dataDeposito?.numeroCuenta,
-          nom_cliente: resConsulta?.personName?.fullName,
+          nom_cliente: resConsulta?.trn?.personName?.fullName,
         },
         id_trx: resConsulta?.id_trx,
+        id_user_pdp: pdpUser.uuid,
       };
       const dataAditional = {
         id_uuid_trx: uniqueId,
@@ -171,7 +176,7 @@ const DepositoCajaSocial = () => {
         }
       );
     },
-    [pdpUser, dataDeposito, roleInfo, resConsulta, uniqueId]
+    [pdpUser, dataDeposito, roleInfo, resConsulta]
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
@@ -201,7 +206,7 @@ const DepositoCajaSocial = () => {
   }, [validNavigate]);
   return (
     <>
-      <h1 className="text-3xl">Depósitos BCSC</h1>
+      <h1 className="text-3xl mt-10">Depósitos BCSC</h1>
       <Form onSubmit={consultaTitular} grid>
         <Fieldset legend="Datos del depósito" className="lg:col-span-2">
           <Input
@@ -222,7 +227,7 @@ const DepositoCajaSocial = () => {
             name="valorDeposito"
             label={"Valor a depositar"}
             type="tel"
-            minLength={5}
+            // minLength={5}
             maxLength={10}
             autoComplete="off"
             min={enumParametrosCajaSocial?.MIN_DEPOSITO_CAJA_SOCIAL}
@@ -231,6 +236,8 @@ const DepositoCajaSocial = () => {
             onInput={onChangeFormatNum}
             disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
             required
+            equalError={false}
+            equalErrorMin={false}
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
@@ -256,7 +263,7 @@ const DepositoCajaSocial = () => {
               title="Respuesta de consulta depósito"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                "Nombres titular": resConsulta?.personName?.fullName ?? "",
+                "Nombres titular": resConsulta?.trn?.personName?.fullName ?? "",
                 "Número de cuenta": dataDeposito?.numeroCuenta,
                 "Valor a depositar": formatMoney.format(
                   dataDeposito?.valorDeposito
@@ -274,7 +281,7 @@ const DepositoCajaSocial = () => {
                 </Button>
                 <Button
                   type="submit"
-                  onClick={pagoDeposito}
+                  onClick={submitEventSetter(pagoDeposito)}
                   disabled={
                     loadingPeticionDeposito || loadingPeticionConsultaTitular
                   }

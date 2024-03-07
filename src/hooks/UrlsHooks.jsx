@@ -23,6 +23,8 @@ import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 // Categorias
 import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
 import Subcategorias from "../pages/Categorias/Subcategorias";
+import { useImgs, useProvideImgsWithDispatch } from "./ImgsHooks";
+import { fetchCategoriasImgs } from "../apps/TrxParams/utils/fetchParametrosCategorias";
 
 // Categorias
 const Categoria = lazy(() => import("../pages/Categorias/Categorias"));
@@ -191,58 +193,104 @@ export const useProvideUrls = () => {
 
   const [urlsCategorias, setUrlsCategorias] = useState([]);
 
+  // const { imgs } = useImgs();
+  const { imgs, svgs, dispatchImgs } = useProvideImgsWithDispatch();
+
   useEffect(() => {
+    const fetchImgs = async () => {
+      const res = await fetchCategoriasImgs();
+      console.log("res", res);
+      if (res?.status) {
+        // Actualizar imágenes en el contexto
+        res?.obj.forEach(({ nombre, img_url }) => {
+          dispatchImgs({
+            type: "SET_IMGS",
+            payload: { name: nombre, img: img_url },
+          });
+        });
+        dispatchImgs({
+          type: "FETCH_IMGS",
+          payload: { dispatch: dispatchImgs },
+        });
+      } else {
+        setUrlsCategorias([]);
+      }
+    };
+
     const fetchUrlsCategorias = async (id_zona) => {
       const formData = new FormData();
       if (id_zona) {
         formData.append("id_zona", id_zona);
         const res = await fetchCategoriasByZona(formData);
-        // console.log("categorias encontradas por zona", res);
         if (res?.status) {
-          const urlsCategoriasFiltrado = res?.obj.map(
-            ({ nombre, img_url, id_categoria, subcategorias }) => {
-              const link = `/categoria/${nombre.replace(/\s+/g, "-")}`;
-              const subcategoriasFiltradas = subcategorias.filter(
-                (subcategoria) =>
-                  subcategoria.status || subcategoria.comercios?.length > 0
+          const urlsCategoriasFiltrado = res?.obj.map((props) => {
+            const link = `/${props.nombre.replace(/\s+/g, "-")}`;
+            const subcategoriasFiltradas = props.subcategorias.filter(
+              (subcategoria) =>
+                subcategoria.status ||
+                subcategoria.comercios ||
+                subcategoria.comercios?.length > 0
+            );
+            const subcats = subcategoriasFiltradas.map((subcategoria) => {
+              const linkSubcat = `${link}/${subcategoria.nombre.replace(
+                /\s+/g,
+                "-"
+              )}`;
+              const logo = (
+                <AppIcons
+                  Logo={
+                    subcategoria.nombre ? subcategoria.nombre : "MARKETPLACE"
+                  }
+                  name={subcategoria.nombre}
+                />
               );
-              const subcats = subcategoriasFiltradas.map(
-                ({ nombre, img_url, id_subcategoria, comercios }) => {
-                  return {
-                    link: `${link}/${nombre.replace(/\s+/g, "-")}`,
-                    label: <AppIcons Logo={img_url} name={nombre} />,
-                    component: (props) => (
-                      <Subcategorias
-                        {...props}
-                        comercios={comercios}
-                        title={nombre}
-                      />
-                    ),
-                    props: { nombre, img_url, id_categoria, id_subcategoria },
-                  };
-                }
-              );
-              if (subcategoriasFiltradas.length === 0) {
-                // Si no hay subcategorias, no se muestra la categoría
-                return {
-                  link: null,
-                  label: null,
-                  component: null,
-                  props: null,
-                  subRoutes: null,
-                };
-              }
               return {
-                link,
-                label: <AppIcons Logo={img_url} name={nombre} />,
+                link: linkSubcat,
+                label: logo,
                 component: (props) => (
-                  <Categoria {...props} subcategorias={subcats} />
+                  <Subcategorias
+                    {...props}
+                    comercios={subcategoria.comercios}
+                    title={subcategoria.nombre}
+                    label={subcategoria.img_url}
+                  />
                 ),
-                props: { nombre, img_url, id_categoria },
-                subRoutes: subcats,
+                props: {
+                  nombre: subcategoria.nombre,
+                  img_url: logo,
+                  id_categoria: subcategoria.id_categoria,
+                  id_subcategoria: subcategoria.id_subcategoria,
+                },
+              };
+            });
+            if (subcategoriasFiltradas.length === 0) {
+              return {
+                link: null,
+                label: null,
+                component: null,
+                props: null,
+                subRoutes: null,
               };
             }
-          );
+            return {
+              link,
+              label: (
+                <AppIcons
+                  Logo={props.img_url ? props.img_url : "MARKETPLACE"}
+                  name={props.nombre}
+                />
+              ),
+              component: (props) => (
+                <Categoria {...props} subcategorias={subcats} />
+              ),
+              props: {
+                nombre: props.nombre,
+                img_url: props.img_url,
+                id_categoria: props.id_categoria,
+              },
+              subRoutes: subcats,
+            };
+          });
           setUrlsCategorias(urlsCategoriasFiltrado);
         } else {
           setUrlsCategorias([]);
@@ -252,9 +300,17 @@ export const useProvideUrls = () => {
 
     // Validar que esté autenticado para hacer la petición
     if (urlsCategorias?.length === 0 && userPermissions?.length > 0) {
+      fetchImgs();
       fetchUrlsCategorias(commerceInfo?.zona_comercio);
     }
-  }, [userPermissions, urlsCategorias?.length, commerceInfo?.zona_comercio]);
+  }, [
+    userPermissions,
+    urlsCategorias?.length,
+    commerceInfo?.zona_comercio,
+    dispatchImgs,
+    imgs,
+    svgs,
+  ]);
 
   const urlsGestion = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
@@ -298,15 +354,13 @@ export const useProvideUrls = () => {
           {toRoute(urlsReportes, true, SubPage)}
           {toRoute(urlsInformacionGeneral, true, SubPage)}
           {toRoute(urlsBilleteraComisiones, true, SubPage)}
+          {toRoute(urlsCategorias, true, SubPage)}
         </Route>
         <Route path="/login" element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
         </Route>
         <Route path="/public" element={<PublicLayout />}>
           {toRoute(publicUrls, false)}
-        </Route>
-        <Route path="/categoria" element={<AdminLayout />}>
-          {toRoute(urlsCategorias, true, SubPage)}
         </Route>
       </Routes>
     );

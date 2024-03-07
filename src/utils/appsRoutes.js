@@ -18,6 +18,7 @@ import rutasColpatria, {
 } from "../apps/Colpatria/routes";
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
+  routesDaviplata,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
@@ -863,6 +864,7 @@ const allUrlsPrivateApps = [
       rutasCajaSocialCB,
     ],
   },
+  routesDaviplata,
   {
     link: "/recaudoEmpresarial",
     label: <AppIcons Logo={"RECAUDO"} name="Recaudo Empresarial" />,

@@ -27,7 +27,6 @@ import MoneyInput from "../../../../components/Base/MoneyInput";
 import { onChangeNumber } from "../../../../utils/functions";
 import { fetchZonas } from "../../utils/fetchZonas";
 
-
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
 
@@ -80,6 +79,7 @@ const emptyCommerce = {
   fk_id_tipo_contrato: 0,
   alert_cupo: "",
   zona_comercio: null,
+  tipo_persona: null,
 };
 
 const CrearComercios = () => {
@@ -178,8 +178,8 @@ const CrearComercios = () => {
         ...structuredClone(old),
         ...structuredClone(res?.obj),
       }));
-      if (res?.obj.alert_cupo.includes("%")) {
-        setAlertPorcent(res?.obj.alert_cupo.replace("%", ""));
+      if (res?.obj.alert_cupo?.includes("%")) {
+        setAlertPorcent(res?.obj.alert_cupo?.replace("%", ""));
       } else {
         setAlertMonto(res?.obj.alert_cupo);
       }
@@ -696,6 +696,20 @@ const CrearComercios = () => {
               }));
             }}
             autoComplete="off"
+          />
+          <Select
+            className="place-self-stretch"
+            id="tipo_persona"
+            name="tipo_persona"
+            label="Tipo persona"
+            required={true}
+            options={[
+              { label: "", value: "" },
+              { label: "NATURAL", value: "NATURAL" },
+              { label: "JURIDICA", value: "JURIDICA" },
+            ]}
+            onChange={onChangeFormat}
+            value={comercio?.tipo_persona}
           />
           <Select
             className="place-self-stretch"

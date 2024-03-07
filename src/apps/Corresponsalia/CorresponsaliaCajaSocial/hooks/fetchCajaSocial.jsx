@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { ErrorCustomBackend, fetchCustom } from "../utils/fetchCajaSocial";
-import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import { notify, notifyError } from "../../../../utils/notify";
 
 const sleep = (millisecons) => {
@@ -47,7 +46,6 @@ export const useFetchCajaSocial = (
           throw error;
         }
       }
-
       //SECUENCIA ---------------Paso 2-------------------------------
       if (banderaConsulta) {
         try {

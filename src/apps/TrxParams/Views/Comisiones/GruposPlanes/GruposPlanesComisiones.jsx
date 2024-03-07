@@ -91,7 +91,7 @@ const GruposPlanesComisiones = () => {
   const onSelectTipoNivelComercios = useCallback(
     (e, i) => {
       navigate(
-        `/params-operations/grupos-planes-comisiones/edit/${gruposPlanes[i]?.["pk_tbl_grupo_planes_comisiones"]}`
+        `/params-operations/grupos-planes-comisiones/${gruposPlanes[i]?.["pk_tbl_grupo_planes_comisiones"]}`
       );
     },
     [gruposPlanes]

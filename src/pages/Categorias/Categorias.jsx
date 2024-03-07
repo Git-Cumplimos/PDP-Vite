@@ -1,10 +1,10 @@
 import HNavbar from "../../components/Base/HNavbar";
-import Error403 from "../Error403";
 
 const Categorias = ({ subcategorias }) => {
-  if (!subcategorias.length) return <Error403 />;
+  if (!subcategorias.length)
+    return <h2 className="text-xl">No se encuentran subcategorías.</h2>;
 
-  return <HNavbar links={subcategorias} />;
+  return <HNavbar links={subcategorias} isIcon />;
 };
 
 export default Categorias;
