@@ -20,7 +20,7 @@ type Props = {
     comerce_data: any,
     ev: MouseEvent<HTMLTableRowElement>
   ) => void;
-  setSearchCommercesFn: Dispatch<SetStateAction<() => void | Promise<void>>>;
+  setSearchCommercesFn?: Dispatch<SetStateAction<() => void | Promise<void>>>;
 };
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
@@ -84,7 +84,7 @@ const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
   );
 
   useEffect(() => {
-    setSearchCommercesFn(() => searchCommercesFn);
+    setSearchCommercesFn?.(() => searchCommercesFn);
   }, [setSearchCommercesFn, searchCommercesFn]);
 
   return (
