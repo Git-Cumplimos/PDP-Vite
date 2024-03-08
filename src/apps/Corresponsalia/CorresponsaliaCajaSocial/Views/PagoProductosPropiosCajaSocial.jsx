@@ -21,21 +21,28 @@ import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
 import { algoCheckCuentaDepositoCajaSocial } from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
 import { useMFA } from "../../../../components/Base/MFAScreen";
+import Select from "../../../../components/Base/Select";
+import BarcodeReader from "../../../../components/Base/BarcodeReader";
 
-const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
-const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
-const URL_CONSULTA_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-deposito`;
+const URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
+const URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
+const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-deposito`;
 
-const DATA_DEPOSITO_INIT = {
-  numeroCuenta: "",
-  valorDeposito: 0,
+const DATA_PAGO_INIT = {
+  estadoLecturaPago: "1",
+  codigoBarras: "",
 };
 
-const DepositoCajaSocial = () => {
+const DATA_TIPO_PAGO = {
+  "Código de barras": "1",
+  Manual: "2",
+};
+
+const PagoProductosPropiosCajaSocial = () => {
   const uniqueId = v4();
   const { submitEventSetter } = useMFA();
   const validNavigate = useNavigate();
-  const [dataDeposito, setDataDeposito] = useState(DATA_DEPOSITO_INIT);
+  const [dataPago, setDataPago] = useState(DATA_PAGO_INIT);
   const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [stateTicketTrx, setStateTicketTrx] = useState(false);
@@ -46,23 +53,28 @@ const DepositoCajaSocial = () => {
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+  const buttonDelete = useRef(null);
   const [loadingPeticionDeposito, peticionPagoDeposito] = useFetchCajaSocial(
-    URL_DEPOSITO_CAJA_SOCIAL,
-    URL_CONSULTA_DEPOSITO,
-    "Pago depósito",
+    URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL,
+    URL_ESTADO_PAGO_PRODUCTOS_PROPIOS,
+    "Pago productos propios",
     true
   );
   const [loadingPeticionConsultaTitular, peticionConsultaTitular] = useFetch(
-    fetchCustom(URL_CONSULTA_TITULAR_DEPOSITO, "POST", "Consulta titular")
+    fetchCustom(
+      URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS,
+      "POST",
+      "Consulta pago productos propios"
+    )
   );
-  const consultaTitular = useCallback(
+  const consultaPagoProductosPropios = useCallback(
     (ev) => {
       ev.preventDefault();
       const numerosInicio = ["21", "23", "24", "26"];
-      const sliceData = dataDeposito.numeroCuenta.slice(0, 2);
+      const sliceData = dataPago.numeroCuenta.slice(0, 2);
       if (!numerosInicio.includes(sliceData))
         return notifyError("Número de cuenta ingresado errado");
-      if (!algoCheckCuentaDepositoCajaSocial(dataDeposito.numeroCuenta))
+      if (!algoCheckCuentaDepositoCajaSocial(dataPago.numeroCuenta))
         return notifyError("Número de cuenta ingresado errado");
       const data = {
         oficina_propia:
@@ -70,7 +82,7 @@ const DepositoCajaSocial = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataDeposito?.valorDeposito,
+        valor_total_trx: dataPago?.valorDeposito,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -84,7 +96,7 @@ const DepositoCajaSocial = () => {
           city: roleInfo?.["ciudad"],
         },
         deposito_caja_social: {
-          numero_cuenta: dataDeposito?.numeroCuenta,
+          numero_cuenta: dataPago?.numeroCuenta,
         },
         id_user_pdp: pdpUser.uuid,
       };
@@ -111,7 +123,7 @@ const DepositoCajaSocial = () => {
         }
       );
     },
-    [dataDeposito, pdpUser, roleInfo]
+    [dataPago, pdpUser, roleInfo]
   );
   const pagoDeposito = useCallback(
     (ev) => {
@@ -122,7 +134,7 @@ const DepositoCajaSocial = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataDeposito?.valorDeposito,
+        valor_total_trx: dataPago?.valorDeposito,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -137,7 +149,7 @@ const DepositoCajaSocial = () => {
           city: roleInfo?.["ciudad"],
         },
         deposito_caja_social: {
-          numero_cuenta: dataDeposito?.numeroCuenta,
+          numero_cuenta: dataPago?.numeroCuenta,
           nom_cliente: resConsulta?.trn?.personName?.fullName,
         },
         id_trx: resConsulta?.id_trx,
@@ -176,99 +188,145 @@ const DepositoCajaSocial = () => {
         }
       );
     },
-    [pdpUser, dataDeposito, roleInfo, resConsulta]
+    [pdpUser, dataPago, roleInfo, resConsulta]
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
     if (ev.target.name === "numeroCuenta") {
       if (!isNaN(value)) {
         value = value.replace(/[\s\.\-+eE]/g, "");
-        setDataDeposito((old) => {
+        setDataPago((old) => {
           return { ...old, [ev.target.name]: value };
         });
       }
     } else
-      setDataDeposito((old) => {
+      setDataPago((old) => {
         return { ...old, [ev.target.name]: value };
       });
   }, []);
   const onChangeFormatNum = useCallback((ev, val) => {
     if (!isNaN(val)) {
-      setDataDeposito((old) => {
+      setDataPago((old) => {
         return { ...old, [ev.target.name]: val };
       });
     }
   }, []);
   const closeModule = useCallback(() => {
-    setDataDeposito(DATA_DEPOSITO_INIT);
+    setDataPago(DATA_PAGO_INIT);
     notifyError("Pago cancelado por el usuario");
   }, []);
+  const onSubmitBarCode = (info) => {
+    console.log(info);
+  };
   return (
     <>
-      <h1 className="text-3xl mt-10">Depósitos BCSC</h1>
-      <Form onSubmit={consultaTitular} grid>
-        <Fieldset legend="Datos del depósito" className="lg:col-span-2">
-          <Input
-            id="numeroCuenta"
-            name="numeroCuenta"
-            label={"Número de cuenta"}
-            type="text"
-            autoComplete="off"
-            minLength={11}
-            maxLength={11}
-            value={dataDeposito?.numeroCuenta}
-            onChange={onChangeFormat}
-            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
-            required
-          />
-          <MoneyInput
-            id="valorDeposito"
-            name="valorDeposito"
-            label={"Valor a depositar"}
-            type="tel"
-            // minLength={5}
-            maxLength={10}
-            autoComplete="off"
-            min={enumParametrosCajaSocial?.MIN_DEPOSITO_CAJA_SOCIAL}
-            max={enumParametrosCajaSocial?.MAX_DEPOSITO_CAJA_SOCIAL}
-            value={dataDeposito?.valorDeposito ?? 0}
-            onInput={onChangeFormatNum}
-            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
-            required
-            equalError={false}
-            equalErrorMin={false}
-          />
-        </Fieldset>
-        <ButtonBar className="lg:col-span-2">
-          <Button
-            type="button"
-            onClick={(e) => {
-              closeModule(e);
-              validNavigate(-1);
-            }}
-            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
-          >
-            Cancelar
-          </Button>
-          <Button
-            type="submit"
-            disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
-          >
-            Realizar consulta
-          </Button>
-        </ButtonBar>
+      <h1 className="text-3xl mt-10">Pago de Productos Propios</h1>
+      <Form
+        onSubmit={consultaPagoProductosPropios}
+        className=" flex flex-col content-center items-center"
+        grid={false}
+      >
+        {/* <Fieldset
+          legend="Datos del pago"
+          className="flex flex-col content-center items-center"
+        > */}
+        <Select
+          id="estadoLecturaPago"
+          name="estadoLecturaPago"
+          label="Tipo de captura"
+          options={DATA_TIPO_PAGO}
+          value={dataPago?.estadoLecturaPago}
+          onChange={onChangeFormat}
+          required
+          // disabled={
+          //   loadingPeticionConsultaTerceros || loadingPeticionCreacionTerceros
+          // }
+        />
+        {dataPago.estadoLecturaPago === "1" ? (
+          <>
+            <BarcodeReader
+              onSearchCodigo={onSubmitBarCode}
+              // disabled={loadingPeticion}
+            />
+            <div ref={buttonDelete}>
+              <Button type="reset">
+                Volver a ingresar el código de barras
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <Input
+              id="numeroCuenta"
+              name="numeroCuenta"
+              label={"Número de cuenta"}
+              type="text"
+              autoComplete="off"
+              minLength={11}
+              maxLength={11}
+              value={dataPago?.numeroCuenta}
+              onChange={onChangeFormat}
+              disabled={
+                loadingPeticionDeposito || loadingPeticionConsultaTitular
+              }
+              required
+            />
+            <MoneyInput
+              id="valorDeposito"
+              name="valorDeposito"
+              label={"Valor a depositar"}
+              type="tel"
+              // minLength={5}
+              maxLength={10}
+              autoComplete="off"
+              min={enumParametrosCajaSocial?.MIN_DEPOSITO_CAJA_SOCIAL}
+              max={enumParametrosCajaSocial?.MAX_DEPOSITO_CAJA_SOCIAL}
+              value={dataPago?.valorDeposito ?? 0}
+              onInput={onChangeFormatNum}
+              disabled={
+                loadingPeticionDeposito || loadingPeticionConsultaTitular
+              }
+              required
+              equalError={false}
+              equalErrorMin={false}
+            />
+            {/* </Fieldset> */}
+            <ButtonBar className="lg:col-span-2">
+              <Button
+                type="button"
+                onClick={(e) => {
+                  closeModule(e);
+                  validNavigate(-1);
+                }}
+                disabled={
+                  loadingPeticionDeposito || loadingPeticionConsultaTitular
+                }
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  loadingPeticionDeposito || loadingPeticionConsultaTitular
+                }
+              >
+                Realizar consulta
+              </Button>
+            </ButtonBar>
+          </>
+        )}
       </Form>
       <Modal show={showModal} className="flex align-middle">
         <>
-          {estadoPeticion === 0 ? (
+          {estadoPeticion === "1" ? (
             <PaymentSummary
               title="Respuesta de consulta depósito"
               subtitle="Resumen de transacción"
               summaryTrx={{
                 "Nombres titular": resConsulta?.trn?.personName?.fullName ?? "",
-                "Número de cuenta": dataDeposito?.numeroCuenta,
+                "Número de cuenta": dataPago?.numeroCuenta,
                 "Valor a depositar": formatMoney.format(
-                  dataDeposito?.valorDeposito
+                  dataPago?.valorDeposito
                 ),
               }}
             >
@@ -322,4 +380,4 @@ const DepositoCajaSocial = () => {
   );
 };
 
-export default DepositoCajaSocial;
+export default PagoProductosPropiosCajaSocial;
