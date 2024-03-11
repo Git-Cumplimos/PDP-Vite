@@ -281,10 +281,17 @@ const ParametrosCategorizacion = () => {
       notifyError("Error al crear categoria");
       console.error(err);
     } finally {
+      fetchAllCategorias();
       fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchCategoriasPages, handleClose, allCategorias]);
+  }, [
+    selectedCategoria,
+    fetchCategoriasPages,
+    handleClose,
+    allCategorias,
+    fetchAllCategorias,
+  ]);
 
   const editCategoria = useCallback(async () => {
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
@@ -439,10 +446,17 @@ const ParametrosCategorizacion = () => {
       console.error(err);
     } finally {
       notify("Categoria editada correctamente");
+      fetchAllCategorias();
       fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchCategoriasPages, handleClose, allCategorias]);
+  }, [
+    selectedCategoria,
+    fetchCategoriasPages,
+    handleClose,
+    allCategorias,
+    fetchAllCategorias,
+  ]);
 
   // const deleteCategoria = useCallback(async () => {
   //   const body = {
