@@ -195,10 +195,17 @@ const ParametrosCategorizacion = () => {
 
     // Cargar imagen de categoria
     const formImgCategoria = new FormData();
-    const img_name = selectedCategoria.img_url[0].name
+    // const img_name = selectedCategoria.img_url[0].name
+    //   .replace(/ /g, "-")
+    //   .replace(/\//g, "-");
+    const img_name = `${selectedCategoria.img_url[0].name
       .replace(/ /g, "-")
-      .replace(/\//g, "-");
-    formImgCategoria.append("img_name", img_name);
+      .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+    const extension = selectedCategoria.img_url[0].name.split(".").pop();
+
+    const img_name_with_extension = `${img_name}.${extension}`;
+    formImgCategoria.append("img_name", img_name_with_extension);
     formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
 
     try {
@@ -209,7 +216,7 @@ const ParametrosCategorizacion = () => {
       );
       if (response.ok) {
         // console.log("Archivo cargado exitosamente.", response);
-        formData.append("img_url", img_name);
+        formData.append("img_url", img_name_with_extension);
       } else {
         console.error("Error al cargar el archivo:", response.statusText);
         // Detener la ejecución si hay un error
@@ -238,10 +245,14 @@ const ParametrosCategorizacion = () => {
             formSubcat.append(`fk_zona`, selectedCategoria.fk_zona);
             // Cargar imagen de cada subcategoria
             const formImgSubCategoria = new FormData();
-            const img_name = sub.img_url[0].name
+            const img_name = `${sub.img_url[0].name
               .replace(/ /g, "-")
-              .replace(/\//g, "-");
-            formImgSubCategoria.append("img_name", img_name);
+              .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+            const extension = sub.img_url[0].name.split(".").pop();
+
+            const img_name_with_extension = `${img_name}.${extension}`;
+            formImgSubCategoria.append("img_name", img_name_with_extension);
             formImgSubCategoria.append("img_type", sub.img_url[0].type);
 
             try {
@@ -251,8 +262,8 @@ const ParametrosCategorizacion = () => {
                 sub.img_url[0]
               );
               if (response.ok) {
-                console.log("Archivo cargado exitosamente.", response);
-                formSubcat.append(`img_url`, img_name);
+                // console.log("Archivo cargado exitosamente.", response);
+                formSubcat.append(`img_url`, img_name_with_extension);
               } else {
                 console.error(
                   "Error al cargar el archivo:",
