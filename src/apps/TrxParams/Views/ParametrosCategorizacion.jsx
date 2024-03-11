@@ -35,6 +35,7 @@ const ParametrosCategorizacion = () => {
 
   // Data zonas y categorias
   const [zonas, setZonas] = useState([]);
+  const [allCategorias, setAllCategorias] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [selectedCategoria, setSelectedCategoria] = useState({
     id_categoria: "",
@@ -132,6 +133,14 @@ const ParametrosCategorizacion = () => {
   );
 
   const fetchAllCategorias = useCallback(() => {
+    fetchCategorias({ page: 1, limit: 1000 })
+      .then((res) => {
+        setAllCategorias(res?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  const fetchCategoriasPages = useCallback(() => {
     fetchCategorias({ page, limit })
       .then((res) => {
         setCategorias(res?.results);
@@ -141,10 +150,9 @@ const ParametrosCategorizacion = () => {
   }, [page, limit]);
 
   const fetchAllZonas = useCallback(() => {
-    fetchZonas()
+    fetchZonas({ page: 1, limit: 1000 })
       .then((res) => {
         setZonas(res?.results);
-        // setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   }, []);
@@ -152,11 +160,21 @@ const ParametrosCategorizacion = () => {
   useEffect(() => {
     fetchAllZonas();
     fetchAllCategorias();
-  }, [page, limit, searchAuto, fetchAllCategorias, fetchAllZonas]);
+    fetchCategoriasPages();
+  }, [
+    page,
+    limit,
+    searchAuto,
+    fetchCategoriasPages,
+    fetchAllZonas,
+    fetchAllCategorias,
+  ]);
 
   const createCategoria = useCallback(async () => {
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = categorias.map((cat) => cat.nombre.toLowerCase());
+    const categoriasNames = allCategorias.map((cat) =>
+      cat.nombre.toLowerCase()
+    );
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
       notifyError("No pueden existir categorias con el mismo nombre");
       return;
@@ -177,10 +195,17 @@ const ParametrosCategorizacion = () => {
 
     // Cargar imagen de categoria
     const formImgCategoria = new FormData();
-    const img_name = selectedCategoria.img_url[0].name
+    // const img_name = selectedCategoria.img_url[0].name
+    //   .replace(/ /g, "-")
+    //   .replace(/\//g, "-");
+    const img_name = `${selectedCategoria.img_url[0].name
       .replace(/ /g, "-")
-      .replace(/\//g, "-");
-    formImgCategoria.append("img_name", img_name);
+      .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+    const extension = selectedCategoria.img_url[0].name.split(".").pop();
+
+    const img_name_with_extension = `${img_name}.${extension}`;
+    formImgCategoria.append("img_name", img_name_with_extension);
     formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
 
     try {
@@ -191,7 +216,7 @@ const ParametrosCategorizacion = () => {
       );
       if (response.ok) {
         // console.log("Archivo cargado exitosamente.", response);
-        formData.append("img_url", img_name);
+        formData.append("img_url", img_name_with_extension);
       } else {
         console.error("Error al cargar el archivo:", response.statusText);
         // Detener la ejecución si hay un error
@@ -220,10 +245,14 @@ const ParametrosCategorizacion = () => {
             formSubcat.append(`fk_zona`, selectedCategoria.fk_zona);
             // Cargar imagen de cada subcategoria
             const formImgSubCategoria = new FormData();
-            const img_name = sub.img_url[0].name
+            const img_name = `${sub.img_url[0].name
               .replace(/ /g, "-")
-              .replace(/\//g, "-");
-            formImgSubCategoria.append("img_name", img_name);
+              .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+            const extension = sub.img_url[0].name.split(".").pop();
+
+            const img_name_with_extension = `${img_name}.${extension}`;
+            formImgSubCategoria.append("img_name", img_name_with_extension);
             formImgSubCategoria.append("img_type", sub.img_url[0].type);
 
             try {
@@ -233,8 +262,8 @@ const ParametrosCategorizacion = () => {
                 sub.img_url[0]
               );
               if (response.ok) {
-                console.log("Archivo cargado exitosamente.", response);
-                formSubcat.append(`img_url`, img_name);
+                // console.log("Archivo cargado exitosamente.", response);
+                formSubcat.append(`img_url`, img_name_with_extension);
               } else {
                 console.error(
                   "Error al cargar el archivo:",
@@ -264,13 +293,22 @@ const ParametrosCategorizacion = () => {
       console.error(err);
     } finally {
       fetchAllCategorias();
+      fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchAllCategorias, handleClose, categorias]);
+  }, [
+    selectedCategoria,
+    fetchCategoriasPages,
+    handleClose,
+    allCategorias,
+    fetchAllCategorias,
+  ]);
 
   const editCategoria = useCallback(async () => {
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = categorias.map((cat) => cat.nombre.toLowerCase());
+    const categoriasNames = allCategorias.map((cat) =>
+      cat.nombre.toLowerCase()
+    );
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
       notifyError("No pueden existir categorias con el mismo nombre");
       return;
@@ -420,9 +458,16 @@ const ParametrosCategorizacion = () => {
     } finally {
       notify("Categoria editada correctamente");
       fetchAllCategorias();
+      fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchAllCategorias, handleClose, categorias]);
+  }, [
+    selectedCategoria,
+    fetchCategoriasPages,
+    handleClose,
+    allCategorias,
+    fetchAllCategorias,
+  ]);
 
   // const deleteCategoria = useCallback(async () => {
   //   const body = {
@@ -434,7 +479,7 @@ const ParametrosCategorizacion = () => {
   //     console.log(res);
   //     if (res?.status) {
   //       notify("Categoria eliminada correctamente");
-  //       fetchAllCategorias();
+  //       fetchCategoriasPages();
   //       handleClose();
   //     } else {
   //       notifyError("Error al eliminar categoria");
@@ -443,7 +488,7 @@ const ParametrosCategorizacion = () => {
   //     notifyError("Error al eliminar categoría");
   //     console.error(err);
   //   }
-  // }, [selectedCategoria, fetchAllCategorias, handleClose]);
+  // }, [selectedCategoria, fetchCategoriasPages, handleClose]);
 
   return (
     <Fragment>

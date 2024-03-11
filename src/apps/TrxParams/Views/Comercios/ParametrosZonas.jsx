@@ -23,6 +23,7 @@ const ParametrosZonas = () => {
   });
 
   // Data zonas y categorias
+  const [allZonas, setAllZonas] = useState([]);
   const [zonas, setZonas] = useState([]);
   const [selectedZona, setSelectedZona] = useState({
     id_zona: "",
@@ -79,7 +80,7 @@ const ParametrosZonas = () => {
     [setQuery]
   );
 
-  const fetchAllZonas = useCallback(() => {
+  const fetchZonasPages = useCallback(() => {
     fetchZonas({ page, limit })
       .then((res) => {
         console.log("zonas", res);
@@ -89,13 +90,22 @@ const ParametrosZonas = () => {
       .catch((err) => console.error(err));
   }, [page, limit]);
 
+  const fetchAllZonas = useCallback(() => {
+    fetchZonas({ page: 1, limit: 1000 })
+      .then((res) => {
+        setAllZonas(res?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
   useEffect(() => {
+    fetchZonasPages();
     fetchAllZonas();
-  }, [page, limit, searchAuto, fetchAllZonas]);
+  }, [page, limit, searchAuto, fetchZonasPages, fetchAllZonas]);
 
   const createZona = useCallback(async () => {
     // Validar que no existan zonas con el mismo nombre
-    const exist = zonas.find((zona) => zona.nombre === selectedZona.nombre);
+    const exist = allZonas.find((zona) => zona.nombre === selectedZona.nombre);
     if (exist) {
       notifyError("Ya existe una zona con ese nombre");
       return;
@@ -107,6 +117,7 @@ const ParametrosZonas = () => {
       console.log(res);
       if (res?.status) {
         notify("Zona creada correctamente");
+        fetchZonasPages();
         fetchAllZonas();
         handleClose();
       } else {
@@ -116,11 +127,11 @@ const ParametrosZonas = () => {
       notifyError("Error al crear zona");
       console.error(err);
     }
-  }, [selectedZona, fetchAllZonas, handleClose, zonas]);
+  }, [selectedZona, fetchZonasPages, fetchAllZonas, handleClose, allZonas]);
 
   const editZona = useCallback(async () => {
     // Validar que no existan zonas con el mismo nombre
-    const exist = zonas.find((zona) => zona.nombre === selectedZona.nombre);
+    const exist = allZonas.find((zona) => zona.nombre === selectedZona.nombre);
     if (exist) {
       notifyError("Ya existe una zona con ese nombre");
       return;
@@ -133,6 +144,7 @@ const ParametrosZonas = () => {
       // console.log(res);
       if (res?.status) {
         notify("Zona editada correctamente");
+        fetchZonasPages();
         fetchAllZonas();
         handleClose();
       } else {
@@ -142,7 +154,7 @@ const ParametrosZonas = () => {
       notifyError("Error al editar zona");
       console.error(err);
     }
-  }, [selectedZona, fetchAllZonas, handleClose, zonas]);
+  }, [selectedZona, fetchZonasPages, fetchAllZonas, handleClose, allZonas]);
 
   // const deleteZona = useCallback(async () => {
   //   const body = {
