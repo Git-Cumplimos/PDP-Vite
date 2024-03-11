@@ -35,6 +35,7 @@ const ParametrosCategorizacion = () => {
 
   // Data zonas y categorias
   const [zonas, setZonas] = useState([]);
+  const [allCategorias, setAllCategorias] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [selectedCategoria, setSelectedCategoria] = useState({
     id_categoria: "",
@@ -132,6 +133,14 @@ const ParametrosCategorizacion = () => {
   );
 
   const fetchAllCategorias = useCallback(() => {
+    fetchCategorias({ page: 1, limit: 1000 })
+      .then((res) => {
+        setAllCategorias(res?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  const fetchCategoriasPages = useCallback(() => {
     fetchCategorias({ page, limit })
       .then((res) => {
         setCategorias(res?.results);
@@ -141,10 +150,9 @@ const ParametrosCategorizacion = () => {
   }, [page, limit]);
 
   const fetchAllZonas = useCallback(() => {
-    fetchZonas()
+    fetchZonas({ page: 1, limit: 1000 })
       .then((res) => {
         setZonas(res?.results);
-        // setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   }, []);
@@ -152,11 +160,21 @@ const ParametrosCategorizacion = () => {
   useEffect(() => {
     fetchAllZonas();
     fetchAllCategorias();
-  }, [page, limit, searchAuto, fetchAllCategorias, fetchAllZonas]);
+    fetchCategoriasPages();
+  }, [
+    page,
+    limit,
+    searchAuto,
+    fetchCategoriasPages,
+    fetchAllZonas,
+    fetchAllCategorias,
+  ]);
 
   const createCategoria = useCallback(async () => {
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = categorias.map((cat) => cat.nombre.toLowerCase());
+    const categoriasNames = allCategorias.map((cat) =>
+      cat.nombre.toLowerCase()
+    );
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
       notifyError("No pueden existir categorias con el mismo nombre");
       return;
@@ -263,14 +281,16 @@ const ParametrosCategorizacion = () => {
       notifyError("Error al crear categoria");
       console.error(err);
     } finally {
-      fetchAllCategorias();
+      fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchAllCategorias, handleClose, categorias]);
+  }, [selectedCategoria, fetchCategoriasPages, handleClose, allCategorias]);
 
   const editCategoria = useCallback(async () => {
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = categorias.map((cat) => cat.nombre.toLowerCase());
+    const categoriasNames = allCategorias.map((cat) =>
+      cat.nombre.toLowerCase()
+    );
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
       notifyError("No pueden existir categorias con el mismo nombre");
       return;
@@ -419,10 +439,10 @@ const ParametrosCategorizacion = () => {
       console.error(err);
     } finally {
       notify("Categoria editada correctamente");
-      fetchAllCategorias();
+      fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchAllCategorias, handleClose, categorias]);
+  }, [selectedCategoria, fetchCategoriasPages, handleClose, allCategorias]);
 
   // const deleteCategoria = useCallback(async () => {
   //   const body = {
@@ -434,7 +454,7 @@ const ParametrosCategorizacion = () => {
   //     console.log(res);
   //     if (res?.status) {
   //       notify("Categoria eliminada correctamente");
-  //       fetchAllCategorias();
+  //       fetchCategoriasPages();
   //       handleClose();
   //     } else {
   //       notifyError("Error al eliminar categoria");
@@ -443,7 +463,7 @@ const ParametrosCategorizacion = () => {
   //     notifyError("Error al eliminar categoría");
   //     console.error(err);
   //   }
-  // }, [selectedCategoria, fetchAllCategorias, handleClose]);
+  // }, [selectedCategoria, fetchCategoriasPages, handleClose]);
 
   return (
     <Fragment>
