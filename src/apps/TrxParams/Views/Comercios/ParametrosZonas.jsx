@@ -94,6 +94,12 @@ const ParametrosZonas = () => {
   }, [page, limit, searchAuto, fetchAllZonas]);
 
   const createZona = useCallback(async () => {
+    // Validar que no existan zonas con el mismo nombre
+    const exist = zonas.find((zona) => zona.nombre === selectedZona.nombre);
+    if (exist) {
+      notifyError("Ya existe una zona con ese nombre");
+      return;
+    }
     const formData = new FormData();
     formData.append("nombre", selectedZona.nombre);
     try {
@@ -110,15 +116,21 @@ const ParametrosZonas = () => {
       notifyError("Error al crear zona");
       console.error(err);
     }
-  }, [selectedZona, fetchAllZonas, handleClose]);
+  }, [selectedZona, fetchAllZonas, handleClose, zonas]);
 
   const editZona = useCallback(async () => {
+    // Validar que no existan zonas con el mismo nombre
+    const exist = zonas.find((zona) => zona.nombre === selectedZona.nombre);
+    if (exist) {
+      notifyError("Ya existe una zona con ese nombre");
+      return;
+    }
     const formData = new FormData();
     formData.append("id_zona", selectedZona.id_zona);
     formData.append("nombre", selectedZona.nombre);
     try {
       const res = await putEditZona(formData);
-      console.log(res);
+      // console.log(res);
       if (res?.status) {
         notify("Zona editada correctamente");
         fetchAllZonas();
@@ -130,7 +142,7 @@ const ParametrosZonas = () => {
       notifyError("Error al editar zona");
       console.error(err);
     }
-  }, [selectedZona, fetchAllZonas, handleClose]);
+  }, [selectedZona, fetchAllZonas, handleClose, zonas]);
 
   // const deleteZona = useCallback(async () => {
   //   const body = {
