@@ -198,7 +198,6 @@ export const useProvideUrls = () => {
   useEffect(() => {
     const fetchImgs = async () => {
       const res = await fetchCategoriasImgs();
-      console.log("res", res);
       if (res?.status) {
         // Actualizar imágenes en el contexto
         res?.obj.forEach(({ nombre, img_url }) => {
