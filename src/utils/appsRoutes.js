@@ -1205,7 +1205,7 @@ const allUrlsPrivateApps = [
 
   //Módulo recaudo genérico
   routesRecaudoGenerico,
-  
+
   rutasRecargasTullave,
   rutasPowwi,
 
