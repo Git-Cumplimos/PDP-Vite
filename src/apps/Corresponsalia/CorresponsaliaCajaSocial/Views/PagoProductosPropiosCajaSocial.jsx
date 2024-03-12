@@ -18,29 +18,35 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
 import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
-import { algoCheckCuentaDepositoCajaSocial } from "../utils/trxUtils";
+import {
+  algoCheckCreditoLendingCajaSocial,
+  algoCheckCuentaCreditoBMCajaSocial,
+  algoCheckTCCreditoRotativoCajaSocial,
+} from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
-import { useMFA } from "../../../../components/Base/MFAScreen";
-import Select from "../../../../components/Base/Select";
 import BarcodeReader from "../../../../components/Base/BarcodeReader";
+import Select from "../../../../components/Base/Select";
 
-const URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
-const URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
-const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-deposito`;
+const URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/consulta-pago-productos-propios`;
+const URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/pago-productos-propios`;
+const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/consulta-estado-pago-productos-propios`;
 
 const DATA_PAGO_INIT = {
-  estadoLecturaPago: "1",
+  estadoLecturaPago: "codigoBarras",
   codigoBarras: "",
+  valorPagoProductosPropios: 0,
+  tipoPago: 1,
+  valorDiferentePagoProductosPropios: 0,
+  numeroProducto: "",
 };
-
-const DATA_TIPO_PAGO = {
-  "Código de barras": "1",
-  Manual: "2",
+const TIPO_PAGO_PRODUCTOS_PROPIOS = {
+  "": "",
+  "Pago mínimo": "1",
+  "Pago total": "2",
+  "Pago valor diferente": "3",
 };
-
 const PagoProductosPropiosCajaSocial = () => {
   const uniqueId = v4();
-  const { submitEventSetter } = useMFA();
   const validNavigate = useNavigate();
   const [dataPago, setDataPago] = useState(DATA_PAGO_INIT);
   const [objTicketActual, setObjTicketActual] = useState({});
@@ -54,35 +60,36 @@ const PagoProductosPropiosCajaSocial = () => {
     content: () => printDiv.current,
   });
   const buttonDelete = useRef(null);
-  const [loadingPeticionDeposito, peticionPagoDeposito] = useFetchCajaSocial(
-    URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL,
-    URL_ESTADO_PAGO_PRODUCTOS_PROPIOS,
-    "Pago productos propios",
-    true
-  );
-  const [loadingPeticionConsultaTitular, peticionConsultaTitular] = useFetch(
-    fetchCustom(
-      URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS,
-      "POST",
-      "Consulta pago productos propios"
-    )
-  );
+  const [loadingPeticionPagoProductosPropios, peticionPagoDeposito] =
+    useFetchCajaSocial(
+      URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL,
+      URL_ESTADO_PAGO_PRODUCTOS_PROPIOS,
+      "Pago productos propios"
+    );
+  const [loadingPeticionConsulta, peticionConsultaPagoProductosPropios] =
+    useFetch(
+      fetchCustom(
+        URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS,
+        "POST",
+        "Consulta pago productos propios"
+      )
+    );
   const consultaPagoProductosPropios = useCallback(
     (ev) => {
       ev.preventDefault();
-      const numerosInicio = ["21", "23", "24", "26"];
-      const sliceData = dataPago.numeroCuenta.slice(0, 2);
-      if (!numerosInicio.includes(sliceData))
-        return notifyError("Número de cuenta ingresado errado");
-      if (!algoCheckCuentaDepositoCajaSocial(dataPago.numeroCuenta))
-        return notifyError("Número de cuenta ingresado errado");
+      if (
+        !algoCheckCuentaCreditoBMCajaSocial(dataPago.numeroProducto) &&
+        !algoCheckCreditoLendingCajaSocial(dataPago.numeroProducto) &&
+        !algoCheckTCCreditoRotativoCajaSocial(dataPago.numeroProducto)
+      )
+        return notifyError("Número de producto ingresado errado");
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataPago?.valorDeposito,
+        valor_total_trx: dataPago?.valorPagoProductosPropios,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -95,13 +102,13 @@ const PagoProductosPropiosCajaSocial = () => {
           dane_code: roleInfo?.codigo_dane,
           city: roleInfo?.["ciudad"],
         },
-        deposito_caja_social: {
-          numero_cuenta: dataPago?.numeroCuenta,
+        pago_productos_propios_caja_social: {
+          numero_producto: dataPago?.numeroProducto,
         },
         id_user_pdp: pdpUser.uuid,
       };
       notifyPending(
-        peticionConsultaTitular({}, data),
+        peticionConsultaPagoProductosPropios({}, data),
         {
           render: () => {
             return "Procesando consulta";
@@ -125,7 +132,7 @@ const PagoProductosPropiosCajaSocial = () => {
     },
     [dataPago, pdpUser, roleInfo]
   );
-  const pagoDeposito = useCallback(
+  const pagoProductosPropios = useCallback(
     (ev) => {
       ev.preventDefault();
       const data = {
@@ -134,7 +141,7 @@ const PagoProductosPropiosCajaSocial = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataPago?.valorDeposito,
+        valor_total_trx: dataPago?.valorPagoProductosPropios,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -148,9 +155,10 @@ const PagoProductosPropiosCajaSocial = () => {
           dane_code: roleInfo?.codigo_dane,
           city: roleInfo?.["ciudad"],
         },
-        deposito_caja_social: {
-          numero_cuenta: dataPago?.numeroCuenta,
+        pago_productos_propios_caja_social: {
+          numero_producto: dataPago?.numeroProducto,
           nom_cliente: resConsulta?.trn?.personName?.fullName,
+          tipo_pago: dataPago?.tipoPago,
         },
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
@@ -169,7 +177,7 @@ const PagoProductosPropiosCajaSocial = () => {
           render: ({ data: res }) => {
             const dataTemp = res.obj;
             setObjTicketActual(dataTemp.ticket ?? {});
-            setEstadoPeticion(1);
+            setEstadoPeticion(2);
             setStateTicketTrx(true);
             return "Pago satisfactorio";
           },
@@ -190,19 +198,55 @@ const PagoProductosPropiosCajaSocial = () => {
     },
     [pdpUser, dataPago, roleInfo, resConsulta]
   );
+  const checkPagoProductosPropios = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      let valorAPagar = 0;
+      if (dataPago.tipoPago === "1") {
+        valorAPagar = resConsulta?.trn?.minCurAmt?.amt;
+      } else if (dataPago.tipoPago === "2") {
+        valorAPagar = resConsulta?.trn?.totalCurAmt?.amt;
+      } else if (dataPago.tipoPago === "3") {
+        valorAPagar = dataPago.valorDiferentePagoProductosPropios;
+      }
+      if (
+        valorAPagar <
+          enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL ||
+        valorAPagar >
+          enumParametrosCajaSocial?.MAX_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+      ) {
+        // setEstadoPeticion(0)
+        // setShowModal(0)
+        return notifyError(
+          `El valor de la transacción debe estar entre ${formatMoney.format(
+            enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+          )} y ${formatMoney.format(
+            enumParametrosCajaSocial?.MAX_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+          )}`
+        );
+      }
+      setDataPago((old) => ({
+        ...old,
+        valorPagoProductosPropios: valorAPagar,
+      }));
+      setEstadoPeticion(1);
+    },
+    [dataPago, resConsulta]
+  );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (ev.target.name === "numeroCuenta") {
+    if (ev.target.name === "numeroProducto") {
       if (!isNaN(value)) {
         value = value.replace(/[\s\.\-+eE]/g, "");
         setDataPago((old) => {
           return { ...old, [ev.target.name]: value };
         });
       }
-    } else
+    } else {
       setDataPago((old) => {
         return { ...old, [ev.target.name]: value };
       });
+    }
   }, []);
   const onChangeFormatNum = useCallback((ev, val) => {
     if (!isNaN(val)) {
@@ -218,6 +262,7 @@ const PagoProductosPropiosCajaSocial = () => {
   const onSubmitBarCode = (info) => {
     console.log(info);
   };
+  const isChecked = (value) => dataPago.estadoLecturaPago === value;
   return (
     <>
       <h1 className="text-3xl mt-10">Pago de Productos Propios</h1>
@@ -226,27 +271,46 @@ const PagoProductosPropiosCajaSocial = () => {
         className=" flex flex-col content-center items-center"
         grid={false}
       >
-        {/* <Fieldset
-          legend="Datos del pago"
-          className="flex flex-col content-center items-center"
-        > */}
-        <Select
-          id="estadoLecturaPago"
-          name="estadoLecturaPago"
-          label="Tipo de captura"
-          options={DATA_TIPO_PAGO}
-          value={dataPago?.estadoLecturaPago}
-          onChange={onChangeFormat}
-          required
-          // disabled={
-          //   loadingPeticionConsultaTerceros || loadingPeticionCreacionTerceros
-          // }
-        />
-        {dataPago.estadoLecturaPago === "1" ? (
+        <Fieldset
+          legend="Tipo de captura"
+          className="flex flex-col content-center items-center mb-10"
+        >
+          <Input
+            id="estadoLecturaPagoCodigoBarras"
+            name="estadoLecturaPago"
+            label={"Código de barras"}
+            type="radio"
+            autoComplete="off"
+            value={"codigoBarras"}
+            onChange={onChangeFormat}
+            disabled={
+              loadingPeticionPagoProductosPropios || loadingPeticionConsulta
+            }
+            required
+            checked={isChecked("codigoBarras")}
+          />
+          <Input
+            id="estadoLecturaPagoManual"
+            name="estadoLecturaPago"
+            label={"Manual"}
+            type="radio"
+            autoComplete="off"
+            value={"manual"}
+            onChange={onChangeFormat}
+            disabled={
+              loadingPeticionPagoProductosPropios || loadingPeticionConsulta
+            }
+            required
+            checked={isChecked("manual")}
+          />
+        </Fieldset>
+        {dataPago.estadoLecturaPago === "codigoBarras" ? (
           <>
             <BarcodeReader
               onSearchCodigo={onSubmitBarCode}
-              // disabled={loadingPeticion}
+              disabled={
+                loadingPeticionPagoProductosPropios || loadingPeticionConsulta
+              }
             />
             <div ref={buttonDelete}>
               <Button type="reset">
@@ -257,40 +321,20 @@ const PagoProductosPropiosCajaSocial = () => {
         ) : (
           <>
             <Input
-              id="numeroCuenta"
-              name="numeroCuenta"
-              label={"Número de cuenta"}
+              id="numeroProducto"
+              name="numeroProducto"
+              label={"Número de producto"}
               type="text"
               autoComplete="off"
               minLength={11}
-              maxLength={11}
-              value={dataPago?.numeroCuenta}
+              maxLength={16}
+              value={dataPago?.numeroProducto}
               onChange={onChangeFormat}
               disabled={
-                loadingPeticionDeposito || loadingPeticionConsultaTitular
+                loadingPeticionPagoProductosPropios || loadingPeticionConsulta
               }
               required
             />
-            <MoneyInput
-              id="valorDeposito"
-              name="valorDeposito"
-              label={"Valor a depositar"}
-              type="tel"
-              // minLength={5}
-              maxLength={10}
-              autoComplete="off"
-              min={enumParametrosCajaSocial?.MIN_DEPOSITO_CAJA_SOCIAL}
-              max={enumParametrosCajaSocial?.MAX_DEPOSITO_CAJA_SOCIAL}
-              value={dataPago?.valorDeposito ?? 0}
-              onInput={onChangeFormatNum}
-              disabled={
-                loadingPeticionDeposito || loadingPeticionConsultaTitular
-              }
-              required
-              equalError={false}
-              equalErrorMin={false}
-            />
-            {/* </Fieldset> */}
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
@@ -299,7 +343,7 @@ const PagoProductosPropiosCajaSocial = () => {
                   validNavigate(-1);
                 }}
                 disabled={
-                  loadingPeticionDeposito || loadingPeticionConsultaTitular
+                  loadingPeticionPagoProductosPropios || loadingPeticionConsulta
                 }
               >
                 Cancelar
@@ -307,7 +351,7 @@ const PagoProductosPropiosCajaSocial = () => {
               <Button
                 type="submit"
                 disabled={
-                  loadingPeticionDeposito || loadingPeticionConsultaTitular
+                  loadingPeticionPagoProductosPropios || loadingPeticionConsulta
                 }
               >
                 Realizar consulta
@@ -318,39 +362,133 @@ const PagoProductosPropiosCajaSocial = () => {
       </Form>
       <Modal show={showModal} className="flex align-middle">
         <>
-          {estadoPeticion === "1" ? (
+          {estadoPeticion === 0 ? (
             <PaymentSummary
-              title="Respuesta de consulta depósito"
+              title="Respuesta de consulta de producto propio"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                "Nombres titular": resConsulta?.trn?.personName?.fullName ?? "",
-                "Número de cuenta": dataPago?.numeroCuenta,
-                "Valor a depositar": formatMoney.format(
-                  dataPago?.valorDeposito
+                "Nombre del titular":
+                  resConsulta?.trn?.personName?.fullName ?? "",
+                "Número de producto": dataPago?.numeroProducto,
+                "Valor pago mínimo": formatMoney.format(
+                  resConsulta?.trn?.minCurAmt?.amt
+                ),
+                "Valor pago total": formatMoney.format(
+                  resConsulta?.trn?.totalCurAmt?.amt
+                ),
+              }}
+            >
+              <Form onSubmit={checkPagoProductosPropios}>
+                <Select
+                  id="tipoPago"
+                  name="tipoPago"
+                  label="Indique el tipo de abono"
+                  options={TIPO_PAGO_PRODUCTOS_PROPIOS}
+                  value={dataPago?.tipoPago}
+                  onChange={onChangeFormat}
+                  required
+                  disabled={
+                    loadingPeticionPagoProductosPropios ||
+                    loadingPeticionConsulta
+                  }
+                />
+                {dataPago.tipoPago === "3" && (
+                  <MoneyInput
+                    id="valorDiferentePagoProductosPropios"
+                    name="valorDiferentePagoProductosPropios"
+                    label={"Valor a pagar"}
+                    type="tel"
+                    // minLength={5}
+                    maxLength={10}
+                    autoComplete="off"
+                    min={
+                      enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+                    }
+                    max={
+                      enumParametrosCajaSocial?.MAX_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+                    }
+                    value={dataPago?.valorDiferentePagoProductosPropios ?? 0}
+                    onInput={onChangeFormatNum}
+                    disabled={
+                      loadingPeticionPagoProductosPropios ||
+                      loadingPeticionConsulta
+                    }
+                    required
+                    equalError={false}
+                    equalErrorMin={false}
+                  />
+                )}
+                <ButtonBar>
+                  <Button
+                    type="button"
+                    onClick={(e) => {
+                      closeModule(e);
+                      validNavigate(-1);
+                    }}
+                    disabled={
+                      loadingPeticionPagoProductosPropios ||
+                      loadingPeticionConsulta
+                    }
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={
+                      loadingPeticionPagoProductosPropios ||
+                      loadingPeticionConsulta
+                    }
+                  >
+                    Realizar pago
+                  </Button>
+                </ButtonBar>
+              </Form>
+            </PaymentSummary>
+          ) : estadoPeticion === 1 ? (
+            <PaymentSummary
+              title="¿Está seguro de realizar el pago del producto de crédito?"
+              subtitle="Resumen de transacción"
+              summaryTrx={{
+                "Nombre del titular":
+                  resConsulta?.trn?.personName?.fullName ?? "",
+                "Número de producto": dataPago?.numeroProducto,
+                "Tipo de abono":
+                  Object.keys(TIPO_PAGO_PRODUCTOS_PROPIOS).filter(
+                    (key) =>
+                      TIPO_PAGO_PRODUCTOS_PROPIOS[key] === dataPago?.tipoPago
+                  )[0] ?? "",
+                "Valor a pagar": formatMoney.format(
+                  dataPago.valorPagoProductosPropios
                 ),
               }}
             >
               <ButtonBar>
                 <Button
-                  onClick={closeModule}
+                  type="button"
+                  onClick={(e) => {
+                    closeModule(e);
+                    validNavigate(-1);
+                  }}
                   disabled={
-                    loadingPeticionDeposito || loadingPeticionConsultaTitular
+                    loadingPeticionPagoProductosPropios ||
+                    loadingPeticionConsulta
                   }
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  onClick={submitEventSetter(pagoDeposito)}
+                  onClick={pagoProductosPropios}
                   disabled={
-                    loadingPeticionDeposito || loadingPeticionConsultaTitular
+                    loadingPeticionPagoProductosPropios ||
+                    loadingPeticionConsulta
                   }
                 >
-                  Realizar depósito
+                  Realizar pago
                 </Button>
               </ButtonBar>
             </PaymentSummary>
-          ) : estadoPeticion === 1 ? (
+          ) : estadoPeticion === 2 ? (
             <div className="flex flex-col justify-center items-center">
               <TicketsCajaSocial
                 stateTrx={stateTicketTrx}
