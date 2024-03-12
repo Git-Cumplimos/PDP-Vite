@@ -171,12 +171,39 @@ const ParametrosCategorizacion = () => {
   ]);
 
   const createCategoria = useCallback(async () => {
+    // Validar que el formulario esté completo
+    if (
+      !selectedCategoria.nombre ||
+      !selectedCategoria.img_url ||
+      !selectedCategoria.fk_zona
+    ) {
+      notifyError("Debe completar todos los campos");
+      return;
+    }
+    if (!selectedCategoria.img_url.length) {
+      notifyError("Debe seleccionar una imagen");
+      return;
+    }
+    // Validar que la categoria tenga subcategorias
+    if (selectedCategoria.subcategorias.length === 0) {
+      notifyError("Debe agregar al menos una subcategoria");
+      return;
+    }
+    // Validar que las subcategorias tengan todos los campos completos
+    if (
+      selectedCategoria.subcategorias.some((sub) => !sub.nombre || !sub.img_url)
+    ) {
+      notifyError("Debe completar todos los campos de las subcategorias");
+      return;
+    }
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = allCategorias.map((cat) =>
-      cat.nombre.toLowerCase()
-    );
+    const categoriasNames = allCategorias
+      .filter((cat) => cat.fk_zona === selectedCategoria.fk_zona)
+      .map((cat) => cat.nombre.toLowerCase());
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
-      notifyError("No pueden existir categorias con el mismo nombre");
+      notifyError(
+        "No pueden existir categorias con el mismo nombre en la misma zona"
+      );
       return;
     }
     // Validar que las subcategorias no tengan el mismo nombre, validando mayúsculas y minúsculas
@@ -305,13 +332,39 @@ const ParametrosCategorizacion = () => {
   ]);
 
   const editCategoria = useCallback(async () => {
+    // Validar que el formulario esté completo
+    if (
+      !selectedCategoria.nombre ||
+      !selectedCategoria.img_url ||
+      !selectedCategoria.fk_zona
+    ) {
+      notifyError("Debe completar todos los campos");
+      return;
+    }
+    // Validar que la categoria tenga subcategorias
+    if (selectedCategoria.subcategorias.length === 0) {
+      notifyError("Debe agregar al menos una subcategoria");
+      return;
+    }
+    // Validar que las subcategorias tengan todos los campos completos
+    const subcategoriasNamesFilled = selectedCategoria.subcategorias.map(
+      (sub) => sub.nombre
+    );
+    const subcategoriasNamesFilledSet = new Set(subcategoriasNamesFilled);
+    if (subcategoriasNamesFilled.length !== subcategoriasNamesFilledSet.size) {
+      notifyError("No pueden existir subcategorias con el mismo nombre");
+      return;
+    }
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
     const categoriasNames = allCategorias
       .filter((cat) => cat.id_categoria !== selectedCategoria.id_categoria) // Excluir la categoría que se está editando
+      .filter((cat) => cat.fk_zona === selectedCategoria.fk_zona) // Filtrar por la misma fk_zona
       .map((cat) => cat.nombre.toLowerCase());
 
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
-      notifyError("No pueden existir categorias con el mismo nombre");
+      notifyError(
+        "No pueden existir categorias con el mismo nombre en la misma zona"
+      );
       return;
     }
     // Validar que las subcategorias no tengan el mismo nombre, validando mayúsculas y minúsculas
@@ -545,6 +598,7 @@ const ParametrosCategorizacion = () => {
             value={selectedCategoria.fk_zona}
             label="Zona"
             options={selectZonas}
+            required
             onChange={(e) => {
               setSelectedCategoria((old) => ({
                 ...old,
@@ -558,7 +612,7 @@ const ParametrosCategorizacion = () => {
             label={"Seleccionar imagen"}
             type="file"
             autoComplete="off"
-            required={selectedCategoria.edit ? false : true}
+            // required={selectedCategoria.edit ? false : true}
             onGetFile={(file) => {
               // console.log(file);
               if (file[0]?.size > 1000000) {
@@ -669,9 +723,15 @@ const ParametrosCategorizacion = () => {
                       label={"Seleccionar imagen"}
                       type="file"
                       autoComplete="off"
-                      required={selectedCategoria.edit ? false : true}
+                      // required={selectedCategoria.edit ? false : true}
                       onGetFile={(file) => {
                         // console.log(file);
+                        if (subcategoria.nombre === "") {
+                          notifyError(
+                            "Primero debe ingresar un nombre para la subcategoria"
+                          );
+                          return;
+                        }
                         if (file[0]?.size > 1000000) {
                           notifyError(
                             "El peso de la imagen no debe ser mayor a 1MB"
@@ -703,6 +763,34 @@ const ParametrosCategorizacion = () => {
                       accept="image/png, image/jpeg, image/jpg"
                     />
                     {selectedCategoria.edit && subcategoria.img_url && (
+                      <div className="flex flex-col items-center justify-center">
+                        <img
+                          src={
+                            typeof subcategoria.img_url === "string"
+                              ? subcategoria.img_url
+                              : subcategoria.img_url[0]
+                              ? URL.createObjectURL(subcategoria.img_url[0])
+                              : ""
+                          }
+                          alt="Imagen sub-categoria"
+                          width="100"
+                          height="100"
+                          className="max-w-xs"
+                        />
+                        {subcategoria.img_url && (
+                          <p>
+                            Peso de la imagen:{" "}
+                            {subcategoria.img_url[0]?.size
+                              ? (
+                                  subcategoria.img_url[0].size / 1000000
+                                ).toFixed(2)
+                              : 0}{" "}
+                            MB
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {!selectedCategoria.edit && subcategoria.img_url && (
                       <div className="flex flex-col items-center justify-center">
                         <img
                           src={
@@ -765,18 +853,25 @@ const ParametrosCategorizacion = () => {
                       <Button
                         type="button"
                         onClick={() => {
-                          setSelectedCategoria((old) => ({
-                            ...old,
-                            subcategorias: old.subcategorias.map((sub) => {
-                              if (sub === subcategoria) {
-                                return {
-                                  ...sub,
-                                  deletion: true,
-                                };
-                              }
-                              return sub;
-                            }),
-                          }));
+                          selectedCategoria.edit
+                            ? setSelectedCategoria((old) => ({
+                                ...old,
+                                subcategorias: old.subcategorias.map((sub) => {
+                                  if (sub === subcategoria) {
+                                    return {
+                                      ...sub,
+                                      deletion: true,
+                                    };
+                                  }
+                                  return sub;
+                                }),
+                              }))
+                            : setSelectedCategoria((old) => ({
+                                ...old,
+                                subcategorias: old.subcategorias.filter(
+                                  (sub) => sub !== subcategoria
+                                ),
+                              }));
                         }}
                       >
                         Eliminar
@@ -812,21 +907,14 @@ const ParametrosCategorizacion = () => {
                 Eliminar
               </Button>
             )} */}
-            <Button type="button" onClick={handleClose}>
+            <Button
+              type="button"
+              disabled={!selectedCategoria.img_url.length}
+              onClick={handleClose}
+            >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={
-                !selectedCategoria.nombre ||
-                !selectedCategoria.img_url?.length ||
-                !selectedCategoria.fk_zona ||
-                selectedCategoria.subcategorias.length === 0 ||
-                selectedCategoria.subcategorias.some(
-                  (sub) => !sub.nombre || !sub.img_url
-                )
-              }
-            >
+            <Button type="submit">
               {selectedCategoria.edit ? "Editar la información" : "Aceptar"}
             </Button>
           </ButtonBar>
