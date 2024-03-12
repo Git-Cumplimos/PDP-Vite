@@ -47,6 +47,10 @@ import rutasPinesCea, {
   listPermissionsPinesCea,
 } from "../apps/PinesCea/routes";
 
+import rutasPinesCrcOlimpia, {
+  listPermissionsPinesCrcOlimpia,
+} from "../apps/PinesCrc/PinesCrcOlimpia/routes";
+
 /**
  * * Providers
  */
@@ -724,6 +728,7 @@ const allUrlsPrivateApps = [
       enumPermisosPractisistemas.practisistemasPines,
       ...listPermissionsPinesCrc,
       ...listPermissionsPinesCea,
+      ...listPermissionsPinesCrcOlimpia,
     ],
     provider: ProvidepinesVus,
     subRoutes: [
@@ -731,6 +736,7 @@ const allUrlsPrivateApps = [
       rutasPinesVus,
       rutasPinesCrc,
       rutasPinesCea,
+      rutasPinesCrcOlimpia,
       {
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
@@ -1199,7 +1205,7 @@ const allUrlsPrivateApps = [
 
   //Módulo recaudo genérico
   routesRecaudoGenerico,
-
+  
   rutasRecargasTullave,
   rutasPowwi,
 
