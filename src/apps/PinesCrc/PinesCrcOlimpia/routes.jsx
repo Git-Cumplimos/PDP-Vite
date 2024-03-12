@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { PermissionsPinesCrc } from "./permissions";
+import { PermissionsPinesCrcOlimpia } from "./permissions";
 
 /** Componente de iconos */
 const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
@@ -10,7 +10,7 @@ const PinesCrcTrx = lazy(() => import("./PinesCrcTrx"));
 const PinesVentaOlimpia = lazy(() => import("./Views/Pines/VentaPinesOlimpia"));
 const PinesDevolucionOlimpia = lazy(() => import("./Views/Devoluciones/DevolucionPinesOlimpia"));
 
-const listPermissions = Object.values(PermissionsPinesCrc);
+const listPermissions = Object.values(PermissionsPinesCrcOlimpia);
 
 export const listPermissionsPinesCrcOlimpia = listPermissions.splice(
   listPermissions.length / 2
@@ -46,9 +46,9 @@ const rutasPinesCrcOlimpia = {
             <AppIcons Logo={"PINES_CREAR"} name={"Venta Pines CRC Olimpia"} />
           ),
           component: PinesVentaOlimpia,
-          permission: [PermissionsPinesCrc.venta_pines,
-             PermissionsPinesCrc.operarPinesVus,
-             PermissionsPinesCrc.administrarPinesVus
+          permission: [PermissionsPinesCrcOlimpia.venta_pines,
+             PermissionsPinesCrcOlimpia.operarPinesVus,
+             PermissionsPinesCrcOlimpia.administrarPinesVus
           ],
           show: false,
         },
@@ -71,9 +71,9 @@ const rutasPinesCrcOlimpia = {
             <AppIcons Logo={"PINES_TRAMITAR"} name={"Devolución Pines CRC Olimpia"} />
           ),
           component: PinesDevolucionOlimpia,
-          permission: [PermissionsPinesCrc.venta_pines,
-             PermissionsPinesCrc.operarPinesVus,
-             PermissionsPinesCrc.administrarPinesVus
+          permission: [PermissionsPinesCrcOlimpia.venta_pines,
+             PermissionsPinesCrcOlimpia.operarPinesVus,
+             PermissionsPinesCrcOlimpia.administrarPinesVus
           ],
           show: false,
         },
