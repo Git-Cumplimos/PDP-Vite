@@ -23,7 +23,7 @@ import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 // Categorias
 import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
 import Subcategorias from "../pages/Categorias/Subcategorias";
-import { useImgs, useProvideImgsWithDispatch } from "./ImgsHooks";
+import { useProvideImgsWithDispatch } from "./ImgsHooks";
 import { fetchCategoriasImgs } from "../apps/TrxParams/utils/fetchParametrosCategorias";
 
 // Categorias
@@ -193,7 +193,6 @@ export const useProvideUrls = () => {
 
   const [urlsCategorias, setUrlsCategorias] = useState([]);
 
-  // const { imgs } = useImgs();
   const { imgs, svgs, dispatchImgs } = useProvideImgsWithDispatch();
 
   useEffect(() => {
@@ -239,7 +238,7 @@ export const useProvideUrls = () => {
               const logo = (
                 <AppIcons
                   Logo={
-                    subcategoria.nombre ? subcategoria.nombre : "MARKETPLACE"
+                    subcategoria.img_url ? subcategoria.img_url : "MARKETPLACE"
                   }
                   name={subcategoria.nombre}
                 />
