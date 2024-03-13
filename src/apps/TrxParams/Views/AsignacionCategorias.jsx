@@ -261,6 +261,7 @@ const AsignacionCategorias = () => {
   }, [page, limit, searchAuto, fetchAllCategoriasFunc, fetchAllZonas]);
 
   const assignCategorias = useCallback(async () => {
+    console.log(selectedAsignacion);
     for (const subcat of selectedAsignacion.subcategorias) {
       const body = {
         id_categoria: subcat.id_categoria,
