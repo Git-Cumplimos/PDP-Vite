@@ -62,7 +62,7 @@ const TablaTransacciones = ({ banco }) => {
         notifyError("Error al cargar Datos ");
       }
     }, []),
-  },{});
+  },{delay:2000});
 
   const searchTrxs = useCallback(() => {
     const tempMap = new Map(searchFilters);
