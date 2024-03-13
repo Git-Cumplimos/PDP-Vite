@@ -105,7 +105,9 @@ const ParametrosZonas = () => {
 
   const createZona = useCallback(async () => {
     // Validar que no existan zonas con el mismo nombre
-    const exist = allZonas.find((zona) => zona.nombre === selectedZona.nombre);
+    const exist = allZonas.find(
+      (zona) => zona.nombre.toLowerCase() === selectedZona.nombre.toLowerCase()
+    );
     if (exist) {
       notifyError("Ya existe una zona con ese nombre");
       return;
@@ -130,8 +132,10 @@ const ParametrosZonas = () => {
   }, [selectedZona, fetchZonasPages, fetchAllZonas, handleClose, allZonas]);
 
   const editZona = useCallback(async () => {
-    // Validar que no existan zonas con el mismo nombre
-    const exist = allZonas.find((zona) => zona.nombre === selectedZona.nombre);
+    // Validar que no existan zonas con el mismo nombre, validando mayusculas y minusculas
+    const exist = allZonas.find(
+      (zona) => zona.nombre.toLowerCase() === selectedZona.nombre.toLowerCase()
+    );
     if (exist) {
       notifyError("Ya existe una zona con ese nombre");
       return;
