@@ -581,7 +581,7 @@ const ParametrosCategorizacion = () => {
           <Input
             id="Nombre categoria"
             name="nombre"
-            label={"Nombre categoria"}
+            label={"Nombre categoría"}
             type="text"
             autoComplete="off"
             value={selectedCategoria.nombre}
@@ -607,7 +607,7 @@ const ParametrosCategorizacion = () => {
             }}
           />
           <FileInput
-            id="Imagen categoria"
+            id="Imagen categoría"
             name="img_url"
             label={"Seleccionar imagen"}
             type="file"
@@ -638,7 +638,7 @@ const ParametrosCategorizacion = () => {
                     ? URL.createObjectURL(selectedCategoria?.img_url[0])
                     : ""
                 }
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -655,7 +655,7 @@ const ParametrosCategorizacion = () => {
             <div className="flex flex-col items-center justify-center">
               <img
                 src={selectedCategoria.img_url}
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -671,7 +671,7 @@ const ParametrosCategorizacion = () => {
                     ? URL.createObjectURL(selectedCategoria?.img_url[0])
                     : ""
                 }
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -688,7 +688,7 @@ const ParametrosCategorizacion = () => {
               JPG
             </p>
           )}
-          <Fieldset legend="Sub-Categorias">
+          <Fieldset legend="Sub-Categorías">
             {selectedCategoria.subcategorias?.map(
               (subcategoria, index) =>
                 !subcategoria.deletion && (
@@ -697,7 +697,7 @@ const ParametrosCategorizacion = () => {
                       key={index}
                       id="Nombre sub-categoria"
                       name="nombre"
-                      label={"Nombre sub-categoria"}
+                      label={"Nombre sub-categoría"}
                       type="text"
                       autoComplete="off"
                       value={subcategoria.nombre}
@@ -728,7 +728,7 @@ const ParametrosCategorizacion = () => {
                         // console.log(file);
                         if (subcategoria.nombre === "") {
                           notifyError(
-                            "Primero debe ingresar un nombre para la subcategoria"
+                            "Primero debe ingresar un nombre para la sub-categoría"
                           );
                           return;
                         }
@@ -772,7 +772,7 @@ const ParametrosCategorizacion = () => {
                               ? URL.createObjectURL(subcategoria.img_url[0])
                               : ""
                           }
-                          alt="Imagen sub-categoria"
+                          alt="Imagen sub-categoría"
                           width="100"
                           height="100"
                           className="max-w-xs"
@@ -800,7 +800,7 @@ const ParametrosCategorizacion = () => {
                               ? URL.createObjectURL(subcategoria.img_url[0])
                               : ""
                           }
-                          alt="Imagen sub-categoria"
+                          alt="Imagen sub-categoría"
                           width="100"
                           height="100"
                           className="max-w-xs"
@@ -896,7 +896,7 @@ const ParametrosCategorizacion = () => {
                   }));
                 }}
               >
-                Crear sub-categoria
+                Crear sub-categoría
               </Button>
             </ButtonBar>
           </Fieldset>

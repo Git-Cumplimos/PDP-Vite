@@ -272,10 +272,10 @@ const AsignacionCategorias = () => {
         if (res?.status) {
           // notify(`Asignación creada correctamente a la subcategoria ${subcat.nombre}`);
         } else {
-          notifyError(`Error al asignar la subcategoria ${subcat.nombre}`);
+          notifyError(`Error al asignar la sub-categoría ${subcat.nombre}`);
         }
       } catch (err) {
-        notifyError(`Error al asignar la subcategoria ${subcat.nombre}`);
+        notifyError(`Error al asignar la sub-categoría ${subcat.nombre}`);
         console.error(err);
       }
     }
@@ -296,7 +296,7 @@ const AsignacionCategorias = () => {
         if (subcat) {
           if (subcat.comercios && subcat.comercios.includes(old.app)) {
             notifyError(
-              "La transacción ya está asignada a la subcategoría seleccionada."
+              "La transacción ya está asignada a la sub-categoría seleccionada."
             );
           } else {
             return {
@@ -382,7 +382,7 @@ const AsignacionCategorias = () => {
             <Select
               id="id_subcategoria"
               name="id_subcategoria"
-              label={"Subcategoría"}
+              label={"Sub-categoría"}
               value={selectedAsignacion.id_subcategoria}
               onChange={onChangeForm}
               options={selectSubcategorias}
