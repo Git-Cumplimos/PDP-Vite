@@ -33,7 +33,6 @@ const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPON
 
 const DATA_PAGO_INIT = {
   estadoLecturaPago: "codigoBarras",
-  codigoBarras: "",
   valorPagoProductosPropios: 0,
   tipoPago: 1,
   valorDiferentePagoProductosPropios: 0,
@@ -76,11 +75,19 @@ const PagoProductosPropiosCajaSocial = () => {
     );
   const consultaPagoProductosPropios = useCallback(
     (ev) => {
-      ev.preventDefault();
+      let numeroProducto = dataPago.numeroProducto;
+      if (typeof ev?.preventDefault === "function") {
+        ev.preventDefault();
+      } else {
+        let codigoBarras = ev;
+        codigoBarras = codigoBarras.replace("]C1", "");
+        numeroProducto = codigoBarras;
+        setDataPago((old) => ({ ...old, numeroProducto: codigoBarras }));
+      }
       if (
-        !algoCheckCuentaCreditoBMCajaSocial(dataPago.numeroProducto) &&
-        !algoCheckCreditoLendingCajaSocial(dataPago.numeroProducto) &&
-        !algoCheckTCCreditoRotativoCajaSocial(dataPago.numeroProducto)
+        !algoCheckCuentaCreditoBMCajaSocial(numeroProducto) &&
+        !algoCheckCreditoLendingCajaSocial(numeroProducto) &&
+        !algoCheckTCCreditoRotativoCajaSocial(numeroProducto)
       )
         return notifyError("Número de producto ingresado errado");
       const data = {
@@ -103,7 +110,7 @@ const PagoProductosPropiosCajaSocial = () => {
           city: roleInfo?.["ciudad"],
         },
         pago_productos_propios_caja_social: {
-          numero_producto: dataPago?.numeroProducto,
+          numero_producto: numeroProducto,
         },
         id_user_pdp: pdpUser.uuid,
       };
@@ -259,9 +266,6 @@ const PagoProductosPropiosCajaSocial = () => {
     setDataPago(DATA_PAGO_INIT);
     notifyError("Pago cancelado por el usuario");
   }, []);
-  const onSubmitBarCode = (info) => {
-    console.log(info);
-  };
   const isChecked = (value) => dataPago.estadoLecturaPago === value;
   return (
     <>
@@ -307,13 +311,18 @@ const PagoProductosPropiosCajaSocial = () => {
         {dataPago.estadoLecturaPago === "codigoBarras" ? (
           <>
             <BarcodeReader
-              onSearchCodigo={onSubmitBarCode}
+              onSearchCodigo={consultaPagoProductosPropios}
               disabled={
                 loadingPeticionPagoProductosPropios || loadingPeticionConsulta
               }
             />
             <div ref={buttonDelete}>
-              <Button type="reset">
+              <Button
+                type="reset"
+                disabled={
+                  loadingPeticionPagoProductosPropios || loadingPeticionConsulta
+                }
+              >
                 Volver a ingresar el código de barras
               </Button>
             </div>
