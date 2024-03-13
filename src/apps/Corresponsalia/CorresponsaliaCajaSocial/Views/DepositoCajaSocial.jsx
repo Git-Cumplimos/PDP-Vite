@@ -18,7 +18,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
 import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
-import { algoCheckCuentaDepositoCajaSocial } from "../utils/trxUtils";
+import { algoCheckCuentaCreditoBMCajaSocial } from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
 import { useMFA } from "../../../../components/Base/MFAScreen";
 
@@ -62,7 +62,7 @@ const DepositoCajaSocial = () => {
       const sliceData = dataDeposito.numeroCuenta.slice(0, 2);
       if (!numerosInicio.includes(sliceData))
         return notifyError("Número de cuenta ingresado errado");
-      if (!algoCheckCuentaDepositoCajaSocial(dataDeposito.numeroCuenta))
+      if (!algoCheckCuentaCreditoBMCajaSocial(dataDeposito.numeroCuenta))
         return notifyError("Número de cuenta ingresado errado");
       const data = {
         oficina_propia:
@@ -201,9 +201,10 @@ const DepositoCajaSocial = () => {
   }, []);
   const closeModule = useCallback(() => {
     setDataDeposito(DATA_DEPOSITO_INIT);
+    setShowModal(false);
+    setEstadoPeticion(0);
     notifyError("Pago cancelado por el usuario");
-    validNavigate(-1);
-  }, [validNavigate]);
+  }, []);
   return (
     <>
       <h1 className="text-3xl mt-10">Depósitos BCSC</h1>
@@ -243,7 +244,10 @@ const DepositoCajaSocial = () => {
         <ButtonBar className="lg:col-span-2">
           <Button
             type="button"
-            onClick={closeModule}
+            onClick={(e) => {
+              closeModule(e);
+              validNavigate(-1);
+            }}
             disabled={loadingPeticionDeposito || loadingPeticionConsultaTitular}
           >
             Cancelar
