@@ -69,7 +69,7 @@ const CupoComer = () => {
       <h1 className="text-3xl mt-6">Consulta cupo comercio</h1>
       {roleInfo?.id_comercio ? (
         ""
-      ) : cupoComer === [] ? (
+      ) : (
         <Form grid>
           <Input
             id="idCliente"
@@ -87,23 +87,24 @@ const CupoComer = () => {
             }}
             required
           />
-          <ButtonBar></ButtonBar>
         </Form>
-      ):("")}
+      )}
 
       <TableEnterprise
         title="Cupo comercios"
-        headers={["Id comercio", "Sobregiro", "Base caja",]}
+        headers={["Id comercio", "Sobregiro", "Base caja","Dias sobregiro"]}
         data={
           cupoComer?.map(
             ({ 
               pk_id_comercio,
               sobregiro,
               base_caja,
+              dias_transcurridos,
             }) => ({
               pk_id_comercio,
               sobregiro: formatMoney.format(sobregiro),
-              base_caja: formatMoney.format(base_caja)
+              base_caja: formatMoney.format(base_caja),
+              dias_transcurridos
             }) 
           ) ?? []
         }
@@ -111,6 +112,7 @@ const CupoComer = () => {
           setPage(pagedata.page);
           setLimit(pagedata.limit);
         }}
+        children={null}
         maxPage={maxPages}
       ></TableEnterprise>
       <Form>
