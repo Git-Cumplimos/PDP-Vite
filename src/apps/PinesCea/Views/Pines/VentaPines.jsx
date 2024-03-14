@@ -622,12 +622,12 @@ const VentaPines = () => {
   const datosConveni = useMemo(() => {
     if (canal == "1") {
       return{
-    "codigo_pin": "0807", 
-    "fk_id_convenio": 2310,//2041, 
+    "codigo_pin":  `${process.env.CODIGO_PIN_CEA_OLIMPIA}`,
+    "fk_id_convenio": `${process.env.CANAL_VENTA_CEA_OLIMPIA}`, //2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CEA", 
     "permite_modificar": true, 
-    "pk_codigo_convenio": "108928", 
+    "pk_codigo_convenio": `${process.env.CODIGO_CONVENIO_CEA_OLIMPIA}`,
     "referencia_1": "Documento", 
     "referencia_2": "Celular", 
     "referencia_3": null, 
@@ -635,12 +635,12 @@ const VentaPines = () => {
     "referencia_5": null
   };}
   else{ return{
-    "codigo_pin": "0043", 
-    "fk_id_convenio": 2310,//2041, 
+    "codigo_pin": `${process.env.CODIGO_PIN_CEA_PAYNET}`, 
+    "fk_id_convenio": `${process.env.CANAL_VENTA_CEA_PAYNET}`,//2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CEA", 
     "permite_modificar": false, 
-    "pk_codigo_convenio": "108928", 
+    "pk_codigo_convenio": `${process.env.CODIGO_CONVENIO_CEA_PAYNET}`,
     "referencia_1": "Documento", 
     "referencia_2": "Celular", 
     "referencia_3": null, 
