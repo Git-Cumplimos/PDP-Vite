@@ -4,7 +4,7 @@ import HNavbar from "../components/Base/HNavbar";
 
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { useMemo,  } from "react";
+import { useMemo } from "react";
 import { useImgs } from "../hooks/ImgsHooks";
 import { useWindowSize } from "../hooks/WindowSizeHooks";
 // import ReconoSERID from "../components/Compound/ReconoSERID/ReconoSERID";

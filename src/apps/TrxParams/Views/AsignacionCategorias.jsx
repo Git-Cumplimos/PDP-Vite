@@ -22,7 +22,6 @@ import Accordion from "../../../components/Base/Accordion";
 import { fetchAllCategorias } from "../../../pages/Categorias/utils/fetchHome";
 import TextArea from "../../../components/Base/TextArea";
 import { postAssign } from "../utils/fetchParametrosAsignaciones";
-import { toast } from "react-toastify";
 
 const AsignacionCategorias = () => {
   const { allRoutes } = useUrls();
@@ -139,16 +138,8 @@ const AsignacionCategorias = () => {
       edit: false,
     });
   }, []);
-  // const handleShowModal = useCallback(() => {
-  //   setShowModal(true);
-  //   setSelectedAsignacion({
-  //     app: "",
-  //     id_categoria: "",
-  //     id_subcategoria: "",
-  //     subcategorias: [],
-  //     edit: false,
-  //   });
-  // }, []);
+
+  const [editClone, setEditClone] = useState({});
 
   const onSelectCategorias = useCallback(
     async (e, i) => {
@@ -158,7 +149,14 @@ const AsignacionCategorias = () => {
         id_categoria: selected.id_categoria,
         id_subcategoria: "",
         subcategorias: selected.subcategorias,
-        edit: false,
+        edit: true,
+      });
+      setEditClone({
+        app: "",
+        id_categoria: selected.id_categoria,
+        id_subcategoria: "",
+        subcategorias: selected.subcategorias,
+        edit: true,
       });
       const subcategorias = categorias.find(
         (cat) => cat.id_categoria === parseInt(selected.id_categoria)
@@ -506,7 +504,13 @@ const AsignacionCategorias = () => {
             <Button type="button" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!selectedAsignacion.edit}>
+            <Button
+              type="submit"
+              disabled={
+                selectedAsignacion.edit &&
+                JSON.stringify(editClone) === JSON.stringify(selectedAsignacion)
+              }
+            >
               Asignar Categoría
             </Button>
           </ButtonBar>
