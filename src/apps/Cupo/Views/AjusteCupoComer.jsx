@@ -28,7 +28,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
     min: 0,
   };
 
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   // useEffect(() => {
   //   if (cupoComer.length === 0) {
   //     notifyError("ID de comercio incorrecto");
@@ -70,7 +70,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
         let body = {
           valor_afectacion : valor,
           fk_id_comercio: idComercio,
-          usuario: roleInfo.id_usuario ?? -1,
+          usuario: roleInfo.id_usuario ?? pdpUser?.uuid ?? -1,
           fk_tipo_de_movimiento: 2,
           motivo_afectacion: razonAjuste,
         }
@@ -101,6 +101,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
       razonAjuste,
       roleInfo?.id_usuario,
       submitName,
+      pdpUser,
       navegate,
       consultaCupoComercios
     ]
