@@ -225,9 +225,7 @@ export const useProvideUrls = () => {
             const link = `/${props.nombre.replace(/\s+/g, "-")}`;
             const subcategoriasFiltradas = props.subcategorias.filter(
               (subcategoria) =>
-                subcategoria.status ||
-                subcategoria.comercios ||
-                subcategoria.comercios?.length > 0
+                subcategoria.comercios || subcategoria.comercios?.length > 0
             );
             const subcats = subcategoriasFiltradas.map((subcategoria) => {
               const linkSubcat = `${link}/${subcategoria.nombre.replace(
@@ -245,6 +243,7 @@ export const useProvideUrls = () => {
               return {
                 link: linkSubcat,
                 label: logo,
+                status: subcategoria.status,
                 component: (props) => (
                   <Subcategorias
                     {...props}
@@ -265,6 +264,7 @@ export const useProvideUrls = () => {
               return {
                 link: null,
                 label: null,
+                status: null,
                 component: null,
                 props: null,
                 subRoutes: null,

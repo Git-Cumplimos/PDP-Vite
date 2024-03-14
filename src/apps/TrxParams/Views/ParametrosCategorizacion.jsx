@@ -45,6 +45,7 @@ const ParametrosCategorizacion = () => {
     edit: false,
     subcategorias: [],
   });
+  const [editClone, setEditClone] = useState({});
   const tableCategorias = useMemo(() => {
     return [
       ...categorias.map((cat) => {
@@ -104,6 +105,21 @@ const ParametrosCategorizacion = () => {
       const selected = categorias[i];
       // console.log(selected);
       setSelectedCategoria({
+        id_categoria: selected.id_categoria,
+        fk_zona: selected.fk_zona,
+        nombre: selected.nombre,
+        img_url: selected.img_url,
+        subcategorias: [
+          ...selected.subcategorias.map((sub) => {
+            return {
+              ...sub,
+              deletion: false,
+            };
+          }),
+        ],
+        edit: true,
+      });
+      setEditClone({
         id_categoria: selected.id_categoria,
         fk_zona: selected.fk_zona,
         nombre: selected.nombre,
@@ -214,6 +230,16 @@ const ParametrosCategorizacion = () => {
     const subcategoriasNamesSet = new Set(subcategoriasNames);
     if (subcategoriasNames.length !== subcategoriasNamesSet.size) {
       notifyError("No pueden existir subcategorias con el mismo nombre");
+      return;
+    }
+    // Validar que no tenga espacios al inicio y al final
+    if (
+      selectedCategoria.nombre.trim() !== selectedCategoria.nombre ||
+      selectedCategoria.subcategorias.some(
+        (sub) => sub.nombre.trim() !== sub.nombre
+      )
+    ) {
+      notifyError("No puede haber espacios al inicio o al final del nombre");
       return;
     }
     const formData = new FormData();
@@ -375,6 +401,16 @@ const ParametrosCategorizacion = () => {
     const subcategoriasNamesSet = new Set(subcategoriasNames);
     if (subcategoriasNames.length !== subcategoriasNamesSet.size) {
       notifyError("No pueden existir subcategorias con el mismo nombre");
+      return;
+    }
+    // Validar que no tenga espacios al inicio y al final
+    if (
+      selectedCategoria.nombre.trim() !== selectedCategoria.nombre ||
+      selectedCategoria.subcategorias.some(
+        (sub) => sub.nombre.trim() !== sub.nombre
+      )
+    ) {
+      notifyError("No puede haber espacios al inicio o al final del nombre");
       return;
     }
     const formData = new FormData();
@@ -914,7 +950,14 @@ const ParametrosCategorizacion = () => {
             >
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button
+              type="submit"
+              disabled={
+                selectedCategoria.edit &&
+                // Validar que se hayan hecho cambios
+                JSON.stringify(selectedCategoria) === JSON.stringify(editClone)
+              }
+            >
               {selectedCategoria.edit ? "Editar la información" : "Aceptar"}
             </Button>
           </ButtonBar>
