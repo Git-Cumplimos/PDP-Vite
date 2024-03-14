@@ -120,7 +120,7 @@ const ConsultaDatafonos = ({
     (ev, i) => {
       ev.preventDefault();
       if (type === "Gestion") {
-        navigate(`editar/${datafonos[i]?.pk_tullave_datafonos}`);
+        navigate(`${datafonos[i]?.pk_tullave_datafonos}`);
       } else {
         navigate(`transaccion/${datafonos[i]?.pk_tullave_datafonos}`);
       }
