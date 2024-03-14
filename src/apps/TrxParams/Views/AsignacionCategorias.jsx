@@ -508,7 +508,7 @@ const AsignacionCategorias = () => {
               type="submit"
               disabled={
                 selectedAsignacion.edit &&
-                JSON.stringify(editClone) === JSON.stringify(selectedAsignacion)
+                JSON.stringify(editClone.subcategorias) === JSON.stringify(selectedAsignacion.subcategorias)
               }
             >
               Asignar Categoría
