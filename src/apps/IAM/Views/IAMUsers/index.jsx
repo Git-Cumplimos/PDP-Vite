@@ -293,7 +293,7 @@ const IAMUsers = () => {
             const copy = new Map(old)
               .set(
                 ev.target.name,
-                ["uuid"].includes(ev.target.name)
+                ["uuid"].includes(ev.target.name) || ["fk_id_comercio"].includes(ev.target.name)
                   ? onChangeNumber(ev)
                   : ev.target.value
               )
@@ -330,7 +330,7 @@ const IAMUsers = () => {
           id="search_fk_id_comercio"
           name="fk_id_comercio"
           label={"ID Comercio relacionado"}
-          type="number"
+          type="tel"
           maxLength={20}
           autoComplete="off"
         />
