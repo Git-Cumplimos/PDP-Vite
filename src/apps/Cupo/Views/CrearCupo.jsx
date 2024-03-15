@@ -84,7 +84,7 @@ const CrearCupo = () => {
         cupo_en_canje: canje,
         base_caja: baseCaja ?? 0,
         dias_max_sobregiro: parseInt(diasMaxSobregiro) ?? 0,
-        usuario: roleInfo.id_usuario ?? -1,
+        usuario: roleInfo.id_usuario ?? pdpUser?.uuid ?? -1,
       };
       postCupoComercio(body)
         .then((res) => {
@@ -108,7 +108,8 @@ const CrearCupo = () => {
       canje,
       sobregiro,
       roleInfo.id_usuario,
-      navigate
+      navigate,
+      pdpUser
     ]
   );
 
