@@ -759,6 +759,7 @@ const ParametrosCategorizacion = () => {
                       label={"Seleccionar imagen"}
                       type="file"
                       autoComplete="off"
+                      disabled={subcategoria.nombre === ""}
                       // required={selectedCategoria.edit ? false : true}
                       onGetFile={(file) => {
                         // console.log(file);
