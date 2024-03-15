@@ -239,7 +239,7 @@ const IAMUsers = () => {
       <DataTable
         title="Usuarios punto de pago"
         headers={[
-          "Id de usuario",
+          "ID de usuario",
           "Nombre de usuario",
           "Email",
           "ID Comercio relacionado",
@@ -305,7 +305,7 @@ const IAMUsers = () => {
         <Input
           id="search_uuid"
           name="uuid"
-          label={"Id de usuario"}
+          label={"ID de usuario"}
           type="tel"
           maxLength={20}
           autoComplete="off"
