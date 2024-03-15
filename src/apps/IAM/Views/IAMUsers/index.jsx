@@ -242,8 +242,8 @@ const IAMUsers = () => {
           "Id de usuario",
           "Nombre de usuario",
           "Email",
-          "ID Comercio Relacionado",
-          "Comercio Relacionado",
+          "ID Comercio relacionado",
+          "Comercio relacionado",
           "Estado",
         ]}
         data={
