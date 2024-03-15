@@ -107,6 +107,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
         },
         pago_credito: {
           numero_credito: dataCreditoUnique?.Numeroprestamo,
+          id_numero_credito: dataCreditoUnique?.Id,
           observaciones: dataInput?.observaciones,
           tipo_documento: dataInput?.tipoDocumento,
           forma_pago: dataInput?.formaPago,
