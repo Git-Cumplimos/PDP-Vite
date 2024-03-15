@@ -946,7 +946,6 @@ const ParametrosCategorizacion = () => {
             )} */}
             <Button
               type="button"
-              disabled={!selectedCategoria.img_url.length}
               onClick={handleClose}
             >
               Cancelar
