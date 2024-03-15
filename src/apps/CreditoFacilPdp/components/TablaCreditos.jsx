@@ -55,7 +55,7 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
         Valorparaestaraldia,
       }) => {
         return {
-          id: Id,
+          id: Numeroprestamo,
           estado: Estado,
           valorCuota: formatMoney.format(Valorcuotaactual),
           saldo: formatMoney.format(Saldo),
@@ -85,7 +85,9 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
   const onSelect = useCallback(
     (ev, i) => {
       const idData = dataTable[i]?.id;
-      const dataCredito = dataCreditos.filter((data) => data.Id === idData);
+      const dataCredito = dataCreditos.filter(
+        (data) => data.Numeroprestamo === idData
+      );
       setDataCreditoUnique(dataCredito[0] ?? {});
     },
     [dataTable, dataCreditos]

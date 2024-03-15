@@ -15,16 +15,54 @@ import Tickets from "../../../components/Base/Tickets";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useNavigate } from "react-router-dom";
 import { useFetchCreditoFacil } from "../hooks/fetchCreditoFacil";
+import Select from "../../../components/Base/Select";
 
 const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
 const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
-
+const DATA_TIPO_DOCUMENTO = {
+  "": "",
+  NIT: 2,
+  "CEDULA CIUDADANIA": 1,
+  "TARJETA DE IDENTIDAD": 4,
+  "REGISTRO CIVIL": 6,
+  "TARJETA DE EXTRANJERIA": 7,
+  "CEDULA EXTRANJERIA": 3,
+  PASAPORTE: 8,
+  "DEFINIDO POR LA DIAN": 10,
+  "TIPO DOCUMENTO EXTRANJERO PJURIDICA": 5,
+  "NIT PERSONA NATURAL": 11,
+};
+const DATA_FORMA_PAGO = {
+  "": "",
+  "CUENTA CTE BANCO DE COLPATRIA": 19,
+  "CUENTA AHORROS BANCO AGRARIO": 20,
+  // "CUENTA CTA BANCOLOMBIA": 22,
+  // "CUENTA CTE DAVIVIENDA": 23,
+  // "CUENTA CTE ITAU": 24,
+  // "DESEMBOLSO CREDITO COMERCIOS": 28,
+};
+const DATA_TIPO_ABONO = {
+  "": "",
+  "ABONO NORMAL": 9,
+  "REDUCCIÓN TIEMPO": 10,
+  "REDUCCIÓN CUOTA": 11,
+  ADELANTADO: 12,
+  "PARA ESTAR AL DÍA": 13,
+  "PAGO TOTAL": 14,
+  "OTRO VALOR": 15,
+};
 const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
   const uniqueId = v4();
   const validNavigate = useNavigate();
   const [dataInput, setDataInput] = useState({
     valor: 0,
     observaciones: "",
+    tipoDocumento: "",
+    formaPago: "",
+    tipoAbono: "",
+    nombreTipoDocumento: "",
+    nombreFormaPago: "",
+    nombreTipoAbono: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -68,8 +106,12 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
           city: roleInfo?.["ciudad"],
         },
         pago_credito: {
-          numero_credito: dataCreditoUnique?.Id,
+          numero_credito: dataCreditoUnique?.Numeroprestamo,
+          id_numero_credito: dataCreditoUnique?.Id,
           observaciones: dataInput?.observaciones,
+          tipo_documento: dataInput?.tipoDocumento,
+          forma_pago: dataInput?.formaPago,
+          tipo_abono: dataInput?.tipoAbono,
         },
       };
       const dataAditional = {
@@ -102,9 +144,43 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    setDataInput((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
+    if (ev.target.name === "tipoDocumento") {
+      let nombreDocumento =
+        Object.keys(DATA_TIPO_DOCUMENTO).filter(
+          (key) => DATA_TIPO_DOCUMENTO[key] === parseInt(value)
+        )[0] ?? "";
+      setDataInput((old) => ({
+        ...old,
+        nombreTipoDocumento: nombreDocumento,
+        [ev.target.name]: value,
+      }));
+    }
+    if (ev.target.name === "formaPago") {
+      let nombreformaPagoTemp =
+        Object.keys(DATA_FORMA_PAGO).filter(
+          (key) => DATA_FORMA_PAGO[key] === parseInt(value)
+        )[0] ?? "";
+      setDataInput((old) => ({
+        ...old,
+        nombreFormaPago: nombreformaPagoTemp,
+        [ev.target.name]: value,
+      }));
+    }
+    if (ev.target.name === "tipoAbono") {
+      let nombreTipoAbonoTemp =
+        Object.keys(DATA_TIPO_ABONO).filter(
+          (key) => DATA_TIPO_ABONO[key] === parseInt(value)
+        )[0] ?? "";
+      setDataInput((old) => ({
+        ...old,
+        nombreTipoAbono: nombreTipoAbonoTemp,
+        [ev.target.name]: value,
+      }));
+    } else {
+      setDataInput((old) => {
+        return { ...old, [ev.target.name]: value };
+      });
+    }
   }, []);
   const onChangeFormatNum = useCallback((ev, val) => {
     if (!isNaN(val)) {
@@ -126,7 +202,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             autoComplete="off"
             minLength={0}
             maxLength={20}
-            value={dataCreditoUnique?.Id}
+            value={dataCreditoUnique?.Numeroprestamo}
             onChange={() => {}}
             disabled
             required
@@ -175,6 +251,36 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             onChange={() => {}}
             disabled
             required
+          />
+          <Select
+            id="tipoDocumento"
+            name="tipoDocumento"
+            label="Tipo de documento"
+            options={DATA_TIPO_DOCUMENTO}
+            value={dataInput?.tipoDocumento}
+            onChange={onChangeFormat}
+            required
+            disabled={loadingPeticionPagoCredito}
+          />
+          <Select
+            id="formaPago"
+            name="formaPago"
+            label="Forma de pago"
+            options={DATA_FORMA_PAGO}
+            value={dataInput?.formaPago}
+            onChange={onChangeFormat}
+            required
+            disabled={loadingPeticionPagoCredito}
+          />
+          <Select
+            id="tipoAbono"
+            name="tipoAbono"
+            label="Tipo de abono"
+            options={DATA_TIPO_ABONO}
+            value={dataInput?.tipoAbono}
+            onChange={onChangeFormat}
+            required
+            disabled={loadingPeticionPagoCredito}
           />
           <MoneyInput
             id="valor"
@@ -229,6 +335,9 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
               subtitle="Resumen de transacción"
               summaryTrx={{
                 "Número crédito": dataCreditoUnique?.Id,
+                "Tipo de documento": dataInput?.nombreTipoDocumento,
+                "Forma de pago": dataInput?.nombreFormaPago,
+                "Tipo de abono": dataInput?.nombreTipoAbono,
                 "Valor a pagar": formatMoney.format(dataInput?.valor),
               }}
             >
