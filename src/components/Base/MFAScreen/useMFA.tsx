@@ -3,26 +3,43 @@ import {
   useCallback,
   useContext,
   useState,
-  FormEventHandler,
   FormEvent,
   MouseEvent,
   useEffect,
   SetStateAction,
   useMemo,
+  Dispatch,
 } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../../hooks/AuthHooks";
 import useLocalStorage from "../../../hooks/useLocalStorage";
 
-export const MFAContext = createContext({
+type EventHandler = (
+  _?: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>
+) => void;
+
+type MFATontextType = {
+  consumer: {
+    activateTotpWall: EventHandler;
+    submitEventSetter: (_: EventHandler) => EventHandler;
+  };
+  api: {
+    activeModal: boolean;
+    submitEvent: EventHandler;
+    setCurrentTotp: Dispatch<SetStateAction<string | null>>;
+    deactivateTotpWall: () => void;
+  };
+};
+
+export const MFAContext = createContext<MFATontextType>({
   consumer: {
     activateTotpWall: () => {},
-    submitEventSetter: (_: FormEventHandler<HTMLFormElement>) => {},
+    submitEventSetter: (_) => _,
   },
   api: {
     activeModal: false,
-    submitEvent: (_: FormEvent<HTMLFormElement>) => {},
-    setCurrentTotp: (_: SetStateAction<string | null>) => {},
+    submitEvent: (_) => {},
+    setCurrentTotp: (_) => {},
     deactivateTotpWall: () => {},
   },
 });
@@ -49,30 +66,25 @@ export const useProvideMFA = () => {
     "current_totp",
     null
   );
-  const [submitEvent, setSubmitEvent] = useState<
-    FormEventHandler<HTMLFormElement>
-  >(() => () => {});
+  const [submitEvent, setSubmitEvent] = useState<EventHandler>(() => () => {});
   const [commerceUseTotp, setCommerceUseTotp] = useLocalStorage<boolean>(
     "commerce_use_totp",
     false
   );
 
-  const activateTotpWall = useCallback(
-    (ev?: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
-      if (ev && ev.type === "submit") {
-        ev.preventDefault();
-      }
-      setActiveModal(true);
-    },
-    []
-  );
+  const activateTotpWall = useCallback<EventHandler>((ev) => {
+    if (ev && ev.type === "submit") {
+      ev.preventDefault();
+    }
+    setActiveModal(true);
+  }, []);
   const deactivateTotpWall = useCallback(() => {
     setActiveModal(false);
     setCurrentTotp(null);
   }, [setCurrentTotp]);
 
   const submitEventSetter = useCallback(
-    (onSubmit: FormEventHandler<HTMLFormElement>) => {
+    (onSubmit: EventHandler) => {
       if (!commerceUseTotp) {
         return onSubmit;
       }
