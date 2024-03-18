@@ -19,6 +19,7 @@ import {
   putModificarConvenio,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
+import ToggleInput from "../../../../../components/Base/ToggleInput";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/banco_agrario_cb_recaudo/subir_archivos_convenios`;
 
@@ -42,6 +43,7 @@ const ConveniosRecaudoAgrario = () => {
     codigo: "",
     ean: "",
     estado: true,
+    permite_recaudo_manual: false,
     nit: "",
     nombre_convenio: "",
     pk_tbl_convenios_banco_agrario: 0,
@@ -86,6 +88,7 @@ const ConveniosRecaudoAgrario = () => {
       codigo: "",
       ean: "",
       estado: true,
+      permite_recaudo_manual: false,
       nit: "",
       nombre_convenio: "",
       pk_tbl_convenios_banco_agrario: 0,
@@ -130,6 +133,7 @@ const ConveniosRecaudoAgrario = () => {
         codigo: convenios[i].codigo,
         ean: convenios[i].ean,
         estado: convenios[i].estado,
+        permite_recaudo_manual: convenios[i].permite_recaudo_manual,
         nit: convenios[i].nit,
         nombre_convenio: convenios[i].nombre_convenio,
         pk_tbl_convenios_banco_agrario:
@@ -197,6 +201,11 @@ const ConveniosRecaudoAgrario = () => {
     if (ev.target.name === "estado") {
       if (value && typeof value === "string") {
         value = value.toLowerCase() === "false" ? false : true;
+      }
+    }
+    if (ev.target.name === "permite_recaudo_manual") {
+      if (value && typeof value === "string") {
+        value = value.toLowerCase() === "on" ? true : false;
       }
     }
     setDataConvenios((old) => {
@@ -610,6 +619,14 @@ const ConveniosRecaudoAgrario = () => {
                 }}
                 onChange={onChangeFormat}
                 value={dataConvenios?.estado}
+              />
+              <ToggleInput
+                id={"permite_recaudo_manual"}
+                label={"Permite recaudo manual"}
+                name={"permite_recaudo_manual"}
+                defaultChecked={dataConvenios?.permite_recaudo_manual}
+                onChange={onChangeFormat}
+                value={dataConvenios?.permite_recaudo_manual}
               />
             </Fieldset>
             {dataConvenios.referencias.map((item, id) => (

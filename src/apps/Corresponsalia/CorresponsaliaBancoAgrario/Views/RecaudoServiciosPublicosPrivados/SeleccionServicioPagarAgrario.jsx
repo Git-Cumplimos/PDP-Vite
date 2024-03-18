@@ -4,6 +4,7 @@ import Input from "../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { postConsultaTablaConveniosPaginado } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
+import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 
 const SeleccionServicioPagarAgrario = () => {
   const navigate = useNavigate();
@@ -52,26 +53,30 @@ const SeleccionServicioPagarAgrario = () => {
     fecthTablaConveniosPaginadoFunc();
   }, [datosTrans, page, limit]);
 
-  const fecthTablaConveniosPaginadoFunc = () => {
-    postConsultaTablaConveniosPaginado({
-      nombre_convenio: datosTrans.convenio,
-      codigo: datosTrans.idConvenio,
-      page,
-      limit,
-    })
-      .then((autoArr) => {
-        setMaxPages(autoArr?.maxPages);
-        setConvenios(autoArr?.results ?? []);
+  const fecthTablaConveniosPaginadoFunc = useDelayedCallback(
+    useCallback(() => {
+      postConsultaTablaConveniosPaginado({
+        nombre_convenio: datosTrans.convenio,
+        codigo: datosTrans.idConvenio,
+        permite_recaudo_manual: true,
+        page,
+        limit,
       })
-      .catch((err) => console.error(err));
-  };
+        .then((autoArr) => {
+          setMaxPages(autoArr?.maxPages);
+          setConvenios(autoArr?.results ?? []);
+        })
+        .catch((err) => console.error(err));
+    }, [datosTrans, limit, page]),
+    500
+  );
   return (
     <>
-      <h1 className='text-3xl text-center'>
+      <h1 className="text-3xl text-center">
         Recaudo servicios públicos y privados
       </h1>
       <TableEnterprise
-        title='Tabla convenios CB Banco Agrario'
+        title="Tabla convenios CB Banco Agrario"
         maxPage={maxPages}
         headers={["Código", "Convenio"]}
         data={tableConvenios}
@@ -80,13 +85,13 @@ const SeleccionServicioPagarAgrario = () => {
         // onChange={onChange}
       >
         <Input
-          id='searchConvenio'
-          name='searchConvenio'
+          id="searchConvenio"
+          name="searchConvenio"
           label={"Nombre convenio"}
-          minLength='1'
-          maxLength='30'
-          type='text'
-          autoComplete='off'
+          minLength="1"
+          maxLength="30"
+          type="text"
+          autoComplete="off"
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
@@ -94,12 +99,12 @@ const SeleccionServicioPagarAgrario = () => {
           }}
         />
         <Input
-          id='idConvenio'
-          label='Código convenio'
-          type='text'
-          name='idConvenio'
-          minLength='1'
-          maxLength='13'
+          id="idConvenio"
+          label="Código convenio"
+          type="text"
+          name="idConvenio"
+          minLength="1"
+          maxLength="13"
           required
           value={datosTrans.idConvenio}
           onInput={(e) => {
@@ -110,7 +115,8 @@ const SeleccionServicioPagarAgrario = () => {
                 return { ...old, idConvenio: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
       </TableEnterprise>
     </>
   );
