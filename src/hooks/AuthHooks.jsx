@@ -695,9 +695,7 @@ export const useProvideAuth = () => {
           )
           .catch(() => {});
       })
-      .catch(() => {
-        dispatchAuth({ type: SIGN_OUT });
-      });
+      .catch(() => signOut());
     // if (Auth.user === null || Auth.user === undefined) {
     // } else {
     //   dispatchAuth({ type: SIGN_OUT });
@@ -706,7 +704,7 @@ export const useProvideAuth = () => {
     //     payload: { loggedUser: Auth.user },
     //   });
     // }
-  }, [pathname]);
+  }, [pathname, signOut]);
 
   useEffect(() => {
     const isPdpCommerce = !!pdpUser?.fk_id_comercio;
