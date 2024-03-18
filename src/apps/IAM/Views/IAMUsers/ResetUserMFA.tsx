@@ -82,16 +82,14 @@ const ResetUserMFA = ({ userInfo }: Props) => {
           title={"Activar / desactivar permiso reset OTP y contraseña usuario"}
         />
         <ButtonBar>
-          <button
-            className={`px-4 py-2 bg-red-600 text-white rounded-full transition-opacity duration-300 ${
-              !allowResetUser && "opacity-40 cursor-default"
-            }`}
+          <Button
             type="button"
+            design="danger"
             disabled={!allowResetUser}
             onClick={() => setShowModal(true)}
           >
             Reset OTP y contraseña usuario
-          </button>
+          </Button>
         </ButtonBar>
       </Fieldset>
       <Modal show={showModal} handleClose={handleClose}>
@@ -105,16 +103,14 @@ const ResetUserMFA = ({ userInfo }: Props) => {
           }}
         >
           <ButtonBar>
-            <button
+            <Button
               type="button"
-              className={`px-4 py-2 bg-red-600 text-white rounded-full transition-opacity duration-300 ${
-                loadingResetUser && "opacity-40 cursor-default"
-              } m-4`}
+              design="danger"
               onClick={resetUser}
               disabled={loadingResetUser}
             >
               Aceptar
-            </button>
+            </Button>
             <Button
               type="button"
               onClick={handleClose}
