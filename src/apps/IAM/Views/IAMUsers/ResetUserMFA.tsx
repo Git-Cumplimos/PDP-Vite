@@ -8,6 +8,9 @@ import Button from "../../../../components/Base/Button";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import { useNavigate } from "react-router-dom";
 
+import { PermissionsIAM } from "../../permissions";
+import { useAuth } from "../../../../hooks/AuthHooks";
+
 type Props = {
   userInfo: {
     id: number;
@@ -21,8 +24,18 @@ const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const ResetUserMFA = ({ userInfo }: Props) => {
   const navigate = useNavigate();
+  const { userPermissions } = useAuth();
+
   const [allowResetUser, setAllowResetUser] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const listaPermisos = useMemo(
+    () =>
+      userPermissions
+        .map(({ id_permission }) => id_permission)
+        .filter((id_permission) => id_permission === PermissionsIAM.reset_mfa),
+    [userPermissions]
+  );
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -35,7 +48,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
       options: useMemo(
         () => ({
           method: "POST",
-          headers: {"Content-Type": "application/json"},
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: userInfo.email }),
         }),
         [userInfo.email]
@@ -44,15 +57,17 @@ const ResetUserMFA = ({ userInfo }: Props) => {
     },
     {
       onPending: useCallback(
-        () => "Reiniciando OTP y contraseña de usuario",
+        () => "Recuperando QR y contraseña de usuario",
         []
       ),
-      onSuccess: useCallback((res) => {
-        // const commerce = res?.obj;
-        handleClose();
-        navigate("/iam/users");
-        return "Reinicio satisfactorio";
-      }, [handleClose, navigate]),
+      onSuccess: useCallback(
+        (_res) => {
+          handleClose();
+          navigate("/iam/users");
+          return "Reinicio satisfactorio";
+        },
+        [handleClose, navigate]
+      ),
       onError: useCallback((error) => {
         if (error?.cause === "custom") {
           return error.message;
@@ -67,10 +82,14 @@ const ResetUserMFA = ({ userInfo }: Props) => {
     { notify: true }
   );
 
+  if (!listaPermisos.length) {
+    return <Fragment />;
+  }
+
   return (
     <Fragment>
       <Fieldset
-        legend={"Reset OTP y contraseña usuario (Danger zone)"}
+        legend={"Recuperar QR y contraseña usuario (Danger zone)"}
         className={"lg:col-span-2"}
       >
         <ToggleInput
@@ -88,13 +107,13 @@ const ResetUserMFA = ({ userInfo }: Props) => {
             disabled={!allowResetUser}
             onClick={() => setShowModal(true)}
           >
-            Reset OTP y contraseña usuario
+            Recuperar QR y contraseña usuario
           </Button>
         </ButtonBar>
       </Fieldset>
       <Modal show={showModal} handleClose={handleClose}>
         <PaymentSummary
-          title="¿Está seguro de realizar el reinicio del usuario?"
+          title="¿Está seguro de recuperar QR y contraseña del usuario?"
           subtitle="Informacion de usuario"
           summaryTrx={{
             "Id de usuario": userInfo.id,

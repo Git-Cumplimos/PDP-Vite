@@ -4,4 +4,5 @@ export enum PermissionsIAM {
   politicas = 16,
   roles = 14,
   permisos = 15,
+  reset_mfa = 38000,
 }
