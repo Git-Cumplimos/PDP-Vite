@@ -49,7 +49,7 @@ const ReporteComercios = () => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl ">Reportes comercio</h1>
+      <h1 className="text-3xl ">Reportes transacciones por comercio</h1>
       <Form onSubmit={getReportCsv}>
         <Input
           type="tel"

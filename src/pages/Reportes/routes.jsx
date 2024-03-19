@@ -29,7 +29,7 @@ export const rutasReportes = [
   },
   {
     link: "/reportes/comercios",
-    label: <AppIcons Logo={"RECAUDO"} name="Reportes comercio" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reportes transacciones por comercio" />,
     component: ReporteComercios,
     permission: [40],
   },
