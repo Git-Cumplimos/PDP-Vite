@@ -22,6 +22,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const [razonAjuste, setRazonAjuste] = useState("");
   const [inputId, setinputId] = useState(false);
   const [submitName, setSubmitName] = useState("");
+  const [disabledBtn, setDisabledBtn] = useState(false);
 
   const limitesMontos = {
     max: 9999999999,
@@ -66,6 +67,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const onSubmitAjuste = useCallback(
     (e) => {
       if (valor !== null && valor !== "") {
+        setDisabledBtn(true)
         const args = { pk_id_comercio: idComercio };
         let body = {
           valor_afectacion : valor,
@@ -89,8 +91,12 @@ const AjusteCupoComer = ({ subRoutes }) => {
           } else {
             notifyError(res?.msg);
           }
+          setDisabledBtn(false)
         })
-        .catch((err) => console.error(err));
+        .catch((err) => {
+          console.error(err)
+          setDisabledBtn(false)
+        });
       } else {
         notifyError("El campo monto no puede estar vacío");
       }
@@ -240,7 +246,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
               subtitle=""
             >
               <ButtonBar className={"lg:col-span-2"}>
-                <Button type={"submit"} onClick={onSubmitAjuste}>
+                <Button type={"submit"} onClick={onSubmitAjuste} disabled={disabledBtn}>
                   Aceptar
                 </Button>
                 <Button type={"button"} onClick={() => setSubmitName("")}>
