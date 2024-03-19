@@ -76,7 +76,7 @@ const ModifiLimiteCanje = () => {
       ) {
         const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario ?? pdpUser?.uuid ?? -1,};
         const data = {};
-        if (baseCaja && baseCaja !== "") data.base_Caja = baseCaja
+        if (baseCaja !== null && baseCaja !== "") data.base_Caja = baseCaja
         if (diasMaxSobregiro && diasMaxSobregiro !== "") data.dias_max_sobregiro = parseInt(diasMaxSobregiro)
         if (valor !== cupoComer?.sobregiro) data.sobregiro = valor
         
@@ -226,7 +226,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              equalErrorMin={true}
+              equalErrorMin={false}
               value={baseCaja ?? parseInt(cupoComer[0]?.base_caja)}
               onInput={onMoneyChange}
               required
