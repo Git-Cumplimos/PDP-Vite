@@ -75,3 +75,7 @@ export const cargarArchivoCupoMasivo = cargueArchivo(
   `${urlComercios}/comercios/crear-cupo-masivo`,
   `${urlComercios}/comercios/crear-cupo-masivo`
 );
+export const cargarArchivoAjusteCupoMasivo = cargueArchivo(
+  `${urlCupo}/servicio-cupo/ajuste-cupo-masivo`,
+  `${urlCupo}/servicio-cupo/ajuste-cupo-masivo`
+);
