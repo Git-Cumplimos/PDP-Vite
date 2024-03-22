@@ -512,14 +512,19 @@ const PagoRecaudoServiciosCajaSocial = ({
             </PaymentSummary>
           ) : estadoPeticion === "response" ? (
             <PaymentSummary
-              title="Respuesta de consulta depósito"
+              title="Respuesta de consulta recaudo"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                "Nombres titular": resConsulta?.trn?.personName?.fullName ?? "",
-                "Número de cuenta": dataRecaudo?.numeroCuenta,
-                "Valor a depositar": formatMoney.format(
-                  dataRecaudo?.valorDeposito
+                Convenio: dataRecaudo?.nombreConvenio ?? "",
+                ...Object.fromEntries(
+                  [...Array(parseInt(convenio.cant_referencias)).keys()].map(
+                    (i) => [
+                      convenio?.[`nom_ref${i + 1}`],
+                      dataRecaudo?.[`ref${i + 1}`],
+                    ]
+                  )
                 ),
+                "Valor a pagar": formatMoney.format(dataRecaudo?.valorTrx),
               }}
             >
               <ButtonBar>
@@ -538,7 +543,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                     loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
                   }
                 >
-                  Realizar depósito
+                  Realizar pago
                 </Button>
               </ButtonBar>
             </PaymentSummary>
