@@ -37,10 +37,10 @@ const AjusteCupoComer = ({ subRoutes }) => {
   };
 
   const formatoAjusteCupoMasivo = [
-    ["pk_comercio", "monto", "razon_ajuste"],
-    [1, 1500, "prueba"],
-    [2, 2500, "Prueba"],
-    [3, 3500, "Prueba"],
+    ["pk_comercio", "monto", "tipo_trx", "razon_ajuste"],
+    [1, 1500, 1 ,"debito"],
+    [2, 2500, 2 ,"credito"],
+    [3, 3500, 3 ,"contingencia"],
 ]
 
   const { roleInfo, pdpUser } = useAuth();
@@ -350,7 +350,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
               <Button
                 type="button"
                 onClick={() => {
-                  descargarFormato("Ejemplo_ajuste_masivo.csv",formatoAjusteCupoMasivo)
+                  descargarFormato("Ejemplo_ajuste_masivo",formatoAjusteCupoMasivo)
                   handleCloseCargaMasiva()
                 }}
               >
