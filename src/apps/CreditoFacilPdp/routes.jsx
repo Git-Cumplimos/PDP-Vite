@@ -26,6 +26,10 @@ const CargueMasivoCredito = lazy(() =>
   import("./Views/Admin/CargueMasivoCredito")
 );
 
+const ValidacionDocumentos = lazy(() =>
+  import("./Views/CreditoFacil/ValidacionDocumentos")
+);
+
 const CreditosPDP = lazy(() => import("./CreditosPDP"));
 
 const listPermissionsCreditoPdp = Object.values(enumPermisosCreditoPdp);
@@ -73,6 +77,12 @@ const rutasCreditosPdp = {
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Extracto Créditos" />,
       component: ExtractosCreditosComerciosPDP,
       permission: [enumPermisosCreditoPdp.EXTRACTOS_CREDITOS_COMERCIO],
+    },
+    {
+      link: "/creditos-pdp/validacion-documentos-creditos",
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Consulta y Validación de Documentos" />,
+      component: ValidacionDocumentos,
+      permission: [enumPermisosCreditoPdp.VALIDACION_DOCUMENTOS],
     },
   ],
 };
