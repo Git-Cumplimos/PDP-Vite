@@ -78,18 +78,18 @@ const PagoProductosPropiosCajaSocial = () => {
       let numeroProducto = dataPago.numeroProducto;
       if (typeof ev?.preventDefault === "function") {
         ev.preventDefault();
+        if (
+          !algoCheckCuentaCreditoBMCajaSocial(numeroProducto) &&
+          !algoCheckCreditoLendingCajaSocial(numeroProducto) &&
+          !algoCheckTCCreditoRotativoCajaSocial(numeroProducto)
+        )
+          return notifyError("Número de producto ingresado errado");
       } else {
         let codigoBarras = ev;
         codigoBarras = codigoBarras.replace("]C1", "");
         numeroProducto = codigoBarras;
         setDataPago((old) => ({ ...old, numeroProducto: codigoBarras }));
       }
-      if (
-        !algoCheckCuentaCreditoBMCajaSocial(numeroProducto) &&
-        !algoCheckCreditoLendingCajaSocial(numeroProducto) &&
-        !algoCheckTCCreditoRotativoCajaSocial(numeroProducto)
-      )
-        return notifyError("Número de producto ingresado errado");
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -111,6 +111,7 @@ const PagoProductosPropiosCajaSocial = () => {
         },
         pago_productos_propios_caja_social: {
           numero_producto: numeroProducto,
+          codigo_barras: dataPago.estadoLecturaPago === "codigoBarras",
         },
         id_user_pdp: pdpUser.uuid,
       };
@@ -166,6 +167,7 @@ const PagoProductosPropiosCajaSocial = () => {
           numero_producto: dataPago?.numeroProducto,
           nom_cliente: resConsulta?.trn?.personName?.fullName,
           tipo_pago: dataPago?.tipoPago,
+          codigo_barras: dataPago.estadoLecturaPago === "codigoBarras",
         },
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,

@@ -132,6 +132,14 @@ const PagoRecaudoServiciosCajaSocial = ({
   const consultaRecaudoServicios = useCallback(
     (ev) => {
       ev.preventDefault();
+      let extraData = {};
+      if (
+        dataCodigoBarras?.fecha_caducidad?.length &&
+        dataCodigoBarras?.fecha_caducidad?.length > 0
+      ) {
+        extraData["fecha_pago_codigo_barras"] =
+          dataCodigoBarras?.fecha_caducidad[0];
+      }
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -159,9 +167,12 @@ const PagoRecaudoServiciosCajaSocial = ({
             name: convenio?.[`nom_ref${i + 1}`],
             value: dataRecaudo?.[`ref${i + 1}`],
           })),
-          flag_otro_valor: false,
+          flag_otro_valor:
+            dataRecaudo.valorTrxOriginal.toString() !==
+            dataRecaudo.valorTrx.toString(),
           tipo_convenio_recaudo: convenio.tipo_recaudo,
           nombre_convenio: dataRecaudo?.nombreConvenio,
+          ...extraData,
         },
         id_user_pdp: pdpUser.uuid,
       };
@@ -258,17 +269,12 @@ const PagoRecaudoServiciosCajaSocial = ({
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (ev.target.name === "numeroCuenta") {
-      if (!isNaN(value)) {
-        value = value.replace(/[\s\.\-+eE]/g, "");
-        setDataRecaudo((old) => {
-          return { ...old, [ev.target.name]: value };
-        });
-      }
-    } else
+    if (!isNaN(value)) {
+      value = value.replace(/[\s\.\-+eE]/g, "");
       setDataRecaudo((old) => {
         return { ...old, [ev.target.name]: value };
       });
+    }
   }, []);
   const onChangeFormatNum = useCallback((ev, val) => {
     if (!isNaN(val)) {
@@ -529,7 +535,10 @@ const PagoRecaudoServiciosCajaSocial = ({
             >
               <ButtonBar>
                 <Button
-                  onClick={closeModule}
+                  onClick={(e) => {
+                    closeModule(e);
+                    validNavigate(-1);
+                  }}
                   disabled={
                     loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
                   }

@@ -41,21 +41,15 @@ export const algoCheckTCCreditoRotativoCajaSocial = (numeroCuenta) => {
     if (conteo === 2) conteo = 0;
     const numeroCuentaIndividual = parseInt(numeroCuentaCut[index]);
     let resultMulti = numeroCuentaIndividual * arrayVali[conteo];
-    console.log("1", resultMulti);
     if (resultMulti > 9) {
       const firstDigit = parseInt(Math.floor(resultMulti / 10));
-      console.log("2", firstDigit);
       const secondDigit = parseInt(resultMulti - 10 * firstDigit);
-      console.log("3", secondDigit);
       resultMulti = firstDigit + secondDigit;
     }
-    console.log("4", resultMulti);
     sumTotal += resultMulti;
     conteo += 1;
   }
-  console.log("8", sumTotal);
-  const sumTotalResult = sumTotal % 10;
-  console.log("casdsa", sumTotalResult);
-  console.log("ccxzzzz", parseInt(numeroCuenta.slice(-1)));
+  const nextValue = Math.ceil(sumTotal / 10) * 10;
+  const sumTotalResult = nextValue - sumTotal;
   return sumTotalResult === parseInt(numeroCuenta.slice(-1));
 };
