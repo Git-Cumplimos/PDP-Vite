@@ -1,4 +1,7 @@
 export const algoCheckCuentaCreditoBMCajaSocial = (numeroCuenta) => {
+  if (numeroCuenta.length !== 11) {
+    return false;
+  }
   const numeroCuentaCut = numeroCuenta.slice(0, 10);
   let conteo = 0;
   let sumTotal = 0;
@@ -16,6 +19,9 @@ export const algoCheckCuentaCreditoBMCajaSocial = (numeroCuenta) => {
 };
 
 export const algoCheckCreditoLendingCajaSocial = (numeroCuenta) => {
+  if (numeroCuenta.length !== 13) {
+    return false;
+  }
   const numeroCuentaCut = numeroCuenta.slice(0, 12);
   let conteo = 0;
   let sumTotal = 0;
@@ -33,6 +39,9 @@ export const algoCheckCreditoLendingCajaSocial = (numeroCuenta) => {
 };
 
 export const algoCheckTCCreditoRotativoCajaSocial = (numeroCuenta) => {
+  if (numeroCuenta.length !== 16) {
+    return false;
+  }
   const numeroCuentaCut = numeroCuenta.slice(0, 15);
   let conteo = 0;
   let sumTotal = 0;
