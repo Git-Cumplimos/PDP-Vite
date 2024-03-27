@@ -53,3 +53,9 @@ export const algoCheckTCCreditoRotativoCajaSocial = (numeroCuenta) => {
   const sumTotalResult = nextValue - sumTotal;
   return sumTotalResult === parseInt(numeroCuenta.slice(-1));
 };
+
+export const algoCheckTarjetaCreditoBinCajaSocial = (numeroCuenta) => {
+  const numeroCuentaCut = numeroCuenta.slice(0, 6);
+  const dataBinValidacion = ["549166", "457021"];
+  return dataBinValidacion.find((data) => data === numeroCuentaCut);
+};
