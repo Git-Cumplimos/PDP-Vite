@@ -22,6 +22,7 @@ import {
   algoCheckCreditoLendingCajaSocial,
   algoCheckCuentaCreditoBMCajaSocial,
   algoCheckTCCreditoRotativoCajaSocial,
+  algoCheckTarjetaCreditoBinCajaSocial,
 } from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
 import BarcodeReader from "../../../../components/Base/BarcodeReader";
@@ -84,6 +85,13 @@ const PagoProductosPropiosCajaSocial = () => {
           !algoCheckTCCreditoRotativoCajaSocial(numeroProducto)
         )
           return notifyError("Número de producto ingresado errado");
+        if (
+          algoCheckTCCreditoRotativoCajaSocial(numeroProducto) &&
+          algoCheckTarjetaCreditoBinCajaSocial(numeroProducto)
+        )
+          return notifyError(
+            "Error respuesta PDP: (No se permite el pago de tarjetas manualmente)"
+          );
       } else {
         let codigoBarras = ev;
         codigoBarras = codigoBarras.replace("]C1", "");
