@@ -38,9 +38,9 @@ const AjusteCupoComer = ({ subRoutes }) => {
 
   const formatoAjusteCupoMasivo = [
     ["pk_comercio", "monto", "tipo_trx", "razon_ajuste"],
-    [1, 1500, 1 ,"debito"],
-    [2, 2500, 2 ,"credito"],
-    [3, 3500, 3 ,"contingencia"],
+    [1, 1500, 1 ,"ajuste debito"],
+    [2, 2500, 2 ,"ajuste credito"],
+    [3, 3500, 3 ,"ajuste contingencia"],
 ]
 
   const { roleInfo, pdpUser } = useAuth();
@@ -145,6 +145,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const CargarArchivo = useCallback(
     async (e) => {
       e.preventDefault();
+      setDisabledBtn(true)
       if (!typoArchivos.includes(file.type)) {
         notifyError('Tipo de archivo incorrecto')
         return;
@@ -164,12 +165,14 @@ const AjusteCupoComer = ({ subRoutes }) => {
         },
         {
           render({ data: res }) {
+            setDisabledBtn(false)
             handleCloseCargaMasiva();
             return res?.msg;
           },
         },
         {
           render({ data: err }) {
+            setDisabledBtn(false)
             if (err?.obj?.url && err.obj?.url !== "") {
               descargarArchivo("Error-del-archivo.csv", err.obj?.url)
             }
@@ -368,7 +371,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 required
               />
               <ButtonBar>
-                <Button type="submit">
+                <Button type="submit" disabled={disabledBtn}>
                   Cargar Archivo
                 </Button>
               </ButtonBar>
