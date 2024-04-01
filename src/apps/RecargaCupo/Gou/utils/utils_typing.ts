@@ -31,13 +31,13 @@ export type TypingDataInput = {
   [NameVar.otp]: string;
 };
 
-//----------------PeticionConsultaOtp------------------
-export type TypingDataConsult = {
-  idSessionToken?: string; //str-number
-  id_trx?: number;
+//----------------PeticionCrearSesion------------------
+export type TypingDataCrearSesion = {
+  id_trx: number;
+  processUrl: string;
 };
 
-//----------------PeticionPago------------------
+//----------------PeticionPay------------------
 export type TypingDataPay = {
   ticket: TypeInfTicket;
 };
