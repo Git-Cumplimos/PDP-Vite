@@ -8,48 +8,36 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
 import Form from "../../../../components/Base/Form";
 import MoneyInput from "../../../../components/Base/MoneyInput";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 import Select from "../../../../components/Base/Select";
 import Input from "../../../../components/Base/Input";
-import InputLong from "../components/InputLong";
-import { do_compare, get_value } from "../utils/utils_function";
+import Modal from "../../../../components/Base/Modal";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import Tickets from "../../../../components/Base/Tickets";
+import { TypeInfTicket } from "../../../../utils/TypingUtils";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import { notifyError, notifyPending } from "../../../../utils/notify";
+import InputLong from "../components/InputLong";
+import useHookRecargarCupo from "../hook/useHookRecagarCupo";
+import { do_compare, get_value } from "../utils/utils_function";
 import {
   TypingDataComercio,
-  TypingDataCrearSesion,
+  TypingDataInput,
   TypingDataPay,
 } from "../utils/utils_typing";
 import classes from "./RecargaCupoConGou.module.css";
-import { notifyError, notifyPending } from "../../../../utils/notify";
-import useHookRecargarCupo from "../hook/useHookRecagarCupo";
-import Modal from "../../../../components/Base/Modal";
-import PaymentSummary from "../../../../components/Compound/PaymentSummary";
-import { useNavigate } from "react-router-dom";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import Tickets from "../../../../components/Base/Tickets";
-import { useReactToPrint } from "react-to-print";
-import { TypeInfTicket } from "../../../../utils/TypingUtils";
+import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAceptarTerminos";
 
 const { contendorFather, contendorSoon, contendorSoonTrx } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type TypingProcess = "Ninguno" | "Pay" | "TrxExitosa";
-
-type TypingDataInput = {
-  nombre_completo: string;
-  correo: string;
-  "correo|confirmacion": string;
-  celular: string;
-  "celular|confirmacion": string;
-  documento: string;
-  tipo_documento: string;
-  referencia: string;
-  fecha: string;
-  valor_trx: string;
-};
 
 type TypingDataInvalid = {
   nombre_completo: string;
@@ -77,7 +65,7 @@ const options_select: Array<{ value: string; label: string }> = Object.keys(
 }));
 
 const dataInputInitial: TypingDataInput = {
-  nombre_completo: "alisson",
+  nombre_completo: "",
   correo: "",
   "correo|confirmacion": "",
   celular: "",
@@ -86,7 +74,7 @@ const dataInputInitial: TypingDataInput = {
   tipo_documento: "",
   referencia: "",
   fecha: "",
-  valor_trx: "1000",
+  valor_trx: "",
 };
 
 const dataInvalidInitial: TypingDataInvalid = {
@@ -104,6 +92,12 @@ const RecargaCupoConGou = () => {
   const [dataInvalid, setDataInvalid] =
     useState<TypingDataInvalid>(dataInvalidInitial);
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [process, setProcess] = useState<TypingProcess>("Ninguno");
+  const [acepto, setAcepto] = useState<{ [key: string]: boolean }>({
+    is_acepto: false,
+    acepto: false,
+  });
 
   const {
     loadingPeticion,
@@ -111,9 +105,6 @@ const RecargaCupoConGou = () => {
     PeticionCheckPay,
     dataSeePay,
   } = useHookRecargarCupo();
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [process, setProcess] = useState<TypingProcess>("Ninguno");
-
   const dataComercio: TypingDataComercio = useMemo(() => {
     const tipo_comercio = roleInfo?.tipo_comercio ?? "";
     return {
@@ -157,6 +148,8 @@ const RecargaCupoConGou = () => {
 
   const onChangeDataInput = useCallback(
     (ev: ChangeEvent<HTMLFormElement>) => {
+      if (ev.target.name === "acepto") return;
+
       const structure_get_value = ev.target.id.split("/")[1];
       if (structure_get_value) {
         const [value, is_change, msg_invalid_get_value] = get_value(
@@ -228,6 +221,18 @@ const RecargaCupoConGou = () => {
   const onSubmitCheckPay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {
       ev.preventDefault();
+      if (dataInput.celular !== dataInput["celular|confirmacion"]) {
+        notifyError("Verifique el numero celular", 2000, {
+          toastId: "notify-validate-dataInput",
+        });
+        return;
+      }
+      if (dataInput.correo !== dataInput["correo|confirmacion"]) {
+        notifyError("Verifique el correo", 2000, {
+          toastId: "notify-validate-dataInput",
+        });
+        return;
+      }
       notifyPending(
         PeticionCheckPay(dataComercio, dataInput, "rrr"),
         {
@@ -262,9 +267,9 @@ const RecargaCupoConGou = () => {
       <SimpleLoading
         show={loadingPeticionBlocking ? true : false}
       ></SimpleLoading>
-      <div className={contendorFather}>
-        <div className={contendorSoon}>
-          <Form onChange={onChangeDataInput} grid>
+      <Form onChange={onChangeDataInput} onSubmit={onSubmitCheckPay} grid>
+        <div className={contendorFather}>
+          <div className={contendorSoon}>
             <InputLong
               id="nombre_completo/letters"
               name="nombre_completo"
@@ -303,7 +308,8 @@ const RecargaCupoConGou = () => {
               label="Número de celular"
               type="text"
               autoComplete="off"
-              maxLength={70}
+              minLength={10}
+              maxLength={10}
               value={dataInput.celular}
               invalid={dataInvalid.celular}
               required
@@ -314,7 +320,8 @@ const RecargaCupoConGou = () => {
               label="Confirmar número de celular"
               type="text"
               autoComplete="off"
-              maxLength={70}
+              minLength={10}
+              maxLength={10}
               value={dataInput["celular|confirmacion"]}
               invalid={dataInvalid["celular|confirmacion"]}
               required
@@ -332,14 +339,11 @@ const RecargaCupoConGou = () => {
               value={dataInput.documento}
               required
             />
-          </Form>
-        </div>
-
-        <fieldset className={contendorSoonTrx}>
-          <legend className="font-bold text-xl">
-            Descripción de la transacción
-          </legend>
-          <Form onChange={onChangeDataInput} grid>
+          </div>
+          <fieldset className={contendorSoonTrx}>
+            <legend className="font-bold text-xl">
+              Descripción de la transacción
+            </legend>
             <Input
               label="Tipo de trámite"
               type="text"
@@ -380,36 +384,35 @@ const RecargaCupoConGou = () => {
               // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
               value={dataInput.valor_trx} //se usa este por que es con decimales
               onInput={(ev: any, valor: any) => {
-                setDataInput((old) => ({ ...old, [ev.target.name]: valor }));
+                setDataInput((old) => ({
+                  ...old,
+                  [ev.target.name]: valor,
+                }));
               }}
               required
             />
-          </Form>
-        </fieldset>
-        <Input
-          type="radio"
-          name="valor_total_trx_checkbox"
-          id={"valor_total_trx_checkbox_1"}
-          label="Acepta Términos y Condiciones"
-          required={true}
-          value={0}
-          // onChange={(ev: ChangeEvent<HTMLInputElement>) =>
-          //   setDataInput((old) => ({
-          //     ...old,
-          //     valor_total_trx: parseFloat(ev.target.value),
-          //   }))
-          // }
-        />
+          </fieldset>
+          <Input
+            id="acepto/radio"
+            name="acepto"
+            type="radio"
+            label="Acepta Términos y Condiciones"
+            required={true}
+            value={"acepto"}
+            onChange={() => setAcepto((old) => ({ ...old, is_acepto: true }))}
+            checked={acepto.acepto}
+          />
+        </div>
         <ButtonBar className={"lg:col-span-2"}>
           <Button
             // disabled={loadingState || loadingPeticionConsultaPin}
             type={"submit"}
-            onClick={onSubmitCheckPay}
           >
             Realizar Pago
           </Button>
         </ButtonBar>
-      </div>
+      </Form>
+
       <Modal show={showModal} handleClose={handleCloseModal}>
         {/**************** Pay **********************/}
         {process === "Pay" && (
@@ -436,6 +439,12 @@ const RecargaCupoConGou = () => {
         </div>
         {/*************** Trx Exitosa **********************/}
       </Modal>
+      {acepto.is_acepto && (
+        <ModalAceptarTerminos
+          acepto={acepto.is_acepto}
+          setAcepto={setAcepto}
+        ></ModalAceptarTerminos>
+      )}
     </Fragment>
   );
 };

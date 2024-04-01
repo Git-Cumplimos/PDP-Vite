@@ -13,6 +13,7 @@ import {
 import {
   TypingDataComercio,
   TypingDataCrearSesion,
+  TypingDataInput,
   TypingDataPay,
 } from "../utils/utils_typing";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
@@ -124,7 +125,7 @@ const useHookRecargarCupo = () => {
   const PeticionPay = useCallback(
     async (
       dataComercio: TypingDataComercio,
-      dataInput: any,
+      dataInput: TypingDataInput,
       id_uuid_trx: string,
       dataCrearSesion: TypingDataCrearSesion
     ): Promise<TypingDataPay> => {
@@ -157,7 +158,6 @@ const useHookRecargarCupo = () => {
             referencia: dataInput.referencia,
             ip_address: "127.0.0.1",
           };
-          console.log(body);
           response = await fetchCustom(
             url_pay,
             "POST",
@@ -205,8 +205,8 @@ const useHookRecargarCupo = () => {
             name_service_consult_for_pay,
             {},
             bodyConsult,
-            5,
-            1
+            15,
+            8
           );
           return {
             ticket: response?.obj?.result?.ticket,
@@ -233,7 +233,7 @@ const useHookRecargarCupo = () => {
   const PeticionCheckPay = useCallback(
     async (
       dataComercio: TypingDataComercio,
-      dataInput: any,
+      dataInput: TypingDataInput,
       id_uuid_trx: string
     ): Promise<TypingDataPay> => {
       const function_name = "PeticionCheckPay";

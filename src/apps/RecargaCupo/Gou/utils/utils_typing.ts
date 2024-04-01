@@ -17,18 +17,17 @@ export type TypingDataComercio = {
   location: TypingLocation;
 };
 
-export enum NameVar {
-  tipoDocumento = "tipoDocumento",
-  numeroIdentificacion = "numeroIdentificacion",
-  valor_total_trx = "valor_total_trx",
-  otp = "otp",
-}
-
 export type TypingDataInput = {
-  [NameVar.tipoDocumento]: string;
-  [NameVar.numeroIdentificacion]: string;
-  [NameVar.valor_total_trx]: number;
-  [NameVar.otp]: string;
+  nombre_completo: string;
+  correo: string;
+  "correo|confirmacion": string;
+  celular: string;
+  "celular|confirmacion": string;
+  documento: string;
+  tipo_documento: string;
+  referencia: string;
+  fecha: string;
+  valor_trx: string;
 };
 
 //----------------PeticionCrearSesion------------------
