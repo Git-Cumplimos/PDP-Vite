@@ -274,7 +274,7 @@ const RecargaCupoConGou = () => {
         <div className={contendorFather}>
           <div className={contendorSoon}>
             <InputLong
-              id="nombre_completo/letters"
+              id="nombre_completo/text"
               name="nombre_completo"
               label="Nombre Completo"
               type="text"
