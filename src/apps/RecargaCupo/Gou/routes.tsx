@@ -9,7 +9,7 @@ const routesRecargaCupoConGou = {
   link: "/recarga-cupo/con-gou",
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="GOU" />,
   component: RecargaCupoConGou,
-  permission: [ListPermissionsRecargaCupoConGou.RECARGA_CUPO_CON_GOU],
+  permission: [ListPermissionsRecargaCupoConGou.RECARGA_CUPO_CON_GOU, 1],
   subRoutes: [],
 };
 

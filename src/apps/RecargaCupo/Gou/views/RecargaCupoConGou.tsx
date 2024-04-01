@@ -23,6 +23,7 @@ import Tickets from "../../../../components/Base/Tickets";
 import { TypeInfTicket } from "../../../../utils/TypingUtils";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError, notifyPending } from "../../../../utils/notify";
+import { v4 } from "uuid";
 import InputLong from "../components/InputLong";
 import useHookRecargarCupo from "../hook/useHookRecagarCupo";
 import { do_compare, get_value } from "../utils/utils_function";
@@ -75,6 +76,7 @@ const dataInputInitial: TypingDataInput = {
   referencia: "",
   fecha: "",
   valor_trx: "",
+  id_uuid_trx: "",
 };
 
 const dataInvalidInitial: TypingDataInvalid = {
@@ -136,6 +138,7 @@ const RecargaCupoConGou = () => {
         day: "2-digit",
       }).format(new Date()),
       referencia: dataComercio.id_comercio.toString(),
+      id_uuid_trx: v4(),
     }));
   }, [dataComercio]);
 
@@ -234,7 +237,7 @@ const RecargaCupoConGou = () => {
         return;
       }
       notifyPending(
-        PeticionCheckPay(dataComercio, dataInput, "rrr"),
+        PeticionCheckPay(dataComercio, dataInput, dataInput.id_uuid_trx),
         {
           render: () => {
             return "Procesando";
@@ -404,11 +407,9 @@ const RecargaCupoConGou = () => {
           />
         </div>
         <ButtonBar className={"lg:col-span-2"}>
-          <Button
-            // disabled={loadingState || loadingPeticionConsultaPin}
-            type={"submit"}
-          >
-            Realizar Pago
+          <Button type={"submit"}>Realizar Pago</Button>
+          <Button onClick={() => handleCloseNinguno(true, routeInicial)}>
+            Cancelar
           </Button>
         </ButtonBar>
       </Form>

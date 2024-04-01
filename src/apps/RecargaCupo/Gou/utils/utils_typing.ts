@@ -28,6 +28,7 @@ export type TypingDataInput = {
   referencia: string;
   fecha: string;
   valor_trx: string;
+  id_uuid_trx: string;
 };
 
 //----------------PeticionCrearSesion------------------

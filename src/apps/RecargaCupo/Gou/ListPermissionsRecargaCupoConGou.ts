@@ -1,3 +1,3 @@
 export const ListPermissionsRecargaCupoConGou = Object.freeze({
-  RECARGA_CUPO_CON_GOU: 1,
+  RECARGA_CUPO_CON_GOU: 600,
 });

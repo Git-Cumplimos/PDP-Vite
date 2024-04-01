@@ -49,7 +49,7 @@ import { formatMoney } from "../../../../components/Base/MoneyInput";
 //   ) => Promise<TypingOutputPayRecaudo>;
 // };
 //FRAGMENT ******************** CONST *******************************
-const url_recargarcupo_gou = "http://127.0.0.1:5000";
+const URL_RECARGARCUPO_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookRecargarCupo = () => {
@@ -66,7 +66,7 @@ const useHookRecargarCupo = () => {
       id_uuid_trx: string
     ): Promise<TypingDataCrearSesion> => {
       const function_name = "PeticionCrearSesion";
-      const url = `${url_recargarcupo_gou}/services_gou/recargarcupo/create_sesion`;
+      const url = `${URL_RECARGARCUPO_GOU}/services_gou/recargarcupo/create_sesion`;
       const name_service = "Crear sesion";
       let response: any;
       try {
@@ -84,24 +84,6 @@ const useHookRecargarCupo = () => {
           ip_address: "127.0.0.1",
         };
         response = await fetchCustom(url, "POST", name_service, {}, body);
-        // response = {
-        //   codigo: 200,
-        //   msg: "recargar cupo GOU - crear sesion exitoso",
-        //   obj: {
-        //     error_msg: {},
-        //     error_status: false,
-        //     ids: {
-        //       id_trx: 427481,
-        //       id_uuid_trx: "rrr",
-        //     },
-        //     result: {
-        //       processUrl:
-        //         "https://checkout.test.goupagos.com.co/spa/session/30458/c9ce492b3e9b930c30211c2f3afb700d",
-        //       request_id: 30458,
-        //     },
-        //   },
-        //   status: true,
-        // };
         return {
           id_trx: response.obj?.ids?.id_trx,
           processUrl: response.obj?.result?.processUrl ?? "",
@@ -130,7 +112,7 @@ const useHookRecargarCupo = () => {
       dataCrearSesion: TypingDataCrearSesion
     ): Promise<TypingDataPay> => {
       const function_name = "PeticionPay";
-      const url_pay = `${url_recargarcupo_gou}/services_gou/recargarcupo/pago`;
+      const url_pay = `${URL_RECARGARCUPO_GOU}/services_gou/recargarcupo/pago`;
       const name_service = "Recargar Cupo Pago";
       let response;
       try {
@@ -187,7 +169,7 @@ const useHookRecargarCupo = () => {
           }
         }
         //SECUENCIA ---------------Paso 2-------------------------------
-        const url_consult_for_pay = `${url_recargarcupo_gou}/services_gou/recargarcupo/consult_for_pago`;
+        const url_consult_for_pay = `${URL_RECARGARCUPO_GOU}/services_gou/recargarcupo/consult_for_pago`;
         const name_service_consult_for_pay = "Consulta Pago";
         try {
           const bodyConsult = {
