@@ -130,13 +130,18 @@ const RecargaCupoConGou = () => {
   }, [roleInfo, pdpUser?.uname]);
 
   useEffect(() => {
+    const date_now = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+
     setDataInput((old) => ({
       ...old,
-      fecha: Intl.DateTimeFormat("es-CO", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }).format(new Date()),
+      fecha: `${date_now.substring(6, 10)}-${date_now.substring(
+        3,
+        5
+      )}-${date_now.substring(0, 2)}`,
       referencia: dataComercio.id_comercio.toString(),
       id_uuid_trx: v4(),
     }));
