@@ -97,7 +97,7 @@ const RecargaCupoConGou = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [process, setProcess] = useState<TypingProcess>("Ninguno");
   const [acepto, setAcepto] = useState<{ [key: string]: boolean }>({
-    is_acepto: false,
+    open_modal: false,
     acepto: false,
   });
 
@@ -151,8 +151,7 @@ const RecargaCupoConGou = () => {
 
   const onChangeDataInput = useCallback(
     (ev: ChangeEvent<HTMLFormElement>) => {
-      if (ev.target.name === "acepto") return;
-
+      if (ev.target.name === undefined && ev.target.id === undefined) return;
       const structure_get_value = ev.target.id.split("/")[1];
       if (structure_get_value) {
         const [value, is_change, msg_invalid_get_value] = get_value(
@@ -396,13 +395,19 @@ const RecargaCupoConGou = () => {
             />
           </fieldset>
           <Input
-            id="acepto/radio"
-            name="acepto"
-            type="radio"
+            type="checkbox"
             label="Acepta Términos y Condiciones"
             required={true}
             value={"acepto"}
-            onChange={() => setAcepto((old) => ({ ...old, is_acepto: true }))}
+            onChange={() =>
+              setAcepto((old) => {
+                if (!old.acepto) {
+                  return { ...old, open_modal: true };
+                } else {
+                  return { ...old, acepto: false };
+                }
+              })
+            }
             checked={acepto.acepto}
           />
         </div>
@@ -440,9 +445,9 @@ const RecargaCupoConGou = () => {
         </div>
         {/*************** Trx Exitosa **********************/}
       </Modal>
-      {acepto.is_acepto && (
+      {acepto.open_modal && (
         <ModalAceptarTerminos
-          acepto={acepto.is_acepto}
+          acepto={acepto.open_modal}
           setAcepto={setAcepto}
         ></ModalAceptarTerminos>
       )}

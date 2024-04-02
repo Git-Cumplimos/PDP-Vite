@@ -13,18 +13,16 @@ const ModalAceptarTerminos = ({ acepto, setAcepto }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
-    if (acepto) {
-      setShowModal(true);
-    }
-  }, [acepto]);
+    setShowModal(true);
+  }, []);
 
   const onClickAcepto = useCallback(() => {
-    setAcepto((old: any) => ({ ...old, acepto: true }));
+    setAcepto((old: any) => ({ ...old, open_modal: false, acepto: true }));
     setShowModal(false);
   }, [setAcepto]);
 
   const handleCloseModal = useCallback(() => {
-    setAcepto((old: any) => ({ ...old, acepto: false }));
+    setAcepto((old: any) => ({ ...old, open_modal: false, acepto: false }));
     setShowModal(false);
   }, [setAcepto]);
 
