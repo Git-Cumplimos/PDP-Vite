@@ -308,6 +308,8 @@ const RecargaCupoConGou = () => {
               value={dataInput["correo|confirmacion"]}
               invalid={dataInvalid["correo|confirmacion"]}
               required
+              onPaste={(ev) => ev.preventDefault()}
+              onDrop={(ev) => ev.preventDefault()}
             />
             <Input
               id="celular/cel/celular|confirmacion=>celular"
@@ -332,6 +334,8 @@ const RecargaCupoConGou = () => {
               value={dataInput["celular|confirmacion"]}
               invalid={dataInvalid["celular|confirmacion"]}
               required
+              onPaste={(ev) => ev.preventDefault()}
+              onDrop={(ev) => ev.preventDefault()}
             />
             <Select label="Tipo de documento" options={options_select} />
 
