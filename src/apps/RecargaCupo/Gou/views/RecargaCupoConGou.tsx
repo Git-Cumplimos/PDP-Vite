@@ -19,7 +19,6 @@ import Input from "../../../../components/Base/Input";
 import Modal from "../../../../components/Base/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import Tickets from "../../../../components/Base/Tickets";
 import { TypeInfTicket } from "../../../../utils/TypingUtils";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError, notifyPending } from "../../../../utils/notify";
@@ -34,6 +33,7 @@ import {
 } from "../utils/utils_typing";
 import classes from "./RecargaCupoConGou.module.css";
 import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAceptarTerminos";
+import TicketsGou from "../components/TicketsGou";
 
 const { contendorFather, contendorSoon, contendorSoonTrx } = classes;
 
@@ -440,7 +440,7 @@ const RecargaCupoConGou = () => {
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
           {process === "TrxExitosa" && ticket && (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-              <Tickets ticket={ticket} refPrint={printDiv} />
+              <TicketsGou ticket={ticket} refPrint={printDiv} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={handleCloseModal}>Cerrar</Button>
