@@ -20,8 +20,8 @@ export const get_value = (structure: string, value_: string) => {
       break;
     }
     case "cel": {
+      is_change = true;
       if (value_[0] === "3") {
-        is_change = true;
         value = (value_.match(/\d/g) ?? []).join("");
         msg_invalid = "";
       } else {
