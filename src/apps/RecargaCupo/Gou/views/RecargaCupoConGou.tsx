@@ -372,17 +372,13 @@ const RecargaCupoConGou = () => {
             />
             <MoneyInput
               name="valor_trx"
-              label="Ingrese el valor a pagar"
+              label="Valor a pagar"
               // decimalDigits={2} //No Se usa este por que es con decimales
               equalError={false}
-              equalErrorMin={true}
+              equalErrorMin={false}
               autoComplete="off"
-              min={0}
-              // max={Math.min(
-              //   valor_total_trx_maximo,
-              //   consultData?.valor_faltante
-              // )}
-              // maxLength={len_valor_total_trx_maximo}
+              min={10000}
+              maxLength={11}
               // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
               value={dataInput.valor_trx} //se usa este por que es con decimales
               onInput={(ev: any, valor: any) => {
