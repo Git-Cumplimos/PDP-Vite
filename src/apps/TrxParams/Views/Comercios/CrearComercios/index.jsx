@@ -1,31 +1,32 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Form from "../../../../components/Base/Form";
-import Input from "../../../../components/Base/Input";
-import Modal from "../../../../components/Base/Modal";
-import Select from "../../../../components/Base/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import { notify, notifyError } from "../../../../utils/notify";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form";
+import Input from "../../../../../components/Base/Input";
+import Modal from "../../../../../components/Base/Modal";
+import Select from "../../../../../components/Base/Select";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postCambiarComercioGrupoComercio,
   postCrearComercio,
   putModificarComercio,
   postDispersionPagoComercio,
   postConsultaParametrizacionConvenios,
-} from "../../utils/fetchComercios";
-import useFetchDebounce from "../../../../hooks/useFetchDebounce";
-import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
-import CommerceTable from "../../components/Commerce/CommerceTable";
-import InputSuggestions from "../../../../components/Base/InputSuggestions/InputSuggestions";
-import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
-import MoneyInput from "../../../../components/Base/MoneyInput";
-import { onChangeNumber } from "../../../../utils/functions";
-import { fetchZonas } from "../../utils/fetchZonas";
+} from "../../../utils/fetchComercios";
+import useFetchDebounce from "../../../../../hooks/useFetchDebounce";
+import useFetchDispatchDebounce from "../../../../../hooks/useFetchDispatchDebounce";
+import CommerceTable from "../../../components/Commerce/CommerceTable";
+import InputSuggestions from "../../../../../components/Base/InputSuggestions/InputSuggestions";
+import ToggleInput from "../../../../../components/Base/ToggleInput/ToggleInput";
+import { useAuth } from "../../../../../hooks/AuthHooks";
+import TiposContratosTable from "../../../components/Commerce/TiposContratosTable";
+import MoneyInput from "../../../../../components/Base/MoneyInput";
+import { onChangeNumber } from "../../../../../utils/functions";
+import { fetchZonas } from "../../../utils/fetchZonas";
+import RepresentanteLegal from "./RepresentanteLegal";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -431,7 +432,7 @@ const CrearComercios = () => {
       const dataOrg = structuredClone(comercio);
       if (!dataOrg.ciiu || !dataOrg.ciiu.length) {
         notifyError(
-          "Debe elegir al menos una actividad económica para el comercio"
+        +  "Debe elegir al menos una actividad económica para el comercio"
         );
         return;
       }
@@ -819,6 +820,7 @@ const CrearComercios = () => {
             }
           />
         </Fieldset>
+        <RepresentanteLegal />
         <Fieldset legend="Ubicación comercio" className="lg:col-span-2">
           <Input
             id="direccion_comercio"
