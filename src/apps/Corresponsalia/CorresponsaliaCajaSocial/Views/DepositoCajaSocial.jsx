@@ -207,7 +207,7 @@ const DepositoCajaSocial = () => {
   }, []);
   return (
     <>
-      <h1 className="text-3xl mt-10">Depósitos BCSC</h1>
+      <h1 className="text-3xl mt-10">Depósitos BCS</h1>
       <Form onSubmit={consultaTitular} grid>
         <Fieldset legend="Datos del depósito" className="lg:col-span-2">
           <Input
