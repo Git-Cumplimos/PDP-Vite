@@ -1,16 +1,19 @@
 import { Auth } from "@aws-amplify/auth";
+
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useState,
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
 import { notify, notifyError } from "../utils/notify";
-import useFetchDispatchDebounce from "./useFetchDispatchDebounce";
+import useFetchDebounce from "./useFetchDebounce";
+import controlgroup from "../layouts/AdminLayout/ControlGroup";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
@@ -18,6 +21,7 @@ const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user = process.env.REACT_APP_URL_COGNITO;
+const url_device = process.env.REACT_APP_URL_COGNITO_DEVICE;
 const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
 const url_pdp_commerce = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
@@ -95,6 +99,7 @@ const SET_ROLEINFO = "SET_ROLEINFO";
 const SET_PERMISSIONS = "SET_PERMISSIONS";
 const SET_PDPUSER = "SET_PDPUSER";
 const SET_QUOTA = "SET_QUOTA";
+const SET_QUOTA_COMISION = "SET_QUOTA_COMISION";
 const SET_COMMERCE_INFO = "SET_COMMERCE_INFO";
 
 const reducerAuth = (userState, action) => {
@@ -127,6 +132,13 @@ const reducerAuth = (userState, action) => {
       const { quota } = payload;
       return { ...userState, quotaInfo: quota };
 
+    case SET_QUOTA_COMISION:
+      const comm = payload;
+      return {
+        ...userState,
+        quotaInfo: { ...userState.quotaInfo, comision: comm },
+      };
+
     case SET_COMMERCE_INFO:
       const { commerce } = payload;
       return { ...userState, commerceInfo: commerce };
@@ -146,6 +158,8 @@ const reducerAuth = (userState, action) => {
 export const AuthContext = createContext({
   signIn: () => {},
   confirmSignIn: () => {},
+  registerDevice: () => {},
+  fetchDevice: () => {},
   signOut: () => {},
   infoTicket,
   handleverifyTotpToken: () => {},
@@ -229,6 +243,7 @@ export const useProvideAuth = () => {
           return null;
         });
       } catch (err) {
+        console.log(err);
         if (err.code === "NotAuthorizedException") {
           dispatchAuth({ type: SIGN_OUT });
         }
@@ -237,6 +252,36 @@ export const useProvideAuth = () => {
     },
     [cognitoUser, navigate, state, pathname]
   );
+
+  const registerDevice = useCallback(async (challengeParam) => {
+    try {
+      if (challengeParam) {
+        const response = await Auth.rememberDevice();
+        console.log(response);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const fetchDevice = useCallback(async () => {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      const email = user["attributes"]["email"];
+      const isControlGroup = controlgroup.includes(email);
+      if (isControlGroup) {
+        const device_id =
+          user["signInUserSession"]["accessToken"]["payload"]["device_key"];
+        const devices = await Auth.fetchDevices();
+        const checkDevice = devices.some((item) => item?.id === device_id);
+        if (checkDevice) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    } catch {}
+  }, []);
 
   const signOut = useCallback(() => {
     Auth.signOut()
@@ -436,119 +481,205 @@ export const useProvideAuth = () => {
     [cognitoUser, handlesetPreferredMFA]
   );
 
-  const [getQuota] = useFetchDispatchDebounce({
-    onSuccess: useCallback((quota) => {
-      const tempRole = {
-        quota: 0,
-        comision: 0,
-        sobregiro: 0,
-        sobregirovalue: 0,
-        alerta: "",
-      };
-      tempRole.quota = quota["cupo disponible"];
-      tempRole.comision = quota["comisiones"];
-      tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
-      tempRole.sobregirovalue = quota["sobregiro"];
-      tempRole.alerta = quota["alerta cupo"];
-      dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
-    }, []),
-    onError: useCallback((error) => {
-      dispatchAuth({
-        type: SET_QUOTA,
-        payload: { quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" } },
-      });
-      if (error?.cause === "custom") {
-        notifyError(error.message);
-      } else {
-        console.error(error);
-      }
-    }, []),
-  });
-
-  const updateCommerceQuota = useCallback(() => {
-    if (id_comercio && id_dispositivo) {
-      getQuota(
-        `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`
-      );
-    }
-  },[id_comercio, id_dispositivo, getQuota]);
-
-  const [getSuserInfo] = useFetchDispatchDebounce({
-    onSuccess: useCallback((suserInfo) => {
-      let _roleinfo = {};
-      setSuserInactive((old) => ("msg" in suserInfo ? suserInfo?.msg : old));
-      if (!("msg" in suserInfo)) {
-        _roleinfo = structuredClone(suserInfo);
-      }
-      fetchDane(suserInfo.codigo_dane)
-        .then((ciudad) => {
-          _roleinfo.ciudad = ciudad;
-        })
-        .catch(() => {})
-        .finally(() => {
+  useFetchDebounce(
+    {
+      url: useMemo(
+        () => `${url_iam_pdp_users}/user-wallet?uuid=${pdpUser?.uuid}`,
+        [pdpUser?.uuid]
+      ),
+      autoDispatch: useMemo(() => pathname, [pathname]),
+      // Se acplica `!!` en el fetchIf por lo que los valores
+      // indefinidos(undefined) deben transformarse a bool.
+      // Si recibe indefinido usara el valor por defecto (true)
+      fetchIf: useMemo(
+        () => !!pdpUser?.uuid && !!pdpUser?.is_comercio_padre,
+        [pdpUser?.uuid, pdpUser?.is_comercio_padre]
+      ),
+    },
+    {
+      onSuccess: useCallback(
+        (quota) =>
           dispatchAuth({
-            type: SET_ROLEINFO,
-            payload: structuredClone(_roleinfo),
-          });
-        });
-    }, []),
-    onError: useCallback((error) => {
-      if (error?.cause === "custom-403") {
-        notifyError(error.message);
-        signOut();
-      } else if (error?.cause === "custom") {
-        notifyError(error.message);
-        setSuserInactive(error.message);
-      } else {
-        console.error(error);
-      }
-    }, [signOut]),
-  });
-
-  const [getLoginPdp] = useFetchDispatchDebounce({
-    onSuccess: useCallback(
-      (res) => {
-        const pdpU = res?.obj?.pdpU;
-        if (!pdpU && !pdpU.active) {
-          notifyError("Usuario inactivo");
-          signOut();
-          return;
-        }
-
-        dispatchAuth({
-          type: SET_PERMISSIONS,
-          payload: { uAccess: res?.obj?.uAccess ?? [] },
-        });
-        dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
-      },
-      [signOut]
-    ),
-    onError: useCallback(
-      (error) => {
-        if (error?.cause in ["custom-403", "custom"]) {
+            type: SET_QUOTA_COMISION,
+            payload: parseFloat(quota?.obj?.saldo) ?? 0,
+          }),
+        []
+      ),
+      onError: useCallback((error) => {
+        if (error?.cause === "custom") {
           notifyError(error.message);
-          signOut();
         } else {
           console.error(error);
         }
-      },
-      [signOut]
-    ),
-  });
+      }, []),
+    }
+  );
 
-  const [getComercios] = useFetchDispatchDebounce({
-    onSuccess: useCallback((res) => {
-      const commerce = res?.obj;
-      dispatchAuth({ type: SET_COMMERCE_INFO, payload: { commerce } });
-    }, []),
-    onError: useCallback((error) => {
-      if (error?.cause === "custom") {
-        notifyError(error.message);
-      } else {
-        console.error(error);
-      }
-    }, []),
-  });
+  const [updateCommerceQuota] = useFetchDebounce(
+    {
+      url: useMemo(
+        () =>
+          `${urlQuota}?id_comercio=${id_comercio}&id_dispositivo=${id_dispositivo}`,
+        [id_comercio, id_dispositivo]
+      ),
+      autoDispatch: useMemo(() => pathname, [pathname]),
+      // Se acplica `!!` en el fetchIf por lo que los valores
+      // indefinidos(undefined) deben transformarse a bool.
+      // Si recibe indefinido usara el valor por defecto
+      fetchIf: useMemo(
+        () => !!id_comercio && !!id_dispositivo,
+        [id_comercio, id_dispositivo]
+      ),
+    },
+    {
+      onSuccess: useCallback((quota) => {
+        const tempRole = {
+          quota: 0,
+          comision: 0,
+          sobregiro: 0,
+          sobregirovalue: 0,
+          alerta: "",
+          tipo_pago_comision: "",
+        };
+        tempRole.quota = quota["cupo disponible"];
+        tempRole.comision = quota["comisiones"];
+        tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
+        tempRole.sobregirovalue = quota["sobregiro"];
+        tempRole.alerta = quota["alerta cupo"];
+        tempRole.tipo_pago_comision = quota["tipo pago comision"] ?? "";
+        dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
+      }, []),
+      onError: useCallback((error) => {
+        dispatchAuth({
+          type: SET_QUOTA,
+          payload: {
+            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" },
+          },
+        });
+        if (error?.cause === "custom") {
+          notifyError(error.message);
+        } else {
+          console.error(error);
+        }
+      }, []),
+    }
+  );
+
+  useFetchDebounce(
+    {
+      url: useMemo(
+        () => `${urlLog}?correo=${userState?.userInfo?.attributes?.email}`,
+        [userState?.userInfo?.attributes?.email]
+      ),
+      fetchIf: useMemo(
+        () => !!userState?.userInfo?.attributes?.email,
+        [userState?.userInfo?.attributes?.email]
+      ),
+    },
+    {
+      onSuccess: useCallback((suserInfo) => {
+        let _roleinfo = {};
+        setSuserInactive((old) => ("msg" in suserInfo ? suserInfo?.msg : old));
+        if (!("msg" in suserInfo)) {
+          _roleinfo = structuredClone(suserInfo);
+        }
+        fetchDane(suserInfo.codigo_dane)
+          .then((ciudad) => {
+            _roleinfo.ciudad = ciudad;
+          })
+          .catch(() => {})
+          .finally(() => {
+            dispatchAuth({
+              type: SET_ROLEINFO,
+              payload: structuredClone(_roleinfo),
+            });
+          });
+      }, []),
+      onError: useCallback(
+        (error) => {
+          if (error?.cause === "custom-403") {
+            notifyError(error.message);
+            signOut();
+          } else if (error?.cause === "custom") {
+            notifyError(error.message);
+            setSuserInactive(error.message);
+          } else {
+            console.error(error);
+          }
+        },
+        [signOut]
+      ),
+    }
+  );
+
+  useFetchDebounce(
+    {
+      url: useMemo(
+        () =>
+          `${url_iam_pdp_users}/user-login?email=${userState?.userInfo?.attributes?.email}`,
+        [userState?.userInfo?.attributes?.email]
+      ),
+      fetchIf: useMemo(
+        () => !!userState?.userInfo?.attributes?.email && !!roleInfo,
+        [userState?.userInfo?.attributes?.email, roleInfo]
+      ),
+    },
+    {
+      onSuccess: useCallback(
+        (res) => {
+          const pdpU = res?.obj?.pdpU;
+          if (!pdpU && !pdpU.active) {
+            notifyError("Usuario inactivo");
+            signOut();
+            return;
+          }
+
+          dispatchAuth({
+            type: SET_PERMISSIONS,
+            payload: { uAccess: res?.obj?.uAccess ?? [] },
+          });
+          dispatchAuth({ type: SET_PDPUSER, payload: { pdpU } });
+        },
+        [signOut]
+      ),
+      onError: useCallback(
+        (error) => {
+          if (error?.cause in ["custom-403", "custom"]) {
+            notifyError(error.message);
+            signOut();
+          } else {
+            console.error(error);
+          }
+        },
+        [signOut]
+      ),
+    }
+  );
+
+  useFetchDebounce(
+    {
+      url: useMemo(
+        () =>
+          `${url_pdp_commerce}/comercios/consultar-unique?pk_comercio=${id_comercio}`,
+        [id_comercio]
+      ),
+      autoDispatch: useMemo(() => pathname, [pathname]),
+      fetchIf: useMemo(() => !!id_comercio, [id_comercio]),
+    },
+    {
+      onSuccess: useCallback((res) => {
+        const commerce = res?.obj;
+        dispatchAuth({ type: SET_COMMERCE_INFO, payload: { commerce } });
+      }, []),
+      onError: useCallback((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error.message);
+        } else {
+          console.error(error);
+        }
+      }, []),
+    }
+  );
 
   // Runs only when route change
   useEffect(() => {
@@ -564,9 +695,7 @@ export const useProvideAuth = () => {
           )
           .catch(() => {});
       })
-      .catch(() => {
-        dispatchAuth({ type: SIGN_OUT });
-      });
+      .catch(() => signOut());
     // if (Auth.user === null || Auth.user === undefined) {
     // } else {
     //   dispatchAuth({ type: SIGN_OUT });
@@ -575,37 +704,7 @@ export const useProvideAuth = () => {
     //     payload: { loggedUser: Auth.user },
     //   });
     // }
-  }, [pathname]);
-
-  useEffect(() => {
-    updateCommerceQuota();
-  }, [pathname, updateCommerceQuota]);
-
-  useEffect(() => {
-    if (id_comercio) {
-      getComercios(
-        `${url_pdp_commerce}/comercios/consultar-unique?pk_comercio=${id_comercio}`
-      );
-    }
-  }, [pathname, id_comercio, getComercios]);
-
-  useEffect(() => {
-    const email = userState?.userInfo?.attributes?.email;
-    if (email) {
-      getSuserInfo(
-        `${urlLog}?correo=${userState?.userInfo?.attributes?.email}`
-      );
-    }
-  }, [userState?.userInfo?.attributes?.email, getSuserInfo]);
-
-  useEffect(() => {
-    const email = userState?.userInfo?.attributes?.email;
-    if (email && roleInfo) {
-      getLoginPdp(
-        `${url_iam_pdp_users}/user-login?email=${userState?.userInfo?.attributes?.email}`
-      );
-    }
-  }, [userState?.userInfo?.attributes?.email, roleInfo, getLoginPdp]);
+  }, [pathname, signOut]);
 
   useEffect(() => {
     const isPdpCommerce = !!pdpUser?.fk_id_comercio;
@@ -637,6 +736,8 @@ export const useProvideAuth = () => {
     handleChangePass,
     signIn,
     confirmSignIn,
+    registerDevice,
+    fetchDevice,
     signOut,
     forgotPassword,
     forgotPasswordSubmit,

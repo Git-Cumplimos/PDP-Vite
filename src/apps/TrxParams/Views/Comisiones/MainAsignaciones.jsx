@@ -44,7 +44,7 @@ const MainAsignaciones = () => {
   const selectAssign = useCallback(
     (ev, i) => {
       ev.preventDefault();
-      navigate(`edit/${asignaciones[i].pk_asignacion_comisiones}`);
+      navigate(`${asignaciones[i].pk_asignacion_comisiones}`);
     },
     [asignaciones]
   );

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useReducer } from "react";
 import ButtonBar from "../ButtonBar";
 import Button from "../Button";
+import { onChangeNumber } from "../../../utils/functions";
 
 const diffTypes = ["VI"];
 const mainStreetTypes = [
@@ -193,8 +194,24 @@ const AddressForm = ({
   );
 
   const onChangeAddress = useCallback(
-    (ev) => dispatch({ type: ev.target.name, payload: ev.target.value }),
-    []
+    (ev) => {
+      if (ev.target.name === UPDATE_MAIN_STREET_NUMBER) {
+        dispatch({
+          type: ev.target.name,
+          payload:
+            addressState.mainStreet.name !== "VI"
+              ? onChangeNumber(ev)
+              : ev.target.value,
+        });
+        return;
+      }
+      if ([UPDATE_SECONDARY_STREET_NUMBER, UPDATE_THIRD_STREET_NUMBER].includes(ev.target.name)) {
+        dispatch({ type: ev.target.name, payload: onChangeNumber(ev) });
+        return;
+      }
+      dispatch({ type: ev.target.name, payload: ev.target.value });
+    },
+    [addressState.mainStreet.name]
   );
 
   return (

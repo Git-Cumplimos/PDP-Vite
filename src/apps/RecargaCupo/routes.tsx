@@ -4,6 +4,8 @@ import {
   listPermissionsRecargaCupoNequi,
   rutasRecargaNequi,
 } from "../Nequi/routes";
+import routesRecargaCupoConGou from "./Gou/routes";
+import { ListPermissionsRecargaCupoConGou } from "./Gou/ListPermissionsRecargaCupoConGou";
 
 const RecargaCupoMenu = lazy(() => import("./RecargaCupoMenu"));
 
@@ -11,8 +13,11 @@ const routesRecargaCupo = {
   link: "/recarga-cupo",
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="Recargar Cupo" />,
   component: RecargaCupoMenu,
-  permission: [...listPermissionsRecargaCupoNequi],
-  subRoutes: [rutasRecargaNequi],
+  permission: [
+    ...listPermissionsRecargaCupoNequi,
+    ListPermissionsRecargaCupoConGou,
+  ],
+  subRoutes: [rutasRecargaNequi, routesRecargaCupoConGou],
 };
 
 export default routesRecargaCupo;

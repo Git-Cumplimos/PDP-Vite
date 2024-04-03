@@ -7,3 +7,15 @@ export type TypingRoutes = {
   permission: number[];
   subModules: TypingRoutes[];
 };
+
+export type TypeInfTicket = {
+  title: string;
+  timeInfo: {
+    "Fecha de venta": string;
+    Hora: string;
+  };
+  commerceInfo: (string | number)[][];
+  commerceName: string;
+  trxInfo: (string | number)[][];
+  disclamer: string;
+};

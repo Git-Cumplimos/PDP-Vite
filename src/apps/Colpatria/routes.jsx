@@ -21,10 +21,18 @@ const AdminColpatria = lazy(() => import("./Views/Admin"));
 const ListaErrores = lazy(() => import("./Views/Admin/ListaErrores"));
 const ConveniosPines = lazy(() => import("./Views/Admin/ConveniosPines"));
 const ConveniosRecaudo = lazy(() => import("./Views/Admin/ConveniosRecaudo"));
+const GeneracionPinColpatria = lazy(() =>
+  import("./Views/GeneracionPinColpatria")
+);
 
 export const rutasGestionColpatria = {
   link: "/corresponsalia/colpatria/gestion",
-  label: <AppIcons Logo={"COLPATRIA_GESTION"} name={"Gestión Corresponsalía Colpatria"} />,
+  label: (
+    <AppIcons
+      Logo={"COLPATRIA_GESTION"}
+      name={"Gestión Corresponsalía Colpatria"}
+    />
+  ),
   component: AdminColpatria,
   permission: [PermissionsColpatria.gestion],
   subRoutes: [
@@ -63,9 +71,7 @@ export const rutasGestionColpatria = {
 
 const listPermissions = Object.values(PermissionsColpatria);
 
-export const listPermissionsColpatria = listPermissions.splice(
-  listPermissions.length / 2
-);
+export const listPermissionsColpatria = listPermissions;
 
 const rutasColpatria = {
   link: "/corresponsalia/colpatria",
@@ -157,7 +163,17 @@ const rutasColpatria = {
       component: PinDePago,
       permission: [PermissionsColpatria.pin_pago],
     },
-    // rutasGestionColpatria,
+    {
+      link: "/corresponsalia/colpatria/generacion-pin",
+      label: (
+        <AppIcons
+          Logo={"COLPATRIA_RETIRO_CON_PIN"}
+          name={"Generación de Pin"}
+        />
+      ),
+      component: GeneracionPinColpatria,
+      permission: [PermissionsColpatria.generacion_pin],
+    },
   ],
 };
 

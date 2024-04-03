@@ -40,7 +40,6 @@ const PagoGiro = () => {
 
   // const [tipoPersona, setTipoPersona] = useState("");
   const [userDocument, setUserDocument] = useState("");
-  const [userDocumentDate, setUserDocumentDate] = useState("");
   const [userAddress /* , setUserAddress */] = useState(
     roleInfo?.direccion ?? ""
   );
@@ -71,11 +70,10 @@ const PagoGiro = () => {
     () => ({
       // "Tipo de persona": ObjTiposPersonas[tipoPersona],
       "No. Identificación": userDocument,
-      "Fecha de expedición identificación": userDocumentDate,
       "No. De PIN": pinNumber,
       "Valor a Retirar": formatMoney.format(valPinPago),
     }),
-    [pinNumber, userDocument, valPinPago, userDocumentDate]
+    [pinNumber, userDocument, valPinPago]
   );
 
   const handleClose = useCallback(() => {
@@ -105,8 +103,6 @@ const PagoGiro = () => {
           // ["", ""],
           ["No. Identificación", userDocument],
           ["", ""],
-          ["Fecha de expedición identificación", userDocumentDate],
-          ["", ""],
           // ["No. De PIN", pinNumber],
           // ["", ""],
           ["Valor a Retirar", formatMoney.format(valPinPago)],
@@ -117,7 +113,6 @@ const PagoGiro = () => {
         colpatria: {
           user_document: userDocument,
           numero_pin: encryptPin(pinNumber),
-          fecha_expedicion: userDocumentDate,
           // is_persona_natural: tipoPersona === "t",
           location: {
             address: userAddress,
@@ -157,7 +152,6 @@ const PagoGiro = () => {
     [
       pinNumber,
       userDocument,
-      userDocumentDate,
       userAddress,
       valPinPago,
       roleInfo,
@@ -229,13 +223,14 @@ const PagoGiro = () => {
 
   return (
     <Fragment>
-      <h1 className='text-3xl mt-6'>Retiro con Pin</h1>
+      <h1 className="text-3xl mt-6">Retiro con Pin</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid>
+        grid
+      >
         {/* <Select
           id='accType'
           name='accType'
@@ -252,11 +247,11 @@ const PagoGiro = () => {
           required
         /> */}
         <Input
-          id='docCliente'
-          name='docCliente'
-          label='No. Identificación'
-          type='tel'
-          autoComplete='off'
+          id="docCliente"
+          name="docCliente"
+          label="No. Identificación"
+          type="tel"
+          autoComplete="off"
           minLength={"5"}
           maxLength={"12"}
           value={userDocument}
@@ -264,31 +259,21 @@ const PagoGiro = () => {
           required
         />
         <Input
-          id='docClienteDate'
-          name='docClienteDate'
-          label='Fecha expedición identificación'
-          type='date'
-          autoComplete='off'
-          value={userDocumentDate}
-          onInput={(ev) => setUserDocumentDate(ev.target.value)}
-          required
-        />
-        <Input
-          id='numPin'
-          name='numPin'
-          label='No. De PIN'
-          type='text'
-          autoComplete='off'
+          id="numPin"
+          name="numPin"
+          label="No. De PIN"
+          type="text"
+          autoComplete="off"
           maxLength={"6"}
           onInput={(ev) => setAccountNumber(onChangeNumber(ev))}
           required
         />
         <Input
-          id='valor'
-          name='valor'
-          label='Valor a Retirar'
-          autoComplete='off'
-          type='tel'
+          id="valor"
+          name="valor"
+          label="Valor a Retirar"
+          autoComplete="off"
+          type="tel"
           minLength={"5"}
           maxLength={"11"}
           onInput={(ev) => setValPinPago(onChangeMoney(ev))}
@@ -300,9 +285,10 @@ const PagoGiro = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={loadingPinPago ? () => {} : handleClose}>
+        handleClose={loadingPinPago ? () => {} : handleClose}
+      >
         {paymentStatus ? (
-          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -313,9 +299,10 @@ const PagoGiro = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type='submit'
+                type="submit"
                 onClick={onMakePayment}
-                disabled={loadingPinPago}>
+                disabled={loadingPinPago}
+              >
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingPinPago}>

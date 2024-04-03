@@ -117,6 +117,18 @@ export const useProvideImgs = () => {
   return assets;
 };
 
+export const useProvideImgsWithDispatch = () => {
+  const assets = useProvideImgs();
+  const [_, dispatchImgs] = useReducer(reducerImgs, initialImgs);
+  useEffect(() => {
+    dispatchImgs({ type: FETCH_IMGS, payload: { dispatch: dispatchImgs } });
+    dispatchImgs({ type: FETCH_SVGS, payload: { dispatch: dispatchImgs } });
+    dispatchImgs({ type: FETCH_BANNERS, payload: { dispatch: dispatchImgs } });
+  }, []);
+
+  return { assets, dispatchImgs };
+};
+
 const checkImage = (url) =>
   new Promise((resolve, reject) => {
     const load_banners = new Image();

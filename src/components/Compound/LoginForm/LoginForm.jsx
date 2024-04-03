@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 
 import { useAuth } from "../../../hooks/AuthHooks";
+import { decryptAES } from "../../../utils/cryptoUtils";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
@@ -145,6 +146,7 @@ const LoginForm = () => {
     event.preventDefault();
     notifyPending(
       auth.validateUser(username).then((res) => {
+        //Decryption Goes Here
         setDisabled(true);
         if (res?.Status === true) {
           setDisabled(false);
@@ -241,7 +243,6 @@ const LoginForm = () => {
       .handleverifyTotpToken(totp)
       .then()
       .catch((err) => {
-        console.log(err);
         if (err.cause === "unknown") {
           notifyError(err.message);
           return;
@@ -306,10 +307,10 @@ const LoginForm = () => {
         <hr />
         <form
           onSubmit={
-            auth.parameters.name === "" ? handleChangePW : handleChangeExisting
+            !auth.parameters?.name ? handleChangePW : handleChangeExisting
           }
         >
-          {auth.parameters.name === "" && (
+          {!auth.parameters?.name && (
             <Fragment>
               <div className={field}>
                 <label htmlFor="names">Nombres:</label>
@@ -369,7 +370,7 @@ const LoginForm = () => {
           <div className={field}>
             <label htmlFor="newPassword">Nueva contraseña:</label>
             <input
-              id="newPassword"
+              id="userNewPw"
               type="password"
               autoComplete="off"
               value={newPass}
@@ -381,7 +382,7 @@ const LoginForm = () => {
           <div className={field}>
             <label htmlFor="confirmNewPassword">Confirmar contraseña:</label>
             <input
-              id="confirmNewPassword"
+              id="confirm-NewPw"
               type="password"
               autoComplete="off"
               value={confirmPass}
@@ -471,7 +472,7 @@ const LoginForm = () => {
           <div className={field}>
             <label htmlFor="names">Contraseña:</label>
             <input
-              id="newpass"
+              id="new-userpw"
               type="password"
               autoFocus
               autoComplete="off"
@@ -484,7 +485,7 @@ const LoginForm = () => {
           <div className={field}>
             <label htmlFor="names">Confirmar contraseña:</label>
             <input
-              id="confirmpass"
+              id="confirm-userpw"
               type="password"
               autoFocus
               autoComplete="off"
@@ -548,8 +549,9 @@ const LoginForm = () => {
         <div className={field}>
           <label htmlFor="password">Contraseña:</label>
           <input
-            id="password"
+            id="user-pw"
             type="password"
+            autoComplete="off"
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);

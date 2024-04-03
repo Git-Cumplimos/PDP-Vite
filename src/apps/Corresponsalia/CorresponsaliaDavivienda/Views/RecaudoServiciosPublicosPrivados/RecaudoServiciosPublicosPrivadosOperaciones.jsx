@@ -303,6 +303,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
+        nomConvenio: convenio.nom_convenio_cnb,
       })
         .then((res) => {
           if (res?.status) {

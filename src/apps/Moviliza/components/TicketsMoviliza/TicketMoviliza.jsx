@@ -8,7 +8,7 @@ const TicketMoviliza = ({
   stateTrx = true,
 }) => {
   const {
-    imgs: { ScotiabankColpatria, pdpHorizontal: LogoPng },
+    imgs: { pdpHorizontal: LogoPng },
   } = useImgs();
 
   if (!ticket) {
@@ -25,11 +25,6 @@ const TicketMoviliza = ({
       <div className="flex flex-col items-center">
         <div className={"w-64"}>
           <div className="aspect-w-13 aspect-h-1">
-            {/* <img
-              src={ScotiabankColpatria}
-              alt="Logo scotiabank colpatria"
-              className="object-center object-cover"
-            /> */}
           </div>
         </div>
         <div className="w-30">

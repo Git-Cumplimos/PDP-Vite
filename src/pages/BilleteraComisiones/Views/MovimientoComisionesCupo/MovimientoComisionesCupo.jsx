@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
@@ -25,6 +25,31 @@ const MovimientoComisionesCupo = () => {
     superior: 1000000,
     inferior: 100,
   });
+
+  useEffect(() => {
+    // if (!quotaInfo || 
+    //   (quotaInfo && Object.keys(quotaInfo).length === 0) ||
+    //   (quotaInfo && Object.values(quotaInfo).every(val => [""," ",0].includes(val)) )
+    // ) {
+    //   navigate("/");
+    // } else {
+      let hasKeys = true;
+      if (["TRANSFERENCIA_MENSUAL"].includes(String(quotaInfo?.tipo_pago_comision).toUpperCase() ?? "")){
+        hasKeys = false
+      }
+      if (!hasKeys) {
+        notifyError(
+          "No se permite la transferencia de comisión, esta se realiza mensualmente"
+        );
+        navigate("/");
+      }
+    // }
+  }, [quotaInfo, navigate]);
+
+  const isComercioPadre = useMemo(
+    () => pdpUser?.is_comercio_padre ?? false,
+    [pdpUser]
+  );
   const [objTicketActual, setObjTicketActual] = useState({
     title: "Recibo de transferencia comisiones a cupo",
     timeInfo: {
@@ -192,6 +217,15 @@ const MovimientoComisionesCupo = () => {
         console.error(err);
       });
   };
+
+  if (isComercioPadre) {
+    return (
+      <Navigate
+        to={"/billetera-comisiones/movimiento-comisiones-cupo-usuario-padre"}
+        replace
+      />
+    );
+  }
 
   if (datosTrans.saldoComision === undefined) {
     return <Fragment />;

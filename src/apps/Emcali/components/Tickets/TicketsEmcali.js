@@ -1,13 +1,6 @@
 import Tickets from "../../../../components/Base/Tickets";
 import { useImgs } from "../../../../hooks/ImgsHooks";
 
-// type TypeTicketsEmcali = {
-//   refPrint: any;
-//   type: string;
-//   ticket: any;
-//   stateTrx: boolean;
-// };
-
 const TicketsEmcali = ({
   refPrint,
   type = "ORIGINAL",

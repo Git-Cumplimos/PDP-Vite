@@ -47,7 +47,7 @@ const Modal = ({
       modalElement.addEventListener("keydown", handleTabKeyPress);
       return () => {
         modalElement.removeEventListener("keydown", handleTabKeyPress);
-      }
+      };
     } else {
       document.body.style.overflow = "auto";
     }
@@ -55,6 +55,11 @@ const Modal = ({
       document.body.style.overflow = "auto";
     };
   }, [show]);
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   return show ? (
     <div ref={refModal} className={`${modal} flex`}>

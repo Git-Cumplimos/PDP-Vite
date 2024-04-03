@@ -19,6 +19,7 @@ import {
   putModificarConvenio,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { v4 as uuidv4 } from "uuid";
+import ToggleInput from "../../../../../components/Base/ToggleInput";
 
 const url_cargueS3 = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/banco_agrario_cb_recaudo/subir_archivos_convenios`;
 
@@ -42,6 +43,7 @@ const ConveniosRecaudoAgrario = () => {
     codigo: "",
     ean: "",
     estado: true,
+    permite_recaudo_manual: false,
     nit: "",
     nombre_convenio: "",
     pk_tbl_convenios_banco_agrario: 0,
@@ -86,6 +88,7 @@ const ConveniosRecaudoAgrario = () => {
       codigo: "",
       ean: "",
       estado: true,
+      permite_recaudo_manual: false,
       nit: "",
       nombre_convenio: "",
       pk_tbl_convenios_banco_agrario: 0,
@@ -130,6 +133,7 @@ const ConveniosRecaudoAgrario = () => {
         codigo: convenios[i].codigo,
         ean: convenios[i].ean,
         estado: convenios[i].estado,
+        permite_recaudo_manual: convenios[i].permite_recaudo_manual,
         nit: convenios[i].nit,
         nombre_convenio: convenios[i].nombre_convenio,
         pk_tbl_convenios_banco_agrario:
@@ -197,6 +201,11 @@ const ConveniosRecaudoAgrario = () => {
     if (ev.target.name === "estado") {
       if (value && typeof value === "string") {
         value = value.toLowerCase() === "false" ? false : true;
+      }
+    }
+    if (ev.target.name === "permite_recaudo_manual") {
+      if (value && typeof value === "string") {
+        value = value.toLowerCase() === "on" ? true : false;
       }
     }
     setDataConvenios((old) => {
@@ -321,9 +330,9 @@ const ConveniosRecaudoAgrario = () => {
                                   resolve(true);
                                 }
                               } else {
-                                // notifyError(res?.msg ?? res?.message ?? "");
-                                setIsUploading(false);
-                                hideModal();
+                                notifyError(res?.msg ?? res?.message ?? "");
+                                // setIsUploading(false);
+                                // hideModal();
                                 resolve(false);
                               }
                             })
@@ -364,7 +373,6 @@ const ConveniosRecaudoAgrario = () => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
       setIsUploading(true);
       let dataTemp = { ...dataConvenios };
       for (let id = 0; id < dataConvenios.referencias.length; id++) {
@@ -386,12 +394,15 @@ const ConveniosRecaudoAgrario = () => {
             if (res?.status) {
               notify(res?.msg);
               navigate(-1);
+              hideModal();
             } else {
               notifyError(res?.msg);
+              hideModal();
             }
           })
           .catch((err) => {
             setIsUploading(false);
+            hideModal();
             notifyError("No se ha podido conectar al servidor");
             console.error(err);
           });
@@ -404,13 +415,16 @@ const ConveniosRecaudoAgrario = () => {
             setIsUploading(false);
             if (res?.status) {
               notify(res?.msg);
+              hideModal();
               navigate(-1);
             } else {
               notifyError(res?.msg);
+              hideModal();
             }
           })
           .catch((err) => {
             setIsUploading(false);
+            hideModal();
             notifyError("No se ha podido conectar al servidor");
             console.error(err);
           });
@@ -422,20 +436,21 @@ const ConveniosRecaudoAgrario = () => {
     <>
       <SimpleLoading show={isUploading} />
       <TableEnterprise
-        title='Tabla de convenios Banco Agrario'
+        title="Tabla de convenios Banco Agrario"
         maxPage={maxPages}
         headers={["Código", "Convenio", "EAN", "Estado"]}
         data={tableConvenios}
         onSelectRow={onSelectConvenio}
-        onSetPageData={setPageData}>
+        onSetPageData={setPageData}
+      >
         <Input
-          id='searchConvenio'
-          name='searchConvenio'
+          id="searchConvenio"
+          name="searchConvenio"
           label={"Buscar convenio"}
-          minLength='1'
-          maxLength='30'
-          type='text'
-          autoComplete='off'
+          minLength="1"
+          maxLength="30"
+          type="text"
+          autoComplete="off"
           onInput={(e) => {
             setDatosTrans((old) => {
               return { ...old, convenio: e.target.value };
@@ -443,12 +458,12 @@ const ConveniosRecaudoAgrario = () => {
           }}
         />
         <Input
-          id='idConvenio'
-          label='Código convenio'
-          type='text'
-          name='idConvenio'
-          minLength='1'
-          maxLength='13'
+          id="idConvenio"
+          label="Código convenio"
+          type="text"
+          name="idConvenio"
+          minLength="1"
+          maxLength="13"
           value={datosTrans.idConvenio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -458,14 +473,15 @@ const ConveniosRecaudoAgrario = () => {
                 return { ...old, idConvenio: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <Input
-          id='ean'
-          label='EAN'
-          type='text'
-          name='ean'
-          minLength='1'
-          maxLength='13'
+          id="ean"
+          label="EAN"
+          type="text"
+          name="ean"
+          minLength="1"
+          maxLength="13"
           value={datosTrans.ean}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
@@ -475,45 +491,48 @@ const ConveniosRecaudoAgrario = () => {
                 return { ...old, ean: num };
               });
             }
-          }}></Input>
+          }}
+        ></Input>
         <ButtonBar>
           <Button
-            type='submit'
+            type="submit"
             onClick={() =>
               setShowModal((old) => ({ estado: 0, showModal: true }))
-            }>
+            }
+          >
             Subir convenios
           </Button>
           <Button
-            type='submit'
+            type="submit"
             onClick={() =>
               setShowModal((old) => ({ estado: 1, showModal: true }))
-            }>
+            }
+          >
             Crear convenios
           </Button>
         </ButtonBar>
       </TableEnterprise>
       <Modal show={showModal} handleClose={hideModal}>
         {estado === 0 ? (
-          <Form formDir='col' onSubmit={saveFile}>
-            <h1 className='text-2xl text-center mb-10 mt-5'>
+          <Form formDir="col" onSubmit={saveFile}>
+            <h1 className="text-2xl text-center mb-10 mt-5">
               Archivo de convenios Agrario
             </h1>
             <InputX
               id={`archivo`}
               label={file.name ? "Cambiar archivo" : `Elegir archivo`}
-              type='file'
+              type="file"
               // disabled={progress !== 0}
-              accept='.csv,.txt'
+              accept=".csv,.txt"
               onGetFile={onChangeFile}
             />
             {file.name ? (
               <>
-                <h2 className='text-l text-center mt-5'>
+                <h2 className="text-l text-center mt-5">
                   {`Archivo seleccionado: ${file.name}`}
                 </h2>
                 <ButtonBar>
-                  <Button type='submit'>Subir</Button>
+                  <Button type="submit">Subir</Button>
                 </ButtonBar>
               </>
             ) : (
@@ -522,71 +541,77 @@ const ConveniosRecaudoAgrario = () => {
           </Form>
         ) : estado === 1 ? (
           <Form grid onSubmit={createUpdateConvenio}>
-            <h1 className='text-2xl font-semibold text-center'>
+            <h1 className="text-2xl font-semibold text-center">
               {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                 ? "Editar convenio Agrario"
                 : "Crear convenio Agrario"}
             </h1>
             <Fieldset
-              legend='Información del convenio'
-              className='lg:col-span-2'>
+              legend="Información del convenio"
+              className="lg:col-span-2"
+            >
               {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0 && (
                 <Input
-                  id='pk_tbl_convenios_banco_agrario'
-                  label='Id comercio'
-                  type='text'
-                  name='pk_tbl_convenios_banco_agrario'
-                  minLength='1'
-                  maxLength='32'
+                  id="pk_tbl_convenios_banco_agrario"
+                  label="Id comercio"
+                  type="text"
+                  name="pk_tbl_convenios_banco_agrario"
+                  minLength="1"
+                  maxLength="32"
                   value={dataConvenios?.pk_tbl_convenios_banco_agrario}
                   onInput={onChangeFormat}
-                  disabled></Input>
+                  disabled
+                ></Input>
               )}
               <Input
-                id='codigo'
-                label='Código convenio'
-                type='text'
-                name='codigo'
-                minLength='1'
-                maxLength='6'
+                id="codigo"
+                label="Código convenio"
+                type="text"
+                name="codigo"
+                minLength="1"
+                maxLength="6"
                 required
                 value={dataConvenios?.codigo}
-                onInput={onChangeFormatNumber}></Input>
+                onInput={onChangeFormatNumber}
+              ></Input>
               <Input
-                id='nombre_convenio'
-                label='Nombre convenio'
-                type='text'
-                name='nombre_convenio'
-                minLength='1'
-                maxLength='80'
+                id="nombre_convenio"
+                label="Nombre convenio"
+                type="text"
+                name="nombre_convenio"
+                minLength="1"
+                maxLength="80"
                 required
                 value={dataConvenios?.nombre_convenio}
-                onInput={onChangeFormat}></Input>
+                onInput={onChangeFormat}
+              ></Input>
               <Input
-                id='ean'
-                label='EAN'
-                type='text'
-                name='ean'
-                minLength='1'
-                maxLength='13'
-                required
+                id="ean"
+                label="EAN"
+                type="text"
+                name="ean"
+                minLength="1"
+                maxLength="13"
+                // required
                 value={dataConvenios?.ean}
-                onInput={onChangeFormatNumber}></Input>
+                onInput={onChangeFormatNumber}
+              ></Input>
               <Input
-                id='nit'
-                label='NIT'
-                type='text'
-                name='nit'
-                minLength='1'
-                maxLength='10'
+                id="nit"
+                label="NIT"
+                type="text"
+                name="nit"
+                minLength="1"
+                maxLength="10"
                 required
                 value={dataConvenios?.nit}
-                onInput={onChangeFormatNumber}></Input>
+                onInput={onChangeFormatNumber}
+              ></Input>
               <Select
-                className='place-self-stretch'
-                id='estado'
-                name='estado'
-                label='Estado del convenio'
+                className="place-self-stretch"
+                id="estado"
+                name="estado"
+                label="Estado del convenio"
                 required={true}
                 options={{
                   Inactivo: false,
@@ -595,33 +620,44 @@ const ConveniosRecaudoAgrario = () => {
                 onChange={onChangeFormat}
                 value={dataConvenios?.estado}
               />
+              <ToggleInput
+                id={"permite_recaudo_manual"}
+                label={"Permite recaudo manual"}
+                name={"permite_recaudo_manual"}
+                defaultChecked={dataConvenios?.permite_recaudo_manual}
+                onChange={onChangeFormat}
+                value={dataConvenios?.permite_recaudo_manual}
+              />
             </Fieldset>
             {dataConvenios.referencias.map((item, id) => (
               <Fieldset
                 legend={`Información referencia ${id + 1}`}
-                className='lg:col-span-2'
-                key={id}>
+                className="lg:col-span-2"
+                key={id}
+              >
                 <Input
                   id={`nombre_ref${id + 1}`}
                   label={`Nombre referencia ${id + 1}`}
-                  type='text'
+                  type="text"
                   name={`nombre_ref${id + 1}`}
-                  minLength='1'
-                  maxLength='50'
+                  minLength="1"
+                  maxLength="50"
                   required
                   value={dataConvenios?.referencias[id][`nombre_ref${id + 1}`]}
-                  onInput={onChangeFormatVect(id)}></Input>
+                  onInput={onChangeFormatVect(id)}
+                ></Input>
                 <Select
-                  className='place-self-stretch'
+                  className="place-self-stretch"
                   id={`algoritmo_ref${id + 1}`}
                   name={`algoritmo_ref${id + 1}`}
                   label={`Tipo de algoritmo referencia ${id + 1}`}
                   required={true}
                   options={{
-                    "N 010 Numérico": "N 010 Numérico",
-                    "A 000 Alfanumérico Números": "A 000 Alfanumérico Números",
-                    "Q 108 Modlo 10": "Q 108 Modlo 10",
-                    "U 109 Base 9": "U 109 Base 9",
+                    Numérico: "numerico",
+                    Alfanumérico: "alfanumerico",
+                    "Modlo 10": "modlo10",
+                    "Base 9": "base9",
+                    "Caracteres sin número": "caracteres",
                   }}
                   onChange={onChangeFormatVect(id)}
                   value={
@@ -631,35 +667,37 @@ const ConveniosRecaudoAgrario = () => {
                 <Input
                   id={`longitud_min_ref${id + 1}`}
                   label={`longitud mínima referencia ${id + 1}`}
-                  type='text'
+                  type="text"
                   name={`longitud_min_ref${id + 1}`}
-                  minLength='1'
-                  maxLength='2'
+                  minLength="1"
+                  maxLength="2"
                   required
                   value={
                     dataConvenios?.referencias[id][`longitud_min_ref${id + 1}`]
                   }
-                  onInput={onChangeFormatNumberVect(id)}></Input>
+                  onInput={onChangeFormatNumberVect(id)}
+                ></Input>
                 <Input
                   id={`longitud_max_ref${id + 1}`}
                   label={`longitud máxima referencia ${id + 1}`}
-                  type='text'
+                  type="text"
                   name={`longitud_max_ref${id + 1}`}
-                  minLength='1'
-                  maxLength='2'
+                  minLength="1"
+                  maxLength="2"
                   required
                   value={
                     dataConvenios?.referencias[id][`longitud_max_ref${id + 1}`]
                   }
-                  onInput={onChangeFormatNumberVect(id)}></Input>
+                  onInput={onChangeFormatNumberVect(id)}
+                ></Input>
               </Fieldset>
             ))}
-            <ButtonBar className='lg:col-span-2'>
+            <ButtonBar className="lg:col-span-2">
               {dataConvenios.referencias.length > 1 && (
                 <Button onClick={deleteReferencia}>Eliminar Referencia</Button>
               )}
               {dataConvenios.referencias.length < 3 && (
-                <Button type='button' onClick={addReferencia}>
+                <Button type="button" onClick={addReferencia}>
                   Agregar referencia
                 </Button>
               )}
@@ -669,10 +707,11 @@ const ConveniosRecaudoAgrario = () => {
                 onClick={() => {
                   notify("Operación cancelada");
                   hideModal();
-                }}>
+                }}
+              >
                 Cancelar
               </Button>
-              <Button type='submit'>
+              <Button type="submit">
                 {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                   ? "Editar convenio"
                   : "Crear convenio"}
@@ -681,7 +720,7 @@ const ConveniosRecaudoAgrario = () => {
           </Form>
         ) : estado === 2 ? (
           <>
-            <h1 className='text-2xl text-center mb-5 font-semibold'>
+            <h1 className="text-2xl text-center mb-5 font-semibold">
               {`¿Está seguro de ${
                 dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                   ? "editar el convenio"
@@ -694,10 +733,11 @@ const ConveniosRecaudoAgrario = () => {
                   onClick={() => {
                     notify("Operación cancelada");
                     hideModal();
-                  }}>
+                  }}
+                >
                   Cancelar
                 </Button>
-                <Button type='submit' onClick={onSubmit}>
+                <Button type="submit" onClick={onSubmit}>
                   {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0
                     ? "Aceptar"
                     : "Aceptar"}

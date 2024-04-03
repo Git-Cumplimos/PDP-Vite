@@ -10,9 +10,11 @@ import MoneyInput from "../../../components/Base/MoneyInput";
 import TextArea from "../../../components/Base/TextArea";
 import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../utils/notify";
 import { putAjusteCupo } from "../utils/fetchCupo";
-import {getConsultaCupoComercio}  from "../utils/fetchFunctions";
+import { getConsultaCupoComercio } from "../utils/fetchFunctions";
+import { cargarArchivoAjusteCupoMasivo } from "../utils/fetchFunctions";
+import { descargarArchivo, descargarFormato } from "../utils/functions";
 
 const AjusteCupoComer = ({ subRoutes }) => {
   const navegate = useNavigate();
@@ -22,13 +24,26 @@ const AjusteCupoComer = ({ subRoutes }) => {
   const [razonAjuste, setRazonAjuste] = useState("");
   const [inputId, setinputId] = useState(false);
   const [submitName, setSubmitName] = useState("");
+  const [disabledBtn, setDisabledBtn] = useState(false);
+
+  const [showModalCargaMasiva, setShowModalCargaMasiva] = useState(false);
+  const [cargarArchivo, setCargarArchivo] = useState(false);
+  const [file, setFile] = useState(null);
+  const typoArchivos = ["text/csv"]
 
   const limitesMontos = {
     max: 9999999999,
     min: 0,
   };
 
-  const { roleInfo } = useAuth();
+  const formatoAjusteCupoMasivo = [
+    ["pk_comercio", "monto", "tipo_trx", "razon_ajuste"],
+    [1, 1500, 1 ,"ajuste debito"],
+    [2, 2500, 2 ,"ajuste credito"],
+    [3, 3500, 3 ,"ajuste contingencia"],
+]
+
+  const { roleInfo, pdpUser } = useAuth();
   // useEffect(() => {
   //   if (cupoComer.length === 0) {
   //     notifyError("ID de comercio incorrecto");
@@ -37,19 +52,19 @@ const AjusteCupoComer = ({ subRoutes }) => {
   // }, [cupoComer]);
 
   const consultaCupoComercios = useCallback((id_comercio) => {
-    getConsultaCupoComercio({'pk_id_comercio':id_comercio ?? idComercio})
+    getConsultaCupoComercio({ 'pk_id_comercio': id_comercio ?? idComercio })
       .then((res) => {
         if (!res?.obj || res?.obj?.length === 0) {
           setinputId(false);
           notifyError("No se encontraron comercios con ese id");
           return;
-        } 
+        }
         setCupoComer(res?.obj ?? []);
       })
       .catch((reason) => {
         notifyError("Error al cargar Datos ");
       });
-  },[idComercio]);
+  }, [idComercio]);
 
   const onChangeId = useCallback((ev) => {
     const formData = new FormData(ev.target.form);
@@ -63,34 +78,44 @@ const AjusteCupoComer = ({ subRoutes }) => {
     setValor(monto);
   }, []);
 
+  const handleCloseCargaMasiva = useCallback(() => {
+    setShowModalCargaMasiva(false);
+    setCargarArchivo(false);
+  }, []);
+
   const onSubmitAjuste = useCallback(
     (e) => {
       if (valor !== null && valor !== "") {
+        setDisabledBtn(true)
         const args = { pk_id_comercio: idComercio };
         let body = {
-          valor_afectacion : valor,
+          valor_afectacion: valor,
           fk_id_comercio: idComercio,
-          usuario: roleInfo.id_usuario ?? -1,
+          usuario: roleInfo.id_usuario ?? pdpUser?.uuid ?? -1,
           fk_tipo_de_movimiento: 2,
           motivo_afectacion: razonAjuste,
         }
         if (submitName === "contigencia") body.ajustes_deuda = true
         if (submitName === "Débito") {
-          body.valor_afectacion = "-" +  valor
+          body.valor_afectacion = "-" + valor
           body.ajustes_deuda = true
         }
         putAjusteCupo(args, body)
-        .then((res) => {
-          consultaCupoComercios(idComercio);
-          if (res?.status) {
-            navegate(`/cupo`);
-            notify(res?.msg);
-            // navigate(-1, { replace: true });
-          } else {
-            notifyError(res?.msg);
-          }
-        })
-        .catch((err) => console.error(err));
+          .then((res) => {
+            consultaCupoComercios(idComercio);
+            if (res?.status) {
+              navegate(`/cupo`);
+              notify(res?.msg);
+              // navigate(-1, { replace: true });
+            } else {
+              notifyError(res?.msg);
+            }
+            setDisabledBtn(false)
+          })
+          .catch((err) => {
+            console.error(err)
+            setDisabledBtn(false)
+          });
       } else {
         notifyError("El campo monto no puede estar vacío");
       }
@@ -101,6 +126,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
       razonAjuste,
       roleInfo?.id_usuario,
       submitName,
+      pdpUser,
       navegate,
       consultaCupoComercios
     ]
@@ -113,12 +139,66 @@ const AjusteCupoComer = ({ subRoutes }) => {
         setinputId(true);
       }
     },
-    [idComercio,consultaCupoComercios]
+    [idComercio, consultaCupoComercios]
   );
+
+  const CargarArchivo = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setDisabledBtn(true)
+      if (!typoArchivos.includes(file.type)) {
+        notifyError('Tipo de archivo incorrecto')
+        return;
+      }
+
+      notifyPending(
+        cargarArchivoAjusteCupoMasivo(
+          file,
+          roleInfo?.id_usuario ?? pdpUser?.uuid,
+          roleInfo?.id_comercio ?? 0,
+          roleInfo?.id_dispositivo ?? 0,
+        ),
+        {
+          render() {
+            return "Enviando solicitud";
+          },
+        },
+        {
+          render({ data: res }) {
+            setDisabledBtn(false)
+            handleCloseCargaMasiva();
+            return res?.msg;
+          },
+        },
+        {
+          render({ data: err }) {
+            setDisabledBtn(false)
+            if (err?.obj?.url && err.obj?.url !== "") {
+              descargarArchivo("Error-del-archivo.csv", err.obj?.url)
+            }
+            handleCloseCargaMasiva()
+            if (!err.msg || err.msg === "") {
+              return `Archivo erróneo`;
+            }
+            return err.msg
+          },
+        }
+      );
+
+    }, [handleCloseCargaMasiva, file, typoArchivos, roleInfo, pdpUser]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Ajuste deuda cupo</h1>
       <Form onSubmit={onSubmitBusqueda} grid>
+        <ButtonBar className={"lg  col-span-2"}>
+          <Button
+            type="button"
+            onClick={() => { setShowModalCargaMasiva(true) }}
+          >
+            Ajuste masiva de cupos
+          </Button>
+        </ButtonBar>
         <Input
           id="Id comercio"
           name="Id comercio"
@@ -163,7 +243,18 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 disabled={true}
                 required
               />
-              <Input
+              <MoneyInput
+                id="deuda"
+                name="deuda"
+                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
+                autoComplete="off"
+                min={limitesMontos?.min}
+                max={limitesMontos?.max}
+                value={parseInt(cupoComer[0]?.deuda)}
+                disabled={true}
+                required
+              />
+              {/* <Input
                 id="deuda"
                 name="deuda"
                 label="Deuda del comercio"
@@ -173,7 +264,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
                 disabled={true}
                 required
-              />
+              /> */}
               <MoneyInput
                 id="cupo_en_canje"
                 name="cupo_en_canje"
@@ -228,7 +319,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
               subtitle=""
             >
               <ButtonBar className={"lg:col-span-2"}>
-                <Button type={"submit"} onClick={onSubmitAjuste}>
+                <Button type={"submit"} onClick={onSubmitAjuste} disabled={disabledBtn}>
                   Aceptar
                 </Button>
                 <Button type={"button"} onClick={() => setSubmitName("")}>
@@ -241,6 +332,53 @@ const AjusteCupoComer = ({ subRoutes }) => {
       ) : (
         ""
       )}
+      <Modal
+        show={showModalCargaMasiva}
+        handleClose={handleCloseCargaMasiva}
+      >
+        <h2 className="text-3xl mx-auto text-center mb-4">
+          Gestión de archivos carga masiva ajuste de cupo
+        </h2>
+        <Form onSubmit={CargarArchivo}>
+          {!cargarArchivo ?
+            <ButtonBar>
+              <Button
+                type="button"
+                onClick={() => {
+                  setCargarArchivo(true);
+                }}
+              >
+                Cargar Archivo
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  descargarFormato("Ejemplo_ajuste_masivo",formatoAjusteCupoMasivo)
+                  handleCloseCargaMasiva()
+                }}
+              >
+                Formato del archivo
+              </Button>
+            </ButtonBar>
+            : <>
+              <Input
+                type="file"
+                autoComplete="off"
+                onChange={(e) => {
+                  setFile(e.target.files[0]);
+                }}
+                accept=".csv,.xlsx"
+                required
+              />
+              <ButtonBar>
+                <Button type="submit" disabled={disabledBtn}>
+                  Cargar Archivo
+                </Button>
+              </ButtonBar>
+            </>
+          }
+        </Form>
+      </Modal>
     </Fragment>
   );
 };

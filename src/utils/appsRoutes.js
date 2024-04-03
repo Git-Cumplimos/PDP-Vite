@@ -8,7 +8,9 @@ import rutasIAM from "../apps/IAM/routes";
 import rutasBancolombiaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialBancolombia/routes";
 import rutasDaviviendaRecaudoEmpresarial from "../apps/RecaudoIntegrado/RecaudoEmpresarialDavivienda/routes";
 
-import rutasRecaudoDirecto,{rutasGestionRecaudoDirecto} from "../apps/RecaudoDirecto/routes";
+import rutasRecaudoDirecto, {
+  rutasGestionRecaudoDirecto,
+} from "../apps/RecaudoDirecto/routes";
 
 import rutasColpatria, {
   listPermissionsColpatria,
@@ -16,11 +18,14 @@ import rutasColpatria, {
 } from "../apps/Colpatria/routes";
 import rutasDaviviendaCB, {
   listPermissionsDavivienda,
+  routesDaviplata,
 } from "../apps/Corresponsalia/CorresponsaliaDavivienda/routes";
 import RoutesTelefoniaMovil from "../apps/TelefoniaMovil/routes";
 
 //Rutas Emcali
 import routesEmcali from "../apps/Emcali/routes";
+//Recaudo genérico
+import routesRecaudoGenerico from "../apps/RecaudoGenerico/routes";
 import routesOtrasEntidades from "../apps/OtrasEntidades/routes";
 
 import { enumPermisosPractisistemas } from "../apps/Practisistemas/enumPermisosPractisistemas";
@@ -37,6 +42,14 @@ import { enumPermisosPinesVus } from "../apps/PinesVus/enumPermisosPinesVus";
 import rutasPinesCrc, {
   listPermissionsPinesCrc,
 } from "../apps/PinesCrc/routes";
+
+import rutasPinesCea, {
+  listPermissionsPinesCea,
+} from "../apps/PinesCea/routes";
+
+import rutasPinesCrcOlimpia, {
+  listPermissionsPinesCrcOlimpia,
+} from "../apps/PinesCrc/PinesCrcOlimpia/routes";
 
 /**
  * * Providers
@@ -68,7 +81,13 @@ import rutasMovii from "../apps/Movii-pdp/routes";
 import rutasMoviliza from "../apps/Moviliza/routes";
 import routesRecargaCupo from "../apps/RecargaCupo/routes";
 import rutasCorresponsaliaNequi from "../apps/Nequi/routes";
+import rutasCreditosPdp from "../apps/CreditoFacilPdp/routes";
+import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
+import rutasCajaSocialCB, {
+  listPermissionsCajaSocial,
+} from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
 
+import routesItau from "../apps/ConveniosItau/routes";
 /**
 
  * * Logos
@@ -346,6 +365,22 @@ const HistoricoAnulacionesPinesCRC = lazy(() =>
 );
 
 /**
+ * Gestion anulación pines CEA
+ */
+const AnulacionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/AnulacionesPines")
+);
+const CargueAnulacionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/Anulaciones/CargueAnulaciones")
+);
+const DescargaPeticionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/Anulaciones/DescargarArchivoPeticiones")
+);
+const HistoricoAnulacionesPinesCEA = lazy(() =>
+  import("../apps/PinesCea/Views/Anulaciones/HistoricoAnulaciones")
+);
+
+/**
  * Pines Combinados -- CRC y Comsión premium
  */
 const PinesCombinados = lazy(() =>
@@ -408,11 +443,49 @@ const allUrlsPrivateApps = [
           },
         ],
       },
+      {
+        link: "/GestionTransaccional/AnulacionesPinesCEA",
+        label: (
+          <AppIcons Logo={"PINES_ADMINISTRAR"} name={"Anulaciones Pines CEA"} />
+        ),
+        component: AnulacionesPinesCEA,
+        permission: [63],
+        subRoutes: [
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCEA/CargueArchivo",
+            label: (
+              <AppIcons Logo={"CARGAR"} name={"Cargue Archivo Anulaciones"} />
+            ),
+            component: CargueAnulacionesPinesCEA,
+            permission: [63],
+          },
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCEA/DescargarPeticiones",
+            label: (
+              <AppIcons
+                Logo={"DESCARGAR"}
+                name={"Descarga Archivo Peticiones"}
+              />
+            ),
+            component: DescargaPeticionesPinesCEA,
+            permission: [63],
+          },
+          {
+            link: "/GestionTransaccional/AnulacionesPinesCEA/Historico",
+            label: (
+              <AppIcons Logo={"DESCARGAR"} name={"Histórico Anulaciones"} />
+            ),
+            component: HistoricoAnulacionesPinesCEA,
+            permission: [63],
+          },
+        ],
+      },
       rutasGestionColpatria,
       rutasGestionRecargasTullave,
       rutasGestionRecaudoDirecto,
       rutasGestionGrupoAval,
       rutasGestionAgrario,
+      routesItau,
     ],
   },
   {
@@ -654,12 +727,16 @@ const allUrlsPrivateApps = [
       enumPermisosPinesVus.operarPinesVus,
       enumPermisosPractisistemas.practisistemasPines,
       ...listPermissionsPinesCrc,
+      ...listPermissionsPinesCea,
+      ...listPermissionsPinesCrcOlimpia,
     ],
     provider: ProvidepinesVus,
     subRoutes: [
       rutasPines,
       rutasPinesVus,
       rutasPinesCrc,
+      rutasPinesCea,
+      rutasPinesCrcOlimpia,
       {
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
@@ -782,6 +859,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsAval,
       ...listPermissionsAgrario,
       ...listPermissionsRecaudoMultiple,
+      ...listPermissionsCajaSocial,
     ],
     subRoutes: [
       rutasDaviviendaCB,
@@ -789,8 +867,10 @@ const allUrlsPrivateApps = [
       rutasAgrarioCB,
       rutasColpatria,
       rutasRecaudoMultiple,
+      rutasCajaSocialCB,
     ],
   },
+  routesDaviplata,
   {
     link: "/recaudoEmpresarial",
     label: <AppIcons Logo={"RECAUDO"} name="Recaudo Empresarial" />,
@@ -1122,6 +1202,10 @@ const allUrlsPrivateApps = [
   // rutasSoat,
   rutasApuestas,
   rutasRecaudoDirecto,
+
+  //Módulo recaudo genérico
+  routesRecaudoGenerico,
+
   rutasRecargasTullave,
   rutasPowwi,
 
@@ -1136,6 +1220,10 @@ const allUrlsPrivateApps = [
   routesRecargaCupo,
   //Modulo Nequi
   rutasCorresponsaliaNequi,
+  //Modulo creditos PDP
+  rutasCreditosPdp,
+  //Modulo transcaribe
+  rutasRecargasTranscaribe,
 ];
 
 export { allUrlsPrivateApps };
