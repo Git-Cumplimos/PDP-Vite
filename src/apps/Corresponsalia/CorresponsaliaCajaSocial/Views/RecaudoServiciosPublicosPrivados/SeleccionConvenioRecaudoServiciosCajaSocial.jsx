@@ -124,7 +124,7 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
       <h1 className="text-3xl mt-10">Recaudo Servicios Públicos y Privados</h1>
       {dataConvenios.estadoTrx === 1 ? (
         <TableEnterprise
-          title="Convenios Corresponsal Bancario BCSC"
+          title="Convenios Corresponsal Bancario BCS"
           maxPage={maxPages}
           headers={["Código Convenio", "Nombre Convenio"]}
           data={tableConvenios}
