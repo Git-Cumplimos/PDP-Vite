@@ -468,7 +468,7 @@ const AdminLayout = () => {
                 }
                 disabled={true}
               />
-              <Input
+              {/* <Input
                 id="deuda"
                 name="deuda"
                 label={
@@ -507,7 +507,7 @@ const AdminLayout = () => {
                   ) ?? 0
                 }
                 disabled={true}
-              />
+              /> */}
               <Input
                 id="dias_max_sobregiro"
                 name="dias_max_sobregiro"
