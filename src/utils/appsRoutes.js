@@ -88,6 +88,7 @@ import rutasCajaSocialCB, {
 } from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
+import routesGestionBCS from "../apps/GestionBCS/routes";
 /**
 
  * * Logos
@@ -486,6 +487,7 @@ const allUrlsPrivateApps = [
       rutasGestionGrupoAval,
       rutasGestionAgrario,
       routesItau,
+      routesGestionBCS,
     ],
   },
   {
