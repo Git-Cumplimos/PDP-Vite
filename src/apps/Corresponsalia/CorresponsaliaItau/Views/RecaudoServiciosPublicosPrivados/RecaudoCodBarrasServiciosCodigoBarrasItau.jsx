@@ -17,7 +17,7 @@ const DATA_CONVENIOS_INIT = {
   },
   data_convenios: [],
 };
-const RecaudoCodBarrasServiciosCodigoBarrasCajaSocial = () => {
+const RecaudoCodBarrasServiciosCodigoBarrasItau = () => {
   const validNavigate = useNavigate();
   const [dataConvenio, setDataConvenio] = useState(DATA_CONVENIOS_INIT);
   const buttonDelete = useRef(null);
@@ -88,4 +88,4 @@ const RecaudoCodBarrasServiciosCodigoBarrasCajaSocial = () => {
   );
 };
 
-export default RecaudoCodBarrasServiciosCodigoBarrasCajaSocial;
+export default RecaudoCodBarrasServiciosCodigoBarrasItau;

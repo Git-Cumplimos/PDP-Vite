@@ -8,7 +8,7 @@ const TicketsItau = ({
   stateTrx = true,
 }) => {
   const {
-    imgs: { logoCajaSocial: LogoPng, pdpHorizontal: LogoPdp },
+    imgs: { logoItau: LogoPng, pdpHorizontal: LogoPdp },
   } = useImgs();
 
   if (!ticket) {

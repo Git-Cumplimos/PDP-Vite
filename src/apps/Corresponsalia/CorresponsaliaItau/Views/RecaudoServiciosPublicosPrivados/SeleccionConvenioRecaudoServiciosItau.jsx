@@ -18,7 +18,7 @@ const DATA_CONVENIOS_INIT = {
   },
 };
 
-const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
+const SeleccionConvenioRecaudoServiciosItau = () => {
   const validNavigate = useNavigate();
   const [dataConvenios, setDataConvenios] = useState(DATA_CONVENIOS_INIT);
   const [{ page, limit }, setPageData] = useState({
@@ -164,4 +164,4 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
   );
 };
 
-export default SeleccionConvenioRecaudoServiciosCajaSocial;
+export default SeleccionConvenioRecaudoServiciosItau;

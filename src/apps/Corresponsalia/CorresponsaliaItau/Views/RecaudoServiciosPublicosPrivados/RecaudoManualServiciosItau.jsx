@@ -11,7 +11,7 @@ import PagoRecaudoServiciosCajaSocial from "../../components/PagoRecaudoServicio
 
 const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
 
-const RecaudoManualServiciosCajaSocial = () => {
+const RecaudoManualServiciosItau = () => {
   const validNavigate = useNavigate();
   const { state } = useLocation();
   const [dataConvenio, setDataConvenio] = useState([]);
@@ -70,4 +70,4 @@ const RecaudoManualServiciosCajaSocial = () => {
   );
 };
 
-export default RecaudoManualServiciosCajaSocial;
+export default RecaudoManualServiciosItau;

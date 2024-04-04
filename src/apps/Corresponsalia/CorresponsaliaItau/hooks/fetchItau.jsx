@@ -1,18 +1,18 @@
 import { useCallback, useState } from "react";
-import { ErrorCustomBackend, fetchCustom } from "../utils/fetchCajaSocial";
+import { ErrorCustomBackend, fetchCustom } from "../utils/fetchItau";
 import { notify, notifyError } from "../../../../utils/notify";
 
 const sleep = (millisecons) => {
   return new Promise((resolve) => setTimeout(resolve, millisecons));
 };
-export const useFetchCajaSocial = (
+export const useFetchItau = (
   url_trx_ = "",
   url_consulta_ = "",
   name_ = "",
   cod_otp = false
 ) => {
   const [state, setState] = useState(false);
-  const fetchCajaSocialTrx = useCallback(
+  const fetchItauTrx = useCallback(
     async (data_ = {}, data_additional_ = {}) => {
       const fetchTrx = fetchCustom(
         url_trx_,
@@ -96,7 +96,7 @@ export const useFetchCajaSocial = (
     [setState, cod_otp, url_trx_, url_consulta_, name_]
   );
 
-  return [state, fetchCajaSocialTrx];
+  return [state, fetchItauTrx];
 };
 
 export class ErrorCustom extends Error {

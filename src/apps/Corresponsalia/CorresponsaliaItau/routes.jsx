@@ -7,41 +7,39 @@ const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
 /**
  * Corresponsalia Itau
  */
-const CorresponsaliaCajaSocial = lazy(() =>
-  import("./CorresponsaliaCajaSocial")
+const CorresponsaliaItau = lazy(() =>
+  import("./CorresponsaliaItau")
 );
-const DepositoCajaSocial = lazy(() => import("./Views/DepositoCajaSocial"));
-const RecaudoServiciosPublicosPrivadosMenuCajaSocial = lazy(() =>
-  import("./Views/RecaudoServiciosPublicosPrivadosMenuCajaSocial")
+
+const RecaudoServiciosPublicosPrivadosMenuItau = lazy(() =>
+  import("./Views/RecaudoServiciosPublicosPrivadosMenuItau")
 );
-const RecaudoManualServiciosCajaSocial = lazy(() =>
+const RecaudoManualServiciosItau = lazy(() =>
   import(
-    "./Views/RecaudoServiciosPublicosPrivados/RecaudoManualServiciosCajaSocial"
+    "./Views/RecaudoServiciosPublicosPrivados/RecaudoManualServiciosItau"
   )
 );
-const RecaudoCodBarrasServiciosCodigoBarrasCajaSocial = lazy(() =>
+const RecaudoCodBarrasServiciosCodigoBarrasItau = lazy(() =>
   import(
-    "./Views/RecaudoServiciosPublicosPrivados/RecaudoCodBarrasServiciosCodigoBarrasCajaSocial"
+    "./Views/RecaudoServiciosPublicosPrivados/RecaudoCodBarrasServiciosCodigoBarrasItau"
   )
 );
 
-const PagoProductosPropiosCajaSocial = lazy(() =>
-  import("./Views/PagoProductosPropiosCajaSocial")
-);
-const SeleccionConvenioRecaudoServiciosCajaSocial = lazy(() =>
+
+const SeleccionConvenioRecaudoServiciosItau = lazy(() =>
   import(
-    "./Views/RecaudoServiciosPublicosPrivados/SeleccionConvenioRecaudoServiciosCajaSocial"
+    "./Views/RecaudoServiciosPublicosPrivados/SeleccionConvenioRecaudoServiciosItau"
   )
 );
 
-export const listPermissionsCajaSocial = Object.values(enumPermisosItau);
+export const listPermissionsItau = Object.values(enumPermisosItau);
 
 const rutasItauCB = {
   //corresponsaliaItau
   link: "/corresponsalia/corresponsalia-itau",
-  label: <AppIcons Logo={"CAJA_SOCIAL"} name="Corresponsalía Itaú" />,
-  component: CorresponsaliaCajaSocial,
-  permission: listPermissionsCajaSocial,
+  label: <AppIcons Logo={"ITAU"} name="Corresponsalía Itaú" />,
+  component: CorresponsaliaItau,
+  permission: listPermissionsItau,
   subRoutes: [
     {
       link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados",
@@ -51,33 +49,33 @@ const rutasItauCB = {
           name="Recaudo servicios públicos y privados"
         />
       ),
-      component: RecaudoServiciosPublicosPrivadosMenuCajaSocial,
+      component: RecaudoServiciosPublicosPrivadosMenuItau,
       permission: [
         enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
       ],
       subRoutes: [
         {
-          link: "/corresponsalia/corresponsalia-caja-social/recaudo-servicios-publicos-privados/seleccion-convenio",
+          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privadosseleccion-convenio",
           label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
-          component: SeleccionConvenioRecaudoServiciosCajaSocial,
+          component: SeleccionConvenioRecaudoServiciosItau,
           permission: [
             enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
           ],
         },
         {
-          link: "/corresponsalia/corresponsalia-caja-social/recaudo-servicios-publicos-privados/codigo-barras",
+          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privadoscodigo-barras",
           label: (
             <AppIcons Logo={"MARKETPLACE"} name="Recaudo código de barras" />
           ),
-          component: RecaudoCodBarrasServiciosCodigoBarrasCajaSocial,
+          component: RecaudoCodBarrasServiciosCodigoBarrasItau,
           permission: [
             enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
           ],
         },
         {
-          link: "/corresponsalia/corresponsalia-caja-social/recaudo-servicios-publicos-privados/recaudo-manual",
+          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privadosrecaudo-manual",
           label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
-          component: RecaudoManualServiciosCajaSocial,
+          component: RecaudoManualServiciosItau,
           permission: [
             enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
           ],
@@ -88,4 +86,4 @@ const rutasItauCB = {
   ],
 };
 
-export default rutasCajaSocialCB;
+export default rutasItauCB;

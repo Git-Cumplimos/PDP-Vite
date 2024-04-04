@@ -4,7 +4,7 @@ import HNavbar from "../../../components/Base/HNavbar";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { notifyError } from "../../../utils/notify";
 
-const CorresponsaliaCajaSocial = ({ subRoutes }) => {
+const CorresponsaliaItau = ({ subRoutes }) => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
@@ -42,4 +42,4 @@ const CorresponsaliaCajaSocial = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default CorresponsaliaCajaSocial;
+export default CorresponsaliaItau;

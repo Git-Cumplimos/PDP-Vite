@@ -4,7 +4,7 @@ import HNavbar from "../../../../components/Base/HNavbar";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError } from "../../../../utils/notify";
 
-const RecaudoServiciosPublicosPrivadosMenuCajaSocial = ({ subRoutes }) => {
+const RecaudoServiciosPublicosPrivadosMenuItau = ({ subRoutes }) => {
   const navigate = useNavigate();
   const { roleInfo } = useAuth();
 
@@ -39,4 +39,4 @@ const RecaudoServiciosPublicosPrivadosMenuCajaSocial = ({ subRoutes }) => {
   return <HNavbar links={subRoutes} isIcon />;
 };
 
-export default RecaudoServiciosPublicosPrivadosMenuCajaSocial;
+export default RecaudoServiciosPublicosPrivadosMenuItau;

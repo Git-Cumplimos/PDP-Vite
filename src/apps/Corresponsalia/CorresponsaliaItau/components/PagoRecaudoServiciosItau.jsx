@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../hooks/useFetch";
-import { fetchCustom } from "../utils/fetchCajaSocial";
+import { fetchCustom } from "../utils/fetchItau";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import Form from "../../../../components/Base/Form";
 import Fieldset from "../../../../components/Base/Fieldset";
@@ -374,7 +374,7 @@ const PagoRecaudoServiciosItau = ({
               type="tel"
               maxLength={10}
               autoComplete="off"
-              min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL}
+              min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
               max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL}
               value={dataRecaudo?.valorTrx ?? 0}
               onInput={onChangeFormatNum}
@@ -434,10 +434,10 @@ const PagoRecaudoServiciosItau = ({
                   maxLength={10}
                   autoComplete="off"
                   min={
-                    enumParametrosItau?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
+                    enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU
                   }
                   max={
-                    enumParametrosItau?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
+                    enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU
                   }
                   value={dataRecaudo?.valorTrxValidacion ?? 0}
                   onInput={onChangeFormatNum}
