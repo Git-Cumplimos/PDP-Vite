@@ -88,6 +88,7 @@ import rutasCajaSocialCB, {
 } from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
+import routesGouCheckPay from "../apps/Gou/routes";
 /**
 
  * * Logos
@@ -1216,6 +1217,8 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
+  //Modulo Gou
+  routesGouCheckPay,
   //Modulo Recarga Cupo
   routesRecargaCupo,
   //Modulo Nequi

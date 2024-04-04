@@ -3,14 +3,14 @@ import { lazy } from "react";
 import { ListPermissionsGou } from "./ListPermissionsGou";
 import AppIcons from "../../components/Base/AppIcons";
 
-const CheckGouOrigin = lazy(() => import("./views/CheckGouOrigin"));
+const GouCheckPay = lazy(() => import("./views/GouCheckPay"));
 
-const routesRecargaCupoConGou = {
-  link: "/recarga-cupo/con-gou",
-  label: <AppIcons Logo={"RECARGA_CELULAR"} name="GOU" />,
-  component: CheckGouOrigin,
+const routesGouCheckPay = {
+  link: "/gou/check_pay/:id_unique",
+  label: <AppIcons Logo={"RECARGA_CELULAR"} name="CHECK GOU" />,
+  component: GouCheckPay,
   permission: [ListPermissionsGou.RECARGA_CUPO_CON_GOU, 1],
   subRoutes: [],
 };
 
-export default routesRecargaCupoConGou;
+export default routesGouCheckPay;
