@@ -37,7 +37,7 @@ const PagoCredito = () => {
   const [datosTrx, setDatosTrx] = useState({
     tipoDocumento: "2",
     documento: "",
-    // tipoPago: "1",
+    tipoPago: "1",
     credito: "",
   });
   
@@ -53,10 +53,10 @@ const PagoCredito = () => {
     { value: "7", label: "Permiso Especial de Permanencia" },
     { value: "8", label: "Permiso por Protección Temporal" },
   ];
-  // const optionsTipoPago = [
-  //   { value: "1", label: "Valor mínimo" },
-  //   { value: "3", label: "Valor Total" },
-  // ];
+  const optionsTipoPago = [
+    { value: "1", label: "Valor mínimo" },
+    { value: "2", label: "Pago valor diferente" },
+  ];
 
   const printDiv = useRef();
 
@@ -70,7 +70,7 @@ const PagoCredito = () => {
     setDatosTrx({
       tipoDocumento: "2",
       documento: "",
-      // tipoPago: "1",
+      tipoPago: "1",
       credito: "",
     });
     setDatosCredito([]);
@@ -139,7 +139,7 @@ const PagoCredito = () => {
             setDatosTrx({
               tipoDocumento: "2",
               documento: "",
-              // tipoPago: "1",
+              tipoPago: "1",
               credito: "",
             });
             setValor("");
@@ -163,25 +163,33 @@ const PagoCredito = () => {
 
   const onMakePayment = useCallback((e) => {
     e.preventDefault();
-    // if (datosTrx?.tipoPago === "1"){
-    //   valor = (datosCredito?.find(item => {
-    //     return item.NumeroCredito === datosTrx?.credito;
-    //   })?.ValorMinimo)
-    // } else{
-    //   valor = (datosCredito?.find(item => {
-    //     return item.NumeroCredito === datosTrx?.credito;
-    //   })?.ValorTotal)
-    // }
-    // if (valor > limitesMontos.max){
-    //   return notifyError(
-    //     "El valor debe ser menor o igual a "+ limitesMontos.max
-    //   );
-    // }
-    // if (valor < limitesMontos.min){
-    //   return notifyError(
-    //     "El valor debe ser mayor o igual a "+ limitesMontos.min
-    //   );
-    // }
+    let valorPagar = 0;
+    if (datosTrx?.tipoPago === "1"){
+      valorPagar = (datosCredito?.find(item => {
+        return item.NumeroCredito === datosTrx?.credito;
+      })?.ValorMinimo)
+    } else{
+      valorPagar = valor
+    }
+    if (valorPagar > limitesMontos.max){
+      return notifyError(
+        "El valor debe ser menor o igual a "+ formatMoney.format(limitesMontos.max)
+      );
+    }
+    if (valorPagar < limitesMontos.min){
+      return notifyError(
+        "El valor debe ser mayor o igual a "+ formatMoney.format(limitesMontos.min)
+      );
+    }
+    if (datosTrx?.tipoPago === "2"){
+      let montoMinimo = (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.ValorMinimo)
+      let validacionValor = parseFloat(montoMinimo) * 3;
+      if (valorPagar > validacionValor){
+        return notifyError(
+          "El valor debe ser menor o igual a "+ formatMoney.format(validacionValor)
+        );
+      }
+    }
     setIsUploading(true);
     const data = {
       comercio: {
@@ -193,7 +201,8 @@ const PagoCredito = () => {
       nombre_usuario: roleInfo?.["nombre comercio"],
       nombre_comercio: roleInfo?.["nombre comercio"],
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
-      valor_total_trx: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.ValorMinimo),
+      // valor_total_trx: (datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.ValorMinimo),
+      valor_total_trx: valorPagar,
       id_trx: datosConsulta?.id_trx,
       address: roleInfo?.direccion,
       city: roleInfo?.ciudad.substring(0, 7),
@@ -244,6 +253,9 @@ const PagoCredito = () => {
     datosCredito,
     uuid,
     goToRecaudo,
+    valor,
+    datosTrx,
+    limitesMontos
   ]);
 
   return (
@@ -355,28 +367,8 @@ const PagoCredito = () => {
                   ${(datosCredito?.find(item => {return item.NumeroCredito === datosTrx?.credito;})?.SegundoApellido)}`
                 }
               </h2>
-                <MoneyInput
-                  id='valor'
-                  name='valor'
-                  label='Valor a pagar'
-                  type='text'
-                  min={limitesMontos.min}
-                  max={limitesMontos.max}
-                  autoComplete='off'
-                  maxLength={"12"}
-                  value={datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorMinimo}
-                  required
-                  disabled={true}
-                  // onInput={(e, monto) => {
-                  //   if (!isNaN(monto)) {
-                  //     setValor(monto);
-                  //   }
-                  // }}
-                  equalError={false}
-                  equalErrorMin={false}
-                />
-                {/* <h2>{`Pago mínimo: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorMinimo)}`}</h2>
-                <h2>{`Pago Total: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorTotal)}`}</h2>
+                <h2 className='text-xl font-semibold'>{`Valor de pago mínimo: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorMinimo)}`}</h2>
+                {/* <h2>{`Pago Total: ${formatMoney.format(datosCredito?.find(item => item.NumeroCredito === datosTrx?.credito)?.ValorTotal)}`}</h2> */}
                 <Select
                   id='tipoPago'
                   label='Indique el tipo de pago'
@@ -390,7 +382,29 @@ const PagoCredito = () => {
                   }}
                   required
                   disabled={loadingPeticionPago}
-                /> */}
+                />{ datosTrx?.tipoPago === "2" ? 
+                <MoneyInput
+                  id='valor'
+                  name='valor'
+                  label='Valor a pagar'
+                  type='text'
+                  min={limitesMontos.min}
+                  max={limitesMontos.max}
+                  autoComplete='off'
+                  maxLength={"12"}
+                  value={valor}
+                  required
+                  disabled={false}
+                  onInput={(e, monto) => {
+                    if (!isNaN(monto)) {
+                      setValor(monto);
+                    }
+                  }}
+                  equalError={false}
+                  equalErrorMin={false}
+                /> 
+                : <></>
+                }
                 <ButtonBar>
                   <Button type='submit' disabled= {loadingPeticionPago}>Realizar Pago</Button>
                   <Button type='button' onClick={handleClose} disabled= {loadingPeticionPago}>Cancelar</Button>

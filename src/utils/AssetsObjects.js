@@ -15,6 +15,7 @@ const images = {
   LogoAgrario: `${urlAssets}/assets/img/Banco-agrario.jpg`,
   LogoPowwi: `${urlAssets}/assets/img/LogoPowwi.png`,
   LogoEmcali: `${urlAssets}/assets/img/LogoEmcali.png`,
+  LogoGou: `${urlAssets}/assets/img/LogoGou.png`,
 };
 
 const svgs = {
@@ -146,7 +147,7 @@ const svgs = {
   //CORRESPONSALIA/AGRARIO
   AGRARIO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AGRARIO/AGRARIO.svg`,
 
-  //CORRESPONSALIA/BCSC
+  //CORRESPONSALIA/BCS
   CAJA_SOCIAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL.svg`,
   CAJA_SOCIAL_DEPOSITO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL_DEPOSITO.svg`,
 
