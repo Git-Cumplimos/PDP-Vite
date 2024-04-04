@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import Fieldset from "../../../../../components/Base/Fieldset";
 import Input from "../../../../../components/Base/Input";
-import { notify, notifyError } from "../../../../../utils/notify";
+import { notifyError } from "../../../../../utils/notify";
 import useFetchDebounce from "../../../../../hooks/useFetchDebounce";
 import Select from "../../../../../components/Base/Select";
 import ToggleInput from "../../../../../components/Base/ToggleInput";
@@ -19,7 +19,14 @@ import AddressForm, {
 import { CitySearchTable } from "../../../../../components/Compound/CitySearch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 
-type Props = {};
+type Props = {
+  setRlPks: (_: {
+    pk_tipo_identificacion_rl: number;
+    pk_numero_identificacion_rl: string;
+  }) => void;
+  fk_tipo_identificacion_rl?: number | null;
+  fk_numero_identificacion_rl?: string | null;
+};
 
 type PropietarioRL = {
   pk_tipo_identificacion_rl: number;
@@ -34,7 +41,7 @@ type PropietarioRL = {
   dane_departamento_rl: string;
   nombre_ciudad: string;
   usuario_ultima_actualizacion: number;
-  dv_interno: number;
+  dv_interno?: number;
 };
 
 const initialPropietarioRL: PropietarioRL = {
@@ -54,13 +61,18 @@ const initialPropietarioRL: PropietarioRL = {
 };
 
 const url_comercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-const url_comercios_dev = `http://localhost:5000`;
+// const url_comercios = `http://localhost:5000`;
 
-const RepresentanteLegal = (props: Props) => {
+const RepresentanteLegal = ({
+  setRlPks,
+  fk_tipo_identificacion_rl,
+  fk_numero_identificacion_rl,
+}: Props) => {
   const { pdpUser } = useAuth();
   const [propietarioRL, setPropietarioRL] =
     useState<PropietarioRL>(initialPropietarioRL);
   const [propietarioRLExists, setPropietarioRLExists] = useState(false);
+  const [updateRl, setUpdateRl] = useState(false);
 
   const [docTypesRL, setDocTypesRL] = useState<
     Array<{ value: string; label: string }>
@@ -69,7 +81,16 @@ const RepresentanteLegal = (props: Props) => {
   const [modifyCity, setModifyCity] = useState(false);
 
   const [addressState, setAddressState] = useState<typeof initialAddress>();
-  const [addressToShow, setAddressToShow] = useState("");
+
+  const propietarioRL2Send = useMemo(() => {
+    const copy = structuredClone(propietarioRL);
+    copy.dane_departamento_rl = copy.dane_departamento_rl.padStart(2, "0");
+    copy.dane_municipio_rl = copy.dane_municipio_rl
+      .replace(".", "")
+      .padStart(5, "0");
+    delete copy.dv_interno;
+    return copy;
+  }, [propietarioRL]);
 
   const handleClose = useCallback(() => {
     setModifyAddress(false);
@@ -82,8 +103,8 @@ const RepresentanteLegal = (props: Props) => {
         ...old,
         direccion_rl: direccion,
       }));
-      setAddressToShow(direccion);
       setAddressState(stateDieccion);
+      setUpdateRl(true);
       handleClose();
     },
     [handleClose]
@@ -136,11 +157,11 @@ const RepresentanteLegal = (props: Props) => {
     { delay: 50 }
   );
 
-  useFetchDebounce(
+  const [searchRL] = useFetchDebounce(
     {
       url: useMemo(
         () =>
-          `${url_comercios_dev}/propietarios-rl/unique?pk_tipo_identificacion_rl=${propietarioRL.pk_tipo_identificacion_rl}&pk_numero_identificacion_rl=${propietarioRL.pk_numero_identificacion_rl}`,
+          `${url_comercios}/propietarios-rl/unique?pk_tipo_identificacion_rl=${propietarioRL.pk_tipo_identificacion_rl}&pk_numero_identificacion_rl=${propietarioRL.pk_numero_identificacion_rl}`,
         [
           propietarioRL.pk_tipo_identificacion_rl,
           propietarioRL.pk_numero_identificacion_rl,
@@ -162,7 +183,7 @@ const RepresentanteLegal = (props: Props) => {
           ...res?.obj,
           usuario_ultima_actualizacion: old.usuario_ultima_actualizacion,
         }));
-        notify("Propietario o RL encontrado");
+        // notify("Propietario o RL encontrado");
         setPropietarioRLExists(true);
       }, []),
       onError: useCallback((error) => {
@@ -174,8 +195,46 @@ const RepresentanteLegal = (props: Props) => {
         }
         setPropietarioRLExists(false);
       }, []),
+      onFinally: useCallback(() => {
+        setUpdateRl(false);
+      }, []),
     },
-    // { delay: 50 }
+    { delay: 1000 }
+  );
+
+  useFetchDebounce(
+    {
+      url: `${url_comercios}/propietarios-rl/admin`,
+      options: useMemo(
+        () => ({
+          method: !propietarioRLExists ? "POST" : "PUT",
+          body: JSON.stringify(propietarioRL2Send),
+          headers: { "Content-Type": "application/json" },
+        }),
+        [propietarioRLExists, propietarioRL2Send]
+      ),
+      autoDispatch: Object.entries(propietarioRL2Send).every(([key, val]) =>
+        key !== "dv_interno" && typeof val !== "boolean" ? !!val : true
+      ),
+      fetchIf: useMemo(() => updateRl, [updateRl]),
+    },
+    {
+      onSuccess: useCallback(
+        (_) => {
+          searchRL();
+        },
+        [searchRL]
+      ),
+      onError: useCallback((error) => {
+        if (error?.cause === "custom") {
+          notifyError(error.message);
+          // console.error(error.message);
+        } else {
+          console.error(error);
+        }
+      }, []),
+    },
+    { delay: 5000 }
   );
 
   useEffect(() => {
@@ -184,6 +243,31 @@ const RepresentanteLegal = (props: Props) => {
       usuario_ultima_actualizacion: (pdpUser ?? { uuid: 0 })?.uuid,
     }));
   }, [pdpUser]);
+
+  useEffect(() => {
+    setRlPks({
+      pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
+      pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
+    });
+  }, [
+    setRlPks,
+    propietarioRL.pk_numero_identificacion_rl,
+    propietarioRL.pk_tipo_identificacion_rl,
+  ]);
+
+  useEffect(() => {
+    setPropietarioRL((old) => ({
+      ...old,
+      pk_tipo_identificacion_rl: fk_tipo_identificacion_rl ?? 0,
+    }));
+  }, [fk_tipo_identificacion_rl]);
+
+  useEffect(() => {
+    setPropietarioRL((old) => ({
+      ...old,
+      pk_numero_identificacion_rl: fk_numero_identificacion_rl ?? "",
+    }));
+  }, [fk_numero_identificacion_rl]);
 
   return (
     <Fragment>
@@ -197,7 +281,7 @@ const RepresentanteLegal = (props: Props) => {
           name="pk_tipo_identificacion_rl"
           label="Tipo de documento"
           options={docTypesRL ?? []}
-          value={propietarioRL.pk_tipo_identificacion_rl}
+          value={propietarioRL.pk_tipo_identificacion_rl ?? ""}
           onChange={(ev: ChangeEvent<HTMLSelectElement>) => {
             setPropietarioRL((old) => ({
               ...old,
@@ -205,6 +289,7 @@ const RepresentanteLegal = (props: Props) => {
                 ? parseInt(ev.target.value)
                 : 0,
             }));
+            setUpdateRl(false);
           }}
           required
         />
@@ -222,6 +307,7 @@ const RepresentanteLegal = (props: Props) => {
               ...old,
               pk_numero_identificacion_rl: ev.target.value,
             }));
+            setUpdateRl(false);
           }}
           autoComplete="off"
         />
@@ -234,12 +320,13 @@ const RepresentanteLegal = (props: Props) => {
           maxLength={40}
           required
           value={propietarioRL.nombre_rl}
-          onChange={(ev) =>
+          onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               nombre_rl: ev.target.value,
-            }))
-          }
+            }));
+            setUpdateRl(true);
+          }}
           autoComplete="off"
         />
         <Input
@@ -251,12 +338,13 @@ const RepresentanteLegal = (props: Props) => {
           maxLength={40}
           required
           value={propietarioRL.apellido_rl}
-          onChange={(ev) =>
+          onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               apellido_rl: ev.target.value,
-            }))
-          }
+            }));
+            setUpdateRl(true);
+          }}
           autoComplete="off"
         />
         <ToggleInput
@@ -264,12 +352,13 @@ const RepresentanteLegal = (props: Props) => {
           id="pep_rl"
           name="pep_rl"
           checked={propietarioRL.pep_rl}
-          onChange={(_: ChangeEvent<HTMLInputElement>) =>
+          onChange={(_: ChangeEvent<HTMLInputElement>) => {
             setPropietarioRL((old) => ({
               ...old,
               pep_rl: !old.pep_rl,
-            }))
-          }
+            }));
+            setUpdateRl(true);
+          }}
         />
         <Input
           label="Teléfono fijo"
@@ -280,12 +369,13 @@ const RepresentanteLegal = (props: Props) => {
           maxLength={10}
           required
           value={propietarioRL.telefono_fijo_rl}
-          onChange={(ev) =>
+          onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               telefono_fijo_rl: ev.target.value,
-            }))
-          }
+            }));
+            setUpdateRl(true);
+          }}
           autoComplete="off"
         />
         <Input
@@ -310,7 +400,7 @@ const RepresentanteLegal = (props: Props) => {
           className="pointer-events-none"
           type="text"
           autoComplete="off"
-          value={addressToShow ?? ""}
+          value={propietarioRL.direccion_rl}
           onChange={() => {}}
           actionBtn={{
             callback: (_) => setModifyAddress(true),
@@ -327,12 +417,13 @@ const RepresentanteLegal = (props: Props) => {
           maxLength={20}
           required
           value={propietarioRL.barrio_rl}
-          onChange={(ev) =>
+          onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               barrio_rl: ev.target.value,
-            }))
-          }
+            }));
+            setUpdateRl(true);
+          }}
           autoComplete="off"
         />
         {propietarioRLExists && (
@@ -367,6 +458,7 @@ const RepresentanteLegal = (props: Props) => {
                 dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
                 nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
               }));
+              setUpdateRl(true);
               handleClose();
             }}
           />

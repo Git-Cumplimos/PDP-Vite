@@ -496,10 +496,8 @@ const AddressForm = ({
           type="button"
           onClick={useCallback(
             (ev) => {
-              console.log("Does it stops?");
               ev.stopPropagation();
               ev.preventDefault();
-              console.log("Does it stops?");
               onSuccess?.(buildAddress(addressState), addressState);
             },
             [onSuccess, addressState]

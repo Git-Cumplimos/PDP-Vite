@@ -81,6 +81,8 @@ const emptyCommerce = {
   alert_cupo: "",
   zona_comercio: null,
   tipo_persona: null,
+  fk_tipo_identificacion_rl: 0,
+  fk_numero_identificacion_rl: "",
 };
 
 const CrearComercios = () => {
@@ -432,7 +434,7 @@ const CrearComercios = () => {
       const dataOrg = structuredClone(comercio);
       if (!dataOrg.ciiu || !dataOrg.ciiu.length) {
         notifyError(
-        +  "Debe elegir al menos una actividad económica para el comercio"
+          "Debe elegir al menos una actividad económica para el comercio"
         );
         return;
       }
@@ -820,7 +822,20 @@ const CrearComercios = () => {
             }
           />
         </Fieldset>
-        <RepresentanteLegal />
+        <RepresentanteLegal
+          fk_tipo_identificacion_rl={comercio?.fk_tipo_identificacion_rl}
+          fk_numero_identificacion_rl={comercio?.fk_numero_identificacion_rl}
+          setRlPks={useCallback(
+            ({ pk_tipo_identificacion_rl, pk_numero_identificacion_rl }) => {
+              setComercio((old) => ({
+                ...old,
+                fk_tipo_identificacion_rl: pk_tipo_identificacion_rl,
+                fk_numero_identificacion_rl: pk_numero_identificacion_rl,
+              }));
+            },
+            []
+          )}
+        />
         <Fieldset legend="Ubicación comercio" className="lg:col-span-2">
           <Input
             id="direccion_comercio"
