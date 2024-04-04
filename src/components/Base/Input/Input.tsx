@@ -6,6 +6,7 @@ import {
   useRef,
   forwardRef,
   useState,
+  ReactNode,
 } from "react";
 import classes from "./Input.module.css";
 
@@ -22,7 +23,7 @@ export interface CustomInputProps extends ComponentPropsWithRef<"input"> {
   invalid?: string;
   actionBtn?: {
     callback: (ev: MouseEvent<HTMLButtonElement>) => void;
-    label: string;
+    label: ReactNode;
   };
 }
 
