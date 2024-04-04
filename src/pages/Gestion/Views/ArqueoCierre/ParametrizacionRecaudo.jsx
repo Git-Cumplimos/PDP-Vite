@@ -39,7 +39,7 @@ const ParametrizacionRecaudo = () => {
   const keysToExclude = ["pk_numero_cuenta1", "pk_numero_cuenta2", "pk_numero_cuenta3"];
   const range = _.range(1, Count+1);
   const [comisionPorcent, setComisionPorcent] = useState('');
-  const [comisionFija, setComisionFija] = useState('');
+  const [comisionFija, setComisionFija] = useState(0);
   const [comision, setComision] = useState(null);
 
   const closeModal = useCallback(() => {
@@ -50,7 +50,7 @@ const ParametrizacionRecaudo = () => {
     setSelectedEntity(null);
     setNumCountjson(originalState);
     setComision(null)
-    setComisionFija('')
+    setComisionFija(0)
     setComisionPorcent('')
   }, []);
 
@@ -148,8 +148,8 @@ const ParametrizacionRecaudo = () => {
     (ev) => {
       ev.preventDefault();
       selectedEntity.comision = comision
-      selectedEntity.comisionFija = comisionFija === ''?null:comisionFija
-      selectedEntity.comisionProcent = comisionPorcent === ''?null:parseInt(comisionPorcent)
+      selectedEntity.comision_fija = comisionFija
+      selectedEntity.comision_porcent = comisionPorcent === ''?0:parseInt(comisionPorcent)
       selectedEntity.parametros = parametrosValues
       if (selectedEntity?.parametros === null ) {
         delete selectedEntity.parametros
@@ -163,41 +163,47 @@ const ParametrizacionRecaudo = () => {
       }if (selectedEntity?.parametros.monto_minimo === 0 || selectedEntity?.parametros.monto_minimo === undefined) {
         delete selectedEntity.parametros.monto_minimo
       }
-      if (validate) {
-
-        // notifyPending(
-        //   editarEntidades(
-        //     {
-        //       pk_nombre_entidad: "",
-        //       pk_is_transportadora: "",
-        //       pk_id_entidad:"",
-        //     },
-        //     selectedEntity
-        //   ),
-        //   {
-        //     render: () => {
-        //       return "Procesando peticion";
-        //     },
-        //   },
-        //   {
-        //     render: ({ data: res }) => {
-        //       closeModal();
-        //       buscarEnt();
-        //       return res?.msg;
-        //     },
-        //   },
-        //   {
-        //     render: ({ data: err }) => {
-        //       if (err?.cause === "custom") {
-        //         return err?.message;
-        //       }
-        //       console.error(err?.message);
-        //       return "Peticion fallida";
-        //     },
-        //   }
-        // );
+      if (comision === false || (comision === true && (comisionFija !== 0 || comisionPorcent !== ''))){
+          if (validate) {
+            if (comisionFija !== 0 && comisionPorcent !== '') {
+              notifyError('Se configura una comisión fija y porcentual')
+            }
+            notifyPending(
+              editarEntidades(
+                {
+                  pk_nombre_entidad: "",
+                  pk_is_transportadora: "",
+                  pk_id_entidad:"",
+                },
+                selectedEntity
+              ),
+              {
+                render: () => {
+                  return "Procesando peticion";
+                },
+              },
+              {
+                render: ({ data: res }) => {
+                  closeModal();
+                  buscarEnt();
+                  return res?.msg;
+                },
+              },
+              {
+                render: ({ data: err }) => {
+                  if (err?.cause === "custom") {
+                    return err?.message;
+                  }
+                  console.error(err?.message);
+                  return "Peticion fallida";
+                },
+              }
+            );
+          }else{
+            notifyError('Número de cuentas duplicado')
+          }
       }else{
-        notifyError('Número de cuentas duplicado')
+        notifyError('Debe fijar un valor de comisión')
       }
     },
     [closeModal, buscarEnt, selectedEntity,parametrosValues,comision,comisionPorcent,comisionFija]
@@ -279,6 +285,18 @@ const ParametrizacionRecaudo = () => {
     }
   };
 
+  const handleSelect = (value) => {
+    if (value === 'true') {
+      setComision(true)
+    }else if (value === 'false') {
+      setComision(false);
+      setComisionPorcent('');
+      setComisionFija(0);
+    }else{
+      setComision(null)
+    }
+  };
+
   return (
     <Fragment>
       <ButtonBar>
@@ -311,7 +329,10 @@ const ParametrizacionRecaudo = () => {
             ...old, 
             monto_maximo : data[i]?.parametros?.monto_maximo,
             monto_minimo : data[i]?.parametros?.monto_minimo
-          }})
+          }});
+          setComision(dataComplet[i]?.comision);
+          setComisionFija(dataComplet[i]?.comision_fija=== null?0:dataComplet[i]?.comision_fija);
+          setComisionPorcent(dataComplet[i]?.comision_porcent === null?'':dataComplet[i]?.comision_porcent);
         }}
       >
         <Input
@@ -506,12 +527,11 @@ const ParametrizacionRecaudo = () => {
                 label="¿Cobrar Comisión?"
                 options={[
                   { value: "", label: "" },
-                  { value: "1", label: "Si" },
-                  { value: "2", label: "No" },
+                  { value: true, label: "Si" },
+                  { value: false, label: "No" },
                 ]}
-                onChange={(e) =>
-                  setComision(e.target.value === "1"? true: e.target.value === "2"? false: null)
-                }
+                defaultValue={comision}
+                onChange={(e) => {handleSelect(e.target.value)}}
                 required
               />
               {comision === true?
@@ -527,7 +547,6 @@ const ParametrizacionRecaudo = () => {
                   maxLength={8}
                   max={99999}
                   required = {false}
-                  // disabled={alertPorcent !== ''? true : false}
                 />
                 <Input
                   key="comisio_porcentual"
@@ -538,7 +557,6 @@ const ParametrizacionRecaudo = () => {
                   value={comisionPorcent + '%'}
                   placeholder="Ingrese el porcentaje"
                   autoComplete='off'
-                  // disabled={comisionFija !== '' && comisionFija !== 0 ? true : false}
                 />
               </>:null}
             </Fieldset>
