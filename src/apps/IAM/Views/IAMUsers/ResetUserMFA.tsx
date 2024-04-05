@@ -114,7 +114,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
       <Modal show={showModal} handleClose={handleClose}>
         <PaymentSummary
           title="¿Está seguro de recuperar QR y contraseña del usuario?"
-          subtitle="Informacion de usuario"
+          subtitle="Información de usuario"
           summaryTrx={{
             "Id de usuario": userInfo.id,
             Correo: userInfo.email,
