@@ -44,7 +44,6 @@ const PagoRecaudoServiciosItau = ({
   dataCodigoBarras,
   tipoRecaudo = "manual",
 }) => {
-
   const uniqueId = v4();
   const validNavigate = useNavigate();
   const [dataRecaudo, setDataRecaudo] = useState(DATA_RECAUDO_INIT);
@@ -205,14 +204,23 @@ const PagoRecaudoServiciosItau = ({
   const pagoRecaudoServicios = useCallback(
     (ev) => {
       ev.preventDefault();
-      console.log("data recaud", dataRecaudo)
+      let valor_send = 0;
+      if (
+        dataRecaudo?.valorTrxOriginal !== 0 &&
+        convenio?.modvalor_consweb === "N" &&
+        convenio?.consultaweb === "S"
+      ) {
+        valor_send = dataRecaudo?.valorTrxOriginal;
+      } else {
+        valor_send = dataRecaudo?.valorTrx;
+      }
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataRecaudo?.valorDeposito,
+        valor_total_trx: valor_send,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -233,7 +241,6 @@ const PagoRecaudoServiciosItau = ({
         },
         id_trx: resConsulta?.id_trx,
       };
-      console.log("esto es Data", data)
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
