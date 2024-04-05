@@ -186,6 +186,10 @@ const PagoRecaudoServiciosItau = ({
             console.log(res?.obj);
             setShowModal(true);
             setResConsulta(res?.obj);
+            setDataRecaudo((old) => ({
+              ...old,
+              valorTrx: res?.obj?.amt,
+            }));
             setEstadoPeticion("response");
             return res?.msg ?? "Consulta satisfactoria";
           },
@@ -217,7 +221,7 @@ const PagoRecaudoServiciosItau = ({
       ) {
         valor_send = parseInt(resConsulta?.amt);
       } else {
-        valor_send = dataRecaudo?.valorTrx;
+        valor_send = parseInt(dataRecaudo?.valorTrx);
       }
       const data = {
         oficina_propia:
@@ -534,9 +538,29 @@ const PagoRecaudoServiciosItau = ({
                     ]
                   )
                 ),
-                "Valor a pagar": formatMoney.format(resConsulta?.amt),
+                [convenio.modvalor_consweb === "N" ? "Valor a pagar" : "Valor consultado"]: formatMoney.format(resConsulta?.amt),
               }}
             >
+              {convenio.modvalor_consweb === "S" && (
+                <MoneyInput
+                  id="valorTrx"
+                  name="valorTrx"
+                  label={"Valor a pagar"}
+                  type="tel"
+                  maxLength={10}
+                  autoComplete="off"
+                  min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
+                  max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
+                  value={dataRecaudo?.valorTrx ?? 0}
+                  onInput={onChangeFormatNum}
+                  disabled={
+                    loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
+                  }
+                  required
+                  equalError={false}
+                  equalErrorMin={false}
+                />
+              )}
               <ButtonBar>
                 <Button
                   onClick={(e) => {
