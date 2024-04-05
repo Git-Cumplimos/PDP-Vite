@@ -20,9 +20,9 @@ import { useFetchItau } from "../hooks/fetchItau";
 import { enumParametrosItau } from "../utils/enumParametrosItau";
 import TicketsItau from "./TicketsItau";
 
-const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-recaudo-servicios`;
-const URL_PAGO_RECAUDO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/recaudo-servicios`;
-const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-estado-recaudo-servicios`;
+const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-recaudo-servicios`;
+const URL_PAGO_RECAUDO_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/recaudo-servicios`;
+const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-estado-recaudo-servicios`;
 
 const DATA_RECAUDO_INIT = {
   codigoConvenio: "",
@@ -44,6 +44,7 @@ const PagoRecaudoServiciosItau = ({
   dataCodigoBarras,
   tipoRecaudo = "manual",
 }) => {
+
   const uniqueId = v4();
   const validNavigate = useNavigate();
   const [dataRecaudo, setDataRecaudo] = useState(DATA_RECAUDO_INIT);
@@ -57,19 +58,22 @@ const PagoRecaudoServiciosItau = ({
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+
   const [loadingPeticionPagoRecaudo, peticionPagoRecaudo] = useFetchItau(
-    URL_PAGO_RECAUDO_CAJA_SOCIAL,
+    URL_PAGO_RECAUDO_ITAU,
     URL_CONSULTA_ESTADO_PAGO_RECAUDO,
     "Pago recaudo servicios"
   );
+
   const [loadingPeticionConsultaRecaudo, peticionConsultaRecaudo] = useFetch(
     fetchCustom(URL_CONSULTA_RECAUDO, "POST", "Consulta recaudo servicios")
   );
+
   useEffect(() => {
     if (tipoRecaudo === "manual") {
       setDataRecaudo((old) => ({
         ...old,
-        codigoConvenio: convenio.pk_convenios,
+        codigoConvenio: convenio.codigo_convenio,
         nombreConvenio: convenio.nombre_convenio,
       }));
     } else {
@@ -87,13 +91,13 @@ const PagoRecaudoServiciosItau = ({
     }
   }, [convenio, dataCodigoBarras, tipoRecaudo]);
 
-  const transaccionRecaudoServiciosCajaSocial = useCallback(
+  const transaccionRecaudoServiciosItau = useCallback(
     (ev) => {
       ev.preventDefault();
       if (
         tipoRecaudo === "manual" &&
         estadoPeticion === "hidden" &&
-        convenio.tipo_recaudo === "01"
+        convenio.consultaweb === "N"
       ) {
         setEstadoPeticion("validate");
         setShowModal(true);
@@ -102,7 +106,7 @@ const PagoRecaudoServiciosItau = ({
       if (
         tipoRecaudo === "manual" &&
         estadoPeticion === "validate" &&
-        convenio.tipo_recaudo === "01"
+        convenio.consultaweb === "N"
       ) {
         for (let i = 0; i < 3; i++) {
           if (dataRecaudo[`ref${i}`] !== dataRecaudo[`ref${i}Validacion`]) {
@@ -119,7 +123,7 @@ const PagoRecaudoServiciosItau = ({
       if (
         tipoRecaudo === "codigoBarras" &&
         estadoPeticion === "hidden" &&
-        convenio.tipo_recaudo === "01"
+        convenio.consultaweb === "N"
       ) {
         setEstadoPeticion("validatePayment");
         setShowModal(true);
@@ -129,6 +133,7 @@ const PagoRecaudoServiciosItau = ({
     },
     [dataRecaudo, pdpUser, roleInfo]
   );
+
   const consultaRecaudoServicios = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -146,7 +151,7 @@ const PagoRecaudoServiciosItau = ({
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataRecaudo?.valorTrx,
+        valor_total_trx: 0,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -154,27 +159,20 @@ const PagoRecaudoServiciosItau = ({
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
         },
-        location: {
-          address: roleInfo?.["direccion"],
-          dane_code: roleInfo?.codigo_dane,
-          city: roleInfo?.["ciudad"],
-        },
-        recaudo_servicios_caja_social: {
+        address: roleInfo?.["direccion"],
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.["ciudad"],
+        Datos: {
           codigo_convenio: dataRecaudo?.codigoConvenio,
-          referencias: [
-            ...Array(parseInt(convenio.cant_referencias)).keys(),
-          ].map((i) => ({
-            name: convenio?.[`nom_ref${i + 1}`],
-            value: dataRecaudo?.[`ref${i + 1}`],
-          })),
-          flag_otro_valor:
-            dataRecaudo.valorTrxOriginal.toString() !==
-            dataRecaudo.valorTrx.toString(),
-          tipo_convenio_recaudo: convenio.tipo_recaudo,
-          nombre_convenio: dataRecaudo?.nombreConvenio,
-          ...extraData,
+          referencia_1: dataRecaudo?.ref1,
+          referencia_2: dataRecaudo?.ref2 === "" ? "" : dataRecaudo?.ref2,
+          // flag_otro_valor:
+          //   dataRecaudo.valorTrxOriginal.toString() !==
+          //   dataRecaudo.valorTrx.toString(),
+          // tipo_convenio_recaudo: convenio.consultaweb,
+          // nombre_convenio: dataRecaudo?.nombreConvenio,
+          // ...extraData,
         },
-        id_user_pdp: pdpUser.uuid,
       };
       notifyPending(
         peticionConsultaRecaudo({}, data),
@@ -202,6 +200,7 @@ const PagoRecaudoServiciosItau = ({
     },
     [pdpUser, dataRecaudo, roleInfo, resConsulta]
   );
+
   const pagoRecaudoServicios = useCallback(
     (ev) => {
       ev.preventDefault();
@@ -267,6 +266,7 @@ const PagoRecaudoServiciosItau = ({
     },
     [pdpUser, dataRecaudo, roleInfo, resConsulta]
   );
+
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
     if (!isNaN(value)) {
@@ -276,6 +276,7 @@ const PagoRecaudoServiciosItau = ({
       });
     }
   }, []);
+
   const onChangeFormatNum = useCallback((ev, val) => {
     if (!isNaN(val)) {
       setDataRecaudo((old) => {
@@ -283,20 +284,22 @@ const PagoRecaudoServiciosItau = ({
       });
     }
   }, []);
+
   const closeModule = useCallback(() => {
     setDataRecaudo(DATA_RECAUDO_INIT);
     setShowModal(false);
     setEstadoPeticion("hidden");
     notifyError("Pago cancelado por el usuario");
   }, []);
+
   const renderReferences = (ingressType = "initial") =>
-    [...Array(parseInt(convenio.cant_referencias)).keys()].map((i) => (
+    [...Array(parseInt(convenio.referencia_2)).keys()].map((i) => (
       <Input
         id={ingressType === "initial" ? `ref${i + 1}` : `ref${i + 1}Validacion`}
         name={
           ingressType === "initial" ? `ref${i + 1}` : `ref${i + 1}Validacion`
         }
-        label={convenio?.[`nom_ref${i + 1}`] ?? ""}
+        label={convenio?.[`referencia${i + 1}`] ?? ""}
         type="text"
         autoComplete="off"
         minLength={1}
@@ -316,15 +319,10 @@ const PagoRecaudoServiciosItau = ({
         key={i}
       />
     ));
-  // const referencias = useMemo(() => {
-  //   let obj = {}
-  //   for (let i = 1; i <= parseInt(convenio.cant_referencias); i++) {
-  //     obj = {...obj,[convenio?.[`nom_ref${i}`]]:}
-  //   }
-  // }, [second])
+
   return (
     <>
-      <Form onSubmit={transaccionRecaudoServiciosCajaSocial} grid>
+      <Form onSubmit={transaccionRecaudoServiciosItau} grid>
         <Fieldset legend="Datos del recaudo" className="lg:col-span-2">
           <Input
             id="nombreConvenio"
@@ -406,7 +404,7 @@ const PagoRecaudoServiciosItau = ({
               loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
             }
           >
-            {convenio.tipo_recaudo === "01"
+            {convenio.consultaweb === "N"
               ? "Realizar pago"
               : "Realizar consulta"}
           </Button>
@@ -420,10 +418,7 @@ const PagoRecaudoServiciosItau = ({
               subtitle=""
               summaryTrx={{}}
             >
-              <Form
-                onSubmit={transaccionRecaudoServiciosCajaSocial}
-                grid={false}
-              >
+              <Form onSubmit={transaccionRecaudoServiciosItau} grid={false}>
                 {renderReferences("validate")}
                 <MoneyInput
                   id="valorTrxValidacion"
@@ -433,12 +428,8 @@ const PagoRecaudoServiciosItau = ({
                   // minLength={5}
                   maxLength={10}
                   autoComplete="off"
-                  min={
-                    enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU
-                  }
-                  max={
-                    enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU
-                  }
+                  min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
+                  max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
                   value={dataRecaudo?.valorTrxValidacion ?? 0}
                   onInput={onChangeFormatNum}
                   disabled={
@@ -469,7 +460,7 @@ const PagoRecaudoServiciosItau = ({
                       loadingPeticionConsultaRecaudo
                     }
                   >
-                    {convenio.tipo_recaudo === "01"
+                    {convenio.consultaweb === "N"
                       ? "Realizar pago"
                       : "Realizar consulta"}
                   </Button>
@@ -483,7 +474,7 @@ const PagoRecaudoServiciosItau = ({
               summaryTrx={{
                 Convenio: dataRecaudo?.nombreConvenio ?? "",
                 ...Object.fromEntries(
-                  [...Array(parseInt(convenio.cant_referencias)).keys()].map(
+                  [...Array(parseInt(convenio.referencia_2)).keys()].map(
                     (i) => [
                       convenio?.[`nom_ref${i + 1}`],
                       dataRecaudo?.[`ref${i + 1}`],
@@ -523,7 +514,7 @@ const PagoRecaudoServiciosItau = ({
               summaryTrx={{
                 Convenio: dataRecaudo?.nombreConvenio ?? "",
                 ...Object.fromEntries(
-                  [...Array(parseInt(convenio.cant_referencias)).keys()].map(
+                  [...Array(parseInt(convenio.referencia_2)).keys()].map(
                     (i) => [
                       convenio?.[`nom_ref${i + 1}`],
                       dataRecaudo?.[`ref${i + 1}`],

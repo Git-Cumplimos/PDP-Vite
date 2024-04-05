@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFetch } from "../../../../../hooks/useFetch";
-import { fetchCustom } from "../../utils/fetchCajaSocial";
+import { fetchCustom } from "../../utils/fetchItau";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Input from "../../../../../components/Base/Input";
 import { notifyPending } from "../../../../../utils/notify";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
+const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
 
 const DATA_CONVENIOS_INIT = {
   convenios: [],
@@ -31,21 +31,20 @@ const SeleccionConvenioRecaudoServiciosItau = () => {
   );
   
   useEffect(() => {
-    consultaConveniosCajaSocial();
+    consultaConveniosItau();
   }, [dataConvenios.filterConvenio, limit, page]);
-  const consultaConveniosCajaSocial = useDelayedCallback(
+  
+  const consultaConveniosItau = useDelayedCallback(
     useCallback(
       (ev) => {
-        let obj = {
-          permite_captura_manual: "1",
-        };
+        let obj = {};
         if (dataConvenios.filterConvenio.codigoConvenio !== "")
-          obj["pk_convenios"] = dataConvenios.filterConvenio.codigoConvenio;
+          obj["codigo_convenio"] = dataConvenios.filterConvenio.codigoConvenio;
         if (dataConvenios.filterConvenio.nombreConvenio !== "")
           obj["nombre_convenio"] = dataConvenios.filterConvenio.nombreConvenio;
 
         const data = {
-          // ...obj,
+          ...obj,
           page,
           limit,
           sortBy: "codigo_convenio",
@@ -82,9 +81,9 @@ const SeleccionConvenioRecaudoServiciosItau = () => {
   );
   const tableConvenios = useMemo(() => {
     return [
-      ...dataConvenios.convenios.map(({ pk_convenios, nombre_convenio }) => {
+      ...dataConvenios.convenios.map(({ codigo_convenio, nombre_convenio }) => {
         return {
-          "Id convenio": pk_convenios,
+          "Id convenio": codigo_convenio,
           Convenio: nombre_convenio !== "" ? nombre_convenio : "N/A",
         };
       }),
@@ -93,7 +92,7 @@ const SeleccionConvenioRecaudoServiciosItau = () => {
   const onSelectConvenio = useCallback(
     (e, i) => {
       validNavigate(
-        "../corresponsalia/corresponsalia-caja-social/recaudo-servicios-publicos-privados/recaudo-manual",
+        "../corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/recaudo-manual",
         {
           state: {
             id: tableConvenios[i]["Id convenio"],
@@ -125,7 +124,7 @@ const SeleccionConvenioRecaudoServiciosItau = () => {
       <h1 className="text-3xl mt-10">Recaudo Servicios Públicos y Privados</h1>
       {dataConvenios.estadoTrx === 1 ? (
         <TableEnterprise
-          title="Convenios Corresponsal Bancario BCS"
+          title="Convenios Corresponsal Bancario Itaú"
           maxPage={maxPages}
           headers={["Código Convenio", "Nombre Convenio"]}
           data={tableConvenios}

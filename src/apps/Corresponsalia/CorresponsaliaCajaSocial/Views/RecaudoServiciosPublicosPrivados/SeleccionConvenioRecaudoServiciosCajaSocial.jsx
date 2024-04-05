@@ -45,10 +45,10 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
           obj["nombre_convenio"] = dataConvenios.filterConvenio.nombreConvenio;
 
         const data = {
-          // ...obj,
+          ...obj,
           page,
           limit,
-          sortBy: "codigo_convenio",
+          sortBy: "pk_convenios",
           sortDir: "DESC",
         };
         notifyPending(

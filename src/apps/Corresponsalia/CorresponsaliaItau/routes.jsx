@@ -51,33 +51,33 @@ const rutasItauCB = {
       ),
       component: RecaudoServiciosPublicosPrivadosMenuItau,
       permission: [
-        enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
+        enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
       ],
       subRoutes: [
         {
-          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privadosseleccion-convenio",
+          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/seleccion-convenio",
           label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: SeleccionConvenioRecaudoServiciosItau,
           permission: [
-            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
+            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
           ],
         },
         {
-          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privadoscodigo-barras",
+          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/codigo-barras",
           label: (
             <AppIcons Logo={"MARKETPLACE"} name="Recaudo código de barras" />
           ),
           component: RecaudoCodBarrasServiciosCodigoBarrasItau,
           permission: [
-            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
+            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
           ],
         },
         {
-          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privadosrecaudo-manual",
+          link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/recaudo-manual",
           label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: RecaudoManualServiciosItau,
           permission: [
-            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_CAJA_SOCIAL,
+            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
           ],
           show: false,
         },

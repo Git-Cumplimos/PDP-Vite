@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "../../../../../hooks/useFetch";
-import { fetchCustom } from "../../utils/fetchCajaSocial";
+import { fetchCustom } from "../../utils/fetchItau";
 import Button from "../../../../../components/Base/Button";
 import BarcodeReader from "../../../../../components/Base/BarcodeReader";
 import { notifyPending } from "../../../../../utils/notify";
 import Form from "../../../../../components/Base/Form";
-import PagoRecaudoServiciosCajaSocial from "../../components/PagoRecaudoServiciosCajaSocial";
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-codigo-barras`;
+import PagoRecaudoServiciosItau from "../../components/PagoRecaudoServiciosItau";
+const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-codigo-barras`;
 const DATA_CONVENIOS_INIT = {
   data_codigo_barras: {
     codigo_ean: "",
@@ -78,7 +78,7 @@ const RecaudoCodBarrasServiciosCodigoBarrasItau = () => {
           </>
         </Form>
       ) : (
-        <PagoRecaudoServiciosCajaSocial
+        <PagoRecaudoServiciosItau
           convenio={dataConvenio.data_convenios[0]}
           dataCodigoBarras={dataConvenio.data_codigo_barras}
           tipoRecaudo="codigoBarras"
