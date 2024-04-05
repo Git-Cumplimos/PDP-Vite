@@ -21,16 +21,21 @@ const TicketsItau = ({
       ticket={ticket}
       stateTrx={stateTrx}
       type={type}
+      whitespaceDisclaimer = {true}
     >
-      <div className="flex flex-col mx-2">
-        <div className="w-64 mx-auto">
-          <div className="aspect-w-14 aspect-h-3">
-            <img src={LogoPng} alt="Logo punto de pago" />
-          </div>
-        </div>
-        <div className="mx-auto w-20">
-          <div className="aspect-w-16 aspect-h-9">
-            <img src={LogoPdp} alt="Logo punto de pago" />
+      <div className='flex flex-col mx-2 my-1 gap-1'>
+        <div className='flex flex-row justify-center items-center w-full'>
+          <div className='flex flex-row mx-auto items-center gap-4'>
+            <div className='mx-auto w-20'>
+              <div className='aspect-w-16 aspect-h-9'>
+                <img src={LogoPdp} alt='Logo punto de pago' />
+              </div>
+            </div>
+            <div className='mx-auto w-20'>
+              <div className='aspect-w-15 aspect-h-10'>
+                <img src={LogoPng} alt='Logo punto de pago' />
+              </div>
+            </div>
           </div>
         </div>
       </div>

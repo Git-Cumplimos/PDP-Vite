@@ -211,6 +211,11 @@ const PagoRecaudoServiciosItau = ({
         convenio?.consultaweb === "S"
       ) {
         valor_send = dataRecaudo?.valorTrxOriginal;
+      } else if (
+        convenio?.modvalor_consweb === "N" &&
+        convenio?.consultaweb === "S"
+      ) {
+        valor_send = parseInt(resConsulta?.amt);
       } else {
         valor_send = dataRecaudo?.valorTrx;
       }
@@ -237,7 +242,7 @@ const PagoRecaudoServiciosItau = ({
           nombre_convenio: dataRecaudo?.nombreConvenio,
           referencia_1: dataRecaudo?.ref1,
           referencia_2: dataRecaudo?.ref2 === "" ? "" : dataRecaudo?.ref2,
-          refInfoRec: resConsulta?.refInfoRec ? resConsulta?.refInfoRec : [],
+          refInfoRec: resConsulta?.RecInfoRec ? resConsulta?.RecInfoRec : [],
         },
         id_trx: resConsulta?.id_trx,
       };
@@ -255,7 +260,7 @@ const PagoRecaudoServiciosItau = ({
           render: ({ data: res }) => {
             const dataTemp = res.obj;
             setObjTicketActual(dataTemp.ticket ?? {});
-            setEstadoPeticion(1);
+            setEstadoPeticion("ticket");
             setStateTicketTrx(true);
             return "Pago satisfactorio";
           },
@@ -524,12 +529,12 @@ const PagoRecaudoServiciosItau = ({
                 ...Object.fromEntries(
                   [...Array(parseInt(convenio.referencia_2)).keys()].map(
                     (i) => [
-                      convenio?.[`nom_ref${i + 1}`],
+                      convenio?.[`referencia${i + 1}`],
                       dataRecaudo?.[`ref${i + 1}`],
                     ]
                   )
                 ),
-                "Valor a pagar": formatMoney.format(dataRecaudo?.valorTrx),
+                "Valor a pagar": formatMoney.format(resConsulta?.amt),
               }}
             >
               <ButtonBar>
