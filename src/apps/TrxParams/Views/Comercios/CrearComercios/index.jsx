@@ -451,6 +451,8 @@ const CrearComercios = () => {
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
+      if (!dataOrg.fk_tipo_identificacion_rl) delete dataOrg["fk_tipo_identificacion_rl"];
+      if (!dataOrg.fk_numero_identificacion_rl) delete dataOrg["fk_numero_identificacion_rl"];
       if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0)
         dataOrg.alert_cupo = "";
       if (pk_comercio_handled) {
