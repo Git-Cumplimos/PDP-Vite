@@ -86,6 +86,9 @@ import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 import rutasCajaSocialCB, {
   listPermissionsCajaSocial,
 } from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
+import rutasItauCB, {
+  listPermissionsItau,
+} from "../apps/Corresponsalia/CorresponsaliaItau/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
 /**
@@ -860,6 +863,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsAgrario,
       ...listPermissionsRecaudoMultiple,
       ...listPermissionsCajaSocial,
+      ...listPermissionsItau,
     ],
     subRoutes: [
       rutasDaviviendaCB,
@@ -868,6 +872,7 @@ const allUrlsPrivateApps = [
       rutasColpatria,
       rutasRecaudoMultiple,
       rutasCajaSocialCB,
+      rutasItauCB,
     ],
   },
   routesDaviplata,
