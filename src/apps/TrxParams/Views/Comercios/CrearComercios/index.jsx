@@ -83,6 +83,7 @@ const emptyCommerce = {
   tipo_persona: null,
   fk_tipo_identificacion_rl: 0,
   fk_numero_identificacion_rl: "",
+  barrio_comercio: "",
 };
 
 const CrearComercios = () => {
@@ -884,6 +885,22 @@ const CrearComercios = () => {
                   return { ...old, longitud_comercio: num };
                 });
               }
+            }}
+            autoComplete="off"
+          />
+          <Input
+            id="barrio_comercio"
+            label="Barrio comercio"
+            type="text"
+            name="barrio_comercio"
+            minLength="4"
+            maxLength="50"
+            required
+            value={comercio?.barrio_comercio}
+            onInput={(e) => {
+              setComercio((old) => {
+                return { ...old, barrio_comercio: e.target.value };
+              });
             }}
             autoComplete="off"
           />
