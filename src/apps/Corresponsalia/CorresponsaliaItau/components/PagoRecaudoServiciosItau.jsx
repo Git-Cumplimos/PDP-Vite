@@ -493,7 +493,7 @@ const PagoRecaudoServiciosItau = ({
                 ...Object.fromEntries(
                   [...Array(parseInt(convenio.referencia_2)).keys()].map(
                     (i) => [
-                      convenio?.[`nom_ref${i + 1}`],
+                      convenio?.[`referencia${i + 1}`],
                       dataRecaudo?.[`ref${i + 1}`],
                     ]
                   )
