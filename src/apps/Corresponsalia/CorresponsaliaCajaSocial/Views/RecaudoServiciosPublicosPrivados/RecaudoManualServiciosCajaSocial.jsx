@@ -18,8 +18,6 @@ const RecaudoManualServiciosCajaSocial = () => {
   const [loadingPeticionConsultaConvenio, peticionConsultaConvenio] = useFetch(
     fetchCustom(URL_CONSULTA_CONVENIO, "POST", "Consulta titular")
   );
-  
-  console.log("aqui")
   useEffect(() => {
     if (state?.convenio.length !== 0) {
       setDataConvenio(state?.convenio ?? []);

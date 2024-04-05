@@ -29,7 +29,6 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
   const [loadingPeticionConsultaConvenio, peticionConsultaConvenio] = useFetch(
     fetchCustom(URL_CONSULTA_CONVENIO, "POST", "Consulta convenio")
   );
-  
   useEffect(() => {
     consultaConveniosCajaSocial();
   }, [dataConvenios.filterConvenio, limit, page]);
