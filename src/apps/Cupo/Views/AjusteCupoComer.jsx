@@ -219,7 +219,16 @@ const AjusteCupoComer = ({ subRoutes }) => {
             </Button>
           </ButtonBar>
         ) : (
-          ""
+          <Input
+            id="nombre_comercio"
+            name="Nombre comercio"
+            label="Nombre comercio"
+            type="text"
+            value={cupoComer[0]?.nombre_comercio ?? ""}
+            autoComplete="off"
+            disabled={true}
+            required
+          />
         )}
       </Form>
       {cupoComer.length === 1 ? (
