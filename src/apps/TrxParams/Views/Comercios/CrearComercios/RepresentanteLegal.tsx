@@ -245,12 +245,15 @@ const RepresentanteLegal = ({
   }, [pdpUser]);
 
   useEffect(() => {
-    setRlPks({
-      pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
-      pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
-    });
+    if (propietarioRLExists) {
+      setRlPks({
+        pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
+        pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
+      });
+    }
   }, [
     setRlPks,
+    propietarioRLExists,
     propietarioRL.pk_numero_identificacion_rl,
     propietarioRL.pk_tipo_identificacion_rl,
   ]);
@@ -291,7 +294,6 @@ const RepresentanteLegal = ({
             }));
             setUpdateRl(false);
           }}
-          required
         />
         <Input
           label="Número de identificación"
@@ -300,7 +302,6 @@ const RepresentanteLegal = ({
           type="tel"
           minLength={5}
           maxLength={12}
-          required
           value={propietarioRL.pk_numero_identificacion_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -318,7 +319,6 @@ const RepresentanteLegal = ({
           type="text"
           minLength={1}
           maxLength={40}
-          required
           value={propietarioRL.nombre_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -336,7 +336,6 @@ const RepresentanteLegal = ({
           type="text"
           minLength={1}
           maxLength={40}
-          required
           value={propietarioRL.apellido_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -367,7 +366,6 @@ const RepresentanteLegal = ({
           type="tel"
           minLength={1}
           maxLength={10}
-          required
           value={propietarioRL.telefono_fijo_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -391,7 +389,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyCity(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required
         />
         <Input
           label="Dirección"
@@ -406,7 +403,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyAddress(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required
         />
         <Input
           label="Barrio"
@@ -415,7 +411,6 @@ const RepresentanteLegal = ({
           type="text"
           minLength={4}
           maxLength={20}
-          required
           value={propietarioRL.barrio_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
