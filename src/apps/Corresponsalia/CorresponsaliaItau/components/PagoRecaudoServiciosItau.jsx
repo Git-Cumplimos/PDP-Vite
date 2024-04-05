@@ -119,6 +119,7 @@ const PagoRecaudoServiciosItau = ({
           return notifyError("Error: El valor de la transacción es diferente");
         }
         pagoRecaudoServicios(ev);
+        return;
       }
       if (
         tipoRecaudo === "codigoBarras" &&
@@ -204,6 +205,7 @@ const PagoRecaudoServiciosItau = ({
   const pagoRecaudoServicios = useCallback(
     (ev) => {
       ev.preventDefault();
+      console.log("data recaud", dataRecaudo)
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -219,18 +221,19 @@ const PagoRecaudoServiciosItau = ({
           id_terminal: roleInfo?.id_dispositivo,
           id_uuid_trx: uniqueId,
         },
-        location: {
-          address: roleInfo?.["direccion"],
-          dane_code: roleInfo?.codigo_dane,
-          city: roleInfo?.["ciudad"],
-        },
-        deposito_caja_social: {
-          numero_cuenta: dataRecaudo?.numeroCuenta,
-          nom_cliente: resConsulta?.trn?.personName?.fullName,
+        address: roleInfo?.["direccion"],
+        dane_code: roleInfo?.codigo_dane,
+        city: roleInfo?.["ciudad"],
+        Datos: {
+          codigo_convenio: dataRecaudo?.codigoConvenio,
+          nombre_convenio: dataRecaudo?.nombreConvenio,
+          referencia_1: dataRecaudo?.ref1,
+          referencia_2: dataRecaudo?.ref2 === "" ? "" : dataRecaudo?.ref2,
+          refInfoRec: resConsulta?.refInfoRec ? resConsulta?.refInfoRec : [],
         },
         id_trx: resConsulta?.id_trx,
-        id_user_pdp: pdpUser.uuid,
       };
+      console.log("esto es Data", data)
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
@@ -252,14 +255,12 @@ const PagoRecaudoServiciosItau = ({
         },
         {
           render: ({ data: error }) => {
-            if (error.hasOwnProperty("optionalObject")) {
-              if (error.optionalObject.hasOwnProperty("ticket")) {
-                setObjTicketActual(error.optionalObject.ticket ?? {});
-                setEstadoPeticion(1);
-                setStateTicketTrx(false);
-              } else validNavigate(-1);
-            } else validNavigate(-1);
-            return error?.message ?? "Pago fallido";
+            if (error?.cause === "custom") {
+              return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
+            }
+            console.error(error?.message);
+            validNavigate(-1);
+            return error?.message ?? "Transacción fallida";
           },
         }
       );
@@ -364,7 +365,7 @@ const PagoRecaudoServiciosItau = ({
                 equalErrorMin={false}
               />
             )}
-          {convenio.permite_modificar_valor === "1" && (
+          {convenio.consultaweb === "N" && (
             <MoneyInput
               id="valorTrx"
               name="valorTrx"
@@ -373,7 +374,7 @@ const PagoRecaudoServiciosItau = ({
               maxLength={10}
               autoComplete="off"
               min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
-              max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL}
+              max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
               value={dataRecaudo?.valorTrx ?? 0}
               onInput={onChangeFormatNum}
               disabled={
