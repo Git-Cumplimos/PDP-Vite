@@ -6,8 +6,10 @@ export type TypingDataComercioSimple = {
   id_terminal: number;
 };
 
-export type TypingDataInputAuto = {
-  id_unique?: string;
+export type TypingSummaryTrx = {
+  msg?: string;
+  summary_trx?: { [key: string]: number | string };
+  valor_trx?: number;
 };
 
 //------PeticionSettingTime------
@@ -19,12 +21,6 @@ export type TypingDataSettingTime = {
 };
 
 //------ PeticionConsultForPay----
-export type TypingDataTrx = {
-  "Num referencia": string;
-};
 export type TypingCheckPay = {
   ticket: TypeInfTicket;
-  valor_trx: number;
-  delay_consult_for_pay: number;
-  retries_consult_for_pay: number;
 };

@@ -9,10 +9,13 @@ import {
   TempErrorFrontService,
   fetchCustomPdp,
   fetchCustomPdpCycle,
+  ErrorCustomBackendPending,
+  ErrorCustomBackendRehazada,
 } from "../../../utils/fetchCustomPdp";
 import {
   TypingDataComercioSimple,
   TypingDataSettingTime,
+  TypingSummaryTrx,
   TypingTypeSettingTime,
 } from "../utils/utils_typing";
 
@@ -51,12 +54,13 @@ import {
 const URL_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
-const useHookGouCheckPay = () => {
+const useHookGouCheckPay = (
+  setSummaryTrx: Dispatch<SetStateAction<TypingSummaryTrx>>
+) => {
   const hook_name = "useHookGouCheckPay";
   const [loadingPeticion, setloadingPeticion] = useState<boolean>(false);
   const [loadingPeticionBlocking, setloadingPeticionBlocking] =
     useState<boolean>(false);
-  const [dataSeePay, setDataSeePay] = useState<any | null>(null);
 
   const PeticionSettingTime = useCallback(
     async (
@@ -100,15 +104,15 @@ const useHookGouCheckPay = () => {
       const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp`;
       const name_service = "Verificando Pago";
       let response;
-      const body = {
-        comercio: {
-          id_comercio: dataComercioSimple.id_comercio,
-          id_usuario: dataComercioSimple.id_usuario,
-          id_terminal: dataComercioSimple.id_terminal,
-        },
-        id_unique: id_unique,
-      };
       try {
+        const body = {
+          comercio: {
+            id_comercio: dataComercioSimple.id_comercio,
+            id_usuario: dataComercioSimple.id_usuario,
+            id_terminal: dataComercioSimple.id_terminal,
+          },
+          id_unique: id_unique,
+        };
         //SECUENCIA ---------------Paso 1-------------------------------
         try {
           response = await fetchCustomPdp(
@@ -126,45 +130,33 @@ const useHookGouCheckPay = () => {
             !(error instanceof ErrorCustomApiGatewayTimeout) &&
             !(error instanceof ErrorCustomFetchTimeout)
           ) {
-            if (!(error instanceof ErrorCustomFetch)) {
-              throw new ErrorCustomUseHookCode(
-                TempErrorFrontService.replace("%s", name_service),
-                error.message,
-                `${hook_name} - ${function_name}`,
-                "notifyError",
-                true
-              );
-            }
+            console.log("1111111111ddddd");
             throw error;
           }
         }
         //SECUENCIA ---------------Paso 2-------------------------------
-        try {
-          response = await fetchCustomPdpCycle(
-            url_consult_for_pay,
-            "POST",
-            name_service,
-            {},
-            body,
-            dataSettingTime.retries_consult_for_pay,
-            dataSettingTime.delay_consult_for_pay
-          );
-          return {
-            ticket: response?.obj?.result?.ticket,
-          };
-        } catch (error: any) {
-          if (!(error instanceof ErrorCustomFetch)) {
-            throw new ErrorCustomUseHookCode(
-              TempErrorFrontService.replace("%s", name_service),
-              error.message,
-              `${hook_name} - ${function_name}`,
-              "notifyError",
-              true
-            );
-          }
-          throw error;
-        }
+        response = await fetchCustomPdpCycle(
+          url_consult_for_pay,
+          "POST",
+          name_service,
+          {},
+          body,
+          dataSettingTime.retries_consult_for_pay,
+          dataSettingTime.delay_consult_for_pay
+        );
+        return {
+          ticket: response?.obj?.result?.ticket,
+        };
       } catch (error: any) {
+        if (!(error instanceof ErrorCustomFetch)) {
+          throw new ErrorCustomUseHookCode(
+            TempErrorFrontService.replace("%s", name_service),
+            error.message,
+            `${hook_name} - ${function_name}`,
+            "notifyError",
+            true
+          );
+        }
         throw error;
       }
     },
@@ -197,8 +189,30 @@ const useHookGouCheckPay = () => {
             error.message,
             `${hook_name} - ${function_name}`,
             "notifyError",
-            true
+            false
           );
+        }
+        if (
+          error instanceof ErrorCustomApiGatewayTimeout &&
+          error instanceof ErrorCustomFetchTimeout &&
+          error instanceof ErrorCustomBackendPending &&
+          error instanceof ErrorCustomBackendRehazada
+        ) {
+          console.log("33333333333333333");
+          const res_obj = error.res?.obj ?? {};
+          setSummaryTrx({
+            msg: error.res?.msg,
+            summary_trx: {
+              ...res_obj.result?.summary_trx_add,
+              "Id transacción": res_obj.ids?.id_trx,
+              "Num referencia": res_obj.result?.referencia,
+              "Estado de la transacción": "Rechazada",
+            },
+            valor_trx: res_obj?.result?.valor_trx,
+          });
+        } else {
+          console.log("33333333333333333pppp");
+          setSummaryTrx((old) => ({ ...old, msg: error.message }));
         }
         throw error;
       } finally {
@@ -206,14 +220,13 @@ const useHookGouCheckPay = () => {
         setloadingPeticionBlocking(false);
       }
     },
-    [PeticionSettingTime, PeticionConsultForPay]
+    [PeticionSettingTime, PeticionConsultForPay, setSummaryTrx]
   );
 
   return {
     loadingPeticion,
     loadingPeticionBlocking,
     PeticionCheckPay,
-    dataSeePay,
   };
   // as const;
 };
