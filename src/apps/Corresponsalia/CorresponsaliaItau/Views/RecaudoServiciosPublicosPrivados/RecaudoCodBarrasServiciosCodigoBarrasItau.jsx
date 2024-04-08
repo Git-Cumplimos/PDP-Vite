@@ -30,6 +30,7 @@ const RecaudoCodBarrasServiciosCodigoBarrasItau = () => {
     const data = {
       codigo_barras: codigoBarras,
     };
+    console.log(data)
     notifyPending(
       peticionConsultaConvenioCodigoBarras({}, data),
       {

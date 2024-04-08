@@ -78,7 +78,7 @@ const PagoRecaudoServiciosItau = ({
     } else {
       setDataRecaudo((old) => ({
         ...old,
-        codigoConvenio: convenio.pk_convenios,
+        codigoConvenio: convenio.codigo_convenio,
         nombreConvenio: convenio.nombre_convenio,
         ref1: dataCodigoBarras.codigos_referencia[0] ?? "",
         ref2: dataCodigoBarras.codigos_referencia[1] ?? "",
