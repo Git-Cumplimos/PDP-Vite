@@ -71,9 +71,11 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
         msg: res?.msg,
         summary_trx: {
           ...res_obj.result?.summary_trx_add,
+          "Tipo de Trámite": res_obj.result?.tipo_tramite,
           "Id transacción": res_obj.ids?.id_trx,
           "Num referencia": res_obj.result?.referencia,
           "Estado de la transacción": status,
+          "Fecha de la transacción": res_obj.result?.fecha,
         },
         valor_trx: res_obj?.result?.valor_trx,
         id_log: res_obj.ids?.id_log,
