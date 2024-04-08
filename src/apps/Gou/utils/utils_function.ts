@@ -82,3 +82,35 @@ export const do_compare = (
 
   return [is_equal, key_change, msg_invalid] as const;
 };
+
+export const ajust_tam_see = (value: string, minCant: number): string => {
+  if (value.length <= minCant) return value;
+
+  const tam = Math.ceil(value.length / minCant);
+  let value_vector = [];
+  let value_final = "";
+  for (let i = 0; i < tam; i++) {
+    let fin = (i + 1) * minCant;
+    if (fin > value.length) fin = value.length;
+    value_vector.push(value.substring(i * minCant, fin));
+    value_final = value_vector.join(" ");
+  }
+  return value_final;
+};
+
+export const ajust_tam_see_obj = (
+  valueObj: { [key: string]: string },
+  minCant: number
+): { [key: string]: string } => {
+  const valueObjNew: { [key: string]: string } = {};
+  Object.keys(valueObj).map((key) => {
+    valueObjNew[key] = ajust_tam_see(valueObj[key].toString(), minCant);
+    return key;
+  });
+  return valueObjNew;
+};
+
+export const ajust_point_see = (value: string, minCant: number): string => {
+  if (value.length <= minCant) return value;
+  return `${value.substring(0, minCant - 4)} ...`;
+};

@@ -6,6 +6,7 @@
   padding-right: 20px;
   padding-bottom: 14px;
   max-width: 600px;
+  min-width: 500px;
   background: #ffffff;
   border: 2px solid rgba(3, 3, 3, 0.326);
   border-radius: 10px;
