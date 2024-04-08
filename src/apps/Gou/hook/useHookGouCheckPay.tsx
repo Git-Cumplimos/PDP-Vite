@@ -23,6 +23,7 @@ import {
   TypingTypeSettingTime,
 } from "../utils/utils_typing";
 import { constMsgTrx } from "../utils/utils_const";
+import { ajust_tam_see_obj } from "../utils/utils_function";
 
 //FRAGMENT ******************** TYPING *******************************
 export type TypeUseHookGouCheckPay = () => {
@@ -66,11 +67,10 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
         }));
         return;
       }
-
       setSummaryTrx({
         msg: res?.msg,
         summary_trx: {
-          ...res_obj.result?.summary_trx_add,
+          ...ajust_tam_see_obj(res_obj.result?.summary_trx_add ?? {}, 26),
           "Tipo de Trámite": res_obj.result?.tipo_tramite,
           "Id transacción": res_obj.ids?.id_trx,
           "Num referencia": res_obj.result?.referencia,
