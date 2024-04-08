@@ -1,0 +1,18 @@
+.containerPrincipal {
+  display: grid;
+  grid-gap: 13px;
+}
+
+.containerPerItemFather {
+  display: grid;
+  grid-gap: 8px;
+}
+
+.containerRes {
+  display: grid;
+  padding-left: 15px;
+}
+
+.labelQuestion {
+  font-weight: 500;
+}
