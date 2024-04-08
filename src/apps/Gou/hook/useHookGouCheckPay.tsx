@@ -1,76 +1,112 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ErrorCustomApiGatewayTimeout,
   ErrorCustomFetch,
   ErrorCustomFetchTimeout,
   ErrorCustomUseHookCode,
-  FuctionEvaluateResponse,
   defaultParamsError,
   TempErrorFrontService,
   fetchCustomPdp,
   fetchCustomPdpCycle,
+  ErrorCustomBackend,
   ErrorCustomBackendPending,
   ErrorCustomBackendRehazada,
+  FuctionEvaluateResponseConsultTrx,
 } from "../../../utils/fetchCustomPdp";
 import {
+  TypingCheckPay,
   TypingDataComercioSimple,
+  TypingDataPath,
   TypingDataSettingTime,
   TypingSummaryTrx,
+  TypingTrx,
   TypingTypeSettingTime,
 } from "../utils/utils_typing";
+import { constMsgTrx } from "../utils/utils_const";
 
 //FRAGMENT ******************** TYPING *******************************
-// export type TypeUseHookRecaudoDirigido = (
-//   autorizador: string,
-//   urlAutorizador: string
-// ) => {
-//   loadingPeticion: boolean;
-//   loadingPeticionBlocking: boolean;
-//   setloadingPeticion: Dispatch<SetStateAction<boolean>>;
-//   ResListarConveniosManual: (
-//     res: TypingJsonStringAny
-//   ) => TypingOutputListarConveniosManual;
-//   PeticionConsultConveniosManual: (
-//     dataComercio: TypingDataComercio,
-//     data: TypingInputConsultConveniosManual
-//   ) => Promise<TypingPreconsult>;
-//   PeticionConsultConveniosBarcode: (
-//     dataComercio: TypingDataComercio,
-//     data: TypingInputConsultConveniosBarcode
-//   ) => Promise<TypingPreconsult>;
-//   PeticionConsultRecaudo: (
-//     dataComercio: TypingDataComercio,
-//     dataPreconsult: TypingPreconsultDataPreconsult,
-//     dataInput: TypingDataInput
-//   ) => Promise<TypingOutputConsultRecaudo>;
-//   PeticionPayRecaudo: (
-//     dataComercio: TypingDataComercio,
-//     dataPreconsult: TypingPreconsultDataPreconsult,
-//     data: TypingInputPayRecaudo
-//   ) => Promise<TypingOutputPayRecaudo>;
-// };
+export type TypeUseHookGouCheckPay = () => {
+  loadingPeticion: boolean;
+  loadingPeticionBlocking: boolean;
+  PeticionCheckPay: (
+    dataComercioSimple: TypingDataComercioSimple,
+    dataPath: TypingDataPath
+  ) => Promise<TypingCheckPay>;
+  DetectionInitial: (id_trx: number, id_uuid_trx: string) => any;
+  trx: TypingTrx;
+  summaryTrx: TypingSummaryTrx;
+};
+
 //FRAGMENT ******************** CONST *******************************
-// const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-const URL_GOU = `http://127.0.0.1:5000`;
+const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
 
 //FRAGMENT ******************** HOOK *******************************
-const useHookGouCheckPay = (
-  setSummaryTrx: Dispatch<SetStateAction<TypingSummaryTrx>>
-) => {
+const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
   const hook_name = "useHookGouCheckPay";
   const [loadingPeticion, setloadingPeticion] = useState<boolean>(false);
   const [loadingPeticionBlocking, setloadingPeticionBlocking] =
     useState<boolean>(false);
+  const [trx, setTrx] = useState<TypingTrx>({
+    status: "Search",
+    msg: constMsgTrx.Search,
+  });
+  const [summaryTrx, setSummaryTrx] = useState<TypingSummaryTrx>({});
+
+  const ArmDataOutput = useCallback(
+    (
+      res: { [key: string]: any },
+      status?: "Aprobada" | "Rechazada" | "Pendiente"
+    ) => {
+      const res_obj = res.obj ?? {};
+
+      if (status === undefined) {
+        setSummaryTrx((old) => ({
+          ...old,
+          id_log: res.obj?.ids?.id_log,
+        }));
+        return;
+      }
+
+      setSummaryTrx({
+        msg: res?.msg,
+        summary_trx: {
+          ...res_obj.result?.summary_trx_add,
+          "Id transacción": res_obj.ids?.id_trx,
+          "Num referencia": res_obj.result?.referencia,
+          "Estado de la transacción": status,
+        },
+        valor_trx: res_obj?.result?.valor_trx,
+        id_log: res_obj.ids?.id_log,
+      });
+      setTrx({
+        status: status,
+        msg: constMsgTrx[status],
+      });
+    },
+    []
+  );
+
+  const DetectionInitial = useCallback(
+    (id_trx: number, id_uuid_trx: string) => {
+      setSummaryTrx({
+        summary_trx: {
+          "Id transacción": id_trx,
+          id_uuid_trx: id_uuid_trx,
+        },
+      });
+    },
+    [setSummaryTrx]
+  );
 
   const PeticionSettingTime = useCallback(
     async (
-      TypeSettingTime: TypingTypeSettingTime
+      setting_time: TypingTypeSettingTime
     ): Promise<TypingDataSettingTime> => {
       const function_name = "PeticionSettingTime";
       const name_service = "consultar configuracion time";
       let response: any;
       try {
-        const url = `${URL_GOU}/services_gou/check_pay/consult_setting_time/${TypeSettingTime}`;
+        const url = `${URL_GOU}/services_gou/check_pay/consult_setting_time/${setting_time}`;
         response = await fetchCustomPdp(url, "GET", name_service);
         return {
           delay_consult_for_pay:
@@ -88,22 +124,26 @@ const useHookGouCheckPay = (
             true
           );
         }
+        if (!(error instanceof ErrorCustomBackend)) {
+          ArmDataOutput(error.res ?? {});
+        }
         throw error;
       }
     },
-    []
+    [ArmDataOutput]
   );
 
   const PeticionConsultForPay = useCallback(
     async (
       dataComercioSimple: TypingDataComercioSimple,
-      dataSettingTime: TypingDataSettingTime,
-      id_unique: string
-    ): Promise<any> => {
+      id_unique: string,
+      dataSettingTime: TypingDataSettingTime
+    ): Promise<TypingCheckPay> => {
       const function_name = "PeticionConsultForPay";
       const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp`;
       const name_service = "Verificando Pago";
       let response;
+      let pendiente = 0;
       try {
         const body = {
           comercio: {
@@ -120,20 +160,43 @@ const useHookGouCheckPay = (
             "POST",
             name_service,
             {},
-            body
+            body,
+            60,
+            defaultParamsError,
+            FuctionEvaluateResponseConsultTrx
           );
+          ArmDataOutput(response, "Aprobada");
           return {
-            ticket: response?.obj?.result?.ticket,
+            ticket: response.obj?.result?.ticket,
+            tipo_tramite: response.obj?.result?.tipo_tramite ?? "",
           };
         } catch (error: any) {
-          if (
-            !(error instanceof ErrorCustomApiGatewayTimeout) &&
-            !(error instanceof ErrorCustomFetchTimeout)
+          if (!(error instanceof ErrorCustomFetch)) {
+            throw new ErrorCustomUseHookCode(
+              TempErrorFrontService.replace("%s", name_service),
+              error.message,
+              `${hook_name} - ${function_name}`,
+              "notifyError",
+              true
+            );
+          } else if (error instanceof ErrorCustomBackendRehazada) {
+            ArmDataOutput(error.res ?? {}, "Rechazada");
+            throw error;
+          } else if (error instanceof ErrorCustomBackend) {
+            ArmDataOutput(error.res ?? {});
+            throw error;
+          } else if (error instanceof ErrorCustomBackendPending) {
+            pendiente += 1;
+            ArmDataOutput(error.res ?? {}, "Pendiente");
+          } else if (
+            error instanceof ErrorCustomApiGatewayTimeout &&
+            error instanceof ErrorCustomFetchTimeout
           ) {
-            console.log("1111111111ddddd");
+          } else {
             throw error;
           }
         }
+
         //SECUENCIA ---------------Paso 2-------------------------------
         response = await fetchCustomPdpCycle(
           url_consult_for_pay,
@@ -144,8 +207,10 @@ const useHookGouCheckPay = (
           dataSettingTime.retries_consult_for_pay,
           dataSettingTime.delay_consult_for_pay
         );
+        ArmDataOutput(response, "Aprobada");
         return {
-          ticket: response?.obj?.result?.ticket,
+          ticket: response.obj?.result?.ticket,
+          tipo_tramite: response.obj?.result?.tipo_tramite ?? "",
         };
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
@@ -156,32 +221,41 @@ const useHookGouCheckPay = (
             "notifyError",
             true
           );
+        } else if (error instanceof ErrorCustomBackendRehazada) {
+          ArmDataOutput(error.res ?? {}, "Rechazada");
+        } else if (error instanceof ErrorCustomBackend && pendiente === 0) {
+          ArmDataOutput(error.res ?? {});
+        } else if (
+          error instanceof ErrorCustomBackendPending &&
+          pendiente === 0
+        ) {
+          ArmDataOutput(error.res ?? {}, "Pendiente");
         }
         throw error;
       }
     },
-    []
+    [ArmDataOutput]
   );
 
   const PeticionCheckPay = useCallback(
     async (
       dataComercioSimple: TypingDataComercioSimple,
-      id_unique: string,
-      typeSettingTime: TypingTypeSettingTime
-    ): Promise<any> => {
+      dataPath: TypingDataPath
+    ): Promise<TypingCheckPay> => {
       const function_name = "PeticionCheckPay";
       setloadingPeticion(true);
       setloadingPeticionBlocking(true);
       const name_service = "PeticionCheckPay";
       try {
-        const dataSettingTime = await PeticionSettingTime(typeSettingTime);
-        const da = await PeticionConsultForPay(
-          dataComercioSimple,
-          dataSettingTime,
-          id_unique
+        const dataSettingTime = await PeticionSettingTime(
+          dataPath.type_setting_time
         );
-        console.log(da);
-        return {};
+        const dataConsultForPay = await PeticionConsultForPay(
+          dataComercioSimple,
+          dataPath.id_unique,
+          dataSettingTime
+        );
+        return dataConsultForPay;
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
           throw new ErrorCustomUseHookCode(
@@ -192,41 +266,22 @@ const useHookGouCheckPay = (
             false
           );
         }
-        if (
-          error instanceof ErrorCustomApiGatewayTimeout &&
-          error instanceof ErrorCustomFetchTimeout &&
-          error instanceof ErrorCustomBackendPending &&
-          error instanceof ErrorCustomBackendRehazada
-        ) {
-          console.log("33333333333333333");
-          const res_obj = error.res?.obj ?? {};
-          setSummaryTrx({
-            msg: error.res?.msg,
-            summary_trx: {
-              ...res_obj.result?.summary_trx_add,
-              "Id transacción": res_obj.ids?.id_trx,
-              "Num referencia": res_obj.result?.referencia,
-              "Estado de la transacción": "Rechazada",
-            },
-            valor_trx: res_obj?.result?.valor_trx,
-          });
-        } else {
-          console.log("33333333333333333pppp");
-          setSummaryTrx((old) => ({ ...old, msg: error.message }));
-        }
         throw error;
       } finally {
         setloadingPeticion(false);
         setloadingPeticionBlocking(false);
       }
     },
-    [PeticionSettingTime, PeticionConsultForPay, setSummaryTrx]
+    [PeticionSettingTime, PeticionConsultForPay]
   );
 
   return {
     loadingPeticion,
     loadingPeticionBlocking,
+    DetectionInitial,
     PeticionCheckPay,
+    trx,
+    summaryTrx,
   };
   // as const;
 };

@@ -4,18 +4,13 @@
   align-items: center;
   padding-left: 20px;
   padding-right: 20px;
-  padding-top: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 14px;
   max-width: 600px;
   background: #ffffff;
   border: 2px solid rgba(3, 3, 3, 0.326);
   border-radius: 10px;
 }
 
-/* .contendorPago {
-  background: #ffffff;
-  @apply px-4 py-2 rounded-md bg-secondary-dark text-white;
-} */
 .contendorPago {
   @apply grid grid-flow-col auto-cols-fr gap-6;
   padding: 5px;
@@ -24,31 +19,10 @@
   border: 1px solid rgba(3, 3, 3, 0.326);
 }
 
-.contendorButton {
+.contendorIdLog {
+  margin-top: 10px;
+  font-size: small;
   display: grid;
   width: 100%;
   justify-items: end;
-}
-
-.contendorSoon {
-  @apply grid gap-6;
-  width: 96%;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  padding-left: 20px;
-  /* padding: 30px 10px; */
-  margin: 10px 10px;
-  background: #ffffff;
-  border: 1px solid rgba(3, 3, 3, 0.326);
-  border-radius: 10px;
-}
-.contendorSoonTrx {
-  @apply grid gap-6;
-  width: 96%;
-  padding-top: 10px;
-  padding-bottom: 30px;
-  margin: 10px 10px;
-  background: #ffffff;
-  border: 1px solid rgba(3, 3, 3, 0.326);
-  border-radius: 10px;
 }

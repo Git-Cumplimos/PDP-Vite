@@ -7,13 +7,31 @@ export type TypingDataComercioSimple = {
 };
 
 export type TypingSummaryTrx = {
+  id_log?: number;
   msg?: string;
   summary_trx?: { [key: string]: number | string };
   valor_trx?: number;
 };
 
-//------PeticionSettingTime------
+export type TypingStatusTrx =
+  | "Search"
+  | "Unidentified"
+  | "Pendiente"
+  | "Aprobada"
+  | "Rechazada";
+
+export type TypingTrx = {
+  status: TypingStatusTrx;
+  msg: string;
+};
+
 export type TypingTypeSettingTime = "origin" | "cross";
+export type TypingDataPath = {
+  type_setting_time: TypingTypeSettingTime;
+  id_unique: string;
+};
+
+//------PeticionSettingTime------
 
 export type TypingDataSettingTime = {
   delay_consult_for_pay: number;
@@ -23,4 +41,5 @@ export type TypingDataSettingTime = {
 //------ PeticionConsultForPay----
 export type TypingCheckPay = {
   ticket: TypeInfTicket;
+  tipo_tramite: string;
 };

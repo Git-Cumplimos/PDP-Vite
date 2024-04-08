@@ -136,9 +136,12 @@ const useHookRecargarCupo = () => {
             id_trx: dataCrearSesion.id_trx,
             id_uuid_trx: id_uuid_trx,
             valor_trx: dataInput.valor_trx,
-            nombre_completo: dataInput.nombre_completo,
             referencia: dataInput.referencia,
             ip_address: "127.0.0.1",
+            summary_trx_add: {
+              Nombre: dataInput.nombre_completo,
+            },
+            tipo_tramite: dataInput.tipo_tramite,
           };
           response = await fetchCustom(
             url_pay,
