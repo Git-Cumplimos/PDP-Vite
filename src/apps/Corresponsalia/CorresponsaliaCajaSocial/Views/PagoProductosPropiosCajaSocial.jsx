@@ -204,7 +204,7 @@ const PagoProductosPropiosCajaSocial = () => {
             if (error.hasOwnProperty("optionalObject")) {
               if (error.optionalObject.hasOwnProperty("ticket")) {
                 setObjTicketActual(error.optionalObject.ticket ?? {});
-                setEstadoPeticion(1);
+                setEstadoPeticion(2);
                 setStateTicketTrx(false);
               } else validNavigate(-1);
             } else validNavigate(-1);
