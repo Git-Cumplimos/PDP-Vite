@@ -33,9 +33,11 @@ import {
 } from "../utils/utils_typing";
 import classes from "./RecargaCupoConGou.module.css";
 import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAceptarTerminos";
-import TicketsGou from "../components/TicketsGou";
+import TicketsGou from "../../../Gou/components/TicketsGou";
+import ModalExterno from "../components/ModalInfoClient/ModalExterno";
 
-const { contendorFather, contendorSoon, contendorSoonTrx } = classes;
+const { contendorFather, contendorSoon, contendorSoonTrx, contendorQuestion } =
+  classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type TypingProcess = "Ninguno" | "Pay" | "TrxExitosa";
@@ -96,6 +98,8 @@ const RecargaCupoConGou = () => {
     useState<TypingDataInvalid>(dataInvalidInitial);
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showModalInfoClient, setShowModalInfoClient] = useState<any>(null);
+  const [showModalAdditional, setShowModalAdditional] = useState<boolean>(true);
   const [process, setProcess] = useState<TypingProcess>("Ninguno");
   const [acepto, setAcepto] = useState<{ [key: string]: boolean }>({
     open_modal: false,
@@ -270,6 +274,10 @@ const RecargaCupoConGou = () => {
     content: () => printDiv.current,
   });
 
+  useEffect(() => {
+    console.log(showModalInfoClient);
+  }, [showModalInfoClient]);
+
   return (
     <Fragment>
       <SimpleLoading
@@ -403,6 +411,14 @@ const RecargaCupoConGou = () => {
               required
             />
           </fieldset>
+          <ButtonBar>
+            <Button onClick={() => setShowModalInfoClient("Questions")}>
+              Preguntas frecuentes
+            </Button>
+            <Button onClick={() => setShowModalInfoClient("Comunication")}>
+              Canales de comunicación
+            </Button>
+          </ButtonBar>
           <Input
             type="checkbox"
             label="Acepta Términos y Condiciones"
@@ -459,6 +475,12 @@ const RecargaCupoConGou = () => {
           acepto={acepto.open_modal}
           setAcepto={setAcepto}
         ></ModalAceptarTerminos>
+      )}
+      {showModalInfoClient && (
+        <ModalExterno
+          showModalInfoClient={showModalInfoClient}
+          setShowModalInfoClient={setShowModalInfoClient}
+        ></ModalExterno>
       )}
     </Fragment>
   );

@@ -30,3 +30,8 @@
   border: 1px solid rgba(3, 3, 3, 0.326);
   border-radius: 10px;
 }
+
+.contendorQuestion {
+  width: 96%;
+  display: grid;
+}

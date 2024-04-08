@@ -18,7 +18,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchItau } from "../hooks/fetchItau";
 import { enumParametrosItau } from "../utils/enumParametrosItau";
-import TicketsItau from "./TicketsItau";
+import TicketsItau from "./TicketsItau/TicketsItau";
 
 const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-recaudo-servicios`;
 const URL_PAGO_RECAUDO_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/recaudo-servicios`;
@@ -538,7 +538,9 @@ const PagoRecaudoServiciosItau = ({
                     ]
                   )
                 ),
-                [convenio.modvalor_consweb === "N" ? "Valor a pagar" : "Valor consultado"]: formatMoney.format(resConsulta?.amt),
+                [convenio.modvalor_consweb === "N"
+                  ? "Valor a pagar"
+                  : "Valor consultado"]: formatMoney.format(resConsulta?.amt),
               }}
             >
               {convenio.modvalor_consweb === "S" && (
