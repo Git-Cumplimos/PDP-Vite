@@ -33,9 +33,10 @@ import {
 } from "../utils/utils_typing";
 import classes from "./RecargaCupoConGou.module.css";
 import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAceptarTerminos";
-import TicketsGou from "../components/TicketsGou";
+import TicketsGou from "../../../Gou/components/TicketsGou";
 
-const { contendorFather, contendorSoon, contendorSoonTrx } = classes;
+const { contendorFather, contendorSoon, contendorSoonTrx, contendorQuestion } =
+  classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type TypingProcess = "Ninguno" | "Pay" | "TrxExitosa";
@@ -403,6 +404,10 @@ const RecargaCupoConGou = () => {
               required
             />
           </fieldset>
+          <ButtonBar>
+            <Button>Preguntas frecuentes</Button>
+            <Button>Canales de comunicación</Button>
+          </ButtonBar>
           <Input
             type="checkbox"
             label="Acepta Términos y Condiciones"
