@@ -64,7 +64,7 @@ const AdminLayout = () => {
 
   const [accept, setAccept] = useState(false);
   const [device, setDevice] = useState(false);
-  const [showModalPublicidad, setShowModalPublicidad] = useState(true);
+  const [showModalPublicidad, setShowModalPublicidad] = useState(false);
   const [showModalCupo, setShowModalCupo] = useState(false);
   const [cupoComercio, setCupoComercio] = useState(false);
   const [ModalAlertBoveda, setModalAlertBoveda] = useState(true);
