@@ -77,6 +77,7 @@ const dataInputInitial: TypingDataInput = {
   fecha: "",
   valor_trx: "",
   id_uuid_trx: "",
+  tipo_tramite: "Recarga Cupo",
 };
 
 const dataInvalidInitial: TypingDataInvalid = {
@@ -360,8 +361,9 @@ const RecargaCupoConGou = () => {
               type="text"
               autoComplete="off"
               maxLength={70}
-              value={"Recarga Cupo"}
+              value={dataInput.tipo_tramite}
               required
+              disabled
             />
             <Input
               label="Número de referencia"
@@ -370,6 +372,7 @@ const RecargaCupoConGou = () => {
               maxLength={70}
               value={dataInput.referencia}
               required
+              disabled
             />
             <Input
               label="Fecha"
@@ -378,6 +381,7 @@ const RecargaCupoConGou = () => {
               maxLength={70}
               value={dataInput.fecha}
               required
+              disabled
             />
             <MoneyInput
               name="valor_trx"
