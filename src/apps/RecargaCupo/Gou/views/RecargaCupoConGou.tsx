@@ -389,7 +389,7 @@ const RecargaCupoConGou = () => {
               disabled
             />
             <Input
-              label="Id unico"
+              label="Id único"
               type="text"
               autoComplete="off"
               value={dataInput.id_uuid_trx}
