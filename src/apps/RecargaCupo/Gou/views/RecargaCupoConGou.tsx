@@ -316,7 +316,7 @@ const RecargaCupoConGou = () => {
                 label="Correo electrónico"
                 type="email"
                 autoComplete="off"
-                maxLength={70}
+                maxLength={100}
                 value={dataInput.correo}
                 required
               />
@@ -328,7 +328,7 @@ const RecargaCupoConGou = () => {
                 label="Confirmación de correo electrónico"
                 type="email"
                 autoComplete="off"
-                maxLength={70}
+                maxLength={100}
                 value={dataInput["correo|confirmacion"]}
                 invalid={dataInvalid["correo|confirmacion"]}
                 required
