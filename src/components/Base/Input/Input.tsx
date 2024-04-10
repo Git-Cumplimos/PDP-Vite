@@ -86,7 +86,7 @@ const Input = forwardRef<HTMLInputElement, CustomInputProps>(
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <div>
+        <div className="w-full">
           {type === "radio" ? (
             <label htmlFor={_id}>
               <input

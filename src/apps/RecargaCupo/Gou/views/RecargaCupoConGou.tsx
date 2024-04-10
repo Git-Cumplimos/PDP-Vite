@@ -35,6 +35,7 @@ import classes from "./RecargaCupoConGou.module.css";
 import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAceptarTerminos";
 import TicketsGou from "../../../Gou/components/TicketsGou";
 import ModalExterno from "../components/ModalInfoClient/ModalExterno";
+import { useImgs } from "../../../../hooks/ImgsHooks";
 
 const { contendorFather, contendorSoon, contendorSoonTrx, contendorGou } =
   classes;
@@ -90,6 +91,7 @@ const dataInvalidInitial: TypingDataInvalid = {
 };
 
 const RecargaCupoConGou = () => {
+  const { imgs } = useImgs();
   const { roleInfo, pdpUser }: any = useAuth();
   const validNavigate = useNavigate();
   const printDiv = useRef(null);
@@ -99,7 +101,6 @@ const RecargaCupoConGou = () => {
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showModalInfoClient, setShowModalInfoClient] = useState<any>(null);
-  const [showModalAdditional, setShowModalAdditional] = useState<boolean>(true);
   const [process, setProcess] = useState<TypingProcess>("Ninguno");
   const [acepto, setAcepto] = useState<{ [key: string]: boolean }>({
     open_modal: false,
@@ -283,43 +284,58 @@ const RecargaCupoConGou = () => {
       <SimpleLoading
         show={loadingPeticionBlocking ? true : false}
       ></SimpleLoading>
-      <Form onChange={onChangeDataInput} onSubmit={onSubmitCheckPay} grid>
-        <div className={contendorFather}>
+      <form
+        onChange={onChangeDataInput}
+        onSubmit={onSubmitCheckPay}
+        className="grid grid-cols-1 place-content-center place-items-center"
+      >
+        <div className={`${contendorFather}`}>
+          <img
+            className={"mb-2 mt-8"}
+            src={`${imgs?.LogoGou}`}
+            alt={"LogoGou"}
+          />
           <div className={contendorSoon}>
-            <InputLong
-              id="nombre_completo/text"
-              name="nombre_completo"
-              label="Nombre Completo"
-              type="text"
-              autoComplete="off"
-              maxLength={70}
-              value={dataInput.nombre_completo}
-              invalid={dataInvalid.nombre_completo}
-              required
-            />
-            <InputLong
-              id="correo/email/correo|confirmacion=>correo"
-              name="correo"
-              label="Correo electrónico"
-              type="email"
-              autoComplete="off"
-              maxLength={70}
-              value={dataInput.correo}
-              required
-            />
-            <InputLong
-              id="correo|confirmacion/email/correo|confirmacion=>correo"
-              name="correo|confirmacion"
-              label="Confirmación de correo electrónico"
-              type="email"
-              autoComplete="off"
-              maxLength={70}
-              value={dataInput["correo|confirmacion"]}
-              invalid={dataInvalid["correo|confirmacion"]}
-              required
-              onPaste={(ev) => ev.preventDefault()}
-              onDrop={(ev) => ev.preventDefault()}
-            />
+            <div className="col-span-2">
+              <Input
+                id="nombre_completo/text"
+                name="nombre_completo"
+                label="Nombre Completo"
+                type="text"
+                autoComplete="off"
+                maxLength={70}
+                value={dataInput.nombre_completo}
+                invalid={dataInvalid.nombre_completo}
+                required
+              />
+            </div>
+            <div className="col-span-2">
+              <Input
+                id="correo/email/correo|confirmacion=>correo"
+                name="correo"
+                label="Correo electrónico"
+                type="email"
+                autoComplete="off"
+                maxLength={70}
+                value={dataInput.correo}
+                required
+              />
+            </div>
+            <div className="col-span-2">
+              <Input
+                id="correo|confirmacion/email/correo|confirmacion=>correo"
+                name="correo|confirmacion"
+                label="Confirmación de correo electrónico"
+                type="email"
+                autoComplete="off"
+                maxLength={70}
+                value={dataInput["correo|confirmacion"]}
+                invalid={dataInvalid["correo|confirmacion"]}
+                required
+                onPaste={(ev) => ev.preventDefault()}
+                onDrop={(ev) => ev.preventDefault()}
+              />
+            </div>
             <Input
               id="celular/cel/celular|confirmacion=>celular"
               name="celular"
@@ -368,8 +384,15 @@ const RecargaCupoConGou = () => {
               label="Tipo de trámite"
               type="text"
               autoComplete="off"
-              maxLength={70}
               value={dataInput.tipo_tramite}
+              required
+              disabled
+            />
+            <Input
+              label="Id unico"
+              type="text"
+              autoComplete="off"
+              value={dataInput.id_uuid_trx}
               required
               disabled
             />
@@ -410,7 +433,7 @@ const RecargaCupoConGou = () => {
               }}
               required
             />
-            <label className="p-5 text-xl font-medium text-center">
+            <label className="px-5 pt-6 text-xl font-medium text-center">
               Señor usuario tenga en cuenta que esta transacción tiene un costo
               de $500 el cual será debitado de Cupo
             </label>
@@ -440,13 +463,15 @@ const RecargaCupoConGou = () => {
             checked={acepto.acepto}
           />
         </div>
-        <ButtonBar className={"lg:col-span-2"}>
-          <Button type={"submit"}>Realizar Pago</Button>
-          <Button onClick={() => handleCloseNinguno(true, routeInicial)}>
-            Cancelar
-          </Button>
-        </ButtonBar>
-      </Form>
+        <div className="grid grid-cols-2">
+          <ButtonBar className={"lg:col-span-2"}>
+            <Button type={"submit"}>Realizar Pago</Button>
+            <Button onClick={() => handleCloseNinguno(true, routeInicial)}>
+              Cancelar
+            </Button>
+          </ButtonBar>
+        </div>
+      </form>
 
       <Modal show={showModal} handleClose={handleCloseModal}>
         {/**************** Pay **********************/}
