@@ -545,6 +545,7 @@ export const useProvideAuth = () => {
         tempRole.comision = quota["comisiones"];
         tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
         tempRole.sobregirovalue = quota["sobregiro"];
+        tempRole.deuda = quota["cupo_canje"] ?? 0;
         tempRole.alerta = quota["alerta cupo"];
         tempRole.tipo_pago_comision = quota["tipo pago comision"] ?? "";
         dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
@@ -553,7 +554,7 @@ export const useProvideAuth = () => {
         dispatchAuth({
           type: SET_QUOTA,
           payload: {
-            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" },
+            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "", deuda : 0 },
           },
         });
         if (error?.cause === "custom") {
