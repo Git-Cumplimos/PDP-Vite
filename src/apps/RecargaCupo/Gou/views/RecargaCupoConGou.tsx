@@ -35,6 +35,7 @@ import classes from "./RecargaCupoConGou.module.css";
 import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAceptarTerminos";
 import TicketsGou from "../../../Gou/components/TicketsGou";
 import ModalExterno from "../components/ModalInfoClient/ModalExterno";
+import { useImgs } from "../../../../hooks/ImgsHooks";
 
 const { contendorFather, contendorSoon, contendorSoonTrx, contendorGou } =
   classes;
@@ -90,6 +91,7 @@ const dataInvalidInitial: TypingDataInvalid = {
 };
 
 const RecargaCupoConGou = () => {
+  const { imgs } = useImgs();
   const { roleInfo, pdpUser }: any = useAuth();
   const validNavigate = useNavigate();
   const printDiv = useRef(null);
@@ -99,7 +101,6 @@ const RecargaCupoConGou = () => {
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showModalInfoClient, setShowModalInfoClient] = useState<any>(null);
-  const [showModalAdditional, setShowModalAdditional] = useState<boolean>(true);
   const [process, setProcess] = useState<TypingProcess>("Ninguno");
   const [acepto, setAcepto] = useState<{ [key: string]: boolean }>({
     open_modal: false,
@@ -289,6 +290,11 @@ const RecargaCupoConGou = () => {
         className="grid grid-cols-1 place-content-center place-items-center"
       >
         <div className={`${contendorFather}`}>
+          <img
+            className={"mb-2 mt-8"}
+            src={`${imgs?.LogoGou}`}
+            alt={"LogoGou"}
+          />
           <div className={contendorSoon}>
             <div className="col-span-2">
               <Input
@@ -378,8 +384,15 @@ const RecargaCupoConGou = () => {
               label="Tipo de trámite"
               type="text"
               autoComplete="off"
-              maxLength={70}
               value={dataInput.tipo_tramite}
+              required
+              disabled
+            />
+            <Input
+              label="Id unico"
+              type="text"
+              autoComplete="off"
+              value={dataInput.id_uuid_trx}
               required
               disabled
             />
