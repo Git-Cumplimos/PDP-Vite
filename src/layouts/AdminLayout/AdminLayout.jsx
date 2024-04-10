@@ -42,6 +42,7 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     diasSobregiro,
+    valMinConsignar,
   } = classes;
 
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -89,6 +90,16 @@ const AdminLayout = () => {
     () => roleInfo?.["nombre comercio"],
     [roleInfo]
   );
+
+  const valorMinConsignar = useMemo(() => {
+    let val = ((quotaInfo?.sobregirovalue ?? 0)-(quotaInfo?.quota ?? 0)) + (quotaInfo?.deuda ?? 0 * -1)
+    if (val < 0) val = 0
+    return formatMoney.format(val);
+  }, [
+    quotaInfo?.quota,
+    quotaInfo?.sobregirovalue,
+    quotaInfo?.deuda
+  ]);
 
   const [clientWidth] = useWindowSize();
 
@@ -306,6 +317,11 @@ const AdminLayout = () => {
               }}
             >
               Cupo disponible {saldoDisponible || "$0.00"}
+            </div>
+          </div>
+          <div className={usrData}>
+            <div className={valMinConsignar}>
+              Valor Mínimo a Consignar {valorMinConsignar || "0"}
             </div>
           </div>
           <div className={usrData}>
