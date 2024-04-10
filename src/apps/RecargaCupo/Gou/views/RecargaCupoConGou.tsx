@@ -435,7 +435,7 @@ const RecargaCupoConGou = () => {
             />
             <label className="px-5 pt-6 text-xl font-medium text-center">
               Señor usuario tenga en cuenta que esta transacción tiene un costo
-              de $500 el cual será debitado de Cupo
+              de $500 el cual será debitado de su cupo
             </label>
           </fieldset>
           <ButtonBar>
