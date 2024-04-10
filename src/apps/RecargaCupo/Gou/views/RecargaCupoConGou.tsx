@@ -116,7 +116,7 @@ const RecargaCupoConGou = () => {
   const dataComercio: TypingDataComercio = useMemo(() => {
     const tipo_comercio = roleInfo?.tipo_comercio ?? "";
     return {
-      id_comercio: roleInfo?.id_comercio ?? 1,
+      id_comercio: roleInfo?.id_comercio ?? 0,
       id_usuario: roleInfo?.id_usuario ?? 0,
       id_terminal: roleInfo?.id_usuario ?? 0,
       nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
