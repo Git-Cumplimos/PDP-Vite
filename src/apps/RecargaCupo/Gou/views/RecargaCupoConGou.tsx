@@ -283,7 +283,7 @@ const RecargaCupoConGou = () => {
       <SimpleLoading
         show={loadingPeticionBlocking ? true : false}
       ></SimpleLoading>
-      <Form onChange={onChangeDataInput} onSubmit={onSubmitCheckPay} grid>
+      <Form onChange={onChangeDataInput} onSubmit={onSubmitCheckPay}>
         <div className={contendorFather}>
           <div className={contendorSoon}>
             <InputLong
@@ -410,7 +410,7 @@ const RecargaCupoConGou = () => {
               }}
               required
             />
-            <label className="p-5 text-xl font-medium text-center">
+            <label className="px-5 pt-6 text-xl font-medium text-center">
               Señor usuario tenga en cuenta que esta transacción tiene un costo
               de $500 el cual será debitado de Cupo
             </label>
@@ -440,6 +440,7 @@ const RecargaCupoConGou = () => {
             checked={acepto.acepto}
           />
         </div>
+
         <ButtonBar className={"lg:col-span-2"}>
           <Button type={"submit"}>Realizar Pago</Button>
           <Button onClick={() => handleCloseNinguno(true, routeInicial)}>

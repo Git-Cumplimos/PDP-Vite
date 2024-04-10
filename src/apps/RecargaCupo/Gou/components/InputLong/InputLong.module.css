@@ -8,6 +8,8 @@
 }
 
 .formItem > div > label {
+  margin-right: 20px;
+  margin-left: 30px;
   @apply text-xl;
 }
 
