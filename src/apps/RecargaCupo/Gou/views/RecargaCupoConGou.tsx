@@ -36,7 +36,7 @@ import ModalAceptarTerminos from "../components/ModalAceptarTerminos/ModalAcepta
 import TicketsGou from "../../../Gou/components/TicketsGou";
 import ModalExterno from "../components/ModalInfoClient/ModalExterno";
 
-const { contendorFather, contendorSoon, contendorSoonTrx, contendorQuestion } =
+const { contendorFather, contendorSoon, contendorSoonTrx, contendorGou } =
   classes;
 
 //FRAGMENT ******************** TYPING *******************************
@@ -279,7 +279,7 @@ const RecargaCupoConGou = () => {
   }, [showModalInfoClient]);
 
   return (
-    <Fragment>
+    <div>
       <SimpleLoading
         show={loadingPeticionBlocking ? true : false}
       ></SimpleLoading>
@@ -410,6 +410,10 @@ const RecargaCupoConGou = () => {
               }}
               required
             />
+            <label className="p-5 text-xl font-medium text-center">
+              Señor usuario tenga en cuenta que esta transacción tiene un costo
+              de $500 el cual será debitado de Cupo
+            </label>
           </fieldset>
           <ButtonBar>
             <Button onClick={() => setShowModalInfoClient("Questions")}>
@@ -482,7 +486,7 @@ const RecargaCupoConGou = () => {
           setShowModalInfoClient={setShowModalInfoClient}
         ></ModalExterno>
       )}
-    </Fragment>
+    </div>
   );
 };
 
