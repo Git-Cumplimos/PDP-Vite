@@ -286,9 +286,9 @@ const RecargaCupoConGou = () => {
       <form
         onChange={onChangeDataInput}
         onSubmit={onSubmitCheckPay}
-        className="grid grid-cols-8"
+        className="grid grid-cols-1 place-content-center place-items-center"
       >
-        <div className={`${contendorFather} col-start-2`}>
+        <div className={`${contendorFather}`}>
           <div className={contendorSoon}>
             <div className="col-span-2">
               <Input
@@ -450,7 +450,7 @@ const RecargaCupoConGou = () => {
             checked={acepto.acepto}
           />
         </div>
-        <div className="grid grid-cols-2 col-span-8">
+        <div className="grid grid-cols-2">
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>Realizar Pago</Button>
             <Button onClick={() => handleCloseNinguno(true, routeInicial)}>
