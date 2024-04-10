@@ -78,7 +78,7 @@ const PagoRecaudoServiciosItau = ({
     } else {
       setDataRecaudo((old) => ({
         ...old,
-        codigoConvenio: convenio.pk_convenios,
+        codigoConvenio: convenio.codigo_convenio,
         nombreConvenio: convenio.nombre_convenio,
         ref1: dataCodigoBarras.codigos_referencia[0] ?? "",
         ref2: dataCodigoBarras.codigos_referencia[1] ?? "",
@@ -212,7 +212,7 @@ const PagoRecaudoServiciosItau = ({
       if (
         dataRecaudo?.valorTrxOriginal !== 0 &&
         convenio?.modvalor_consweb === "N" &&
-        convenio?.consultaweb === "S"
+        convenio?.consultaweb === "N"
       ) {
         valor_send = dataRecaudo?.valorTrxOriginal;
       } else if (
@@ -364,43 +364,64 @@ const PagoRecaudoServiciosItau = ({
             required
           />
           {renderReferences("initial")}
-          {tipoRecaudo === "codigoBarras" &&
-            dataCodigoBarras.pago.length > 0 && (
-              <MoneyInput
-                id="valorTrxOriginal"
-                name="valorTrxOriginal"
-                label={"Valor a pagar original"}
-                type="tel"
-                maxLength={10}
-                autoComplete="off"
-                value={dataRecaudo?.valorTrxOriginal ?? 0}
-                onInput={() => {}}
-                disabled
-                required
-                equalError={false}
-                equalErrorMin={false}
-              />
-            )}
-          {convenio.consultaweb === "N" && (
+          {tipoRecaudo === "codigoBarras" && convenio.consultaweb === "N" && (
             <MoneyInput
-              id="valorTrx"
-              name="valorTrx"
-              label={"Valor a pagar"}
+              id="valorTrxOriginal"
+              name="valorTrxOriginal"
+              label={"Valor a pagar original"}
               type="tel"
               maxLength={10}
               autoComplete="off"
-              min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
-              max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
-              value={dataRecaudo?.valorTrx ?? 0}
-              onInput={onChangeFormatNum}
-              disabled={
-                loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
-              }
+              value={dataRecaudo?.valorTrxOriginal ?? 0}
+              onInput={() => {}}
+              disabled
               required
               equalError={false}
               equalErrorMin={false}
             />
           )}
+          {convenio.consultaweb === "N" &&
+            convenio.modvalor_consweb === "S" && (
+              <MoneyInput
+                id="valorTrx"
+                name="valorTrx"
+                label={"Valor a pagar"}
+                type="tel"
+                maxLength={10}
+                autoComplete="off"
+                min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
+                max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
+                value={dataRecaudo?.valorTrx ?? 0}
+                onInput={onChangeFormatNum}
+                disabled={
+                  loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
+                }
+                required
+                equalError={false}
+                equalErrorMin={false}
+              />
+            )}
+          {convenio.consultaweb === "N" &&
+            tipoRecaudo !== "codigoBarras" && (
+              <MoneyInput
+                id="valorTrx"
+                name="valorTrx"
+                label={"Valor a pagar"}
+                type="tel"
+                maxLength={10}
+                autoComplete="off"
+                min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
+                max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
+                value={dataRecaudo?.valorTrx ?? 0}
+                onInput={onChangeFormatNum}
+                disabled={
+                  loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
+                }
+                required
+                equalError={false}
+                equalErrorMin={false}
+              />
+            )}
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
           <Button
