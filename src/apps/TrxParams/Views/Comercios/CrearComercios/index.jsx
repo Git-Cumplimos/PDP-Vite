@@ -447,6 +447,7 @@ const CrearComercios = () => {
       delete dataOrg["fecha_registro"];
       delete dataOrg["nombre_grupo_comercios"];
       delete dataOrg["ciiu_list"];
+      delete dataOrg["flag_update"];
       if (!dataOrg.fk_comercio_padre) delete dataOrg["fk_comercio_padre"];
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
@@ -913,7 +914,7 @@ const CrearComercios = () => {
             label="Número Dane ciudad"
             type="tel"
             name="dane_ciudad"
-            minLength="1"
+            minLength="5"
             maxLength="5"
             required
             value={comercio?.dane_ciudad}
@@ -930,8 +931,8 @@ const CrearComercios = () => {
             label="Número Dane departamento"
             type="tel"
             name="dane_dpto"
-            minLength="1"
-            maxLength="5"
+            minLength="2"
+            maxLength="2"
             required
             value={comercio?.dane_dpto}
             onInput={(e) => {

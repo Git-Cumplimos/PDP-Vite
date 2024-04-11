@@ -18,6 +18,7 @@ import AddressForm, {
 } from "../../../../../components/Base/AddressForm";
 import { CitySearchTable } from "../../../../../components/Compound/CitySearch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
+import { onChangeNumber } from "../../../../../utils/functions";
 
 type Props = {
   setRlPks: (_: {
@@ -234,7 +235,7 @@ const RepresentanteLegal = ({
         }
       }, []),
     },
-    { delay: 5000 }
+    { delay: 500 }
   );
 
   useEffect(() => {
@@ -275,7 +276,7 @@ const RepresentanteLegal = ({
   return (
     <Fragment>
       <Fieldset
-        legend={"Representante legal o propietario (occidente)"}
+        legend={"Representante legal o propietario"}
         className="lg:col-span-2"
       >
         <Select
@@ -306,7 +307,7 @@ const RepresentanteLegal = ({
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
-              pk_numero_identificacion_rl: ev.target.value,
+              pk_numero_identificacion_rl: onChangeNumber(ev),
             }));
             setUpdateRl(false);
           }}
@@ -370,7 +371,7 @@ const RepresentanteLegal = ({
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
-              telefono_fijo_rl: ev.target.value,
+              telefono_fijo_rl: onChangeNumber(ev),
             }));
             setUpdateRl(true);
           }}
@@ -445,18 +446,41 @@ const RepresentanteLegal = ({
           />
         )}
         {modifyCity && (
-          <CitySearchTable
-            onSelectCity={(cityInfo) => {
-              setPropietarioRL((old) => ({
-                ...old,
-                dane_municipio_rl: cityInfo.c_digo_dane_del_municipio,
-                dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
-                nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
-              }));
-              setUpdateRl(true);
-              handleClose();
-            }}
-          />
+          <Fragment>
+            <Fieldset legend={"Municipio actual"}>
+              <ul className="grid grid-flow-row gap-2 justify-center align-middle">
+                {Object.entries({
+                  "Codigo DANE departamento":
+                    propietarioRL.dane_departamento_rl,
+                  "Codigo DANE municipio": propietarioRL.dane_municipio_rl,
+                  "Nombre ciudad": propietarioRL.nombre_ciudad,
+                }).map(([key, val]) => {
+                  return (
+                    <li key={key}>
+                      <h1 className="grid grid-flow-col auto-cols-fr gap-6">
+                        <strong className="justify-self-end">{key}:</strong>
+                        <p className="justify-self-start whitespace-pre-wrap">
+                          {val}
+                        </p>
+                      </h1>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Fieldset>
+            <CitySearchTable
+              onSelectCity={(cityInfo) => {
+                setPropietarioRL((old) => ({
+                  ...old,
+                  dane_municipio_rl: cityInfo.c_digo_dane_del_municipio,
+                  dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
+                  nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
+                }));
+                setUpdateRl(true);
+                handleClose();
+              }}
+            />
+          </Fragment>
         )}
       </Modal>
     </Fragment>

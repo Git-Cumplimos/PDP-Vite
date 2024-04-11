@@ -1,10 +1,12 @@
-export type DaneCity = {
-  region: string;
+export type DaneCityShow = {
   municipio: string;
   departamento: string;
   c_digo_dane_del_departamento: string;
   c_digo_dane_del_municipio: string;
-}
+};
+export type DaneCity = DaneCityShow & {
+  region: string;
+};
 
 export type SearchFilters = Omit<DaneCity, "region"> & {
   // page: number;
@@ -147,8 +149,10 @@ export const reducerCommerceFilters = (
           // state.page === newValAll.page,
           state.municipio === newValAll.municipio,
           state.departamento === newValAll.departamento,
-          state.c_digo_dane_del_departamento === newValAll.c_digo_dane_del_departamento,
-          state.c_digo_dane_del_municipio === newValAll.c_digo_dane_del_municipio,
+          state.c_digo_dane_del_departamento ===
+            newValAll.c_digo_dane_del_departamento,
+          state.c_digo_dane_del_municipio ===
+            newValAll.c_digo_dane_del_municipio,
         ].every(Boolean)
       ) {
         return state;
