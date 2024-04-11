@@ -65,7 +65,7 @@ const ConsultaConveniosBloqueados = ({
   const selectConvenio = useCallback(
     (ev, i) => {
       ev.preventDefault();
-      navigate(`editar/${Convenios[i]?.id_convenio}`);
+      navigate(`${Convenios[i]?.id_convenio}`);
     },
     [
       Convenios,

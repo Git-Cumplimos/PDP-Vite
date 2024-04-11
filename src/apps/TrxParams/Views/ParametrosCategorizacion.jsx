@@ -45,6 +45,7 @@ const ParametrosCategorizacion = () => {
     edit: false,
     subcategorias: [],
   });
+  const [editClone, setEditClone] = useState({});
   const tableCategorias = useMemo(() => {
     return [
       ...categorias.map((cat) => {
@@ -104,6 +105,21 @@ const ParametrosCategorizacion = () => {
       const selected = categorias[i];
       // console.log(selected);
       setSelectedCategoria({
+        id_categoria: selected.id_categoria,
+        fk_zona: selected.fk_zona,
+        nombre: selected.nombre,
+        img_url: selected.img_url,
+        subcategorias: [
+          ...selected.subcategorias.map((sub) => {
+            return {
+              ...sub,
+              deletion: false,
+            };
+          }),
+        ],
+        edit: true,
+      });
+      setEditClone({
         id_categoria: selected.id_categoria,
         fk_zona: selected.fk_zona,
         nombre: selected.nombre,
@@ -214,6 +230,16 @@ const ParametrosCategorizacion = () => {
     const subcategoriasNamesSet = new Set(subcategoriasNames);
     if (subcategoriasNames.length !== subcategoriasNamesSet.size) {
       notifyError("No pueden existir subcategorias con el mismo nombre");
+      return;
+    }
+    // Validar que no tenga espacios al inicio y al final
+    if (
+      selectedCategoria.nombre.trim() !== selectedCategoria.nombre ||
+      selectedCategoria.subcategorias.some(
+        (sub) => sub.nombre.trim() !== sub.nombre
+      )
+    ) {
+      notifyError("No puede haber espacios al inicio o al final del nombre");
       return;
     }
     const formData = new FormData();
@@ -375,6 +401,16 @@ const ParametrosCategorizacion = () => {
     const subcategoriasNamesSet = new Set(subcategoriasNames);
     if (subcategoriasNames.length !== subcategoriasNamesSet.size) {
       notifyError("No pueden existir subcategorias con el mismo nombre");
+      return;
+    }
+    // Validar que no tenga espacios al inicio y al final
+    if (
+      selectedCategoria.nombre.trim() !== selectedCategoria.nombre ||
+      selectedCategoria.subcategorias.some(
+        (sub) => sub.nombre.trim() !== sub.nombre
+      )
+    ) {
+      notifyError("No puede haber espacios al inicio o al final del nombre");
       return;
     }
     const formData = new FormData();
@@ -581,7 +617,7 @@ const ParametrosCategorizacion = () => {
           <Input
             id="Nombre categoria"
             name="nombre"
-            label={"Nombre categoria"}
+            label={"Nombre categoría"}
             type="text"
             autoComplete="off"
             value={selectedCategoria.nombre}
@@ -607,7 +643,7 @@ const ParametrosCategorizacion = () => {
             }}
           />
           <FileInput
-            id="Imagen categoria"
+            id="Imagen categoría"
             name="img_url"
             label={"Seleccionar imagen"}
             type="file"
@@ -638,7 +674,7 @@ const ParametrosCategorizacion = () => {
                     ? URL.createObjectURL(selectedCategoria?.img_url[0])
                     : ""
                 }
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -655,7 +691,7 @@ const ParametrosCategorizacion = () => {
             <div className="flex flex-col items-center justify-center">
               <img
                 src={selectedCategoria.img_url}
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -671,7 +707,7 @@ const ParametrosCategorizacion = () => {
                     ? URL.createObjectURL(selectedCategoria?.img_url[0])
                     : ""
                 }
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -688,7 +724,7 @@ const ParametrosCategorizacion = () => {
               JPG
             </p>
           )}
-          <Fieldset legend="Sub-Categorias">
+          <Fieldset legend="Sub-Categorías">
             {selectedCategoria.subcategorias?.map(
               (subcategoria, index) =>
                 !subcategoria.deletion && (
@@ -697,7 +733,7 @@ const ParametrosCategorizacion = () => {
                       key={index}
                       id="Nombre sub-categoria"
                       name="nombre"
-                      label={"Nombre sub-categoria"}
+                      label={"Nombre sub-categoría"}
                       type="text"
                       autoComplete="off"
                       value={subcategoria.nombre}
@@ -723,12 +759,13 @@ const ParametrosCategorizacion = () => {
                       label={"Seleccionar imagen"}
                       type="file"
                       autoComplete="off"
+                      disabled={subcategoria.nombre === ""}
                       // required={selectedCategoria.edit ? false : true}
                       onGetFile={(file) => {
                         // console.log(file);
                         if (subcategoria.nombre === "") {
                           notifyError(
-                            "Primero debe ingresar un nombre para la subcategoria"
+                            "Primero debe ingresar un nombre para la sub-categoría"
                           );
                           return;
                         }
@@ -772,7 +809,7 @@ const ParametrosCategorizacion = () => {
                               ? URL.createObjectURL(subcategoria.img_url[0])
                               : ""
                           }
-                          alt="Imagen sub-categoria"
+                          alt="Imagen sub-categoría"
                           width="100"
                           height="100"
                           className="max-w-xs"
@@ -800,7 +837,7 @@ const ParametrosCategorizacion = () => {
                               ? URL.createObjectURL(subcategoria.img_url[0])
                               : ""
                           }
-                          alt="Imagen sub-categoria"
+                          alt="Imagen sub-categoría"
                           width="100"
                           height="100"
                           className="max-w-xs"
@@ -896,7 +933,7 @@ const ParametrosCategorizacion = () => {
                   }));
                 }}
               >
-                Crear sub-categoria
+                Crear sub-categoría
               </Button>
             </ButtonBar>
           </Fieldset>
@@ -909,12 +946,18 @@ const ParametrosCategorizacion = () => {
             )} */}
             <Button
               type="button"
-              disabled={!selectedCategoria.img_url.length}
               onClick={handleClose}
             >
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button
+              type="submit"
+              disabled={
+                selectedCategoria.edit &&
+                // Validar que se hayan hecho cambios
+                JSON.stringify(selectedCategoria) === JSON.stringify(editClone)
+              }
+            >
               {selectedCategoria.edit ? "Editar la información" : "Aceptar"}
             </Button>
           </ButtonBar>

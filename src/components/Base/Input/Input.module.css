@@ -26,6 +26,23 @@
   min-width: 100px;
 }
 
+.formItem > div > label > input[type="radio"] {
+  visibility: hidden;
+}
+
+.custom_radiobutton {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  @apply bg-secondary-light border-solid border-primary border-2;
+}
+.formItem > div > label > input[type="radio"]:checked + .custom_radiobutton {
+  border: 2px solid bg-primary;
+  @apply bg-primary;
+}
+
 .formItem > div > input:disabled {
   @apply bg-gray-100;
 }

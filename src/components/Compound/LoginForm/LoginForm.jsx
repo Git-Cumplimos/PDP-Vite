@@ -307,10 +307,10 @@ const LoginForm = () => {
         <hr />
         <form
           onSubmit={
-            auth.parameters.name === "" ? handleChangePW : handleChangeExisting
+            !auth.parameters?.name ? handleChangePW : handleChangeExisting
           }
         >
-          {auth.parameters.name === "" && (
+          {!auth.parameters?.name && (
             <Fragment>
               <div className={field}>
                 <label htmlFor="names">Nombres:</label>

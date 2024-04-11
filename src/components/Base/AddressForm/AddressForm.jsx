@@ -27,7 +27,7 @@ const mainStreetTypes = [
   { label: "Vía", value: "VI" },
 ];
 
-const initialAddress = {
+export const initialAddress = {
   mainStreet: {
     name: "",
     number: "",
@@ -185,8 +185,8 @@ const reducerAddress = (addressState, action) => {
 
 const AddressForm = ({
   onCancel = () => {},
-  onSuccess = () => {},
-  editAddress = null,
+  onSuccess = (_, __) => {},
+  editAddress = initialAddress,
 }) => {
   const [addressState, dispatch] = useReducer(
     reducerAddress,
@@ -205,7 +205,11 @@ const AddressForm = ({
         });
         return;
       }
-      if ([UPDATE_SECONDARY_STREET_NUMBER, UPDATE_THIRD_STREET_NUMBER].includes(ev.target.name)) {
+      if (
+        [UPDATE_SECONDARY_STREET_NUMBER, UPDATE_THIRD_STREET_NUMBER].includes(
+          ev.target.name
+        )
+      ) {
         dispatch({ type: ev.target.name, payload: onChangeNumber(ev) });
         return;
       }
@@ -215,16 +219,7 @@ const AddressForm = ({
   );
 
   return (
-    <form
-      className="grid grid-flow-row gap-2 my-4"
-      onSubmit={useCallback(
-        (ev) => {
-          ev.preventDefault();
-          onSuccess?.(buildAddress(addressState), addressState);
-        },
-        [onSuccess, addressState]
-      )}
-    >
+    <div className="grid grid-flow-row gap-2 my-4">
       {!diffTypes.includes(addressState.mainStreet.name) ? (
         <Fragment>
           <div className="grid grid-cols-6 gap-2">
@@ -496,9 +491,22 @@ const AddressForm = ({
         >
           Limpiar
         </Button>
-        <Button type="submit">Aceptar</Button>
+        <Button
+          design="primary"
+          type="button"
+          onClick={useCallback(
+            (ev) => {
+              ev.stopPropagation();
+              ev.preventDefault();
+              onSuccess?.(buildAddress(addressState), addressState);
+            },
+            [onSuccess, addressState]
+          )}
+        >
+          Aceptar
+        </Button>
       </ButtonBar>
-    </form>
+    </div>
   );
 };
 

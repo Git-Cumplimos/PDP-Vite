@@ -34,7 +34,7 @@ const routesItau = {
       permission: [enumPermisosConveniosItau.BLOQUEOS_CONVENIOS_ITAU],
     },
     {
-      link: "/GestionTransaccional/bloqueo-convenios-itau/editar/:id",
+      link: "/GestionTransaccional/bloqueo-convenios-itau/:id",
       label: <AppIcons Logo={"BLOQUEO_CONVENIOS_ITAU"} name={"Bloqueo Convenios Itaú"} />,
       component: CrearBloqueoConveniosItau,
       permission: [enumPermisosConveniosItau.BLOQUEOS_CONVENIOS_ITAU],

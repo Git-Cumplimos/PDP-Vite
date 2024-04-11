@@ -83,10 +83,16 @@ const CrearBloqueoItau = () => {
             notify(res?.msg)
             navigate("/GestionTransaccional/bloqueo-convenios-itau")
           }else{
-            notifyError(res?.msg);
+            if (res?.msg.includes("SchemaError:")) {
+              const msg = res?.msg.replace("SchemaError:", "");
+              notifyError(msg);
+            } else {
+              notifyError(res?.msg);
+            }
           }
         })
         .catch((err) => {
+          console.log(err)
           if (err?.cause === "custom") {
             notifyError(err?.message);
             return;
@@ -178,7 +184,7 @@ const CrearBloqueoItau = () => {
   return (
     <>
       <Fragment>
-        <h1 className="text-3xl text-center">Bloqueo Convenios Itaú</h1>
+        <h1 className="text-3xl mt-10 mb-8">Bloqueo Convenios Itaú</h1>
         <Fieldset legend={"Bloquear Convenio"} className={"lg:col-span-2"}>
           <Input
             id='id_convenio'

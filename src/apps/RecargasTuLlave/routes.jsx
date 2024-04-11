@@ -64,7 +64,7 @@ export const rutasGestionRecargasTullave = {
           show: false,
         },
         {
-          link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos/editar/:id",
+          link: "/GestionTransaccional/recargas-tu-llave/gestion-datafonos/:id",
           label: <AppIcons Logo={"RECAUDO"} name={"Editar datáfono"} />,
           component: CreateDatafono,
           permission: [enumPermisosTuLlaveAdmin.GESTION_DATAFONOS_TULLAVE],
@@ -114,7 +114,10 @@ const rutasRecargasTullave = {
     {
       link: "/recargas-tu-llave/consolidacion-trx",
       label: (
-        <AppIcons Logo={"TULLAVE_GESTION_DATAFONO"} name="Transacciones Recarga Tarjeta Datafonos" />
+        <AppIcons
+          Logo={"TULLAVE_GESTION_DATAFONO"}
+          name="Transacciones Recarga Tarjeta Datafonos"
+        />
       ),
       component: ReporteTuLLaveTrx,
       permission: [enumPermisosTuLlave.CONSOLIDACION_TULLAVE],
