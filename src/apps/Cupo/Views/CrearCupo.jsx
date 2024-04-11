@@ -62,14 +62,14 @@ const CrearCupo = () => {
       setSummary({
         "Id del comercio": idComercio,
         "Sobregiro": formatMoney.format(sobregiro),
-        Deuda: formatMoney.format(deuda),
-        "Cupo en canje": formatMoney.format(canje),
+        "Cartera": formatMoney.format(deuda), // Deuda
+        "Deuda": formatMoney.format(canje), // Cupo en canje
         "Base de caja": formatMoney.format(baseCaja),
         "Dias máximos de sobregiro": diasMaxSobregiro,
       });
       // } else {
       //   notifyError(
-      //     "Los campos sobregiro, deuda o cupo en canje no pueden ser cero"
+      //     "Los campos sobregiro, cartera o deuda no pueden ser cero"
       //   );
       // }
     },
@@ -205,7 +205,7 @@ const CrearCupo = () => {
         <MoneyInput
           id="deuda" // cartera
           name="deuda" // cartera
-          label="Cartera"
+          label="Cartera" // Deuda
           autoComplete="off"
           maxLength={"14"}
           min={limitesMontos?.min}
@@ -218,7 +218,7 @@ const CrearCupo = () => {
         <MoneyInput
           id="cupo_canje"
           name="cupo_canje"
-          label="Cupo en canje"
+          label="Deuda" // Cupo en canje
           autoComplete="off"
           maxLength={"14"}
           min={limitesMontos?.min}

@@ -503,7 +503,7 @@ const AdminLayout = () => {
               <Input
                 id="cupo_en_canje"
                 name="cupo_en_canje"
-                label="Cupo en canje"
+                label="Deuda" // Cupo en canje
                 autoComplete="off"
                 value={
                   formatMoney.format(

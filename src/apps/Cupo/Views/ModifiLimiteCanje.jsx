@@ -198,7 +198,7 @@ const ModifiLimiteCanje = () => {
             <MoneyInput
               id="cupo_en_canje"
               name="cupo_en_canje"
-              label="Cupo en canje"
+              label="Deuda" // Cupo en canje
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
