@@ -386,7 +386,10 @@ export const useProvideAuth = () => {
               Error http: {response.statusText} ({response.status})
             </p>
           );
-          return;
+          throw new Error(
+            `Error consultando el servicio de verificacion de token: Error http: ${response.statusText} (${response.status})`,
+            { cause: "custom" }
+          );
         }
         const resJson = await response.json();
         if (!resJson?.status) {
@@ -454,7 +457,11 @@ export const useProvideAuth = () => {
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
-        await verifyTOTP(totp);
+        try {
+          await verifyTOTP(totp);
+        } catch (error) {
+          throw error;
+        }
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);

@@ -89,7 +89,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
   return (
     <Fragment>
       <Fieldset
-        legend={"Recuperar QR y contraseña usuario (Danger zone)"}
+        legend={"Recuperar QR y contraseña usuario"}
         className={"lg:col-span-2"}
       >
         <ToggleInput
