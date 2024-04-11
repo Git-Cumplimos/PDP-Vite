@@ -18,6 +18,7 @@ import AddressForm, {
 } from "../../../../../components/Base/AddressForm";
 import { CitySearchTable } from "../../../../../components/Compound/CitySearch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
+import { onChangeNumber } from "../../../../../utils/functions";
 
 type Props = {
   setRlPks: (_: {
@@ -234,7 +235,7 @@ const RepresentanteLegal = ({
         }
       }, []),
     },
-    { delay: 5000 }
+    { delay: 500 }
   );
 
   useEffect(() => {
@@ -245,12 +246,15 @@ const RepresentanteLegal = ({
   }, [pdpUser]);
 
   useEffect(() => {
-    setRlPks({
-      pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
-      pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
-    });
+    if (propietarioRLExists) {
+      setRlPks({
+        pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
+        pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
+      });
+    }
   }, [
     setRlPks,
+    propietarioRLExists,
     propietarioRL.pk_numero_identificacion_rl,
     propietarioRL.pk_tipo_identificacion_rl,
   ]);
@@ -272,7 +276,7 @@ const RepresentanteLegal = ({
   return (
     <Fragment>
       <Fieldset
-        legend={"Representante legal o propietario (occidente)"}
+        legend={"Representante legal o propietario"}
         className="lg:col-span-2"
       >
         <Select
@@ -291,7 +295,6 @@ const RepresentanteLegal = ({
             }));
             setUpdateRl(false);
           }}
-          required
         />
         <Input
           label="Número de identificación"
@@ -300,12 +303,11 @@ const RepresentanteLegal = ({
           type="tel"
           minLength={5}
           maxLength={12}
-          required
           value={propietarioRL.pk_numero_identificacion_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
-              pk_numero_identificacion_rl: ev.target.value,
+              pk_numero_identificacion_rl: onChangeNumber(ev),
             }));
             setUpdateRl(false);
           }}
@@ -318,7 +320,6 @@ const RepresentanteLegal = ({
           type="text"
           minLength={1}
           maxLength={40}
-          required
           value={propietarioRL.nombre_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -336,7 +337,6 @@ const RepresentanteLegal = ({
           type="text"
           minLength={1}
           maxLength={40}
-          required
           value={propietarioRL.apellido_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -367,12 +367,11 @@ const RepresentanteLegal = ({
           type="tel"
           minLength={1}
           maxLength={10}
-          required
           value={propietarioRL.telefono_fijo_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
-              telefono_fijo_rl: ev.target.value,
+              telefono_fijo_rl: onChangeNumber(ev),
             }));
             setUpdateRl(true);
           }}
@@ -391,7 +390,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyCity(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required
         />
         <Input
           label="Dirección"
@@ -406,7 +404,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyAddress(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required
         />
         <Input
           label="Barrio"
@@ -415,7 +412,6 @@ const RepresentanteLegal = ({
           type="text"
           minLength={4}
           maxLength={20}
-          required
           value={propietarioRL.barrio_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
@@ -450,18 +446,41 @@ const RepresentanteLegal = ({
           />
         )}
         {modifyCity && (
-          <CitySearchTable
-            onSelectCity={(cityInfo) => {
-              setPropietarioRL((old) => ({
-                ...old,
-                dane_municipio_rl: cityInfo.c_digo_dane_del_municipio,
-                dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
-                nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
-              }));
-              setUpdateRl(true);
-              handleClose();
-            }}
-          />
+          <Fragment>
+            <Fieldset legend={"Municipio actual"}>
+              <ul className="grid grid-flow-row gap-2 justify-center align-middle">
+                {Object.entries({
+                  "Codigo DANE departamento":
+                    propietarioRL.dane_departamento_rl,
+                  "Codigo DANE municipio": propietarioRL.dane_municipio_rl,
+                  "Nombre ciudad": propietarioRL.nombre_ciudad,
+                }).map(([key, val]) => {
+                  return (
+                    <li key={key}>
+                      <h1 className="grid grid-flow-col auto-cols-fr gap-6">
+                        <strong className="justify-self-end">{key}:</strong>
+                        <p className="justify-self-start whitespace-pre-wrap">
+                          {val}
+                        </p>
+                      </h1>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Fieldset>
+            <CitySearchTable
+              onSelectCity={(cityInfo) => {
+                setPropietarioRL((old) => ({
+                  ...old,
+                  dane_municipio_rl: cityInfo.c_digo_dane_del_municipio,
+                  dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
+                  nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
+                }));
+                setUpdateRl(true);
+                handleClose();
+              }}
+            />
+          </Fragment>
         )}
       </Modal>
     </Fragment>
