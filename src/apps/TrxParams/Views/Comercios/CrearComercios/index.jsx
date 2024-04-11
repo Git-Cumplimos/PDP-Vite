@@ -447,15 +447,10 @@ const CrearComercios = () => {
       delete dataOrg["fecha_registro"];
       delete dataOrg["nombre_grupo_comercios"];
       delete dataOrg["ciiu_list"];
-      delete dataOrg["flag_update"];
       if (!dataOrg.fk_comercio_padre) delete dataOrg["fk_comercio_padre"];
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
-      if (!dataOrg.fk_tipo_identificacion_rl)
-        delete dataOrg["fk_tipo_identificacion_rl"];
-      if (!dataOrg.fk_numero_identificacion_rl)
-        delete dataOrg["fk_numero_identificacion_rl"];
       if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0)
         dataOrg.alert_cupo = "";
       if (pk_comercio_handled) {

@@ -22,8 +22,8 @@ import { onChangeNumber } from "../../../../../utils/functions";
 
 type Props = {
   setRlPks: (_: {
-    pk_tipo_identificacion_rl: number;
-    pk_numero_identificacion_rl: string;
+    pk_tipo_identificacion_rl?: number;
+    pk_numero_identificacion_rl?: string;
   }) => void;
   fk_tipo_identificacion_rl?: number | null;
   fk_numero_identificacion_rl?: string | null;
@@ -251,6 +251,11 @@ const RepresentanteLegal = ({
         pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
         pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
       });
+    } else if (!propietarioRL.pk_tipo_identificacion_rl && !propietarioRL.pk_numero_identificacion_rl) {
+      setRlPks({
+        pk_numero_identificacion_rl: undefined,
+        pk_tipo_identificacion_rl: undefined,
+      });
     }
   }, [
     setRlPks,
@@ -287,12 +292,18 @@ const RepresentanteLegal = ({
           options={docTypesRL ?? []}
           value={propietarioRL.pk_tipo_identificacion_rl ?? ""}
           onChange={(ev: ChangeEvent<HTMLSelectElement>) => {
-            setPropietarioRL((old) => ({
-              ...old,
-              pk_tipo_identificacion_rl: ev.target.value
-                ? parseInt(ev.target.value)
-                : 0,
-            }));
+            setPropietarioRL((old) => {
+              if (!ev.target.value && !old.pk_numero_identificacion_rl) {
+                setPropietarioRLExists(false);
+                return initialPropietarioRL;
+              }
+              return {
+                ...old,
+                pk_tipo_identificacion_rl: ev.target.value
+                  ? parseInt(ev.target.value)
+                  : 0,
+              };
+            });
             setUpdateRl(false);
           }}
         />
@@ -305,10 +316,17 @@ const RepresentanteLegal = ({
           maxLength={12}
           value={propietarioRL.pk_numero_identificacion_rl}
           onChange={(ev) => {
-            setPropietarioRL((old) => ({
-              ...old,
-              pk_numero_identificacion_rl: onChangeNumber(ev),
-            }));
+            setPropietarioRL((old) => {
+              const parsedValue = onChangeNumber(ev);
+              if (!parsedValue && !old.pk_tipo_identificacion_rl) {
+                setPropietarioRLExists(false);
+                return initialPropietarioRL;
+              }
+              return {
+                ...old,
+                pk_numero_identificacion_rl: parsedValue,
+              };
+            });
             setUpdateRl(false);
           }}
           autoComplete="off"
