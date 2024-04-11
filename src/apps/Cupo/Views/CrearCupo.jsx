@@ -203,9 +203,9 @@ const CrearCupo = () => {
           required
         />
         <MoneyInput
-          id="deuda"
-          name="deuda"
-          label="Deuda"
+          id="deuda" // cartera
+          name="deuda" // cartera
+          label="Cartera"
           autoComplete="off"
           maxLength={"14"}
           min={limitesMontos?.min}

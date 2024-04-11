@@ -201,7 +201,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Ajuste deuda cupo</h1>
+      <h1 className="text-3xl mt-6">Ajuste credito cupo</h1>
       <Form onSubmit={onSubmitBusqueda} grid>
         <ButtonBar className={"lg  col-span-2"}>
           <Button
@@ -255,28 +255,28 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 disabled={true}
                 required
               />
-              <MoneyInput
-                id="deuda"
-                name="deuda"
-                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
+              {/* <MoneyInput
+                id="deuda" // cartera
+                name="deuda" // cartera
+                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={parseInt(cupoComer[0]?.deuda)}
                 disabled={true}
                 required
-              />
-              {/* <Input
-                id="deuda"
-                name="deuda"
-                label="Deuda del comercio"
+              /> */}
+              <Input
+                id="deuda" // cartera
+                name="deuda" // cartera
+                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
                 disabled={true}
                 required
-              /> */}
+              />
               <MoneyInput
                 id="cupo_en_canje"
                 name="cupo_en_canje"

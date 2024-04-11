@@ -1,7 +1,7 @@
 import { ExportToCsv } from "export-to-csv";
 
 const formatoCupoMasivo = [
-    ["pk_comercio", "sobregiro", "deuda", "cupo_en_canje", "dias_max_sobregiro", "base_caja"],
+    ["pk_comercio", "sobregiro", "cartera", "cupo_en_canje", "dias_max_sobregiro", "base_caja"],
     [1, 1500, 1000, 0, 1, 0],
     [2, 2500, 2000, 0, 2, 0],
     [3, 3500, 3000, 0, 3, 0],

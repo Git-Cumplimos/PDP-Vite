@@ -185,13 +185,13 @@ const ModifiLimiteCanje = () => {
         ) : (
           <>
             <Input
-              id="deuda"
-              name="deuda"
-              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
+              id="deuda" // cartera
+              name="deuda" // cartera 
+              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={formatMoney.format(Math.abs(parseInt(cupoComer[0]?.deuda))) ?? 0}
+              value={formatMoney.format(parseInt(cupoComer[0]?.deuda)) ?? 0}
               disabled={true}
               required
               />

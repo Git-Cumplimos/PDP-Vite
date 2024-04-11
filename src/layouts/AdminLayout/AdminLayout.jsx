@@ -485,17 +485,17 @@ const AdminLayout = () => {
                 disabled={true}
               />
               {/* <Input
-                id="deuda"
-                name="deuda"
+                id="deuda" // cartera
+                name="deuda" // cartera
                 label={
                   parseInt(cupoComercio[0]?.deuda) >= 1
-                    ? "Deuda al comercio"
-                    : "Deuda del comercio"
+                    ? "Cartera al comercio"
+                    : "Cartera del comercio"
                 }
                 autoComplete="off"
                 value={
                   formatMoney.format(
-                    Math.abs(parseInt(cupoComercio[0]?.deuda))
+                    parseInt(cupoComercio[0]?.deuda)
                   ) ?? 0
                 }
                 disabled={true}
