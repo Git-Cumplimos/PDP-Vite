@@ -452,8 +452,10 @@ const CrearComercios = () => {
       if (!dataOrg.fk_id_tipo_contrato) delete dataOrg["fk_id_tipo_contrato"];
       if (!dataOrg.tipo_pago_comision) delete dataOrg["tipo_pago_comision"];
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
-      if (!dataOrg.fk_tipo_identificacion_rl) delete dataOrg["fk_tipo_identificacion_rl"];
-      if (!dataOrg.fk_numero_identificacion_rl) delete dataOrg["fk_numero_identificacion_rl"];
+      if (!dataOrg.fk_tipo_identificacion_rl)
+        delete dataOrg["fk_tipo_identificacion_rl"];
+      if (!dataOrg.fk_numero_identificacion_rl)
+        delete dataOrg["fk_numero_identificacion_rl"];
       if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0)
         dataOrg.alert_cupo = "";
       if (pk_comercio_handled) {
@@ -769,34 +771,20 @@ const CrearComercios = () => {
             value={
               comercio?.comercio_padre ? comercio?.comercio_padre : "Vacio"
             }
-            info={
-              <button
-                type="button"
-                style={{
-                  position: "absolute",
-                  top: "-33px",
-                  right: "-235px",
-                  fontSize: "15px",
-                  padding: "5px",
-                  backgroundColor: "#e26c22",
-                  color: "white",
-                  borderRadius: "5px",
-                }}
-                onClick={(e) => {
-                  if (comercio?.comercio_padre) {
-                    setComercio((old) => ({
-                      ...old,
-                      fk_comercio_padre: null,
-                      comercio_padre: "",
-                    }));
-                  } else {
-                    handleShowModal();
-                  }
-                }}
-              >
-                {comercio?.comercio_padre ? "Eliminar" : "Agregar comercio"}
-              </button>
-            }
+            actionBtn={{
+              label: comercio?.comercio_padre ? "Eliminar" : "Agregar comercio",
+              callback: (e) => {
+                if (comercio?.comercio_padre) {
+                  setComercio((old) => ({
+                    ...old,
+                    fk_comercio_padre: null,
+                    comercio_padre: "",
+                  }));
+                } else {
+                  handleShowModal();
+                }
+              },
+            }}
             disabled
           />
           {Boolean(pk_comercio_handled) && (
@@ -1158,35 +1146,21 @@ const CrearComercios = () => {
                       required
                       autoComplete="off"
                       value={comercio?.codigos_institucionales[key]}
-                      info={
-                        <button
-                          type="button"
-                          style={{
-                            position: "absolute",
-                            top: "-33px",
-                            right: "-235px",
-                            fontSize: "15px",
-                            padding: "5px",
-                            backgroundColor: "#e26c22",
-                            color: "white",
-                            borderRadius: "5px",
-                          }}
-                          onClick={() => {
-                            const rest = {
-                              ...comercio?.codigos_institucionales,
+                      actionBtn={{
+                        label: "Eliminar",
+                        callback: () => {
+                          const rest = {
+                            ...comercio?.codigos_institucionales,
+                          };
+                          delete rest[key];
+                          setComercio((old) => {
+                            return {
+                              ...old,
+                              codigos_institucionales: rest,
                             };
-                            delete rest[key];
-                            setComercio((old) => {
-                              return {
-                                ...old,
-                                codigos_institucionales: rest,
-                              };
-                            });
-                          }}
-                        >
-                          Eliminar
-                        </button>
-                      }
+                          });
+                        },
+                      }}
                       onInput={(e) => {
                         setComercio((old) => {
                           return {
