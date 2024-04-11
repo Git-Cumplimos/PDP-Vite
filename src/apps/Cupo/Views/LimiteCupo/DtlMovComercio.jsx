@@ -157,8 +157,8 @@ const DtlMovComercio = () => {
           "Valor afectación",
           "Fecha afectación",
           "Hora afectación",
-          "Deuda actual",
-          "Cupo canje",
+          "Cartera actual", // Deuda
+          "Deuda", // Cupo canje
           "Usuario",
           "Id transacción",
           "Descripción afectación",

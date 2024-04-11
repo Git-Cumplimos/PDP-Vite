@@ -794,8 +794,8 @@ const allUrlsPrivateApps = [
         permission: [62],
       },
       {
-        link: "/cupo/ajuste-deuda-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        link: "/cupo/ajuste-cartera-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste cartera cupo"} />,
         component: AjusteCupo,
         permission: [59],
       },
