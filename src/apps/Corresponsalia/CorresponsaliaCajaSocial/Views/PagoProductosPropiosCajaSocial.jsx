@@ -227,6 +227,12 @@ const PagoProductosPropiosCajaSocial = () => {
       } else if (dataPago.tipoPago === "3") {
         valorAPagar = dataPago.valorDiferentePagoProductosPropios;
       }
+      if (valorAPagar < resConsulta?.trn?.totalCurAmt?.amt)
+        return notifyError(
+          `El valor de la transacción debe ser menor de  ${formatMoney.format(
+            enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+          )}`
+        );
       if (
         valorAPagar <
           enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL ||
