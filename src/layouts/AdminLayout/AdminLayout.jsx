@@ -92,7 +92,11 @@ const AdminLayout = () => {
   );
 
   const valorMinConsignar = useMemo(() => {
-    let val = ((quotaInfo?.sobregirovalue ?? 0)-(quotaInfo?.quota ?? 0)) + (quotaInfo?.deuda ?? 0 * -1)
+    let val = (
+      (parseFloat(quotaInfo?.sobregirovalue) ?? 0)-(parseFloat(quotaInfo?.quota) ?? 0)
+    ) + (
+      (parseFloat(quotaInfo?.deuda) ?? 0) * -1
+    )
     if (val < 0) val = 0
     return formatMoney.format(val);
   }, [

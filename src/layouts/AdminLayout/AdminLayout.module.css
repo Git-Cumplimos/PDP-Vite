@@ -32,7 +32,7 @@ header.headerPDP .usrData > .diasSobregiro {
   @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
 }
 header.headerPDP .usrData > .valMinConsignar {
-  max-width: 15.75rem;
+  max-width: 16rem;
   @apply rounded-full px-6 bg-primary-light text-white mx-2 text-center;
 }
 
