@@ -163,11 +163,9 @@ const ParametrizacionRecaudo = () => {
       }if (selectedEntity?.parametros.monto_minimo === 0 || selectedEntity?.parametros.monto_minimo === undefined) {
         delete selectedEntity.parametros.monto_minimo
       }
-      if (comision === false || (comision === true && (comisionFija !== 0 || comisionPorcent !== ''))){
+
+      if (comision === false || (comision === true && (comisionFija !== 0 || (comisionPorcent !== '' && comisionPorcent !== 0)))){
           if (validate) {
-            if (comisionFija !== 0 && comisionPorcent !== '') {
-              notifyError('Se configura una comisión fija y porcentual')
-            }
             notifyPending(
               editarEntidades(
                 {
@@ -296,6 +294,12 @@ const ParametrizacionRecaudo = () => {
       setComision(null)
     }
   };
+
+  useEffect(() => {
+    if (comisionFija !== 0 && (comisionPorcent !== '' && comisionPorcent !== 0)) {
+      notifyError('Esta configurando una comisión fija y porcentual')
+    }
+  }, [comisionFija,comisionPorcent]);
 
   return (
     <Fragment>
