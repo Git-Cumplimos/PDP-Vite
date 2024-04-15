@@ -126,7 +126,14 @@ const Retiro = () => {
             });
             return notifyError("Ingrese un código OTP válido de 8 dígitos");
           }
-          else {
+          if (dataRetiro?.valorRetiro % 10000 !== 0) {
+            setDataRetiro((old) => {
+              return { ...old, valorRetiro: 0 };
+            });
+            return notifyError(
+              "El valor a retirar debe ser múltiplo de $10.000"
+            );
+          } else {
             setEstadoPeticion(1);
             setShowModal(true);
           }
