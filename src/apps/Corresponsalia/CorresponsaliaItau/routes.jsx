@@ -32,6 +32,10 @@ const SeleccionConvenioRecaudoServiciosItau = lazy(() =>
   )
 );
 
+const RetiroItau = lazy(() =>
+  import("./Views/TrxCuentas/Retiro")
+);
+
 export const listPermissionsItau = Object.values(enumPermisosItau);
 
 const rutasItauCB = {
@@ -82,6 +86,12 @@ const rutasItauCB = {
           show: false,
         },
       ],
+    },
+    {
+      link: "/corresponsalia/corresponsalia-itau/retiro",
+      label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
+      component: RetiroItau,
+      permission: [enumPermisosItau.RETIRO_ITAU],
     },
   ],
 };
