@@ -64,7 +64,6 @@ const Retiro = () => {
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
-      console.log(data);
       notifyPending(
         peticionRetiro(data, dataAditional),
         {
