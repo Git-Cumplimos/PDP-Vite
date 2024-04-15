@@ -1,10 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFetch } from "../../../../../hooks/useFetch";
-import { fetchCustom } from "../../utils/fetchItau";
+import { fetchCustom, postConsultaConveniosItau } from "../../utils/fetchItau";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Input from "../../../../../components/Base/Input";
-import { notifyPending } from "../../../../../utils/notify";
+import {
+  notify,
+  notifyPending,
+  notifyError,
+} from "../../../../../utils/notify";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 
 const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
@@ -29,7 +33,7 @@ const SeleccionConvenioRecaudoServiciosItau = () => {
   const [loadingPeticionConsultaConvenio, peticionConsultaConvenio] = useFetch(
     fetchCustom(URL_CONSULTA_CONVENIO, "POST", "Consulta convenio")
   );
-  
+
   useEffect(() => {
     consultaConveniosItau();
   }, [dataConvenios.filterConvenio, limit, page]);
@@ -50,30 +54,23 @@ const SeleccionConvenioRecaudoServiciosItau = () => {
           sortBy: "codigo_convenio",
           sortDir: "DESC",
         };
-        notifyPending(
-          peticionConsultaConvenio({}, data),
-          {
-            render: () => {
-              return "Procesando consulta";
-            },
-          },
-          {
-            render: ({ data: res }) => {
+        postConsultaConveniosItau(data)
+          .then((res) => {
+            if (res?.status) {
               setDataConvenios((old) => {
                 return { ...old, convenios: res.obj.results ?? [] };
               });
               setMaxPages(res.obj.maxPages ?? 0);
-              return res?.msg ?? "Consulta satisfactoria";
-            },
-          },
-          {
-            render: ({ data: error }) => {
+            } else {
+              notifyError(res?.msg);
               validNavigate(-1);
-              return error?.message ?? "Consulta fallida";
-            },
-          }
-          // { toastId: "1" }
-        );
+            }
+          })
+          .catch((err) => {
+            validNavigate(-1);
+            notifyError("No se ha podido conectar al servidor");
+            console.error(err);
+          });
       },
       [dataConvenios, limit, page]
     ),

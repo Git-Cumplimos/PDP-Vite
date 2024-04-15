@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFetch } from "../../../../../hooks/useFetch";
-import { fetchCustom } from "../../utils/fetchItau";
+import { fetchCustom, postConsultaConveniosItau } from "../../utils/fetchItau";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Input from "../../../../../components/Base/Input";
 import { notifyError, notifyPending } from "../../../../../utils/notify";
@@ -35,27 +35,20 @@ const RecaudoManualServiciosItau = () => {
       sortBy: "codigo_convenio",
       sortDir: "DESC",
     };
-    notifyPending(
-      peticionConsultaConvenio({}, obj),
-      {
-        render: () => {
-          return "Procesando consulta";
-        },
-      },
-      {
-        render: ({ data: res }) => {
+    postConsultaConveniosItau(obj)
+      .then((res) => {
+        if (res?.status) {
           setDataConvenio(res.obj.results ?? []);
-          return res?.msg ?? "Consulta satisfactoria";
-        },
-      },
-      {
-        render: ({ data: error }) => {
+        } else {
+          notifyError(res?.msg);
           validNavigate(-1);
-          return error?.message ?? "Consulta fallida";
-        },
-      },
-      { toastId: "1" }
-    );
+        }
+      })
+      .catch((err) => {
+        validNavigate(-1);
+        notifyError("No se ha podido conectar al servidor");
+        console.error(err);
+      });
   }, []);
 
   return (
