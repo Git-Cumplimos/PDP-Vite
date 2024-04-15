@@ -93,12 +93,14 @@ const AdminLayout = () => {
 
   const valorMinConsignar = useMemo(() => {
     let val = (
-      (parseFloat(quotaInfo?.sobregirovalue) ?? 0)-(parseFloat(quotaInfo?.quota) ?? 0)
-    ) + (
-      (parseFloat(quotaInfo?.deuda) ?? 0) * -1
+      (
+        parseFloat(quotaInfo?.sobregirovalue ?? 0) - parseFloat(quotaInfo?.quota ?? 0)
+      ) + (
+        parseFloat(quotaInfo?.deuda ?? 0)
+      )
     )
     if (val < 0) val = 0
-    return formatMoney.format(val);
+    return formatMoney.format(val ?? 0);
   }, [
     quotaInfo?.quota,
     quotaInfo?.sobregirovalue,
@@ -325,7 +327,7 @@ const AdminLayout = () => {
           </div>
           <div className={usrData}>
             <div className={valMinConsignar}>
-              Valor Mínimo a Consignar {valorMinConsignar || "0"}
+              Valor Mínimo a Consignar {valorMinConsignar || "$0.00"}
             </div>
           </div>
           <div className={usrData}>
