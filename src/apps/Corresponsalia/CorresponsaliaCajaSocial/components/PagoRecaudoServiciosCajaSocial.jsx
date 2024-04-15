@@ -126,8 +126,7 @@ const PagoRecaudoServiciosCajaSocial = ({
           return notifyError("Error: El valor de la transacción es diferente");
         }
         pagoRecaudoServicios(ev);
-      }
-      if (
+      } else if (
         tipoRecaudo === "codigoBarras" &&
         estadoPeticion === "hidden" &&
         convenio.tipo_recaudo === "01"
@@ -135,10 +134,11 @@ const PagoRecaudoServiciosCajaSocial = ({
         setEstadoPeticion("validatePayment");
         setShowModal(true);
         return;
+      } else {
+        consultaRecaudoServicios(ev);
       }
-      consultaRecaudoServicios(ev);
     },
-    [dataRecaudo, pdpUser, roleInfo]
+    [dataRecaudo, pdpUser, roleInfo, convenio, tipoRecaudo, estadoPeticion]
   );
   const consultaRecaudoServicios = useCallback(
     (ev) => {
@@ -300,7 +300,7 @@ const PagoRecaudoServiciosCajaSocial = ({
           render: ({ data: res }) => {
             const dataTemp = res.obj;
             setObjTicketActual(dataTemp.ticket ?? {});
-            setEstadoPeticion(1);
+            setEstadoPeticion("ticket");
             setStateTicketTrx(true);
             return "Pago satisfactorio";
           },
@@ -310,7 +310,7 @@ const PagoRecaudoServiciosCajaSocial = ({
             if (error.hasOwnProperty("optionalObject")) {
               if (error.optionalObject.hasOwnProperty("ticket")) {
                 setObjTicketActual(error.optionalObject.ticket ?? {});
-                setEstadoPeticion(1);
+                setEstadoPeticion("ticket");
                 setStateTicketTrx(false);
               } else validNavigate(-1);
             } else validNavigate(-1);
