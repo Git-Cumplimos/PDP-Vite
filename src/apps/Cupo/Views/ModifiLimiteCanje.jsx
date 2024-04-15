@@ -214,6 +214,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
+              equalErrorMin={false}
               value={valor ?? parseInt(cupoComer[0]?.sobregiro)}
               onInput={onMoneyChange}
               required
