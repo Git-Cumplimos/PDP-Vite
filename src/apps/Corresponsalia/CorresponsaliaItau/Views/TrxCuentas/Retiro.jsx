@@ -112,33 +112,29 @@ const Retiro = () => {
       });
     }
   }, []);
+  const handleSubmit = () => {
+    if (dataRetiro.otpItau.length < 8) {
+      setDataRetiro({
+        otpItau: "",
+        numeroDocumento: "",
+        valorRetiro: 0,
+      });
+      return notifyError("Ingrese un código OTP válido de 8 dígitos");
+    }
+    if (dataRetiro?.valorRetiro % 10000 !== 0) {
+      setDataRetiro((old) => {
+        return { ...old, valorRetiro: 0 };
+      });
+      return notifyError("El valor a retirar debe ser múltiplo de $10.000");
+    } else {
+      setEstadoPeticion(1);
+      setShowModal(true);
+    }
+  };
   return (
     <>
       <h1 className="text-3xl">Retiro Itaú</h1>
-      <Form
-        onSubmit={() => {
-          if (dataRetiro.otpItau.length < 8) {
-            setDataRetiro({
-              otpItau: "",
-              numeroDocumento: "",
-              valorRetiro: 0,
-            });
-            return notifyError("Ingrese un código OTP válido de 8 dígitos");
-          }
-          if (dataRetiro?.valorRetiro % 10000 !== 0) {
-            setDataRetiro((old) => {
-              return { ...old, valorRetiro: 0 };
-            });
-            return notifyError(
-              "El valor a retirar debe ser múltiplo de $10.000"
-            );
-          } else {
-            setEstadoPeticion(1);
-            setShowModal(true);
-          }
-        }}
-        grid
-      >
+      <Form onSubmit={handleSubmit} grid>
         <Input
           id="numeroDocumento"
           name="numeroDocumento"
