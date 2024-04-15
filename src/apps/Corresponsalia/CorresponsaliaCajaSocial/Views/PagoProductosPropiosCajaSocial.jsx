@@ -35,7 +35,7 @@ const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPON
 const DATA_PAGO_INIT = {
   estadoLecturaPago: "codigoBarras",
   valorPagoProductosPropios: 0,
-  tipoPago: 1,
+  tipoPago: "1",
   valorDiferentePagoProductosPropios: 0,
   numeroProducto: "",
 };
@@ -230,7 +230,7 @@ const PagoProductosPropiosCajaSocial = () => {
       if (valorAPagar < resConsulta?.trn?.totalCurAmt?.amt)
         return notifyError(
           `El valor de la transacción debe ser menor de  ${formatMoney.format(
-            enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
+            resConsulta?.trn?.totalCurAmt?.amt
           )}`
         );
       if (
