@@ -381,47 +381,48 @@ const PagoRecaudoServiciosItau = ({
             />
           )}
           {convenio.consultaweb === "N" &&
-            convenio.modvalor_consweb === "S" && (
-              <MoneyInput
-                id="valorTrx"
-                name="valorTrx"
-                label={"Valor a pagar"}
-                type="tel"
-                maxLength={10}
-                autoComplete="off"
-                min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
-                max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
-                value={dataRecaudo?.valorTrx ?? 0}
-                onInput={onChangeFormatNum}
-                disabled={
-                  loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
-                }
-                required
-                equalError={false}
-                equalErrorMin={false}
-              />
-            )}
-          {convenio.consultaweb === "N" &&
-            tipoRecaudo !== "codigoBarras" && (
-              <MoneyInput
-                id="valorTrx"
-                name="valorTrx"
-                label={"Valor a pagar"}
-                type="tel"
-                maxLength={10}
-                autoComplete="off"
-                min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
-                max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
-                value={dataRecaudo?.valorTrx ?? 0}
-                onInput={onChangeFormatNum}
-                disabled={
-                  loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
-                }
-                required
-                equalError={false}
-                equalErrorMin={false}
-              />
-            )}
+            convenio.modvalor_consweb === "S" &&
+            tipoRecaudo ===
+              "codigoBarras"(
+                <MoneyInput
+                  id="valorTrx"
+                  name="valorTrx"
+                  label={"Valor a pagar"}
+                  type="tel"
+                  maxLength={10}
+                  autoComplete="off"
+                  min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
+                  max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
+                  value={dataRecaudo?.valorTrx ?? 0}
+                  onInput={onChangeFormatNum}
+                  disabled={
+                    loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
+                  }
+                  required
+                  equalError={false}
+                  equalErrorMin={false}
+                />
+              )}
+          {convenio.consultaweb === "N" && tipoRecaudo !== "codigoBarras" && (
+            <MoneyInput
+              id="valorTrx"
+              name="valorTrx"
+              label={"Valor a pagar"}
+              type="tel"
+              maxLength={10}
+              autoComplete="off"
+              min={enumParametrosItau?.MIN_RECAUDO_SERVICIOS_ITAU}
+              max={enumParametrosItau?.MAX_RECAUDO_SERVICIOS_ITAU}
+              value={dataRecaudo?.valorTrx ?? 0}
+              onInput={onChangeFormatNum}
+              disabled={
+                loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
+              }
+              required
+              equalError={false}
+              equalErrorMin={false}
+            />
+          )}
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
           <Button
