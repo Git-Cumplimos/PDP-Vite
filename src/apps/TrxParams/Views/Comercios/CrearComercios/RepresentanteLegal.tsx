@@ -93,6 +93,18 @@ const RepresentanteLegal = ({
     return copy;
   }, [propietarioRL]);
 
+  const makeUpdateRl = useCallback(
+    () =>
+      setUpdateRl(
+        !!propietarioRL.pk_tipo_identificacion_rl &&
+          !!propietarioRL.pk_numero_identificacion_rl
+      ),
+    [
+      propietarioRL.pk_tipo_identificacion_rl,
+      propietarioRL.pk_numero_identificacion_rl,
+    ]
+  );
+
   const handleClose = useCallback(() => {
     setModifyAddress(false);
     setModifyCity(false);
@@ -105,10 +117,10 @@ const RepresentanteLegal = ({
         direccion_rl: direccion,
       }));
       setAddressState(stateDieccion);
-      setUpdateRl(true);
+      makeUpdateRl();
       handleClose();
     },
-    [handleClose]
+    [handleClose, makeUpdateRl]
   );
 
   useFetchDebounce(
@@ -158,7 +170,7 @@ const RepresentanteLegal = ({
     { delay: 50 }
   );
 
-  const [searchRL] = useFetchDebounce(
+  /* const [searchRL] =  */ useFetchDebounce(
     {
       url: useMemo(
         () =>
@@ -186,21 +198,31 @@ const RepresentanteLegal = ({
         }));
         // notify("Propietario o RL encontrado");
         setPropietarioRLExists(true);
-      }, []),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          // notifyError(error.message);
-          console.error(error.message);
-        } else {
-          console.error(error);
-        }
-        setPropietarioRLExists(false);
-      }, []),
-      onFinally: useCallback(() => {
         setUpdateRl(false);
       }, []),
+      onError: useCallback(
+        (error) => {
+          if (error?.cause === "custom") {
+            // notifyError(error.message);
+            console.error(error.message);
+          } else {
+            console.error(error);
+          }
+          setPropietarioRLExists(false);
+          makeUpdateRl();
+          setPropietarioRL((old) => ({
+            ...initialPropietarioRL,
+            pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
+            pk_numero_identificacion_rl: old.pk_numero_identificacion_rl,
+          }));
+        },
+        [makeUpdateRl]
+      ),
+      // onFinally: useCallback(() => {
+      //   setUpdateRl(false);
+      // }, []),
     },
-    { delay: 1000 }
+    { delay: 500 }
   );
 
   useFetchDebounce(
@@ -214,17 +236,25 @@ const RepresentanteLegal = ({
         }),
         [propietarioRLExists, propietarioRL2Send]
       ),
-      autoDispatch: Object.entries(propietarioRL2Send).every(([key, val]) =>
-        key !== "dv_interno" && typeof val !== "boolean" ? !!val : true
-      ),
+      // autoDispatch: useMemo(() => {
+      //   const temp = Object.entries(propietarioRL2Send).every(([key, val]) =>
+      //     key !== "dv_interno" && typeof val !== "boolean" ? !!val : true
+      //   );
+      //   console.log(temp);
+      //   return temp;
+      // }, [propietarioRL2Send]),
       fetchIf: useMemo(() => updateRl, [updateRl]),
     },
     {
       onSuccess: useCallback(
         (_) => {
-          searchRL();
+          // searchRL();
+          setUpdateRl(false);
+          setPropietarioRLExists(true);
         },
-        [searchRL]
+        [
+          /* searchRL */
+        ]
       ),
       onError: useCallback((error) => {
         if (error?.cause === "custom") {
@@ -235,7 +265,7 @@ const RepresentanteLegal = ({
         }
       }, []),
     },
-    { delay: 500 }
+    { delay: 1000 }
   );
 
   useEffect(() => {
@@ -251,7 +281,10 @@ const RepresentanteLegal = ({
         pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
         pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
       });
-    } else if (!propietarioRL.pk_tipo_identificacion_rl && !propietarioRL.pk_numero_identificacion_rl) {
+    } else if (
+      !propietarioRL.pk_tipo_identificacion_rl &&
+      !propietarioRL.pk_numero_identificacion_rl
+    ) {
       setRlPks({
         pk_numero_identificacion_rl: undefined,
         pk_tipo_identificacion_rl: undefined,
@@ -292,19 +325,15 @@ const RepresentanteLegal = ({
           options={docTypesRL ?? []}
           value={propietarioRL.pk_tipo_identificacion_rl ?? ""}
           onChange={(ev: ChangeEvent<HTMLSelectElement>) => {
-            setPropietarioRL((old) => {
-              if (!ev.target.value && !old.pk_numero_identificacion_rl) {
-                setPropietarioRLExists(false);
-                return initialPropietarioRL;
-              }
-              return {
-                ...old,
-                pk_tipo_identificacion_rl: ev.target.value
-                  ? parseInt(ev.target.value)
-                  : 0,
-              };
-            });
+            setPropietarioRLExists(false);
             setUpdateRl(false);
+            setPropietarioRL((old) => ({
+              ...initialPropietarioRL,
+              pk_numero_identificacion_rl: old.pk_numero_identificacion_rl,
+              pk_tipo_identificacion_rl: ev.target.value
+                ? parseInt(ev.target.value)
+                : 0,
+            }));
           }}
         />
         <Input
@@ -316,18 +345,13 @@ const RepresentanteLegal = ({
           maxLength={12}
           value={propietarioRL.pk_numero_identificacion_rl}
           onChange={(ev) => {
-            setPropietarioRL((old) => {
-              const parsedValue = onChangeNumber(ev);
-              if (!parsedValue && !old.pk_tipo_identificacion_rl) {
-                setPropietarioRLExists(false);
-                return initialPropietarioRL;
-              }
-              return {
-                ...old,
-                pk_numero_identificacion_rl: parsedValue,
-              };
-            });
+            setPropietarioRLExists(false);
             setUpdateRl(false);
+            setPropietarioRL((old) => ({
+              ...initialPropietarioRL,
+              pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
+              pk_numero_identificacion_rl: onChangeNumber(ev),
+            }));
           }}
           autoComplete="off"
         />
@@ -344,7 +368,7 @@ const RepresentanteLegal = ({
               ...old,
               nombre_rl: ev.target.value,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -361,7 +385,7 @@ const RepresentanteLegal = ({
               ...old,
               apellido_rl: ev.target.value,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -375,7 +399,7 @@ const RepresentanteLegal = ({
               ...old,
               pep_rl: !old.pep_rl,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
         />
         <Input
@@ -391,7 +415,7 @@ const RepresentanteLegal = ({
               ...old,
               telefono_fijo_rl: onChangeNumber(ev),
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -436,7 +460,7 @@ const RepresentanteLegal = ({
               ...old,
               barrio_rl: ev.target.value,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -468,9 +492,9 @@ const RepresentanteLegal = ({
             <Fieldset legend={"Municipio actual"}>
               <ul className="grid grid-flow-row gap-2 justify-center align-middle">
                 {Object.entries({
-                  "Codigo DANE departamento":
+                  "Código DANE departamento":
                     propietarioRL.dane_departamento_rl,
-                  "Codigo DANE municipio": propietarioRL.dane_municipio_rl,
+                  "Código DANE municipio": propietarioRL.dane_municipio_rl,
                   "Nombre ciudad": propietarioRL.nombre_ciudad,
                 }).map(([key, val]) => {
                   return (
@@ -494,7 +518,7 @@ const RepresentanteLegal = ({
                   dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
                   nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
                 }));
-                setUpdateRl(true);
+                makeUpdateRl();
                 handleClose();
               }}
             />

@@ -131,11 +131,11 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
 
   return (
     <DataTable
-      title="Busqueda municipios DANE"
+      title="Búsqueda municipios DANE"
       headers={[
-        "Cod DANE municipio",
+        "Código DANE municipio",
         "Nombre Municipio",
-        "Cod DANE departamento",
+        "Código DANE departamento",
         "Nombre Departamento",
       ]}
       data={tableCities}
