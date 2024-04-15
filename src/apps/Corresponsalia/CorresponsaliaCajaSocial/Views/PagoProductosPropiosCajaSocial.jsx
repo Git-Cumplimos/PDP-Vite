@@ -227,7 +227,7 @@ const PagoProductosPropiosCajaSocial = () => {
       } else if (dataPago.tipoPago === "3") {
         valorAPagar = dataPago.valorDiferentePagoProductosPropios;
       }
-      if (valorAPagar < resConsulta?.trn?.totalCurAmt?.amt)
+      if (valorAPagar > resConsulta?.trn?.totalCurAmt?.amt)
         return notifyError(
           `El valor de la transacción debe ser menor de  ${formatMoney.format(
             resConsulta?.trn?.totalCurAmt?.amt
