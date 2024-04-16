@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import { initialSearchObj, reducerCommerceFilters } from "./state";
-import type { DaneCity } from "./state";
+import type { DaneCity, DaneCityShow } from "./state";
 import useFetchDebounce from "../../../hooks/useFetchDebounce";
 import DataTable from "../../Base/DataTable";
 import { onChangeNumber } from "../../../utils/functions";
@@ -16,7 +16,7 @@ import { notifyError } from "../../../utils/notify";
 
 type Props = {
   onSelectCity: (
-    city_data: DaneCity,
+    city_data: DaneCity | DaneCityShow,
     ev: MouseEvent<HTMLTableRowElement>
   ) => void;
 };
@@ -40,9 +40,16 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
           c_digo_dane_del_departamento,
           departamento,
         }) => ({
-          c_digo_dane_del_municipio,
+          c_digo_dane_del_municipio: c_digo_dane_del_municipio
+            .split(".")
+            .map((val) => val.padStart(3, "0"))
+            .join("")
+            .substring(1),
           municipio,
-          c_digo_dane_del_departamento,
+          c_digo_dane_del_departamento: c_digo_dane_del_departamento.padStart(
+            2,
+            "0"
+          ),
           departamento,
         })
       ),
@@ -114,7 +121,7 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
           .then((res: any) => setCities(res ?? []))
           .catch((error: any) => {
             notifyError("Error consultando municipios dane");
-            console.error(error)
+            console.error(error);
           });
       }, []),
       onError: useCallback((error) => console.error(error), []),
@@ -124,15 +131,15 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
 
   return (
     <DataTable
-      title="Busqueda municipios dane"
+      title="Búsqueda municipios DANE"
       headers={[
-        "Cod dane municipio",
-        "Municipio",
-        "Cod dane departamento",
-        "Departamento",
+        "Código DANE municipio",
+        "Nombre Municipio",
+        "Código DANE departamento",
+        "Nombre Departamento",
       ]}
       data={tableCities}
-      onClickRow={(e, i) => onSelectCity(cities[i], e)}
+      onClickRow={(e, i) => onSelectCity(tableCities[i], e)}
       tblFooter={
         <Fragment>
           <DataTable.LimitSelector
@@ -175,7 +182,7 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
       <Input
         id="municipio"
         name="municipio"
-        label={"Municipio"}
+        label={"Nombre Municipio"}
         type="text"
         maxLength={10}
         autoComplete="off"
@@ -184,13 +191,13 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
       <Input
         id="departamento"
         name="departamento"
-        label={"Departamento"}
+        label={"Nombre Departamento"}
         type="text"
         maxLength={10}
         autoComplete="off"
         defaultValue={searchFilters.departamento}
       />
-      <Input
+      {/* <Input
         id="c_digo_dane_del_departamento"
         name="c_digo_dane_del_departamento"
         label={"Codigo dane del departamento"}
@@ -207,7 +214,7 @@ const CitySearchTable = ({ onSelectCity }: Props) => {
         maxLength={10}
         autoComplete="off"
         defaultValue={searchFilters.c_digo_dane_del_municipio}
-      />
+      /> */}
     </DataTable>
   );
 };

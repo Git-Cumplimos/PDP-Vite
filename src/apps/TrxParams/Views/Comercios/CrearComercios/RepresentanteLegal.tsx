@@ -18,11 +18,12 @@ import AddressForm, {
 } from "../../../../../components/Base/AddressForm";
 import { CitySearchTable } from "../../../../../components/Compound/CitySearch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
+import { onChangeNumber } from "../../../../../utils/functions";
 
 type Props = {
   setRlPks: (_: {
-    pk_tipo_identificacion_rl: number;
-    pk_numero_identificacion_rl: string;
+    pk_tipo_identificacion_rl?: number;
+    pk_numero_identificacion_rl?: string;
   }) => void;
   fk_tipo_identificacion_rl?: number | null;
   fk_numero_identificacion_rl?: string | null;
@@ -92,6 +93,18 @@ const RepresentanteLegal = ({
     return copy;
   }, [propietarioRL]);
 
+  const makeUpdateRl = useCallback(
+    () =>
+      setUpdateRl(
+        !!propietarioRL.pk_tipo_identificacion_rl &&
+          !!propietarioRL.pk_numero_identificacion_rl
+      ),
+    [
+      propietarioRL.pk_tipo_identificacion_rl,
+      propietarioRL.pk_numero_identificacion_rl,
+    ]
+  );
+
   const handleClose = useCallback(() => {
     setModifyAddress(false);
     setModifyCity(false);
@@ -104,10 +117,10 @@ const RepresentanteLegal = ({
         direccion_rl: direccion,
       }));
       setAddressState(stateDieccion);
-      setUpdateRl(true);
+      makeUpdateRl();
       handleClose();
     },
-    [handleClose]
+    [handleClose, makeUpdateRl]
   );
 
   useFetchDebounce(
@@ -157,7 +170,7 @@ const RepresentanteLegal = ({
     { delay: 50 }
   );
 
-  const [searchRL] = useFetchDebounce(
+  /* const [searchRL] =  */ useFetchDebounce(
     {
       url: useMemo(
         () =>
@@ -185,21 +198,31 @@ const RepresentanteLegal = ({
         }));
         // notify("Propietario o RL encontrado");
         setPropietarioRLExists(true);
-      }, []),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          // notifyError(error.message);
-          console.error(error.message);
-        } else {
-          console.error(error);
-        }
-        setPropietarioRLExists(false);
-      }, []),
-      onFinally: useCallback(() => {
         setUpdateRl(false);
       }, []),
+      onError: useCallback(
+        (error) => {
+          if (error?.cause === "custom") {
+            // notifyError(error.message);
+            console.error(error.message);
+          } else {
+            console.error(error);
+          }
+          setPropietarioRLExists(false);
+          makeUpdateRl();
+          setPropietarioRL((old) => ({
+            ...initialPropietarioRL,
+            pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
+            pk_numero_identificacion_rl: old.pk_numero_identificacion_rl,
+          }));
+        },
+        [makeUpdateRl]
+      ),
+      // onFinally: useCallback(() => {
+      //   setUpdateRl(false);
+      // }, []),
     },
-    { delay: 1000 }
+    { delay: 500 }
   );
 
   useFetchDebounce(
@@ -213,17 +236,25 @@ const RepresentanteLegal = ({
         }),
         [propietarioRLExists, propietarioRL2Send]
       ),
-      autoDispatch: Object.entries(propietarioRL2Send).every(([key, val]) =>
-        key !== "dv_interno" && typeof val !== "boolean" ? !!val : true
-      ),
+      // autoDispatch: useMemo(() => {
+      //   const temp = Object.entries(propietarioRL2Send).every(([key, val]) =>
+      //     key !== "dv_interno" && typeof val !== "boolean" ? !!val : true
+      //   );
+      //   console.log(temp);
+      //   return temp;
+      // }, [propietarioRL2Send]),
       fetchIf: useMemo(() => updateRl, [updateRl]),
     },
     {
       onSuccess: useCallback(
         (_) => {
-          searchRL();
+          // searchRL();
+          setUpdateRl(false);
+          setPropietarioRLExists(true);
         },
-        [searchRL]
+        [
+          /* searchRL */
+        ]
       ),
       onError: useCallback((error) => {
         if (error?.cause === "custom") {
@@ -234,7 +265,7 @@ const RepresentanteLegal = ({
         }
       }, []),
     },
-    { delay: 5000 }
+    { delay: 1000 }
   );
 
   useEffect(() => {
@@ -245,12 +276,23 @@ const RepresentanteLegal = ({
   }, [pdpUser]);
 
   useEffect(() => {
-    setRlPks({
-      pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
-      pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
-    });
+    if (propietarioRLExists) {
+      setRlPks({
+        pk_numero_identificacion_rl: propietarioRL.pk_numero_identificacion_rl,
+        pk_tipo_identificacion_rl: propietarioRL.pk_tipo_identificacion_rl,
+      });
+    } else if (
+      !propietarioRL.pk_tipo_identificacion_rl &&
+      !propietarioRL.pk_numero_identificacion_rl
+    ) {
+      setRlPks({
+        pk_numero_identificacion_rl: undefined,
+        pk_tipo_identificacion_rl: undefined,
+      });
+    }
   }, [
     setRlPks,
+    propietarioRLExists,
     propietarioRL.pk_numero_identificacion_rl,
     propietarioRL.pk_tipo_identificacion_rl,
   ]);
@@ -272,7 +314,7 @@ const RepresentanteLegal = ({
   return (
     <Fragment>
       <Fieldset
-        legend={"Representante legal o propietario (occidente)"}
+        legend={"Representante legal o propietario"}
         className="lg:col-span-2"
       >
         <Select
@@ -283,15 +325,16 @@ const RepresentanteLegal = ({
           options={docTypesRL ?? []}
           value={propietarioRL.pk_tipo_identificacion_rl ?? ""}
           onChange={(ev: ChangeEvent<HTMLSelectElement>) => {
+            setPropietarioRLExists(false);
+            setUpdateRl(false);
             setPropietarioRL((old) => ({
-              ...old,
+              ...initialPropietarioRL,
+              pk_numero_identificacion_rl: old.pk_numero_identificacion_rl,
               pk_tipo_identificacion_rl: ev.target.value
                 ? parseInt(ev.target.value)
                 : 0,
             }));
-            setUpdateRl(false);
           }}
-          required
         />
         <Input
           label="Número de identificación"
@@ -300,14 +343,15 @@ const RepresentanteLegal = ({
           type="tel"
           minLength={5}
           maxLength={12}
-          required
           value={propietarioRL.pk_numero_identificacion_rl}
           onChange={(ev) => {
-            setPropietarioRL((old) => ({
-              ...old,
-              pk_numero_identificacion_rl: ev.target.value,
-            }));
+            setPropietarioRLExists(false);
             setUpdateRl(false);
+            setPropietarioRL((old) => ({
+              ...initialPropietarioRL,
+              pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
+              pk_numero_identificacion_rl: onChangeNumber(ev),
+            }));
           }}
           autoComplete="off"
         />
@@ -318,14 +362,13 @@ const RepresentanteLegal = ({
           type="text"
           minLength={1}
           maxLength={40}
-          required
           value={propietarioRL.nombre_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               nombre_rl: ev.target.value,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -336,14 +379,13 @@ const RepresentanteLegal = ({
           type="text"
           minLength={1}
           maxLength={40}
-          required
           value={propietarioRL.apellido_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               apellido_rl: ev.target.value,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -357,7 +399,7 @@ const RepresentanteLegal = ({
               ...old,
               pep_rl: !old.pep_rl,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
         />
         <Input
@@ -367,14 +409,13 @@ const RepresentanteLegal = ({
           type="tel"
           minLength={1}
           maxLength={10}
-          required
           value={propietarioRL.telefono_fijo_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
-              telefono_fijo_rl: ev.target.value,
+              telefono_fijo_rl: onChangeNumber(ev),
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -391,7 +432,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyCity(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required
         />
         <Input
           label="Dirección"
@@ -406,7 +446,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyAddress(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required
         />
         <Input
           label="Barrio"
@@ -415,14 +454,13 @@ const RepresentanteLegal = ({
           type="text"
           minLength={4}
           maxLength={20}
-          required
           value={propietarioRL.barrio_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({
               ...old,
               barrio_rl: ev.target.value,
             }));
-            setUpdateRl(true);
+            makeUpdateRl();
           }}
           autoComplete="off"
         />
@@ -450,18 +488,41 @@ const RepresentanteLegal = ({
           />
         )}
         {modifyCity && (
-          <CitySearchTable
-            onSelectCity={(cityInfo) => {
-              setPropietarioRL((old) => ({
-                ...old,
-                dane_municipio_rl: cityInfo.c_digo_dane_del_municipio,
-                dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
-                nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
-              }));
-              setUpdateRl(true);
-              handleClose();
-            }}
-          />
+          <Fragment>
+            <Fieldset legend={"Municipio actual"}>
+              <ul className="grid grid-flow-row gap-2 justify-center align-middle">
+                {Object.entries({
+                  "Código DANE departamento":
+                    propietarioRL.dane_departamento_rl,
+                  "Código DANE municipio": propietarioRL.dane_municipio_rl,
+                  "Nombre ciudad": propietarioRL.nombre_ciudad,
+                }).map(([key, val]) => {
+                  return (
+                    <li key={key}>
+                      <h1 className="grid grid-flow-col auto-cols-fr gap-6">
+                        <strong className="justify-self-end">{key}:</strong>
+                        <p className="justify-self-start whitespace-pre-wrap">
+                          {val}
+                        </p>
+                      </h1>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Fieldset>
+            <CitySearchTable
+              onSelectCity={(cityInfo) => {
+                setPropietarioRL((old) => ({
+                  ...old,
+                  dane_municipio_rl: cityInfo.c_digo_dane_del_municipio,
+                  dane_departamento_rl: cityInfo.c_digo_dane_del_departamento,
+                  nombre_ciudad: `${cityInfo.municipio} - ${cityInfo.departamento}`,
+                }));
+                makeUpdateRl();
+                handleClose();
+              }}
+            />
+          </Fragment>
         )}
       </Modal>
     </Fragment>

@@ -766,34 +766,20 @@ const CrearComercios = () => {
             value={
               comercio?.comercio_padre ? comercio?.comercio_padre : "Vacio"
             }
-            info={
-              <button
-                type="button"
-                style={{
-                  position: "absolute",
-                  top: "-33px",
-                  right: "-235px",
-                  fontSize: "15px",
-                  padding: "5px",
-                  backgroundColor: "#e26c22",
-                  color: "white",
-                  borderRadius: "5px",
-                }}
-                onClick={(e) => {
-                  if (comercio?.comercio_padre) {
-                    setComercio((old) => ({
-                      ...old,
-                      fk_comercio_padre: null,
-                      comercio_padre: "",
-                    }));
-                  } else {
-                    handleShowModal();
-                  }
-                }}
-              >
-                {comercio?.comercio_padre ? "Eliminar" : "Agregar comercio"}
-              </button>
-            }
+            actionBtn={{
+              label: comercio?.comercio_padre ? "Eliminar" : "Agregar comercio",
+              callback: (e) => {
+                if (comercio?.comercio_padre) {
+                  setComercio((old) => ({
+                    ...old,
+                    fk_comercio_padre: null,
+                    comercio_padre: "",
+                  }));
+                } else {
+                  handleShowModal();
+                }
+              },
+            }}
             disabled
           />
           {Boolean(pk_comercio_handled) && (
@@ -911,7 +897,7 @@ const CrearComercios = () => {
             label="Número Dane ciudad"
             type="tel"
             name="dane_ciudad"
-            minLength="1"
+            minLength="5"
             maxLength="5"
             required
             value={comercio?.dane_ciudad}
@@ -928,8 +914,8 @@ const CrearComercios = () => {
             label="Número Dane departamento"
             type="tel"
             name="dane_dpto"
-            minLength="1"
-            maxLength="5"
+            minLength="2"
+            maxLength="2"
             required
             value={comercio?.dane_dpto}
             onInput={(e) => {
@@ -1155,35 +1141,21 @@ const CrearComercios = () => {
                       required
                       autoComplete="off"
                       value={comercio?.codigos_institucionales[key]}
-                      info={
-                        <button
-                          type="button"
-                          style={{
-                            position: "absolute",
-                            top: "-33px",
-                            right: "-235px",
-                            fontSize: "15px",
-                            padding: "5px",
-                            backgroundColor: "#e26c22",
-                            color: "white",
-                            borderRadius: "5px",
-                          }}
-                          onClick={() => {
-                            const rest = {
-                              ...comercio?.codigos_institucionales,
+                      actionBtn={{
+                        label: "Eliminar",
+                        callback: () => {
+                          const rest = {
+                            ...comercio?.codigos_institucionales,
+                          };
+                          delete rest[key];
+                          setComercio((old) => {
+                            return {
+                              ...old,
+                              codigos_institucionales: rest,
                             };
-                            delete rest[key];
-                            setComercio((old) => {
-                              return {
-                                ...old,
-                                codigos_institucionales: rest,
-                              };
-                            });
-                          }}
-                        >
-                          Eliminar
-                        </button>
-                      }
+                          });
+                        },
+                      }}
                       onInput={(e) => {
                         setComercio((old) => {
                           return {

@@ -44,9 +44,9 @@ export const cargueArchivo = (url_cargar, url_verificar) => {
 
       const body = {
         "file": filename,
-        "id_dispositivo": id_usuario,
-        "id_comercio": id_comercio,
-        "id_usuario": id_dispositivo
+        "id_dispositivo" : id_dispositivo,
+        "id_comercio" : id_comercio,
+        "id_usuario" : id_usuario
       }
 
       const responseValidacionArchivo = await fetchData(url_verificar, "POST", {}, body);

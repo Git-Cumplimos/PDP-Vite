@@ -244,6 +244,7 @@ const banners = {
   BANNER_3: `${urlAssets}/assets/img/banners/BANNER_3.jpg`,
   BANNER_4: `${urlAssets}/assets/img/banners/BANNER_4.jpg`,
   BANNER_5: `${urlAssets}/assets/img/banners/BANNER_5.jpg`,
+  BANNER_6: `${urlAssets}/assets/img/banners/BANNER_6.jpg`,
 };
 
 export { images, svgs, banners };

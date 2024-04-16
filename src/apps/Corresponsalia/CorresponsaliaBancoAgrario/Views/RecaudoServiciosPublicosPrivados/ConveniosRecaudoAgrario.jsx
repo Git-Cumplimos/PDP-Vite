@@ -198,19 +198,20 @@ const ConveniosRecaudoAgrario = () => {
   };
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (ev.target.name === "estado") {
-      if (value && typeof value === "string") {
-        value = value.toLowerCase() === "false" ? false : true;
-      }
-    }
     if (ev.target.name === "permite_recaudo_manual") {
-      if (value && typeof value === "string") {
-        value = value.toLowerCase() === "on" ? true : false;
+      setDataConvenios((old) => {
+        return { ...old, [ev.target.name]: !old[ev.target.name] };
+      });
+    } else {
+      if (ev.target.name === "estado") {
+        if (value && typeof value === "string") {
+          value = value.toLowerCase() === "false" ? false : true;
+        }
       }
+      setDataConvenios((old) => {
+        return { ...old, [ev.target.name]: value };
+      });
     }
-    setDataConvenios((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
   }, []);
   const onChangeFormatNumber = useCallback((ev) => {
     const valor = ev.target.value;

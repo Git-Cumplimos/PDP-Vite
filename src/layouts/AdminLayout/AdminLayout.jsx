@@ -42,6 +42,7 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     diasSobregiro,
+    valMinConsignar,
   } = classes;
 
   const urlAssets = process.env.REACT_APP_ASSETS_URL;
@@ -89,6 +90,22 @@ const AdminLayout = () => {
     () => roleInfo?.["nombre comercio"],
     [roleInfo]
   );
+
+  const valorMinConsignar = useMemo(() => {
+    let val = (
+      (
+        parseFloat(quotaInfo?.sobregirovalue ?? 0) - parseFloat(quotaInfo?.quota ?? 0)
+      ) + (
+        parseFloat(quotaInfo?.deuda ?? 0)
+      )
+    )
+    if (val < 0) val = 0
+    return formatMoney.format(val ?? 0);
+  }, [
+    quotaInfo?.quota,
+    quotaInfo?.sobregirovalue,
+    quotaInfo?.deuda
+  ]);
 
   const [clientWidth] = useWindowSize();
 
@@ -309,6 +326,11 @@ const AdminLayout = () => {
             </div>
           </div>
           <div className={usrData}>
+            <div className={valMinConsignar}>
+              Valor Mínimo a Consignar {valorMinConsignar || "$0.00"}
+            </div>
+          </div>
+          <div className={usrData}>
             <div className={diasSobregiro}>
               Dias sobregiro {sobregiro || "0"}
             </div>
@@ -469,17 +491,17 @@ const AdminLayout = () => {
                 disabled={true}
               />
               {/* <Input
-                id="deuda"
-                name="deuda"
+                id="deuda" // cartera
+                name="deuda" // cartera
                 label={
                   parseInt(cupoComercio[0]?.deuda) >= 1
-                    ? "Deuda al comercio"
-                    : "Deuda del comercio"
+                    ? "Cartera al comercio"
+                    : "Cartera del comercio"
                 }
                 autoComplete="off"
                 value={
                   formatMoney.format(
-                    Math.abs(parseInt(cupoComercio[0]?.deuda))
+                    parseInt(cupoComercio[0]?.deuda)
                   ) ?? 0
                 }
                 disabled={true}
@@ -487,7 +509,7 @@ const AdminLayout = () => {
               <Input
                 id="cupo_en_canje"
                 name="cupo_en_canje"
-                label="Cupo en canje"
+                label="Deuda" // Cupo en canje
                 autoComplete="off"
                 value={
                   formatMoney.format(
