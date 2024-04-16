@@ -551,19 +551,6 @@ const ConveniosRecaudoAgrario = () => {
               legend="Información del convenio"
               className="lg:col-span-2"
             >
-              {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0 && (
-                <Input
-                  id="pk_tbl_convenios_banco_agrario"
-                  label="Id comercio"
-                  type="text"
-                  name="pk_tbl_convenios_banco_agrario"
-                  minLength="1"
-                  maxLength="32"
-                  value={dataConvenios?.pk_tbl_convenios_banco_agrario}
-                  onInput={onChangeFormat}
-                  disabled
-                ></Input>
-              )}
               <Input
                 id="codigo"
                 label="Código convenio"
