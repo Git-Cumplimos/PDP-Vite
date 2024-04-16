@@ -51,6 +51,10 @@ import rutasPinesCrcOlimpia, {
   listPermissionsPinesCrcOlimpia,
 } from "../apps/PinesCrc/PinesCrcOlimpia/routes";
 
+import rutasPinesCeaOlimpia, {
+  listPermissionsPinesCeaOlimpia,
+} from "../apps/PinesCea/PinesCeaOlimpia/routes";
+
 /**
  * * Providers
  */
@@ -733,6 +737,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsPinesCrc,
       ...listPermissionsPinesCea,
       ...listPermissionsPinesCrcOlimpia,
+      ...listPermissionsPinesCeaOlimpia,
     ],
     provider: ProvidepinesVus,
     subRoutes: [
@@ -741,6 +746,7 @@ const allUrlsPrivateApps = [
       rutasPinesCrc,
       rutasPinesCea,
       rutasPinesCrcOlimpia,
+      rutasPinesCeaOlimpia,
       {
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
