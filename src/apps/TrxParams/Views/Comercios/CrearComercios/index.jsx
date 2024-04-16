@@ -81,8 +81,8 @@ const emptyCommerce = {
   alert_cupo: "",
   zona_comercio: null,
   tipo_persona: null,
-  fk_tipo_identificacion_rl: 0,
-  fk_numero_identificacion_rl: "",
+  fk_tipo_identificacion_rl: undefined,
+  fk_numero_identificacion_rl: undefined,
   barrio_comercio: "",
 };
 
@@ -181,6 +181,8 @@ const CrearComercios = () => {
       setComercio((old) => ({
         ...structuredClone(old),
         ...structuredClone(res?.obj),
+        fk_tipo_identificacion_rl: old?.fk_tipo_identificacion_rl == null ? undefined : old.fk_tipo_identificacion_rl,
+        fk_numero_identificacion_rl: old?.fk_numero_identificacion_rl == null ? undefined : old.fk_numero_identificacion_rl,
       }));
       if (res?.obj.alert_cupo?.includes("%")) {
         setAlertPorcent(res?.obj.alert_cupo?.replace("%", ""));
