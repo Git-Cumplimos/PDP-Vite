@@ -48,9 +48,10 @@ const DtlMovComercio = () => {
   const [fetchTrxs] = useFetchDispatchDebounce({
     onSuccess: useCallback((res) => {
       setDtlCupo(res?.obj ?? {});
-      setNombreComercio(res?.obj?.nombre_comercio ?? "");
+      setNombreComercio((res?.obj?.results ?? [{}])[0].nombre_comercio ?? "");
     }, []),
     onError: useCallback((error) => {
+      setDtlCupo(null);
       if (error instanceof ErrorPDPFetch) {
         notifyError(error.message);
       }
@@ -61,7 +62,7 @@ const DtlMovComercio = () => {
   }, { delay: 2000 });
 
   const searchDetalleComercio = useCallback(() => {
-    if (!idComercio) return false
+    // if (!idComercio) return false
 
     setSingleFilter("page", (old) => page ?? old);
     setSingleFilter("limit", (old) => limit ?? old)
@@ -103,11 +104,12 @@ const DtlMovComercio = () => {
       (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
     ).join("");
     setIdComercio(idComer);
+    setNombreComercio("");
   }, []);
 
   useEffect(() => {
     setIdComercio(roleInfo?.id_comercio ?? "");
-    setNombreComercio(roleInfo?.["nombre comercio"] ?? null);
+    // setNombreComercio(roleInfo?.["nombre comercio"] ?? null);
   }, [roleInfo]);
 
   useEffect(() => {
@@ -157,7 +159,7 @@ const DtlMovComercio = () => {
             required
           />
           {
-            nombreComercio !== null && (
+            ( ![null,""].includes(nombreComercio) && ![null,""].includes(idComercio)) && (
               <Input
                 id="nombre_comercio"
                 name="Nombre comercio"

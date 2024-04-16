@@ -185,6 +185,16 @@ const ModifiLimiteCanje = () => {
         ) : (
           <>
             <Input
+              id="nombre_comercio"
+              name="Nombre comercio"
+              label="Nombre comercio"
+              type="text"
+              value={cupoComer[0]?.nombre_comercio ?? ""}
+              autoComplete="off"
+              disabled={true}
+              required
+            />
+            <Input
               id="deuda"
               name="deuda"
               label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}

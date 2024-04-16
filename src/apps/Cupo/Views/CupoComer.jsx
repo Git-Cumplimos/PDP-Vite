@@ -54,9 +54,9 @@ const CupoComer = () => {
 
   const searchCupoComercio = useCallback(() => {
     setSingleFilter("pk_id_comercio", idComercio ?? "");
-    setSingleFilter("nombre_comercio",nombreComercio ?? "")
+    setSingleFilter("nombre_comercio", nombreComercio ?? "")
     setSingleFilter("page", (old) => page ?? old);
-    setSingleFilter("limit", (old) =>limit ?? old)
+    setSingleFilter("limit", (old) => limit ?? old)
     const tempMap = new Map(searchFilters);
     const url = getConsultaComercios()
     tempMap.forEach((val, key, map) => {
@@ -75,12 +75,12 @@ const CupoComer = () => {
       searchFilters,
       setSingleFilter,
       fetchTrxs,
-  ]
+    ]
   );
 
   useEffect(() => {
     setIdComercio(roleInfo?.id_comercio ?? "");
-    setNombreComercio(roleInfo?.["nombre comercio"] ?? "");
+    // setNombreComercio(roleInfo?.["nombre comercio"] ?? "");
   }, [roleInfo]);
 
   useEffect(() => {
@@ -114,40 +114,9 @@ const CupoComer = () => {
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Consulta cupo comercio</h1>
-      {roleInfo?.id_comercio ? (
-        ""
-      ) : (
-        <Form grid>
-          <Input
-            id="idCliente"
-            name="Id comercio"
-            label="Id comercio"
-            type="text"
-            autoComplete="off"
-            minLength={"0"}
-            maxLength={"10"}
-            value={idComercio ?? ""}
-            onChange={(ev) => onChangeId(ev, "Id comercio")}
-            required
-          />
-          <Input
-            id="nombre_comercio"
-            name="nombre_comercio"
-            label="Nombre comercio"
-            type="text"
-            value={nombreComercio ?? ""}
-            autoComplete="off"
-            minLength={"0"}
-            maxLength={"30"}
-            onChange={(ev) => onChangeId(ev, "nombre_comercio")}
-            required
-          />
-        </Form>
-      )}
-
       <TableEnterprise
         title="Cupo comercios"
-        headers={["Id comercio", "Nombre comercio" ,"Sobregiro", "Base caja", "Dias sobregiro"]}
+        headers={["Id comercio", "Nombre comercio", "Sobregiro", "Base caja", "Dias sobregiro"]}
         data={
           cupoComer?.map(
             ({
@@ -171,7 +140,38 @@ const CupoComer = () => {
         }}
         children={null}
         maxPage={maxPages}
-      ></TableEnterprise>
+      >
+        {roleInfo?.id_comercio ? (
+          ""
+        ) : (
+          <>
+            <Input
+              id="idCliente"
+              name="Id comercio"
+              label="Id comercio"
+              type="text"
+              autoComplete="off"
+              minLength={"0"}
+              maxLength={"10"}
+              value={idComercio ?? ""}
+              onChange={(ev) => onChangeId(ev, "Id comercio")}
+              required
+            />
+            <Input
+              id="nombre_comercio"
+              name="nombre_comercio"
+              label="Nombre comercio"
+              type="text"
+              value={nombreComercio ?? ""}
+              autoComplete="off"
+              minLength={"0"}
+              maxLength={"30"}
+              onChange={(ev) => onChangeId(ev, "nombre_comercio")}
+              required
+            />
+          </>
+        )}
+      </TableEnterprise>
       <Form>
         <ButtonBar className={"lg col-span-2"}>
           <Button
