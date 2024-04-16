@@ -201,7 +201,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Ajuste credito cupo</h1>
+      <h1 className="text-3xl mt-6">Ajuste cartera cupo</h1>
       <Form onSubmit={onSubmitBusqueda} grid>
         <ButtonBar className={"lg  col-span-2"}>
           <Button
