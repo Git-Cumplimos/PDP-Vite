@@ -178,11 +178,18 @@ const CrearComercios = () => {
 
   const [fetchComercios] = useFetchDispatchDebounce({
     onSuccess: useCallback((res) => {
+      console.log(res);
       setComercio((old) => ({
         ...structuredClone(old),
         ...structuredClone(res?.obj),
-        fk_tipo_identificacion_rl: old?.fk_tipo_identificacion_rl == null ? undefined : old.fk_tipo_identificacion_rl,
-        fk_numero_identificacion_rl: old?.fk_numero_identificacion_rl == null ? undefined : old.fk_numero_identificacion_rl,
+        fk_tipo_identificacion_rl:
+          res?.obj?.fk_tipo_identificacion_rl == null
+            ? undefined
+            : res?.obj.fk_tipo_identificacion_rl,
+        fk_numero_identificacion_rl:
+          res?.obj?.fk_numero_identificacion_rl == null
+            ? undefined
+            : res?.obj.fk_numero_identificacion_rl,
       }));
       if (res?.obj.alert_cupo?.includes("%")) {
         setAlertPorcent(res?.obj.alert_cupo?.replace("%", ""));
