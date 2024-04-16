@@ -110,28 +110,33 @@ export const FuctionEvaluateResponseConsultTrx = (
   const function_name = FuctionEvaluateResponseConsultTrx.name;
   //evaluar el status_
   try {
-    if (peticion_?.hasOwnProperty("status_") === true) {
-      const status_ = peticion_.status_.toLowerCase();
-      if (status_ === "pendiente") {
-        throw new ErrorCustomBackendPending(
-          peticion_?.msg,
-          peticion_?.msg,
-          `${function_name} - evaluar el status_ pendiente`,
-          error_.errorCustomFetchCode?.typeNotify,
-          error_.errorCustomFetchCode?.ignoring,
-          error_.errorCustomFetchCode?.console_error,
-          peticion_
-        );
-      } else if (status_ === "rechazada") {
-        throw new ErrorCustomBackendRehazada(
-          peticion_?.msg,
-          peticion_?.msg,
-          `${function_name} - evaluar el status_ Rechazada`,
-          error_.errorCustomFetchCode?.typeNotify,
-          error_.errorCustomFetchCode?.ignoring,
-          error_.errorCustomFetchCode?.console_error,
-          peticion_
-        );
+    if (peticion_?.status === false) {
+      if (peticion_?.hasOwnProperty("status_") === true) {
+        const status_ = peticion_.status_.toLowerCase();
+        switch (status_) {
+          case "pendiente":
+            throw new ErrorCustomBackendPending(
+              peticion_?.msg,
+              peticion_?.msg,
+              `${function_name} - evaluar el status_ pendiente`,
+              error_.errorCustomFetchCode?.typeNotify,
+              error_.errorCustomFetchCode?.ignoring,
+              error_.errorCustomFetchCode?.console_error,
+              peticion_
+            );
+          // break;
+          case "rechazada":
+            throw new ErrorCustomBackendRehazada(
+              peticion_?.msg,
+              peticion_?.msg,
+              `${function_name} - evaluar el status_ Rechazada`,
+              error_.errorCustomFetchCode?.typeNotify,
+              error_.errorCustomFetchCode?.ignoring,
+              error_.errorCustomFetchCode?.console_error,
+              peticion_
+            );
+          // break;
+        }
       }
     }
     return FuctionEvaluateResponse(peticion_, name_, error_);

@@ -50,6 +50,7 @@ import { formatMoney } from "../../../../components/Base/MoneyInput";
 // };
 //FRAGMENT ******************** CONST *******************************
 const URL_RECARGARCUPO_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+// const URL_RECARGARCUPO_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookRecargarCupo = () => {

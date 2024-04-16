@@ -15,7 +15,7 @@ export type TypingSummaryTrx = {
 
 export type TypingStatusTrx =
   | "Search"
-  | "Unidentified"
+  | "Indefinite"
   | "Pendiente"
   | "Aprobada"
   | "Rechazada";
@@ -28,7 +28,7 @@ export type TypingTrx = {
 export type TypingTypeSettingTime = "origin" | "cross";
 export type TypingDataPath = {
   type_setting_time: TypingTypeSettingTime;
-  id_unique: string;
+  id_hash: string;
 };
 
 //------PeticionSettingTime------
