@@ -12,7 +12,7 @@ import {
   ErrorCustomBackendPending,
   ErrorCustomBackendRehazada,
   FuctionEvaluateResponseConsultTrx,
-} from "../../../utils/fetchCustomPdp";
+} from "../../../../../utils/fetchCustomPdp";
 import {
   TypingCheckPay,
   TypingDataComercioSimple,
@@ -21,9 +21,9 @@ import {
   TypingSummaryTrx,
   TypingTrx,
   TypingTypeSettingTime,
-} from "../utils/utils_typing";
-import { constMsgTrx } from "../utils/utils_const";
-import { ajust_tam_see_obj } from "../utils/utils_function";
+} from "../../../utils/utils_typing";
+import { constMsgTrx } from "../../../utils/utils_const";
+import { ajust_tam_see_obj } from "../../../utils/utils_function";
 
 //FRAGMENT ******************** TYPING *******************************
 export type TypeUseHookGouCheckPay = () => {
@@ -33,13 +33,13 @@ export type TypeUseHookGouCheckPay = () => {
     dataComercioSimple: TypingDataComercioSimple,
     dataPath: TypingDataPath
   ) => Promise<TypingCheckPay>;
-  DetectionInitial: (id_trx: number, id_uuid_trx: string) => any;
   trx: TypingTrx;
   summaryTrx: TypingSummaryTrx;
 };
 
 //FRAGMENT ******************** CONST *******************************
 const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+// const URL_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
@@ -56,30 +56,46 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
   const ArmDataOutput = useCallback(
     (
       res: { [key: string]: any },
-      status?: "Aprobada" | "Rechazada" | "Pendiente"
+      status?: "Aprobada" | "Rechazada" | "Pendiente" | "Indefinite"
     ) => {
-      const res_obj = res.obj ?? {};
-
       if (status === undefined) {
+        status = "Indefinite";
+      }
+      const res_obj = res?.obj ?? {};
+      const res_obj_result = res_obj?.result ?? {};
+      let summary_trx: { [key: string]: any } = {};
+      if (Object.keys(res_obj_result).length === 0) {
+        summary_trx["Id transacción"] =
+          res_obj?.ids?.id_trx && res_obj?.ids?.id_trx;
         setSummaryTrx((old) => ({
           ...old,
+          summary_trx:
+            Object.keys(summary_trx).length === 0 ? undefined : summary_trx,
           id_log: res.obj?.ids?.id_log,
         }));
-        return;
-      }
-      setSummaryTrx({
-        msg: res?.msg,
-        summary_trx: {
+      } else {
+        summary_trx = {
           ...ajust_tam_see_obj(res_obj.result?.summary_trx_add ?? {}, 26),
-          "Tipo de Trámite": res_obj.result?.tipo_tramite,
-          "Id transacción": res_obj.ids?.id_trx,
-          "Num referencia": res_obj.result?.referencia,
-          "Estado de la transacción": status,
-          "Fecha de la transacción": res_obj.result?.fecha,
-        },
-        valor_trx: res_obj?.result?.valor_trx,
-        id_log: res_obj.ids?.id_log,
-      });
+          ...summary_trx,
+        };
+        summary_trx["Tipo de Trámite"] =
+          res_obj_result?.tipo_tramite && res_obj_result?.tipo_tramite;
+        summary_trx["Id transacción"] =
+          res_obj?.ids?.id_trx && res_obj?.ids?.id_trx;
+        summary_trx["Num referencia"] =
+          res_obj_result?.referencia && res_obj_result?.referencia;
+        summary_trx["Estado de la transacción"] = status;
+        summary_trx["Fecha de la transacción"] =
+          res_obj_result?.fecha && res_obj_result?.fecha;
+        setSummaryTrx({
+          msg: res?.msg,
+          summary_trx:
+            Object.keys(summary_trx).length === 0 ? undefined : summary_trx,
+          valor_trx: res_obj_result?.valor_trx,
+          id_log: res_obj.ids?.id_log,
+        });
+      }
+
       setTrx({
         status: status,
         msg: constMsgTrx[status],
@@ -88,27 +104,15 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
     []
   );
 
-  const DetectionInitial = useCallback(
-    (id_trx: number, id_uuid_trx: string) => {
-      setSummaryTrx({
-        summary_trx: {
-          "Id transacción": id_trx,
-          id_uuid_trx: id_uuid_trx,
-        },
-      });
-    },
-    [setSummaryTrx]
-  );
-
   const PeticionSettingTime = useCallback(
     async (
-      setting_time: TypingTypeSettingTime
+      type_setting_time: TypingTypeSettingTime
     ): Promise<TypingDataSettingTime> => {
       const function_name = "PeticionSettingTime";
       const name_service = "consultar configuracion time";
       let response: any;
       try {
-        const url = `${URL_GOU}/services_gou/check_pay/consult_setting_time/${setting_time}`;
+        const url = `${URL_GOU}/services_gou/check_pay/consult_setting_time/${type_setting_time}`;
         response = await fetchCustomPdp(url, "GET", name_service);
         return {
           delay_consult_for_pay:
@@ -138,7 +142,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
   const PeticionConsultForPay = useCallback(
     async (
       dataComercioSimple: TypingDataComercioSimple,
-      id_unique: string,
+      id_hash: string,
       dataSettingTime: TypingDataSettingTime
     ): Promise<TypingCheckPay> => {
       const function_name = "PeticionConsultForPay";
@@ -153,7 +157,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
             id_usuario: dataComercioSimple.id_usuario,
             id_terminal: dataComercioSimple.id_terminal,
           },
-          id_unique: id_unique,
+          pk_hash: id_hash,
         };
         //SECUENCIA ---------------Paso 1-------------------------------
         try {
@@ -254,7 +258,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
         );
         const dataConsultForPay = await PeticionConsultForPay(
           dataComercioSimple,
-          dataPath.id_unique,
+          dataPath.id_hash,
           dataSettingTime
         );
         return dataConsultForPay;
@@ -280,7 +284,6 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
   return {
     loadingPeticion,
     loadingPeticionBlocking,
-    DetectionInitial,
     PeticionCheckPay,
     trx,
     summaryTrx,
