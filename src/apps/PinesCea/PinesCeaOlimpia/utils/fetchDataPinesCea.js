@@ -45,10 +45,10 @@ const fetchData = async (
   const _headers = {};
   if (authenticate) {
     _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;
-    _headers.Authorization_servicio_olimpia = JSON.stringify({
-      username: process.env.REACT_APP_USUARIO_CEA_OLIMPIA, 
-      password: process.env.REACT_APP_CONTRASENNA_CEA_OLIMPIA
-    });
+    // _headers.Authorization_servicio_olimpia = JSON.stringify({
+    //   username: process.env.REACT_APP_USUARIO_CEA_OLIMPIA, 
+    //   password: process.env.REACT_APP_CONTRASENNA_CEA_OLIMPIA
+    // });
   }
 
   fetchOptions.headers = {
@@ -63,6 +63,7 @@ const fetchData = async (
       fetchOptions.body = JSON.stringify(data);
     }
   }
+  console.log(fetchOptions)
   async function fetchWithTimeout(resource, options, timeout) {
     const abortController = new AbortController();
     const id = setTimeout(() => abortController.abort(), timeout);

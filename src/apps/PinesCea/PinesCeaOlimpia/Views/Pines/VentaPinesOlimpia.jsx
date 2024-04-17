@@ -19,6 +19,7 @@ import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 
 import { notifyError, notifyPending } from "../../../../../utils/notify";
+import fetchData from "../../../../../utils/fetchData";
 import fetchDataPinesCea from "../../utils/fetchDataPinesCea";
 import ScreenBlocker from "../../../components/ScreenBlocker";
 import TicketOlimpia from "../../components/TicketOlimpia";
