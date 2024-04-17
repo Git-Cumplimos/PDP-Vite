@@ -1,12 +1,12 @@
 import { Auth } from "@aws-amplify/auth";
 
-const fetchData = async (
+const fetchDataPinesCea = async (
   url = "",
   method = "GET",
   queries = {},
   data = {},
   headers = {},
-  authenticate = true,
+  authenticate = false,
   timeout = 60000
 ) => {
   if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
@@ -101,4 +101,4 @@ const fetchData = async (
   }
 };
 
-export default fetchData;
+export default fetchDataPinesCea;
