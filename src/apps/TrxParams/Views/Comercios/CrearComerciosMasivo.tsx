@@ -13,6 +13,7 @@ import Modal from "../../../../components/Base/Modal";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyError } from "../../../../utils/notify";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
 type Props = {
   showMassive: boolean;
@@ -23,8 +24,18 @@ type Props = {
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 // const urlComercios = `http://localhost:5000`;
 
-const CrearComerciosMasivo = ({ showMassive, setShowMassive, searchCommercesFn }: Props) => {
+const CrearComerciosMasivo = ({
+  showMassive,
+  setShowMassive,
+  searchCommercesFn,
+}: Props) => {
+  const { pdpUser } = useAuth();
   const [fileUpload, setFileUpload] = useState<File>();
+
+  const currentUserId = useMemo(
+    () => (pdpUser ?? { uuid: 0 })?.uuid,
+    [pdpUser]
+  );
 
   const handleClose = useCallback(() => {
     setShowMassive(false);
@@ -59,39 +70,43 @@ const CrearComerciosMasivo = ({ showMassive, setShowMassive, searchCommercesFn }
       options: useMemo(() => {
         const formData = new FormData();
         formData.append("file", fileUpload as Blob);
+        formData.append("usuario_ultima_actualizacion", `${currentUserId}`);
         return {
           method: "POST",
           body: formData,
         };
-      }, [fileUpload]),
+      }, [fileUpload, currentUserId]),
     },
     {
       onPending: useCallback(() => "Cargando archivo", []),
-      onSuccess: useCallback((response) => {
-        if (!response.ok) {
-          if (response.headers.get("Content-Type")?.includes("csv")) {
-            response
-              .blob()
-              .then((blob: Blob) => {
-                const urlFile = URL.createObjectURL(blob);
-                window.open(urlFile, "_blank");
-              })
-              .catch((error: any) => console.error(error));
-          } else {
-            response
-              .json()
-              .then((res: any) => console.log(res))
-              .catch((error: any) => console.error(error));
+      onSuccess: useCallback(
+        (response) => {
+          if (!response.ok) {
+            if (response.headers.get("Content-Type")?.includes("csv")) {
+              response
+                .blob()
+                .then((blob: Blob) => {
+                  const urlFile = URL.createObjectURL(blob);
+                  window.open(urlFile, "_blank");
+                })
+                .catch((error: any) => console.error(error));
+            } else {
+              response
+                .json()
+                .then((res: any) => console.log(res))
+                .catch((error: any) => console.error(error));
+            }
+            // throw new Error("Error con archivo cargado", { cause: "custom" });
+            notifyError("Error con archivo cargado");
+            // return "Error con archivo cargado";
+            return "Carga finalizada";
           }
-          // throw new Error("Error con archivo cargado", { cause: "custom" });
-          notifyError("Error con archivo cargado");
-          // return "Error con archivo cargado";
-          return "Carga finalizada";
-        }
-        searchCommercesFn?.();
-        handleClose();
-        return "Carga satisfactoria";
-      }, [handleClose, searchCommercesFn]),
+          searchCommercesFn?.();
+          handleClose();
+          return "Carga satisfactoria";
+        },
+        [handleClose, searchCommercesFn]
+      ),
       onError: useCallback((error) => {
         if (error?.cause === "custom") {
           // notifyError(error.message);

@@ -51,6 +51,10 @@ import rutasPinesCrcOlimpia, {
   listPermissionsPinesCrcOlimpia,
 } from "../apps/PinesCrc/PinesCrcOlimpia/routes";
 
+import rutasPinesCeaOlimpia, {
+  listPermissionsPinesCeaOlimpia,
+} from "../apps/PinesCea/PinesCeaOlimpia/routes";
+
 /**
  * * Providers
  */
@@ -86,9 +90,13 @@ import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 import rutasCajaSocialCB, {
   listPermissionsCajaSocial,
 } from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
+import rutasItauCB, {
+  listPermissionsItau,
+} from "../apps/Corresponsalia/CorresponsaliaItau/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
 import routesGestionBCS from "../apps/GestionBCS/routes";
+import routesGouCheckPay from "../apps/Gou/routes";
 /**
 
  * * Logos
@@ -731,6 +739,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsPinesCrc,
       ...listPermissionsPinesCea,
       ...listPermissionsPinesCrcOlimpia,
+      ...listPermissionsPinesCeaOlimpia,
     ],
     provider: ProvidepinesVus,
     subRoutes: [
@@ -739,6 +748,7 @@ const allUrlsPrivateApps = [
       rutasPinesCrc,
       rutasPinesCea,
       rutasPinesCrcOlimpia,
+      rutasPinesCeaOlimpia,
       {
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
@@ -792,8 +802,8 @@ const allUrlsPrivateApps = [
         permission: [62],
       },
       {
-        link: "/cupo/ajuste-deuda-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        link: "/cupo/ajuste-cartera-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste cartera cupo"} />,
         component: AjusteCupo,
         permission: [59],
       },
@@ -862,6 +872,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsAgrario,
       ...listPermissionsRecaudoMultiple,
       ...listPermissionsCajaSocial,
+      ...listPermissionsItau,
     ],
     subRoutes: [
       rutasDaviviendaCB,
@@ -870,6 +881,7 @@ const allUrlsPrivateApps = [
       rutasColpatria,
       rutasRecaudoMultiple,
       rutasCajaSocialCB,
+      rutasItauCB,
     ],
   },
   routesDaviplata,
@@ -1218,6 +1230,8 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
+  //Modulo Gou
+  routesGouCheckPay,
   //Modulo Recarga Cupo
   routesRecargaCupo,
   //Modulo Nequi

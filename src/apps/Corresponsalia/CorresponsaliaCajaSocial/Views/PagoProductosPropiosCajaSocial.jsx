@@ -35,7 +35,7 @@ const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPON
 const DATA_PAGO_INIT = {
   estadoLecturaPago: "codigoBarras",
   valorPagoProductosPropios: 0,
-  tipoPago: 1,
+  tipoPago: "1",
   valorDiferentePagoProductosPropios: 0,
   numeroProducto: "",
 };
@@ -174,8 +174,9 @@ const PagoProductosPropiosCajaSocial = () => {
         pago_productos_propios_caja_social: {
           numero_producto: dataPago?.numeroProducto,
           nom_cliente: resConsulta?.trn?.personName?.fullName,
-          tipo_pago: dataPago?.tipoPago,
           codigo_barras: dataPago.estadoLecturaPago === "codigoBarras",
+          valor_minimo: resConsulta?.trn?.minCurAmt?.amt,
+          valor_maximo: resConsulta?.trn?.totalCurAmt?.amt,
         },
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
@@ -204,7 +205,7 @@ const PagoProductosPropiosCajaSocial = () => {
             if (error.hasOwnProperty("optionalObject")) {
               if (error.optionalObject.hasOwnProperty("ticket")) {
                 setObjTicketActual(error.optionalObject.ticket ?? {});
-                setEstadoPeticion(1);
+                setEstadoPeticion(2);
                 setStateTicketTrx(false);
               } else validNavigate(-1);
             } else validNavigate(-1);
@@ -226,6 +227,12 @@ const PagoProductosPropiosCajaSocial = () => {
       } else if (dataPago.tipoPago === "3") {
         valorAPagar = dataPago.valorDiferentePagoProductosPropios;
       }
+      if (valorAPagar > resConsulta?.trn?.totalCurAmt?.amt)
+        return notifyError(
+          `El valor de la transacción debe ser menor de  ${formatMoney.format(
+            resConsulta?.trn?.totalCurAmt?.amt
+          )}`
+        );
       if (
         valorAPagar <
           enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL ||
@@ -418,7 +425,7 @@ const PagoProductosPropiosCajaSocial = () => {
                     label={"Valor a pagar"}
                     type="tel"
                     // minLength={5}
-                    maxLength={10}
+                    maxLength={12}
                     autoComplete="off"
                     min={
                       enumParametrosCajaSocial?.MIN_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
@@ -426,7 +433,10 @@ const PagoProductosPropiosCajaSocial = () => {
                     max={
                       enumParametrosCajaSocial?.MAX_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL
                     }
-                    value={dataPago?.valorDiferentePagoProductosPropios ?? 0}
+                    defaultValue={
+                      dataPago?.valorDiferentePagoProductosPropios ?? 0
+                    }
+                    decimalDigits={2}
                     onInput={onChangeFormatNum}
                     disabled={
                       loadingPeticionPagoProductosPropios ||

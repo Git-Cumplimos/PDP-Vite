@@ -1,31 +1,32 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import Button from "../../../../components/Base/Button";
-import ButtonBar from "../../../../components/Base/ButtonBar";
-import Fieldset from "../../../../components/Base/Fieldset";
-import Form from "../../../../components/Base/Form";
-import Input from "../../../../components/Base/Input";
-import Modal from "../../../../components/Base/Modal";
-import Select from "../../../../components/Base/Select";
-import SimpleLoading from "../../../../components/Base/SimpleLoading";
-import { notify, notifyError } from "../../../../utils/notify";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import Fieldset from "../../../../../components/Base/Fieldset";
+import Form from "../../../../../components/Base/Form";
+import Input from "../../../../../components/Base/Input";
+import Modal from "../../../../../components/Base/Modal";
+import Select from "../../../../../components/Base/Select";
+import SimpleLoading from "../../../../../components/Base/SimpleLoading";
+import { notify, notifyError } from "../../../../../utils/notify";
 import {
   postCambiarComercioGrupoComercio,
   postCrearComercio,
   putModificarComercio,
   postDispersionPagoComercio,
   postConsultaParametrizacionConvenios,
-} from "../../utils/fetchComercios";
-import useFetchDebounce from "../../../../hooks/useFetchDebounce";
-import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
-import CommerceTable from "../../components/Commerce/CommerceTable";
-import InputSuggestions from "../../../../components/Base/InputSuggestions/InputSuggestions";
-import ToggleInput from "../../../../components/Base/ToggleInput/ToggleInput";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import TiposContratosTable from "../../components/Commerce/TiposContratosTable";
-import MoneyInput from "../../../../components/Base/MoneyInput";
-import { onChangeNumber } from "../../../../utils/functions";
-import { fetchZonas } from "../../utils/fetchZonas";
+} from "../../../utils/fetchComercios";
+import useFetchDebounce from "../../../../../hooks/useFetchDebounce";
+import useFetchDispatchDebounce from "../../../../../hooks/useFetchDispatchDebounce";
+import CommerceTable from "../../../components/Commerce/CommerceTable";
+import InputSuggestions from "../../../../../components/Base/InputSuggestions/InputSuggestions";
+import ToggleInput from "../../../../../components/Base/ToggleInput/ToggleInput";
+import { useAuth } from "../../../../../hooks/AuthHooks";
+import TiposContratosTable from "../../../components/Commerce/TiposContratosTable";
+import MoneyInput from "../../../../../components/Base/MoneyInput";
+import { onChangeNumber } from "../../../../../utils/functions";
+import { fetchZonas } from "../../../utils/fetchZonas";
+import RepresentanteLegal from "./RepresentanteLegal";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -80,6 +81,9 @@ const emptyCommerce = {
   alert_cupo: "",
   zona_comercio: null,
   tipo_persona: null,
+  fk_tipo_identificacion_rl: undefined,
+  fk_numero_identificacion_rl: undefined,
+  barrio_comercio: "",
 };
 
 const CrearComercios = () => {
@@ -174,9 +178,18 @@ const CrearComercios = () => {
 
   const [fetchComercios] = useFetchDispatchDebounce({
     onSuccess: useCallback((res) => {
+      console.log(res);
       setComercio((old) => ({
         ...structuredClone(old),
         ...structuredClone(res?.obj),
+        fk_tipo_identificacion_rl:
+          res?.obj?.fk_tipo_identificacion_rl == null
+            ? undefined
+            : res?.obj.fk_tipo_identificacion_rl,
+        fk_numero_identificacion_rl:
+          res?.obj?.fk_numero_identificacion_rl == null
+            ? undefined
+            : res?.obj.fk_numero_identificacion_rl,
       }));
       if (res?.obj.alert_cupo?.includes("%")) {
         setAlertPorcent(res?.obj.alert_cupo?.replace("%", ""));
@@ -762,34 +775,20 @@ const CrearComercios = () => {
             value={
               comercio?.comercio_padre ? comercio?.comercio_padre : "Vacio"
             }
-            info={
-              <button
-                type="button"
-                style={{
-                  position: "absolute",
-                  top: "-33px",
-                  right: "-235px",
-                  fontSize: "15px",
-                  padding: "5px",
-                  backgroundColor: "#e26c22",
-                  color: "white",
-                  borderRadius: "5px",
-                }}
-                onClick={(e) => {
-                  if (comercio?.comercio_padre) {
-                    setComercio((old) => ({
-                      ...old,
-                      fk_comercio_padre: null,
-                      comercio_padre: "",
-                    }));
-                  } else {
-                    handleShowModal();
-                  }
-                }}
-              >
-                {comercio?.comercio_padre ? "Eliminar" : "Agregar comercio"}
-              </button>
-            }
+            actionBtn={{
+              label: comercio?.comercio_padre ? "Eliminar" : "Agregar comercio",
+              callback: (e) => {
+                if (comercio?.comercio_padre) {
+                  setComercio((old) => ({
+                    ...old,
+                    fk_comercio_padre: null,
+                    comercio_padre: "",
+                  }));
+                } else {
+                  handleShowModal();
+                }
+              },
+            }}
             disabled
           />
           {Boolean(pk_comercio_handled) && (
@@ -819,6 +818,20 @@ const CrearComercios = () => {
             }
           />
         </Fieldset>
+        <RepresentanteLegal
+          fk_tipo_identificacion_rl={comercio?.fk_tipo_identificacion_rl}
+          fk_numero_identificacion_rl={comercio?.fk_numero_identificacion_rl}
+          setRlPks={useCallback(
+            ({ pk_tipo_identificacion_rl, pk_numero_identificacion_rl }) => {
+              setComercio((old) => ({
+                ...old,
+                fk_tipo_identificacion_rl: pk_tipo_identificacion_rl,
+                fk_numero_identificacion_rl: pk_numero_identificacion_rl,
+              }));
+            },
+            []
+          )}
+        />
         <Fieldset legend="Ubicación comercio" className="lg:col-span-2">
           <Input
             id="direccion_comercio"
@@ -870,6 +883,22 @@ const CrearComercios = () => {
             }}
             autoComplete="off"
           />
+          <Input
+            id="barrio_comercio"
+            label="Barrio comercio"
+            type="text"
+            name="barrio_comercio"
+            minLength="4"
+            maxLength="50"
+            required
+            value={comercio?.barrio_comercio}
+            onInput={(e) => {
+              setComercio((old) => {
+                return { ...old, barrio_comercio: e.target.value };
+              });
+            }}
+            autoComplete="off"
+          />
         </Fieldset>
         <Fieldset legend="Códigos Dane" className="lg:col-span-2">
           <Input
@@ -877,7 +906,7 @@ const CrearComercios = () => {
             label="Número Dane ciudad"
             type="tel"
             name="dane_ciudad"
-            minLength="1"
+            minLength="5"
             maxLength="5"
             required
             value={comercio?.dane_ciudad}
@@ -894,8 +923,8 @@ const CrearComercios = () => {
             label="Número Dane departamento"
             type="tel"
             name="dane_dpto"
-            minLength="1"
-            maxLength="5"
+            minLength="2"
+            maxLength="2"
             required
             value={comercio?.dane_dpto}
             onInput={(e) => {
@@ -1121,35 +1150,21 @@ const CrearComercios = () => {
                       required
                       autoComplete="off"
                       value={comercio?.codigos_institucionales[key]}
-                      info={
-                        <button
-                          type="button"
-                          style={{
-                            position: "absolute",
-                            top: "-33px",
-                            right: "-235px",
-                            fontSize: "15px",
-                            padding: "5px",
-                            backgroundColor: "#e26c22",
-                            color: "white",
-                            borderRadius: "5px",
-                          }}
-                          onClick={() => {
-                            const rest = {
-                              ...comercio?.codigos_institucionales,
+                      actionBtn={{
+                        label: "Eliminar",
+                        callback: () => {
+                          const rest = {
+                            ...comercio?.codigos_institucionales,
+                          };
+                          delete rest[key];
+                          setComercio((old) => {
+                            return {
+                              ...old,
+                              codigos_institucionales: rest,
                             };
-                            delete rest[key];
-                            setComercio((old) => {
-                              return {
-                                ...old,
-                                codigos_institucionales: rest,
-                              };
-                            });
-                          }}
-                        >
-                          Eliminar
-                        </button>
-                      }
+                          });
+                        },
+                      }}
                       onInput={(e) => {
                         setComercio((old) => {
                           return {

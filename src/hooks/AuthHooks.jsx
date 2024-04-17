@@ -386,7 +386,10 @@ export const useProvideAuth = () => {
               Error http: {response.statusText} ({response.status})
             </p>
           );
-          return;
+          throw new Error(
+            `Error consultando el servicio de verificacion de token: Error http: ${response.statusText} (${response.status})`,
+            { cause: "custom" }
+          );
         }
         const resJson = await response.json();
         if (!resJson?.status) {
@@ -454,7 +457,11 @@ export const useProvideAuth = () => {
   const handlesetPreferredMFA = useCallback(
     async (totp) => {
       try {
-        await verifyTOTP(totp);
+        try {
+          await verifyTOTP(totp);
+        } catch (error) {
+          throw error;
+        }
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
         if (preferredMFA === "SUCCESS") {
           await confirmSignIn(totp);
@@ -545,6 +552,7 @@ export const useProvideAuth = () => {
         tempRole.comision = quota["comisiones"];
         tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
         tempRole.sobregirovalue = quota["sobregiro"];
+        tempRole.deuda = quota["cupo_canje"] ?? 0;
         tempRole.alerta = quota["alerta cupo"];
         tempRole.tipo_pago_comision = quota["tipo pago comision"] ?? "";
         dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
@@ -553,7 +561,7 @@ export const useProvideAuth = () => {
         dispatchAuth({
           type: SET_QUOTA,
           payload: {
-            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" },
+            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "", deuda : 0 },
           },
         });
         if (error?.cause === "custom") {

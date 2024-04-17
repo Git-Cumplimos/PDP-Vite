@@ -50,6 +50,7 @@ import { formatMoney } from "../../../../components/Base/MoneyInput";
 // };
 //FRAGMENT ******************** CONST *******************************
 const URL_RECARGARCUPO_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+// const URL_RECARGARCUPO_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookRecargarCupo = () => {
@@ -136,9 +137,12 @@ const useHookRecargarCupo = () => {
             id_trx: dataCrearSesion.id_trx,
             id_uuid_trx: id_uuid_trx,
             valor_trx: dataInput.valor_trx,
-            nombre_completo: dataInput.nombre_completo,
             referencia: dataInput.referencia,
             ip_address: "127.0.0.1",
+            summary_trx_add: {
+              Nombre: dataInput.nombre_completo,
+            },
+            tipo_tramite: dataInput.tipo_tramite,
           };
           response = await fetchCustom(
             url_pay,

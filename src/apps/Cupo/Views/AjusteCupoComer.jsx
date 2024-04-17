@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/Base/Button";
 import ButtonBar from "../../../components/Base/ButtonBar";
@@ -15,6 +15,7 @@ import { putAjusteCupo } from "../utils/fetchCupo";
 import { getConsultaCupoComercio } from "../utils/fetchFunctions";
 import { cargarArchivoAjusteCupoMasivo } from "../utils/fetchFunctions";
 import { descargarArchivo, descargarFormato } from "../utils/functions";
+import { PermissionsCupo } from "../permissions";
 
 const AjusteCupoComer = ({ subRoutes }) => {
   const navegate = useNavigate();
@@ -43,13 +44,24 @@ const AjusteCupoComer = ({ subRoutes }) => {
     [3, 3500, 3 ,"ajuste contingencia"],
 ]
 
-  const { roleInfo, pdpUser } = useAuth();
+  const { roleInfo, pdpUser, userPermissions } = useAuth();
   // useEffect(() => {
   //   if (cupoComer.length === 0) {
   //     notifyError("ID de comercio incorrecto");
   //     setinputId(false);
   //   }
   // }, [cupoComer]);
+  const listaPermisos = useMemo(
+    () =>
+      userPermissions
+        .map(({ id_permission }) => id_permission)
+        .filter((id_permission) => [
+          PermissionsCupo.ajuste_contingencia,
+          PermissionsCupo.ajuste_credito,
+          PermissionsCupo.ajuste_debito,
+        ].includes(id_permission)),
+    [userPermissions]
+  );
 
   const consultaCupoComercios = useCallback((id_comercio) => {
     getConsultaCupoComercio({ 'pk_id_comercio': id_comercio ?? idComercio })
@@ -189,7 +201,7 @@ const AjusteCupoComer = ({ subRoutes }) => {
 
   return (
     <Fragment>
-      <h1 className="text-3xl mt-6">Ajuste deuda cupo</h1>
+      <h1 className="text-3xl mt-6">Ajuste cartera cupo</h1>
       <Form onSubmit={onSubmitBusqueda} grid>
         <ButtonBar className={"lg  col-span-2"}>
           <Button
@@ -219,7 +231,16 @@ const AjusteCupoComer = ({ subRoutes }) => {
             </Button>
           </ButtonBar>
         ) : (
-          ""
+          <Input
+            id="nombre_comercio"
+            name="Nombre comercio"
+            label="Nombre comercio"
+            type="text"
+            value={cupoComer[0]?.nombre_comercio ?? ""}
+            autoComplete="off"
+            disabled={true}
+            required
+          />
         )}
       </Form>
       {cupoComer.length === 1 ? (
@@ -243,32 +264,32 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 disabled={true}
                 required
               />
-              <MoneyInput
-                id="deuda"
-                name="deuda"
-                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
+              {/* <MoneyInput
+                id="deuda" // cartera
+                name="deuda" // cartera
+                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={parseInt(cupoComer[0]?.deuda)}
                 disabled={true}
                 required
-              />
-              {/* <Input
-                id="deuda"
-                name="deuda"
-                label="Deuda del comercio"
+              /> */}
+              <Input
+                id="deuda" // cartera
+                name="deuda" // cartera
+                label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
                 value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
                 disabled={true}
                 required
-              /> */}
+              />
               <MoneyInput
                 id="cupo_en_canje"
                 name="cupo_en_canje"
-                label="Cupo en canje"
+                label="Deuda" // Cupo en canje
                 autoComplete="off"
                 min={limitesMontos?.min}
                 max={limitesMontos?.max}
@@ -277,41 +298,51 @@ const AjusteCupoComer = ({ subRoutes }) => {
                 required
               />
             </Fieldset>
-            <Fieldset legend={"Datos Cupo"}>
-              <MoneyInput
-                id="monto"
-                name="monto"
-                label="Monto"
-                autoComplete="off"
-                maxLength={"14"}
-                min={limitesMontos?.min}
-                max={limitesMontos?.max}
-                onInput={onMoneyChange}
-                required
-              />
-              <TextArea
-                required
-                id="razon_ajuste"
-                name="razon_ajuste"
-                label="Razón de ajuste"
-                autoComplete="off"
-                maxLength={"100"}
-                value={razonAjuste}
-                onInput={(e) => setRazonAjuste(e.target.value.trimLeft())}
-                info={`Maximo 100 caracteres: (${razonAjuste.length}/100)`}
-              />
-            </Fieldset>
-            <ButtonBar className={"lg:col-span-2"}>
-              <Button type={"submit"} name={"Débito"}>
-                Ajuste débito
-              </Button>
-              <Button type={"submit"} name={"Crédito"}>
-                Ajuste crédito
-              </Button>
-              <Button type={"submit"} name={"contigencia"}>
-                Ajuste crédito tipo contingencia
-              </Button>
-            </ButtonBar>
+            {listaPermisos.length ? (
+            <>
+              <Fieldset legend={"Datos Cupo"}>
+                <MoneyInput
+                  id="monto"
+                  name="monto"
+                  label="Monto"
+                  autoComplete="off"
+                  maxLength={"14"}
+                  min={limitesMontos?.min}
+                  max={limitesMontos?.max}
+                  onInput={onMoneyChange}
+                  required
+                />
+                <TextArea
+                  required
+                  id="razon_ajuste"
+                  name="razon_ajuste"
+                  label="Razón de ajuste"
+                  autoComplete="off"
+                  maxLength={"100"}
+                  value={razonAjuste}
+                  onInput={(e) => setRazonAjuste(e.target.value.trimLeft())}
+                  info={`Maximo 100 caracteres: (${razonAjuste.length}/100)`}
+                />
+              </Fieldset>
+              <ButtonBar className={"lg:col-span-2"}>
+                {listaPermisos.includes(PermissionsCupo.ajuste_debito) && (
+                  <Button type={"submit"} name={"Débito"}>
+                    Ajuste débito
+                  </Button>
+                )}
+                {listaPermisos.includes(PermissionsCupo.ajuste_credito) && (
+                  <Button type={"submit"} name={"Crédito"}>
+                    Ajuste crédito
+                  </Button>
+                )}
+                {listaPermisos.includes(PermissionsCupo.ajuste_contingencia) && (
+                  <Button type={"submit"} name={"contigencia"}>
+                    Ajuste crédito tipo contingencia
+                  </Button>
+                )}
+              </ButtonBar>
+            </>
+            ):("")}
           </Form>
           <Modal show={submitName} handleClose={() => setSubmitName("")}>
             <PaymentSummary

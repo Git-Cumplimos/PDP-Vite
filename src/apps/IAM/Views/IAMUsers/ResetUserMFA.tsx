@@ -89,7 +89,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
   return (
     <Fragment>
       <Fieldset
-        legend={"Recuperar QR y contraseña usuario (Danger zone)"}
+        legend={"Recuperar QR y contraseña usuario"}
         className={"lg:col-span-2"}
       >
         <ToggleInput
@@ -114,7 +114,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
       <Modal show={showModal} handleClose={handleClose}>
         <PaymentSummary
           title="¿Está seguro de recuperar QR y contraseña del usuario?"
-          subtitle="Informacion de usuario"
+          subtitle="Información de usuario"
           summaryTrx={{
             "Id de usuario": userInfo.id,
             Correo: userInfo.email,

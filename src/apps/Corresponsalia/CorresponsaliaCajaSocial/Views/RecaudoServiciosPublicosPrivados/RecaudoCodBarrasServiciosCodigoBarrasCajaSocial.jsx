@@ -20,6 +20,7 @@ const DATA_CONVENIOS_INIT = {
 const RecaudoCodBarrasServiciosCodigoBarrasCajaSocial = () => {
   const validNavigate = useNavigate();
   const [dataConvenio, setDataConvenio] = useState(DATA_CONVENIOS_INIT);
+  const [codigoBarrasData, setCodigoBarrasData] = useState("");
   const buttonDelete = useRef(null);
   const [
     loadingPeticionConsultaConvenioCodigoBarras,
@@ -27,6 +28,7 @@ const RecaudoCodBarrasServiciosCodigoBarrasCajaSocial = () => {
   ] = useFetch(fetchCustom(URL_CONSULTA_CONVENIO, "POST", "Consulta titular"));
 
   const consultaCodigoBarras = useCallback((codigoBarras) => {
+    setCodigoBarrasData(codigoBarras);
     const data = {
       codigo_barras: codigoBarras,
     };
@@ -81,6 +83,7 @@ const RecaudoCodBarrasServiciosCodigoBarrasCajaSocial = () => {
         <PagoRecaudoServiciosCajaSocial
           convenio={dataConvenio.data_convenios[0]}
           dataCodigoBarras={dataConvenio.data_codigo_barras}
+          codigoBarras={codigoBarrasData}
           tipoRecaudo="codigoBarras"
         />
       )}

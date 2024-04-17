@@ -30,10 +30,12 @@ const DATA_RECAUDO_INIT = {
   ref1: "",
   ref2: "",
   ref3: "",
+  otraReferencia: "",
   valorTrx: 0,
   ref1Validacion: "",
   ref2Validacion: "",
   ref3Validacion: "",
+  otraReferenciaValidacion: "",
   valorTrxValidacion: 0,
   valorTrxOriginal: 0,
   fechaCaducidad: "",
@@ -42,6 +44,7 @@ const DATA_RECAUDO_INIT = {
 const PagoRecaudoServiciosCajaSocial = ({
   convenio,
   dataCodigoBarras,
+  codigoBarras = "",
   tipoRecaudo = "manual",
 }) => {
   const uniqueId = v4();
@@ -80,6 +83,7 @@ const PagoRecaudoServiciosCajaSocial = ({
         ref1: dataCodigoBarras.codigos_referencia[0] ?? "",
         ref2: dataCodigoBarras.codigos_referencia[1] ?? "",
         ref3: dataCodigoBarras.codigos_referencia[2] ?? "",
+        otraReferencia: "",
         valorTrxOriginal: dataCodigoBarras.pago[0] ?? 0,
         valorTrx: dataCodigoBarras.pago[0] ?? 0,
         fechaCaducidad: dataCodigoBarras.fecha_caducidad[0] ?? "",
@@ -111,12 +115,18 @@ const PagoRecaudoServiciosCajaSocial = ({
             );
           }
         }
+        if (
+          dataRecaudo.otraReferencia !== dataRecaudo.otraReferenciaValidacion
+        ) {
+          return notifyError(
+            "Error: Los valores de las referencias son diferentes"
+          );
+        }
         if (dataRecaudo.valorTrx !== dataRecaudo.valorTrxValidacion) {
           return notifyError("Error: El valor de la transacción es diferente");
         }
         pagoRecaudoServicios(ev);
-      }
-      if (
+      } else if (
         tipoRecaudo === "codigoBarras" &&
         estadoPeticion === "hidden" &&
         convenio.tipo_recaudo === "01"
@@ -124,10 +134,11 @@ const PagoRecaudoServiciosCajaSocial = ({
         setEstadoPeticion("validatePayment");
         setShowModal(true);
         return;
+      } else {
+        consultaRecaudoServicios(ev);
       }
-      consultaRecaudoServicios(ev);
     },
-    [dataRecaudo, pdpUser, roleInfo]
+    [dataRecaudo, pdpUser, roleInfo, convenio, tipoRecaudo, estadoPeticion]
   );
   const consultaRecaudoServicios = useCallback(
     (ev) => {
@@ -138,7 +149,11 @@ const PagoRecaudoServiciosCajaSocial = ({
         dataCodigoBarras?.fecha_caducidad?.length > 0
       ) {
         extraData["fecha_pago_codigo_barras"] =
-          dataCodigoBarras?.fecha_caducidad[0];
+          dataCodigoBarras?.fecha_caducidad[-1];
+      }
+      if (tipoRecaudo !== "manual") {
+        extraData["codigo_barras"] = codigoBarras;
+        extraData["flag_codigo_barras"] = true;
       }
       const data = {
         oficina_propia:
@@ -146,7 +161,7 @@ const PagoRecaudoServiciosCajaSocial = ({
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataRecaudo?.valorTrx,
+        valor_total_trx: dataRecaudo?.valorTrxOriginal,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -167,9 +182,8 @@ const PagoRecaudoServiciosCajaSocial = ({
             name: convenio?.[`nom_ref${i + 1}`],
             value: dataRecaudo?.[`ref${i + 1}`],
           })),
-          flag_otro_valor:
-            dataRecaudo.valorTrxOriginal.toString() !==
-            dataRecaudo.valorTrx.toString(),
+          otra_referencia: dataRecaudo.otraReferencia,
+          flag_otro_valor: convenio.permite_modificar_valor,
           tipo_convenio_recaudo: convenio.tipo_recaudo,
           nombre_convenio: dataRecaudo?.nombreConvenio,
           ...extraData,
@@ -205,13 +219,41 @@ const PagoRecaudoServiciosCajaSocial = ({
   const pagoRecaudoServicios = useCallback(
     (ev) => {
       ev.preventDefault();
+      let extraData = {};
+      if (
+        dataCodigoBarras?.fecha_caducidad?.length &&
+        dataCodigoBarras?.fecha_caducidad?.length > 0
+      ) {
+        extraData["fecha_pago_codigo_barras"] =
+          dataCodigoBarras?.fecha_caducidad[-1];
+      }
+      if (tipoRecaudo !== "manual") {
+        extraData["codigo_barras"] = codigoBarras;
+        extraData["flag_codigo_barras"] = true;
+      }
+      if (
+        dataRecaudo?.valorTrx <
+          enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL ||
+        dataRecaudo?.valorTrx >
+          enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
+      ) {
+        // setEstadoPeticion(0)
+        // setShowModal(0)
+        return notifyError(
+          `El valor de la transacción debe estar entre ${formatMoney.format(
+            enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
+          )} y ${formatMoney.format(
+            enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
+          )}`
+        );
+      }
       const data = {
         oficina_propia:
           roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: dataRecaudo?.valorDeposito,
+        valor_total_trx: dataRecaudo?.valorTrx,
         nombre_comercio: roleInfo?.["nombre comercio"],
         nombre_usuario: pdpUser?.uname ?? "",
         comercio: {
@@ -225,9 +267,21 @@ const PagoRecaudoServiciosCajaSocial = ({
           dane_code: roleInfo?.codigo_dane,
           city: roleInfo?.["ciudad"],
         },
-        deposito_caja_social: {
-          numero_cuenta: dataRecaudo?.numeroCuenta,
-          nom_cliente: resConsulta?.trn?.personName?.fullName,
+        recaudo_servicios_caja_social: {
+          codigo_convenio: dataRecaudo?.codigoConvenio,
+          referencias: [
+            ...Array(parseInt(convenio.cant_referencias)).keys(),
+          ].map((i) => ({
+            name: convenio?.[`nom_ref${i + 1}`],
+            value: dataRecaudo?.[`ref${i + 1}`],
+          })),
+          otra_referencia: dataRecaudo.otraReferencia,
+          //TODO
+          flag_otro_valor: convenio.permite_modificar_valor,
+          tipo_convenio_recaudo: convenio.tipo_recaudo,
+          nombre_convenio: dataRecaudo?.nombreConvenio,
+          codigo_notificacion: "",
+          ...extraData,
         },
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
@@ -246,7 +300,7 @@ const PagoRecaudoServiciosCajaSocial = ({
           render: ({ data: res }) => {
             const dataTemp = res.obj;
             setObjTicketActual(dataTemp.ticket ?? {});
-            setEstadoPeticion(1);
+            setEstadoPeticion("ticket");
             setStateTicketTrx(true);
             return "Pago satisfactorio";
           },
@@ -256,7 +310,7 @@ const PagoRecaudoServiciosCajaSocial = ({
             if (error.hasOwnProperty("optionalObject")) {
               if (error.optionalObject.hasOwnProperty("ticket")) {
                 setObjTicketActual(error.optionalObject.ticket ?? {});
-                setEstadoPeticion(1);
+                setEstadoPeticion("ticket");
                 setStateTicketTrx(false);
               } else validNavigate(-1);
             } else validNavigate(-1);
@@ -349,34 +403,81 @@ const PagoRecaudoServiciosCajaSocial = ({
             required
           />
           {renderReferences("initial")}
+          {convenio?.solicita_otra_ref === "1" && (
+            <Input
+              id={"otraReferencia"}
+              name={"otraReferencia"}
+              label={convenio?.[`nombre_otra_ref`] ?? ""}
+              type="text"
+              autoComplete="off"
+              minLength={1}
+              maxLength={32}
+              value={dataRecaudo?.[`otraReferencia`]}
+              onChange={onChangeFormat}
+              disabled={
+                loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
+              }
+              required
+            />
+          )}
           {tipoRecaudo === "codigoBarras" &&
-            dataCodigoBarras.pago.length > 0 && (
+          dataCodigoBarras.pago.length > 0 ? (
+            <>
               <MoneyInput
                 id="valorTrxOriginal"
                 name="valorTrxOriginal"
                 label={"Valor a pagar original"}
                 type="tel"
-                maxLength={10}
+                maxLength={12}
+                decimalDigits={2}
                 autoComplete="off"
-                value={dataRecaudo?.valorTrxOriginal ?? 0}
+                defaultValue={dataCodigoBarras.pago[0] ?? 0}
                 onInput={() => {}}
                 disabled
                 required
                 equalError={false}
                 equalErrorMin={false}
               />
-            )}
-          {convenio.permite_modificar_valor === "1" && (
+              {convenio.permite_modificar_valor === "1" &&
+                convenio.tipo_recaudo === "01" && (
+                  <MoneyInput
+                    id="valorTrx"
+                    name="valorTrx"
+                    label={"Valor a pagar"}
+                    type="tel"
+                    maxLength={12}
+                    decimalDigits={2}
+                    autoComplete="off"
+                    min={
+                      enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
+                    }
+                    max={
+                      enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
+                    }
+                    defaultValue={dataRecaudo?.valorTrx ?? 0}
+                    onInput={onChangeFormatNum}
+                    disabled={
+                      loadingPeticionPagoRecaudo ||
+                      loadingPeticionConsultaRecaudo
+                    }
+                    required
+                    equalError={false}
+                    equalErrorMin={false}
+                  />
+                )}
+            </>
+          ) : tipoRecaudo === "manual" && convenio.tipo_recaudo === "01" ? (
             <MoneyInput
               id="valorTrx"
               name="valorTrx"
               label={"Valor a pagar"}
               type="tel"
-              maxLength={10}
+              maxLength={12}
+              decimalDigits={2}
               autoComplete="off"
               min={enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL}
               max={enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL}
-              value={dataRecaudo?.valorTrx ?? 0}
+              defaultValue={dataRecaudo?.valorTrx ?? 0}
               onInput={onChangeFormatNum}
               disabled={
                 loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
@@ -385,6 +486,8 @@ const PagoRecaudoServiciosCajaSocial = ({
               equalError={false}
               equalErrorMin={false}
             />
+          ) : (
+            <></>
           )}
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
@@ -425,6 +528,24 @@ const PagoRecaudoServiciosCajaSocial = ({
                 grid={false}
               >
                 {renderReferences("validate")}
+                {convenio?.solicita_otra_ref === "1" && (
+                  <Input
+                    id={"otraReferenciaValidacion"}
+                    name={"otraReferenciaValidacion"}
+                    label={convenio?.[`nombre_otra_ref`] ?? ""}
+                    type="text"
+                    autoComplete="off"
+                    minLength={1}
+                    maxLength={32}
+                    value={dataRecaudo?.otraReferenciaValidacion}
+                    onChange={onChangeFormat}
+                    disabled={
+                      loadingPeticionPagoRecaudo ||
+                      loadingPeticionConsultaRecaudo
+                    }
+                    required
+                  />
+                )}
                 <MoneyInput
                   id="valorTrxValidacion"
                   name="valorTrxValidacion"

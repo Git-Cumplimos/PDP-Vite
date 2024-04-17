@@ -198,19 +198,20 @@ const ConveniosRecaudoAgrario = () => {
   };
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (ev.target.name === "estado") {
-      if (value && typeof value === "string") {
-        value = value.toLowerCase() === "false" ? false : true;
-      }
-    }
     if (ev.target.name === "permite_recaudo_manual") {
-      if (value && typeof value === "string") {
-        value = value.toLowerCase() === "on" ? true : false;
+      setDataConvenios((old) => {
+        return { ...old, [ev.target.name]: !old[ev.target.name] };
+      });
+    } else {
+      if (ev.target.name === "estado") {
+        if (value && typeof value === "string") {
+          value = value.toLowerCase() === "false" ? false : true;
+        }
       }
+      setDataConvenios((old) => {
+        return { ...old, [ev.target.name]: value };
+      });
     }
-    setDataConvenios((old) => {
-      return { ...old, [ev.target.name]: value };
-    });
   }, []);
   const onChangeFormatNumber = useCallback((ev) => {
     const valor = ev.target.value;
@@ -550,19 +551,6 @@ const ConveniosRecaudoAgrario = () => {
               legend="Información del convenio"
               className="lg:col-span-2"
             >
-              {dataConvenios?.pk_tbl_convenios_banco_agrario !== 0 && (
-                <Input
-                  id="pk_tbl_convenios_banco_agrario"
-                  label="Id comercio"
-                  type="text"
-                  name="pk_tbl_convenios_banco_agrario"
-                  minLength="1"
-                  maxLength="32"
-                  value={dataConvenios?.pk_tbl_convenios_banco_agrario}
-                  onInput={onChangeFormat}
-                  disabled
-                ></Input>
-              )}
               <Input
                 id="codigo"
                 label="Código convenio"

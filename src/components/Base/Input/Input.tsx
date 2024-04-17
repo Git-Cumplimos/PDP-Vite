@@ -6,6 +6,7 @@ import {
   useRef,
   forwardRef,
   useState,
+  ReactNode,
 } from "react";
 import classes from "./Input.module.css";
 
@@ -22,7 +23,7 @@ export interface CustomInputProps extends ComponentPropsWithRef<"input"> {
   invalid?: string;
   actionBtn?: {
     callback: (ev: MouseEvent<HTMLButtonElement>) => void;
-    label: string;
+    label: ReactNode;
   };
 }
 
@@ -85,7 +86,7 @@ const Input = forwardRef<HTMLInputElement, CustomInputProps>(
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <div>
+        <div className="w-full">
           {type === "radio" ? (
             <label htmlFor={_id}>
               <input

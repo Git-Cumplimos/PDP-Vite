@@ -199,7 +199,7 @@ const FileInputX = () => {
       <Modal show={showModal} handleClose={handleClose}>
         <br />
         <h1 className="text-xl font-semibold">
-          ¿Está seguro de cargar el archivo de los registros de pagos?
+          ¿Está seguro de cargar el archivo de anulaciones?
         </h1>
 
         <ButtonBar>

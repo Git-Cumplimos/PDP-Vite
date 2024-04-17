@@ -185,20 +185,30 @@ const ModifiLimiteCanje = () => {
         ) : (
           <>
             <Input
-              id="deuda"
-              name="deuda"
-              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Deuda al comercio" : "Deuda del comercio"}
+              id="nombre_comercio"
+              name="Nombre comercio"
+              label="Nombre comercio"
+              type="text"
+              value={cupoComer[0]?.nombre_comercio ?? ""}
+              autoComplete="off"
+              disabled={true}
+              required
+            />
+            <Input
+              id="deuda" // cartera
+              name="deuda" // cartera 
+              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={formatMoney.format(Math.abs(parseInt(cupoComer[0]?.deuda))) ?? 0}
+              value={formatMoney.format(parseInt(cupoComer[0]?.deuda)) ?? 0}
               disabled={true}
               required
               />
             <MoneyInput
               id="cupo_en_canje"
               name="cupo_en_canje"
-              label="Cupo en canje"
+              label="Deuda" // Cupo en canje
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
@@ -214,6 +224,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
+              equalErrorMin={false}
               value={valor ?? parseInt(cupoComer[0]?.sobregiro)}
               onInput={onMoneyChange}
               required

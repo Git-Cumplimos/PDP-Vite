@@ -1,5 +1,5 @@
-import Tickets from "../../../../../components/Base/Tickets";
-import { useImgs } from "../../../../../hooks/ImgsHooks";
+import Tickets from "../../../../components/Base/Tickets";
+import { useImgs } from "../../../../hooks/ImgsHooks";
 
 const TicketsGou = ({
   refPrint,
