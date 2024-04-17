@@ -50,7 +50,7 @@ const LoginForm = () => {
       .then()
       .catch((err) => {
         if (err.code === "CodeMismatchException") {
-          notifyError("Codigo TOTP invalido");
+          notifyError("Código TOTP invalido");
         } else if (err.code === "NotAuthorizedException") {
           notifyError("La sesion ha expirado");
           setPassword("");
@@ -292,7 +292,7 @@ const LoginForm = () => {
             />
           </div>
           <div className={field}>
-            <button type="submit">Validar codigo</button>
+            <button type="submit">Validar código</button>
           </div>
         </form>
       </div>
