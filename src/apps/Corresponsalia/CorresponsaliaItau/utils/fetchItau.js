@@ -3,6 +3,8 @@ import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
 import { notify } from "../../../../utils/notify";
 
+const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
+
 export const fetchCustom = (
   url_,
   metodo_,
@@ -254,3 +256,43 @@ export class msgCustomBackend extends ErrorCustom {
     super(message, "msgCustomBackend", error_msg, null, optionalObject);
   }
 }
+
+export const postConsultaConveniosItau = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      parseObj
+    ),
+  };
+
+  try {
+    const res = await fetchData(
+      `${URL_CONSULTA_CONVENIO}`,
+      "POST",
+      {},
+      dataObj,
+      {},
+      true
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data ?? "";
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
