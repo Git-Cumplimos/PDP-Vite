@@ -524,46 +524,48 @@ const ParametrizacionRecaudo = () => {
                 required={false}
               />
             </Fieldset>
-            <Fieldset legend={"Comisión"}>
-              <Select
-                id="comision"
-                name="comision"
-                label="¿Cobrar Comisión?"
-                options={[
-                  { value: "", label: "" },
-                  { value: true, label: "Si" },
-                  { value: false, label: "No" },
-                ]}
-                defaultValue={comision}
-                onChange={(e) => {handleSelect(e.target.value)}}
-                required
-              />
-              {comision === true?
-              <>
-                <MoneyInput
-                  key='comision_fija'
-                  name='comision_fija'
-                  label="Comisión Fija"
-                  value={comisionFija}
-                  onChange={handleChangeCurrenci}
-                  autoComplete="off"
-                  placeholder="$0"
-                  maxLength={8}
-                  max={99999}
-                  required = {false}
+            {!selectedEntity?.pk_is_transportadora?
+              <Fieldset legend={"Comisión"}>
+                <Select
+                  id="comision"
+                  name="comision"
+                  label="¿Cobrar Comisión?"
+                  options={[
+                    { value: "", label: "" },
+                    { value: true, label: "Si" },
+                    { value: false, label: "No" },
+                  ]}
+                  defaultValue={comision}
+                  onChange={(e) => {handleSelect(e.target.value)}}
+                  required
                 />
-                <Input
-                  key="comisio_porcentual"
-                  name="comisio_porcentual"
-                  label="Comisión Porcentual"
-                  onChange={handleChangeCurrenci}
-                  type="text"
-                  value={comisionPorcent + '%'}
-                  placeholder="Ingrese el porcentaje"
-                  autoComplete='off'
-                />
-              </>:null}
-            </Fieldset>
+                {comision === true?
+                <>
+                  <MoneyInput
+                    key='comision_fija'
+                    name='comision_fija'
+                    label="Comisión Fija"
+                    value={comisionFija}
+                    onChange={handleChangeCurrenci}
+                    autoComplete="off"
+                    placeholder="$0"
+                    maxLength={8}
+                    max={99999}
+                    required = {false}
+                  />
+                  <Input
+                    key="comisio_porcentual"
+                    name="comisio_porcentual"
+                    label="Comisión Porcentual"
+                    onChange={handleChangeCurrenci}
+                    type="text"
+                    value={comisionPorcent + '%'}
+                    placeholder="Ingrese el porcentaje"
+                    autoComplete='off'
+                  />
+                </>:null}
+              </Fieldset>
+            :null}
             <ButtonBar>
               <Button type="submit">Actualizar información</Button>
               <Button type="button" onClick={closeModal}>
