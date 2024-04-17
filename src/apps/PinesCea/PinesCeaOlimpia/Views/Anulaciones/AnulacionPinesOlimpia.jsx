@@ -43,7 +43,8 @@ const DevolucionPinesOlimpia = () => {
   const [numeroIdentificacion, setNumeroIdentificacion] = useState("");
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [valorPin, setValorPin] = useState("");
-  const [idTrx, setIdTrx] = useState("");
+  const [idTrx, setIdTrx] = useState(""); 
+  const [idTrxRecaudo, setIdTrxRecaudo] = useState("");
   const [pin, setPin] = useState("");
   const [auditoria, setAuditoria] = useState("");
   const [idRespuesta, setIdRespuesta] = useState("");
@@ -205,6 +206,7 @@ const DevolucionPinesOlimpia = () => {
           setValorTansaccion(res?.obj?.result?.ValorTansaccion);
           setIdTrx(res?.obj?.id_trx);
           setPin(res?.obj?.result?.Pin);
+          setIdTrxRecaudo(res?.obj?.result?.IdTrxRecaudo);
           setEstadoConsulta(true);
         }
       })
@@ -234,7 +236,7 @@ const DevolucionPinesOlimpia = () => {
         TipoIdentificacion: tipoIdentificacion,
         NumeroIdentificacion: numeroIdentificacion,
         ValorTansaccion: valorTansaccion,
-        id_trx: idTrx,
+        id_trx: idTrxRecaudo,
         direccion: roleInfo?.direccion ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
         comercio_propio: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -275,9 +277,9 @@ const DevolucionPinesOlimpia = () => {
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,
               ValorTansaccion: valorTansaccion,
-              CodigoAprobacion: idTrx,
+              CodigoAprobacion: idTrxRecaudo,
               FechaTransaccion: fechaFormateada,
-              IdBancoDevolucion: "1",
+              IdBancoDevolucion: "1001",
               IdTipoCuentaDevolucion: "27",
               IdTipoDevolucion: "1",
               IdTipoIdentificacionDevolucion: "1",
