@@ -93,6 +93,21 @@ const RepresentanteLegal = ({
     return copy;
   }, [propietarioRL]);
 
+  const areAllFieldsEmpty = useMemo(
+    () =>
+      Object.entries(propietarioRL2Send).every(([key, val]) =>
+        ![
+          "dv_interno",
+          "usuario_ultima_actualizacion",
+          "dane_departamento_rl",
+          "dane_municipio_rl",
+        ].includes(key)
+          ? !val
+          : true
+      ),
+    [propietarioRL2Send]
+  );
+
   const makeUpdateRl = useCallback(
     () =>
       setUpdateRl(
@@ -170,7 +185,7 @@ const RepresentanteLegal = ({
     { delay: 50 }
   );
 
-  /* const [searchRL] =  */ useFetchDebounce(
+  useFetchDebounce(
     {
       url: useMemo(
         () =>
@@ -218,9 +233,6 @@ const RepresentanteLegal = ({
         },
         [makeUpdateRl]
       ),
-      // onFinally: useCallback(() => {
-      //   setUpdateRl(false);
-      // }, []),
     },
     { delay: 500 }
   );
@@ -236,13 +248,6 @@ const RepresentanteLegal = ({
         }),
         [propietarioRLExists, propietarioRL2Send]
       ),
-      // autoDispatch: useMemo(() => {
-      //   const temp = Object.entries(propietarioRL2Send).every(([key, val]) =>
-      //     key !== "dv_interno" && typeof val !== "boolean" ? !!val : true
-      //   );
-      //   console.log(temp);
-      //   return temp;
-      // }, [propietarioRL2Send]),
       fetchIf: useMemo(() => updateRl, [updateRl]),
     },
     {
@@ -335,6 +340,7 @@ const RepresentanteLegal = ({
                 : 0,
             }));
           }}
+          required={!areAllFieldsEmpty}
         />
         <Input
           label="Número de identificación"
@@ -354,6 +360,7 @@ const RepresentanteLegal = ({
             }));
           }}
           autoComplete="off"
+          required={!areAllFieldsEmpty}
         />
         <Input
           label="Nombre"
@@ -371,6 +378,7 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
+          required={!areAllFieldsEmpty}
         />
         <Input
           label="Apellido"
@@ -388,6 +396,7 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
+          required={!areAllFieldsEmpty}
         />
         <ToggleInput
           label="¿PEP?"
@@ -418,6 +427,7 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
+          required={!areAllFieldsEmpty}
         />
         <Input
           label="Ciudad residencia"
@@ -429,9 +439,22 @@ const RepresentanteLegal = ({
           value={propietarioRL.nombre_ciudad}
           onChange={() => {}}
           actionBtn={{
-            callback: (_) => setModifyCity(true),
-            label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
+            callback: propietarioRL.nombre_ciudad
+              ? (_) =>
+                  setPropietarioRL((old) => ({
+                    ...old,
+                    dane_municipio_rl: "",
+                    dane_departamento_rl: "",
+                    nombre_ciudad: "",
+                  }))
+              : (_) => setModifyCity(true),
+            label: propietarioRL.nombre_ciudad ? (
+              <span className="px-1 py-0 text-sm bi bi-trash" />
+            ) : (
+              <span className="px-1 py-0 text-sm bi bi-pencil-square" />
+            ),
           }}
+          required={!areAllFieldsEmpty}
         />
         <Input
           label="Dirección"
@@ -446,6 +469,7 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyAddress(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
+          required={!areAllFieldsEmpty}
         />
         <Input
           label="Barrio"
@@ -463,6 +487,7 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
+          required={!areAllFieldsEmpty}
         />
         {propietarioRLExists && (
           <Input
