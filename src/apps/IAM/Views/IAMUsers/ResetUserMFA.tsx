@@ -111,7 +111,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
           </Button>
         </ButtonBar>
       </Fieldset>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} handleClose={handleClose} bigger>
         <PaymentSummary
           title="¿Está seguro de recuperar QR y contraseña del usuario?"
           subtitle="Información de usuario"
