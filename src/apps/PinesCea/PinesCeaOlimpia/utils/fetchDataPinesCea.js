@@ -6,7 +6,7 @@ const fetchDataPinesCea = async (
   queries = {},
   data = {},
   headers = {},
-  authenticate = false,
+  authenticate = true,
   timeout = 60000
 ) => {
   if (!["GET", "POST", "PUT", "DELETE"].includes(method)) {
@@ -49,6 +49,7 @@ const fetchDataPinesCea = async (
     //   username: process.env.REACT_APP_USUARIO_CEA_OLIMPIA, 
     //   password: process.env.REACT_APP_CONTRASENNA_CEA_OLIMPIA
     // });
+    _headers.Authorization_servicio_olimpia = "Basic cHRlc2E6cHRlc2E="
   }
 
   fetchOptions.headers = {
