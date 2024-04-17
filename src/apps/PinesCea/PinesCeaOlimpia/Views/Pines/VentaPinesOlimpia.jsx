@@ -299,7 +299,7 @@ const VentaPinesOlimpia = () => {
                 setAuditoria(res?.obj?.result?.Auditoria);
                 setIdRespuesta(res?.obj?.result?.IdRespuesta);
                 setMensajeRespuesta(res?.obj?.result?.MensajeRespuesta);
-                setIdTrx(res?.obj?.result?.id_trx);
+                // setIdTrx(res?.obj?.result?.id_trx);
                 setPin(res?.obj?.result?.pin);
                 setEstadoPago(true);
                 setPaymentStatus(res?.obj?.ticket ?? {});
