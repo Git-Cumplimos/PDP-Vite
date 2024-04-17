@@ -6,6 +6,7 @@ export type TypingRoutes = {
   component: any;
   permission: number[];
   subModules: TypingRoutes[];
+  show?: boolean;
 };
 
 export type TypeInfTicket = {

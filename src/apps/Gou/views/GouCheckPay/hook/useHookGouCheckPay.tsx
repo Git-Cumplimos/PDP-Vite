@@ -38,8 +38,8 @@ export type TypeUseHookGouCheckPay = () => {
 };
 
 //FRAGMENT ******************** CONST *******************************
-const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-// const URL_GOU = `http://127.0.0.1:5000`;
+// const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+const URL_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
@@ -157,7 +157,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
             id_usuario: dataComercioSimple.id_usuario,
             id_terminal: dataComercioSimple.id_terminal,
           },
-          pk_hash: id_hash,
+          id_hash: id_hash,
         };
         //SECUENCIA ---------------Paso 1-------------------------------
         try {
