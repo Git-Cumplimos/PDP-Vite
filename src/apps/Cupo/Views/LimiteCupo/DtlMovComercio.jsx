@@ -62,7 +62,7 @@ const DtlMovComercio = () => {
   }, { delay: 2000 });
 
   const searchDetalleComercio = useCallback(() => {
-    // if (!idComercio) return false
+    if (!idComercio) return false
 
     setSingleFilter("page", (old) => page ?? old);
     setSingleFilter("limit", (old) => limit ?? old)
@@ -105,6 +105,7 @@ const DtlMovComercio = () => {
     ).join("");
     setIdComercio(idComer);
     setNombreComercio("");
+    setDtlCupo(null);
   }, []);
 
   useEffect(() => {
@@ -127,17 +128,28 @@ const DtlMovComercio = () => {
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
-      if (idComercio !== "") {
-        if (fechaEnd !== null || fechaini !== null) {
-          crearData(
-            idComercio,
-            fechaEnd,
-            fechaini,
-            tipoTransaccion,
-            tipoAfectacion
-          );
-        }
+      if (["", null].includes(idComercio)) {
+        notifyError("El id del comercio no puede estar vacío, por favor digite ese campo.")
+        return false
       }
+      if (fechaEnd === null || fechaini === null) {
+        notifyError("Las fechas no pueden estar vacías, por favor digite esos campos")
+        return false
+      }
+      if (
+        new Date(fechaEnd) <= new Date(fechaini)
+      ) {
+        notifyError("La fecha final debe ser mayor a la inicial");
+        return false;
+      }
+
+      crearData(
+        idComercio,
+        fechaEnd,
+        fechaini,
+        tipoTransaccion,
+        tipoAfectacion
+      );
     },
     [idComercio, fechaEnd, fechaini, tipoTransaccion, tipoAfectacion, crearData]
   );
@@ -159,7 +171,7 @@ const DtlMovComercio = () => {
             required
           />
           {
-            ( ![null,""].includes(nombreComercio) && ![null,""].includes(idComercio)) && (
+            (![null, ""].includes(nombreComercio) && ![null, ""].includes(idComercio)) && (
               <Input
                 id="nombre_comercio"
                 name="Nombre comercio"
@@ -176,109 +188,113 @@ const DtlMovComercio = () => {
       ) : (
         ""
       )}
-      <TableEnterprise
-        title="Detalle movimientos cupo comercios"
-        headers={[
-          "Id detalle movimiento",
-          "Tipo de movimiento",
-          "Tipo de afectación",
-          "Valor afectación",
-          "Fecha afectación",
-          "Hora afectación",
-          "Cartera actual", // Deuda
-          "Deuda", // Cupo canje
-          "Usuario",
-          "Id transacción",
-          "Descripción afectación",
-        ]}
-        data={
-          (dtlCupo?.results ?? []).map(
-            ({
-              pk_id_dtl_mov,
-              tipo_movimiento,
-              nombre,
-              valor_afectacion,
-              fecha_afectacion,
-              hora_afectacion,
-              deuda_dsp_afectacion,
-              cupo_canje_dsp_afectacion,
-              usuario,
-              fk_id_trx,
-              motivo_afectacion,
-            }) => ({
-              pk_id_dtl_mov,
-              tipo_movimiento,
-              nombre,
-              valor_afectacion: formatMoney.format(valor_afectacion ?? 0),
-              fecha_afectacion,
-              hora_afectacion,
-              deuda_dsp_afectacion: formatMoney.format(deuda_dsp_afectacion ?? 0),
-              cupo_canje_dsp_afectacion: formatMoney.format(
-                cupo_canje_dsp_afectacion ?? 0
-              ),
-              usuario,
-              fk_id_trx,
-              motivo_afectacion,
-            })
-          ) ?? []
-        }
-        onSetPageData={(pagedata) => {
-          setPage(pagedata.page);
-          setLimit(pagedata.limit);
-        }}
-        maxPage={dtlCupo?.maxPages}
-      >
-        <Form onChange={(ev) => onChange(ev)} grid>
-          <Input
-            id="fecha_inico"
-            name="fecha_inico"
-            label="Fecha inicio"
-            type="datetime-local"
-            autoComplete="off"
-            required
-          />
-          <Input
-            id="fecha_final"
-            name="fecha_final"
-            label="Fecha final"
-            type="datetime-local"
-            autoComplete="off"
-            required
-          />
-          <Select
-            label="Tipo de afectación"
-            options={{
-              "": null,
-              "Cash-In": false,
-              "Cash-Out": true,
+      {(![null, ""].includes(idComercio)) && (
+        <>
+          <TableEnterprise
+            title="Detalle movimientos cupo comercios"
+            headers={[
+              "Id detalle movimiento",
+              "Tipo de movimiento",
+              "Tipo de afectación",
+              "Valor afectación",
+              "Fecha afectación",
+              "Hora afectación",
+              "Cartera actual", // Deuda
+              "Deuda", // Cupo canje
+              "Usuario",
+              "Id transacción",
+              "Descripción afectación",
+            ]}
+            data={
+              (dtlCupo?.results ?? []).map(
+                ({
+                  pk_id_dtl_mov,
+                  tipo_movimiento,
+                  nombre,
+                  valor_afectacion,
+                  fecha_afectacion,
+                  hora_afectacion,
+                  deuda_dsp_afectacion,
+                  cupo_canje_dsp_afectacion,
+                  usuario,
+                  fk_id_trx,
+                  motivo_afectacion,
+                }) => ({
+                  pk_id_dtl_mov,
+                  tipo_movimiento,
+                  nombre,
+                  valor_afectacion: formatMoney.format(valor_afectacion ?? 0),
+                  fecha_afectacion,
+                  hora_afectacion,
+                  deuda_dsp_afectacion: formatMoney.format(deuda_dsp_afectacion ?? 0),
+                  cupo_canje_dsp_afectacion: formatMoney.format(
+                    cupo_canje_dsp_afectacion ?? 0
+                  ),
+                  usuario,
+                  fk_id_trx,
+                  motivo_afectacion,
+                })
+              ) ?? []
+            }
+            onSetPageData={(pagedata) => {
+              setPage(pagedata.page);
+              setLimit(pagedata.limit);
             }}
-            value={tipoAfectacion}
-            /* required={true} */
-            onChange={(e) => {
-              setTipoAfectacion(e.target.value);
-            }}
-          />
-          <Select
-            label="Tipo de transacción"
-            options={{
-              "": null,
-              Transacción: 1,
-              Ajuste: 2,
-              Asignación: 3,
-            }}
-            value={tipoTransaccion}
-            /* required={true} */
-            onChange={(e) => {
-              setTipoTransaccion(e.target.value);
-            }}
-          />
-        </Form>
-      </TableEnterprise>
-      <ButtonBar>
-        <Button type={"submit"} disabled={loadData} onClick={onSubmitDownload}>
-          Descargar reporte
-        </Button>
-      </ButtonBar>
+            maxPage={dtlCupo?.maxPages}
+          >
+            <Form onChange={(ev) => onChange(ev)} grid>
+              <Input
+                id="fecha_inico"
+                name="fecha_inico"
+                label="Fecha inicio"
+                type="datetime-local"
+                autoComplete="off"
+                required
+              />
+              <Input
+                id="fecha_final"
+                name="fecha_final"
+                label="Fecha final"
+                type="datetime-local"
+                autoComplete="off"
+                required
+              />
+              <Select
+                label="Tipo de afectación"
+                options={{
+                  "": null,
+                  "Cash-In": false,
+                  "Cash-Out": true,
+                }}
+                value={tipoAfectacion}
+                /* required={true} */
+                onChange={(e) => {
+                  setTipoAfectacion(e.target.value);
+                }}
+              />
+              <Select
+                label="Tipo de transacción"
+                options={{
+                  "": null,
+                  Transacción: 1,
+                  Ajuste: 2,
+                  Asignación: 3,
+                }}
+                value={tipoTransaccion}
+                /* required={true} */
+                onChange={(e) => {
+                  setTipoTransaccion(e.target.value);
+                }}
+              />
+            </Form>
+          </TableEnterprise>
+          <ButtonBar>
+            <Button type={"submit"} disabled={loadData} onClick={onSubmitDownload}>
+              Descargar reporte
+            </Button>
+          </ButtonBar>
+        </>
+      )}
     </Fragment>
   );
 };
