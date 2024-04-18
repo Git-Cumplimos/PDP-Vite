@@ -95,6 +95,7 @@ import rutasItauCB, {
 } from "../apps/Corresponsalia/CorresponsaliaItau/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
+import routesGestionBCS from "../apps/GestionBCS/routes";
 import routesGouCheckPay from "../apps/Gou/routes";
 /**
 
@@ -494,6 +495,7 @@ const allUrlsPrivateApps = [
       rutasGestionGrupoAval,
       rutasGestionAgrario,
       routesItau,
+      routesGestionBCS,
     ],
   },
   {
