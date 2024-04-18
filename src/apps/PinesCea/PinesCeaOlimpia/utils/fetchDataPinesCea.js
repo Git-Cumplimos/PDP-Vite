@@ -48,7 +48,7 @@ const fetchDataPinesCea = async (
   const _headers = {};
   if (authenticate) {
     _headers.Authorization = `Bearer ${session?.idToken?.jwtToken}`;
-    _headers.Authorization_servicio_olimpia = `Basic ${AuthorizationOlimpiaCodificado}`;
+    _headers.Authorizationolimpia = `Basic ${AuthorizationOlimpiaCodificado}`;
   }
 
   fetchOptions.headers = {
