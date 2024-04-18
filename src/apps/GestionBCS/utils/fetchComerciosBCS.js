@@ -1,54 +1,7 @@
 import fetchData from "../../../utils/fetchData";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import { fetchDataTotpNoMsg } from "../../../utils/MFA";
-
-// const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}`;
-// const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000`;
-
-// export const bloquearConveniosItau = async (bodyObj) => {
-//   if (!bodyObj) {
-//     return new Promise((resolve, reject) => {
-//       resolve("Sin datos body");
-//     });
-//   }
-//   let parseObj = JSON.stringify(bodyObj);
-//   let dataObj = {
-//     data: cifrarAES(
-//       `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
-//       `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
-//       parseObj
-//     ),
-//   };
-
-//   try {
-//     const res = await fetchData(
-//       `${URL_CORRESPONSALIA_ITAU}/convenios_itau/crear_bloqueo`,
-//       "POST",
-//       {},
-//       dataObj,
-//       {},
-//       {},
-//       40000
-//     );
-//     if (!res?.status) {
-//       console.error(res?.msg);
-//     }
-//     if (res?.obj !== {}) {
-//       const dataDecrypt = res?.obj?.data;
-//       const obj = decryptAES(
-//         `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
-//         `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
-//         dataDecrypt
-//       );
-//       res.obj = JSON.parse(obj);
-//     }
-
-//     return res;
-//   } catch (err) {
-//     throw err;
-//   }
-// };
 
 export const fetchCustom = (
   url_,
