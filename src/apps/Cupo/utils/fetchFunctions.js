@@ -94,9 +94,12 @@ export const getConsultaComercios = buildGetFunction(
 export const getConsultaCupoComercio = buildGetFunction(
   `${urlCupo}/servicio-cupo/gestion-cupo`
 );
-export const cargarArchivoCupoMasivo = cargueArchivo(
-  `${urlComercios}/comercios/crear-cupo-masivo`,
-  `${urlComercios}/comercios/crear-cupo-masivo`
+export const cargarArchivoCupoMasivo = validarAjustesMasivos(
+  `${urlCupo}/servicio-cupo/consultar-ajuste-cupo-masivo`,
+  cargueArchivo(
+    `${urlCupo}/servicio-cupo/crear-cupo-masivo`,
+    `${urlCupo}/servicio-cupo/crear-cupo-masivo`
+  )
 );
 export const cargarArchivoAjusteCupoMasivo = validarAjustesMasivos(
   `${urlCupo}/servicio-cupo/consultar-ajuste-cupo-masivo`,
