@@ -164,7 +164,6 @@ const VentaPinesOlimpia = () => {
     }
     )
       .then((res) => {
-        console.log (res?.obj?.result?.Estado)
         if (!res?.status || (res?.obj?.result?.Estado != 'Referenciado')) {
           if (res?.obj?.result?.Estado == undefined){
             setIsLoading(false);
