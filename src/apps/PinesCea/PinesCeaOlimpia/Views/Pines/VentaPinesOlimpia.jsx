@@ -44,6 +44,7 @@ const VentaPinesOlimpia = () => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [valorPin, setValorPin] = useState("");
   const [idTrx, setIdTrx] = useState("");
+  const [idRunt, setIdRunt] = useState("");
   const [pin, setPin] = useState("");
   const [auditoria, setAuditoria] = useState("");
   const [idRespuesta, setIdRespuesta] = useState("");
@@ -204,6 +205,7 @@ const VentaPinesOlimpia = () => {
           setValorTansaccion(res?.obj?.result?.ValorTansaccion);
           setIdTrx(res?.obj?.id_trx);
           setPin(res?.obj?.result?.Pin);
+          setIdRunt(res?.obj?.result?.IdRunt);
           setEstadoConsulta(true);
         }
       })
@@ -234,6 +236,7 @@ const VentaPinesOlimpia = () => {
         NumeroIdentificacion: numeroIdentificacion,
         ValorTansaccion: valorTansaccion,
         id_trx: idTrx,
+        IdRunt: idRunt,
         direccion: roleInfo?.direccion ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
         comercio_propio: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
