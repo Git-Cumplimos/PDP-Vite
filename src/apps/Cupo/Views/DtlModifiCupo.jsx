@@ -7,14 +7,20 @@ import { notifyError } from "../../../utils/notify";
 import { getConsultaAsignacionCupoLimite } from "../utils/fetchFunctions";
 import useFetchDispatchDebounce, { ErrorPDPFetch } from "../../../hooks/useFetchDispatchDebounce";
 import useMap from "../../../hooks/useMap";
+import Select from "../../../components/Base/Select/Select";
 
 const initialSearchFilters = new Map([
   ["fk_id_comercio", ""],
   ["nombre_comercio", ""],
   ["page", 1],
   ["limit", 10],
+  ["sortDir", "DESC"],
 ]);
 
+const options_select = [
+  { value: "DESC", label: "Descendente" },
+  { value: "ASC", label: "Ascendente" },
+];
 
 const DtlMovLimite = () => {
   const { roleInfo } = useAuth();
@@ -84,7 +90,9 @@ const DtlMovLimite = () => {
       setIdComercio((onChangeInput.match(/\d/g) ?? []).join(""))
     }
     if (id_input === "nombre_comercio") setNombreComercio(onChangeInput);
-  }, []);
+    if (id_input === "orden") setSingleFilter("sortDir", (old) => onChangeInput ?? old)
+
+  }, [setSingleFilter]);
 
   return (
     <Fragment>
@@ -151,6 +159,14 @@ const DtlMovLimite = () => {
               minLength={"0"}
               maxLength={"30"}
               onChange={(ev) => onChangeId(ev, "nombre_comercio")}
+            />
+            <Select
+              id="orden"
+              name="orden"
+              label="Orden"
+              options={options_select}
+              onChange={(ev) => onChangeId(ev, "orden")}
+              value={searchFilters?.sortDir}
             />
           </>
         )
