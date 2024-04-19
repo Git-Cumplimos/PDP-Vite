@@ -817,7 +817,7 @@ const allUrlsPrivateApps = [
         link: "/cupo/detalle-modificacion-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Detalle modificación cupo"} />,
         component: DetalleModificacionCupo,
-        permission: [1],
+        permission: [20002],
       },
       {
         link: "/cupo/tipos-movimientos-cupo",
