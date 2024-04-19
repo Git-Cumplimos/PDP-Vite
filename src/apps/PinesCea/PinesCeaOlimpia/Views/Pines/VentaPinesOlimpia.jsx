@@ -45,6 +45,8 @@ const VentaPinesOlimpia = () => {
   const [valorPin, setValorPin] = useState("");
   const [idTrx, setIdTrx] = useState("");
   const [idRunt, setIdRunt] = useState("");
+  const [codigoAprobacion, setCodigoAprobacion] = useState("");
+  const [fechaTransaccion, setFechaTransaccion] = useState("");
   const [pin, setPin] = useState("");
   const [auditoria, setAuditoria] = useState("");
   const [idRespuesta, setIdRespuesta] = useState("");
@@ -174,6 +176,9 @@ const VentaPinesOlimpia = () => {
             setValorTansaccion("");
             setIdTrx("");
             setPin("");
+            setIdRunt("");
+            setCodigoAprobacion("");
+            setFechaTransaccion("");
             notifyError(res?.msg);
             setNumeroPin("");
             setNumeroDocumento("");
@@ -189,6 +194,9 @@ const VentaPinesOlimpia = () => {
             setValorTansaccion("");
             setIdTrx("");
             setPin("");
+            setIdRunt("");
+            setCodigoAprobacion("");
+            setFechaTransaccion("");
             notifyError("Estado de pin no permitido para para recaudo");
             setNumeroPin("");
             setNumeroDocumento("");
@@ -206,6 +214,8 @@ const VentaPinesOlimpia = () => {
           setIdTrx(res?.obj?.id_trx);
           setPin(res?.obj?.result?.Pin);
           setIdRunt(res?.obj?.result?.IdRunt);
+          setCodigoAprobacion(res?.obj?.result?.CodigoAprobacion);
+          setFechaTransaccion(res?.obj?.result?.FechaTransaccion);
           setEstadoConsulta(true);
         }
       })
@@ -237,6 +247,8 @@ const VentaPinesOlimpia = () => {
         ValorTansaccion: valorTansaccion,
         id_trx: idTrx,
         IdRunt: idRunt,
+        CodigoAprobacion: codigoAprobacion,
+        FechaTransaccion: fechaTransaccion,
         direccion: roleInfo?.direccion ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
         comercio_propio: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -251,6 +263,9 @@ const VentaPinesOlimpia = () => {
           setMensajeRespuesta("");
           setIdTrx("");
           setPin("");
+          setIdRunt("");
+          setCodigoAprobacion("");
+          setFechaTransaccion("");
           notifyError(res?.msg);
           setEstadoConsulta(false);
           setIsLoadingPago(false);
@@ -289,6 +304,9 @@ const VentaPinesOlimpia = () => {
                 setMensajeRespuesta("");
                 setIdTrx("");
                 setPin("");
+                setIdRunt("");
+                setCodigoAprobacion("");
+                setFechaTransaccion("");
                 notifyError(res2?.msg);
                 setEstadoConsulta(false);
                 setIsLoadingPago(false);
