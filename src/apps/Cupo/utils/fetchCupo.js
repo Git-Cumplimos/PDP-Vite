@@ -80,38 +80,6 @@ export const postDtlCambioLimiteCanje = async (bodyObj) => {
   }
 };
 
-export const getConsultaAsignacionCupoLimite = async (
-  fk_id_comercio,
-  page,
-  limit
-) => {
-  const busqueda = { limit };
-  busqueda.sortBy = "fecha_afectacion";
-  busqueda.sortDir = "DESC";
-  if (fk_id_comercio) {
-    busqueda.fk_id_comercio = fk_id_comercio;
-  }
-  if (page) {
-    busqueda.page = page;
-  }
-  try {
-    const res = await fetchData(
-      `${urlCupo}/servicio-cupo/modificacion-cupo`,
-      "GET",
-      busqueda,
-      {},
-      false
-    );
-    if (res?.status) {
-      return { ...res?.obj };
-    } else {
-      console.error(res?.msg);
-      return { maxPages: 0, results: [] };
-    }
-  } catch (err) {
-    throw err;
-  }
-};
 
 export const putAjusteCupo = async (argsObj, bodyObj) => {
   if (!argsObj || !bodyObj) {

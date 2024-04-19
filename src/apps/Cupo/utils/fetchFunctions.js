@@ -109,3 +109,7 @@ export const cargarArchivoAjusteCupoMasivo = validarAjustesMasivos(
 export const getConsultaDtlMovCupo = () =>{
   return `${urlCupo}/servicio-cupo/dtlcupo/sinpdf`
 };
+
+export const getConsultaAsignacionCupoLimite = () =>{
+  return `${urlCupo}/servicio-cupo/modificacion-cupo`
+};
