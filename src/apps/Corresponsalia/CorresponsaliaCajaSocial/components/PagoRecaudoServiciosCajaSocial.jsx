@@ -378,6 +378,9 @@ const PagoRecaudoServiciosCajaSocial = ({
   // }, [second])
   return (
     <>
+      {
+        console.log(dataRecaudo)
+      }
       <Form onSubmit={transaccionRecaudoServiciosCajaSocial} grid>
         <Fieldset legend="Datos del recaudo" className="lg:col-span-2">
           <Input
