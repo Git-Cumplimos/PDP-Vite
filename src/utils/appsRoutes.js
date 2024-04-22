@@ -822,7 +822,7 @@ const allUrlsPrivateApps = [
         permission: [59],
       },
       {
-        link: "/cupo/cupo-comercio/detalles-cupo",
+        link: "/cupo/detalles-movimiento-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />,
         component: DtlMovCupo,
         permission: [62],
