@@ -179,6 +179,7 @@ const PagoRecaudoServiciosItau = ({
         city: roleInfo?.["ciudad"],
         Datos: {
           codigo_convenio: dataRecaudo?.codigoConvenio,
+          fecha_caducidad: dataRecaudo?.fechaCaducidad,
         },
       };
       for (let i = 1; i <= 8; i++) {
@@ -255,6 +256,7 @@ const PagoRecaudoServiciosItau = ({
           codigo_convenio: dataRecaudo?.codigoConvenio,
           nombre_convenio: dataRecaudo?.nombreConvenio,
           refInfoRec: resConsulta?.RecInfoRec ? resConsulta?.RecInfoRec : [],
+          fecha_caducidad: dataRecaudo?.fechaCaducidad,
         },
         id_trx: resConsulta?.id_trx,
       };
@@ -354,9 +356,78 @@ const PagoRecaudoServiciosItau = ({
       }
       const referenceValue = convenio[referenceKey];
       if (referenceValue !== null) {
-        contador++;
-        if (tipoRecaudo === "manual") {
-          if (convenio[`tipo_dato_ref${i}`] === "Cadena") {
+        if (referenceValue.toString().toUpperCase().includes("VALOR")) {
+          break;
+        } else {
+          contador++;
+          if (tipoRecaudo === "manual") {
+            if (convenio[`tipo_dato_ref${i}`] === "Cadena") {
+              references.push(
+                <Input
+                  id={
+                    ingressType === "initial"
+                      ? referenceKey
+                      : `${referenceKey}Validacion`
+                  }
+                  name={
+                    ingressType === "initial"
+                      ? referenceKey
+                      : `${referenceKey}Validacion`
+                  }
+                  label={referenceValue}
+                  type="text"
+                  autoComplete="off"
+                  maxLength={32}
+                  value={
+                    ingressType === "initial"
+                      ? dataRecaudo?.[referenceKey]
+                      : dataRecaudo?.[`${referenceKey}Validacion`]
+                  }
+                  onChange={onChangeFormatCadena}
+                  disabled={
+                    loadingPeticionPagoRecaudo ||
+                    loadingPeticionConsultaRecaudo ||
+                    tipoRecaudo !== "manual"
+                  }
+                  required
+                  key={i}
+                />
+              );
+            }
+            if (convenio[`tipo_dato_ref${i}`] === "Número") {
+              references.push(
+                <Input
+                  id={
+                    ingressType === "initial"
+                      ? referenceKey
+                      : `${referenceKey}Validacion`
+                  }
+                  name={
+                    ingressType === "initial"
+                      ? referenceKey
+                      : `${referenceKey}Validacion`
+                  }
+                  label={referenceValue}
+                  type="text"
+                  autoComplete="off"
+                  maxLength={32}
+                  value={
+                    ingressType === "initial"
+                      ? dataRecaudo?.[referenceKey]
+                      : dataRecaudo?.[`${referenceKey}Validacion`]
+                  }
+                  onChange={onChangeFormat}
+                  disabled={
+                    loadingPeticionPagoRecaudo ||
+                    loadingPeticionConsultaRecaudo ||
+                    tipoRecaudo !== "manual"
+                  }
+                  required
+                  key={i}
+                />
+              );
+            }
+          } else {
             references.push(
               <Input
                 id={
@@ -379,144 +450,14 @@ const PagoRecaudoServiciosItau = ({
                     : dataRecaudo?.[`${referenceKey}Validacion`]
                 }
                 onChange={onChangeFormatCadena}
-                disabled={
-                  loadingPeticionPagoRecaudo ||
-                  loadingPeticionConsultaRecaudo ||
-                  tipoRecaudo !== "manual"
-                }
+                disabled={true}
                 required
                 key={i}
               />
             );
           }
-          if (convenio[`tipo_dato_ref${i}`] === "Monto") {
-            references.push(
-              <MoneyInput
-                id={
-                  ingressType === "initial"
-                    ? referenceKey
-                    : `${referenceKey}Validacion`
-                }
-                name={
-                  ingressType === "initial"
-                    ? referenceKey
-                    : `${referenceKey}Validacion`
-                }
-                label={referenceValue}
-                type="tel"
-                autoComplete="off"
-                maxLength={10}
-                value={
-                  ingressType === "initial"
-                    ? dataRecaudo?.[referenceKey]
-                    : dataRecaudo?.[`${referenceKey}Validacion`]
-                }
-                onChange={onChangeFormatNum}
-                disabled={
-                  loadingPeticionPagoRecaudo ||
-                  loadingPeticionConsultaRecaudo ||
-                  tipoRecaudo !== "manual"
-                }
-                required
-                key={i}
-              />
-            );
-          }
-          if (convenio[`tipo_dato_ref${i}`] === "Fecha") {
-            references.push(
-              <Input
-                id={
-                  ingressType === "initial"
-                    ? referenceKey
-                    : `${referenceKey}Validacion`
-                }
-                name={
-                  ingressType === "initial"
-                    ? referenceKey
-                    : `${referenceKey}Validacion`
-                }
-                label={referenceValue}
-                type="date"
-                autoComplete="off"
-                value={
-                  ingressType === "initial"
-                    ? dataRecaudo?.[referenceKey]
-                    : dataRecaudo?.[`${referenceKey}Validacion`]
-                }
-                onChange={onChangeFormatFecha}
-                disabled={
-                  loadingPeticionPagoRecaudo ||
-                  loadingPeticionConsultaRecaudo ||
-                  tipoRecaudo !== "manual"
-                }
-                required
-                key={i}
-              />
-            );
-          }
-          if (convenio[`tipo_dato_ref${i}`] === "Número") {
-            references.push(
-              <Input
-                id={
-                  ingressType === "initial"
-                    ? referenceKey
-                    : `${referenceKey}Validacion`
-                }
-                name={
-                  ingressType === "initial"
-                    ? referenceKey
-                    : `${referenceKey}Validacion`
-                }
-                label={referenceValue}
-                type="text"
-                autoComplete="off"
-                maxLength={32}
-                value={
-                  ingressType === "initial"
-                    ? dataRecaudo?.[referenceKey]
-                    : dataRecaudo?.[`${referenceKey}Validacion`]
-                }
-                onChange={onChangeFormat}
-                disabled={
-                  loadingPeticionPagoRecaudo ||
-                  loadingPeticionConsultaRecaudo ||
-                  tipoRecaudo !== "manual"
-                }
-                required
-                key={i}
-              />
-            );
-          }
-        } else {
-          references.push(
-            <Input
-              id={
-                ingressType === "initial"
-                  ? referenceKey
-                  : `${referenceKey}Validacion`
-              }
-              name={
-                ingressType === "initial"
-                  ? referenceKey
-                  : `${referenceKey}Validacion`
-              }
-              label={referenceValue}
-              type="text"
-              autoComplete="off"
-              maxLength={32}
-              value={
-                ingressType === "initial"
-                  ? dataRecaudo?.[referenceKey]
-                  : dataRecaudo?.[`${referenceKey}Validacion`]
-              }
-              onChange={onChangeFormatCadena}
-              disabled={true}
-              required
-              key={i}
-            />
-          );
+          convenio.referencia_2 = contador;
         }
-        convenio.referencia_2 = contador;
       }
     }
     return references;
