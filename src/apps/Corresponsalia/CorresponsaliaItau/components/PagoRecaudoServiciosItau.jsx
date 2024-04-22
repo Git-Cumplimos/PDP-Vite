@@ -27,13 +27,23 @@ const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONS
 const DATA_RECAUDO_INIT = {
   codigoConvenio: "",
   nombreConvenio: "",
-  ref1: "",
-  ref2: "",
-  ref3: "",
+  referencia1: "",
+  referencia2: "",
+  referencia3: "",
+  referencia4: "",
+  referencia5: "",
+  referencia6: "",
+  referencia7: "",
+  referencia8: "",
   valorTrx: 0,
-  ref1Validacion: "",
-  ref2Validacion: "",
-  ref3Validacion: "",
+  referencia1Validacion: "",
+  referencia2Validacion: "",
+  referencia3Validacion: "",
+  referencia4Validacion: "",
+  referencia5Validacion: "",
+  referencia6Validacion: "",
+  referencia7Validacion: "",
+  referencia8Validacion: "",
   valorTrxValidacion: 0,
   valorTrxOriginal: 0,
   fechaCaducidad: "",
@@ -76,17 +86,19 @@ const PagoRecaudoServiciosItau = ({
         nombreConvenio: convenio.nombre_convenio,
       }));
     } else {
-      setDataRecaudo((old) => ({
-        ...old,
-        codigoConvenio: convenio.codigo_convenio,
-        nombreConvenio: convenio.nombre_convenio,
-        ref1: dataCodigoBarras.codigos_referencia[0] ?? "",
-        ref2: dataCodigoBarras.codigos_referencia[1] ?? "",
-        ref3: dataCodigoBarras.codigos_referencia[2] ?? "",
-        valorTrxOriginal: dataCodigoBarras.pago[0] ?? 0,
-        valorTrx: dataCodigoBarras.pago[0] ?? 0,
-        fechaCaducidad: dataCodigoBarras.fecha_caducidad[0] ?? "",
-      }));
+      setDataRecaudo((old) => {
+        const newRecaudo = { ...old };
+        newRecaudo.codigoConvenio = convenio.codigo_convenio;
+        newRecaudo.nombreConvenio = convenio.nombre_convenio;
+        for (let i = 0; i < 8; i++) {
+          newRecaudo[`referencia${i + 1}`] =
+            dataCodigoBarras.codigos_referencia[i] ?? "";
+        }
+        newRecaudo.valorTrxOriginal = dataCodigoBarras.pago[0] ?? 0;
+        newRecaudo.valorTrx = dataCodigoBarras.pago[0] ?? 0;
+        newRecaudo.fechaCaducidad = dataCodigoBarras.fecha_caducidad[0] ?? "";
+        return newRecaudo;
+      });
     }
   }, [convenio, dataCodigoBarras, tipoRecaudo]);
 
@@ -107,10 +119,13 @@ const PagoRecaudoServiciosItau = ({
         estadoPeticion === "validate" &&
         convenio.consultaweb === "N"
       ) {
-        for (let i = 0; i < 3; i++) {
-          if (dataRecaudo[`ref${i}`] !== dataRecaudo[`ref${i}Validacion`]) {
+        for (let i = 1; i < 9; i++) {
+          if (
+            dataRecaudo[`referencia${i}`] !==
+            dataRecaudo[`referencia${i}Validacion`]
+          ) {
             return notifyError(
-              "Error: Los valores de las referencias son diferentes"
+              "Error: Los valores de las referencias son diferentes "
             );
           }
         }
@@ -164,16 +179,12 @@ const PagoRecaudoServiciosItau = ({
         city: roleInfo?.["ciudad"],
         Datos: {
           codigo_convenio: dataRecaudo?.codigoConvenio,
-          referencia_1: dataRecaudo?.ref1,
-          referencia_2: dataRecaudo?.ref2 === "" ? "" : dataRecaudo?.ref2,
-          // flag_otro_valor:
-          //   dataRecaudo.valorTrxOriginal.toString() !==
-          //   dataRecaudo.valorTrx.toString(),
-          // tipo_convenio_recaudo: convenio.consultaweb,
-          // nombre_convenio: dataRecaudo?.nombreConvenio,
-          // ...extraData,
         },
       };
+      for (let i = 1; i <= 8; i++) {
+        const referencia = dataRecaudo[`referencia${i}`];
+        data.Datos[`referencia_${i}`] = referencia === "" ? "" : referencia;
+      }
       notifyPending(
         peticionConsultaRecaudo({}, data),
         {
@@ -183,7 +194,6 @@ const PagoRecaudoServiciosItau = ({
         },
         {
           render: ({ data: res }) => {
-            console.log(res?.obj);
             setShowModal(true);
             setResConsulta(res?.obj);
             setDataRecaudo((old) => ({
@@ -244,12 +254,14 @@ const PagoRecaudoServiciosItau = ({
         Datos: {
           codigo_convenio: dataRecaudo?.codigoConvenio,
           nombre_convenio: dataRecaudo?.nombreConvenio,
-          referencia_1: dataRecaudo?.ref1,
-          referencia_2: dataRecaudo?.ref2 === "" ? "" : dataRecaudo?.ref2,
           refInfoRec: resConsulta?.RecInfoRec ? resConsulta?.RecInfoRec : [],
         },
         id_trx: resConsulta?.id_trx,
       };
+      for (let i = 1; i <= 8; i++) {
+        const referencia = dataRecaudo[`referencia${i}`];
+        data.Datos[`referencia_${i}`] = referencia === "" ? "" : referencia;
+      }
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
@@ -302,6 +314,29 @@ const PagoRecaudoServiciosItau = ({
     }
   }, []);
 
+  const onChangeFormatCadena = useCallback((ev) => {
+    const { name, value } = ev.target;
+    setDataRecaudo((old) => ({
+      ...old,
+      [name]: value,
+    }));
+  }, []);
+
+  const onChangeFormatFecha = useCallback((ev) => {
+    const { name, value } = ev.target;
+    let formattedValue = value;
+    if (formattedValue.length === 8) {
+      formattedValue = `${formattedValue.slice(0, 4)}-${formattedValue.slice(
+        4,
+        6
+      )}-${formattedValue.slice(6, 8)}`;
+    }
+    setDataRecaudo((old) => ({
+      ...old,
+      [name]: formattedValue,
+    }));
+  }, []);
+
   const closeModule = useCallback(() => {
     setDataRecaudo(DATA_RECAUDO_INIT);
     setShowModal(false);
@@ -309,33 +344,183 @@ const PagoRecaudoServiciosItau = ({
     notifyError("Pago cancelado por el usuario");
   }, []);
 
-  const renderReferences = (ingressType = "initial") =>
-    [...Array(parseInt(convenio.referencia_2)).keys()].map((i) => (
-      <Input
-        id={ingressType === "initial" ? `ref${i + 1}` : `ref${i + 1}Validacion`}
-        name={
-          ingressType === "initial" ? `ref${i + 1}` : `ref${i + 1}Validacion`
+  const renderReferences = (ingressType = "initial") => {
+    const references = [];
+    let contador = 0;
+    for (let i = 1; ; i++) {
+      const referenceKey = `referencia${i}`;
+      if (!convenio.hasOwnProperty(referenceKey)) {
+        break;
+      }
+      const referenceValue = convenio[referenceKey];
+      if (referenceValue !== null) {
+        contador++;
+        if (tipoRecaudo === "manual") {
+          if (convenio[`tipo_dato_ref${i}`] === "Cadena") {
+            references.push(
+              <Input
+                id={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                name={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                label={referenceValue}
+                type="text"
+                autoComplete="off"
+                maxLength={32}
+                value={
+                  ingressType === "initial"
+                    ? dataRecaudo?.[referenceKey]
+                    : dataRecaudo?.[`${referenceKey}Validacion`]
+                }
+                onChange={onChangeFormatCadena}
+                disabled={
+                  loadingPeticionPagoRecaudo ||
+                  loadingPeticionConsultaRecaudo ||
+                  tipoRecaudo !== "manual"
+                }
+                required
+                key={i}
+              />
+            );
+          }
+          if (convenio[`tipo_dato_ref${i}`] === "Monto") {
+            references.push(
+              <MoneyInput
+                id={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                name={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                label={referenceValue}
+                type="tel"
+                autoComplete="off"
+                maxLength={10}
+                value={
+                  ingressType === "initial"
+                    ? dataRecaudo?.[referenceKey]
+                    : dataRecaudo?.[`${referenceKey}Validacion`]
+                }
+                onChange={onChangeFormatNum}
+                disabled={
+                  loadingPeticionPagoRecaudo ||
+                  loadingPeticionConsultaRecaudo ||
+                  tipoRecaudo !== "manual"
+                }
+                required
+                key={i}
+              />
+            );
+          }
+          if (convenio[`tipo_dato_ref${i}`] === "Fecha") {
+            references.push(
+              <Input
+                id={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                name={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                label={referenceValue}
+                type="date"
+                autoComplete="off"
+                value={
+                  ingressType === "initial"
+                    ? dataRecaudo?.[referenceKey]
+                    : dataRecaudo?.[`${referenceKey}Validacion`]
+                }
+                onChange={onChangeFormatFecha}
+                disabled={
+                  loadingPeticionPagoRecaudo ||
+                  loadingPeticionConsultaRecaudo ||
+                  tipoRecaudo !== "manual"
+                }
+                required
+                key={i}
+              />
+            );
+          }
+          if (convenio[`tipo_dato_ref${i}`] === "Número") {
+            references.push(
+              <Input
+                id={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                name={
+                  ingressType === "initial"
+                    ? referenceKey
+                    : `${referenceKey}Validacion`
+                }
+                label={referenceValue}
+                type="text"
+                autoComplete="off"
+                maxLength={32}
+                value={
+                  ingressType === "initial"
+                    ? dataRecaudo?.[referenceKey]
+                    : dataRecaudo?.[`${referenceKey}Validacion`]
+                }
+                onChange={onChangeFormat}
+                disabled={
+                  loadingPeticionPagoRecaudo ||
+                  loadingPeticionConsultaRecaudo ||
+                  tipoRecaudo !== "manual"
+                }
+                required
+                key={i}
+              />
+            );
+          }
+        } else {
+          references.push(
+            <Input
+              id={
+                ingressType === "initial"
+                  ? referenceKey
+                  : `${referenceKey}Validacion`
+              }
+              name={
+                ingressType === "initial"
+                  ? referenceKey
+                  : `${referenceKey}Validacion`
+              }
+              label={referenceValue}
+              type="text"
+              autoComplete="off"
+              maxLength={32}
+              value={
+                ingressType === "initial"
+                  ? dataRecaudo?.[referenceKey]
+                  : dataRecaudo?.[`${referenceKey}Validacion`]
+              }
+              onChange={onChangeFormatCadena}
+              disabled={true}
+              required
+              key={i}
+            />
+          );
         }
-        label={convenio?.[`referencia${i + 1}`] ?? ""}
-        type="text"
-        autoComplete="off"
-        minLength={1}
-        maxLength={32}
-        value={
-          ingressType === "initial"
-            ? dataRecaudo?.[`ref${i + 1}`]
-            : dataRecaudo?.[`ref${i + 1}Validacion`]
-        }
-        onChange={onChangeFormat}
-        disabled={
-          loadingPeticionPagoRecaudo ||
-          loadingPeticionConsultaRecaudo ||
-          tipoRecaudo !== "manual"
-        }
-        required
-        key={i}
-      />
-    ));
+        convenio.referencia_2 = contador;
+      }
+    }
+    return references;
+  };
 
   return (
     <>
@@ -515,7 +700,7 @@ const PagoRecaudoServiciosItau = ({
                   [...Array(parseInt(convenio.referencia_2)).keys()].map(
                     (i) => [
                       convenio?.[`referencia${i + 1}`],
-                      dataRecaudo?.[`ref${i + 1}`],
+                      dataRecaudo?.[`referencia${i + 1}`],
                     ]
                   )
                 ),
@@ -555,7 +740,7 @@ const PagoRecaudoServiciosItau = ({
                   [...Array(parseInt(convenio.referencia_2)).keys()].map(
                     (i) => [
                       convenio?.[`referencia${i + 1}`],
-                      dataRecaudo?.[`ref${i + 1}`],
+                      dataRecaudo?.[`referencia${i + 1}`],
                     ]
                   )
                 ),
