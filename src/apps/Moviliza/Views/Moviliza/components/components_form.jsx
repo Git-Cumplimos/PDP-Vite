@@ -179,6 +179,7 @@ const { styleComponentsInput, formItem } = classes;
   };
 
 export const LecturaMoviliza = ({
+  loadingPeticionJwt,
   loadingPeticion,
   onSubmit,
   handleClose,
@@ -231,7 +232,11 @@ export const LecturaMoviliza = ({
       <ButtonBar className="flex justify-center py-6">
         <Button type={"submit"}  onClick={onSubmit} disabled={ 
           token === "" || 
-          numeroMoviliza === "" || numeroMoviliza === 0 || 0 >= numeroMoviliza.length || numeroMoviliza.length > 30 ? !loadingPeticion : loadingPeticion }>
+          numeroMoviliza === "" || 
+          numeroMoviliza === 0 || 
+          0 >= numeroMoviliza.length || 
+          numeroMoviliza.length > 30 
+           ? !loadingPeticion || !loadingPeticionJwt : loadingPeticion || loadingPeticionJwt }>
         Realizar consulta
         </Button>
         <Button type={"reset"} onClick={handleClose} disabled={loadingPeticion}>
