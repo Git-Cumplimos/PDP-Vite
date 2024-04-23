@@ -67,8 +67,8 @@ export const useFetchItau = (
           }
           if (PeticionConsulta?.obj?.status_trx === "Rechazada") {
             throw new ErrorCustomBackend(
-              PeticionConsulta?.msg,
-              PeticionConsulta?.msg
+              PeticionConsulta?.obj?.message_trx,
+              PeticionConsulta?.obj?.message_trx,
             );
           } else if (PeticionConsulta?.obj?.status_trx === "Aprobada") {
             response = PeticionConsulta;
