@@ -4,7 +4,6 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCajaSocial";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Input from "../../../../../components/Base/Input";
-import { notifyPending } from "../../../../../utils/notify";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 
 const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
