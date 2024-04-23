@@ -163,7 +163,6 @@ const useHookWithGouPay = (
               ...old,
               id_trx: resCheckUrlProcess.id_trx,
             }));
-            window.open(resCheckUrlProcess.url_process);
             return {
               url_process: resCheckUrlProcess.url_process,
               what_service: function_name,
@@ -444,10 +443,10 @@ const useHookWithGouPay = (
               35
             ),
           ]);
-          // if (response?.what_service === "PeticionCheckUrlProcess") {
-          //   window.open(response.url_process);
-          //   go_url_process = true;
-          // }
+          if (response?.what_service === "PeticionCheckUrlProcess") {
+            window.open(response.url_process);
+            go_url_process = true;
+          }
         } catch (error: any) {
           if (!(error instanceof ErrorCustomFetch)) {
             throw new ErrorCustomUseHookCode(
@@ -483,9 +482,9 @@ const useHookWithGouPay = (
                 retries: 6,
               }),
             ]);
-            // if (response?.what_service === "PeticionCheckUrlProcess") {
-            //   window.open(response.url_process);
-            // }
+            if (response?.what_service === "PeticionCheckUrlProcess") {
+              window.open(response.url_process);
+            }
           }
         } catch (error: any) {
           if (!(error instanceof ErrorCustomFetch)) {
