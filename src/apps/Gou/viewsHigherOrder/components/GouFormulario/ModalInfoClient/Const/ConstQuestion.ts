@@ -1,4 +1,6 @@
-export const constQuestion: any = {
+import { TypingConstInfo } from "../TypingModalInfoClient";
+
+export const constQuestion: TypingConstInfo = {
   1: {
     que: "1. ¿Realizar la transacción por Gou me genera un costo adicional?",
     res: {

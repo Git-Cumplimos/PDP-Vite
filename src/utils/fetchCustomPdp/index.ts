@@ -10,9 +10,10 @@ export {
   ErrorCustomBackend,
   ErrorCustomBackendUser,
   ErrorCustomBackendPending,
-  ErrorCustomBackendRehazada,
+  ErrorCustomBackendRechazada,
   ErrorCustomUseHookCode,
   ErrorCustomComponentCode,
+  ErrorCustomRaise,
 } from "./ExceptionCustom";
 
 export { fetchCustomPdp, fetchCustomPdpCycle } from "./FetchCustom";

@@ -12,7 +12,6 @@ import {
   TypingDataComercioSimple,
   TypingDataPath,
 } from "../../utils/utils_typing";
-import GouCheckPayOrigin from "./components/GouCheckPayOrigin";
 import GouCheckPayCross from "./components/GouCheckPayCross";
 
 //FRAGMENT ******************** COMPONENT *******************************
@@ -29,18 +28,12 @@ const GouCheckPay = () => {
     return {
       id_comercio: roleInfo?.id_comercio ?? 0,
       id_usuario: roleInfo?.id_usuario ?? 0,
-      id_terminal: roleInfo?.id_usuario ?? 0,
+      id_terminal: roleInfo?.id_dispositivo ?? 0,
     };
-  }, [roleInfo]);
+  }, [roleInfo?.id_comercio, roleInfo?.id_usuario, roleInfo?.id_dispositivo]);
 
   useEffect(() => {
     const validPath = (): string | null => {
-      if (
-        params.type_setting_time !== "origin" &&
-        params.type_setting_time !== "cross"
-      ) {
-        return "url incorrecta 'type_setting_time'";
-      }
       if (params.id_hash === undefined) {
         return "url incorrecta 'id_hash'";
       }
@@ -48,7 +41,6 @@ const GouCheckPay = () => {
         return "url incorrecta 'id_hash'";
       }
       setDataPath({
-        type_setting_time: params.type_setting_time,
         id_hash: params.id_hash,
       });
       return null;
@@ -89,26 +81,14 @@ const GouCheckPay = () => {
 
   return (
     <Fragment>
-      {dataPath?.type_setting_time === "origin" && (
-        <GouCheckPayOrigin
-          imgs={imgs}
-          dataPath={dataPath}
-          summaryTrx={summaryTrx}
-          trx={trx}
-          loadingPeticion={loadingPeticion}
-          ticket={ticket}
-        ></GouCheckPayOrigin>
-      )}
-      {dataPath?.type_setting_time === "cross" && (
-        <GouCheckPayCross
-          imgs={imgs}
-          dataPath={dataPath}
-          summaryTrx={summaryTrx}
-          trx={trx}
-          loadingPeticion={loadingPeticion}
-          ticket={ticket}
-        ></GouCheckPayCross>
-      )}
+      <GouCheckPayCross
+        imgs={imgs}
+        dataPath={dataPath}
+        summaryTrx={summaryTrx}
+        trx={trx}
+        loadingPeticion={loadingPeticion}
+        ticket={ticket}
+      ></GouCheckPayCross>
     </Fragment>
   );
 };

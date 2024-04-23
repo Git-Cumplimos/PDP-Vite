@@ -10,14 +10,14 @@ import {
   fetchCustomPdpCycle,
   ErrorCustomBackend,
   ErrorCustomBackendPending,
-  ErrorCustomBackendRehazada,
+  ErrorCustomBackendRechazada,
   FuctionEvaluateResponseConsultTrx,
 } from "../../../../../utils/fetchCustomPdp";
 import {
   TypingCheckPay,
   TypingDataComercioSimple,
   TypingDataPath,
-  TypingDataSettingTime,
+  TypingDataSettingTimeCheckPay,
   TypingSummaryTrx,
   TypingTrx,
   TypingTypeSettingTime,
@@ -38,8 +38,8 @@ export type TypeUseHookGouCheckPay = () => {
 };
 
 //FRAGMENT ******************** CONST *******************************
-const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-// const URL_GOU = `http://127.0.0.1:5000`;
+// const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+const URL_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
@@ -56,10 +56,10 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
   const ArmDataOutput = useCallback(
     (
       res: { [key: string]: any },
-      status?: "Aprobada" | "Rechazada" | "Pendiente" | "Indefinite"
+      status?: "Aprobada" | "Rechazada" | "Pendiente" | "Desconocida"
     ) => {
       if (status === undefined) {
-        status = "Indefinite";
+        status = "Desconocida";
       }
       const res_obj = res?.obj ?? {};
       const res_obj_result = res_obj?.result ?? {};
@@ -69,30 +69,28 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           res_obj?.ids?.id_trx && res_obj?.ids?.id_trx;
         setSummaryTrx((old) => ({
           ...old,
-          summary_trx:
-            Object.keys(summary_trx).length === 0 ? undefined : summary_trx,
           id_log: res.obj?.ids?.id_log,
+          id_trx: res_obj?.ids?.id_trx,
         }));
       } else {
         summary_trx = {
           ...ajust_tam_see_obj(res_obj.result?.summary_trx_add ?? {}, 26),
           ...summary_trx,
         };
-        summary_trx["Tipo de Trámite"] =
-          res_obj_result?.tipo_tramite && res_obj_result?.tipo_tramite;
-        summary_trx["Id transacción"] =
-          res_obj?.ids?.id_trx && res_obj?.ids?.id_trx;
-        summary_trx["Num referencia"] =
-          res_obj_result?.referencia && res_obj_result?.referencia;
-        summary_trx["Estado de la transacción"] = status;
-        summary_trx["Fecha de la transacción"] =
-          res_obj_result?.fecha && res_obj_result?.fecha;
         setSummaryTrx({
           msg: res?.msg,
-          summary_trx:
-            Object.keys(summary_trx).length === 0 ? undefined : summary_trx,
+          summary_trx_asterisk:
+            res_obj_result?.tipo_tramite && res_obj_result?.asterisk,
+          summary_trx_own: {
+            tipo_tramite:
+              res_obj_result?.tipo_tramite && res_obj_result?.tipo_tramite,
+            referencia:
+              res_obj_result?.referencia && res_obj_result?.referencia,
+            fecha: res_obj_result?.fecha && res_obj_result?.fecha,
+          },
           valor_trx: res_obj_result?.valor_trx,
           id_log: res_obj.ids?.id_log,
+          id_trx: res_obj?.ids?.id_trx,
         });
       }
 
@@ -107,7 +105,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
   const PeticionSettingTime = useCallback(
     async (
       type_setting_time: TypingTypeSettingTime
-    ): Promise<TypingDataSettingTime> => {
+    ): Promise<TypingDataSettingTimeCheckPay> => {
       const function_name = "PeticionSettingTime";
       const name_service = "consultar configuracion time";
       let response: any;
@@ -115,10 +113,8 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
         const url = `${URL_GOU}/services_gou/check_pay/consult_setting_time/${type_setting_time}`;
         response = await fetchCustomPdp(url, "GET", name_service);
         return {
-          delay_consult_for_pay:
-            response.obj?.result?.setting?.delay_consult_for_pay ?? 15,
-          retries_consult_for_pay:
-            response.obj?.result?.setting?.retries_consult_for_pay ?? 4,
+          delay: response.obj?.result?.setting?.delay_consult_for_pay ?? 15,
+          retries: response.obj?.result?.setting?.retries_consult_for_pay ?? 4,
         };
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
@@ -130,23 +126,23 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
             true
           );
         }
-        if (!(error instanceof ErrorCustomBackend)) {
-          ArmDataOutput(error.res ?? {});
-        }
+        // if (!(error instanceof ErrorCustomBackend)) {
+        //   ArmDataOutput(error.res ?? {});
+        // }
         throw error;
       }
     },
-    [ArmDataOutput]
+    []
   );
 
   const PeticionConsultForPay = useCallback(
     async (
       dataComercioSimple: TypingDataComercioSimple,
       id_hash: string,
-      dataSettingTime: TypingDataSettingTime
+      dataSettingTime: TypingDataSettingTimeCheckPay
     ): Promise<TypingCheckPay> => {
       const function_name = "PeticionConsultForPay";
-      const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp`;
+      const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp/cross`;
       const name_service = "Verificando Pago";
       let response;
       let pendiente = 0;
@@ -157,7 +153,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
             id_usuario: dataComercioSimple.id_usuario,
             id_terminal: dataComercioSimple.id_terminal,
           },
-          pk_hash: id_hash,
+          id_hash: id_hash,
         };
         //SECUENCIA ---------------Paso 1-------------------------------
         try {
@@ -185,7 +181,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
               "notifyError",
               true
             );
-          } else if (error instanceof ErrorCustomBackendRehazada) {
+          } else if (error instanceof ErrorCustomBackendRechazada) {
             ArmDataOutput(error.res ?? {}, "Rechazada");
             throw error;
           } else if (error instanceof ErrorCustomBackend) {
@@ -210,8 +206,8 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           name_service,
           {},
           body,
-          dataSettingTime.retries_consult_for_pay,
-          dataSettingTime.delay_consult_for_pay
+          dataSettingTime.retries,
+          dataSettingTime.delay
         );
         ArmDataOutput(response, "Aprobada");
         return {
@@ -227,7 +223,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
             "notifyError",
             true
           );
-        } else if (error instanceof ErrorCustomBackendRehazada) {
+        } else if (error instanceof ErrorCustomBackendRechazada) {
           ArmDataOutput(error.res ?? {}, "Rechazada");
         } else if (error instanceof ErrorCustomBackend && pendiente === 0) {
           ArmDataOutput(error.res ?? {});
@@ -247,19 +243,22 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
     async (
       dataComercioSimple: TypingDataComercioSimple,
       dataPath: TypingDataPath
-    ): Promise<TypingCheckPay> => {
+    ): Promise<any> => {
       const function_name = "PeticionCheckPay";
       setloadingPeticion(true);
       setloadingPeticionBlocking(true);
       const name_service = "PeticionCheckPay";
       try {
-        const dataSettingTime = await PeticionSettingTime(
-          dataPath.type_setting_time
-        );
+        // const dataSettingTime = await PeticionSettingTime(
+        //   dataPath.type_setting_time
+        // );
         const dataConsultForPay = await PeticionConsultForPay(
           dataComercioSimple,
           dataPath.id_hash,
-          dataSettingTime
+          {
+            retries: 10,
+            delay: 30,
+          }
         );
         return dataConsultForPay;
       } catch (error: any) {
@@ -278,7 +277,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
         setloadingPeticionBlocking(false);
       }
     },
-    [PeticionSettingTime, PeticionConsultForPay]
+    [PeticionConsultForPay]
   );
 
   return {
