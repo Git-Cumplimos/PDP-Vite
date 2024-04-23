@@ -1,4 +1,6 @@
-export const constComunication: any = {
+import { TypingConstInfo } from "../TypingModalInfoClient";
+
+export const constComunication: TypingConstInfo = {
   1: {
     que: "Correos electrónicos",
     res: {

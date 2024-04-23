@@ -114,3 +114,51 @@ export const ajust_point_see = (value: string, minCant: number): string => {
   if (value.length <= minCant) return value;
   return `${value.substring(0, minCant - 4)} ...`;
 };
+
+export const list_a_dict_segun_order = (
+  summary: Array<{ [key: string]: string | number | null }>
+): { [key: string]: string | number } => {
+  let summary_new: { [key: string]: string | number } = {};
+  summary.map((kargs) => {
+    const value = Object.values(kargs)[0];
+    const key: string = Object.keys(kargs)[0];
+    if (value !== null) {
+      summary_new = { ...summary_new, [key]: value };
+    }
+    return kargs;
+  });
+  return summary_new;
+};
+
+export const dict_segun_order = (
+  order: Array<string>,
+  summary: { [key: string]: any }
+): { [key: string]: string | number } => {
+  let summary_new: { [key: string]: string | number } = {};
+  order.map((value_string, index) => {
+    const value = summary[value_string];
+    if (value) {
+      summary_new = { ...summary_new, [value_string]: value };
+    }
+    return index;
+  });
+  return summary_new;
+};
+
+export const dict_summary_trx_own = (
+  relationshipSummary: { [key: string]: string },
+  summary_trx_own: { [key: string]: any }
+): { [key: string]: string | number } => {
+  let summary_trx_own_new: { [key: string]: any } = {};
+  Object.keys(relationshipSummary).map((key, index) => {
+    const arg = summary_trx_own[key];
+    if (arg) {
+      summary_trx_own_new = {
+        ...summary_trx_own_new,
+        [relationshipSummary[key]]: arg,
+      };
+    }
+    return index;
+  });
+  return summary_trx_own_new;
+};

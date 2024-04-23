@@ -1,29 +1,23 @@
-import { Fragment, useEffect } from "react";
-import Modal from "../../../../../../components/Base/Modal";
+import { Fragment } from "react";
+import Modal from "../../../../../../../components/Base/Modal";
 
+import { PropsModalInterno } from "../TypingModalInfoClient";
 import classes from "./ModalQuestions.module.css";
 
 //FRAGMENT ******************** CSS *******************************
 const {
+  containerPrincipal,
   containerPerItemFather,
   containerRes,
   labelQuestion,
-  containerPrincipal,
 } = classes;
-
-//FRAGMENT ******************** Typing *******************************
-type PropsModalQuestions = {
-  constInfo: any;
-  showModalInfoClient: any;
-  setShowModalInfoClient: any;
-};
 
 //FRAGMENT ******************** COMPONENT *******************************
 const ModalQuestions = ({
   constInfo,
   showModalInfoClient,
   setShowModalInfoClient,
-}: PropsModalQuestions) => {
+}: PropsModalInterno) => {
   return (
     <Modal
       show={showModalInfoClient !== null ? true : false}

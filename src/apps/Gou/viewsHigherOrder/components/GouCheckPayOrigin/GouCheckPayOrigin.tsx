@@ -1,39 +1,46 @@
 import React, { Fragment, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import Modal from "../../../../../../components/Base/Modal";
-import PaymentSummary from "../../../../../../components/Compound/PaymentSummary";
-import Button from "../../../../../../components/Base/Button";
-import ButtonBar from "../../../../../../components/Base/ButtonBar";
-import { formatMoney } from "../../../../../../components/Base/MoneyInput";
-import { notifyError } from "../../../../../../utils/notify";
-import { TypeInfTicket } from "../../../../../../utils/TypingUtils";
+import Modal from "../../../../../components/Base/Modal";
+import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
+import Button from "../../../../../components/Base/Button";
+import ButtonBar from "../../../../../components/Base/ButtonBar";
+import { formatMoney } from "../../../../../components/Base/MoneyInput";
+import { notifyError } from "../../../../../utils/notify";
+import { TypeInfTicket } from "../../../../../utils/TypingUtils";
 
-import TicketsGou from "../../../../components/TicketsGou";
+import TicketsGou from "../../../components/TicketsGou";
 import {
   TypingDataPath,
   TypingSummaryTrx,
   TypingTrx,
-} from "../../../../utils/utils_typing";
-import { ajust_tam_see } from "../../../../utils/utils_function";
+} from "../../../utils/utils_typing";
+import {
+  ajust_tam_see,
+  dict_segun_order,
+  dict_summary_trx_own,
+  list_a_dict_segun_order,
+} from "../../../utils/utils_function";
 import classes from "./GouCheckPayOrigin.module.css";
+import {
+  constOrderSummary,
+  constRelationshipSummary,
+} from "../../../utils/utils_const";
 
 //FRAGMENT ******************** CONST *******************************
 const { contendorIdLog, contendorPago, labelHash } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type PropsGouCheckPayOrigin = {
-  imgs: any;
-  dataPath: TypingDataPath | null;
-  summaryTrx: TypingSummaryTrx;
+  logoGou: any;
+  summaryTrx: any;
   trx: TypingTrx;
   loadingPeticion: boolean;
   ticket: TypeInfTicket | null;
 };
 //FRAGMENT ******************** COMPONENT *******************************
 const GouChecPayOrigin = ({
-  imgs,
-  dataPath,
+  logoGou,
   summaryTrx,
   loadingPeticion,
   trx,
@@ -64,29 +71,34 @@ const GouChecPayOrigin = ({
     <Fragment>
       <Modal show={true} handleClose={handleCloseModal}>
         {/*************** Trx Search **********************/}
-        {dataPath && trx.status !== "Aprobada" && (
+        {trx.status !== "Aprobada" && (
           <Fragment>
             {summaryTrx.id_log && (
               <label className={contendorIdLog}>{summaryTrx.id_log}</label>
             )}
             <img
               className={summaryTrx.id_log ? "pl-20 mb-5" : "pl-20 mb-5"}
-              src={`${imgs?.LogoGou}`}
+              src={`${logoGou}`}
               alt={"LogoGou"}
             />
 
             <PaymentSummary
               title={trx.msg}
               subtitle={summaryTrx?.msg ?? ""}
-              // summaryTrx={summaryTrx.summary_trx}
+              summaryTrx={{
+                ...list_a_dict_segun_order(
+                  summaryTrx?.summary_trx_asterisk ?? []
+                ),
+                ...dict_segun_order(
+                  constOrderSummary,
+                  dict_summary_trx_own(constRelationshipSummary, {
+                    ...(summaryTrx?.summary_trx_own ?? {}),
+                    status: trx.status,
+                    id_trx: summaryTrx?.id_trx,
+                  })
+                ),
+              }}
             >
-              {/* <div className={labelHash}>
-                {dataPath?.id_hash &&
-                  summaryTrx?.summary_trx?.["Id transacción"] === undefined && (
-                    <label>{ajust_tam_see(dataPath.id_hash, 50)}</label>
-                  )}
-              </div> */}
-
               {summaryTrx.valor_trx && (
                 <Fragment>
                   <h1 className={contendorPago}>
@@ -97,8 +109,11 @@ const GouChecPayOrigin = ({
                   </h1>
                 </Fragment>
               )}
+              <div className={labelHash}>
+                {!summaryTrx?.id_trx && <label>{summaryTrx.id_unico}</label>}
+              </div>
             </PaymentSummary>
-            {/* {!loadingPeticion && (
+            {!loadingPeticion && (
               <div className={!summaryTrx?.summary_trx ? "pt-4" : ""}>
                 <ButtonBar>
                   <Button onClick={() => validNavigate("../")}>
@@ -106,7 +121,7 @@ const GouChecPayOrigin = ({
                   </Button>
                 </ButtonBar>
               </div>
-            )} */}
+            )}
           </Fragment>
         )}
         {/*************** Trx Search **********************/}

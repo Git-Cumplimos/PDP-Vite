@@ -6,17 +6,28 @@ export type TypingDataComercioSimple = {
   id_terminal: number;
 };
 
+export type TypingSummaryTrxOwn = {
+  tipo_tramite?: string;
+  referencia?: string;
+  fecha?: string;
+};
+
 export type TypingSummaryTrx = {
   id_log?: number;
+  id_unico?: string;
+  id_trx?: number;
   msg?: string;
-  summary_trx?: { [key: string]: number | string };
+  summary_trx_asterisk?: Array<{ [key: string]: any }>;
+  summary_trx_own?: TypingSummaryTrxOwn;
   valor_trx?: number;
 };
 
 export type TypingStatusTrx =
   | "Search"
   | "Indefinite"
+  | "Desconocida"
   | "Pendiente"
+  | "Pendiente."
   | "Aprobada"
   | "Rechazada";
 
@@ -27,15 +38,19 @@ export type TypingTrx = {
 
 export type TypingTypeSettingTime = "origin" | "cross";
 export type TypingDataPath = {
-  type_setting_time: TypingTypeSettingTime;
   id_hash: string;
 };
 
 //------PeticionSettingTime------
 
-export type TypingDataSettingTime = {
-  delay_consult_for_pay: number;
-  retries_consult_for_pay: number;
+export type TypingDataSettingTimeCheckPay = {
+  delay: number;
+  retries: number;
+};
+
+export type TypingDataSettingTimeCheckUrlProcess = {
+  delay: number;
+  timeout: number;
 };
 
 //------ PeticionConsultForPay----
