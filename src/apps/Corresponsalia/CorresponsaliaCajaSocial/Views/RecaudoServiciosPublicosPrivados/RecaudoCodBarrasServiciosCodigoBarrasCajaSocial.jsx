@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "../../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCajaSocial";
