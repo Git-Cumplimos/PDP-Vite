@@ -38,8 +38,8 @@ export type TypeUseHookGouCheckPay = () => {
 };
 
 //FRAGMENT ******************** CONST *******************************
-// const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-const URL_GOU = `http://127.0.0.1:5000`;
+const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+// const URL_GOU = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
