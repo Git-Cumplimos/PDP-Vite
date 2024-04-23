@@ -121,7 +121,7 @@ const ConsultaComerciosRechazados = () => {
           onChange={(e) => {
             if (!isNaN(e.target.value)) {
               const valor = e.target.value;
-              const num = valor.replace(/[\s\.-]/g, "");
+              const num = valor.replace(/[^\d]/g, '');
               setDataComercios((old) => {
                 return { ...old, id_comercio: num };
               });
