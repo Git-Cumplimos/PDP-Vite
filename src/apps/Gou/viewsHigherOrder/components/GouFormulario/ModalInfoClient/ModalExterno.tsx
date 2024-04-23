@@ -1,9 +1,10 @@
 import React, { Fragment } from "react";
-import { constComunication, constQuestion } from "./Const";
+
+import ModalAceptarTerminos from "./ModalAceptarTerminos";
 import ModalComunication from "./ModalComunication";
 import ModalQuestions from "./ModalQuestions";
 import { PropsModalExterno } from "./TypingModalInfoClient";
-import ModalAceptarTerminos from "./ModalAceptarTerminos";
+import { constComunication, constQuestion } from "./Const";
 
 const ModalExterno = ({
   showModalInfoClient,

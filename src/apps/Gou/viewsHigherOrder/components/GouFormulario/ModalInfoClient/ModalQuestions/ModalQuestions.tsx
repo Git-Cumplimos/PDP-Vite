@@ -1,8 +1,7 @@
 import { Fragment } from "react";
 import Modal from "../../../../../../../components/Base/Modal";
-
-import { PropsModalInterno } from "../TypingModalInfoClient";
 import classes from "./ModalQuestions.module.css";
+import { PropsModalInterno } from "../TypingModalInfoClient";
 
 //FRAGMENT ******************** CSS *******************************
 const {
@@ -24,7 +23,7 @@ const ModalQuestions = ({
       handleClose={() => setShowModalInfoClient(null)}
     >
       <h1 className="py-5 text-2xl font-semibold grid justify-center">
-        Aceptar Terminos y condiciones
+        Preguntas Frecuentes
       </h1>
       <div className={containerPrincipal}>
         {Object.keys(constInfo).map((key) => {
