@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import Modal from "../../../../../../../components/Base/Modal";
 
-import { PropsModalInterno } from "../TypingModalInfoClient";
 import classes from "./ModalComunication.module.css";
+import { PropsModalInterno } from "../TypingModalInfoClient";
 
 //FRAGMENT ******************** CSS *******************************
 const {

@@ -17,7 +17,7 @@ const ModalAceptarTerminos = ({
       show={showModalInfoClient !== null ? true : false}
       handleClose={() => setShowModalInfoClient(null)}
     >
-      <PaymentSummary title="Aceptar Terminos y condiciones" subtitle="">
+      <PaymentSummary title="Aceptar Términos y condiciones" subtitle="">
         <ButtonBar>
           <></>
           <Button
