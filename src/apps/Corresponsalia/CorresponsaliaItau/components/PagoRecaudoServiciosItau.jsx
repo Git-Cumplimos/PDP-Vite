@@ -490,22 +490,24 @@ const PagoRecaudoServiciosItau = ({
             required
           />
           {renderReferences("initial")}
-          {tipoRecaudo === "codigoBarras" && convenio.consultaweb === "N" && (
-            <MoneyInput
-              id="valorTrxOriginal"
-              name="valorTrxOriginal"
-              label={"Valor a pagar original"}
-              type="tel"
-              maxLength={10}
-              autoComplete="off"
-              value={dataRecaudo?.valorTrxOriginal ?? 0}
-              onInput={() => {}}
-              disabled
-              required
-              equalError={false}
-              equalErrorMin={false}
-            />
-          )}
+          {tipoRecaudo === "codigoBarras" &&
+            convenio.consultaweb === "N" &&
+            dataRecaudo?.valorTrxOriginal !== 0 && (
+              <MoneyInput
+                id="valorTrxOriginal"
+                name="valorTrxOriginal"
+                label={"Valor a pagar original"}
+                type="tel"
+                maxLength={10}
+                autoComplete="off"
+                value={dataRecaudo?.valorTrxOriginal ?? 0}
+                onInput={() => {}}
+                disabled
+                required
+                equalError={false}
+                equalErrorMin={false}
+              />
+            )}
           {convenio.consultaweb === "N" &&
             convenio.modvalor_consweb === "S" &&
             tipoRecaudo === "codigoBarras" && (
