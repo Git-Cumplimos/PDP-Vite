@@ -17,7 +17,7 @@ import Modal from "../../../../components/Base/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
-import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
+import { enumParametrosCajaSocial } from "../utils/enumParametrosCajaSocial";
 import { algoCheckCuentaCreditoBMCajaSocial } from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
 import { useMFA } from "../../../../components/Base/MFAScreen";
