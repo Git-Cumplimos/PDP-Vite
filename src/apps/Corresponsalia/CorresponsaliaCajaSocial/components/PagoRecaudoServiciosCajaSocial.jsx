@@ -154,6 +154,7 @@ const PagoRecaudoServiciosCajaSocial = ({
       if (tipoRecaudo !== "manual") {
         extraData["codigo_barras"] = codigoBarras;
         extraData["flag_codigo_barras"] = true;
+        extraData["ean_code"] = dataCodigoBarras?.codigo_ean;
       }
       const data = {
         oficina_propia:
@@ -245,6 +246,7 @@ const PagoRecaudoServiciosCajaSocial = ({
       if (tipoRecaudo !== "manual") {
         extraData["codigo_barras"] = codigoBarras;
         extraData["flag_codigo_barras"] = true;
+        extraData["ean_code"] = dataCodigoBarras?.codigo_ean;
       }
       if (
         dataRecaudo?.valorTrx <
@@ -306,7 +308,6 @@ const PagoRecaudoServiciosCajaSocial = ({
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
       };
-      console.log(data);
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
