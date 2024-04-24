@@ -582,8 +582,8 @@ const PagoRecaudoServiciosCajaSocial = ({
                   name="valorTrxValidacion"
                   label={"Valor a pagar"}
                   type="tel"
-                  // minLength={5}
-                  maxLength={10}
+                  maxLength={12}
+                  decimalDigits={2}
                   autoComplete="off"
                   min={
                     enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
@@ -591,7 +591,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                   max={
                     enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
                   }
-                  value={dataRecaudo?.valorTrxValidacion ?? 0}
+                  defaultValue={0}
                   onInput={onChangeFormatNum}
                   disabled={
                     loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo

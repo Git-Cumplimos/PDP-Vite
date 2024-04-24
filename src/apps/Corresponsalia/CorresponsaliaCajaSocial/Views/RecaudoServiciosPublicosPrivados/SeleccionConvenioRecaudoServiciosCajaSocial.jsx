@@ -5,6 +5,7 @@ import { fetchCustom } from "../../utils/fetchCajaSocial";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Input from "../../../../../components/Base/Input";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
+import { notifyError } from "../../../../../utils/notify";
 
 const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
 
@@ -59,7 +60,7 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
           })
           .catch((error) => {
             validNavigate(-1);
-            return error?.message ?? "Consulta fallida";
+            notifyError(error?.message ?? "Consulta fallida");
           });
       },
       [dataConvenios, limit, page]
