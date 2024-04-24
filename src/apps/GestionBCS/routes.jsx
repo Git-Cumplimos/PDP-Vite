@@ -22,13 +22,13 @@ export const listPermissionsGestionBCS = listPermissions;
 
 const routesItau = {
   link: "/GestionTransaccional/gestion-banco-caja-social",
-  label: <AppIcons Logo={"BLOQUEO_CONVENIOS_ITAU"} name='Gestión BCS' />,
+  label: <AppIcons Logo={"BLOQUEO_COMERCIO_BCS"} name='Gestión BCS' />,
   component: GestionBCS,
   permission: [enumPermisosGestionBCS.GESTION_BCS],
   subRoutes: [
     {
       link: "/GestionTransaccional/gestion-banco-caja-social/comercios-rechazados",
-      label: <AppIcons Logo={"BLOQUEO_CONVENIOS_ITAU"} name={"Comercios Rechazados"} />,
+      label: <AppIcons Logo={"BLOQUEO_COMERCIO_BCS"} name={"Comercios Rechazados"} />,
       component: ComerciosRechazadosBCS,
       permission: [enumPermisosGestionBCS.COMERCIOS_RECHAZADOS_BCS],
     },
