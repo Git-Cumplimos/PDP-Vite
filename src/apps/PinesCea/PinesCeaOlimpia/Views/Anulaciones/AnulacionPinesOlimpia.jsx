@@ -295,8 +295,8 @@ const DevolucionPinesOlimpia = () => {
               IdTipoCuentaDevolucion: "27",
               IdTipoDevolucion: "1",
               IdTipoIdentificacionDevolucion: "1",
-              NumeroCuentaDevolucion: "1",
-              NumeroIdentificacionDevolucion: "1"
+              NumeroCuentaDevolucion: "0",
+              NumeroIdentificacionDevolucion: "0"
           }
           )
             .then((res2) => {
