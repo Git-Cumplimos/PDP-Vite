@@ -17,6 +17,7 @@ const images = {
   LogoPowwi: `${urlAssets}/assets/img/LogoPowwi.png`,
   LogoEmcali: `${urlAssets}/assets/img/LogoEmcali.png`,
   LogoGou: `${urlAssets}/assets/img/LogoGou.png`,
+  LogoEvertec: `${urlAssets}/assets/img/LogoEvertec.jpg`,
 };
 
 const svgs = {
@@ -154,7 +155,7 @@ const svgs = {
 
   //CORRESPONSALIA/ITAU
   ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/ITAU/ITAU.png`,
-  
+
   //CORRESPONSALIA/RECAUDO MULTIPLE
   RECAUDO_MULTIPLE: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE.svg`,
   RECAUDO_MULTIPLE_CARGAR: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CARGAR.svg`,

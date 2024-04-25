@@ -97,6 +97,7 @@ import rutasItauCB, {
 import routesItau from "../apps/ConveniosItau/routes";
 import routesGestionBCS from "../apps/GestionBCS/routes";
 import routesGouCheckPay from "../apps/Gou/routes";
+import routesEvertecCheckPay from "../apps/Evertec/routes";
 /**
 
  * * Logos
@@ -1244,6 +1245,8 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
+  //Modulo Gou
+  routesEvertecCheckPay,
   //Modulo Gou
   routesGouCheckPay,
   //Modulo Recarga Cupo

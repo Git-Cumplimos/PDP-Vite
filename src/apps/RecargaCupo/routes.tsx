@@ -6,6 +6,7 @@ import {
 } from "../Nequi/routes";
 import routesRecargaCupoConGou from "./Gou/routes";
 import { ListPermissionsRecargaCupoConGou } from "./Gou/ListPermissionsRecargaCupoConGou";
+import routesRecargaCupoWithEvertec from "./Evertec/routes";
 
 const RecargaCupoMenu = lazy(() => import("./RecargaCupoMenu"));
 
@@ -17,7 +18,11 @@ const routesRecargaCupo = {
     ...listPermissionsRecargaCupoNequi,
     ListPermissionsRecargaCupoConGou,
   ],
-  subRoutes: [rutasRecargaNequi, routesRecargaCupoConGou],
+  subRoutes: [
+    rutasRecargaNequi,
+    routesRecargaCupoConGou,
+    routesRecargaCupoWithEvertec,
+  ],
 };
 
 export default routesRecargaCupo;
