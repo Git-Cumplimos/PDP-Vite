@@ -17,7 +17,7 @@ import {
   TypingOutputCheckPay,
   TypingDataComercioSimple,
   TypingDataPath,
-  TypingDataSettingTimeCheckPay,
+  TypingDataSetting,
   TypingSummaryTrx,
   TypingTrx,
   TypingTypeSettingTime,
@@ -106,7 +106,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
     async (
       dataComercioSimple: TypingDataComercioSimple,
       id_hash: string,
-      dataSettingTime: TypingDataSettingTimeCheckPay
+      dataSettingTime: any
     ): Promise<TypingOutputCheckPay> => {
       const function_name = "PeticionConsultForPay";
       const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp/cross`;

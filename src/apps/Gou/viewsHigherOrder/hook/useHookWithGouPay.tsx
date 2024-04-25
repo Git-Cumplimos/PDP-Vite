@@ -20,10 +20,11 @@ import { constMsgTrx } from "../../utils/utils_const";
 import { ajust_tam_see } from "../../utils/utils_function";
 import {
   TypingOutputCheckPay,
-  TypingDataSettingTimeCheckPay,
+  TypingDataSetting,
   TypingStatusTrx,
   TypingSummaryTrx,
   TypingTrx,
+  TypingTypeSettingTime,
 } from "../../utils/utils_typing";
 import {
   TypingDataInput,
@@ -34,7 +35,9 @@ import {
   TypingDataPay,
   TypingDataSettingTimeCheckUrlProcess,
   TypingUseHookWithGouPay,
+  TypingDataSettingValor,
 } from "../utils/utils.typing";
+import { PeticionSettingBase } from "../../utils/utils_peticiones";
 
 //FRAGMENT ******************** CONST *******************************
 // const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
@@ -56,6 +59,40 @@ const useHookWithGouPay: TypingUseHookWithGouPay = (
     status: "Search",
     msg: constMsgTrx.Search,
   });
+
+  const PeticionSetting =
+    useCallback(async (): Promise<TypingDataSettingValor> => {
+      const function_name = "PeticionSetting";
+      const name_service = "consultar configuracion time";
+      setloadingPeticionBlocking(true);
+      try {
+        const dataSetting: TypingDataSetting = await PeticionSettingBase(
+          URL_GOU,
+          "origin",
+          type_operation
+        );
+        return {
+          valor_costo_trx: dataSetting.valor_costo_trx,
+          valor_trx_maximo: dataSetting.valor_trx_maximo,
+          valor_trx_minimo: dataSetting.valor_trx_minimo,
+          valor_trx_maximo_exacto: dataSetting.valor_trx_maximo_exacto,
+          valor_trx_minimo_exacto: dataSetting.valor_trx_minimo_exacto,
+        };
+      } catch (error: any) {
+        if (!(error instanceof ErrorCustomFetch)) {
+          throw new ErrorCustomUseHookCode(
+            TempErrorFrontService.replace("%s", name_service),
+            error.message,
+            `${function_name}`,
+            "notifyError",
+            true
+          );
+        }
+        throw error;
+      } finally {
+        setloadingPeticionBlocking(false);
+      }
+    }, [type_operation]);
 
   const PeticionCheckUrlProcessBase = useCallback(
     async (
@@ -337,7 +374,7 @@ const useHookWithGouPay: TypingUseHookWithGouPay = (
     async (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput,
-      dataSettingTime: TypingDataSettingTimeCheckPay
+      dataSettingTime: any
     ): Promise<TypingOutputCheckPay> => {
       const function_name = "PeticionConsultForPay";
       const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp/origin`;
@@ -530,6 +567,7 @@ const useHookWithGouPay: TypingUseHookWithGouPay = (
   return {
     loadingPeticion,
     loadingPeticionBlocking,
+    PeticionSetting,
     PeticionCheckPay,
     summaryTrx,
     trx,

@@ -1,7 +1,9 @@
 import React, {
+  Fragment,
   FunctionComponent,
   MouseEvent,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -23,7 +25,10 @@ import {
   TypingOutputUseHookWithGouPay,
   TypingOutputUseHookGouFormularioAdd,
   PropsGouFormularioAdd,
+  TypingDataSettingValor,
 } from "./utils/utils.typing";
+import SimpleLoading from "../../../components/Base/SimpleLoading";
+import { useNavigate } from "react-router-dom";
 
 //FRAGMENT ******************** TYPING *******************************
 
@@ -37,14 +42,20 @@ const WithGouPay = (
   ComponectFormAdd: FunctionComponent<PropsGouFormularioAdd>,
   ComponectTicket: FunctionComponent<any>,
   useHookGouFormularioAdd: TypingUseHookGouFormularioAdd,
-  type_operation: number
+  type_operation: number,
+  url_return_front: string
 ): JSX.Element => {
+  const goNavigate = useNavigate();
   const { roleInfo, pdpUser }: any = useAuth();
   const { imgs } = useImgs();
   const printDiv = useRef(null);
   const [dataInputOrigin, setDataInputOrigin] = useState<TypingDataInputOrigin>(
     dataInputOriginInitial
   );
+  const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
+  const [dataSettingValor, setDataSettingValor] =
+    useState<TypingDataSettingValor | null>(null);
+
   const dataInputOriginAuto: TypingDataInputOriginAuto = useMemo(() => {
     const date_now = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
@@ -97,6 +108,8 @@ const WithGouPay = (
 
   const {
     loadingPeticion,
+    loadingPeticionBlocking,
+    PeticionSetting,
     PeticionCheckPay,
     summaryTrx,
     trx,
@@ -105,14 +118,35 @@ const WithGouPay = (
     PeticionPayBase
   );
 
-  const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
+  useEffect(() => {
+    notifyPending(
+      PeticionSetting(),
+      {
+        render: () => {
+          return "Procesando configuración";
+        },
+      },
+      {
+        render: ({ data }: { data: TypingDataSettingValor }) => {
+          setDataSettingValor(data);
+          return "Consulta Configuración exitosa";
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          goNavigate(url_return_front);
+          return error?.message ?? "Consulta Configuración Rechazada";
+        },
+      }
+    );
+  }, [PeticionSetting, goNavigate, url_return_front]);
 
   const onSubmitCheckPay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {
       ev.preventDefault();
+      return;
       const [is_schema, dataModalAdd]: [boolean, TypingDataModalAdd] =
         onSubmitSchema();
-
       if (!is_schema) {
         return;
       }
@@ -159,21 +193,26 @@ const WithGouPay = (
   );
 
   return (
-    <div>
-      <GouFormulario
-        logoGou={imgs?.LogoGou}
-        dataInputOrigin={dataInputOrigin}
-        dataInputOriginAuto={dataInputOriginAuto}
-        dataInputRequired={dataInputRequired}
-        setDataInputOrigin={setDataInputOrigin}
-        onChangeDataInputAdd={onChangeDataInputAdd}
-        onSubmitCheckPay={onSubmitCheckPay}
-      >
-        <ComponectFormAdd
-          dataInputAdd={dataInputAdd}
-          others={others}
-        ></ComponectFormAdd>
-      </GouFormulario>
+    <Fragment>
+      <SimpleLoading show={loadingPeticionBlocking}></SimpleLoading>
+      {dataSettingValor && (
+        <GouFormulario
+          logoGou={imgs?.LogoGou}
+          dataSettingValor={dataSettingValor}
+          dataInputOrigin={dataInputOrigin}
+          dataInputOriginAuto={dataInputOriginAuto}
+          dataInputRequired={dataInputRequired}
+          setDataInputOrigin={setDataInputOrigin}
+          onChangeDataInputAdd={onChangeDataInputAdd}
+          onSubmitCheckPay={onSubmitCheckPay}
+        >
+          <ComponectFormAdd
+            dataInputAdd={dataInputAdd}
+            others={others}
+          ></ComponectFormAdd>
+        </GouFormulario>
+      )}
+
       {trx.status !== "Search" && (
         <GouCheckPayOrigin
           logoGou={imgs?.LogoGou}
@@ -185,7 +224,7 @@ const WithGouPay = (
           <ComponectTicket ticket={ticket} refPrint={printDiv} />
         </GouCheckPayOrigin>
       )}
-    </div>
+    </Fragment>
   );
 };
 

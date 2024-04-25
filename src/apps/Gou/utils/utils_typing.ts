@@ -43,9 +43,16 @@ export type TypingDataPath = {
 
 //------PeticionSettingTime------
 
-export type TypingDataSettingTimeCheckPay = {
+export type TypingDataSetting = {
+  valor_costo_trx: number;
+  valor_trx_maximo: number;
+  valor_trx_minimo: number;
+  valor_trx_maximo_exacto: boolean;
+  valor_trx_minimo_exacto: boolean;
   check_pay__delay: number;
   check_pay__retries: number;
+  check_url_process__delay: number;
+  check_url_process__timeout: number;
 };
 
 //------ PeticionConsultForPay----

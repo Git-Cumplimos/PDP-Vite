@@ -4,9 +4,11 @@ import {
   TypingDataComercio,
 } from "../../../../utils/TypingUtils";
 import {
+  TypingDataSetting,
   TypingOutputCheckPay,
   TypingSummaryTrx,
   TypingTrx,
+  TypingTypeSettingTime,
 } from "../../utils/utils_typing";
 
 export type TypingDataInputOrigin = {
@@ -65,9 +67,20 @@ export type TypingUseHookWithGouPay = (
 export type TypingOutputUseHookWithGouPay = {
   loadingPeticion: boolean;
   loadingPeticionBlocking: boolean;
+  PeticionSetting: TypingPeticionSetting;
   PeticionCheckPay: TypingPeticionCheckPay;
   summaryTrx: TypingSummaryTrx;
   trx: TypingTrx;
+};
+
+//? PeticionSetting
+export type TypingPeticionSetting = () => Promise<TypingDataSettingValor>;
+export type TypingDataSettingValor = {
+  valor_costo_trx: number;
+  valor_trx_maximo: number;
+  valor_trx_minimo: number;
+  valor_trx_maximo_exacto: boolean;
+  valor_trx_minimo_exacto: boolean;
 };
 
 //? PeticionCheckUrlProcessBase

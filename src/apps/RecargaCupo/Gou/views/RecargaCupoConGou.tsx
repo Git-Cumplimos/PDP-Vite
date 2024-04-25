@@ -31,7 +31,7 @@ const RecargaCupoConGou = ({ others }: PropsGouFormularioAdd) => {
           autoComplete="off"
           maxLength={70}
           value={others.dataInputAddOwn.nombre_completo}
-          required
+          // required
         />
       </div>
       <div className="col-span-2">
@@ -43,7 +43,7 @@ const RecargaCupoConGou = ({ others }: PropsGouFormularioAdd) => {
           autoComplete="off"
           maxLength={100}
           value={others.dataInputAddOwn.correo}
-          required
+          // required
         />
       </div>
       <div className="col-span-2">
@@ -56,7 +56,7 @@ const RecargaCupoConGou = ({ others }: PropsGouFormularioAdd) => {
           maxLength={100}
           value={others.dataInputAddOwn["correo|confirmacion"]}
           invalid={others.dataInvalid["correo|confirmacion"]}
-          required
+          // required
           onPaste={(ev) => ev.preventDefault()}
           onDrop={(ev) => ev.preventDefault()}
         />
@@ -71,7 +71,7 @@ const RecargaCupoConGou = ({ others }: PropsGouFormularioAdd) => {
         maxLength={10}
         value={others.dataInputAddOwn.celular}
         invalid={others.dataInvalid.celular}
-        required
+        // required
       />
       <Input
         id="celular|confirmacion/cel/celular|confirmacion=>celular"
@@ -83,7 +83,7 @@ const RecargaCupoConGou = ({ others }: PropsGouFormularioAdd) => {
         maxLength={10}
         value={others.dataInputAddOwn["celular|confirmacion"]}
         invalid={others.dataInvalid["celular|confirmacion"]}
-        required
+        // required
         onPaste={(ev) => ev.preventDefault()}
         onDrop={(ev) => ev.preventDefault()}
       />
@@ -97,7 +97,7 @@ const RecargaCupoConGou = ({ others }: PropsGouFormularioAdd) => {
         minLength={5}
         maxLength={10}
         value={others.dataInputAddOwn.documento}
-        required
+        // required
       />
     </Fragment>
   );

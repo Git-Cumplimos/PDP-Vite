@@ -7,7 +7,9 @@ import React, {
 } from "react";
 
 import Input from "../../../../../components/Base/Input";
-import MoneyInput from "../../../../../components/Base/MoneyInput";
+import MoneyInput, {
+  formatMoney,
+} from "../../../../../components/Base/MoneyInput";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
 
@@ -17,6 +19,7 @@ import {
   TypingDataInputOrigin,
   TypingDataInputOriginAuto,
   TypingOnChangeDataInputAdd,
+  TypingDataSettingValor,
 } from "../../utils/utils.typing";
 import { TypingShowModalInfoClient } from "./ModalInfoClient/TypingModalInfoClient";
 import classes from "./GouFormulario.module.css";
@@ -27,6 +30,7 @@ const { contendorFather, contendorSoon, contendorSoonTrx } = classes;
 //FRAGMENT ******************** TYPING *******************************
 type PropsGouFormulario = {
   logoGou: any;
+  dataSettingValor: TypingDataSettingValor;
   dataInputOrigin: TypingDataInputOrigin;
   dataInputOriginAuto: TypingDataInputOriginAuto;
   dataInputRequired: TypingDataInputRequired;
@@ -39,6 +43,7 @@ type PropsGouFormulario = {
 //FRAGMENT ******************** COMPONENT ***************************
 const GouFormulario = ({
   logoGou,
+  dataSettingValor,
   dataInputOrigin,
   dataInputOriginAuto,
   dataInputRequired,
@@ -70,7 +75,7 @@ const GouFormulario = ({
               type="text"
               autoComplete="off"
               value={dataInputRequired.tipo_tramite}
-              required
+              // required
               disabled
             />
             <Input
@@ -78,7 +83,7 @@ const GouFormulario = ({
               type="text"
               autoComplete="off"
               value={dataInputRequired.id_unico_form}
-              required
+              // required
               disabled
             />
             <Input
@@ -87,7 +92,7 @@ const GouFormulario = ({
               autoComplete="off"
               maxLength={70}
               value={dataInputRequired.referencia}
-              required
+              // required
               disabled
             />
             <Input
@@ -96,17 +101,18 @@ const GouFormulario = ({
               autoComplete="off"
               maxLength={70}
               value={dataInputOriginAuto.fecha}
-              required
+              // required
               disabled
             />
             <MoneyInput
               name="valor_trx"
               label="Valor a pagar"
               // decimalDigits={2} //No Se usa este por que es con decimales
-              equalError={false}
-              equalErrorMin={false}
+              equalError={dataSettingValor.valor_trx_maximo_exacto}
+              equalErrorMin={dataSettingValor.valor_trx_minimo_exacto}
               autoComplete="off"
-              min={10000}
+              min={1000}
+              max={2000}
               maxLength={11}
               // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
               value={dataInputOrigin.valor_trx} //se usa este por que es con decimales
@@ -119,8 +125,10 @@ const GouFormulario = ({
               required
             />
             <label className="px-5 pt-6 text-xl font-medium text-center">
-              Señor usuario tenga en cuenta que esta transacción tiene un costo
-              de $500 el cual será debitado de su cupo
+              {`Señor usuario tenga en cuenta que esta transacción tiene un costo
+              de ${formatMoney.format(
+                dataSettingValor.valor_costo_trx ?? 0
+              )} el cual será debitado de su cupo`}
             </label>
           </fieldset>
           <ButtonBar>
