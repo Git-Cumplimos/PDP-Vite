@@ -37,8 +37,8 @@ import { constMsgTrx, constRelationshipSummary } from "../../utils/utils_const";
 import { ajust_tam_see } from "../../utils/utils_function";
 
 //FRAGMENT ******************** CONST *******************************
-// const URL_EVERTEC = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-const URL_EVERTEC = `http://127.0.0.1:5000`;
+const URL_EVERTEC = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+// const URL_EVERTEC = `http://127.0.0.1:5000`;
 
 //FRAGMENT ******************** TYPING *******************************
 
