@@ -17,7 +17,7 @@ const images = {
   LogoPowwi: `${urlAssets}/assets/img/LogoPowwi.png`,
   LogoEmcali: `${urlAssets}/assets/img/LogoEmcali.png`,
   LogoGou: `${urlAssets}/assets/img/LogoGou.png`,
-  LogoEvertec: `${urlAssets}/assets/img/LogoEvertec.jpg`,
+  LogoEvertec: `${urlAssets}/assets/img/LogoEventec.svg`,
 };
 
 const svgs = {
