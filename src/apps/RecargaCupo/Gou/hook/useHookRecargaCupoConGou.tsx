@@ -45,8 +45,8 @@ export type TypingOthers = {
 };
 
 //FRAGMENT ******************** CONST **********************************
-const URL_RECARGARCUPO_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-// const URL_RECARGARCUPO_GOU = `http://127.0.0.1:5000`;
+// const URL_RECARGARCUPO_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
+const URL_RECARGARCUPO_GOU = `http://127.0.0.1:5000`;
 
 export const dataInputAddOwnInitial: TypingDataInputAddOwn = {
   nombre_completo: "",
