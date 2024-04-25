@@ -1,29 +1,29 @@
 import React, {
-  ChangeEvent,
   FunctionComponent,
   MouseEvent,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from "react";
-import GouFormulario from "./components/GouFormulario";
-import { useAuth } from "../../../hooks/AuthHooks";
-import { TypeInfTicket, TypingDataComercio } from "../../../utils/TypingUtils";
-import {
-  TypeUseHookGouFormularioAdd,
-  TypingDataInputAdd,
-  TypingDataInputRequired,
-  TypingDataInputOrigin,
-  TypingDataInputOriginAuto,
-  TypingOnChangeDataInputAdd,
-  TypingDataModalAdd,
-} from "./utils/utils.typing";
 import { v4 } from "uuid";
 import { useImgs } from "../../../hooks/ImgsHooks";
 import { notifyPending } from "../../../utils/notify";
-import useHookWithGouPay from "./hook/useHookGouPay";
+import { useAuth } from "../../../hooks/AuthHooks";
+import { TypeInfTicket, TypingDataComercio } from "../../../utils/TypingUtils";
+
+import GouFormulario from "./components/GouFormulario";
 import GouCheckPayOrigin from "./components/GouCheckPayOrigin";
-import { hash } from "../../../utils/hash";
+import useHookWithGouPay from "./hook/useHookWithGouPay";
+import {
+  TypingUseHookGouFormularioAdd,
+  TypingDataInputOrigin,
+  TypingDataInputOriginAuto,
+  TypingDataModalAdd,
+  TypingOutputUseHookWithGouPay,
+  TypingOutputUseHookGouFormularioAdd,
+  PropsGouFormularioAdd,
+} from "./utils/utils.typing";
 
 //FRAGMENT ******************** TYPING *******************************
 
@@ -34,12 +34,14 @@ const dataInputOriginInitial: TypingDataInputOrigin = {
 
 //FRAGMENT ******************** COMPONENT *******************************
 const WithGouPay = (
-  ComponectFormAdd: FunctionComponent<any>,
-  useHookGouFormularioAdd: TypeUseHookGouFormularioAdd,
+  ComponectFormAdd: FunctionComponent<PropsGouFormularioAdd>,
+  ComponectTicket: FunctionComponent<any>,
+  useHookGouFormularioAdd: TypingUseHookGouFormularioAdd,
   type_operation: number
-) => {
+): JSX.Element => {
   const { roleInfo, pdpUser }: any = useAuth();
   const { imgs } = useImgs();
+  const printDiv = useRef(null);
   const [dataInputOrigin, setDataInputOrigin] = useState<TypingDataInputOrigin>(
     dataInputOriginInitial
   );
@@ -88,9 +90,21 @@ const WithGouPay = (
     onSubmitSchema,
     PeticionPayBase,
     others,
-  } = useHookGouFormularioAdd(dataComercio, dataInputOriginAuto);
-  const { loadingPeticion, PeticionCheckPay, summaryTrx, trx } =
-    useHookWithGouPay(type_operation, PeticionPayBase);
+  }: TypingOutputUseHookGouFormularioAdd = useHookGouFormularioAdd(
+    dataComercio,
+    dataInputOriginAuto
+  );
+
+  const {
+    loadingPeticion,
+    PeticionCheckPay,
+    summaryTrx,
+    trx,
+  }: TypingOutputUseHookWithGouPay = useHookWithGouPay(
+    type_operation,
+    PeticionPayBase
+  );
+
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
 
   const onSubmitCheckPay = useCallback(
@@ -127,7 +141,6 @@ const WithGouPay = (
         },
         {
           render: ({ data: error }) => {
-            // handleCloseNinguno(false, routeInicial);
             return error?.message ?? "Pago rechazado";
           },
         }
@@ -167,8 +180,10 @@ const WithGouPay = (
           summaryTrx={summaryTrx}
           trx={trx}
           loadingPeticion={loadingPeticion}
-          ticket={ticket}
-        ></GouCheckPayOrigin>
+          printDiv={printDiv}
+        >
+          <ComponectTicket ticket={ticket} refPrint={printDiv} />
+        </GouCheckPayOrigin>
       )}
     </div>
   );

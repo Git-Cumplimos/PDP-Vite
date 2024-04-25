@@ -1,8 +1,13 @@
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { ChangeEvent } from "react";
 import {
   TypeInfTicket,
   TypingDataComercio,
 } from "../../../../utils/TypingUtils";
+import {
+  TypingOutputCheckPay,
+  TypingSummaryTrx,
+  TypingTrx,
+} from "../../utils/utils_typing";
 
 export type TypingDataInputOrigin = {
   valor_trx: string;
@@ -11,13 +16,13 @@ export type TypingDataInputOriginAuto = {
   fecha: string;
   id_uuid_trx: string;
 };
-export type TypingDataInputAdd = { [key: string]: string };
 export type TypingDataInputRequired = {
   tipo_tramite: string;
   id_unico_form: string;
   id_unico_modal: string;
   referencia: string;
 };
+export type TypingDataInputAdd = { [key: string]: string };
 export type TypingDataInputAddAuto = { [key: string]: string };
 export type TypingDataModalAdd = Array<{ [key: string]: string }> | undefined;
 export type TypingOnChangeDataInputAdd = (
@@ -25,19 +30,17 @@ export type TypingOnChangeDataInputAdd = (
 ) => void;
 export type TypingOnSubmitSchema = () => [boolean, TypingDataModalAdd];
 
-export type TypingDataPay = {
-  ticket: TypeInfTicket;
-};
-
 export type TypingPeticionPayBase = (
   dataComercio: TypingDataComercio,
   dataInput: TypingDataInput
 ) => Promise<TypingDataPay>;
 
-export type TypeUseHookGouFormularioAdd = (
+export type TypingUseHookGouFormularioAdd = (
   dataComercio: TypingDataComercio,
   dataInputOriginAuto: TypingDataInputOriginAuto
-) => {
+) => TypingOutputUseHookGouFormularioAdd;
+
+export type TypingOutputUseHookGouFormularioAdd = {
   dataInputRequired: TypingDataInputRequired;
   dataInputAdd: TypingDataInputAdd;
   dataInputAddAuto: TypingDataInputAddAuto;
@@ -52,7 +55,37 @@ export type PropsGouFormularioAdd = {
   others: { [key: string]: any };
 };
 
-//FRAGMENT ******************** FOR HOOK *******************************
+//FRAGMENT *************** FOR HOOK UseHookWithGouPay **************************
+//? UseHookWithGouPay
+export type TypingUseHookWithGouPay = (
+  type_operation: number,
+  PeticionPayBase: TypingPeticionPayBase
+) => TypingOutputUseHookWithGouPay;
+
+export type TypingOutputUseHookWithGouPay = {
+  loadingPeticion: boolean;
+  loadingPeticionBlocking: boolean;
+  PeticionCheckPay: TypingPeticionCheckPay;
+  summaryTrx: TypingSummaryTrx;
+  trx: TypingTrx;
+};
+
+//? PeticionCheckUrlProcessBase
+export type TypingOutputCheckUrlProcessBase = {
+  url_process: string;
+  id_trx: number;
+};
+
+//? PeticionCheckUrlProcess
+export type TypingDataSettingTimeCheckUrlProcess = {
+  delay: number;
+  timeout: number;
+};
+export type TypingPeticionCheckUrlProcessOutput = {
+  url_process: string;
+  what_service: string;
+};
+
 //? PeticionPay
 export type TypingDataInput = TypingDataInputOrigin &
   TypingDataInputOriginAuto &
@@ -60,13 +93,13 @@ export type TypingDataInput = TypingDataInputOrigin &
   TypingDataInputRequired &
   TypingDataInputAddAuto;
 
-//? PeticionUrlProcess
-export type TypingPeticionUrlProcessBaseOutput = {
-  url_process: string;
-  id_trx: number;
+export type TypingDataPay = {
+  ticket: TypeInfTicket;
 };
 
-export type TypingPeticionCheckUrlProcessOutput = {
-  url_process: string;
-  what_service: string;
-};
+//? PeticionCheckPay
+export type TypingPeticionCheckPay = (
+  dataComercio: TypingDataComercio,
+  dataInput: TypingDataInput,
+  dataModalAdd: TypingDataModalAdd
+) => Promise<TypingOutputCheckPay>;

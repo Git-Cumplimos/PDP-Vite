@@ -1,59 +1,110 @@
-import React, { Fragment, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import PaymentSummary from "../../../../../../components/Compound/PaymentSummary";
-import Button from "../../../../../../components/Base/Button";
-import ButtonBar from "../../../../../../components/Base/ButtonBar";
-import Modal from "../../../../../../components/Base/Modal";
-import { TypeInfTicket } from "../../../../../../utils/TypingUtils";
-import { formatMoney } from "../../../../../../components/Base/MoneyInput";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
+import ButtonBar from "../../../../components/Base/ButtonBar";
+import Button from "../../../../components/Base/Button";
+import Modal from "../../../../components/Base/Modal";
+import { useImgs } from "../../../../hooks/ImgsHooks";
+import { useAuth } from "../../../../hooks/AuthHooks";
+import { notifyError, notifyPending } from "../../../../utils/notify";
+import { TypeInfTicket } from "../../../../utils/TypingUtils";
+import { formatMoney } from "../../../../components/Base/MoneyInput";
+import { TempErrorFrontUser } from "../../../../utils/fetchCustomPdp";
 
-import TicketsGou from "../../../../components/TicketsGou";
+import TicketsGou from "../../components/TicketsGou";
+import useHookGouCheckPay from "./hook/useHookGouCheckPay";
 import {
+  TypingOutputCheckPay,
+  TypingDataComercioSimple,
   TypingDataPath,
-  TypingSummaryTrx,
-  TypingTrx,
-} from "../../../../utils/utils_typing";
+} from "../../utils/utils_typing";
 import {
   ajust_tam_see,
   dict_segun_order,
   dict_summary_trx_own,
   list_a_dict_segun_order,
-} from "../../../../utils/utils_function";
-import classes from "./GouCheckPayCross.module.css";
+} from "../../utils/utils_function";
 import {
   constOrderSummary,
   constRelationshipSummary,
-} from "../../../../utils/utils_const";
+} from "../../utils/utils_const";
 
-//FRAGMENT ******************** CONST *******************************
+import classes from "./GouCheckPayCross.module.css";
+
+//FRAGMENT ******************** CSS *******************************
 const { contendorBorder, contendorIdLog, contendorPago } = classes;
 
-//FRAGMENT ******************** TYPING *******************************
-type PropsGouCheckPayCross = {
-  imgs: any;
-  dataPath: TypingDataPath | null;
-  summaryTrx: TypingSummaryTrx;
-  trx: TypingTrx;
-  loadingPeticion: boolean;
-  ticket: TypeInfTicket | null;
-};
-
 //FRAGMENT ******************** COMPONENT *******************************
-const GouCheckPayCross = ({
-  imgs,
-  dataPath,
-  summaryTrx,
-  trx,
-  loadingPeticion,
-  ticket,
-}: PropsGouCheckPayCross) => {
+const GouCheckPayCross = () => {
+  const { roleInfo }: any = useAuth();
+  const { imgs } = useImgs();
+  const params = useParams();
+  const [dataPath, setDataPath] = useState<TypingDataPath | null>(null);
+  const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
+  const { loadingPeticion, PeticionCheckPay, trx, summaryTrx } =
+    useHookGouCheckPay();
   const validNavigate = useNavigate();
   const printDiv = useRef(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
   });
+
+  const dataComercioSimple: TypingDataComercioSimple = useMemo(() => {
+    return {
+      id_comercio: roleInfo?.id_comercio ?? 0,
+      id_usuario: roleInfo?.id_usuario ?? 0,
+      id_terminal: roleInfo?.id_dispositivo ?? 0,
+    };
+  }, [roleInfo?.id_comercio, roleInfo?.id_usuario, roleInfo?.id_dispositivo]);
+
+  useEffect(() => {
+    const validPath = (): string | null => {
+      if (params.id_hash === undefined) {
+        return "url incorrecta 'id_hash'";
+      }
+      if (params.id_hash === ":id_hash") {
+        return "url incorrecta 'id_hash'";
+      }
+      setDataPath({
+        id_hash: params.id_hash,
+      });
+      return null;
+    };
+    const error_msg = validPath();
+    if (error_msg) {
+      notifyError(TempErrorFrontUser.replace("%s", error_msg), 3000, {
+        toastId: "notify-lot-format",
+      });
+      return;
+    }
+  }, [params.id_hash, params.type_setting_time]);
+
+  useEffect(() => {
+    if (dataPath === null) {
+      return;
+    }
+    notifyPending(
+      PeticionCheckPay(dataComercioSimple, dataPath),
+      {
+        render: () => {
+          return "Procesando";
+        },
+      },
+      {
+        render: ({ data }: { data: TypingOutputCheckPay }) => {
+          setTicket(data.ticket);
+          return `${data.tipo_tramite} Aprobada`;
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          return error?.message ?? "Se desconoce el estado de la transacción";
+        },
+      }
+    );
+  }, [dataComercioSimple, PeticionCheckPay, dataPath]);
 
   return (
     <Fragment>

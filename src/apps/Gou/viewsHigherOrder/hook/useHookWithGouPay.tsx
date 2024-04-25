@@ -1,13 +1,5 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { TypingDataComercio } from "../../../../utils/TypingUtils";
-import {
-  TypingDataInput,
-  TypingDataModalAdd,
-  TypingPeticionUrlProcessBaseOutput,
-  TypingPeticionCheckUrlProcessOutput,
-  TypingPeticionPayBase,
-  TypingDataPay,
-} from "../utils/utils.typing";
 import {
   ErrorCustomApiGatewayTimeout,
   ErrorCustomFetchTimeout,
@@ -24,17 +16,25 @@ import {
   ErrorCustomBackendPending,
   ErrorCustomBackend,
 } from "../../../../utils/fetchCustomPdp";
+import { constMsgTrx } from "../../utils/utils_const";
+import { ajust_tam_see } from "../../utils/utils_function";
 import {
-  TypingCheckPay,
+  TypingOutputCheckPay,
   TypingDataSettingTimeCheckPay,
-  TypingDataSettingTimeCheckUrlProcess,
   TypingStatusTrx,
   TypingSummaryTrx,
   TypingTrx,
 } from "../../utils/utils_typing";
-import { formatMoney } from "../../../../components/Base/MoneyInput";
-import { constMsgTrx, constRelationshipSummary } from "../../utils/utils_const";
-import { ajust_tam_see } from "../../utils/utils_function";
+import {
+  TypingDataInput,
+  TypingDataModalAdd,
+  TypingOutputCheckUrlProcessBase,
+  TypingPeticionCheckUrlProcessOutput,
+  TypingPeticionPayBase,
+  TypingDataPay,
+  TypingDataSettingTimeCheckUrlProcess,
+  TypingUseHookWithGouPay,
+} from "../utils/utils.typing";
 
 //FRAGMENT ******************** CONST *******************************
 // const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
@@ -43,7 +43,7 @@ const URL_GOU = `http://127.0.0.1:5000`;
 //FRAGMENT ******************** TYPING *******************************
 
 //FRAGMENT ******************** HOOK *******************************
-const useHookWithGouPay = (
+const useHookWithGouPay: TypingUseHookWithGouPay = (
   type_operation: number,
   PeticionPayBase: TypingPeticionPayBase
 ) => {
@@ -62,7 +62,7 @@ const useHookWithGouPay = (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput,
       name_service: string
-    ): Promise<TypingPeticionUrlProcessBaseOutput> => {
+    ): Promise<TypingOutputCheckUrlProcessBase> => {
       const function_name = "PeticionUrlProcessBase";
       const url_check_url_process = `${URL_GOU}/services_gou/check_pay/check_url_process`;
       let response;
@@ -152,7 +152,7 @@ const useHookWithGouPay = (
       try {
         do {
           try {
-            const resCheckUrlProcess: TypingPeticionUrlProcessBaseOutput =
+            const resCheckUrlProcess: TypingOutputCheckUrlProcessBase =
               await PeticionCheckUrlProcessBase(
                 dataComercio,
                 dataInputAuto,
@@ -338,7 +338,7 @@ const useHookWithGouPay = (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput,
       dataSettingTime: TypingDataSettingTimeCheckPay
-    ): Promise<TypingCheckPay> => {
+    ): Promise<TypingOutputCheckPay> => {
       const function_name = "PeticionConsultForPay";
       const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp/origin`;
       const name_service = "Verificando Pago";
@@ -360,8 +360,8 @@ const useHookWithGouPay = (
           name_service,
           {},
           body,
-          dataSettingTime.retries,
-          dataSettingTime.delay
+          dataSettingTime.check_pay__retries,
+          dataSettingTime.check_pay__delay
         );
         ArmDataOutput(response, "Aprobada");
         return {
@@ -402,7 +402,7 @@ const useHookWithGouPay = (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput,
       dataModalAdd: TypingDataModalAdd
-    ): Promise<TypingCheckPay> => {
+    ): Promise<TypingOutputCheckPay> => {
       const function_name = "PeticionPay";
       const name_service = "Servicio Gou";
       setloadingPeticion(true);
@@ -478,8 +478,8 @@ const useHookWithGouPay = (
                 150
               ),
               PeticionConsultForPay(dataComercio, dataInput, {
-                delay: 30,
-                retries: 6,
+                check_pay__delay: 30,
+                check_pay__retries: 6,
               }),
             ]);
             if (response?.what_service === "PeticionCheckUrlProcess") {
@@ -501,8 +501,8 @@ const useHookWithGouPay = (
         try {
           //SECUENCIA ---------------Paso 3-------------------------------
           response = await PeticionConsultForPay(dataComercio, dataInput, {
-            delay: 30,
-            retries: 6,
+            check_pay__delay: 30,
+            check_pay__retries: 6,
           });
           return response;
         } catch (error: any) {

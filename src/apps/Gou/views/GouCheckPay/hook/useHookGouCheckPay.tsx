@@ -14,7 +14,7 @@ import {
   FuctionEvaluateResponseConsultTrx,
 } from "../../../../../utils/fetchCustomPdp";
 import {
-  TypingCheckPay,
+  TypingOutputCheckPay,
   TypingDataComercioSimple,
   TypingDataPath,
   TypingDataSettingTimeCheckPay,
@@ -32,7 +32,7 @@ export type TypeUseHookGouCheckPay = () => {
   PeticionCheckPay: (
     dataComercioSimple: TypingDataComercioSimple,
     dataPath: TypingDataPath
-  ) => Promise<TypingCheckPay>;
+  ) => Promise<TypingOutputCheckPay>;
   trx: TypingTrx;
   summaryTrx: TypingSummaryTrx;
 };
@@ -102,45 +102,12 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
     []
   );
 
-  const PeticionSettingTime = useCallback(
-    async (
-      type_setting_time: TypingTypeSettingTime
-    ): Promise<TypingDataSettingTimeCheckPay> => {
-      const function_name = "PeticionSettingTime";
-      const name_service = "consultar configuracion time";
-      let response: any;
-      try {
-        const url = `${URL_GOU}/services_gou/check_pay/consult_setting_time/${type_setting_time}`;
-        response = await fetchCustomPdp(url, "GET", name_service);
-        return {
-          delay: response.obj?.result?.setting?.delay_consult_for_pay ?? 15,
-          retries: response.obj?.result?.setting?.retries_consult_for_pay ?? 4,
-        };
-      } catch (error: any) {
-        if (!(error instanceof ErrorCustomFetch)) {
-          throw new ErrorCustomUseHookCode(
-            TempErrorFrontService.replace("%s", name_service),
-            error.message,
-            `${hook_name} - ${function_name}`,
-            "notifyError",
-            true
-          );
-        }
-        // if (!(error instanceof ErrorCustomBackend)) {
-        //   ArmDataOutput(error.res ?? {});
-        // }
-        throw error;
-      }
-    },
-    []
-  );
-
   const PeticionConsultForPay = useCallback(
     async (
       dataComercioSimple: TypingDataComercioSimple,
       id_hash: string,
       dataSettingTime: TypingDataSettingTimeCheckPay
-    ): Promise<TypingCheckPay> => {
+    ): Promise<TypingOutputCheckPay> => {
       const function_name = "PeticionConsultForPay";
       const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp/cross`;
       const name_service = "Verificando Pago";
@@ -206,8 +173,8 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           name_service,
           {},
           body,
-          dataSettingTime.retries,
-          dataSettingTime.delay
+          dataSettingTime.check_pay__retries,
+          dataSettingTime.check_pay__delay
         );
         ArmDataOutput(response, "Aprobada");
         return {
@@ -256,8 +223,8 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           dataComercioSimple,
           dataPath.id_hash,
           {
-            retries: 10,
-            delay: 30,
+            check_pay__retries: 10,
+            check_pay__delay: 30,
           }
         );
         return dataConsultForPay;

@@ -44,17 +44,12 @@ export type TypingDataPath = {
 //------PeticionSettingTime------
 
 export type TypingDataSettingTimeCheckPay = {
-  delay: number;
-  retries: number;
-};
-
-export type TypingDataSettingTimeCheckUrlProcess = {
-  delay: number;
-  timeout: number;
+  check_pay__delay: number;
+  check_pay__retries: number;
 };
 
 //------ PeticionConsultForPay----
-export type TypingCheckPay = {
+export type TypingOutputCheckPay = {
   ticket: TypeInfTicket;
   tipo_tramite: string;
 };

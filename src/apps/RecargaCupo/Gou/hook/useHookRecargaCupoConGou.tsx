@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import {
-  TypeUseHookGouFormularioAdd,
+  TypingUseHookGouFormularioAdd,
   TypingDataInputAdd,
   TypingDataInputRequired,
   TypingDataInputOriginAuto,
@@ -64,7 +64,7 @@ export const dataInvalidInitial: TypingDataInvalid = {
 };
 
 //FRAGMENT ******************** HOOK ***********************************
-const useHookRecargaCupoConGou: TypeUseHookGouFormularioAdd = (
+const useHookRecargaCupoConGou: TypingUseHookGouFormularioAdd = (
   dataComercio: TypingDataComercio,
   dataInputOriginAuto: TypingDataInputOriginAuto
 ) => {

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useRef } from "react";
+import React, { Fragment, ReactNode, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Modal from "../../../../../components/Base/Modal";
@@ -7,16 +7,9 @@ import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { notifyError } from "../../../../../utils/notify";
-import { TypeInfTicket } from "../../../../../utils/TypingUtils";
 
-import TicketsGou from "../../../components/TicketsGou";
+import { TypingTrx } from "../../../utils/utils_typing";
 import {
-  TypingDataPath,
-  TypingSummaryTrx,
-  TypingTrx,
-} from "../../../utils/utils_typing";
-import {
-  ajust_tam_see,
   dict_segun_order,
   dict_summary_trx_own,
   list_a_dict_segun_order,
@@ -27,7 +20,7 @@ import {
   constRelationshipSummary,
 } from "../../../utils/utils_const";
 
-//FRAGMENT ******************** CONST *******************************
+//FRAGMENT ******************** CSS *******************************
 const { contendorIdLog, contendorPago, labelHash } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
@@ -36,7 +29,8 @@ type PropsGouCheckPayOrigin = {
   summaryTrx: any;
   trx: TypingTrx;
   loadingPeticion: boolean;
-  ticket: TypeInfTicket | null;
+  printDiv: any;
+  children: ReactNode;
 };
 //FRAGMENT ******************** COMPONENT *******************************
 const GouChecPayOrigin = ({
@@ -44,10 +38,10 @@ const GouChecPayOrigin = ({
   summaryTrx,
   loadingPeticion,
   trx,
-  ticket,
+  printDiv,
+  children,
 }: PropsGouCheckPayOrigin) => {
   const validNavigate = useNavigate();
-  const printDiv = useRef(null);
 
   const handlePrint = useReactToPrint({
     content: () => printDiv.current,
@@ -128,7 +122,7 @@ const GouChecPayOrigin = ({
         {/**************** Trx Aprobada **********************/}
         {trx.status === "Aprobada" && (
           <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            <TicketsGou ticket={ticket} refPrint={printDiv} />
+            {children}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={() => validNavigate("../")}>Cerrar</Button>
