@@ -11,7 +11,7 @@ const routesEvertecCheckPay = {
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="CHECK EVERTEC" />,
   component: GouMenu,
   permission: ListPermissionsGou,
-  // show: false,
+  show: false,
   subRoutes: [
     {
       link: "/check_evertec/:id_hash",
@@ -19,7 +19,7 @@ const routesEvertecCheckPay = {
       component: GouCheckPay,
       permission: ListPermissionsGou,
       subRoutes: [],
-      // show: false,
+      show: false,
     },
   ],
 };
