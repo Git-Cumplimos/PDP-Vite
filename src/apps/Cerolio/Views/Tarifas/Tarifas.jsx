@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Button from "../../../../components/Base/Button";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
@@ -10,6 +10,8 @@ import {
   fetchUpdateTarifasByIdComercio,
 } from "../../utils/tarifas";
 import { notify, notifyError } from "../../../../utils/notify";
+import { makeMoneyFormatter } from "../../../../utils/functions";
+import MoneyInput from "../../../../components/Base/MoneyInput";
 
 const Tarifas = () => {
   const [modalTarifas, setModalTarifas] = useState(false);
@@ -22,9 +24,10 @@ const Tarifas = () => {
       C1: 0,
     },
   ]);
-  const handleShowModalTarifas = () => {
+
+  const handleShowModalTarifas = useCallback(() => {
     setModalTarifas(!modalTarifas);
-  };
+  }, [modalTarifas]);
 
   const getTarifasByComercio = useCallback(async () => {
     try {
@@ -37,6 +40,19 @@ const Tarifas = () => {
       console.error(error);
     }
   }, []);
+
+  const tableTarifas = useMemo(() => {
+    const moneyFormatter = makeMoneyFormatter(2);
+    return dataTarifas.map((tarifa) => {
+      return {
+        "A1-A2": moneyFormatter.format(tarifa["A1-A2"]),
+        B1: moneyFormatter.format(tarifa["B1"]),
+        C1: moneyFormatter.format(tarifa["C1"]),
+        "B2-C2": moneyFormatter.format(tarifa["B2-C2"]),
+        "B3-C3": moneyFormatter.format(tarifa["B3-C3"]),
+      };
+    });
+  }, [dataTarifas]);
 
   useEffect(() => {
     getTarifasByComercio();
@@ -53,6 +69,7 @@ const Tarifas = () => {
           "B3-C3": dataTarifas[0]["B3-C3"],
         },
       };
+      console.log(body);
       const response = await fetchUpdateTarifasByIdComercio(3, body);
       console.log(response);
       if (response?.status) {
@@ -73,19 +90,7 @@ const Tarifas = () => {
         title="Tarifas"
         maxPage={5}
         headers={["A1-A2", "B1", "C1", "B2-C2", "B3-C3"]}
-        data={
-          dataTarifas.length > 0
-            ? [
-                {
-                  "A1-A2": dataTarifas[0]["A1-A2"],
-                  B1: dataTarifas[0]["B1"],
-                  C1: dataTarifas[0]["C1"],
-                  "B2-C2": dataTarifas[0]["B2-C2"],
-                  "B3-C3": dataTarifas[0]["B3-C3"],
-                },
-              ]
-            : []
-        }
+        data={tableTarifas}
         children={null}
       />
       <ButtonBar>
@@ -94,43 +99,46 @@ const Tarifas = () => {
       <Modal show={modalTarifas} handleClose={handleShowModalTarifas}>
         <h1 className="text-2xl">Tarifas</h1>
         <Form onSubmit={() => updateTarifasByComercio()}>
-          <Input
+          <MoneyInput
             label="A1-A2"
+            value={parseInt(dataTarifas[0]["A1-A2"])}
             type="number"
-            value={dataTarifas[0]["A1-A2"]}
-            onChange={(e) => {
-              setDataTarifas([{ ...dataTarifas[0], "A1-A2": e.target.value }]);
+            onInput={(e) => {
+              setDataTarifas([{ ...dataTarifas[0], "A1-A2": e }]);
             }}
           />
-          <Input
+          <MoneyInput
             label="B1"
             type="number"
-            value={dataTarifas[0]["B1"]}
-            onChange={(e) => {
+            value={parseInt(dataTarifas[0]["B1"])}
+            onInput={(e) => {
               setDataTarifas([{ ...dataTarifas[0], B1: e.target.value }]);
             }}
           />
-          <Input
+          <MoneyInput
             label="C1"
             type="number"
-            value={dataTarifas[0]["C1"]}
-            onChange={(e) => {
+            value={parseInt(dataTarifas[0]["C1"])}
+            onInput={(e) => {
               setDataTarifas([{ ...dataTarifas[0], C1: e.target.value }]);
             }}
           />
-          <Input
+          <MoneyInput
             label="B2-C2"
             type="number"
-            value={dataTarifas[0]["B2-C2"]}
-            onChange={(e) => {
+            value={parseInt(dataTarifas[0]["B2-C2"])}
+            onInput={(e) => {
               setDataTarifas([{ ...dataTarifas[0], "B2-C2": e.target.value }]);
             }}
           />
-          <Input
+          <MoneyInput
             label="B3-C3"
             type="number"
-            value={dataTarifas[0]["B3-C3"]}
-            onChange={(e) => {
+            min={"0"}
+            max={"100"}
+            value={parseInt(dataTarifas[0]["B3-C3"])}
+            maxLength={"10"}
+            onInput={(e) => {
               setDataTarifas([{ ...dataTarifas[0], "B3-C3": e.target.value }]);
             }}
           />
