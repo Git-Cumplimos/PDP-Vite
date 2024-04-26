@@ -12,10 +12,10 @@ import Form from "../../../../components/Base/Form";
 // import Modal from "../../../../components/Base/Modal";
 import Select from "../../../../components/Base/Select";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { makeMoneyFormatter } from "../../../../utils/functions";
+import { makeMoneyFormatter, validateDates } from "../../../../utils/functions";
 import { notifyError,notifyPending } from "../../../../utils/notify";
 import { buscarReporteTrxTuLlave } from "../../utils/fetchTuLlave";
-import { validateDates } from "../../../../pages/Gestion/utils/functions";
+// import { validateDates } from "../../../../pages/Gestion/utils/functions";
 import Input from "../../../../components/Base/Input/Input";
 
 const formatMoney = makeMoneyFormatter(2);
