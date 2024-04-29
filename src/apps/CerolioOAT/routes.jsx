@@ -9,6 +9,12 @@ const CerolioOAT = lazy(() => import("./Views/CerolioOAT"));
 const CerolioOATAgendar = lazy(() => import("./Views/Agenda/Agenda"));
 const CerolioOATTarifas = lazy(() => import("./Views/Tarifas/Tarifas"));
 const CerolioOATReportes = lazy(() => import("./Views/Reportes/Reportes"));
+const CerolioOATReportesConsulta = lazy(() =>
+  import("./Views/Reportes/ReportesConsulta/ReportesConsulta")
+);
+const CerolioOATReportesHistorico = lazy(() =>
+  import("./Views/Reportes/ReportesHistorico/ReportesHistorico")
+);
 const listPermissions = Object.values(enumPermisosCerolioOAT);
 export const listPermissionsCerolioOAT = listPermissions;
 
@@ -35,6 +41,20 @@ const rutasCerolioOAT = {
       label: <AppIcons Logo={"MARKETPLACE"} name="Reportes" />,
       component: CerolioOATReportes,
       permission: [enumPermisosCerolioOAT.cerolioOAT],
+      subRoutes: [
+        {
+          link: "/cerolio-oat/reportes/consulta",
+          label: <AppIcons Logo={"MARKETPLACE"} name="Reportes Consulta" />,
+          component: CerolioOATReportesConsulta,
+          permission: [enumPermisosCerolioOAT.cerolioOAT],
+        },
+        {
+          link: "/cerolio-oat/reportes/historico",
+          label: <AppIcons Logo={"MARKETPLACE"} name="Reportes Histórico" />,
+          component: CerolioOATReportesHistorico,
+          permission: [enumPermisosCerolioOAT.cerolioOAT],
+        },
+      ],
     },
   ],
 };

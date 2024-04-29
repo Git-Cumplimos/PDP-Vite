@@ -1,9 +1,7 @@
-const Pines = () => {
-  return (
-    <div>
-      <h1>Pines</h1>
-    </div>
-  );
-}
+import HNavbar from "../../../../components/Base/HNavbar";
+
+const Pines = ({ subRoutes }) => {
+  return <HNavbar links={subRoutes} isIcon />;
+};
 
 export default Pines;

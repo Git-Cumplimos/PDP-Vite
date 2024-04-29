@@ -1,9 +1,7 @@
-const Reportes = () => {
-  return (
-    <div>
-      <h1>Reportes</h1>
-    </div>
-  );
-}
+import HNavbar from "../../../../components/Base/HNavbar";
+
+const Reportes = ({ subRoutes }) => {
+  return <HNavbar links={subRoutes} isIcon />;
+};
 
 export default Reportes;
