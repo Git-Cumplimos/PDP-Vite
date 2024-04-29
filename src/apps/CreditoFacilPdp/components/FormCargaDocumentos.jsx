@@ -2,20 +2,36 @@ import { useCallback, useState, useEffect } from "react";
 import Form from "../../../components/Base/Form/Form";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
-import { notifyError, notifyPending } from "../../../utils/notify";
-import fetchData from "../../../utils/fetchData";
-import { useAuth } from "../../../hooks/AuthHooks";
 import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
-import {
-  postTerminosCondicionesCEACRC,
-  postConsultaDocumentosBd,
-} from "../hooks/fetchCreditoFacil";
-import { fetchCustom } from "../utils/fetchCreditoFacil";
+import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
+import { postConsultaDocumentosBd } from "../hooks/fetchCreditoFacil";
+import { notifyError, notifyPending } from "../../../utils/notify";
+import fetchData from "../../../utils/fetchData";
+import { postTerminosCondicionesCEACRC } from "../hooks/fetchCreditoFacil";
+import { fetchCustom } from "../utils/fetchCreditoFacil";
 
 const URL_CARGA_ARCHIVO_S3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-creditos`;
 const URL_GUARDAR_DOCUMENTOS_TBL_MOVIMIENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/actualizacion-documentos`;
+
+const initialFileState = {
+  pagareFirmado: "",
+  cedulaRepresentante: "",
+  estadoFinanciero: "",
+  camaraComercio: "",
+  contrato: "",
+  certificacionBancaria: "",
+};
+
+const documentTypes = [
+  { key: "pagareFirmado", label: "Pagaré Firmado" },
+  { key: "cedulaRepresentante", label: "Cédula del Representante Legal" },
+  { key: "estadoFinanciero", label: "Estados Financieros" },
+  { key: "camaraComercio", label: "Cámara de Comercio" },
+  { key: "contrato", label: "Contrato" },
+  { key: "certificacionBancaria", label: "Certificación Bancaria" },
+];
 
 const FormCargaDocumentos = ({
   setModalOpen,
@@ -23,36 +39,32 @@ const FormCargaDocumentos = ({
   dataCredito,
   setFormCarga,
 }) => {
-  const [isModalOpenPDF, setModalOpenPDF] = useState(false);
-  const { roleInfo } = useAuth();
   const [isChecked, setChecked] = useState(false);
-  const [url, setUrl] = useState("");
+  const [isModalOpenPDF, setModalOpenPDF] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [fileDocuments, setFileDocuments] = useState({
-    pagareFirmado: "",
-    cedulaRepresentante: "",
-    estadoFinanciero: "",
-    camaraComercio: "",
-    contrato: "",
-    certificacionBancaria: "",
-  });
-  const [dataConsultaDocumentos, setDataConsultaDocumentos] = useState(false);
+  const { roleInfo } = useAuth();
+  const [url, setUrl] = useState("");
+  const [fileDocuments, setFileDocuments] = useState(initialFileState);
+  const [loadingPeticionGuardarDocumentos, peticionGuardarDocumentos] =
+    useFetch(
+      fetchCustom(
+        URL_GUARDAR_DOCUMENTOS_TBL_MOVIMIENTOS,
+        "POST",
+        "Guardar documentos"
+      )
+    );
 
   useEffect(() => {
     consultaDocumentos();
   }, []);
 
   const consultaDocumentos = useCallback(() => {
-    const body = {
-      numero_solicitud: dataCredito?.NroSolicitud,
-    };
+    const body = { numero_solicitud: dataCredito?.NroSolicitud };
     postConsultaDocumentosBd(body)
       .then((autoArr) => {
-        console.log("Aquiiiiii", autoArr);
         const consultaDocumentosBD = autoArr?.obj?.archivos;
         setFileDocuments({
-          pagareFirmado:
-            consultaDocumentosBD?.pagare !== "" ? "Pagare.pdf" : "",
+          pagareFirmado: consultaDocumentosBD?.pagare ? "Pagare.pdf" : "",
           cedulaRepresentante: consultaDocumentosBD?.cedulaRepresentante
             ? "CedulaRepresentante.pdf"
             : "",
@@ -71,8 +83,7 @@ const FormCargaDocumentos = ({
       .catch((err) => console.error(err));
   }, []);
 
-  const onChangeFile = (file, variable, inputElement) => {
-    // Validación de la extensión del archivo
+  const onChangeFile = useCallback((file, variable, inputElement) => {
     if (file) {
       const fileName = file.name.toLowerCase();
       const extension = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -80,36 +91,16 @@ const FormCargaDocumentos = ({
         extension === "pdf" ||
         ["jpg", "jpeg", "png", "gif"].includes(extension)
       ) {
-        setFileDocuments((prevState) => ({
-          ...prevState,
-          [variable]: file,
-        }));
+        setFileDocuments((prevState) => ({ ...prevState, [variable]: file }));
       } else {
-        setFileDocuments((prevState) => ({
-          ...prevState,
-          [variable]: "",
-        }));
-        if (inputElement) {
-          inputElement.value = null;
-        }
-        notifyError("Solo se permiten archivos PDF o Imágenes.");
+        setFileDocuments((prevState) => ({ ...prevState, [variable]: "" }));
+        if (inputElement) inputElement.value = null;
+        notifyError("Solo se permiten archivos PDF o imágenes.");
       }
     } else {
-      setFileDocuments((prevState) => ({
-        ...prevState,
-        [variable]: "",
-      }));
+      setFileDocuments((prevState) => ({ ...prevState, [variable]: "" }));
     }
-  };
-
-  const [loadingPeticionGuardarDocumentos, peticionGuardarDocumentos] =
-    useFetch(
-      fetchCustom(
-        URL_GUARDAR_DOCUMENTOS_TBL_MOVIMIENTOS,
-        "POST",
-        "Guardar documentos"
-      )
-    );
+  }, []);
 
   const cargar_documentos = useCallback(
     async (e) => {
@@ -126,6 +117,7 @@ const FormCargaDocumentos = ({
           certificacionBancaria: fileDocuments?.certificacionBancaria?.name,
         },
       };
+
       try {
         const respuesta = await fetchData(
           URL_CARGA_ARCHIVO_S3,
@@ -164,22 +156,18 @@ const FormCargaDocumentos = ({
               const resFormData = filesToUpload[archivoKey];
               if (resFormData) {
                 const formData2 = new FormData();
-
                 for (const property in resFormData?.fields) {
                   formData2.set(
                     `${property}`,
                     `${resFormData?.fields[property]}`
                   );
                 }
-
                 formData2.set("file", file);
-
                 try {
                   const res = await fetch(resFormData?.url, {
                     method: "POST",
                     body: formData2,
                   });
-
                   if (!res.ok) {
                     throw new Error(`Error al subir el archivo ${archivoKey}`);
                   }
@@ -194,6 +182,7 @@ const FormCargaDocumentos = ({
               }
             }
           }
+
           if (allFilesUploaded) {
             const data = {
               archivos: {
@@ -208,19 +197,19 @@ const FormCargaDocumentos = ({
               },
               numero_solicitud: dataCredito?.NroSolicitud,
             };
-            console.log(data);
+
             notifyPending(
               peticionGuardarDocumentos({}, data),
               {
-                render: () => {
-                  return "Procesando cague de documentos";
-                },
+                render: () => "Procesando carga de documentos",
               },
               {
                 render: ({ data: res }) => {
                   consultaCreditos();
                   setModalOpenPDF(false);
-                  return "Cargue de documentos exitoso";
+                  setModalOpen(false);
+                  setFormCarga(false);
+                  return "Carga de documentos exitosa";
                 },
               },
               {
@@ -232,7 +221,7 @@ const FormCargaDocumentos = ({
                   } else {
                     consultaCreditos();
                     setModalOpenPDF(false);
-                    return "Cargue de documentos fallido";
+                    return "Carga de documentos fallida";
                   }
                 },
               }
@@ -248,7 +237,7 @@ const FormCargaDocumentos = ({
     [roleInfo, fileDocuments]
   );
 
-  const openModal = async () => {
+  const openModal = useCallback(() => {
     if (isChecked) {
       setChecked(!isChecked);
     } else {
@@ -262,7 +251,7 @@ const FormCargaDocumentos = ({
         }
       });
     }
-  };
+  }, [isChecked]);
 
   const handleClose = useCallback(() => {
     setModalOpen(false);
@@ -288,176 +277,50 @@ const FormCargaDocumentos = ({
         <h2 className="text-xl text-center mb-10">
           Por favor realice el cargue de cada documento
         </h2>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <label
-            htmlFor="pagare"
-            className="text-xl"
-            style={{ width: "250px", marginRight: "20px" }}
-          >
-            Pagaré Firmado
-          </label>
-          <Input
-            type="file"
-            id="pagare"
-            name="pagare"
-            accept=".pdf,image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              onChangeFile(file, "pagareFirmado", e.target);
+
+        {/* Iterar sobre los tipos de documentos */}
+        {documentTypes.map(({ key, label }) => (
+          <div
+            key={key}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "10px",
             }}
-            required
-          />
-          {fileDocuments?.pagareFirmado !== "" ? (
-            <>
-              <div>{"Archivo guardado: "}{fileDocuments?.pagareFirmado}</div>
-              <label
-                htmlFor="pagare"
-                className="text-xl"
-                style={{ width: "250px", marginRight: "20px" }}
-              >
-                En validación
-              </label>
-            </>
-          ) : (
-            <></>
-          )}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <label
-            htmlFor="cedula"
-            className="text-xl"
-            style={{ width: "250px", marginRight: "20px" }}
           >
-            Cédula del Representante Legal
-          </label>
-          <Input
-            type="file"
-            id="cedula"
-            name="cedula"
-            accept=".pdf,image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              onChangeFile(file, "cedulaRepresentante", e.target);
-            }}
-            required
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <label
-            htmlFor="estadosFinancieros"
-            className="text-xl"
-            style={{ width: "250px", marginRight: "20px" }}
-          >
-            Estados Financieros
-          </label>
-          <Input
-            type="file"
-            id="estadosFinancieros"
-            name="estadosFinancieros"
-            accept=".pdf,image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              onChangeFile(file, "estadoFinanciero", e.target);
-            }}
-            required
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <label
-            htmlFor="camaraComercio"
-            className="text-xl"
-            style={{ width: "250px", marginRight: "20px" }}
-          >
-            Cámara de Comercio
-          </label>
-          <Input
-            type="file"
-            id="camaraComercio"
-            name="camaraComercio"
-            accept=".pdf,image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              onChangeFile(file, "camaraComercio", e.target);
-            }}
-            required
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <label
-            htmlFor="contrato"
-            className="text-xl"
-            style={{ width: "250px", marginRight: "20px" }}
-          >
-            Contrato
-          </label>
-          <Input
-            type="file"
-            id="contrato"
-            name="contrato"
-            accept=".pdf,image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              onChangeFile(file, "contrato", e.target);
-            }}
-            required
-          />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <label
-            htmlFor="certificacionBancaria"
-            className="text-xl"
-            style={{ width: "250px", marginRight: "20px" }}
-          >
-            Certificación Bancaria
-          </label>
-          <Input
-            type="file"
-            id="certificacionBancaria"
-            name="certificacionBancaria"
-            accept=".pdf,image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              onChangeFile(file, "certificacionBancaria", e.target);
-            }}
-            required
-          />
-        </div>
+            <label
+              htmlFor={key}
+              className="text-xl"
+              style={{ width: "250px", marginRight: "20px" }}
+            >
+              {label}
+            </label>
+            <Input
+              type="file"
+              id={key}
+              name={key}
+              accept=".pdf,image/*"
+              onChange={(e) => onChangeFile(e.target.files[0], key, e.target)}
+              required
+            />
+            {fileDocuments[key] !== "" && (
+              <>
+                <div>
+                  {"Archivo guardado: "}
+                  {fileDocuments[key] && fileDocuments[key].name}
+                </div>
+                <label
+                  htmlFor={key}
+                  className="text-xl"
+                  style={{ width: "250px", marginRight: "20px" }}
+                >
+                  En validación
+                </label>
+              </>
+            )}
+          </div>
+        ))}
+
         <div className="text-center">
           <label className="text-xl">
             <input
