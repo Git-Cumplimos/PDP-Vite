@@ -345,11 +345,18 @@ export const useProvideAuth = () => {
         }
 
         const strQr = resJson?.obj?.otpauth_url;
-        console.log(strQr);
         setQr(strQr);
         setTimer((old) => {
           clearTimeout(old);
-          return null;
+          return setTimeout(() => {
+            signOut();
+            notifyError(
+              "La sesión ha expirado, por favor intente de nuevo",
+              5000,
+              { toastId: "expired-session-not" }
+            );
+            setQr("");
+          }, 90000);
         });
       } catch (err) {
         console.error(err);
