@@ -1,17 +1,27 @@
 import { lazy } from "react";
 
-import { ListPermissionsGou } from "./ListPermissionsGou";
 import AppIcons from "../../components/Base/AppIcons";
+import { ListPermissionsGou } from "./ListPermissionsGou";
 
+const GouMenu = lazy(() => import("./GouMenu"));
 const GouCheckPay = lazy(() => import("./views/GouCheckPay"));
 
 const routesGouCheckPay = {
-  link: "/gou/check_pay/:type_setting_time/:id_hash",
+  link: "/check_gou",
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="CHECK GOU" />,
-  component: GouCheckPay,
-  permission: [ListPermissionsGou.RECARGA_CUPO_CON_GOU],
-  subRoutes: [],
+  component: GouMenu,
+  permission: ListPermissionsGou,
   show: false,
+  subRoutes: [
+    {
+      link: "/check_gou/check_pay/:id_hash",
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="check pay" />,
+      component: GouCheckPay,
+      permission: ListPermissionsGou,
+      subRoutes: [],
+      show: false,
+    },
+  ],
 };
 
 export default routesGouCheckPay;

@@ -1,12 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../../../hooks/AuthHooks";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFetch } from "../../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCajaSocial";
-import TableEnterprise from "../../../../../components/Base/TableEnterprise";
-import Input from "../../../../../components/Base/Input";
-import { notifyError, notifyPending } from "../../../../../utils/notify";
-import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
+import { notifyPending } from "../../../../../utils/notify";
 import PagoRecaudoServiciosCajaSocial from "../../components/PagoRecaudoServiciosCajaSocial";
 
 const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;

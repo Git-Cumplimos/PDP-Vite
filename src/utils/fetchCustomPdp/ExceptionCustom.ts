@@ -40,7 +40,7 @@ export class ErrorCustomFetch extends Error {
       const name_console_error = this.error_msg_front.split(":");
       console.error(name_console_error[0], {
         "Error Name": error_name,
-        "Error Conred": this.error_msg_front,
+        "Error Pdp": this.error_msg_front,
         "Error Sequence": this.error_msg_sequence,
         "Error Console": `${this.error_msg_console}`,
       });
@@ -227,7 +227,7 @@ export class ErrorCustomBackendPending extends ErrorCustomTimeout {
   }
 }
 
-export class ErrorCustomBackendRehazada extends ErrorCustomTimeout {
+export class ErrorCustomBackendRechazada extends ErrorCustomTimeout {
   constructor(
     error_msg_front: string,
     error_msg_console: string,
@@ -238,7 +238,7 @@ export class ErrorCustomBackendRehazada extends ErrorCustomTimeout {
     res?: { [key: string]: any }
   ) {
     super(
-      "ErrorCustomBackendRehazada",
+      "ErrorCustomBackendRechazada",
       error_msg_front,
       error_msg_console,
       error_msg_sequence,
@@ -282,6 +282,27 @@ export class ErrorCustomComponentCode extends ErrorCustomFetch {
   ) {
     super(
       "ErrorCustomComponenteCode",
+      error_msg_front,
+      error_msg_console,
+      error_msg_sequence,
+      typeNotify,
+      ignoring,
+      console_error
+    );
+  }
+}
+
+export class ErrorCustomRaise extends ErrorCustomFetch {
+  constructor(
+    error_msg_front: string,
+    error_msg_console: string,
+    error_msg_sequence: string,
+    typeNotify: string = "notifyError",
+    ignoring: boolean = false,
+    console_error: boolean = true
+  ) {
+    super(
+      "ErrorCustomRaise",
       error_msg_front,
       error_msg_console,
       error_msg_sequence,

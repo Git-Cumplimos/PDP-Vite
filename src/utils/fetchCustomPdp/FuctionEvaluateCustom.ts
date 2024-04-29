@@ -1,7 +1,7 @@
 import {
   ErrorCustomBackend,
   ErrorCustomBackendPending,
-  ErrorCustomBackendRehazada,
+  ErrorCustomBackendRechazada,
   ErrorCustomBackendUser,
   ErrorCustomFetch,
   ErrorCustomFetchCode,
@@ -126,7 +126,7 @@ export const FuctionEvaluateResponseConsultTrx = (
             );
           // break;
           case "rechazada":
-            throw new ErrorCustomBackendRehazada(
+            throw new ErrorCustomBackendRechazada(
               peticion_?.msg,
               peticion_?.msg,
               `${function_name} - evaluar el status_ Rechazada`,

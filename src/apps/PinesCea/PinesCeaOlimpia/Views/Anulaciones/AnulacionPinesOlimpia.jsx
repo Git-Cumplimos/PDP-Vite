@@ -36,7 +36,7 @@ const DevolucionPinesOlimpia = () => {
   const { roleInfo, pdpUser } = useAuth();
   const [numeroPin, setNumeroPin] = useState("");
   const [numeroDocumento, setNumeroDocumento] = useState("");
-  const [valorTansaccion, setValorTansaccion] = useState("");
+  const [valorTransaccion, setValorTransaccion] = useState("");
   const [estado, setEstado] = useState("");
   const [codigoDestino, setCodigoDestino] = useState("");
   const [existe, setExiste] = useState(false);
@@ -44,6 +44,8 @@ const DevolucionPinesOlimpia = () => {
   const [tipoIdentificacion, setTipoIdentificacion] = useState("");
   const [valorPin, setValorPin] = useState("");
   const [idTrx, setIdTrx] = useState(""); 
+  const [codigoAprobacion, setCodigoAprobacion] = useState("");
+  const [fechaTransaccion, setFechaTransaccion] = useState("");
   const [idTrxRecaudo, setIdTrxRecaudo] = useState("");
   const [pin, setPin] = useState("");
   const [auditoria, setAuditoria] = useState("");
@@ -172,9 +174,11 @@ const DevolucionPinesOlimpia = () => {
             setEstado("");
             setNumeroIdentificacion("");
             setTipoIdentificacion("");
-            setValorTansaccion("");
+            setValorTransaccion("");
             setIdTrx("");
             setPin("");
+            setCodigoAprobacion("");
+            setFechaTransaccion("");
             notifyError(res?.msg);
             setNumeroPin("");
             setNumeroDocumento("");
@@ -187,9 +191,11 @@ const DevolucionPinesOlimpia = () => {
             setEstado("");
             setNumeroIdentificacion("");
             setTipoIdentificacion("");
-            setValorTansaccion("");
+            setValorTransaccion("");
             setIdTrx("");
             setPin("");
+            setCodigoAprobacion("");
+            setFechaTransaccion("");
             notifyError("Estado de pin no permitido para para anulación");
             setNumeroPin("");
             setNumeroDocumento("");
@@ -203,10 +209,12 @@ const DevolucionPinesOlimpia = () => {
           setEstado(res?.obj?.result?.Estado);
           setNumeroIdentificacion(res?.obj?.result?.NumeroIdentificacion);
           setTipoIdentificacion(res?.obj?.result?.TipoIdentificacion);
-          setValorTansaccion(res?.obj?.result?.ValorTansaccion);
+          setValorTransaccion(res?.obj?.result?.ValorTransaccion);
           setIdTrx(res?.obj?.id_trx);
           setPin(res?.obj?.result?.Pin);
           setIdTrxRecaudo(res?.obj?.result?.IdTrxRecaudo);
+          setCodigoAprobacion(res?.obj?.result?.CodigoAprobacion);
+          setFechaTransaccion(res?.obj?.result?.FechaTransaccion);
           setEstadoConsulta(true);
         }
       })
@@ -235,8 +243,10 @@ const DevolucionPinesOlimpia = () => {
         Pin: numeroPin,
         TipoIdentificacion: tipoIdentificacion,
         NumeroIdentificacion: numeroIdentificacion,
-        ValorTansaccion: valorTansaccion,
+        ValorTransaccion: valorTransaccion,
         id_trx: idTrxRecaudo,
+        CodigoAprobacion: codigoAprobacion,
+        FechaTransaccion: fechaTransaccion,
         direccion: roleInfo?.direccion ?? "",
         nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
         comercio_propio: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
@@ -251,6 +261,8 @@ const DevolucionPinesOlimpia = () => {
           setMensajeRespuesta("");
           setIdTrx("");
           setPin("");
+          setCodigoAprobacion("");
+          setFechaTransaccion("");
           notifyError(res?.msg);
           setEstadoConsulta(false);
           setIsLoadingPago(false);
@@ -276,15 +288,15 @@ const DevolucionPinesOlimpia = () => {
               Pin: numeroPin,
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,
-              ValorTansaccion: valorTansaccion,
+              ValorTransaccion: valorTransaccion,
               CodigoAprobacion: idTrxRecaudo,
               FechaTransaccion: fechaFormateada,
               IdBancoDevolucion: "1001",
               IdTipoCuentaDevolucion: "27",
               IdTipoDevolucion: "1",
               IdTipoIdentificacionDevolucion: "1",
-              NumeroCuentaDevolucion: "1",
-              NumeroIdentificacionDevolucion: "1"
+              NumeroCuentaDevolucion: "0",
+              NumeroIdentificacionDevolucion: "0"
           }
           )
             .then((res2) => {
@@ -295,6 +307,8 @@ const DevolucionPinesOlimpia = () => {
                 setMensajeRespuesta("");
                 setIdTrx("");
                 setPin("");
+                setCodigoAprobacion("");
+                setFechaTransaccion("");
                 notifyError(res2?.msg);
                 setEstadoConsulta(false);
                 setIsLoadingPago(false);
@@ -307,7 +321,7 @@ const DevolucionPinesOlimpia = () => {
                 setAuditoria(res?.obj?.result?.Auditoria);
                 setIdRespuesta(res?.obj?.result?.IdRespuesta);
                 setMensajeRespuesta(res?.obj?.result?.MensajeRespuesta);
-                setIdTrx(res?.obj?.result?.id_trx);
+                // setIdTrx(res?.obj?.result?.id_trx);
                 setPin(res?.obj?.result?.pin);
                 setEstadoPago(true);
                 setPaymentStatus(res?.obj?.ticket ?? {});
@@ -445,7 +459,7 @@ const DevolucionPinesOlimpia = () => {
           handleClose = {handleClose}
           tipoIdentificacion = {tipoIdentificacion}
           numeroIdentificacion ={numeroIdentificacion}
-          valorPin = {valorTansaccion}
+          valorPin = {valorTransaccion}
           estadoPin = {estado}
           numeroPin = {numeroPin}
           >

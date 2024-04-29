@@ -153,9 +153,6 @@ const RepresentanteLegal = ({
               },
             ].concat(
               res?.obj
-                ?.filter(({ id_doc }: { id_doc: number }) =>
-                  [1, 3].includes(id_doc)
-                )
                 ?.map(
                   ({
                     id_doc,

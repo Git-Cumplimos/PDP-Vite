@@ -1,0 +1,7 @@
+.contendorIdLog {
+  margin-top: 20px;
+  font-size: small;
+  display: grid;
+  width: 100%;
+  justify-items: end;
+}

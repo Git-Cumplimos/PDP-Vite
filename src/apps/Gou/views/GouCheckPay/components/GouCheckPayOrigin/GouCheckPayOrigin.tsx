@@ -78,14 +78,14 @@ const GouChecPayOrigin = ({
             <PaymentSummary
               title={trx.msg}
               subtitle={summaryTrx?.msg ?? ""}
-              summaryTrx={summaryTrx.summary_trx}
+              // summaryTrx={summaryTrx.summary_trx}
             >
-              <div className={labelHash}>
+              {/* <div className={labelHash}>
                 {dataPath?.id_hash &&
                   summaryTrx?.summary_trx?.["Id transacción"] === undefined && (
                     <label>{ajust_tam_see(dataPath.id_hash, 50)}</label>
                   )}
-              </div>
+              </div> */}
 
               {summaryTrx.valor_trx && (
                 <Fragment>
@@ -98,7 +98,7 @@ const GouChecPayOrigin = ({
                 </Fragment>
               )}
             </PaymentSummary>
-            {!loadingPeticion && (
+            {/* {!loadingPeticion && (
               <div className={!summaryTrx?.summary_trx ? "pt-4" : ""}>
                 <ButtonBar>
                   <Button onClick={() => validNavigate("../")}>
@@ -106,7 +106,7 @@ const GouChecPayOrigin = ({
                   </Button>
                 </ButtonBar>
               </div>
-            )}
+            )} */}
           </Fragment>
         )}
         {/*************** Trx Search **********************/}

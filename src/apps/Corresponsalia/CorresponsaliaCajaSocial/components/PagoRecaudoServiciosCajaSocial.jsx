@@ -17,7 +17,7 @@ import Modal from "../../../../components/Base/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
-import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
+import { enumParametrosCajaSocial } from "../utils/enumParametrosCajaSocial";
 import TicketsCajaSocial from "./TicketsCajaSocial";
 
 const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-recaudo-servicios`;
@@ -154,6 +154,7 @@ const PagoRecaudoServiciosCajaSocial = ({
       if (tipoRecaudo !== "manual") {
         extraData["codigo_barras"] = codigoBarras;
         extraData["flag_codigo_barras"] = true;
+        extraData["ean_code"] = dataCodigoBarras?.codigo_ean;
       }
       const data = {
         oficina_propia:
@@ -199,9 +200,15 @@ const PagoRecaudoServiciosCajaSocial = ({
         },
         {
           render: ({ data: res }) => {
-            console.log(res?.obj);
             setShowModal(true);
             setResConsulta(res?.obj);
+            setDataRecaudo((old) => {
+              return {
+                ...old,
+                valorTrx: res?.obj.valor_consultado,
+                valorTrxOriginal: res?.obj.valor_consultado,
+              };
+            });
             setEstadoPeticion("response");
             return res?.msg ?? "Consulta satisfactoria";
           },
@@ -214,7 +221,16 @@ const PagoRecaudoServiciosCajaSocial = ({
         }
       );
     },
-    [pdpUser, dataRecaudo, roleInfo, resConsulta]
+    [
+      pdpUser,
+      dataRecaudo,
+      roleInfo,
+      resConsulta,
+      codigoBarras,
+      convenio,
+      dataCodigoBarras,
+      tipoRecaudo,
+    ]
   );
   const pagoRecaudoServicios = useCallback(
     (ev) => {
@@ -225,11 +241,12 @@ const PagoRecaudoServiciosCajaSocial = ({
         dataCodigoBarras?.fecha_caducidad?.length > 0
       ) {
         extraData["fecha_pago_codigo_barras"] =
-          dataCodigoBarras?.fecha_caducidad[-1];
+          dataCodigoBarras?.fecha_caducidad[0];
       }
       if (tipoRecaudo !== "manual") {
         extraData["codigo_barras"] = codigoBarras;
         extraData["flag_codigo_barras"] = true;
+        extraData["ean_code"] = dataCodigoBarras?.codigo_ean;
       }
       if (
         dataRecaudo?.valorTrx <
@@ -246,6 +263,13 @@ const PagoRecaudoServiciosCajaSocial = ({
             enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
           )}`
         );
+      }
+      if (convenio.tipo_recaudo === "01") {
+        extraData["flag_otro_valor"] = convenio.permite_modificar_valor;
+      } else {
+        extraData["codigo_notificacion"] = resConsulta?.valor_notificacion;
+        extraData["flag_otro_valor"] =
+          dataRecaudo?.valorTrx !== dataRecaudo?.valorTrxOriginal ? "1" : "0";
       }
       const data = {
         oficina_propia:
@@ -272,15 +296,13 @@ const PagoRecaudoServiciosCajaSocial = ({
           referencias: [
             ...Array(parseInt(convenio.cant_referencias)).keys(),
           ].map((i) => ({
-            name: convenio?.[`nom_ref${i + 1}`],
+            name: convenio?.[`nom_ref${i + 1}`].slice(0, 30),
             value: dataRecaudo?.[`ref${i + 1}`],
           })),
           otra_referencia: dataRecaudo.otraReferencia,
-          //TODO
-          flag_otro_valor: convenio.permite_modificar_valor,
+          nombre_otra_referencia: convenio.nombre_otra_ref,
           tipo_convenio_recaudo: convenio.tipo_recaudo,
           nombre_convenio: dataRecaudo?.nombreConvenio,
-          codigo_notificacion: "",
           ...extraData,
         },
         id_trx: resConsulta?.id_trx,
@@ -319,7 +341,16 @@ const PagoRecaudoServiciosCajaSocial = ({
         }
       );
     },
-    [pdpUser, dataRecaudo, roleInfo, resConsulta]
+    [
+      pdpUser,
+      dataRecaudo,
+      roleInfo,
+      resConsulta,
+      convenio,
+      codigoBarras,
+      dataCodigoBarras,
+      tipoRecaudo,
+    ]
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
@@ -454,7 +485,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                     max={
                       enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
                     }
-                    defaultValue={dataRecaudo?.valorTrx ?? 0}
+                    defaultValue={dataCodigoBarras.pago[0] ?? 0}
                     onInput={onChangeFormatNum}
                     disabled={
                       loadingPeticionPagoRecaudo ||
@@ -551,8 +582,8 @@ const PagoRecaudoServiciosCajaSocial = ({
                   name="valorTrxValidacion"
                   label={"Valor a pagar"}
                   type="tel"
-                  // minLength={5}
-                  maxLength={10}
+                  maxLength={12}
+                  decimalDigits={2}
                   autoComplete="off"
                   min={
                     enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
@@ -560,7 +591,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                   max={
                     enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
                   }
-                  value={dataRecaudo?.valorTrxValidacion ?? 0}
+                  defaultValue={0}
                   onInput={onChangeFormatNum}
                   disabled={
                     loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
@@ -651,31 +682,64 @@ const PagoRecaudoServiciosCajaSocial = ({
                     ]
                   )
                 ),
-                "Valor a pagar": formatMoney.format(dataRecaudo?.valorTrx),
+                [`${
+                  convenio.permite_modificar_valor === "1"
+                    ? "Valor consultado"
+                    : "Valor a pagar"
+                }`]: formatMoney.format(dataRecaudo.valorTrxOriginal),
               }}
             >
-              <ButtonBar>
-                <Button
-                  onClick={(e) => {
-                    closeModule(e);
-                    validNavigate(-1);
-                  }}
-                  disabled={
-                    loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
-                  }
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  onClick={pagoRecaudoServicios}
-                  disabled={
-                    loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo
-                  }
-                >
-                  Realizar pago
-                </Button>
-              </ButtonBar>
+              <Form onSubmit={pagoRecaudoServicios}>
+                {convenio.permite_modificar_valor === "1" && (
+                  <MoneyInput
+                    id="valorTrx"
+                    name="valorTrx"
+                    label={"Valor a pagar"}
+                    type="tel"
+                    maxLength={12}
+                    decimalDigits={2}
+                    autoComplete="off"
+                    min={
+                      enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
+                    }
+                    max={
+                      enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
+                    }
+                    defaultValue={dataRecaudo.valorTrxOriginal ?? 0}
+                    onInput={onChangeFormatNum}
+                    disabled={
+                      loadingPeticionPagoRecaudo ||
+                      loadingPeticionConsultaRecaudo
+                    }
+                    required
+                    equalError={false}
+                    equalErrorMin={false}
+                  />
+                )}
+                <ButtonBar>
+                  <Button
+                    onClick={(e) => {
+                      closeModule(e);
+                      validNavigate(-1);
+                    }}
+                    disabled={
+                      loadingPeticionPagoRecaudo ||
+                      loadingPeticionConsultaRecaudo
+                    }
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={
+                      loadingPeticionPagoRecaudo ||
+                      loadingPeticionConsultaRecaudo
+                    }
+                  >
+                    Realizar pago
+                  </Button>
+                </ButtonBar>
+              </Form>
             </PaymentSummary>
           ) : estadoPeticion === "ticket" ? (
             <div className="flex flex-col justify-center items-center">

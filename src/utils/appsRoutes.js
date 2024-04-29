@@ -99,6 +99,7 @@ import routesGestionBCS from "../apps/GestionBCS/routes";
 import routesGouCheckPay from "../apps/Gou/routes";
 import rutasCerolioOAT from "../apps/CerolioOAT/routes";
 import rutasCerolioAdmin from "../apps/CerolioAdmin/routes";
+import routesEvertecCheckPay from "../apps/Evertec/routes";
 /**
 
  * * Logos
@@ -810,7 +811,7 @@ const allUrlsPrivateApps = [
         permission: [59],
       },
       {
-        link: "/cupo/cupo-comercio/detalles-cupo",
+        link: "/cupo/detalles-movimiento-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />,
         component: DtlMovCupo,
         permission: [62],
@@ -831,7 +832,7 @@ const allUrlsPrivateApps = [
         link: "/cupo/detalle-modificacion-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Detalle modificación cupo"} />,
         component: DetalleModificacionCupo,
-        permission: [1],
+        permission: [20002],
       },
       {
         link: "/cupo/tipos-movimientos-cupo",
@@ -1232,6 +1233,8 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
+  //Modulo Gou
+  routesEvertecCheckPay,
   //Modulo Gou
   routesGouCheckPay,
   //Modulo Recarga Cupo

@@ -75,20 +75,20 @@ const validarAjustesMasivos = (url, functionMasive) => {
       for (let i = 0; i < 5; i++) {
         try {
           let res = await fetchData(url + "?id_file=" + id_file, "GET");
-          if (res?.status && (res?.obj?.cantidad ?? 0 ) >= cantidad_estimada) {
+          if (res?.status && (res?.obj?.cantidad ?? 0) >= cantidad_estimada) {
             res.msg = `Se han realizado ${res?.obj?.cantidad ?? 0} ajustes de manera masiva`
             return res;
           }
-        } catch (err) {}
+        } catch (err) { }
         await new Promise(resolve => setTimeout(resolve, 10000 * 1));
       }
-      throw {"msg":"Error al validar los ajustes procesados, validar de manera manual"}
+      throw { "msg": "Error al validar los ajustes procesados, validar de manera manual" }
     }
 
   };
 };
 
-export const getConsultaComercios = () =>{
+export const getConsultaComercios = () => {
   return `${urlCupo}/servicio-cupo/cupo-paginated`
 };
 export const getConsultaCupoComercio = buildGetFunction(
@@ -109,6 +109,14 @@ export const cargarArchivoAjusteCupoMasivo = validarAjustesMasivos(
   )
 );
 
-export const getConsultaDtlMovCupo = () =>{
+export const getConsultaDtlMovCupo = () => {
   return `${urlCupo}/servicio-cupo/dtlcupo/sinpdf`
 };
+
+export const getConsultaAsignacionCupoLimite = () => {
+  return `${urlCupo}/servicio-cupo/modificacion-cupo`
+};
+
+export const getConsultaComercioEspecifico = buildGetFunction(
+  `${urlCupo}/servicio-cupo/consultar-comercio-especifico`
+);

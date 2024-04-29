@@ -4,8 +4,8 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { fetchCustom } from "../../utils/fetchCajaSocial";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Input from "../../../../../components/Base/Input";
-import { notifyPending } from "../../../../../utils/notify";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
+import { notifyError } from "../../../../../utils/notify";
 
 const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
 
@@ -50,30 +50,18 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
           sortBy: "pk_convenios",
           sortDir: "DESC",
         };
-        notifyPending(
-          peticionConsultaConvenio({}, data),
-          {
-            render: () => {
-              return "Procesando consulta";
-            },
-          },
-          {
-            render: ({ data: res }) => {
-              setDataConvenios((old) => {
-                return { ...old, convenios: res.obj.results ?? [] };
-              });
-              setMaxPages(res.obj.maxPages ?? 0);
-              return res?.msg ?? "Consulta satisfactoria";
-            },
-          },
-          {
-            render: ({ data: error }) => {
-              validNavigate(-1);
-              return error?.message ?? "Consulta fallida";
-            },
-          }
-          // { toastId: "1" }
-        );
+        peticionConsultaConvenio({}, data)
+          .then((res) => {
+            setDataConvenios((old) => {
+              return { ...old, convenios: res.obj.results ?? [] };
+            });
+            setMaxPages(res.obj.maxPages ?? 0);
+            return res?.msg ?? "Consulta satisfactoria";
+          })
+          .catch((error) => {
+            validNavigate(-1);
+            notifyError(error?.message ?? "Consulta fallida");
+          });
       },
       [dataConvenios, limit, page]
     ),
@@ -110,12 +98,18 @@ const SeleccionConvenioRecaudoServiciosCajaSocial = () => {
       if (!isNaN(value)) {
         value = value.replace(/[\s\.\-+eE]/g, "");
         setDataConvenios((old) => {
-          return { ...old, filterConvenio: { [ev.target.name]: value } };
+          return {
+            ...old,
+            filterConvenio: { ...old.filterConvenio, [ev.target.name]: value },
+          };
         });
       }
     } else {
       setDataConvenios((old) => {
-        return { ...old, filterConvenio: { [ev.target.name]: value } };
+        return {
+          ...old,
+          filterConvenio: { ...old.filterConvenio, [ev.target.name]: value },
+        };
       });
     }
   }, []);

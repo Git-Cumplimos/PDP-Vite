@@ -17,7 +17,7 @@ import Modal from "../../../../components/Base/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
-import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
+import { enumParametrosCajaSocial } from "../utils/enumParametrosCajaSocial";
 import {
   algoCheckCreditoLendingCajaSocial,
   algoCheckCuentaCreditoBMCajaSocial,

@@ -11,7 +11,7 @@ export const ComponentsModalSummaryTrx = ({
   numeroPin,
   tipoIdentificacion,
   numeroIdentificacion,
-  valorTansaccion
+  valorTransaccion
 }) => {
   return (
     <Fragment>
@@ -27,7 +27,7 @@ export const ComponentsModalSummaryTrx = ({
           tipoIdentificacion == 4? "NIT":
           tipoIdentificacion == 5? "Pasaporte":"",
           "Número de identificación": numeroIdentificacion,
-          "Valor del Pin": valorTansaccion,
+          "Valor del Pin": valorTransaccion,
         }}
       >
         {!loadingPeticion ? (

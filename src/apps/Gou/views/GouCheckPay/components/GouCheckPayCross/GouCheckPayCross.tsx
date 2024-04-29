@@ -14,8 +14,17 @@ import {
   TypingSummaryTrx,
   TypingTrx,
 } from "../../../../utils/utils_typing";
-import { ajust_tam_see } from "../../../../utils/utils_function";
+import {
+  ajust_tam_see,
+  dict_segun_order,
+  dict_summary_trx_own,
+  list_a_dict_segun_order,
+} from "../../../../utils/utils_function";
 import classes from "./GouCheckPayCross.module.css";
+import {
+  constOrderSummary,
+  constRelationshipSummary,
+} from "../../../../utils/utils_const";
 
 //FRAGMENT ******************** CONST *******************************
 const { contendorBorder, contendorIdLog, contendorPago } = classes;
@@ -62,12 +71,23 @@ const GouCheckPayCross = ({
           <PaymentSummary
             title={trx.msg}
             subtitle={summaryTrx?.msg ?? ""}
-            summaryTrx={summaryTrx.summary_trx}
+            summaryTrx={{
+              ...list_a_dict_segun_order(
+                summaryTrx?.summary_trx_asterisk ?? []
+              ),
+              ...dict_segun_order(
+                constOrderSummary,
+                dict_summary_trx_own(constRelationshipSummary, {
+                  ...(summaryTrx?.summary_trx_own ?? {}),
+                  status: trx.status !== "Search" ? trx.status : undefined,
+                  id_trx: summaryTrx?.id_trx,
+                })
+              ),
+            }}
           >
-            {dataPath?.id_hash &&
-              summaryTrx?.summary_trx?.["Id transacción"] === undefined && (
-                <label>{ajust_tam_see(dataPath.id_hash, 50)}</label>
-              )}
+            {dataPath?.id_hash && !summaryTrx?.id_trx && (
+              <label>{ajust_tam_see(dataPath.id_hash, 50)}</label>
+            )}
 
             {summaryTrx.valor_trx && (
               <Fragment>
