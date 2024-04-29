@@ -129,9 +129,19 @@ const TicketsDavivienda = ({
         <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
           {commerceName ?? ""}
         </h1>
-        {/* <h1 className='uppercase text-center px-8 my-1 text-sm font-semibold'>
-          Transacción exitosa
-        </h1> */}
+        {commerceInfo[3][1] === 0 &&
+        commerceName === "PAGO POR GIRO DAVIVIENDA" ? (
+          <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
+            TRANSACCIÓN DECLINADA
+          </h1>
+        ) : commerceInfo[3][1] === "Consulta Transacción" &&
+          commerceName === "PAGO POR GIRO DAVIVIENDA" ? (
+          <></>
+        ) : (
+          <h1 className="uppercase text-center px-8 my-1 text-sm font-semibold">
+            TRANSACCIÓN EXITOSA
+          </h1>
+        )}
         <div className="flex flex-col gap-1 px-2 text-xs">
           {trxInfo
             .map((e, i, arr) => {

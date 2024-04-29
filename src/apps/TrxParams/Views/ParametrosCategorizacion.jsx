@@ -35,6 +35,7 @@ const ParametrosCategorizacion = () => {
 
   // Data zonas y categorias
   const [zonas, setZonas] = useState([]);
+  const [allCategorias, setAllCategorias] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [selectedCategoria, setSelectedCategoria] = useState({
     id_categoria: "",
@@ -44,6 +45,7 @@ const ParametrosCategorizacion = () => {
     edit: false,
     subcategorias: [],
   });
+  const [editClone, setEditClone] = useState({});
   const tableCategorias = useMemo(() => {
     return [
       ...categorias.map((cat) => {
@@ -117,6 +119,21 @@ const ParametrosCategorizacion = () => {
         ],
         edit: true,
       });
+      setEditClone({
+        id_categoria: selected.id_categoria,
+        fk_zona: selected.fk_zona,
+        nombre: selected.nombre,
+        img_url: selected.img_url,
+        subcategorias: [
+          ...selected.subcategorias.map((sub) => {
+            return {
+              ...sub,
+              deletion: false,
+            };
+          }),
+        ],
+        edit: true,
+      });
       setShowModal(true);
     },
     [categorias]
@@ -132,6 +149,14 @@ const ParametrosCategorizacion = () => {
   );
 
   const fetchAllCategorias = useCallback(() => {
+    fetchCategorias({ page: 1, limit: 1000 })
+      .then((res) => {
+        setAllCategorias(res?.results);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  const fetchCategoriasPages = useCallback(() => {
     fetchCategorias({ page, limit })
       .then((res) => {
         setCategorias(res?.results);
@@ -141,10 +166,9 @@ const ParametrosCategorizacion = () => {
   }, [page, limit]);
 
   const fetchAllZonas = useCallback(() => {
-    fetchZonas()
+    fetchZonas({ page: 1, limit: 1000 })
       .then((res) => {
         setZonas(res?.results);
-        // setMaxPages(res?.maxPages);
       })
       .catch((err) => console.error(err));
   }, []);
@@ -152,13 +176,50 @@ const ParametrosCategorizacion = () => {
   useEffect(() => {
     fetchAllZonas();
     fetchAllCategorias();
-  }, [page, limit, searchAuto, fetchAllCategorias, fetchAllZonas]);
+    fetchCategoriasPages();
+  }, [
+    page,
+    limit,
+    searchAuto,
+    fetchCategoriasPages,
+    fetchAllZonas,
+    fetchAllCategorias,
+  ]);
 
   const createCategoria = useCallback(async () => {
+    // Validar que el formulario esté completo
+    if (
+      !selectedCategoria.nombre ||
+      !selectedCategoria.img_url ||
+      !selectedCategoria.fk_zona
+    ) {
+      notifyError("Debe completar todos los campos");
+      return;
+    }
+    if (!selectedCategoria.img_url.length) {
+      notifyError("Debe seleccionar una imagen");
+      return;
+    }
+    // Validar que la categoria tenga subcategorias
+    if (selectedCategoria.subcategorias.length === 0) {
+      notifyError("Debe agregar al menos una subcategoria");
+      return;
+    }
+    // Validar que las subcategorias tengan todos los campos completos
+    if (
+      selectedCategoria.subcategorias.some((sub) => !sub.nombre || !sub.img_url)
+    ) {
+      notifyError("Debe completar todos los campos de las subcategorias");
+      return;
+    }
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = categorias.map((cat) => cat.nombre.toLowerCase());
+    const categoriasNames = allCategorias
+      .filter((cat) => cat.fk_zona === selectedCategoria.fk_zona)
+      .map((cat) => cat.nombre.toLowerCase());
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
-      notifyError("No pueden existir categorias con el mismo nombre");
+      notifyError(
+        "No pueden existir categorias con el mismo nombre en la misma zona"
+      );
       return;
     }
     // Validar que las subcategorias no tengan el mismo nombre, validando mayúsculas y minúsculas
@@ -171,16 +232,33 @@ const ParametrosCategorizacion = () => {
       notifyError("No pueden existir subcategorias con el mismo nombre");
       return;
     }
+    // Validar que no tenga espacios al inicio y al final
+    if (
+      selectedCategoria.nombre.trim() !== selectedCategoria.nombre ||
+      selectedCategoria.subcategorias.some(
+        (sub) => sub.nombre.trim() !== sub.nombre
+      )
+    ) {
+      notifyError("No puede haber espacios al inicio o al final del nombre");
+      return;
+    }
     const formData = new FormData();
     formData.append("nombre", selectedCategoria.nombre);
     formData.append("fk_zona", selectedCategoria.fk_zona);
 
     // Cargar imagen de categoria
     const formImgCategoria = new FormData();
-    const img_name = selectedCategoria.img_url[0].name
+    // const img_name = selectedCategoria.img_url[0].name
+    //   .replace(/ /g, "-")
+    //   .replace(/\//g, "-");
+    const img_name = `${selectedCategoria.img_url[0].name
       .replace(/ /g, "-")
-      .replace(/\//g, "-");
-    formImgCategoria.append("img_name", img_name);
+      .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+    const extension = selectedCategoria.img_url[0].name.split(".").pop();
+
+    const img_name_with_extension = `${img_name}.${extension}`;
+    formImgCategoria.append("img_name", img_name_with_extension);
     formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
 
     try {
@@ -191,7 +269,7 @@ const ParametrosCategorizacion = () => {
       );
       if (response.ok) {
         // console.log("Archivo cargado exitosamente.", response);
-        formData.append("img_url", img_name);
+        formData.append("img_url", img_name_with_extension);
       } else {
         console.error("Error al cargar el archivo:", response.statusText);
         // Detener la ejecución si hay un error
@@ -220,10 +298,14 @@ const ParametrosCategorizacion = () => {
             formSubcat.append(`fk_zona`, selectedCategoria.fk_zona);
             // Cargar imagen de cada subcategoria
             const formImgSubCategoria = new FormData();
-            const img_name = sub.img_url[0].name
+            const img_name = `${sub.img_url[0].name
               .replace(/ /g, "-")
-              .replace(/\//g, "-");
-            formImgSubCategoria.append("img_name", img_name);
+              .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+            const extension = sub.img_url[0].name.split(".").pop();
+
+            const img_name_with_extension = `${img_name}.${extension}`;
+            formImgSubCategoria.append("img_name", img_name_with_extension);
             formImgSubCategoria.append("img_type", sub.img_url[0].type);
 
             try {
@@ -233,8 +315,8 @@ const ParametrosCategorizacion = () => {
                 sub.img_url[0]
               );
               if (response.ok) {
-                console.log("Archivo cargado exitosamente.", response);
-                formSubcat.append(`img_url`, img_name);
+                // console.log("Archivo cargado exitosamente.", response);
+                formSubcat.append(`img_url`, img_name_with_extension);
               } else {
                 console.error(
                   "Error al cargar el archivo:",
@@ -247,7 +329,7 @@ const ParametrosCategorizacion = () => {
               const resSub = await postCreateSubCategoria(formSubcat);
               console.log("CREACION DE SUBCATEGORIA", resSub);
               if (resSub?.status) {
-                notify(`Subcategoria ${sub.nombre} creada correctamente`);
+                // notify(`Subcategoria ${sub.nombre} creada correctamente`);
               } else {
                 notifyError(`Error al crear subcategoria ${sub.nombre}`);
               }
@@ -264,15 +346,51 @@ const ParametrosCategorizacion = () => {
       console.error(err);
     } finally {
       fetchAllCategorias();
+      fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchAllCategorias, handleClose, categorias]);
+  }, [
+    selectedCategoria,
+    fetchCategoriasPages,
+    handleClose,
+    allCategorias,
+    fetchAllCategorias,
+  ]);
 
   const editCategoria = useCallback(async () => {
+    // Validar que el formulario esté completo
+    if (
+      !selectedCategoria.nombre ||
+      !selectedCategoria.img_url ||
+      !selectedCategoria.fk_zona
+    ) {
+      notifyError("Debe completar todos los campos");
+      return;
+    }
+    // Validar que la categoria tenga subcategorias
+    if (selectedCategoria.subcategorias.length === 0) {
+      notifyError("Debe agregar al menos una subcategoria");
+      return;
+    }
+    // Validar que las subcategorias tengan todos los campos completos
+    const subcategoriasNamesFilled = selectedCategoria.subcategorias.map(
+      (sub) => sub.nombre
+    );
+    const subcategoriasNamesFilledSet = new Set(subcategoriasNamesFilled);
+    if (subcategoriasNamesFilled.length !== subcategoriasNamesFilledSet.size) {
+      notifyError("No pueden existir subcategorias con el mismo nombre");
+      return;
+    }
     // Validar que la categoria no tenga el mismo nombre, validando mayúsculas y minúsculas
-    const categoriasNames = categorias.map((cat) => cat.nombre.toLowerCase());
+    const categoriasNames = allCategorias
+      .filter((cat) => cat.id_categoria !== selectedCategoria.id_categoria) // Excluir la categoría que se está editando
+      .filter((cat) => cat.fk_zona === selectedCategoria.fk_zona) // Filtrar por la misma fk_zona
+      .map((cat) => cat.nombre.toLowerCase());
+
     if (categoriasNames.includes(selectedCategoria.nombre.toLowerCase())) {
-      notifyError("No pueden existir categorias con el mismo nombre");
+      notifyError(
+        "No pueden existir categorias con el mismo nombre en la misma zona"
+      );
       return;
     }
     // Validar que las subcategorias no tengan el mismo nombre, validando mayúsculas y minúsculas
@@ -285,6 +403,16 @@ const ParametrosCategorizacion = () => {
       notifyError("No pueden existir subcategorias con el mismo nombre");
       return;
     }
+    // Validar que no tenga espacios al inicio y al final
+    if (
+      selectedCategoria.nombre.trim() !== selectedCategoria.nombre ||
+      selectedCategoria.subcategorias.some(
+        (sub) => sub.nombre.trim() !== sub.nombre
+      )
+    ) {
+      notifyError("No puede haber espacios al inicio o al final del nombre");
+      return;
+    }
     const formData = new FormData();
     formData.append("id_categoria", selectedCategoria.id_categoria);
     formData.append("nombre", selectedCategoria.nombre);
@@ -294,10 +422,14 @@ const ParametrosCategorizacion = () => {
       formData.append("img_url", selectedCategoria.img_url);
     } else {
       const formImgCategoria = new FormData();
-      const img_name = selectedCategoria.img_url[0].name
+      const img_name = `${selectedCategoria.img_url[0].name
         .replace(/ /g, "-")
-        .replace(/\//g, "-");
-      formImgCategoria.append("img_name", img_name);
+        .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+      const extension = selectedCategoria.img_url[0].name.split(".").pop();
+
+      const img_name_with_extension = `${img_name}.${extension}`;
+      formImgCategoria.append("img_name", img_name_with_extension);
       formImgCategoria.append("img_type", selectedCategoria.img_url[0].type);
 
       // Iterar sobre FormData y mostrar en la consola
@@ -313,7 +445,7 @@ const ParametrosCategorizacion = () => {
         );
         if (response.ok) {
           // console.log("Archivo cargado exitosamente.", response);
-          formData.append("img_url", img_name);
+          formData.append("img_url", img_name_with_extension);
         } else {
           console.error("Error al cargar el archivo:", response.statusText);
           // Detener la ejecución si hay un error
@@ -345,10 +477,14 @@ const ParametrosCategorizacion = () => {
               formSubcat.append(`img_url`, sub.img_url);
             } else {
               const formImgSubCategoria = new FormData();
-              const img_name = sub.img_url[0].name
+              const img_name = `${sub.img_url[0].name
                 .replace(/ /g, "-")
-                .replace(/\//g, "-");
-              formImgSubCategoria.append("img_name", img_name);
+                .replace(/\//g, "-")}-${new Date().toISOString().slice(0, 10)}`;
+
+              const extension = sub.img_url[0].name.split(".").pop();
+
+              const img_name_with_extension = `${img_name}.${extension}`;
+              formImgSubCategoria.append("img_name", img_name_with_extension);
               formImgSubCategoria.append("img_type", sub.img_url[0].type);
 
               try {
@@ -359,7 +495,7 @@ const ParametrosCategorizacion = () => {
                 );
                 if (response.ok) {
                   // console.log("Archivo cargado exitosamente.", response);
-                  formSubcat.append(`img_url`, img_name);
+                  formSubcat.append(`img_url`, img_name_with_extension);
                 } else {
                   console.error(
                     "Error al cargar el archivo:",
@@ -393,7 +529,7 @@ const ParametrosCategorizacion = () => {
                 const resSub = await postCreateSubCategoria(formSubcat);
                 // console.log("CREACION DE SUBCATEGORIA", resSub);
                 if (resSub?.status) {
-                  notify(`Subcategoria ${sub.nombre} creada correctamente`);
+                  // notify(`Subcategoria ${sub.nombre} creada correctamente`);
                 } else {
                   notifyError(`Error al crear subcategoria ${sub.nombre}`);
                 }
@@ -401,7 +537,7 @@ const ParametrosCategorizacion = () => {
                 const resSub = await putEditSubCategoria(formSubcat);
                 console.log("EDICION DE SUBCATEGORIA", resSub);
                 if (resSub?.status) {
-                  notify(`Subcategoria ${sub.nombre} editada correctamente`);
+                  // notify(`Subcategoria ${sub.nombre} editada correctamente`);
                 } else {
                   notifyError(`Error al editar subcategoria ${sub.nombre}`);
                 }
@@ -420,9 +556,16 @@ const ParametrosCategorizacion = () => {
     } finally {
       notify("Categoria editada correctamente");
       fetchAllCategorias();
+      fetchCategoriasPages();
       handleClose();
     }
-  }, [selectedCategoria, fetchAllCategorias, handleClose, categorias]);
+  }, [
+    selectedCategoria,
+    fetchCategoriasPages,
+    handleClose,
+    allCategorias,
+    fetchAllCategorias,
+  ]);
 
   // const deleteCategoria = useCallback(async () => {
   //   const body = {
@@ -434,7 +577,7 @@ const ParametrosCategorizacion = () => {
   //     console.log(res);
   //     if (res?.status) {
   //       notify("Categoria eliminada correctamente");
-  //       fetchAllCategorias();
+  //       fetchCategoriasPages();
   //       handleClose();
   //     } else {
   //       notifyError("Error al eliminar categoria");
@@ -443,7 +586,7 @@ const ParametrosCategorizacion = () => {
   //     notifyError("Error al eliminar categoría");
   //     console.error(err);
   //   }
-  // }, [selectedCategoria, fetchAllCategorias, handleClose]);
+  // }, [selectedCategoria, fetchCategoriasPages, handleClose]);
 
   return (
     <Fragment>
@@ -474,7 +617,7 @@ const ParametrosCategorizacion = () => {
           <Input
             id="Nombre categoria"
             name="nombre"
-            label={"Nombre categoria"}
+            label={"Nombre categoría"}
             type="text"
             autoComplete="off"
             value={selectedCategoria.nombre}
@@ -491,6 +634,7 @@ const ParametrosCategorizacion = () => {
             value={selectedCategoria.fk_zona}
             label="Zona"
             options={selectZonas}
+            required
             onChange={(e) => {
               setSelectedCategoria((old) => ({
                 ...old,
@@ -499,12 +643,12 @@ const ParametrosCategorizacion = () => {
             }}
           />
           <FileInput
-            id="Imagen categoria"
+            id="Imagen categoría"
             name="img_url"
             label={"Seleccionar imagen"}
             type="file"
             autoComplete="off"
-            required={selectedCategoria.edit ? false : true}
+            // required={selectedCategoria.edit ? false : true}
             onGetFile={(file) => {
               // console.log(file);
               if (file[0]?.size > 1000000) {
@@ -530,7 +674,7 @@ const ParametrosCategorizacion = () => {
                     ? URL.createObjectURL(selectedCategoria?.img_url[0])
                     : ""
                 }
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -547,7 +691,7 @@ const ParametrosCategorizacion = () => {
             <div className="flex flex-col items-center justify-center">
               <img
                 src={selectedCategoria.img_url}
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -563,7 +707,7 @@ const ParametrosCategorizacion = () => {
                     ? URL.createObjectURL(selectedCategoria?.img_url[0])
                     : ""
                 }
-                alt="Imagen sub-categoria"
+                alt="Imagen sub-categoría"
                 width="100"
                 height="100"
                 className="max-w-xs"
@@ -580,7 +724,7 @@ const ParametrosCategorizacion = () => {
               JPG
             </p>
           )}
-          <Fieldset legend="Sub-Categorias">
+          <Fieldset legend="Sub-Categorías">
             {selectedCategoria.subcategorias?.map(
               (subcategoria, index) =>
                 !subcategoria.deletion && (
@@ -589,7 +733,7 @@ const ParametrosCategorizacion = () => {
                       key={index}
                       id="Nombre sub-categoria"
                       name="nombre"
-                      label={"Nombre sub-categoria"}
+                      label={"Nombre sub-categoría"}
                       type="text"
                       autoComplete="off"
                       value={subcategoria.nombre}
@@ -615,9 +759,16 @@ const ParametrosCategorizacion = () => {
                       label={"Seleccionar imagen"}
                       type="file"
                       autoComplete="off"
-                      required={selectedCategoria.edit ? false : true}
+                      disabled={subcategoria.nombre === ""}
+                      // required={selectedCategoria.edit ? false : true}
                       onGetFile={(file) => {
                         // console.log(file);
+                        if (subcategoria.nombre === "") {
+                          notifyError(
+                            "Primero debe ingresar un nombre para la sub-categoría"
+                          );
+                          return;
+                        }
                         if (file[0]?.size > 1000000) {
                           notifyError(
                             "El peso de la imagen no debe ser mayor a 1MB"
@@ -658,7 +809,35 @@ const ParametrosCategorizacion = () => {
                               ? URL.createObjectURL(subcategoria.img_url[0])
                               : ""
                           }
-                          alt="Imagen sub-categoria"
+                          alt="Imagen sub-categoría"
+                          width="100"
+                          height="100"
+                          className="max-w-xs"
+                        />
+                        {subcategoria.img_url && (
+                          <p>
+                            Peso de la imagen:{" "}
+                            {subcategoria.img_url[0]?.size
+                              ? (
+                                  subcategoria.img_url[0].size / 1000000
+                                ).toFixed(2)
+                              : 0}{" "}
+                            MB
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {!selectedCategoria.edit && subcategoria.img_url && (
+                      <div className="flex flex-col items-center justify-center">
+                        <img
+                          src={
+                            typeof subcategoria.img_url === "string"
+                              ? subcategoria.img_url
+                              : subcategoria.img_url[0]
+                              ? URL.createObjectURL(subcategoria.img_url[0])
+                              : ""
+                          }
+                          alt="Imagen sub-categoría"
                           width="100"
                           height="100"
                           className="max-w-xs"
@@ -711,18 +890,25 @@ const ParametrosCategorizacion = () => {
                       <Button
                         type="button"
                         onClick={() => {
-                          setSelectedCategoria((old) => ({
-                            ...old,
-                            subcategorias: old.subcategorias.map((sub) => {
-                              if (sub === subcategoria) {
-                                return {
-                                  ...sub,
-                                  deletion: true,
-                                };
-                              }
-                              return sub;
-                            }),
-                          }));
+                          selectedCategoria.edit
+                            ? setSelectedCategoria((old) => ({
+                                ...old,
+                                subcategorias: old.subcategorias.map((sub) => {
+                                  if (sub === subcategoria) {
+                                    return {
+                                      ...sub,
+                                      deletion: true,
+                                    };
+                                  }
+                                  return sub;
+                                }),
+                              }))
+                            : setSelectedCategoria((old) => ({
+                                ...old,
+                                subcategorias: old.subcategorias.filter(
+                                  (sub) => sub !== subcategoria
+                                ),
+                              }));
                         }}
                       >
                         Eliminar
@@ -747,7 +933,7 @@ const ParametrosCategorizacion = () => {
                   }));
                 }}
               >
-                Crear sub-categoria
+                Crear sub-categoría
               </Button>
             </ButtonBar>
           </Fieldset>
@@ -758,19 +944,18 @@ const ParametrosCategorizacion = () => {
                 Eliminar
               </Button>
             )} */}
-            <Button type="button" onClick={handleClose}>
+            <Button
+              type="button"
+              onClick={handleClose}
+            >
               Cancelar
             </Button>
             <Button
               type="submit"
               disabled={
-                !selectedCategoria.nombre ||
-                !selectedCategoria.img_url?.length ||
-                !selectedCategoria.fk_zona ||
-                selectedCategoria.subcategorias.length === 0 ||
-                selectedCategoria.subcategorias.some(
-                  (sub) => !sub.nombre || !sub.img_url
-                )
+                selectedCategoria.edit &&
+                // Validar que se hayan hecho cambios
+                JSON.stringify(selectedCategoria) === JSON.stringify(editClone)
               }
             >
               {selectedCategoria.edit ? "Editar la información" : "Aceptar"}

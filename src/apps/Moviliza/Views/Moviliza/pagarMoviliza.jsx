@@ -216,14 +216,14 @@ const PagarMoviliza = () => {
             peticionConsultMoviliza({}, dataConsulta)
             .then((response) => {
                 if (response?.status === true) {
-                  if (response?.obj?.object?.estado != "PAGADO"){
+                  if (response?.obj?.object?.estado == "EMITIDO"){
                   setResConsultMoviliza(response?.obj);
                   setPaso("ResumenTrx");
                   setShowModal(true);
                   // notify ("Respuesta PDP: Consulta realizada");
                   }
                   else{
-                    notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
+                    notifyError ("Respuesta PDP: Liquidación no se encuentra en estado EMITIDO");
                     navigate("/");
                     navigate("/moviliza");
                   }
@@ -318,13 +318,13 @@ const PagarMoviliza = () => {
           peticionConsultMoviliza({}, data)
             .then((response) => {
                 if (response?.status === true) {
-                  if (response?.obj?.object?.estado != "PAGADO"){
+                  if (response?.obj?.object?.estado == "EMITIDO"){
                   setResConsultMoviliza(response?.obj);
                   setPaso("ResumenTrx");
                   setShowModal(true);
                   }
                   else{
-                    notifyError ("Respuesta PDP: Liquidación se encuentra en estado PAGADO");
+                    notifyError ("Respuesta PDP: Liquidación no se encuentra en estado EMITIDO");
                     navigate("/");
                     navigate("/moviliza");
                   }
@@ -343,9 +343,16 @@ const PagarMoviliza = () => {
                         }
                 }
                     else{
-                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                      navigate("/");
-                      navigate("/moviliza");
+                      if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
+                        notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
+                        navigate("/");
+                        navigate("/moviliza");
+                      }
+                      else{
+                        notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                        navigate("/");
+                        navigate("/moviliza");
+                      }
                     }
                 }
                }
@@ -539,7 +546,7 @@ const PagarMoviliza = () => {
   const HandleCloseTrx = useCallback(() => {
     setPaso("LecturaBarcode");
     setShowModal(false);
-    notifyError("Respuesta PDP: Transacción cancelada");
+    notifyError("Respuesta PDP: Transacción cancelada por el usuario");
     setNumeroMoviliza("");
     setDatosTrans({ codBarras: "" })
     setCambioBarcodeBoton(false)
@@ -614,6 +621,7 @@ const PagarMoviliza = () => {
         {/******************************Respuesta Lectura runt*******************************************************/}
         {paso === "LecturaMoviliza" && (
           <LecturaMoviliza
+            loadingPeticionJwt = {loadingPeticionJwt}
             loadingPeticion={loadingPeticionConsultMoviliza}
             onSubmit={onSubmitConsultMoviliza}
             handleClose={HandleCloseTrx}
@@ -622,7 +630,8 @@ const PagarMoviliza = () => {
             option_barcode={option_barcode}
             option_manual={option_manual}
             numeroMoviliza={numeroMoviliza}
-            token={token}></LecturaMoviliza>
+            token={token}>
+            </LecturaMoviliza>
         )}
         {/******************************Respuesta Lectura runt*******************************************************/}
 

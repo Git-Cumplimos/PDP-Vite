@@ -115,7 +115,10 @@ const ConsultarPago = () => {
     <Fragment>
       <SimpleLoading show={loadingPeticionMicrositio}></SimpleLoading>
       <h1 className="text-3xl mt-6">Consulta Pagos</h1>
-      <Form className=" flex flex-col content-center items-center">
+      <Form
+        className=" flex flex-col content-center items-center"
+        onSubmit={onSubmitConsulta}
+      >
         <div className={styleComponents}>
           <Input
             id="numLiquidacion"
@@ -123,7 +126,7 @@ const ConsultarPago = () => {
             type="text"
             minLength="1"
             maxLength="30"
-            required={true}
+            required
             autoComplete="off"
             value={numLiquidacion}
             disabled={enable}
@@ -136,11 +139,7 @@ const ConsultarPago = () => {
           />
         </div>
         <ButtonBar className="flex justify-center py-6">
-          <Button
-            type="submit"
-            onClick={onSubmitConsulta}
-            disabled={loadingPeticionMicrositio || enable}
-          >
+          <Button type="submit" disabled={loadingPeticionMicrositio || enable}>
             Realizar consulta
           </Button>
           <Button

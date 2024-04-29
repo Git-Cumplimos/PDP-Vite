@@ -47,6 +47,14 @@ import rutasPinesCea, {
   listPermissionsPinesCea,
 } from "../apps/PinesCea/routes";
 
+import rutasPinesCrcOlimpia, {
+  listPermissionsPinesCrcOlimpia,
+} from "../apps/PinesCrc/PinesCrcOlimpia/routes";
+
+import rutasPinesCeaOlimpia, {
+  listPermissionsPinesCeaOlimpia,
+} from "../apps/PinesCea/PinesCeaOlimpia/routes";
+
 /**
  * * Providers
  */
@@ -82,8 +90,14 @@ import rutasRecargasTranscaribe from "../apps/TransCaribe/routes";
 import rutasCajaSocialCB, {
   listPermissionsCajaSocial,
 } from "../apps/Corresponsalia/CorresponsaliaCajaSocial/routes";
+import rutasItauCB, {
+  listPermissionsItau,
+} from "../apps/Corresponsalia/CorresponsaliaItau/routes";
 
 import routesItau from "../apps/ConveniosItau/routes";
+import routesGestionBCS from "../apps/GestionBCS/routes";
+import routesGouCheckPay from "../apps/Gou/routes";
+import routesEvertecCheckPay from "../apps/Evertec/routes";
 /**
 
  * * Logos
@@ -383,6 +397,20 @@ const PinesCombinados = lazy(() =>
   import("../apps/PinesVus/Views/PinesCombinados/CrearPin")
 );
 
+/**
+ * Cerolio
+ */
+const Cerolio = lazy(() => import("../apps/Cerolio/Views/Cerolio"));
+const CerolioAgendar = lazy(() =>
+  import("../apps/Cerolio/Views/Agenda/Agenda")
+);
+const CerolioReportes = lazy(() =>
+  import("../apps/Cerolio/Views/Reportes/Reportes")
+);
+const CerolioTarifas = lazy(() =>
+  import("../apps/Cerolio/Views/Tarifas/Tarifas")
+);
+
 const allUrlsPrivateApps = [
   {
     link: "https://portal.solucionesenred.co/",
@@ -482,6 +510,7 @@ const allUrlsPrivateApps = [
       rutasGestionGrupoAval,
       rutasGestionAgrario,
       routesItau,
+      routesGestionBCS,
     ],
   },
   {
@@ -724,6 +753,8 @@ const allUrlsPrivateApps = [
       enumPermisosPractisistemas.practisistemasPines,
       ...listPermissionsPinesCrc,
       ...listPermissionsPinesCea,
+      ...listPermissionsPinesCrcOlimpia,
+      ...listPermissionsPinesCeaOlimpia,
     ],
     provider: ProvidepinesVus,
     subRoutes: [
@@ -731,6 +762,8 @@ const allUrlsPrivateApps = [
       rutasPinesVus,
       rutasPinesCrc,
       rutasPinesCea,
+      rutasPinesCrcOlimpia,
+      rutasPinesCeaOlimpia,
       {
         link: "/Pines/Combinados",
         label: <AppIcons Logo={"PINES"} name={"Pines Combinados"} />,
@@ -784,13 +817,13 @@ const allUrlsPrivateApps = [
         permission: [62],
       },
       {
-        link: "/cupo/ajuste-deuda-cupo",
-        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste deuda cupo"} />,
+        link: "/cupo/ajuste-cartera-cupo",
+        label: <AppIcons Logo={"RECAUDO"} name={"Ajuste cartera cupo"} />,
         component: AjusteCupo,
         permission: [59],
       },
       {
-        link: "/cupo/cupo-comercio/detalles-cupo",
+        link: "/cupo/detalles-movimiento-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Detalle movimiento cupo"} />,
         component: DtlMovCupo,
         permission: [62],
@@ -811,7 +844,7 @@ const allUrlsPrivateApps = [
         link: "/cupo/detalle-modificacion-cupo",
         label: <AppIcons Logo={"RECAUDO"} name={"Detalle modificación cupo"} />,
         component: DetalleModificacionCupo,
-        permission: [1],
+        permission: [20002],
       },
       {
         link: "/cupo/tipos-movimientos-cupo",
@@ -854,6 +887,7 @@ const allUrlsPrivateApps = [
       ...listPermissionsAgrario,
       ...listPermissionsRecaudoMultiple,
       ...listPermissionsCajaSocial,
+      ...listPermissionsItau,
     ],
     subRoutes: [
       rutasDaviviendaCB,
@@ -862,6 +896,7 @@ const allUrlsPrivateApps = [
       rutasColpatria,
       rutasRecaudoMultiple,
       rutasCajaSocialCB,
+      rutasItauCB,
     ],
   },
   routesDaviplata,
@@ -1210,6 +1245,10 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
+  //Modulo Gou
+  routesEvertecCheckPay,
+  //Modulo Gou
+  routesGouCheckPay,
   //Modulo Recarga Cupo
   routesRecargaCupo,
   //Modulo Nequi
@@ -1218,6 +1257,33 @@ const allUrlsPrivateApps = [
   rutasCreditosPdp,
   //Modulo transcaribe
   rutasRecargasTranscaribe,
+  // Módulo Cerolio
+  {
+    link: "/cerolio",
+    label: <AppIcons Logo={"MARKETPLACE"} name="Cerolio" />,
+    component: Cerolio,
+    permission: [1],
+    subRoutes: [
+      {
+        link: "/cerolio/agendar",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Agendas" />,
+        component: CerolioAgendar,
+        permission: [1],
+      },
+      {
+        link: "/cerolio/tarifas",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Configuración Tarifas" />,
+        component: CerolioTarifas,
+        permission: [1],
+      },
+      {
+        link: "/cerolio/reportes",
+        label: <AppIcons Logo={"MARKETPLACE"} name="Reportes" />,
+        component: CerolioReportes,
+        permission: [1],
+      },
+    ],
+  },
 ];
 
 export { allUrlsPrivateApps };

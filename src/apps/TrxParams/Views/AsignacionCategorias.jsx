@@ -22,7 +22,6 @@ import Accordion from "../../../components/Base/Accordion";
 import { fetchAllCategorias } from "../../../pages/Categorias/utils/fetchHome";
 import TextArea from "../../../components/Base/TextArea";
 import { postAssign } from "../utils/fetchParametrosAsignaciones";
-import { toast } from "react-toastify";
 
 const AsignacionCategorias = () => {
   const { allRoutes } = useUrls();
@@ -139,16 +138,8 @@ const AsignacionCategorias = () => {
       edit: false,
     });
   }, []);
-  // const handleShowModal = useCallback(() => {
-  //   setShowModal(true);
-  //   setSelectedAsignacion({
-  //     app: "",
-  //     id_categoria: "",
-  //     id_subcategoria: "",
-  //     subcategorias: [],
-  //     edit: false,
-  //   });
-  // }, []);
+
+  const [editClone, setEditClone] = useState({});
 
   const onSelectCategorias = useCallback(
     async (e, i) => {
@@ -158,7 +149,14 @@ const AsignacionCategorias = () => {
         id_categoria: selected.id_categoria,
         id_subcategoria: "",
         subcategorias: selected.subcategorias,
-        edit: false,
+        edit: true,
+      });
+      setEditClone({
+        app: "",
+        id_categoria: selected.id_categoria,
+        id_subcategoria: "",
+        subcategorias: selected.subcategorias,
+        edit: true,
       });
       const subcategorias = categorias.find(
         (cat) => cat.id_categoria === parseInt(selected.id_categoria)
@@ -261,6 +259,7 @@ const AsignacionCategorias = () => {
   }, [page, limit, searchAuto, fetchAllCategoriasFunc, fetchAllZonas]);
 
   const assignCategorias = useCallback(async () => {
+    console.log(selectedAsignacion);
     for (const subcat of selectedAsignacion.subcategorias) {
       const body = {
         id_categoria: subcat.id_categoria,
@@ -272,10 +271,10 @@ const AsignacionCategorias = () => {
         if (res?.status) {
           // notify(`Asignación creada correctamente a la subcategoria ${subcat.nombre}`);
         } else {
-          notifyError(`Error al asignar la subcategoria ${subcat.nombre}`);
+          notifyError(`Error al asignar la sub-categoría ${subcat.nombre}`);
         }
       } catch (err) {
-        notifyError(`Error al asignar la subcategoria ${subcat.nombre}`);
+        notifyError(`Error al asignar la sub-categoría ${subcat.nombre}`);
         console.error(err);
       }
     }
@@ -296,7 +295,7 @@ const AsignacionCategorias = () => {
         if (subcat) {
           if (subcat.comercios && subcat.comercios.includes(old.app)) {
             notifyError(
-              "La transacción ya está asignada a la subcategoría seleccionada."
+              "La transacción ya está asignada a la sub-categoría seleccionada."
             );
           } else {
             return {
@@ -382,7 +381,7 @@ const AsignacionCategorias = () => {
             <Select
               id="id_subcategoria"
               name="id_subcategoria"
-              label={"Subcategoría"}
+              label={"Sub-categoría"}
               value={selectedAsignacion.id_subcategoria}
               onChange={onChangeForm}
               options={selectSubcategorias}
@@ -505,7 +504,13 @@ const AsignacionCategorias = () => {
             <Button type="button" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!selectedAsignacion.edit}>
+            <Button
+              type="submit"
+              disabled={
+                selectedAsignacion.edit &&
+                JSON.stringify(editClone.subcategorias) === JSON.stringify(selectedAsignacion.subcategorias)
+              }
+            >
               Asignar Categoría
             </Button>
           </ButtonBar>

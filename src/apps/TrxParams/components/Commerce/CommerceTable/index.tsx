@@ -41,16 +41,19 @@ const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
           comercio_padre,
           nombre_comercio,
           numero_identificacion,
+          email_comercio,
           pk_comercio,
         }: {
           comercio_padre: string;
           nombre_comercio: string;
           numero_identificacion: number;
+          email_comercio: string;
           pk_comercio: number;
         }) => ({
           Id: pk_comercio,
           Comercio: nombre_comercio,
           Documento: numero_identificacion,
+          Email: email_comercio,
           "Comercio padre": comercio_padre ?? "Sin comercio padre",
         })
       ),
@@ -91,7 +94,7 @@ const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
     <Fragment>
       <DataTable
         title="Comercios"
-        headers={["Id", "Comercio", "Documento", "Comercio padre"]}
+        headers={["Id", "Comercio", "Documento", "Email", "Comercio padre"]}
         data={tableComercios}
         onClickRow={onSelectComercios}
         tblFooter={
@@ -148,6 +151,15 @@ const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
           maxLength={60}
           autoComplete="off"
           defaultValue={searchFilters.nombre_comercio}
+        />
+        <Input
+          id="email_comercio"
+          name="email_comercio"
+          label={"Email comercio"}
+          type="email"
+          maxLength={100}
+          autoComplete="off"
+          defaultValue={searchFilters.email_comercio}
         />
       </DataTable>
     </Fragment>

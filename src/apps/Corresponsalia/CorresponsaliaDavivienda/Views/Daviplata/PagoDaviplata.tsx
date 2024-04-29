@@ -278,7 +278,7 @@ const PagoDaviplata = () => {
                 equalError={false}
                 equalErrorMin={true}
                 minLength={1}
-                maxLength={13}
+                // maxLength={13} Se comentario por pruebas 18/03/2024
                 autoComplete="off"
                 // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
                 value={dataInput.valor_total_trx} //se usa este por que es sin decimales

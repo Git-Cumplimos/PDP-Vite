@@ -378,7 +378,7 @@ const rutasConfiguraciones = {
     },
     {
       link: "/params-operations/comercios-params",
-      label: <AppIcons Logo={"RECAUDO"} name={"Comercios"} />,
+      label: <AppIcons Logo={"RECAUDO"} name={"Parametrización comercios"} />,
       component: Comercios,
       permission: [enumPermisosTrx.comercios],
       subRoutes: [

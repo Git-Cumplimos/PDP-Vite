@@ -23,7 +23,7 @@ import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
 // Categorias
 import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
 import Subcategorias from "../pages/Categorias/Subcategorias";
-import { useImgs, useProvideImgsWithDispatch } from "./ImgsHooks";
+import { useProvideImgsWithDispatch } from "./ImgsHooks";
 import { fetchCategoriasImgs } from "../apps/TrxParams/utils/fetchParametrosCategorias";
 
 // Categorias
@@ -193,13 +193,11 @@ export const useProvideUrls = () => {
 
   const [urlsCategorias, setUrlsCategorias] = useState([]);
 
-  // const { imgs } = useImgs();
   const { imgs, svgs, dispatchImgs } = useProvideImgsWithDispatch();
 
   useEffect(() => {
     const fetchImgs = async () => {
       const res = await fetchCategoriasImgs();
-      console.log("res", res);
       if (res?.status) {
         // Actualizar imágenes en el contexto
         res?.obj.forEach(({ nombre, img_url }) => {
@@ -227,9 +225,7 @@ export const useProvideUrls = () => {
             const link = `/${props.nombre.replace(/\s+/g, "-")}`;
             const subcategoriasFiltradas = props.subcategorias.filter(
               (subcategoria) =>
-                subcategoria.status ||
-                subcategoria.comercios ||
-                subcategoria.comercios?.length > 0
+                subcategoria.comercios || subcategoria.comercios?.length > 0
             );
             const subcats = subcategoriasFiltradas.map((subcategoria) => {
               const linkSubcat = `${link}/${subcategoria.nombre.replace(
@@ -239,7 +235,7 @@ export const useProvideUrls = () => {
               const logo = (
                 <AppIcons
                   Logo={
-                    subcategoria.nombre ? subcategoria.nombre : "MARKETPLACE"
+                    subcategoria.img_url ? subcategoria.img_url : "MARKETPLACE"
                   }
                   name={subcategoria.nombre}
                 />
@@ -247,6 +243,7 @@ export const useProvideUrls = () => {
               return {
                 link: linkSubcat,
                 label: logo,
+                status: subcategoria.status,
                 component: (props) => (
                   <Subcategorias
                     {...props}
@@ -267,6 +264,7 @@ export const useProvideUrls = () => {
               return {
                 link: null,
                 label: null,
+                status: null,
                 component: null,
                 props: null,
                 subRoutes: null,
