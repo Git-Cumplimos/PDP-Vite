@@ -97,6 +97,8 @@ import rutasItauCB, {
 import routesItau from "../apps/ConveniosItau/routes";
 import routesGestionBCS from "../apps/GestionBCS/routes";
 import routesGouCheckPay from "../apps/Gou/routes";
+import rutasCerolioOAT from "../apps/CerolioOAT/routes";
+import rutasCerolioAdmin from "../apps/CerolioAdmin/routes";
 /**
 
  * * Logos
@@ -394,20 +396,6 @@ const HistoricoAnulacionesPinesCEA = lazy(() =>
  */
 const PinesCombinados = lazy(() =>
   import("../apps/PinesVus/Views/PinesCombinados/CrearPin")
-);
-
-/**
- * Cerolio
- */
-const Cerolio = lazy(() => import("../apps/Cerolio/Views/Cerolio"));
-const CerolioAgendar = lazy(() =>
-  import("../apps/Cerolio/Views/Agenda/Agenda")
-);
-const CerolioReportes = lazy(() =>
-  import("../apps/Cerolio/Views/Reportes/Reportes")
-);
-const CerolioTarifas = lazy(() =>
-  import("../apps/Cerolio/Views/Tarifas/Tarifas")
 );
 
 const allUrlsPrivateApps = [
@@ -1254,33 +1242,10 @@ const allUrlsPrivateApps = [
   rutasCreditosPdp,
   //Modulo transcaribe
   rutasRecargasTranscaribe,
-  // Módulo Cerolio
-  {
-    link: "/cerolio",
-    label: <AppIcons Logo={"MARKETPLACE"} name="Cerolio" />,
-    component: Cerolio,
-    permission: [1],
-    subRoutes: [
-      {
-        link: "/cerolio/agendar",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Agendas" />,
-        component: CerolioAgendar,
-        permission: [1],
-      },
-      {
-        link: "/cerolio/tarifas",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Configuración Tarifas" />,
-        component: CerolioTarifas,
-        permission: [1],
-      },
-      {
-        link: "/cerolio/reportes",
-        label: <AppIcons Logo={"MARKETPLACE"} name="Reportes" />,
-        component: CerolioReportes,
-        permission: [1],
-      },
-    ],
-  },
+  // Módulo Cerolio OAT
+  rutasCerolioOAT,
+  // Módulo Cerolio Admin
+  rutasCerolioAdmin,
 ];
 
 export { allUrlsPrivateApps };

@@ -5257,6 +5257,11 @@
   "resolved" "https://registry.npmjs.org/at-least-node/-/at-least-node-1.0.0.tgz"
   "version" "1.0.0"
 
+"atomico@^1.76.1":
+  "integrity" "sha512-mshhLRMeIltNYbnQnqgnrvJ/uDa8XDfTQcjw3ymOygQqwHIQ4Sp0LcNYMCbACkV3DtV+eDXb9szwU4qMUuGwYQ=="
+  "resolved" "https://registry.npmjs.org/atomico/-/atomico-1.79.2.tgz"
+  "version" "1.79.2"
+
 "autoprefixer@^10.4.12", "autoprefixer@^10.4.13", "autoprefixer@^10.4.14":
   "integrity" "sha512-FQzyfOsTlwVzjHxKEqRIAdJx9niO6VCBCoEwax/VLSoQF29ggECcPuBqUMZ+u8jCZOPSy8b8/8KnuFbp0SaFZQ=="
   "resolved" "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.14.tgz"
@@ -5750,6 +5755,13 @@
   "integrity" "sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ=="
   "resolved" "https://registry.npmjs.org/callsites/-/callsites-3.1.0.tgz"
   "version" "3.1.0"
+
+"cally@^0.5.3":
+  "integrity" "sha512-WjJgUUw/ToR9qFKir6hK4fS1+Z2J91wOXQefafJ3Ev4HZkx4R8CZXXw15rzo7Ta8Y7KAGlRbI4Mufb5n0GH6jw=="
+  "resolved" "https://registry.npmjs.org/cally/-/cally-0.5.3.tgz"
+  "version" "0.5.3"
+  dependencies:
+    "atomico" "^1.76.1"
 
 "camel-case@^4.1.2":
   "integrity" "sha512-gxGWBrTT1JuMx6R+o5PTXMmUnhnVzLQ9SNutD4YqKtI6ap897t3tKECYla6gCWEkplXnlNybEkZg9GEGxKFCgw=="
