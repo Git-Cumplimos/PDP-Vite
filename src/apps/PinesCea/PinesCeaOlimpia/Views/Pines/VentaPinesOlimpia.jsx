@@ -18,7 +18,7 @@ import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 
-import { notifyError, notifyPending } from "../../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../../utils/notify";
 import fetchDataPinesCea from "../../utils/fetchDataPinesCea";
 import ScreenBlocker from "../../../components/ScreenBlocker";
 import TicketOlimpia from "../../components/TicketOlimpia";
@@ -324,6 +324,7 @@ const VentaPinesOlimpia = () => {
                 setEstadoPago(true);
                 setPaymentStatus(res?.obj?.ticket ?? {});
                 setIsLoadingPago(false);
+                notify("Transacción exitosa")
               }
             })
             .catch((err) => {
