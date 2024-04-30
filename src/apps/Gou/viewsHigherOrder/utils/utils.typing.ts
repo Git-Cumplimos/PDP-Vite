@@ -77,10 +77,11 @@ export type TypingOutputUseHookWithGouPay = {
 export type TypingPeticionSetting = () => Promise<TypingDataSettingValor>;
 export type TypingDataSettingValor = {
   valor_costo_trx: number;
-  valor_trx_maximo: number;
-  valor_trx_minimo: number;
-  valor_trx_maximo_exacto: boolean;
-  valor_trx_minimo_exacto: boolean;
+  valor_trx_maximo?: number;
+  valor_trx_minimo?: number;
+  valor_trx_maximo_exacto?: number;
+  valor_trx_minimo_exacto?: number;
+  cant_valor_trx_maximo: number;
 };
 
 //? PeticionCheckUrlProcessBase

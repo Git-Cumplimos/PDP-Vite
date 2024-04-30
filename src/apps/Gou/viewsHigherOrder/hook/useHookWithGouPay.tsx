@@ -71,13 +71,26 @@ const useHookWithGouPay: TypingUseHookWithGouPay = (
           "origin",
           type_operation
         );
-        return {
+
+        console.log(dataSetting.cant_valor_trx_maximo);
+        const dataSettingValor: TypingDataSettingValor = {
           valor_costo_trx: dataSetting.valor_costo_trx,
-          valor_trx_maximo: dataSetting.valor_trx_maximo,
-          valor_trx_minimo: dataSetting.valor_trx_minimo,
-          valor_trx_maximo_exacto: dataSetting.valor_trx_maximo_exacto,
-          valor_trx_minimo_exacto: dataSetting.valor_trx_minimo_exacto,
+          cant_valor_trx_maximo: dataSetting.cant_valor_trx_maximo,
         };
+
+        if (dataSetting?.valor_trx_maximo)
+          dataSettingValor.valor_trx_maximo = dataSetting?.valor_trx_maximo;
+        else
+          dataSettingValor.valor_trx_maximo_exacto =
+            dataSetting?.valor_trx_maximo_exacto;
+
+        if (dataSetting?.valor_trx_minimo)
+          dataSettingValor.valor_trx_minimo = dataSetting?.valor_trx_minimo;
+        else
+          dataSettingValor.valor_trx_minimo_exacto =
+            dataSetting?.valor_trx_minimo_exacto;
+
+        return dataSettingValor;
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
           throw new ErrorCustomUseHookCode(

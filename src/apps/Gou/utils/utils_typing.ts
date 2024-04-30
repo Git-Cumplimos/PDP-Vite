@@ -45,10 +45,11 @@ export type TypingDataPath = {
 
 export type TypingDataSetting = {
   valor_costo_trx: number;
-  valor_trx_maximo: number;
-  valor_trx_minimo: number;
-  valor_trx_maximo_exacto: boolean;
-  valor_trx_minimo_exacto: boolean;
+  valor_trx_maximo?: number;
+  valor_trx_minimo?: number;
+  valor_trx_maximo_exacto?: number;
+  valor_trx_minimo_exacto?: number;
+  cant_valor_trx_maximo: number;
   check_pay__delay: number;
   check_pay__retries: number;
   check_url_process__delay: number;

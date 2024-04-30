@@ -1,3 +1,4 @@
+import { formatMoney } from "../../../components/Base/MoneyInput";
 import {
   fetchCustomPdp,
   ErrorCustomFetch,
@@ -21,12 +22,8 @@ export const PeticionSettingBase = async (
     };
     const response = await fetchCustomPdp(url, "GET", name_service, params);
     const setting = response?.obj?.result?.setting ?? {};
-    return {
+    const dataSetting: TypingDataSetting = {
       valor_costo_trx: setting?.valor_costo_trx,
-      valor_trx_maximo: setting?.valor_trx_maximo,
-      valor_trx_minimo: setting?.valor_trx_minimo,
-      valor_trx_maximo_exacto: !setting?.valor_trx_maximo_exacto, //el contario por que asi funciona el front
-      valor_trx_minimo_exacto: !setting?.valor_trx_minimo_exacto, //el contario por que asi funciona el front
       check_url_process__delay: Math.max(
         setting?.time_front?.check_url_process__first_delay,
         setting?.time_front?.check_url_process__second_delay
@@ -37,7 +34,25 @@ export const PeticionSettingBase = async (
       ),
       check_pay__delay: setting?.time_front_result?.check_pay__delay,
       check_pay__retries: setting?.time_front_result?.check_pay__retries,
+      cant_valor_trx_maximo: 0,
     };
+    if (setting?.valor_trx_maximo) {
+      dataSetting.valor_trx_maximo = setting?.valor_trx_maximo;
+      dataSetting.cant_valor_trx_maximo = `${formatMoney.format(
+        setting?.valor_trx_maximo ?? 0
+      )}`.length;
+    } else {
+      dataSetting.valor_trx_maximo_exacto = setting?.valor_trx_maximo_exacto;
+      dataSetting.cant_valor_trx_maximo = `${formatMoney.format(
+        setting?.valor_trx_maximo_exacto ?? 0
+      )}`.length;
+    }
+
+    if (setting?.valor_trx_minimo)
+      dataSetting.valor_trx_minimo = setting?.valor_trx_minimo;
+    else dataSetting.valor_trx_minimo_exacto = setting?.valor_trx_minimo_exacto;
+
+    return dataSetting;
   } catch (error: any) {
     if (!(error instanceof ErrorCustomFetch)) {
       throw new ErrorCustomFetchCode(

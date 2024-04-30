@@ -108,12 +108,22 @@ const GouFormulario = ({
               name="valor_trx"
               label="Valor a pagar"
               // decimalDigits={2} //No Se usa este por que es con decimales
-              equalError={dataSettingValor.valor_trx_maximo_exacto}
-              equalErrorMin={dataSettingValor.valor_trx_minimo_exacto}
+              equalError={
+                dataSettingValor?.valor_trx_maximo_exacto ? false : true
+              }
+              equalErrorMin={
+                dataSettingValor?.valor_trx_minimo_exacto ? false : true
+              }
               autoComplete="off"
-              min={1000}
-              max={2000}
-              maxLength={11}
+              min={
+                dataSettingValor?.valor_trx_minimo_exacto ??
+                dataSettingValor?.valor_trx_minimo
+              }
+              max={
+                dataSettingValor?.valor_trx_maximo_exacto ??
+                dataSettingValor?.valor_trx_maximo
+              }
+              maxLength={dataSettingValor.cant_valor_trx_maximo}
               // defaultValue={inputData.valor_total_trx} //No Se usa este por que es con decimales
               value={dataInputOrigin.valor_trx} //se usa este por que es con decimales
               onInput={(ev: any, valor: any) => {
