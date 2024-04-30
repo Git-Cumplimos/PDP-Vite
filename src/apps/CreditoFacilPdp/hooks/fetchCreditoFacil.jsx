@@ -11,6 +11,7 @@ const URL_CONSULTAR_CREDITOS_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OT
 const URL_CONSULTAR_VALIDACION_DOCUMENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consulta-creditos`;
 const URL_TERMINOS_CONDICIONES_CEA_CRC = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/terminos-condiciones-cea-crc`;
 const URL_CONSULTA_DOCUMENTOS_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consultar-documentos-bd`;
+const URL_DESCARGA_ARCHIVO_VALIDACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/descargar-documento`;
 
 
 const sleep = (millisecons) => {
@@ -334,6 +335,43 @@ export const postConsultaDocumentosBd = async (bodyObj) => {
   try {
     const res = await fetchData(
       `${URL_CONSULTA_DOCUMENTOS_BD}`,
+      "POST",
+      {},
+      dataObj
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const postDescargarDocumentoValidacion = async (bodyObj) => {
+  if (!bodyObj) {
+    return "Sin datos body";
+  }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      parseObj
+    ),
+  };
+  try {
+    const res = await fetchData(
+      `${URL_DESCARGA_ARCHIVO_VALIDACION}`,
       "POST",
       {},
       dataObj

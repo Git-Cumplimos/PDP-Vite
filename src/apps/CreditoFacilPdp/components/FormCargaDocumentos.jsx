@@ -6,8 +6,11 @@ import Input from "../../../components/Base/Input";
 import Modal from "../../../components/Base/Modal";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetch } from "../../../hooks/useFetch";
-import { postConsultaDocumentosBd } from "../hooks/fetchCreditoFacil";
-import { notifyError, notifyPending } from "../../../utils/notify";
+import {
+  postConsultaDocumentosBd,
+  postDescargarDocumentoValidacion,
+} from "../hooks/fetchCreditoFacil";
+import { notifyError, notifyPending, notify} from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { postTerminosCondicionesCEACRC } from "../hooks/fetchCreditoFacil";
 import { fetchCustom } from "../utils/fetchCreditoFacil";
@@ -33,6 +36,15 @@ const documentTypes = [
   { key: "certificacionBancaria", label: "Certificación Bancaria" },
 ];
 
+const initialStatusFile = {
+  pagareFirmado: "",
+  cedulaRepresentante: "",
+  estadoFinanciero: "",
+  camaraComercio: "",
+  contrato: "",
+  certificacionBancaria: "",
+};
+
 const FormCargaDocumentos = ({
   setModalOpen,
   consultaCreditos,
@@ -44,6 +56,8 @@ const FormCargaDocumentos = ({
   const [showModal, setShowModal] = useState(false);
   const { roleInfo } = useAuth();
   const [url, setUrl] = useState("");
+  const [estado, setEstado] = useState(0);
+  const [validationStatus, setValidationStatus] = useState(initialStatusFile);
   const [fileDocuments, setFileDocuments] = useState(initialFileState);
   const [loadingPeticionGuardarDocumentos, peticionGuardarDocumentos] =
     useFetch(
@@ -63,21 +77,40 @@ const FormCargaDocumentos = ({
     postConsultaDocumentosBd(body)
       .then((autoArr) => {
         const consultaDocumentosBD = autoArr?.obj?.archivos;
+        if (Object.keys(consultaDocumentosBD).length > 0) {
+          setEstado(1);
+        }
         setFileDocuments({
-          pagareFirmado: consultaDocumentosBD?.pagare ? "Pagare.pdf" : "",
+          pagareFirmado: consultaDocumentosBD?.pagare?.archivo
+            ? consultaDocumentosBD?.pagare?.archivo
+            : "",
           cedulaRepresentante: consultaDocumentosBD?.cedulaRepresentante
-            ? "CedulaRepresentante.pdf"
+            ? consultaDocumentosBD?.cedulaRepresentante?.archivo
             : "",
           estadoFinanciero: consultaDocumentosBD?.estadoFinanciero
-            ? "EstadoFinanciero.pdf"
+            ? consultaDocumentosBD?.estadoFinanciero?.archivo
             : "",
           camaraComercio: consultaDocumentosBD?.camaraComercio
-            ? "CamaraComercio.pdf"
+            ? consultaDocumentosBD?.camaraComercio?.archivo
             : "",
-          contrato: consultaDocumentosBD?.contrato ? "Contrato.pdf" : "",
+          contrato: consultaDocumentosBD?.contrato
+            ? consultaDocumentosBD?.contrato?.archivo
+            : "",
           certificacionBancaria: consultaDocumentosBD?.certificacionBancaria
-            ? "CertificacionBancaria.pdf"
+            ? consultaDocumentosBD?.certificacionBancaria?.archivo
             : "",
+        });
+        setValidationStatus({
+          pagareFirmado: consultaDocumentosBD?.pagare?.estadoValidacion,
+          cedulaRepresentante:
+            consultaDocumentosBD?.cedulaRepresentante?.estadoValidacion,
+          estadoFinanciero:
+            consultaDocumentosBD?.estadoFinanciero?.estadoValidacion,
+          camaraComercio:
+            consultaDocumentosBD?.camaraComercio?.estadoValidacion,
+          contrato: consultaDocumentosBD?.contrato?.estadoValidacion,
+          certificacionBancaria:
+            consultaDocumentosBD?.certificacionBancaria?.estadoValidacion,
         });
       })
       .catch((err) => console.error(err));
@@ -186,14 +219,48 @@ const FormCargaDocumentos = ({
           if (allFilesUploaded) {
             const data = {
               archivos: {
-                pagare: respuestaFile?.pagare?.fields?.key,
-                cedulaRepresentante:
-                  respuestaFile?.cedulaRepresentante?.fields?.key,
-                estadoFinanciero: respuestaFile?.estadoFinanciero?.fields?.key,
-                camaraComercio: respuestaFile?.camaraComercio?.fields?.key,
-                contrato: respuestaFile?.contrato?.fields?.key,
-                certificacionBancaria:
-                  respuestaFile?.certificacionBancaria?.fields?.key,
+                pagare: {
+                  archivo: respuestaFile?.pagare?.fields?.key,
+                  estadoValidacion:
+                    validationStatus.pagareFirmado === undefined
+                      ? "En Validación"
+                      : validationStatus.pagareFirmado,
+                },
+                cedulaRepresentante: {
+                  archivo: respuestaFile?.cedulaRepresentante?.fields?.key,
+                  estadoValidacion:
+                    validationStatus.cedulaRepresentante === undefined
+                      ? "En Validación"
+                      : validationStatus.cedulaRepresentante,
+                },
+                estadoFinanciero: {
+                  archivo: respuestaFile?.estadoFinanciero?.fields?.key,
+                  estadoValidacion:
+                    validationStatus.estadoFinanciero === undefined
+                      ? "En Validación"
+                      : validationStatus.estadoFinanciero,
+                },
+                camaraComercio: {
+                  archivo: respuestaFile?.camaraComercio?.fields?.key,
+                  estadoValidacion:
+                    validationStatus.camaraComercio === undefined
+                      ? "En Validación"
+                      : validationStatus.camaraComercio,
+                },
+                contrato: {
+                  archivo: respuestaFile?.contrato?.fields?.key,
+                  estadoValidacion:
+                    validationStatus.contrato === undefined
+                      ? "En Validación"
+                      : validationStatus.contrato,
+                },
+                certificacionBancaria: {
+                  archivo: respuestaFile?.certificacionBancaria?.fields?.key,
+                  estadoValidacion:
+                    validationStatus.certificacionBancaria === undefined
+                      ? "En Validación"
+                      : validationStatus.certificacionBancaria,
+                },
               },
               numero_solicitud: dataCredito?.NroSolicitud,
             };
@@ -209,6 +276,7 @@ const FormCargaDocumentos = ({
                   setModalOpenPDF(false);
                   setModalOpen(false);
                   setFormCarga(false);
+                  setEstado(0);
                   return "Carga de documentos exitosa";
                 },
               },
@@ -220,6 +288,7 @@ const FormCargaDocumentos = ({
                     return error?.message;
                   } else {
                     consultaCreditos();
+                    setEstado(0);
                     setModalOpenPDF(false);
                     return "Carga de documentos fallida";
                   }
@@ -231,6 +300,7 @@ const FormCargaDocumentos = ({
       } catch (err) {
         consultaCreditos();
         setModalOpenPDF(false);
+        setEstado(0);
         notifyError("Error al cargar Datos");
       }
     },
@@ -256,6 +326,7 @@ const FormCargaDocumentos = ({
   const handleClose = useCallback(() => {
     setModalOpen(false);
     setFormCarga(false);
+    setEstado(0);
     consultaCreditos();
   }, []);
 
@@ -268,6 +339,33 @@ const FormCargaDocumentos = ({
     setChecked(true);
   }, []);
 
+  // Dentro de tu componente
+  const handleModify = (key) => {
+    // Lógica para manejar la acción de modificar el documento con la clave 'key'
+    console.log("Modificando documento con clave:", key);
+    // Por ejemplo, podrías abrir un modal o navegar a una nueva página para permitir la modificación del documento
+  };
+
+  // const handleView = (key) => {
+
+  //   // Lógica para manejar la acción de ver el documento con la clave 'key'
+  //   console.log("Viendo documento con clave:", key);
+  //   // Por ejemplo, podrías abrir una vista previa del documento en una ventana modal
+  // };
+
+  const handleView = useCallback((key) => {
+    console.log("Viendo documento con clave:", key);
+    const body = { filename: key };
+    postDescargarDocumentoValidacion(body)
+      .then((autoArr) => {
+        if (autoArr?.status) {
+          notify(autoArr?.msg);
+          window.open(autoArr?.obj?.url);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
   return (
     <>
       <Form formDir="col" onSubmit={cargar_documentos}>
@@ -277,50 +375,135 @@ const FormCargaDocumentos = ({
         <h2 className="text-xl text-center mb-10">
           Por favor realice el cargue de cada documento
         </h2>
-
-        {/* Iterar sobre los tipos de documentos */}
-        {documentTypes.map(({ key, label }) => (
-          <div
-            key={key}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginBottom: "10px",
-            }}
-          >
-            <label
-              htmlFor={key}
-              className="text-xl"
-              style={{ width: "250px", marginRight: "20px" }}
-            >
-              {label}
-            </label>
-            <Input
-              type="file"
-              id={key}
-              name={key}
-              accept=".pdf,image/*"
-              onChange={(e) => onChangeFile(e.target.files[0], key, e.target)}
-              required
-            />
-            {fileDocuments[key] !== "" && (
-              <>
-                <div>
-                  {"Archivo guardado: "}
-                  {fileDocuments[key] && fileDocuments[key].name}
-                </div>
-                <label
-                  htmlFor={key}
-                  className="text-xl"
-                  style={{ width: "250px", marginRight: "20px" }}
-                >
-                  En validación
-                </label>
-              </>
-            )}
-          </div>
-        ))}
-
+        {fileDocuments.pagareFirmado !== "" && estado !== 0 && (
+          <table>
+            <thead>
+              <tr className="text-xl">
+                <th>Archivo</th>
+                <th>Acciones</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(fileDocuments).map((key) => (
+                <tr key={key}>
+                  <td>
+                    <h3 className="text-xl">
+                      {documentTypes.find((doc) => doc.key === key)?.label}
+                    </h3>
+                    {fileDocuments[key] ? (
+                      <p className="text-xl">
+                        {fileDocuments[key].name === undefined
+                          ? fileDocuments[key].split("/").pop()
+                          : fileDocuments[key].name}
+                      </p>
+                    ) : (
+                      <Input
+                        type="file"
+                        id={key}
+                        name={key}
+                        accept=".pdf,image/*"
+                        onChange={(e) =>
+                          onChangeFile(e.target.files[0], key, e.target)
+                        }
+                        required
+                      />
+                    )}
+                  </td>
+                  <td>
+                    {fileDocuments[key] && (
+                      <ButtonBar>
+                        <Button type="submit" onClick={() => handleModify(key)}>
+                          Modificar
+                        </Button>
+                        <Button
+                          type="submit"
+                          onClick={() => handleView(fileDocuments[key])}
+                        >
+                          Ver
+                        </Button>
+                      </ButtonBar>
+                    )}
+                  </td>
+                  <td>
+                    <p className="tex-xl font-semibold">
+                      {validationStatus[key] === undefined &&
+                      fileDocuments[key] !== ""
+                        ? "En Validación"
+                        : validationStatus[key]}
+                    </p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {estado === 0 && (
+          <>
+            {Object.keys(fileDocuments).map((key) => (
+              <div key={key}>
+                <h3 className="text-2xl mb-2">
+                  {documentTypes.find((doc) => doc.key === key)?.label}
+                </h3>
+                {fileDocuments[key] ? (
+                  <div style={{ display: "flex", marginLeft: "auto" }}>
+                    <input
+                      type="text"
+                      value={
+                        fileDocuments[key].name === undefined
+                          ? fileDocuments[key].split("/").pop()
+                          : fileDocuments[key].name
+                      }
+                      readOnly
+                      style={{ width: "60%", height: "7vh" }}
+                      className="text-l"
+                    />
+                    <button
+                      style={{
+                        marginLeft: "auto",
+                        backgroundColor: "#E1E1DF",
+                        border: "1px solid #ccc",
+                        borderRadius: "15px",
+                        color: "#333",
+                        height: "38px",
+                        lineHeight: "35px",
+                        padding: "0 15px",
+                      }}
+                      type="button"
+                      onClick={() =>
+                        document.getElementById(key + "-file").click()
+                      }
+                    >
+                      Cambiar archivo
+                    </button>
+                    <input
+                      type="file"
+                      id={key + "-file"}
+                      name={key}
+                      accept=".pdf,image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) =>
+                        onChangeFile(e.target.files[0], key, e.target)
+                      }
+                      onClick={(e) => (e.target.value = null)}
+                    />
+                  </div>
+                ) : (
+                  <Input
+                    type="file"
+                    id={key}
+                    name={key}
+                    accept=".pdf,image/*"
+                    onChange={(e) =>
+                      onChangeFile(e.target.files[0], key, e.target)
+                    }
+                    required
+                  />
+                )}
+              </div>
+            ))}
+          </>
+        )}
         <div className="text-center">
           <label className="text-xl">
             <input
