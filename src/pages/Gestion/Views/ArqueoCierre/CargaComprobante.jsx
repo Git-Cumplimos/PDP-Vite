@@ -36,7 +36,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const CargaComprobante = () => {
   const navigate = useNavigate();
-  const { roleInfo,userPermissions,quotaInfo } = useAuth();
+  const { roleInfo,userPermissions,quotaInfo,userInfo } = useAuth();
   const formRef = useRef(null);
 
   const [tiposComprobantes, setTiposComprobantes] = useState([]);
@@ -75,8 +75,10 @@ const CargaComprobante = () => {
     () => ({
       "Id comercio": roleInfo?.id_comercio ?? 59,
       "Id usuario": roleInfo?.id_usuario ?? 8202,
+      "Nombre comercio": roleInfo?.nombre_comercio,
+      "Nombre usuario": userInfo?.attributes?.name
     }),
-    [roleInfo?.id_comercio, roleInfo?.id_usuario]
+    [roleInfo?.id_comercio, roleInfo?.id_usuario, userInfo?.attributes?.name, roleInfo?.nombre_comercio]
   );
 
   const searchEntities = useCallback((is_transport) => {
