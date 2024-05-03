@@ -157,12 +157,6 @@ const CargueMasivoCredito = () => {
           )}
         </>
       )}
-      <ModalRechazarCreditos
-        dataCredito={dataCredito}
-        consultaCreditos={consultaCreditos}
-        setShowModal={setShowModal}
-        showModal={showModal}
-      />
     </>
   );
 };
