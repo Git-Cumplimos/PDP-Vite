@@ -361,7 +361,8 @@ const FormCargaDocumentos = ({
   }, []);
 
   const handleModify = (key) => {
-    setNameFile(key.split("/").pop());
+    const name_file = key.split("/").pop()
+    setNameFile(name_file);
     setNameRoute(key);
     setModifyFile(true);
     setShowModal(true);
@@ -460,10 +461,9 @@ const FormCargaDocumentos = ({
     } catch (err) {
       consultaCreditos();
       setModalOpenPDF(false);
-      setEstado(0);
       notifyError("Error al cargar Datos");
     }
-  }, []);
+  }, [dataCredito, nameFile, nameRoute, file]);
 
   const handleView = useCallback((key) => {
     const body = { filename: key };
