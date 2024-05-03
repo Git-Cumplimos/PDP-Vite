@@ -27,6 +27,7 @@ import MoneyInput from "../../../../../components/Base/MoneyInput";
 import { onChangeNumber } from "../../../../../utils/functions";
 import { fetchZonas } from "../../../utils/fetchZonas";
 import RepresentanteLegal from "./RepresentanteLegal";
+import AddressForm from "../../../../../components/Base/AddressForm";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -101,6 +102,8 @@ const CrearComercios = () => {
   const [alertMonto, setAlertMonto] = useState("");
   const [alertPorcent, setAlertPorcent] = useState("");
   const [zonas, setZonas] = useState([]);
+  const [modifyAddress, setModifyAddress] = useState(false);
+  const [addressState, setAddressState] = useState();
 
   const [dispersionPagos, setDispersionPagos] = useState({
     id_comercio: "",
@@ -346,6 +349,15 @@ const CrearComercios = () => {
     codigosInst: [],
   });
   const [grupoComercios, setGrupoComercios] = useState([]);
+
+  const saveAddress = useCallback((direccion, stateDieccion) => {
+    setComercio((old) => ({
+      ...old,
+      direccion_comercio: direccion,
+    }));
+    setAddressState(stateDieccion);
+    setModifyAddress(false);
+  }, []);
 
   const handleClose = useCallback(() => {
     setShowModal(false);
@@ -838,12 +850,15 @@ const CrearComercios = () => {
             label="Dirección comercio"
             type="text"
             name="direccion_comercio"
-            minLength="1"
-            maxLength="100"
-            required
+            className="pointer-events-none"
             value={comercio?.direccion_comercio}
-            onInput={onChangeFormat}
+            onChange={() => {}}
             autoComplete="off"
+            actionBtn={{
+              callback: (_) => setModifyAddress(true),
+              label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
+            }}
+            required
           />
           <Input
             id="latitud_comercio"
@@ -1631,6 +1646,13 @@ const CrearComercios = () => {
       </Modal>
       <Modal show={chooseContrato} handleClose={() => setChooseContrato(false)}>
         <TiposContratosTable onSelectContract={onSelectTipoContrato} />
+      </Modal>
+      <Modal show={modifyAddress} handleClose={() => setModifyAddress(false)}>
+        <AddressForm
+          editAddress={addressState}
+          onCancel={() => setModifyAddress(false)}
+          onSuccess={saveAddress}
+        />
       </Modal>
     </Fragment>
   );
