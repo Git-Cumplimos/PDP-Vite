@@ -287,7 +287,7 @@ const VentaPinesOlimpia = () => {
             "POST",
             {},
             {
-              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA,
+              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA_CEA,
               Pin: numeroPin,
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,
