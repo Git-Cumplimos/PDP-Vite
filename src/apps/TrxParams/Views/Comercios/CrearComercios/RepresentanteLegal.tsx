@@ -375,7 +375,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Apellido"
@@ -393,7 +392,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         <ToggleInput
           label="¿PEP?"
@@ -424,7 +422,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Ciudad residencia"
@@ -451,7 +448,6 @@ const RepresentanteLegal = ({
               <span className="px-1 py-0 text-sm bi bi-pencil-square" />
             ),
           }}
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Dirección"
@@ -466,7 +462,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyAddress(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Barrio"
@@ -484,7 +479,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         {propietarioRLExists && (
           <Input
