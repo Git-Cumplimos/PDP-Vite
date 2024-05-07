@@ -81,6 +81,7 @@ const DevolucionPinesOlimpia = () => {
   });
 
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [ticketComision, setTicketComisions] = useState(null);
   const [inquiryStatus, setInquiryStatus] = useState(null);
 
   const onChangeMoney = useMoney({
@@ -325,6 +326,7 @@ const DevolucionPinesOlimpia = () => {
                 setPin(res?.obj?.result?.pin);
                 setEstadoPago(true);
                 setPaymentStatus(res?.obj?.ticket ?? {});
+                setTicketComisions(res?.obj?.ticket_costo_comision ?? {});
                 setIsLoadingPago(false);
                 notify("Transacción exitosa")
               }
@@ -448,6 +450,9 @@ const DevolucionPinesOlimpia = () => {
         {paymentStatus ? (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketOlimpia refPrint={printDiv} ticket={paymentStatus} />
+            {ticketComision ? (
+            <TicketOlimpia refPrint={printDiv} ticket={ticketComision} />
+            ):(<></>)}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleClose}>Cerrar</Button>
