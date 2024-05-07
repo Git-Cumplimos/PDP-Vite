@@ -47,9 +47,6 @@ const ModalModificarDocumento = ({
 
   const onChangeFile = useCallback((file, variable, inputElement) => {
     if (file) {
-      console.log(file);
-      console.log(variable);
-      console.log(inputElement);
       const fileName = file.name.toLowerCase();
       const extension = fileName.substring(fileName.lastIndexOf(".") + 1);
       if (

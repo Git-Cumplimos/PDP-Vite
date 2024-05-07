@@ -137,7 +137,6 @@ const CargueMasivoCredito = () => {
         if (Object.keys(consultaDocumentosBD).length > 0) {
           setEstado(1);
         }
-        console.log(autoArr?.obj);
         setFileDocuments({
           pagareFirmado: consultaDocumentosBD?.Pagare?.archivo
             ? consultaDocumentosBD?.Pagare?.archivo
