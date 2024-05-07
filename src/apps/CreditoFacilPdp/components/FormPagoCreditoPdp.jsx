@@ -21,25 +21,16 @@ const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago
 const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
 const DATA_TIPO_DOCUMENTO = {
   "": "",
-  NIT: 2,
-  "CEDULA CIUDADANIA": 1,
-  "TARJETA DE IDENTIDAD": 4,
-  "REGISTRO CIVIL": 6,
-  "TARJETA DE EXTRANJERIA": 7,
-  "CEDULA EXTRANJERIA": 3,
-  PASAPORTE: 8,
-  "DEFINIDO POR LA DIAN": 10,
-  "TIPO DOCUMENTO EXTRANJERO PJURIDICA": 5,
-  "NIT PERSONA NATURAL": 11,
+  "RECIBO DE CAJA": "R01",
+  "OTROS INGRESOS": "R02",
 };
 const DATA_FORMA_PAGO = {
   "": "",
   "CUENTA CTE BANCO DE COLPATRIA": 19,
   "CUENTA AHORROS BANCO AGRARIO": 20,
-  // "CUENTA CTA BANCOLOMBIA": 22,
-  // "CUENTA CTE DAVIVIENDA": 23,
-  // "CUENTA CTE ITAU": 24,
-  // "DESEMBOLSO CREDITO COMERCIOS": 28,
+  "RECAUDO CEAS": 25,
+  "RECAUDO CRCS": 26,
+  "RECAUDO COMERCIOS": 27,
 };
 const DATA_TIPO_ABONO = {
   "": "",
@@ -147,7 +138,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
     if (ev.target.name === "tipoDocumento") {
       let nombreDocumento =
         Object.keys(DATA_TIPO_DOCUMENTO).filter(
-          (key) => DATA_TIPO_DOCUMENTO[key] === parseInt(value)
+          (key) => DATA_TIPO_DOCUMENTO[key] === value
         )[0] ?? "";
       setDataInput((old) => ({
         ...old,
