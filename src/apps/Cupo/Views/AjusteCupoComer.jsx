@@ -62,7 +62,8 @@ const AjusteCupoComer = ({ subRoutes }) => {
         setCupoComer(res?.obj ?? []);
       })
       .catch((reason) => {
-        notifyError("Error al cargar Datos ");
+        let msg = (reason?.message ?? "").replace("Exception","Error")
+        notifyError( msg ?? "Error al cargar Datos ");
       });
   }, [idComercio]);
 
