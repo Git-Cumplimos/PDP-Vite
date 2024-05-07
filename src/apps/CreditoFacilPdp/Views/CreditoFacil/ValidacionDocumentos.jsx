@@ -61,7 +61,7 @@ const ValidacionDocumentos = () => {
       const body = {
         limit: limit,
         page: page,
-        id_comercio: 14903,/// Aqui cambiar por roleInfo?.id_comercio
+        id_comercio: roleInfo?.id_comercio,/// Aqui cambiar por 14903
       };
       if (datosTrans?.year !== "" && datosTrans?.month !== "") {
         body.year = parseInt(datosTrans?.year);

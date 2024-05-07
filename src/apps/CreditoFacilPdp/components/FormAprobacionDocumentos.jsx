@@ -62,7 +62,7 @@ const FormAprobacionDocumentos = ({
   return (
     <>
       <Form formDir="col">
-        {fileDocuments.pagareFirmado !== "" && estado !== 0 && (
+        {fileDocuments.pagareFirmado !== "" && estado !== 0 ? (
           <>
             <h1 className="text-3xl text-center mb-10 mt-5">
               Validación de Documentos Cargados
@@ -173,6 +173,15 @@ const FormAprobacionDocumentos = ({
                 ))}
               </tbody>
             </table>
+            <ButtonBar>
+              <Button onClick={handleClose}>Volver</Button>
+            </ButtonBar>
+          </>
+        ) : (
+          <>
+            <h1 className="text-3xl text-center mb-10 mt-5">
+              El comercio aún no ha subido los documentos requeridos.
+            </h1>
             <ButtonBar>
               <Button onClick={handleClose}>Volver</Button>
             </ButtonBar>

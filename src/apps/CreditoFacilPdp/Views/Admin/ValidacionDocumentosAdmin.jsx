@@ -61,7 +61,6 @@ const CargueMasivoCredito = () => {
       const body = {
         limit: limit,
         page: page,
-        // id_comercio: 14903,/// Aqui cambiar por roleInfo?.id_comercio
       };
       if (datosTrans?.year !== "" && datosTrans?.month !== "") {
         body.year = parseInt(datosTrans?.year);
