@@ -450,7 +450,9 @@ const DevolucionPinesOlimpia = () => {
         {paymentStatus ? (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketOlimpia refPrint={printDiv} ticket={paymentStatus} />
+            {ticketComision ? (
             <TicketOlimpia refPrint={printDiv} ticket={ticketComision} />
+            ):(<></>)}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleClose}>Cerrar</Button>
