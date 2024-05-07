@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import FormCargaDocumentos from "../../components/FormCargaDocumentos";
 import useDelayedCallback from "../../../../hooks/useDelayedCallback";
-import { postValidacionDocumentosCreditos, postConsultaDocumentosBd } from "../../hooks/fetchCreditoFacil";
+import {
+  postValidacionDocumentosCreditos,
+  postConsultaDocumentosBd,
+} from "../../hooks/fetchCreditoFacil";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import Input from "../../../../components/Base/Input";
-import FormAceptarTerminosCEACRC from "../../components/FormAceptarTerminosCEACRC";
-import ModalModificarDocumento from "../../components/ModalModificarDocumento";
-import FormActualizarDocumentos from "../../components/FormActualizarDocumentos";
-import { useAuth } from "../../../../hooks/AuthHooks";
-import { postTerminosCondicionesCEACRC } from "../../hooks/fetchCreditoFacil";
-import { notifyError } from "../../../../utils/notify";
+import FormAprobacionDocumentos from "../../components/FormAprobacionDocumentos";
+import ModalCambioEstadoDocumentos from "../../components/ModalCambioEstadoDocumentos";
 
 const initialFileState = {
   pagareFirmado: "",
@@ -21,9 +19,8 @@ const initialFileState = {
   certificacionBancaria: "",
 };
 
-const ValidacionDocumentos = () => {
+const CargueMasivoCredito = () => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const { roleInfo, pdpUser } = useAuth();
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
@@ -50,7 +47,10 @@ const ValidacionDocumentos = () => {
     month: "",
   });
   const [fileDocuments, setFileDocuments] = useState(initialFileState);
+  const [estadoDocumento, setEstadoDocumento] = useState("");
   const [validationStatus, setValidationStatus] = useState(initialFileState);
+  const [validateDate, setValidateDate] = useState(initialFileState);
+  const [usuarioCargue, setUsuarioCargue] = useState("");
 
   useEffect(() => {
     consultaCreditos();
@@ -61,11 +61,14 @@ const ValidacionDocumentos = () => {
       const body = {
         limit: limit,
         page: page,
-        id_comercio: 14903,/// Aqui cambiar por roleInfo?.id_comercio
+        // id_comercio: 14903,/// Aqui cambiar por roleInfo?.id_comercio
       };
       if (datosTrans?.year !== "" && datosTrans?.month !== "") {
         body.year = parseInt(datosTrans?.year);
         body.month = parseInt(datosTrans?.month);
+      }
+      if (datosTrans?.idComercio !== "") {
+        body.id_comercio = parseInt(datosTrans?.idComercio);
       }
       postValidacionDocumentosCreditos(body)
         .then((autoArr) => {
@@ -115,31 +118,15 @@ const ValidacionDocumentos = () => {
     ];
   }, [listadoCreditos]);
 
-  const openModal = useCallback(() => {
-    if (isChecked) {
-      setChecked(false);
-    } else {
-      postTerminosCondicionesCEACRC().then((res) => {
-        if (!res?.status) {
-          notifyError(res?.msg);
-        } else {
-          setUrl(res?.obj?.url);
-          setModalOpenPDF(true);
-          setShowModal(true);
-        }
-      });
-    }
-  }, [isChecked]);
-
   const handleClose = useCallback(() => {
     setModalOpen(false);
     setFormCarga(false);
     setEstado(0);
-    consultaCreditos();
     setFileDocuments(initialFileState);
     setChecked(false);
     setOpenUpdate(false);
     setModifyFile(false);
+    consultaCreditos();
   }, []);
 
   const consultaDocumentos = useCallback(() => {
@@ -150,6 +137,7 @@ const ValidacionDocumentos = () => {
         if (Object.keys(consultaDocumentosBD).length > 0) {
           setEstado(1);
         }
+        console.log(autoArr?.obj);
         setFileDocuments({
           pagareFirmado: consultaDocumentosBD?.Pagare?.archivo
             ? consultaDocumentosBD?.Pagare?.archivo
@@ -182,6 +170,17 @@ const ValidacionDocumentos = () => {
           certificacionBancaria:
             consultaDocumentosBD?.CertificacionBancaria?.estadoValidacion,
         });
+        setUsuarioCargue(autoArr?.obj?.usuario_documentos);
+        setValidateDate({
+          pagareFirmado: consultaDocumentosBD?.Pagare?.fechaCargue,
+          cedulaRepresentante:
+            consultaDocumentosBD?.CedulaRepresentante?.fechaCargue,
+          estadoFinanciero: consultaDocumentosBD?.EstadoFinanciero?.fechaCargue,
+          camaraComercio: consultaDocumentosBD?.CamaraComercio?.fechaCargue,
+          contrato: consultaDocumentosBD?.Contrato?.fechaCargue,
+          certificacionBancaria:
+            consultaDocumentosBD?.CertificacionBancaria?.fechaCargue,
+        });
       })
       .catch((err) => console.error(err));
   }, [dataCredito]);
@@ -189,15 +188,21 @@ const ValidacionDocumentos = () => {
   return (
     <>
       {formCarga ? (
-        <FormCargaDocumentos
-          consultaCreditos={consultaCreditos}
-          dataCredito={dataCredito}
-          isChecked={isChecked}
+        <FormAprobacionDocumentos
+          setChecked={setChecked}
+          setShowModal2={setShowModal2}
+          setModifyFile={setModifyFile}
+          setNameRoute={setNameRoute}
+          setNameFile={setNameFile}
           estado={estado}
-          setFileDocuments={setFileDocuments}
           fileDocuments={fileDocuments}
-          openModal={openModal}
+          dataCredito={dataCredito}
           handleClose={handleClose}
+          setEstadoDocumento={setEstadoDocumento}
+          consultaDocumentos={consultaDocumentos}
+          validationStatus={validationStatus}
+          validateDate={validateDate}
+          usuarioCargue={usuarioCargue}
         />
       ) : (
         <>
@@ -232,9 +237,16 @@ const ValidacionDocumentos = () => {
                 minLength="1"
                 maxLength="20"
                 type="text"
-                value={roleInfo?.id_comercio}
+                value={datosTrans?.idComercio}
                 autoComplete="off"
-                disabled
+                onInput={(e) => {
+                  let num = e.target.value.replace(/[\s\.\-+eE]/g, "");
+                  if (!isNaN(num)) {
+                    setDatosTrans((old) => {
+                      return { ...old, idComercio: num };
+                    });
+                  }
+                }}
               />
               <Input
                 type="month"
@@ -255,49 +267,24 @@ const ValidacionDocumentos = () => {
           )}
         </>
       )}
-      {isModalOpenPDF && (
-        <FormAceptarTerminosCEACRC
-          setModalOpenPDF={setModalOpenPDF}
-          url={url}
-          showModal={showModal}
-          setChecked={setChecked}
-        />
-      )}
-      {openUpdate && (
-        <FormActualizarDocumentos
-          dataCredito={dataCredito}
-          setChecked={setChecked}
-          setShowModal2={setShowModal2}
-          setModifyFile={setModifyFile}
-          setNameRoute={setNameRoute}
-          setNameFile={setNameFile}
-          setEstado={setEstado}
-          estado={estado}
-          setFileDocuments={setFileDocuments}
-          fileDocuments={fileDocuments}
-          handleClose={handleClose}
-          consultaDocumentos={consultaDocumentos}
-          validationStatus={validationStatus}
-        />
-      )}
-      {modifyFile && !isModalOpenPDF &&(
-        <ModalModificarDocumento
+      {modifyFile && !isModalOpenPDF && (
+        <ModalCambioEstadoDocumentos
           setModifyFile={setModifyFile}
           setShowModal2={setShowModal2}
           showModal2={showModal2}
           setFile={setFile}
           nameFile={nameFile}
-          consultaCreditos={consultaCreditos}
+          consultaDocumentos={consultaDocumentos}
           file={file}
           setModalOpenPDF={setModalOpenPDF}
           nameRoute={nameRoute}
           dataCredito={dataCredito}
           setEstado={setEstado}
-          consultaDocumentos={consultaDocumentos}
+          estadoDocumento={estadoDocumento}
         />
       )}
     </>
   );
 };
 
-export default ValidacionDocumentos;
+export default CargueMasivoCredito;

@@ -13,6 +13,15 @@ import Fieldset from "../../../components/Base/Fieldset";
 const URL_ACTUALIZAR_DOCUMENTO_TBL_MOVIMIENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/actualizacion-documento-guardado`;
 const URL_MODIFICAR_ARCHIVO_S3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-modificar`;
 
+const documentTypes = [
+  { key: "Pagare.pdf", label: "Pagaré Firmado" },
+  { key: "CedulaRepresentante.pdf", label: "Cédula del Representante Legal" },
+  { key: "EstadoFinanciero.pdf", label: "Estados Financieros" },
+  { key: "CamaraComercio.pdf", label: "Cámara de Comercio" },
+  { key: "Contrato.pdf", label: "Contrato" },
+  { key: "CertificacionBancaria.pdf", label: "Certificación Bancaria" },
+];
+
 const ModalModificarDocumento = ({
   setModifyFile,
   setShowModal2,
@@ -25,6 +34,7 @@ const ModalModificarDocumento = ({
   nameRoute,
   dataCredito,
   setEstado,
+  consultaDocumentos,
 }) => {
   const [loadingPeticionActualizarDocumento, peticionActualizarDocumento] =
     useFetch(
@@ -132,6 +142,7 @@ const ModalModificarDocumento = ({
               {
                 render: ({ data: res }) => {
                   setShowModal2(false);
+                  consultaDocumentos();
                   return "Actualización de documento exitosa";
                 },
               },
@@ -171,9 +182,10 @@ const ModalModificarDocumento = ({
           handleClose={handleCloseModify}
           className="flex align-middle"
         >
+          <br />
           <Fieldset className="lg:col-span-2">
             <h1 className="text-2xl text-center mt-5">
-              {nameFile.replace(/\.[^.]+$/, "")}
+              {documentTypes.find((doc) => doc.key === nameFile)?.label}
             </h1>
             <Input
               type="file"

@@ -30,6 +30,10 @@ const ValidacionDocumentos = lazy(() =>
   import("./Views/CreditoFacil/ValidacionDocumentos")
 );
 
+const ValidacionDocumentosAdmin = lazy(() =>
+  import("./Views/Admin/ValidacionDocumentosAdmin")
+);
+
 const CreditosPDP = lazy(() => import("./CreditosPDP"));
 
 const listPermissionsCreditoPdp = Object.values(enumPermisosCreditoPdp);
@@ -80,9 +84,25 @@ const rutasCreditosPdp = {
     },
     {
       link: "/creditos-pdp/validacion-documentos-creditos",
-      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Consulta y Validación de Documentos" />,
+      label: (
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Consulta y Validación de Documentos"
+        />
+      ),
       component: ValidacionDocumentos,
       permission: [enumPermisosCreditoPdp.VALIDACION_DOCUMENTOS],
+    },
+    {
+      link: "/creditos-pdp/validacion-documentos-analista",
+      label: (
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Consulta y Validación de Documentos"
+        />
+      ),
+      component: ValidacionDocumentosAdmin,
+      permission: [enumPermisosCreditoPdpAdmin.VALIDACION_DOCUMENTOS_ADMIN],
     },
   ],
 };

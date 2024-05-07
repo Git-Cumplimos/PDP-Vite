@@ -31,7 +31,7 @@ const FormCargaDocumentos = ({
   openModal,
   handleClose,
 }) => {
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const [loadingPeticionGuardarDocumentos, peticionGuardarDocumentos] =
     useFetch(
       fetchCustom(
@@ -141,34 +141,42 @@ const FormCargaDocumentos = ({
           }
 
           if (allFilesUploaded) {
+            const fechaHoraActual = new Date().toISOString().replace("T", " ").replace(/\.\d{3}Z$/, "");
             const data = {
               archivos: {
                 Pagare: {
                   archivo: respuestaFile?.Pagare?.fields?.key,
                   estadoValidacion: "En Validación",
+                  fechaCargue: fechaHoraActual,
                 },
                 CedulaRepresentante: {
                   archivo: respuestaFile?.CedulaRepresentante?.fields?.key,
                   estadoValidacion: "En Validación",
+                  fechaCargue: fechaHoraActual,
                 },
                 EstadoFinanciero: {
                   archivo: respuestaFile?.EstadoFinanciero?.fields?.key,
                   estadoValidacion: "En Validación",
+                  fechaCargue: fechaHoraActual,
                 },
                 CamaraComercio: {
                   archivo: respuestaFile?.CamaraComercio?.fields?.key,
                   estadoValidacion: "En Validación",
+                  fechaCargue: fechaHoraActual,
                 },
                 Contrato: {
                   archivo: respuestaFile?.Contrato?.fields?.key,
                   estadoValidacion: "En Validación",
+                  fechaCargue: fechaHoraActual,
                 },
                 CertificacionBancaria: {
                   archivo: respuestaFile?.CertificacionBancaria?.fields?.key,
                   estadoValidacion: "En Validación",
+                  fechaCargue: fechaHoraActual,
                 },
               },
               numero_solicitud: dataCredito?.NroSolicitud,
+              name_usuario: pdpUser?.uname
             };
 
             notifyPending(

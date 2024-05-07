@@ -4,7 +4,7 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import Input from "../../../components/Base/Input";
 import {
-  postConsultaDocumentosBd,
+  // postConsultaDocumentosBd,
   postDescargarDocumentoValidacion,
 } from "../hooks/fetchCreditoFacil";
 import { notifyError, notify } from "../../../utils/notify";
@@ -18,75 +18,21 @@ const documentTypes = [
   { key: "certificacionBancaria", label: "Certificación Bancaria" },
 ];
 
-const initialStatusFile = {
-  pagareFirmado: "",
-  cedulaRepresentante: "",
-  estadoFinanciero: "",
-  camaraComercio: "",
-  contrato: "",
-  certificacionBancaria: "",
-};
-
 const FormActualizarDocumentos = ({
-  dataCredito,
   setChecked,
   setShowModal2,
   setModifyFile,
   setNameRoute,
   setNameFile,
-  setEstado,
   estado,
   setFileDocuments,
   fileDocuments,
   handleClose,
+  consultaDocumentos,
+  validationStatus,
 }) => {
-  const [validationStatus, setValidationStatus] = useState(initialStatusFile);
   useEffect(() => {
     consultaDocumentos();
-  }, []);
-
-  const consultaDocumentos = useCallback(() => {
-    const body = { numero_solicitud: dataCredito?.NroSolicitud };
-    postConsultaDocumentosBd(body)
-      .then((autoArr) => {
-        const consultaDocumentosBD = autoArr?.obj?.archivos;
-        if (Object.keys(consultaDocumentosBD).length > 0) {
-          setEstado(1);
-        }
-        setFileDocuments({
-          pagareFirmado: consultaDocumentosBD?.Pagare?.archivo
-            ? consultaDocumentosBD?.Pagare?.archivo
-            : "",
-          cedulaRepresentante: consultaDocumentosBD?.CedulaRepresentante
-            ? consultaDocumentosBD?.CedulaRepresentante?.archivo
-            : "",
-          estadoFinanciero: consultaDocumentosBD?.EstadoFinanciero
-            ? consultaDocumentosBD?.EstadoFinanciero?.archivo
-            : "",
-          camaraComercio: consultaDocumentosBD?.CamaraComercio
-            ? consultaDocumentosBD?.CamaraComercio?.archivo
-            : "",
-          contrato: consultaDocumentosBD?.Contrato
-            ? consultaDocumentosBD?.Contrato?.archivo
-            : "",
-          certificacionBancaria: consultaDocumentosBD?.CertificacionBancaria
-            ? consultaDocumentosBD?.CertificacionBancaria?.archivo
-            : "",
-        });
-        setValidationStatus({
-          pagareFirmado: consultaDocumentosBD?.Pagare?.estadoValidacion,
-          cedulaRepresentante:
-            consultaDocumentosBD?.CedulaRepresentante?.estadoValidacion,
-          estadoFinanciero:
-            consultaDocumentosBD?.EstadoFinanciero?.estadoValidacion,
-          camaraComercio:
-            consultaDocumentosBD?.CamaraComercio?.estadoValidacion,
-          contrato: consultaDocumentosBD?.Contrato?.estadoValidacion,
-          certificacionBancaria:
-            consultaDocumentosBD?.CertificacionBancaria?.estadoValidacion,
-        });
-      })
-      .catch((err) => console.error(err));
   }, []);
 
   const onChangeFile = useCallback((file, variable, inputElement) => {
