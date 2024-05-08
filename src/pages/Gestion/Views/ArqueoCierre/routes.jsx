@@ -56,7 +56,7 @@ export const rutasArqueo = [
   },
   {
     link: "/gestion/arqueo/arqueo-cierre-caja",
-    label: <AppIcons Logo={"RECAUDO"} name="Cierre de caja" />,
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte por Categoría" />,
     component: CierreCaja,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },

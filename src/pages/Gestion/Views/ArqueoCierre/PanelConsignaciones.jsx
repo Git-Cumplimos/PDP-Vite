@@ -53,7 +53,7 @@ const PanelConsignaciones = () => {
   const [stateRev, setStateRev] = useState(null);
   const [observacionesAnalisis, setObservacionesAnalisis] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userPermissions,roleInfo,updateCommerceQuota  } = useAuth();
+  const { userPermissions,roleInfo,updateCommerceQuota,userInfo  } = useAuth();
   const [rol, setRol] = useState(false);
   const [idComercio, setIdComercio] = useState('');
   const [idCajero, setIdCajero] = useState('');
@@ -86,6 +86,7 @@ const PanelConsignaciones = () => {
     })
       .then((res) => {
         setMaxPages(res?.obj?.maxPages ?? 0);
+
         setComprobantes(res?.obj?.results ?? []);
       })
       .catch((err) => {
@@ -130,6 +131,7 @@ const PanelConsignaciones = () => {
             pk_id_comprobante: selected?.pk_id_comprobante,
             observaciones_analisis: observacionesAnalisis,
             fk_estado_revision: stateRev,
+            nombre_responsable: userInfo?.attributes?.name,
           }
         ),
         {
@@ -166,6 +168,7 @@ const PanelConsignaciones = () => {
       selected?.pk_id_comprobante,
       stateRev,
       updateCommerceQuota,
+      userInfo?.attributes?.name
     ]
   );
 
@@ -187,6 +190,7 @@ const PanelConsignaciones = () => {
     }
   };
 
+  console.log(comprobantes)
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Validación de comprobante</h1>
@@ -195,6 +199,7 @@ const PanelConsignaciones = () => {
         headers={[
           // "Id",
           "Id comercio",
+          "Nombre Comercio",
           "Id Cajero",
           "Tipo de movimiento",
           "Empresa",
@@ -205,6 +210,8 @@ const PanelConsignaciones = () => {
           "Observaciones",
           "Fecha registro",
           "Estado",
+          "Nombre de quien aprueba",
+          "Fecha de aprobación",
         ]}
         maxPage={maxPages}
         data={comprobantes.map(
@@ -219,10 +226,14 @@ const PanelConsignaciones = () => {
             valor_movimiento,
             created,
             observaciones_analisis,
-            total_externos
+            total_externos,
+            nombre_comercio,
+            nombre_responsable,
+            fecha_aprobacion
           }) => ({
             // pk_id_comprobante,
             id_comercio,
+            nombre_comercio,
             id_usuario,
             fk_tipo_comprobante, 
             fk_nombre_entidad,
@@ -233,6 +244,8 @@ const PanelConsignaciones = () => {
             observaciones_analisis,
             created: dateFormatter.format(new Date(created)),
             fk_estado_revision: estadoRevision.get(fk_estado_revision) ?? "",
+            nombre_responsable,
+            fecha_aprobacion: fecha_aprobacion!=null?dateFormatter.format(new Date(fecha_aprobacion)):null,
           })
         )}
         onSelectRow={(_e, index) => {
@@ -353,20 +366,31 @@ const PanelConsignaciones = () => {
             value={selected?.fk_tipo_comprobante ?? ""}
             disabled
           />
-          <Input
-            id="valor_efectivo_pdp"
-            label="Valor efectivo caja"
-            type="text"
-            value={formatMoney.format(selected?.valor_efectivo_pdp) ?? ""}
-            disabled
-          />
-          <Input
-            id="valor_efectivo_boveda"
-            label="Valor efectivo bóveda"
-            type="text"
-            value={formatMoney.format(selected?.valor_efectivo_boveda) ?? ""}
-            disabled
-          />
+          {selected?.fk_tipo_comprobante !== "Recibido transportadora"?
+          <>
+            <Input
+              id="valor_efectivo_pdp"
+              label="Valor efectivo caja"
+              type="text"
+              value={formatMoney.format(selected?.valor_efectivo_pdp) ?? ""}
+              disabled
+            />
+            <Input
+              id="valor_efectivo_boveda"
+              label="Valor efectivo bóveda"
+              type="text"
+              value={formatMoney.format(selected?.valor_efectivo_boveda) ?? ""}
+              disabled
+            />
+            <Input
+              id="valor_efectivo_externos"
+              label="Efectivo redes externas"
+              type="text"
+              value={formatMoney.format(selected?.valores_externos) ?? ""}
+              disabled
+            />
+          </>
+          :null}
           <Input
             id="valor_movimiento"
             label="Valor total"
@@ -420,6 +444,28 @@ const PanelConsignaciones = () => {
             }
             disabled={selected?.fk_estado_revision !== null}
           />
+          {selected?.fk_estado_revision !== null?
+          <>
+            <Input
+              id="nombre_responsable"
+              label="Nombre de quien aprueba"
+              type="text"
+              value={selected?.nombre_responsable}
+              disabled
+            />
+            <Input
+              id="fecha_aprobacion"
+              label="Fecha de aprobación"
+              type="text"
+              value={
+                selected?.fecha_aprobacion
+                ? dateFormatter.format(new Date(selected?.fecha_aprobacion))
+                : ""
+              }
+              disabled
+            />
+          </>
+          :null}
           <TextArea
             id="observaciones"
             name="observaciones"

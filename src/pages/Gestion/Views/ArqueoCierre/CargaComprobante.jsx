@@ -36,9 +36,8 @@ const formatMoney = makeMoneyFormatter(0);
 
 const CargaComprobante = () => {
   const navigate = useNavigate();
-  const { roleInfo,userPermissions,quotaInfo } = useAuth();
+  const { roleInfo,userPermissions,quotaInfo,userInfo } = useAuth();
   const formRef = useRef(null);
-
   const [tiposComprobantes, setTiposComprobantes] = useState([]);
 
   const [movementType, setMovementType] = useState("");
@@ -53,6 +52,7 @@ const CargaComprobante = () => {
   const [valorComprobante, setValorComprobante] = useState(0.0);
   const [valorEfectivoPdp, setvalorEfectivoPdp] = useState(0.0);
   const [valorEfectivoBoveda, setvalorEfectivoBoveda] = useState(0.0);
+  const [valorEfectivoRedesExternas, setvalorEfectivoRedesExternas] = useState(0.0);
   const [observaciones, setObservaciones] = useState("");
   const [rolIngreso, setRolIngreso] = useState(false);
   const [rolRetiro, setRolRetiro] = useState(false);
@@ -60,6 +60,8 @@ const CargaComprobante = () => {
   const [selectedEntidadesExt, setSelectedEntidadesExt] = useState({
     entidades_agregar: [],
   });
+  const [valorEnCaja, setValorEnCaja] = useState(0);
+  const [valor_Boveda, setValorEnBoveda] = useState(0);
   // const [valoresExternos, setValoresExternos] = useState({});
 
   const [limitesMontos, setLimitesMontos] = useState({
@@ -75,8 +77,10 @@ const CargaComprobante = () => {
     () => ({
       "Id comercio": roleInfo?.id_comercio ?? 59,
       "Id usuario": roleInfo?.id_usuario ?? 8202,
+      "Nombre comercio": roleInfo?.nombre_comercio,
+      "Nombre usuario": userInfo?.attributes?.name
     }),
-    [roleInfo?.id_comercio, roleInfo?.id_usuario]
+    [roleInfo?.id_comercio, roleInfo?.id_usuario, userInfo?.attributes?.name, roleInfo?.nombre_comercio]
   );
 
   const searchEntities = useCallback((is_transport) => {
@@ -116,29 +120,30 @@ const CargaComprobante = () => {
 
   const uploadComprobante = useCallback(async () => {
     try {
-      var valores = await verValorBoveda({
-        id_usuario: roleInfo?.id_usuario,
-        id_comercio: roleInfo?.id_comercio,
-        id_terminal: roleInfo?.id_dispositivo,
-      });
-      var valor_Boveda = valores?.obj[0]?.valor_boveda !== undefined?parseInt(valores?.obj[0]?.valor_boveda):0
+      // var valores = await verValorBoveda({
+      //   id_usuario: roleInfo?.id_usuario,
+      //   id_comercio: roleInfo?.id_comercio,
+      //   id_terminal: roleInfo?.id_dispositivo,
+      // });
+      // var valor_Boveda = valores?.obj[0]?.valor_boveda !== undefined?parseInt(valores?.obj[0]?.valor_boveda):0
+
       if (movementType !== "Movimiento a bóveda") {
         // var sumExter = 0
         // Object.values(valoresExternos).map((e)=> sumExter += e)
         // if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
         if (parseInt(valorComprobante) !== 0) {
-          if (movementType !== "Recibido transportadora") {          
-            if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
-              throw new Error("Efectivo insuficiente en Caja", {
-                cause: "custom",
-              });
-            }
-            if (valor_Boveda < valorEfectivoBoveda) {
-              throw new Error("Efectivo insuficiente en bóveda", {
-                cause: "custom",
-              });
-            }
-          }
+          // if (movementType !== "Recibido transportadora") {          
+          //   if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
+          //     throw new Error("Efectivo insuficiente en Caja", {
+          //       cause: "custom",
+          //     });
+          //   }
+          //   if (valor_Boveda < valorEfectivoBoveda) {
+          //     throw new Error("Efectivo insuficiente en bóveda", {
+          //       cause: "custom",
+          //     });
+          //   }
+          // }
 
           if (!selectedEntity) {
             throw new Error("No se ha seleccionado una entidad", {
@@ -173,6 +178,7 @@ const CargaComprobante = () => {
             fk_nombre_entidad: selectedEntity,
             fk_tipo_comprobante: movementType,
             id_comercio: roleInfo?.id_comercio,
+            nombre_comercio: roleInfo?.nombre_comercio,
             id_usuario: roleInfo?.id_usuario,
             id_terminal: roleInfo?.id_dispositivo,
             nro_comprobante: comprobanteNumber,
@@ -181,7 +187,7 @@ const CargaComprobante = () => {
             archivo: filename,
             valor_efectivo_pdp: valorEfectivoPdp,
             valor_efectivo_boveda: valorEfectivoBoveda,
-            // valores_externos: valoresExternos,
+            valores_externos: valorEfectivoRedesExternas,
           };
           if (movementType === "Consignación Bancaria") {
             reqBody["nro_cuenta"] = accountNumber;
@@ -225,6 +231,7 @@ const CargaComprobante = () => {
       throw error;
     }
   }, [
+    valor_Boveda,
     file,
     movementType,
     selectedEntity,
@@ -240,6 +247,8 @@ const CargaComprobante = () => {
     valorEfectivoPdp,
     valorEfectivoBoveda,
     // valoresExternos,
+    roleInfo?.nombre_comercio,
+    valorEfectivoRedesExternas
   ]);
 
   const onFileChange = useCallback((files) => {   
@@ -251,7 +260,7 @@ const CargaComprobante = () => {
   }, []);
   
   const valuesComprobante = () => {
-    const suma = valorEfectivoPdp + valorEfectivoBoveda;
+    const suma = valorEfectivoPdp + valorEfectivoBoveda + valorEfectivoRedesExternas;
     setValorComprobante(suma.toString());
   };
   
@@ -299,10 +308,18 @@ const CargaComprobante = () => {
     buscarTiposComprobantes()
       .then((res) => {
         setTiposComprobantes(
-          (res?.obj ?? []).map(({ nombre_comprobante }) => ({
-            value: nombre_comprobante,
-            label: nombre_comprobante,
-          }))
+          (res?.obj ?? [])
+            .filter(({ nombre_comprobante }) => 
+              (id_permission.includes(7014) && nombre_comprobante === 'Consignación Bancaria') ||
+              (id_permission.includes(7015) && nombre_comprobante === 'Entrega transportadora') ||
+              (id_permission.includes(7016) && nombre_comprobante === 'Recibido transportadora') ||
+              (id_permission.includes(7017) && nombre_comprobante === 'Movimiento a bóveda') ||
+              (id_permission.includes(7018) && nombre_comprobante === 'Transferencia de efectivo entre cajeros')
+            )
+            .map(({ nombre_comprobante }) => ({
+              value: nombre_comprobante,
+              label: nombre_comprobante
+            }))
         );
       })
       .catch((err) => {
@@ -313,6 +330,30 @@ const CargaComprobante = () => {
         notifyError("Peticion fallida");
       });
   }, [userPermissions]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        var valores = await verValorBoveda({
+          id_usuario: roleInfo?.id_usuario,
+          id_comercio: roleInfo?.id_comercio,
+          id_terminal: roleInfo?.id_dispositivo,
+        });
+        var valor_Boveda = valores?.obj[0]?.valor_boveda !== undefined?parseInt(valores?.obj[0]?.valor_boveda):0
+        setValorEnBoveda(valor_Boveda)
+        setValorEnCaja(quotaInfo?.quota-valor_Boveda)
+      } catch (error) {
+        console.error('Error al obtener los datos:', error);
+      }
+    };
+    fetchData();
+  }, [
+    quotaInfo?.quota,
+    roleInfo?.id_usuario,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+  ]);
+
 
   // const EntityExt = useCallback(() =>{
   //   setShowModal(true);
@@ -385,6 +426,7 @@ const CargaComprobante = () => {
             setValorComprobante(0.0)
             setvalorEfectivoPdp(0.0)
             setvalorEfectivoBoveda(0.0)
+            setvalorEfectivoRedesExternas(0.0)
             setFile(null)
             setImage(null)
             setSelectedEntidadesExt((old) => {return {...old,entidades_agregar: [],};});
@@ -477,36 +519,61 @@ const CargaComprobante = () => {
                 required
               />
               {movementType === "Consignación Bancaria" || movementType === "Entrega transportadora" ?(<>
-                <Input
-                  id="valor_caja_pdp"
-                  name="valor_caja_pdp"  
-                  label={`Valor efectivo Caja`}
-                  autoComplete="off"
-                  type="tel"
-                  minLength={"5"}
-                  maxLength={"13"}
-                  onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
-                  onBlur={valuesComprobante}
-                  // required
-                />
-                <Input
-                  id="valor_boveda"
-                  name="valor_boveda"  
-                  label={`Valor efectivo Bóveda`}
-                  autoComplete="off"
-                  type="tel"
-                  maxLength={"12"}
-                  onInput={(ev) => setvalorEfectivoBoveda(onChangeMoney(ev))}
-                  onBlur={valuesComprobante}
-                />
-                <Input
-                  id="valor"
-                  name="valor"  
-                  label={`Valor total`}
-                  type="tel"
-                  value={formatMoney.format(valorComprobante)}
-                  disabled
-                />
+                {roleInfo?.tipo_comercio === "OFICINAS PROPIAS"?<>
+                  <Input
+                    id="valor_caja_pdp"
+                    name="valor_caja_pdp"  
+                    label={`Valor efectivo Caja`}
+                    autoComplete="off"
+                    type="tel"
+                    // minLength={"5"}
+                    maxLength={"13"}
+                    onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
+                    onBlur={valuesComprobante}
+                    // required
+                  />
+                  <Input
+                    id="valor_boveda"
+                    name="valor_boveda"  
+                    label={`Valor efectivo Bóveda`}
+                    autoComplete="off"
+                    type="tel"
+                    maxLength={"12"}
+                    onInput={(ev) => setvalorEfectivoBoveda(onChangeMoney(ev))}
+                    onBlur={valuesComprobante}
+                  />
+                  <Input
+                    id="valor_redes_externas"
+                    name="valor_redes_externas"  
+                    label={`Valor efectivo Redes Externas`}
+                    autoComplete="off"
+                    type="tel"
+                    maxLength={"12"}
+                    onInput={(ev) => setvalorEfectivoRedesExternas(onChangeMoney(ev))}
+                    onBlur={valuesComprobante}
+                  />
+                  <Input
+                    id="valor"
+                    name="valor"  
+                    label={`Valor total`}
+                    type="tel"
+                    value={formatMoney.format(valorComprobante)}
+                    disabled
+                  />
+                </>:<>
+                  <Input
+                    id="valor_caja_pdp"
+                    name="valor_caja_pdp"  
+                    label={`Valor efectivo`}
+                    autoComplete="off"
+                    type="tel"
+                    minLength={"5"}
+                    maxLength={"13"}
+                    onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
+                    onBlur={valuesComprobante}
+                    required
+                  />
+                </>}
                 {/* {renderInputs()} */}
                 {/* <ButtonBar>
                   <Button type="button" onClick={() => EntityExt()}>
@@ -543,6 +610,26 @@ const CargaComprobante = () => {
                 required
                 type="tel"
               />
+              {TipoMovimiento === "Ingreso a bóveda"?
+                <Input
+                  id="efectivo_caja"
+                  name="efectivo_caja"  
+                  label={`Efectivo en caja`}
+                  type="tel"
+                  value={formatMoney.format(valorEnCaja)}
+                  disabled
+                />
+              :null}
+              {TipoMovimiento === "Retiro de bóveda"?
+                <Input
+                  id="efectivo_boveda"
+                  name="efectivo_boveda"  
+                  label={`Efectivo en bóveda`}
+                  type="tel"
+                  value={formatMoney.format(valor_Boveda)}
+                  disabled
+                />
+              :null}
               <Input
                 id="valor"
                 name="valor"

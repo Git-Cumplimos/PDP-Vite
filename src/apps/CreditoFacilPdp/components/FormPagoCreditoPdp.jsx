@@ -21,26 +21,17 @@ const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago
 const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
 const DATA_TIPO_DOCUMENTO = {
   "": "",
-  NIT: 2,
-  "CEDULA CIUDADANIA": 1,
-  "TARJETA DE IDENTIDAD": 4,
-  "REGISTRO CIVIL": 6,
-  "TARJETA DE EXTRANJERIA": 7,
-  "CEDULA EXTRANJERIA": 3,
-  PASAPORTE: 8,
-  "DEFINIDO POR LA DIAN": 10,
-  "TIPO DOCUMENTO EXTRANJERO PJURIDICA": 5,
-  "NIT PERSONA NATURAL": 11,
+  "RECIBO DE CAJA": "R01",
+  // "OTROS INGRESOS": "R02",
 };
-const DATA_FORMA_PAGO = {
-  "": "",
-  "CUENTA CTE BANCO DE COLPATRIA": 19,
-  "CUENTA AHORROS BANCO AGRARIO": 20,
-  // "CUENTA CTA BANCOLOMBIA": 22,
-  // "CUENTA CTE DAVIVIENDA": 23,
-  // "CUENTA CTE ITAU": 24,
-  // "DESEMBOLSO CREDITO COMERCIOS": 28,
-};
+// const DATA_FORMA_PAGO = {
+//   "": "",
+//   "CUENTA CTE BANCO DE COLPATRIA": 19,
+//   "CUENTA AHORROS BANCO AGRARIO": 20,
+//   "RECAUDO CEAS": 25,
+//   "RECAUDO CRCS": 26,
+//   "RECAUDO COMERCIOS": 27,
+// };
 const DATA_TIPO_ABONO = {
   "": "",
   "ABONO NORMAL": 9,
@@ -58,10 +49,10 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
     valor: 0,
     observaciones: "",
     tipoDocumento: "",
-    formaPago: "",
+    // formaPago: "",
     tipoAbono: "",
     nombreTipoDocumento: "",
-    nombreFormaPago: "",
+    // nombreFormaPago: "",
     nombreTipoAbono: "",
   });
   const [objTicketActual, setObjTicketActual] = useState({});
@@ -110,7 +101,8 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
           id_numero_credito: dataCreditoUnique?.Id,
           observaciones: dataInput?.observaciones,
           tipo_documento: dataInput?.tipoDocumento,
-          forma_pago: dataInput?.formaPago,
+          tipo_comercio: roleInfo?.tipo_comercio,
+          // forma_pago: dataInput?.formaPago,
           tipo_abono: dataInput?.tipoAbono,
         },
       };
@@ -147,7 +139,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
     if (ev.target.name === "tipoDocumento") {
       let nombreDocumento =
         Object.keys(DATA_TIPO_DOCUMENTO).filter(
-          (key) => DATA_TIPO_DOCUMENTO[key] === parseInt(value)
+          (key) => DATA_TIPO_DOCUMENTO[key] === value
         )[0] ?? "";
       setDataInput((old) => ({
         ...old,
@@ -155,17 +147,17 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
         [ev.target.name]: value,
       }));
     }
-    if (ev.target.name === "formaPago") {
-      let nombreformaPagoTemp =
-        Object.keys(DATA_FORMA_PAGO).filter(
-          (key) => DATA_FORMA_PAGO[key] === parseInt(value)
-        )[0] ?? "";
-      setDataInput((old) => ({
-        ...old,
-        nombreFormaPago: nombreformaPagoTemp,
-        [ev.target.name]: value,
-      }));
-    }
+    // if (ev.target.name === "formaPago") {
+    //   let nombreformaPagoTemp =
+    //     Object.keys(DATA_FORMA_PAGO).filter(
+    //       (key) => DATA_FORMA_PAGO[key] === parseInt(value)
+    //     )[0] ?? "";
+    //   setDataInput((old) => ({
+    //     ...old,
+    //     nombreFormaPago: nombreformaPagoTemp,
+    //     [ev.target.name]: value,
+    //   }));
+    // }
     if (ev.target.name === "tipoAbono") {
       let nombreTipoAbonoTemp =
         Object.keys(DATA_TIPO_ABONO).filter(
@@ -262,7 +254,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             required
             disabled={loadingPeticionPagoCredito}
           />
-          <Select
+          {/* <Select
             id="formaPago"
             name="formaPago"
             label="Forma de pago"
@@ -271,7 +263,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             onChange={onChangeFormat}
             required
             disabled={loadingPeticionPagoCredito}
-          />
+          /> */}
           <Select
             id="tipoAbono"
             name="tipoAbono"
@@ -336,7 +328,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
               summaryTrx={{
                 "Número crédito": dataCreditoUnique?.Id,
                 "Tipo de documento": dataInput?.nombreTipoDocumento,
-                "Forma de pago": dataInput?.nombreFormaPago,
+                // "Forma de pago": dataInput?.nombreFormaPago,
                 "Tipo de abono": dataInput?.nombreTipoAbono,
                 "Valor a pagar": formatMoney.format(dataInput?.valor),
               }}
