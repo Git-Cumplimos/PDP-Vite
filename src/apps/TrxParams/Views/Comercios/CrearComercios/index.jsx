@@ -1276,349 +1276,351 @@ const CrearComercios = () => {
             disabled={alertMonto !== "" && alertMonto !== 0 ? true : false}
           />
         </Fieldset>
-        <Fieldset legend="Dispersión de pagos" className="lg:col-span-2">
-          <Select
-            id="derechos_locales"
-            name="derechos_locales"
-            label="Derechos locales"
-            options={{
-              "": "",
-              Davivienda: 13,
-              "Grupo Aval": 17,
-              Colpatria: 14,
-              "Banco Agrario": 16,
-            }}
-            value={dispersionPagos?.autorizador_local}
-            onChange={(ev) =>
-              setDispersionPagos((old) => {
-                return {
-                  ...old,
-                  autorizador_local:
-                    ev.target.value !== ""
-                      ? parseInt(ev.target.value)
-                      : ev.target.value,
-                };
-              })
-            }
-            required={
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Input
-            key="convenio_local"
-            name="convenio_local"
-            label="Convenio local"
-            onChange={handleChangeDispersionPagos}
-            type="text"
-            minLength="1"
-            maxLength="13"
-            value={dispersionPagos?.convenio_local}
-            placeholder="Ingrese el convenio"
-            autoComplete="off"
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Select
-            id="derechos_runt"
-            name="derechos_runt"
-            label="Derechos RUNT"
-            options={{
-              "": "",
-              Davivienda: 13,
-              "Grupo Aval": 17,
-              Colpatria: 14,
-              "Banco Agrario": 16,
-            }}
-            value={dispersionPagos?.autorizador_runt}
-            onChange={(ev) =>
-              setDispersionPagos((old) => {
-                return {
-                  ...old,
-                  autorizador_runt:
-                    ev.target.value !== ""
-                      ? parseInt(ev.target.value)
-                      : ev.target.value,
-                  trx_unica_runt_mt: false,
-                };
-              })
-            }
-            disabled={
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== ""
-                ? true
-                : false
-            }
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Input
-            key="convenio_runt"
-            name="convenio_runt"
-            label="Convenio RUNT"
-            onChange={handleChangeDispersionPagos}
-            type="text"
-            minLength="1"
-            maxLength="13"
-            value={dispersionPagos?.convenio_runt}
-            placeholder="Ingrese el convenio"
-            autoComplete="off"
-            disabled={
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== ""
-                ? true
-                : false
-            }
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Select
-            id="derechos_mt"
-            name="derechos_mt"
-            label="Derechos MT"
-            options={{
-              "": "",
-              Davivienda: 13,
-              "Grupo Aval": 17,
-              Colpatria: 14,
-              "Banco Agrario": 16,
-            }}
-            value={dispersionPagos?.autorizador_mt}
-            onChange={(ev) =>
-              setDispersionPagos((old) => {
-                return {
-                  ...old,
-                  autorizador_mt:
-                    ev.target.value !== ""
-                      ? parseInt(ev.target.value)
-                      : ev.target.value,
-                  trx_unica_runt_mt: false,
-                };
-              })
-            }
-            disabled={
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== ""
-                ? true
-                : false
-            }
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Input
-            key="convenio_mt"
-            name="convenio_mt"
-            label="Convenio MT"
-            onChange={handleChangeDispersionPagos}
-            type="text"
-            minLength="1"
-            maxLength="13"
-            value={dispersionPagos?.convenio_mt}
-            placeholder="Ingrese el convenio"
-            autoComplete="off"
-            disabled={
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== ""
-                ? true
-                : false
-            }
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Select
-            id="derechos_runt_mt"
-            name="derechos_runt_mt"
-            label="Derechos RUNT y MT"
-            options={{
-              "": "",
-              Davivienda: 13,
-              "Grupo Aval": 17,
-              Colpatria: 14,
-              "Banco Agrario": 16,
-            }}
-            value={dispersionPagos?.autorizador_runt_mt}
-            onChange={(ev) =>
-              setDispersionPagos((old) => {
-                return {
-                  ...old,
-                  autorizador_runt_mt:
-                    ev.target.value !== ""
-                      ? parseInt(ev.target.value)
-                      : ev.target.value,
-                  trx_unica_runt_mt: true,
-                };
-              })
-            }
-            disabled={
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.autorizador_mt !== ""
-                ? true
-                : false
-            }
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Input
-            key="convenio_runt_mt"
-            name="convenio_runt_mt"
-            label="Convenio RUNT y MT"
-            onChange={handleChangeDispersionPagos}
-            type="text"
-            minLength="1"
-            maxLength="13"
-            value={dispersionPagos?.convenio_runt_mt}
-            placeholder="Ingrese el convenio"
-            autoComplete="off"
-            disabled={
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.autorizador_mt !== ""
-                ? true
-                : false
-            }
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.usuario_jwt !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Input
-            key="usuario_jwt"
-            name="usuario_jwt"
-            label="Usuario autenticación"
-            onChange={handleChangeDispersionPagos}
-            type="text"
-            minLength="1"
-            maxLength="30"
-            value={dispersionPagos?.usuario_jwt}
-            placeholder="Ingrese el usuario"
-            autoComplete="off"
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.contrasena_jwt !== ""
-                ? true
-                : false
-            }
-          />
-          <Input
-            key="contrasena_jwt"
-            name="contrasena_jwt"
-            label="Contraseña autenticación"
-            onChange={handleChangeDispersionPagos}
-            type="text"
-            minLength="1"
-            maxLength="100"
-            value={dispersionPagos?.contrasena_jwt}
-            placeholder="Ingrese la contraseña"
-            autoComplete="off"
-            required={
-              dispersionPagos?.autorizador_local !== "" ||
-              dispersionPagos?.autorizador_runt !== "" ||
-              dispersionPagos?.autorizador_mt !== "" ||
-              dispersionPagos?.autorizador_runt_mt !== "" ||
-              dispersionPagos?.convenio_runt !== "" ||
-              dispersionPagos?.convenio_mt !== "" ||
-              dispersionPagos?.convenio_runt_mt !== "" ||
-              dispersionPagos?.convenio_local !== "" ||
-              dispersionPagos?.usuario_jwt !== ""
-                ? true
-                : false
-            }
-          />
-        </Fieldset>
+        {process.env.REACT_APP_APPENV_NAME === "pdp" && (
+          <Fieldset legend="Dispersión de pagos" className="lg:col-span-2">
+            <Select
+              id="derechos_locales"
+              name="derechos_locales"
+              label="Derechos locales"
+              options={{
+                "": "",
+                Davivienda: 13,
+                "Grupo Aval": 17,
+                Colpatria: 14,
+                "Banco Agrario": 16,
+              }}
+              value={dispersionPagos?.autorizador_local}
+              onChange={(ev) =>
+                setDispersionPagos((old) => {
+                  return {
+                    ...old,
+                    autorizador_local:
+                      ev.target.value !== ""
+                        ? parseInt(ev.target.value)
+                        : ev.target.value,
+                  };
+                })
+              }
+              required={
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Input
+              key="convenio_local"
+              name="convenio_local"
+              label="Convenio local"
+              onChange={handleChangeDispersionPagos}
+              type="text"
+              minLength="1"
+              maxLength="13"
+              value={dispersionPagos?.convenio_local}
+              placeholder="Ingrese el convenio"
+              autoComplete="off"
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Select
+              id="derechos_runt"
+              name="derechos_runt"
+              label="Derechos RUNT"
+              options={{
+                "": "",
+                Davivienda: 13,
+                "Grupo Aval": 17,
+                Colpatria: 14,
+                "Banco Agrario": 16,
+              }}
+              value={dispersionPagos?.autorizador_runt}
+              onChange={(ev) =>
+                setDispersionPagos((old) => {
+                  return {
+                    ...old,
+                    autorizador_runt:
+                      ev.target.value !== ""
+                        ? parseInt(ev.target.value)
+                        : ev.target.value,
+                    trx_unica_runt_mt: false,
+                  };
+                })
+              }
+              disabled={
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== ""
+                  ? true
+                  : false
+              }
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Input
+              key="convenio_runt"
+              name="convenio_runt"
+              label="Convenio RUNT"
+              onChange={handleChangeDispersionPagos}
+              type="text"
+              minLength="1"
+              maxLength="13"
+              value={dispersionPagos?.convenio_runt}
+              placeholder="Ingrese el convenio"
+              autoComplete="off"
+              disabled={
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== ""
+                  ? true
+                  : false
+              }
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Select
+              id="derechos_mt"
+              name="derechos_mt"
+              label="Derechos MT"
+              options={{
+                "": "",
+                Davivienda: 13,
+                "Grupo Aval": 17,
+                Colpatria: 14,
+                "Banco Agrario": 16,
+              }}
+              value={dispersionPagos?.autorizador_mt}
+              onChange={(ev) =>
+                setDispersionPagos((old) => {
+                  return {
+                    ...old,
+                    autorizador_mt:
+                      ev.target.value !== ""
+                        ? parseInt(ev.target.value)
+                        : ev.target.value,
+                    trx_unica_runt_mt: false,
+                  };
+                })
+              }
+              disabled={
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== ""
+                  ? true
+                  : false
+              }
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Input
+              key="convenio_mt"
+              name="convenio_mt"
+              label="Convenio MT"
+              onChange={handleChangeDispersionPagos}
+              type="text"
+              minLength="1"
+              maxLength="13"
+              value={dispersionPagos?.convenio_mt}
+              placeholder="Ingrese el convenio"
+              autoComplete="off"
+              disabled={
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== ""
+                  ? true
+                  : false
+              }
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Select
+              id="derechos_runt_mt"
+              name="derechos_runt_mt"
+              label="Derechos RUNT y MT"
+              options={{
+                "": "",
+                Davivienda: 13,
+                "Grupo Aval": 17,
+                Colpatria: 14,
+                "Banco Agrario": 16,
+              }}
+              value={dispersionPagos?.autorizador_runt_mt}
+              onChange={(ev) =>
+                setDispersionPagos((old) => {
+                  return {
+                    ...old,
+                    autorizador_runt_mt:
+                      ev.target.value !== ""
+                        ? parseInt(ev.target.value)
+                        : ev.target.value,
+                    trx_unica_runt_mt: true,
+                  };
+                })
+              }
+              disabled={
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.autorizador_mt !== ""
+                  ? true
+                  : false
+              }
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Input
+              key="convenio_runt_mt"
+              name="convenio_runt_mt"
+              label="Convenio RUNT y MT"
+              onChange={handleChangeDispersionPagos}
+              type="text"
+              minLength="1"
+              maxLength="13"
+              value={dispersionPagos?.convenio_runt_mt}
+              placeholder="Ingrese el convenio"
+              autoComplete="off"
+              disabled={
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.autorizador_mt !== ""
+                  ? true
+                  : false
+              }
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.usuario_jwt !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Input
+              key="usuario_jwt"
+              name="usuario_jwt"
+              label="Usuario autenticación"
+              onChange={handleChangeDispersionPagos}
+              type="text"
+              minLength="1"
+              maxLength="30"
+              value={dispersionPagos?.usuario_jwt}
+              placeholder="Ingrese el usuario"
+              autoComplete="off"
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.contrasena_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+            <Input
+              key="contrasena_jwt"
+              name="contrasena_jwt"
+              label="Contraseña autenticación"
+              onChange={handleChangeDispersionPagos}
+              type="text"
+              minLength="1"
+              maxLength="100"
+              value={dispersionPagos?.contrasena_jwt}
+              placeholder="Ingrese la contraseña"
+              autoComplete="off"
+              required={
+                dispersionPagos?.autorizador_local !== "" ||
+                dispersionPagos?.autorizador_runt !== "" ||
+                dispersionPagos?.autorizador_mt !== "" ||
+                dispersionPagos?.autorizador_runt_mt !== "" ||
+                dispersionPagos?.convenio_runt !== "" ||
+                dispersionPagos?.convenio_mt !== "" ||
+                dispersionPagos?.convenio_runt_mt !== "" ||
+                dispersionPagos?.convenio_local !== "" ||
+                dispersionPagos?.usuario_jwt !== ""
+                  ? true
+                  : false
+              }
+            />
+          </Fieldset>
+        )}
         <Fieldset legend="Parametrización zona" className="lg:col-span-2">
           <Select
             id="Zona comercio"
