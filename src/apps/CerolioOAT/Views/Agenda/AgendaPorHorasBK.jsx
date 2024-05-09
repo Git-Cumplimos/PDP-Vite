@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import {
   CalendarDate,
   CalendarMonth,
@@ -7,11 +7,8 @@ import Input from "../../../../components/Base/Input";
 import Button from "../../../../components/Base/Button";
 import { fetchGetHorariosByIdComercio } from "../../utils/agenda";
 import { notifyError } from "../../../../utils/notify";
-import Table from "../../../../components/Base/Table";
-import { useAuth } from "../../../../hooks/AuthHooks";
 
 const Agenda = () => {
-  const { roleInfo } = useAuth();
   const [date, setDate] = useState(null);
 
   const changeDate = async (e) => {
@@ -36,7 +33,7 @@ const Agenda = () => {
     setDate(fechaSeleccionadaFormatted);
     const horarios = await fetchGetHorariosByIdComercio(
       fechaSeleccionadaFormatted,
-      roleInfo.id_comercio
+      3
     );
     if (horarios.status) {
       console.log("horarios original", horarios.obj?.["horarios disponibles"]);
@@ -88,14 +85,20 @@ const Agenda = () => {
   };
 
   const [hours, setHours] = useState([
-    { day: "Lunes", startTime: "08:00", endTime: "19:00" },
-    { day: "Martes", startTime: "08:00", endTime: "19:00" },
-    { day: "Miércoles", startTime: "08:00", endTime: "19:00" },
-    { day: "Jueves", startTime: "08:00", endTime: "19:00" },
-    { day: "Viernes", startTime: "08:00", endTime: "19:00" },
-    { day: "Sábado", startTime: "08:00", endTime: "19:00" },
-    { day: "Domingo", startTime: "08:00", endTime: "19:00" },
-    { day: "Festivo", startTime: "08:00", endTime: "19:00" },
+    { hour: "06:00-07:00", available: true },
+    { hour: "07:00-08:00", available: true },
+    { hour: "08:00-09:00", available: true },
+    { hour: "09:00-10:00", available: true },
+    { hour: "10:00-11:00", available: true },
+    { hour: "11:00-12:00", available: true },
+    { hour: "12:00-13:00", available: true },
+    { hour: "13:00-14:00", available: true },
+    { hour: "14:00-15:00", available: true },
+    { hour: "15:00-16:00", available: true },
+    { hour: "16:00-17:00", available: true },
+    { hour: "17:00-18:00", available: true },
+    { hour: "18:00-19:00", available: true },
+    { hour: "19:00-20:00", available: true },
   ]);
 
   const updateHours = async () => {
@@ -110,50 +113,46 @@ const Agenda = () => {
   };
 
   return (
-    <div className="flex flex-col w-full">
-      <CalendarDate value={date} onChange={changeDate}>
-        <CalendarMonth />
-      </CalendarDate>
-      <div className="grid grid-cols-4">
-        {hours.map((hour, index) => (
-          <Fragment key={index}>
-            <Input
-              label={`¿Desde qué hora atiendes los ${hour.day}?`}
-              type="time"
-              value={hour.startTime}
-              onChange={(e) => {
+    <>
+      <h2 className="text-center">
+        Por favor modifique las horas de acuerdo a su necesidad
+      </h2>
+      <div className="grid grid-cols-2 gap-5">
+        <CalendarDate value={date} onChange={changeDate}>
+          <CalendarMonth />
+        </CalendarDate>
+        <div className="grid items-center grid-cols-3 gap-5">
+          {hours.map((hour, index) => (
+            <button
+              key={hour.hour}
+              className={`mr-2 p-2 rounded-xl ${
+                hour.available ? "bg-green-500" : "bg-red-500"
+              }`}
+              onClick={() => {
                 const newHours = [...hours];
-                newHours[index].startTime = e.target.value;
+                newHours[index].available = !newHours[index].available;
                 setHours(newHours);
               }}
-            />
-            <Input
-              label={`¿Hasta qué hora atiendes los ${hour.day}?`}
-              type="time"
-              value={hour.endTime}
-              onChange={(e) => {
-                const newHours = [...hours];
-                newHours[index].endTime = e.target.value;
-                setHours(newHours);
-              }}
-            />
-          </Fragment>
-        ))}
+            >
+              {hour.hour}
+            </button>
+          ))}
+        </div>
+        <div className="col-span-2">
+          <Input
+            label="¿Cuántas personas puedes atender por hora?"
+            type="number"
+            placeholder="Número de personas"
+          />
+        </div>
+        <Button design="secondary" type="button">
+          Limpiar todo
+        </Button>
+        <Button design="primary" type="button" onClick={updateHours}>
+          Guardar
+        </Button>
       </div>
-      <div className="col-span-2">
-        <Input
-          label="¿Cuántas personas puedes atender por hora?"
-          type="number"
-          placeholder="Número de personas"
-        />
-      </div>
-      <Button design="secondary" type="button">
-        Limpiar todo
-      </Button>
-      <Button design="primary" type="button" onClick={updateHours}>
-        Guardar
-      </Button>
-    </div>
+    </>
   );
 };
 
