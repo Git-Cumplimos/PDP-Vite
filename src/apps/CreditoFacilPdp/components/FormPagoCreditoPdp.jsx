@@ -6,7 +6,7 @@ import Form from "../../../components/Base/Form";
 import Fieldset from "../../../components/Base/Fieldset";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
-import { notifyPending } from "../../../utils/notify";
+import { notifyError, notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useReactToPrint } from "react-to-print";
 import Modal from "../../../components/Base/Modal";
@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useFetchCreditoFacil } from "../hooks/fetchCreditoFacil";
 import Select from "../../../components/Base/Select";
 import TextArea from "../../../components/Base/TextArea";
+import { enumParametrosCreditosPDP } from "../utils/enumParametrosCreditosPdp";
 
 const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
 const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
@@ -68,10 +69,20 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
       URL_CONSULTA_PAGO_CREDITO,
       "Pago crédito"
     );
-  const showModalFunc = useCallback((ev) => {
-    ev.preventDefault();
-    setShowModal(true);
-  }, []);
+  const showModalFunc = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      if (dataInput.valor > enumParametrosCreditosPDP.MAXPAGOCREDITOPDP) {
+        return notifyError(
+          `El valor de la transacción debe ser menor de  ${formatMoney.format(
+            enumParametrosCreditosPDP.MAXPAGOCREDITOPDP
+          )}`
+        );
+      }
+      setShowModal(true);
+    },
+    [dataInput.valor]
+  );
   const pagoCredito = useCallback(
     (ev) => {
       ev.preventDefault();
