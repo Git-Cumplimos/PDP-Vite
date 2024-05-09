@@ -6,7 +6,6 @@ import Form from "../../../components/Base/Form";
 import Fieldset from "../../../components/Base/Fieldset";
 import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
-import { enumParametrosCreditosPDP } from "../utils/enumParametrosCreditosPdp";
 import { notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useReactToPrint } from "react-to-print";
@@ -16,11 +15,11 @@ import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useNavigate } from "react-router-dom";
 import { useFetchCreditoFacil } from "../hooks/fetchCreditoFacil";
 import Select from "../../../components/Base/Select";
+import TextArea from "../../../components/Base/TextArea";
 
 const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
 const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
 const DATA_TIPO_DOCUMENTO = {
-  "": "",
   "RECIBO DE CAJA": "R01",
   // "OTROS INGRESOS": "R02",
 };
@@ -33,27 +32,27 @@ const DATA_TIPO_DOCUMENTO = {
 //   "RECAUDO COMERCIOS": 27,
 // };
 const DATA_TIPO_ABONO = {
-  "": "",
-  "ABONO NORMAL": 9,
-  "REDUCCIÓN TIEMPO": 10,
-  "REDUCCIÓN CUOTA": 11,
-  ADELANTADO: 12,
-  "PARA ESTAR AL DÍA": 13,
-  "PAGO TOTAL": 14,
-  "OTRO VALOR": 15,
+  // "": "",
+  // "ABONO NORMAL": 9,
+  // "REDUCCIÓN TIEMPO": 10,
+  // "REDUCCIÓN CUOTA": 11,
+  // ADELANTADO: 12,
+  // "PARA ESTAR AL DÍA": 13,
+  "PAGO TOTAL": "14",
+  "OTRO VALOR": "15",
 };
 const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
   const uniqueId = v4();
   const validNavigate = useNavigate();
   const [dataInput, setDataInput] = useState({
-    valor: 0,
+    valor: Math.ceil(dataCreditoUnique.Saldo),
     observaciones: "",
-    tipoDocumento: "",
+    tipoDocumento: "R01",
     // formaPago: "",
-    tipoAbono: "",
-    nombreTipoDocumento: "",
+    tipoAbono: "14",
+    nombreTipoDocumento: "RECIBO DE CAJA",
     // nombreFormaPago: "",
-    nombreTipoAbono: "",
+    nombreTipoAbono: "PAGO TOTAL",
   });
   const [objTicketActual, setObjTicketActual] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -162,12 +161,17 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
     if (ev.target.name === "tipoAbono") {
       let nombreTipoAbonoTemp =
         Object.keys(DATA_TIPO_ABONO).filter(
-          (key) => DATA_TIPO_ABONO[key] === parseInt(value)
+          (key) => DATA_TIPO_ABONO[key] === value
         )[0] ?? "";
+      let valor = Math.ceil(dataCreditoUnique?.Valorcuotaactual);
+      if (value === "14") {
+        valor = Math.ceil(dataCreditoUnique?.Saldo);
+      }
       setDataInput((old) => ({
         ...old,
         nombreTipoAbono: nombreTipoAbonoTemp,
         [ev.target.name]: value,
+        valor: valor,
       }));
     } else {
       setDataInput((old) => {
@@ -283,24 +287,25 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             minLength={5}
             maxLength={10}
             autoComplete="off"
-            min={enumParametrosCreditosPDP?.MINPAGOCREDITOPDP}
-            max={
-              parseInt(dataCreditoUnique?.Valordesembolso) ??
-              enumParametrosCreditosPDP?.MAXPAGOCREDITOPDP
-            }
+            min={Math.ceil(dataCreditoUnique?.Valorcuotaactual)}
+            max={Math.ceil(dataCreditoUnique?.Saldo)}
             value={dataInput?.valor ?? ""}
             onInput={onChangeFormatNum}
-            disabled={loadingPeticionPagoCredito}
+            disabled={
+              loadingPeticionPagoCredito || dataInput.tipoAbono === "14"
+            }
+            equalError={false}
+            equalErrorMin={false}
             required
           />
-          <Input
+          <TextArea
             id="observaciones"
             name="observaciones"
             label={"Observaciones"}
             type="text"
             autoComplete="off"
             minLength={0}
-            maxLength={20}
+            maxLength={100}
             value={dataInput?.observaciones ?? ""}
             onChange={onChangeFormat}
             disabled={loadingPeticionPagoCredito}
