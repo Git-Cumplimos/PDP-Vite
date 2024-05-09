@@ -1,6 +1,6 @@
-import { TypingConstInfo } from "../TypingModalInfoClient";
+import { TypingInfoClientConst } from "../../../Gou/viewsHigherOrder/utils/utils_typing";
 
-export const constComunication: TypingConstInfo = {
+export const constComunication: TypingInfoClientConst = {
   1: {
     que: "Correos electrónicos",
     res: {

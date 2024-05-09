@@ -1,240 +1,230 @@
 import React, {
   ChangeEvent,
+  Dispatch,
+  SetStateAction,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
 import {
-  TypingUseHookGouFormularioAdd,
-  TypingDataInputAdd,
-  TypingDataInputRequired,
-  TypingDataInputOriginAuto,
-  TypingOnChangeDataInputAdd,
+  TypingUseHookPasarelaSon,
+  TypingOnChangeDataInputSon,
   TypingOnSubmitSchema,
-  TypingDataInputAddAuto,
   TypingDataInput,
-  TypingDataPay,
-  TypingPeticionPayBase,
-} from "../../../Gou/viewsHigherOrder/utils/utils.typing";
+  TypingPeticionPrePayBase,
+  TypingFormDataInput,
+  TypingFormClientDataInput,
+  TypingFormTrxDataInput,
+  TypingFormAddDataInput,
+  TypingOutputErrorPrePayBase,
+} from "../../../Gou/viewsHigherOrder/utils/utils_typing";
 import { notifyError } from "../../../../utils/notify";
 import { hash } from "../../../../utils/hash";
-import { fetchCustomPdp } from "../../../../utils/fetchCustomPdp";
+import {
+  TempErrorFrontService,
+  fetchCustomPdp,
+  ErrorCustomFetch,
+  ErrorCustomUseHookCode,
+} from "../../../../utils/fetchCustomPdp";
 import { TypingDataComercio } from "../../../../utils/TypingUtils";
 import { do_compare, get_value } from "../../../Gou/utils/utils_function";
+import { v4 } from "uuid";
+import { URL_RECARGARCUPO_WITH_PASARELA } from "../routes_backend";
+import { ErrorCustomPeticionPrePayBase } from "../../../Gou/viewsHigherOrder/utils/utils_exception";
 
 //FRAGMENT ******************** TYPING *******************************
-type TypingDataInputAddOwn = {
-  nombre_completo: string;
-  correo: string;
-  "correo|confirmacion": "";
-  celular: string;
-  "celular|confirmacion": "";
-  documento: string;
-};
-
-type TypingDataInvalid = {
-  "correo|confirmacion": string;
-  celular: string;
-  "celular|confirmacion": string;
-};
-
-export type TypingOthers = {
-  dataInvalid: TypingDataInputAddOwn;
-  dataInputAddOwn: TypingDataInvalid;
-};
-
-//FRAGMENT ******************** CONST **********************************
-// const URL_RECARGARCUPO_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-const URL_RECARGARCUPO_GOU = `http://127.0.0.1:5000`;
-
-export const dataInputAddOwnInitial: TypingDataInputAddOwn = {
-  nombre_completo: "",
-  correo: "",
-  "correo|confirmacion": "",
-  celular: "",
-  "celular|confirmacion": "",
-  documento: "",
-};
-
-export const dataInvalidInitial: TypingDataInvalid = {
-  "correo|confirmacion": "",
-  celular: "",
-  "celular|confirmacion": "",
-};
+export type TypingOthers = { [key: string]: any };
 
 //FRAGMENT ******************** HOOK ***********************************
-const useHookRecargaCupoConGou: TypingUseHookGouFormularioAdd = (
+const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
   dataComercio: TypingDataComercio,
-  dataInputOriginAuto: TypingDataInputOriginAuto
+  dataInitialAddWithPasarelaPay: { [key: string]: any } | undefined,
+  formClientDataInput: TypingFormClientDataInput,
+  setFormClientDataInput: Dispatch<SetStateAction<TypingFormClientDataInput>>,
+  formTrxDataInput: TypingFormTrxDataInput,
+  setFormTrxDataInput: Dispatch<SetStateAction<TypingFormTrxDataInput>>,
+  formAddDataInput: TypingFormAddDataInput,
+  setFormAddDataInput: Dispatch<SetStateAction<TypingFormAddDataInput>>
 ) => {
-  const [dataInputAdd, setDataInputAdd] = useState<TypingDataInputAdd>({});
-  const [dataInputAddOwn, setDataInputAddOwn] = useState<TypingDataInputAddOwn>(
-    dataInputAddOwnInitial
-  );
-  const [dataInvalid, setDataInvalid] =
-    useState<TypingDataInvalid>(dataInvalidInitial);
-
+  const hook_name = "useHookRecargaCupoConGou";
   useEffect(() => {
-    setDataInputAdd({
-      nombre_completo: dataInputAddOwn.nombre_completo,
-      correo: dataInputAddOwn.correo,
-      celular: dataInputAddOwn.celular,
-      documento: dataInputAddOwn.documento,
-    });
-  }, [
-    setDataInputAdd,
-    dataInputAddOwn.nombre_completo,
-    dataInputAddOwn.correo,
-    dataInputAddOwn.celular,
-    dataInputAddOwn.documento,
-  ]);
+    const date_now = Intl.DateTimeFormat("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
 
-  const dataInputAddAuto: TypingDataInputAddAuto = useMemo(() => {
-    return {
-      id_uuid_trx_hash: hash(dataInputOriginAuto.id_uuid_trx),
-    };
-  }, [dataInputOriginAuto.id_uuid_trx]);
-
-  const dataInputRequired: TypingDataInputRequired = useMemo(() => {
-    return {
-      tipo_tramite: "Recarga Cupo",
-      id_unico_form: dataInputOriginAuto.id_uuid_trx,
-      id_unico_modal: dataInputAddAuto.id_uuid_trx_hash,
-      referencia: dataComercio.id_comercio.toString(),
-    };
-  }, [
-    dataInputOriginAuto.id_uuid_trx,
-    dataInputAddAuto.id_uuid_trx_hash,
-    dataComercio.id_comercio,
-  ]);
-
-  const onChangeDataInputAdd: TypingOnChangeDataInputAdd = useCallback(
-    (ev: ChangeEvent<HTMLFormElement>) => {
-      if (ev.target.name === undefined && ev.target.id === undefined) return;
-      const structure_get_value = ev.target.id.split("/")[1];
-      if (structure_get_value) {
-        const [value, is_change, msg_invalid_get_value] = get_value(
-          structure_get_value,
-          ev.target.value ?? ""
-        );
-        if (is_change) {
-          setDataInputAddOwn((old) => ({ ...old, [ev.target.name]: value }));
-        }
-        if (dataInvalid.hasOwnProperty(ev.target.name)) {
-          setDataInvalid((old) => ({
-            ...old,
-            [ev.target.name]: msg_invalid_get_value,
-          }));
-        }
-        const structure_compare = ev.target.id.split("/")[2];
-        if (structure_compare) {
-          const [, key_change, msg_invalid_do_compare] = do_compare(
-            { ...dataInputAddOwn },
-            ev.target.name,
-            value,
-            structure_compare
-          );
-          if (
-            dataInvalid.hasOwnProperty(key_change) &&
-            msg_invalid_get_value === ""
-          ) {
-            setDataInvalid((old) => ({
-              ...old,
-              [key_change]: msg_invalid_do_compare,
-            }));
-          }
-        }
-      }
-    },
-    [dataInvalid, dataInputAddOwn, setDataInputAddOwn]
-  );
+    const id_uuid_trx = v4();
+    const referencia_array = id_uuid_trx.split("-");
+    setFormTrxDataInput((old) => ({
+      ...old,
+      tipo_tramite: "Recargar Cupo",
+      id_unico: id_uuid_trx,
+      referencia: referencia_array.join(""),
+      fecha: `${date_now.substring(6, 10)}-${date_now.substring(
+        3,
+        5
+      )}-${date_now.substring(0, 2)}`,
+    }));
+  }, [setFormTrxDataInput]);
 
   const onSubmitSchema: TypingOnSubmitSchema = useCallback(() => {
-    if (dataInputAddOwn.celular !== dataInputAddOwn["celular|confirmacion"]) {
-      notifyError("Verifique el numero celular", 2000, {
-        toastId: "notify-validate-dataInput",
-      });
-      return [false, undefined];
-    }
-    if (dataInputAddOwn.correo !== dataInputAddOwn["correo|confirmacion"]) {
-      notifyError("Verifique el correo", 2000, {
-        toastId: "notify-validate-dataInput",
-      });
-      return [false, undefined];
-    }
-    return [true, [{ Nombre: dataInputAddOwn.nombre_completo }]];
-  }, [dataInputAddOwn]);
+    return [
+      hash(formTrxDataInput.id_unico),
+      true,
+      [
+        {
+          Nombre: `${formClientDataInput.nombres} ${formClientDataInput.apellidos}`,
+        },
+      ],
+    ];
+  }, [
+    formTrxDataInput.id_unico,
+    formClientDataInput.nombres,
+    formClientDataInput.apellidos,
+  ]);
 
-  const PeticionPayBase: TypingPeticionPayBase = useCallback(
+  const PeticionPrePayBase: TypingPeticionPrePayBase = useCallback(
     async (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput
-    ): Promise<TypingDataPay> => {
-      const url_pay = `${URL_RECARGARCUPO_GOU}/services_gou/recargarcupo/pago`;
+    ): Promise<any> => {
+      const function_name = "PeticionPrePayBase";
       const name_service = "Recargar Cupo Pago";
       let response;
-
-      const body = {
-        comercio: {
-          id_comercio: dataComercio.id_comercio,
-          id_usuario: dataComercio.id_usuario,
-          id_terminal: dataComercio.id_terminal,
-          nombre_comercio: dataComercio.nombre_comercio,
-          nombre_usuario: dataComercio.nombre_usuario,
-          oficina_propia: dataComercio.oficina_propia,
-          location: {
-            address: dataComercio.location.address,
-            dane_code: dataComercio.location.dane_code,
-            city: dataComercio.location.city,
-            country: dataComercio.location.country,
+      try {
+        const destino = dataInitialAddWithPasarelaPay?.destino
+          ? dataInitialAddWithPasarelaPay?.destino
+          : "";
+        const url_pre_pay = `${URL_RECARGARCUPO_WITH_PASARELA}${destino}`;
+        const ip_address_fetch: any = await fetch(
+          `https://api.ipify.org?format=json`
+        );
+        const ip_address = ip_address_fetch?.ip
+          ? ip_address_fetch?.ip
+          : "127.0.0.1";
+        // const body = {
+        //   comercio: {
+        //     id_comercio: dataComercio.id_comercio,
+        //     id_usuario: dataComercio.id_usuario,
+        //     id_terminal: dataComercio.id_terminal,
+        //     nombre_comercio: dataComercio.nombre_comercio,
+        //     nombre_usuario: dataComercio.nombre_usuario,
+        //     oficina_propia: dataComercio.oficina_propia,
+        //     location: {
+        //       address: dataComercio.location.address,
+        //       dane_code: dataComercio.location.dane_code,
+        //       city: dataComercio.location.city,
+        //       country: dataComercio.location.country,
+        //     },
+        //   },
+        //   id_uuid_trx: dataInput.id_unico,
+        //   id_hash: hash(dataInput.id_unico),
+        //   valor_trx: dataInput.valor_trx,
+        //   ip_address: ip_address,
+        //   referencia: dataInput.referencia,
+        //   nombres: dataInput.nombres,
+        //   apellidos: dataInput.apellidos,
+        //   documento: dataInput.documento,
+        //   tipo_documento: dataInput.tipo_documento,
+        //   correo: dataInput.correo,
+        //   celular: dataInput.celular,
+        // };
+        // response = await fetchCustomPdp(
+        //   url_pre_pay,
+        //   "POST",
+        //   name_service,
+        //   {},
+        //   body,
+        //   120
+        // );
+        response = {
+          codigo: 200,
+          msg: "Inicio Recargar Cupo inicio gou (GOU) Exitosa",
+          obj: {
+            error_msg: {},
+            error_status: false,
+            ids: {
+              id_hash:
+                "c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
+              id_log: 23,
+              id_trx: 437358,
+              id_uuid_trx: "12982799-d876-4525-ab37-21838b38f025",
+              pasarela_id_log: 6579,
+              pasarela_id_request: 34598,
+            },
+            result: {
+              asterisk: [
+                {
+                  Nombre: "Alisson Dayana",
+                },
+              ],
+              fecha: "09/05/2024 17:09:09",
+              referencia: "12982799d8764525ab3721838b38f025",
+              search: {
+                Nombre: "Alisson Dayana",
+              },
+              url_process:
+                "https://checkout.test.goupagos.com.co/spa/session/34598/d55055a7933a3553c5fd7b4ad8f86761",
+              url_return:
+                "https://cloudfront.puntodepagopruebas.com/check_pasarela_pay/c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
+              valor_trx: 10000.0,
+            },
           },
-        },
-        id_uuid_trx: dataInput.id_uuid_trx,
-        id_uuid_trx_hash: dataInputAddAuto.id_uuid_trx_hash,
-        valor_trx: dataInput.valor_trx,
-        referencia: dataInput.referencia,
-        ip_address: "127.0.0.1",
-        asterisk: {
-          correo: dataInputAddOwn.correo,
-          nombre_completo: dataInputAddOwn.nombre_completo,
-          documento: dataInputAddOwn.documento,
-          tipo_documento: "cc",
-          celular: dataInputAddOwn.celular,
-        },
-      };
-      response = await fetchCustomPdp(
-        url_pay,
-        "POST",
-        name_service,
-        {},
-        body,
-        120
-      );
-      return {
-        ticket: response?.obj?.result?.ticket,
-      };
+          status: true,
+        };
+        return {
+          ticket: {},
+        };
+      } catch (error: any) {
+        if (!(error instanceof ErrorCustomFetch)) {
+          throw new ErrorCustomUseHookCode(
+            TempErrorFrontService.replace("%s", name_service),
+            error.message,
+            `${hook_name} - ${function_name}`,
+            "notifyError",
+            true
+          );
+        }
+        const outputPrePayBase: TypingOutputErrorPrePayBase = {};
+        if (error?.res) {
+          response = error?.res;
+          outputPrePayBase.id_trx = response?.obj?.ids?.id_trx;
+          outputPrePayBase.id_log = response?.obj?.ids?.id_log;
+          outputPrePayBase.fecha = response?.obj?.result?.fecha;
+        }
+        throw new ErrorCustomPeticionPrePayBase(
+          error.message,
+          error,
+          outputPrePayBase
+        );
+      }
     },
-    [
-      dataInputAddAuto.id_uuid_trx_hash,
-      dataInputAddOwn.correo,
-      dataInputAddOwn.nombre_completo,
-      dataInputAddOwn.documento,
-      dataInputAddOwn.celular,
-    ]
+    [dataInitialAddWithPasarelaPay?.destino]
   );
 
   return {
-    dataInputRequired,
-    dataInputAdd,
-    dataInputAddAuto,
-    onChangeDataInputAdd,
-    onSubmitSchema,
-    PeticionPayBase,
-    others: {
-      dataInputAddOwn: dataInputAddOwn,
-      dataInvalid: dataInvalid,
+    formClientInputs: {
+      nombres: null,
+      apellidos: null,
+      correo: null,
+      celular: null,
+      documento: null,
+      tipo_documento: null,
+      "correo|confirmacion": null,
+      "celular|confirmacion": null,
     },
+    formTrxInputs: {
+      tipo_tramite: "",
+      id_unico: "",
+      referencia: "",
+      fecha: "",
+      valor_trx: null,
+    },
+    onSubmitSchema,
+    PeticionPrePayBase,
+    others: {},
   };
 };
 

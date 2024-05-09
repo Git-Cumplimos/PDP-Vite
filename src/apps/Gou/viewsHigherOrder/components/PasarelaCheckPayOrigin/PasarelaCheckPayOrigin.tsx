@@ -1,4 +1,9 @@
-import React, { Fragment, ReactNode, useCallback } from "react";
+import React, {
+  Fragment,
+  FunctionComponent,
+  ReactNode,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import Modal from "../../../../../components/Base/Modal";
@@ -10,22 +15,23 @@ import { notifyError } from "../../../../../utils/notify";
 
 import { TypingTrx } from "../../../utils/utils_typing";
 import {
+  ajust_tam_see,
   dict_segun_order,
   dict_summary_trx_own,
   list_a_dict_segun_order,
 } from "../../../utils/utils_function";
-import classes from "./GouCheckPayOrigin.module.css";
 import {
   constOrderSummary,
   constRelationshipSummary,
 } from "../../../utils/utils_const";
+import classes from "./PasarelaCheckPayOrigin.module.css";
 
 //FRAGMENT ******************** CSS *******************************
 const { contendorIdLog, contendorPago, labelHash } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
-type PropsGouCheckPayOrigin = {
-  logoGou: any;
+type PropsPasarelaCheckPayOrigin = {
+  ComponentLogo: FunctionComponent;
   summaryTrx: any;
   trx: TypingTrx;
   loadingPeticion: boolean;
@@ -33,14 +39,14 @@ type PropsGouCheckPayOrigin = {
   children: ReactNode;
 };
 //FRAGMENT ******************** COMPONENT *******************************
-const GouChecPayOrigin = ({
-  logoGou,
+const PasarelaChecPayOrigin = ({
+  ComponentLogo,
   summaryTrx,
   loadingPeticion,
   trx,
   printDiv,
   children,
-}: PropsGouCheckPayOrigin) => {
+}: PropsPasarelaCheckPayOrigin) => {
   const validNavigate = useNavigate();
 
   const handlePrint = useReactToPrint({
@@ -70,23 +76,21 @@ const GouChecPayOrigin = ({
             {summaryTrx.id_log && (
               <label className={contendorIdLog}>{summaryTrx.id_log}</label>
             )}
-            <img
-              className={summaryTrx.id_log ? "pl-20 mb-5" : "pl-20 mb-5"}
-              src={`${logoGou}`}
-              alt={"LogoGou"}
-            />
+            <div className="px-10">
+              <ComponentLogo></ComponentLogo>
+            </div>
 
             <PaymentSummary
               title={trx.msg}
               subtitle={summaryTrx?.msg ?? ""}
               summaryTrx={{
                 ...list_a_dict_segun_order(
-                  summaryTrx?.summary_trx_asterisk ?? []
+                  [...summaryTrx?.summary_trx_asterisk] ?? []
                 ),
                 ...dict_segun_order(
                   constOrderSummary,
                   dict_summary_trx_own(constRelationshipSummary, {
-                    ...(summaryTrx?.summary_trx_own ?? {}),
+                    ...({ ...summaryTrx?.summary_trx_own } ?? {}),
                     status: trx.status,
                     id_trx: summaryTrx?.id_trx,
                   })
@@ -98,17 +102,19 @@ const GouChecPayOrigin = ({
                   <h1 className={contendorPago}>
                     <strong className="justify-self-end">Pago:</strong>
                     <p className="justify-self-start whitespace-pre-wrap">
-                      {formatMoney.format(summaryTrx.valor_trx)}
+                      {`${formatMoney.format(summaryTrx.valor_trx)} COP`}
                     </p>
                   </h1>
                 </Fragment>
               )}
               <div className={labelHash}>
-                {!summaryTrx?.id_trx && <label>{summaryTrx.id_unico}</label>}
+                {!summaryTrx?.id_trx && !summaryTrx?.id_log && (
+                  <label>{ajust_tam_see(summaryTrx.id_unico, 50)}</label>
+                )}
               </div>
             </PaymentSummary>
             {!loadingPeticion && (
-              <div className={!summaryTrx?.summary_trx ? "pt-4" : ""}>
+              <div className="pt-4">
                 <ButtonBar>
                   <Button onClick={() => validNavigate("../")}>
                     Regresar al inicio
@@ -135,4 +141,4 @@ const GouChecPayOrigin = ({
   );
 };
 
-export default GouChecPayOrigin;
+export default PasarelaChecPayOrigin;

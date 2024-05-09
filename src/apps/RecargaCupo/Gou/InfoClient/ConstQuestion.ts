@@ -1,6 +1,6 @@
-import { TypingConstInfo } from "../TypingModalInfoClient";
+import { TypingInfoClientConst } from "../../../Gou/viewsHigherOrder/utils/utils_typing";
 
-export const constQuestion: TypingConstInfo = {
+export const constQuestion: TypingInfoClientConst = {
   1: {
     que: "1. ¿Realizar la transacción por Gou me genera un costo adicional?",
     res: {

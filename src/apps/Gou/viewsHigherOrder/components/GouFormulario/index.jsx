@@ -1,1 +1,1 @@
-export { default } from "./GouFormulario";
+export { default } from "./PasarelaFormulario";

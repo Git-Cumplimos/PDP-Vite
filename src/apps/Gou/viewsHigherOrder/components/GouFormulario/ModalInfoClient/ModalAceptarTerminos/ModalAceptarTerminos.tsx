@@ -3,14 +3,15 @@ import Modal from "../../../../../../../components/Base/Modal";
 import PaymentSummary from "../../../../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../../../../components/Base/ButtonBar";
 import Button from "../../../../../../../components/Base/Button";
-import { PropsModalInternoAcepto } from "../TypingModalInfoClient";
+import { PropsModalInternoAcepto } from "../../../../utils/utils_typing";
 
 //FRAGMENT ******************** COMPONENT *******************************
 const ModalAceptarTerminos = ({
-  constInfo,
   showModalInfoClient,
   setShowModalInfoClient,
   setAcepto,
+  infoClientConst,
+  children,
 }: PropsModalInternoAcepto) => {
   return (
     <Modal
@@ -19,7 +20,7 @@ const ModalAceptarTerminos = ({
     >
       <PaymentSummary title="Aceptar Términos y condiciones" subtitle="">
         <ButtonBar>
-          <></>
+          {children && !infoClientConst && children}
           <Button
             type={"submit"}
             onClick={() => {

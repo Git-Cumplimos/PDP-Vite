@@ -57,6 +57,10 @@ export type TypingDataSetting = {
 };
 
 //------ PeticionConsultForPay----
+export type TypingDataPay = {
+  ticket: TypeInfTicket;
+};
+
 export type TypingOutputCheckPay = {
   ticket: TypeInfTicket;
   tipo_tramite: string;
