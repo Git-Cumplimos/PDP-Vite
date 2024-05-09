@@ -15,6 +15,7 @@ const CerolioOATReportesConsulta = lazy(() =>
 const CerolioOATReportesHistorico = lazy(() =>
   import("./Views/Reportes/ReportesHistorico/ReportesHistorico")
 );
+const CerolioOATPin = lazy(() => import("./Views/PIN/Pin"));
 const listPermissions = Object.values(enumPermisosCerolioOAT);
 export const listPermissionsCerolioOAT = listPermissions;
 
@@ -55,6 +56,12 @@ const rutasCerolioOAT = {
           permission: [enumPermisosCerolioOAT.cerolioOAT],
         },
       ],
+    },
+    {
+      link: "/cerolio-oat/pin",
+      label: <AppIcons Logo={"MARKETPLACE"} name="PIN" />,
+      component: CerolioOATPin,
+      permission: [enumPermisosCerolioOAT.cerolioOAT],
     },
   ],
 };
