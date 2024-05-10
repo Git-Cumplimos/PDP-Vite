@@ -377,7 +377,7 @@ const PagoRecaudoServiciosItau = ({
                   label={referenceValue}
                   type="text"
                   autoComplete="off"
-                  maxLength={32}
+                  maxLength={30}
                   value={
                     ingressType === "initial"
                       ? dataRecaudo?.[referenceKey]
@@ -410,7 +410,7 @@ const PagoRecaudoServiciosItau = ({
                   label={referenceValue}
                   type="text"
                   autoComplete="off"
-                  maxLength={32}
+                  maxLength={30}
                   value={
                     ingressType === "initial"
                       ? dataRecaudo?.[referenceKey]
@@ -443,7 +443,7 @@ const PagoRecaudoServiciosItau = ({
                 label={referenceValue}
                 type="text"
                 autoComplete="off"
-                maxLength={32}
+                maxLength={30}
                 value={
                   ingressType === "initial"
                     ? dataRecaudo?.[referenceKey]
