@@ -1,0 +1,61 @@
+calendar-date,
+calendar-range {
+  svg {
+    height: 16px;
+    width: 16px;
+    fill: none;
+    stroke: rgb(226, 106, 34);
+    stroke-width: 2;
+  }
+
+  path {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &::part(button) {
+    border: 1px solid rgb(226, 106, 34);
+    background-color: #ffffff;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+  }
+
+  &::part(button):focus-visible {
+    outline: 2px solid rgb(226, 106, 34);
+  }
+}
+
+calendar-month {
+  &::part(selected) {
+    background-color: rgb(226, 106, 34);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.247);
+  }
+
+  &::part(td) {
+    border: 1px solid #adb5bd;
+  }
+
+  &::part(button) {
+    border-radius: 5px;
+  }
+
+  &::part(range-inner) {
+    border-radius: 0;
+    background-color: rgb(190, 90, 28);
+  }
+
+  &::part(range-start) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  &::part(range-end) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+
+  &::part(range-start range-end) {
+    border-radius: 5px;
+  }
+}

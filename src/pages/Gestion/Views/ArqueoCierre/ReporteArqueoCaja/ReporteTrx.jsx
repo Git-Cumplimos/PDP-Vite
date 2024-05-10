@@ -36,7 +36,7 @@ import {
   buscarTicketReporte,
   searchCierre,
 } from "../../../utils/fetchCaja";
-import { validateDates } from "../../../utils/functions";
+import { validateDates } from "../../../../../utils/functions";
 import Input from "../../../../../components/Base/Input/Input";
 import TicketsCajaSocial from "../../../../../apps/Corresponsalia/CorresponsaliaCajaSocial/components/TicketsCajaSocial";
 

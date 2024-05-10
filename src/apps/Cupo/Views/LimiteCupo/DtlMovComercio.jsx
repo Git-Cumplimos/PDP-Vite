@@ -13,6 +13,7 @@ import { getConsultaDtlMovCupo } from "../../utils/fetchFunctions";
 import {
   PeticionDescargarPdf,
 } from "../../utils/fetchCupo";
+import { validateDates } from "../../../../utils/functions";
 
 import useFetchDispatchDebounce, { ErrorPDPFetch } from "../../../../hooks/useFetchDispatchDebounce";
 import useMap from "../../../../hooks/useMap";
@@ -147,6 +148,9 @@ const DtlMovComercio = () => {
         notifyError("La fecha final debe ser mayor a la inicial");
         return false;
       }
+      if ((!validateDates(fechaini,15) || !validateDates(fechaEnd,15))){
+        return false
+      }
 
       crearData(
         idComercio,
@@ -253,6 +257,7 @@ const DtlMovComercio = () => {
             label="Fecha inicio"
             type="datetime-local"
             autoComplete="off"
+            value={fechaini ?? ""}
             required
           />
           <Input
@@ -261,6 +266,7 @@ const DtlMovComercio = () => {
             label="Fecha final"
             type="datetime-local"
             autoComplete="off"
+            value={fechaEnd ?? ""}
             required
           />
           <Select

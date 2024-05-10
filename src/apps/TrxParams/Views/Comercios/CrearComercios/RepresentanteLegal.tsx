@@ -152,21 +152,20 @@ const RepresentanteLegal = ({
                 label: "",
               },
             ].concat(
-              res?.obj
-                ?.map(
-                  ({
-                    id_doc,
-                    Nombre,
-                    nombre_corto,
-                  }: {
-                    id_doc: number;
-                    Nombre: string;
-                    nombre_corto: string;
-                  }) => ({
-                    value: id_doc,
-                    label: `${Nombre} (${nombre_corto})`,
-                  })
-                ) ?? []
+              res?.obj?.map(
+                ({
+                  id_doc,
+                  Nombre,
+                  nombre_corto,
+                }: {
+                  id_doc: number;
+                  Nombre: string;
+                  nombre_corto: string;
+                }) => ({
+                  value: id_doc,
+                  label: `${Nombre} (${nombre_corto})`,
+                })
+              ) ?? []
             )
           ),
         []
@@ -195,7 +194,8 @@ const RepresentanteLegal = ({
       fetchIf: useMemo(
         () =>
           Boolean(propietarioRL.pk_tipo_identificacion_rl) &&
-          Boolean(propietarioRL.pk_numero_identificacion_rl),
+          Boolean(propietarioRL.pk_numero_identificacion_rl)
+          && propietarioRL.pk_numero_identificacion_rl.length >= 5,
         [
           propietarioRL.pk_tipo_identificacion_rl,
           propietarioRL.pk_numero_identificacion_rl,
@@ -245,7 +245,11 @@ const RepresentanteLegal = ({
         }),
         [propietarioRLExists, propietarioRL2Send]
       ),
-      fetchIf: useMemo(() => updateRl, [updateRl]),
+      fetchIf: useMemo(
+        () =>
+          updateRl && propietarioRL2Send.pk_numero_identificacion_rl.length >= 5,
+        [updateRl, propietarioRL2Send.pk_numero_identificacion_rl.length]
+      ),
     },
     {
       onSuccess: useCallback(
@@ -344,16 +348,18 @@ const RepresentanteLegal = ({
           id="pk_numero_identificacion_rl"
           name="pk_numero_identificacion_rl"
           type="tel"
-          minLength={5}
+          minLength={!areAllFieldsEmpty ? 5 : 0}
           maxLength={12}
           value={propietarioRL.pk_numero_identificacion_rl}
           onChange={(ev) => {
             setPropietarioRLExists(false);
             setUpdateRl(false);
+            // Clean number on event and not on setState
+            const newNumId = onChangeNumber(ev, false);
             setPropietarioRL((old) => ({
               ...initialPropietarioRL,
               pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
-              pk_numero_identificacion_rl: onChangeNumber(ev),
+              pk_numero_identificacion_rl: newNumId,
             }));
           }}
           autoComplete="off"
@@ -375,7 +381,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Apellido"
@@ -393,7 +398,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         <ToggleInput
           label="¿PEP?"
@@ -424,7 +428,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Ciudad residencia"
@@ -451,7 +454,6 @@ const RepresentanteLegal = ({
               <span className="px-1 py-0 text-sm bi bi-pencil-square" />
             ),
           }}
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Dirección"
@@ -466,7 +468,6 @@ const RepresentanteLegal = ({
             callback: (_) => setModifyAddress(true),
             label: <span className="px-1 py-0 text-sm bi bi-pencil-square" />,
           }}
-          required={!areAllFieldsEmpty}
         />
         <Input
           label="Barrio"
@@ -484,7 +485,6 @@ const RepresentanteLegal = ({
             makeUpdateRl();
           }}
           autoComplete="off"
-          required={!areAllFieldsEmpty}
         />
         {propietarioRLExists && (
           <Input

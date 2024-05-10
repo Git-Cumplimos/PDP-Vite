@@ -343,9 +343,16 @@ const PagarMoviliza = () => {
                         }
                 }
                     else{
-                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                      navigate("/");
-                      navigate("/moviliza");
+                      if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
+                        notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
+                        navigate("/");
+                        navigate("/moviliza");
+                      }
+                      else{
+                        notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                        navigate("/");
+                        navigate("/moviliza");
+                      }
                     }
                 }
                }

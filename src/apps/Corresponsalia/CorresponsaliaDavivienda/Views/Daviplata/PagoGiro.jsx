@@ -124,6 +124,7 @@ const PagoGiro = () => {
             valor: res?.valorTransaccion,
           }));
           let ticket_consulta = res?.obj?.ticket
+          ticket_consulta["commerceInfo"][6][0] = "No. de aprobación"
           ticket_consulta["commerceInfo"][6][1] = "<strong>Transacción Rechazada por el cliente"
           setObjTicketActual(ticket_consulta);
           setDatosConsulta(res?.obj?.respuesta_davivienda[0]);

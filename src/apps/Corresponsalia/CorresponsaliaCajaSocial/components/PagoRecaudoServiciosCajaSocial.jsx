@@ -17,7 +17,7 @@ import Modal from "../../../../components/Base/Modal";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import { useReactToPrint } from "react-to-print";
 import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
-import { enumParametrosCajaSocial } from "../utils/enumParametrosCreditosPdp";
+import { enumParametrosCajaSocial } from "../utils/enumParametrosCajaSocial";
 import TicketsCajaSocial from "./TicketsCajaSocial";
 
 const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-recaudo-servicios`;
@@ -154,6 +154,7 @@ const PagoRecaudoServiciosCajaSocial = ({
       if (tipoRecaudo !== "manual") {
         extraData["codigo_barras"] = codigoBarras;
         extraData["flag_codigo_barras"] = true;
+        extraData["ean_code"] = dataCodigoBarras?.codigo_ean;
       }
       const data = {
         oficina_propia:
@@ -245,6 +246,7 @@ const PagoRecaudoServiciosCajaSocial = ({
       if (tipoRecaudo !== "manual") {
         extraData["codigo_barras"] = codigoBarras;
         extraData["flag_codigo_barras"] = true;
+        extraData["ean_code"] = dataCodigoBarras?.codigo_ean;
       }
       if (
         dataRecaudo?.valorTrx <
@@ -306,7 +308,6 @@ const PagoRecaudoServiciosCajaSocial = ({
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
       };
-      console.log(data);
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
@@ -450,24 +451,25 @@ const PagoRecaudoServiciosCajaSocial = ({
               required
             />
           )}
-          {tipoRecaudo === "codigoBarras" &&
-          dataCodigoBarras.pago.length > 0 ? (
+          {tipoRecaudo === "codigoBarras" && (
             <>
-              <MoneyInput
-                id="valorTrxOriginal"
-                name="valorTrxOriginal"
-                label={"Valor a pagar original"}
-                type="tel"
-                maxLength={12}
-                decimalDigits={2}
-                autoComplete="off"
-                defaultValue={dataCodigoBarras.pago[0] ?? 0}
-                onInput={() => {}}
-                disabled
-                required
-                equalError={false}
-                equalErrorMin={false}
-              />
+              {dataCodigoBarras.pago.length > 0 && (
+                <MoneyInput
+                  id="valorTrxOriginal"
+                  name="valorTrxOriginal"
+                  label={"Valor a pagar original"}
+                  type="tel"
+                  maxLength={12}
+                  decimalDigits={2}
+                  autoComplete="off"
+                  defaultValue={dataCodigoBarras.pago[0] ?? 0}
+                  onInput={() => {}}
+                  disabled
+                  required
+                  equalError={false}
+                  equalErrorMin={false}
+                />
+              )}
               {convenio.permite_modificar_valor === "1" &&
                 convenio.tipo_recaudo === "01" && (
                   <MoneyInput
@@ -496,7 +498,8 @@ const PagoRecaudoServiciosCajaSocial = ({
                   />
                 )}
             </>
-          ) : tipoRecaudo === "manual" && convenio.tipo_recaudo === "01" ? (
+          )}
+          {tipoRecaudo === "manual" && convenio.tipo_recaudo === "01" && (
             <MoneyInput
               id="valorTrx"
               name="valorTrx"
@@ -516,8 +519,6 @@ const PagoRecaudoServiciosCajaSocial = ({
               equalError={false}
               equalErrorMin={false}
             />
-          ) : (
-            <></>
           )}
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
@@ -581,8 +582,8 @@ const PagoRecaudoServiciosCajaSocial = ({
                   name="valorTrxValidacion"
                   label={"Valor a pagar"}
                   type="tel"
-                  // minLength={5}
-                  maxLength={10}
+                  maxLength={12}
+                  decimalDigits={2}
                   autoComplete="off"
                   min={
                     enumParametrosCajaSocial?.MIN_RECAUDO_SERVICIOS_CAJA_SOCIAL
@@ -590,7 +591,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                   max={
                     enumParametrosCajaSocial?.MAX_RECAUDO_SERVICIOS_CAJA_SOCIAL
                   }
-                  value={dataRecaudo?.valorTrxValidacion ?? 0}
+                  defaultValue={0}
                   onInput={onChangeFormatNum}
                   disabled={
                     loadingPeticionPagoRecaudo || loadingPeticionConsultaRecaudo

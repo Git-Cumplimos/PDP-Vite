@@ -18,7 +18,7 @@ import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 
-import { notifyError, notifyPending } from "../../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../../utils/notify";
 import fetchDataPinesCea from "../../utils/fetchDataPinesCea";
 import ScreenBlocker from "../../../components/ScreenBlocker";
 import TicketOlimpia from "../../components/TicketOlimpia";
@@ -36,7 +36,7 @@ const DevolucionPinesOlimpia = () => {
   const { roleInfo, pdpUser } = useAuth();
   const [numeroPin, setNumeroPin] = useState("");
   const [numeroDocumento, setNumeroDocumento] = useState("");
-  const [valorTansaccion, setValorTansaccion] = useState("");
+  const [valorTransaccion, setValorTransaccion] = useState("");
   const [estado, setEstado] = useState("");
   const [codigoDestino, setCodigoDestino] = useState("");
   const [existe, setExiste] = useState(false);
@@ -81,6 +81,7 @@ const DevolucionPinesOlimpia = () => {
   });
 
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [ticketComision, setTicketComisions] = useState(null);
   const [inquiryStatus, setInquiryStatus] = useState(null);
 
   const onChangeMoney = useMoney({
@@ -174,7 +175,7 @@ const DevolucionPinesOlimpia = () => {
             setEstado("");
             setNumeroIdentificacion("");
             setTipoIdentificacion("");
-            setValorTansaccion("");
+            setValorTransaccion("");
             setIdTrx("");
             setPin("");
             setCodigoAprobacion("");
@@ -191,7 +192,7 @@ const DevolucionPinesOlimpia = () => {
             setEstado("");
             setNumeroIdentificacion("");
             setTipoIdentificacion("");
-            setValorTansaccion("");
+            setValorTransaccion("");
             setIdTrx("");
             setPin("");
             setCodigoAprobacion("");
@@ -209,7 +210,7 @@ const DevolucionPinesOlimpia = () => {
           setEstado(res?.obj?.result?.Estado);
           setNumeroIdentificacion(res?.obj?.result?.NumeroIdentificacion);
           setTipoIdentificacion(res?.obj?.result?.TipoIdentificacion);
-          setValorTansaccion(res?.obj?.result?.ValorTansaccion);
+          setValorTransaccion(res?.obj?.result?.ValorTransaccion);
           setIdTrx(res?.obj?.id_trx);
           setPin(res?.obj?.result?.Pin);
           setIdTrxRecaudo(res?.obj?.result?.IdTrxRecaudo);
@@ -243,7 +244,7 @@ const DevolucionPinesOlimpia = () => {
         Pin: numeroPin,
         TipoIdentificacion: tipoIdentificacion,
         NumeroIdentificacion: numeroIdentificacion,
-        ValorTansaccion: valorTansaccion,
+        ValorTransaccion: valorTransaccion,
         id_trx: idTrxRecaudo,
         CodigoAprobacion: codigoAprobacion,
         FechaTransaccion: fechaTransaccion,
@@ -284,19 +285,19 @@ const DevolucionPinesOlimpia = () => {
             "POST",
             {},
             {
-              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA,
+              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA_CEA,
               Pin: numeroPin,
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,
-              ValorTansaccion: valorTansaccion,
+              ValorTransaccion: valorTransaccion,
               CodigoAprobacion: idTrxRecaudo,
               FechaTransaccion: fechaFormateada,
               IdBancoDevolucion: "1001",
               IdTipoCuentaDevolucion: "27",
               IdTipoDevolucion: "1",
               IdTipoIdentificacionDevolucion: "1",
-              NumeroCuentaDevolucion: "1",
-              NumeroIdentificacionDevolucion: "1"
+              NumeroCuentaDevolucion: "0",
+              NumeroIdentificacionDevolucion: "0"
           }
           )
             .then((res2) => {
@@ -325,7 +326,9 @@ const DevolucionPinesOlimpia = () => {
                 setPin(res?.obj?.result?.pin);
                 setEstadoPago(true);
                 setPaymentStatus(res?.obj?.ticket ?? {});
+                setTicketComisions(res?.obj?.ticket_costo_comision ?? {});
                 setIsLoadingPago(false);
+                notify("Transacción exitosa")
               }
             })
             .catch((err) => {
@@ -447,6 +450,9 @@ const DevolucionPinesOlimpia = () => {
         {paymentStatus ? (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketOlimpia refPrint={printDiv} ticket={paymentStatus} />
+            {ticketComision ? (
+            <TicketOlimpia refPrint={printDiv} ticket={ticketComision} />
+            ):(<></>)}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleClose}>Cerrar</Button>
@@ -459,7 +465,7 @@ const DevolucionPinesOlimpia = () => {
           handleClose = {handleClose}
           tipoIdentificacion = {tipoIdentificacion}
           numeroIdentificacion ={numeroIdentificacion}
-          valorPin = {valorTansaccion}
+          valorPin = {valorTransaccion}
           estadoPin = {estado}
           numeroPin = {numeroPin}
           >
