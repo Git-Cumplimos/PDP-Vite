@@ -96,9 +96,9 @@ import rutasItauCB, {
 
 import routesItau from "../apps/ConveniosItau/routes";
 import routesGestionBCS from "../apps/GestionBCS/routes";
+import rutasCerolioOAT from "../apps/Cerolio/CerolioOAT/routes";
+import rutasCerolioAdmin from "../apps/Cerolio/CerolioAdmin/routes";
 import routesPasarelaCheckPay from "../apps/Pasarelas/routes";
-import rutasCerolioOAT from "../apps/CerolioOAT/routes";
-import rutasCerolioAdmin from "../apps/CerolioAdmin/routes";
 /**
 
  * * Logos
