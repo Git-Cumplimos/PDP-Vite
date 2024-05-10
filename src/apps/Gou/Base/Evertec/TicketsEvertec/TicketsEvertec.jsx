@@ -1,14 +1,14 @@
-import Tickets from "../../../../components/Base/Tickets";
-import { useImgs } from "../../../../hooks/ImgsHooks";
+import Tickets from "../../../../../components/Base/Tickets";
+import { useImgs } from "../../../../../hooks/ImgsHooks";
 
-const TicketsGou = ({
+const TicketsEvertec = ({
   refPrint,
   type = "ORIGINAL",
   ticket,
   stateTrx = true,
 }) => {
   const {
-    imgs: { LogoGou: LogoPng, pdpHorizontal: LogoPdp },
+    imgs: { pdpHorizontal: LogoPdp },
   } = useImgs();
 
   if (!ticket) {
@@ -32,7 +32,10 @@ const TicketsGou = ({
             </div>
             <div className="mx-auto w-20">
               <div className="aspect-w-20 aspect-h-20">
-                <img src={LogoPng} alt="Logo punto de pago" />
+                <img
+                  src={`https://static.placetopay.com/placetopay-logo.svg`}
+                  alt="Logo punto de pago"
+                />
               </div>
             </div>
           </div>
@@ -42,4 +45,4 @@ const TicketsGou = ({
   );
 };
 
-export default TicketsGou;
+export default TicketsEvertec;

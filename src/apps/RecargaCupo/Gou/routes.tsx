@@ -15,7 +15,7 @@ import {
   constQuestion as constQuestionEvertec,
 } from "../../Gou/Base/Evertec/InfoClient";
 
-const routesRecargaCupoConGou = [
+const routesRecargaCupoWithPasarela = [
   {
     link: "/recarga-cupo/with-gou",
     label: <AppIcons Logo={"RECARGA_CELULAR"} name="GOU" />,
@@ -61,4 +61,4 @@ const routesRecargaCupoConGou = [
     subRoutes: [],
   },
 ];
-export default routesRecargaCupoConGou;
+export default routesRecargaCupoWithPasarela;

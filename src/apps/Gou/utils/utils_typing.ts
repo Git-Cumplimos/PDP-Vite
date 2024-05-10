@@ -64,4 +64,5 @@ export type TypingDataPay = {
 export type TypingOutputCheckPay = {
   ticket: TypeInfTicket;
   tipo_tramite: string;
+  destino: string;
 };

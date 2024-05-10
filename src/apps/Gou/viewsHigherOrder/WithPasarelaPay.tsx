@@ -194,7 +194,7 @@ const WithPasarelaPay = (
         {
           render: ({ data }: { data: TypingOutputPrePay }) => {
             setOutputPrePay(data);
-            return "Pago aprobado";
+            return "Generar el link de pago";
           },
         },
         {

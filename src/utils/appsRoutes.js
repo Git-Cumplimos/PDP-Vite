@@ -96,7 +96,7 @@ import rutasItauCB, {
 
 import routesItau from "../apps/ConveniosItau/routes";
 import routesGestionBCS from "../apps/GestionBCS/routes";
-import routesGouCheckPay from "../apps/Gou/routes";
+import routesPasarelaCheckPay from "../apps/Gou/routes";
 /**
 
  * * Logos
@@ -1244,8 +1244,8 @@ const allUrlsPrivateApps = [
   routesOtrasEntidades,
   //Modulo Moviliza
   rutasMoviliza,
-  //Modulo Gou
-  routesGouCheckPay,
+  //Modulo Pasarela
+  routesPasarelaCheckPay,
   //Modulo Recarga Cupo
   routesRecargaCupo,
   //Modulo Nequi

@@ -12,7 +12,7 @@ import { TypeInfTicket } from "../../../../utils/TypingUtils";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { TempErrorFrontUser } from "../../../../utils/fetchCustomPdp";
 
-import TicketsGou from "../../components/TicketsGou";
+import TicketsGou from "../../Base/Gou/TicketsGou";
 import useHookGouCheckPay from "./hook/useHookGouCheckPay";
 import {
   TypingOutputCheckPay,
@@ -31,6 +31,11 @@ import {
 } from "../../utils/utils_const";
 
 import classes from "./GouCheckPayCross.module.css";
+import {
+  ListaDestinos,
+  ListaTramites,
+} from "../../lista_destinos_and_tramites";
+import Tickets from "../../../../components/Base/Tickets";
 
 //FRAGMENT ******************** CSS *******************************
 const { contendorBorder, contendorIdLog, contendorPago } = classes;
@@ -42,7 +47,7 @@ const GouCheckPayCross = () => {
   const params = useParams();
   const [dataPath, setDataPath] = useState<TypingDataPath | null>(null);
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
-  const { loadingPeticion, PeticionCheckPay, trx, summaryTrx } =
+  const { loadingPeticion, PeticionCheckPay, trx, summaryTrx, dataComponent } =
     useHookGouCheckPay();
   const validNavigate = useNavigate();
   const printDiv = useRef(null);
@@ -95,6 +100,7 @@ const GouCheckPayCross = () => {
       {
         render: ({ data }: { data: TypingOutputCheckPay }) => {
           setTicket(data.ticket);
+
           return `${data.tipo_tramite} Aprobada`;
         },
       },
@@ -113,23 +119,20 @@ const GouCheckPayCross = () => {
           {summaryTrx.id_log && (
             <label className={contendorIdLog}>{summaryTrx.id_log}</label>
           )}
-          <img
-            className={summaryTrx.id_log ? "mb-5" : "mb-5 mt-8"}
-            src={`${imgs?.LogoGou}`}
-            alt={"LogoGou"}
-          />
-
+          {dataComponent?.destino === "GOU" && <ListaDestinos.GOU />}
+          {dataComponent?.destino === "EVERTEC" && <ListaDestinos.EVERTEC />}
+          <br></br>
           <PaymentSummary
             title={trx.msg}
             subtitle={summaryTrx?.msg ?? ""}
             summaryTrx={{
-              ...list_a_dict_segun_order(
-                summaryTrx?.summary_trx_asterisk ?? []
-              ),
+              ...list_a_dict_segun_order([
+                ...(summaryTrx?.summary_trx_asterisk ?? []),
+              ]),
               ...dict_segun_order(
                 constOrderSummary,
                 dict_summary_trx_own(constRelationshipSummary, {
-                  ...(summaryTrx?.summary_trx_own ?? {}),
+                  ...{ ...(summaryTrx?.summary_trx_own ?? {}) },
                   status: trx.status !== "Search" ? trx.status : undefined,
                   id_trx: summaryTrx?.id_trx,
                 })
@@ -145,7 +148,7 @@ const GouCheckPayCross = () => {
                 <h1 className={contendorPago}>
                   <strong className="justify-self-end">Pago:</strong>
                   <p className="justify-self-start whitespace-pre-wrap">
-                    {formatMoney.format(summaryTrx.valor_trx)}
+                    {`${formatMoney.format(summaryTrx.valor_trx)} COP`}
                   </p>
                 </h1>
               </Fragment>
@@ -161,17 +164,35 @@ const GouCheckPayCross = () => {
           )}
           {!loadingPeticion && (
             <div className={trx.status !== "Aprobada" ? "pt-4" : ""}>
-              <Button onClick={() => validNavigate("../")}>
-                Regresar al inicio
+              <Button onClick={() => validNavigate("../Transacciones")}>
+                Modulo Transacciones
               </Button>
             </div>
+          )}
+
+          {!loadingPeticion && (
+            <Button onClick={() => validNavigate("../")}>
+              Regresar al inicio
+            </Button>
           )}
         </div>
       )}
       <Modal show={showModal && ticket} handleClose={() => setShowModal(false)}>
         {/**************** Trx Aprobada **********************/}
         <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-          <TicketsGou ticket={ticket} refPrint={printDiv} />
+          {dataComponent?.tipo_tramite === "GOU:RECARGAR CUPO" && (
+            <ListaTramites.GOU_RECARGAR_CUPO
+              ticket={ticket}
+              refPrint={printDiv}
+            />
+          )}
+          {dataComponent?.tipo_tramite === "EVERTEC:RECARGAR CUPO" && (
+            <ListaTramites.EVERTEC_RECARGAR_CUPO
+              ticket={ticket}
+              refPrint={printDiv}
+            />
+          )}
+          {!dataComponent && <Tickets ticket={ticket} refPrint={printDiv} />}
           <ButtonBar>
             <Button onClick={handlePrint}>Imprimir</Button>
             <Button onClick={() => setShowModal(false)}>Cerrar</Button>

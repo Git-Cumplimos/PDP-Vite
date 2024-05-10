@@ -1,18 +1,18 @@
 import { lazy } from "react";
 
 import AppIcons from "../../components/Base/AppIcons";
-import { ListPermissionsGou } from "./ListPermissionsGou";
+import { ListPermissionsPasarela } from "./ListPermissionsPasarela";
 const GouCheckPayCross = lazy(
   () => import("./views/GouCheckPay/GouCheckPayCross")
 );
 
-const routesGouCheckPay = {
+const routesPasarelaCheckPay = {
   link: "/check_gou_pay/:id_hash",
   label: <AppIcons Logo={"RECARGA_CELULAR"} name="check pay" />,
   component: GouCheckPayCross,
-  permission: ListPermissionsGou,
+  permission: ListPermissionsPasarela,
   subRoutes: [],
   // show: false,
 };
 
-export default routesGouCheckPay;
+export default routesPasarelaCheckPay;

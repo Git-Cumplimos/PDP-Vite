@@ -1,26 +1,15 @@
-import React, {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import {
   TypingUseHookPasarelaSon,
-  TypingOnChangeDataInputSon,
   TypingOnSubmitSchema,
   TypingDataInput,
   TypingPeticionPrePayBase,
-  TypingFormDataInput,
   TypingFormClientDataInput,
   TypingFormTrxDataInput,
   TypingFormAddDataInput,
   TypingOutputErrorPrePayBase,
   TypingOutputPrePayBase,
 } from "../../../Gou/viewsHigherOrder/utils/utils_typing";
-import { notifyError } from "../../../../utils/notify";
 import { hash } from "../../../../utils/hash";
 import {
   TempErrorFrontService,
@@ -136,41 +125,6 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
           body,
           120
         );
-        // response = {
-        //   codigo: 200,
-        //   msg: "Inicio Recargar Cupo inicio gou (GOU) Exitosa",
-        //   obj: {
-        //     error_msg: {},
-        //     error_status: false,
-        //     ids: {
-        //       id_hash:
-        //         "c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
-        //       id_log: 23,
-        //       id_trx: 437358,
-        //       id_uuid_trx: "12982799-d876-4525-ab37-21838b38f025",
-        //       pasarela_id_log: 6579,
-        //       pasarela_id_request: 34598,
-        //     },
-        //     result: {
-        //       asterisk: [
-        //         {
-        //           Nombre: "Alisson Dayana",
-        //         },
-        //       ],
-        //       fecha: "09/05/2024 17:09:09",
-        //       referencia: "12982799d8764525ab3721838b38f025",
-        //       search: {
-        //         Nombre: "Alisson Dayana",
-        //       },
-        //       url_process:
-        //         "https://checkout.test.goupagos.com.co/spa/session/34598/d55055a7933a3553c5fd7b4ad8f86761",
-        //       url_return:
-        //         "https://cloudfront.puntodepagopruebas.com/check_pasarela_pay/c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
-        //       valor_trx: 10000.0,
-        //     },
-        //   },
-        //   status: true,
-        // };
         const res_obj = response?.obj ?? {};
         return {
           url_process: res_obj.result?.url_process,

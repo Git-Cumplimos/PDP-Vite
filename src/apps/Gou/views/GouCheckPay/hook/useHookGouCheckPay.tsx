@@ -17,13 +17,15 @@ import {
   TypingOutputCheckPay,
   TypingDataComercioSimple,
   TypingDataPath,
-  TypingDataSetting,
   TypingSummaryTrx,
   TypingTrx,
-  TypingTypeSettingTime,
 } from "../../../utils/utils_typing";
 import { constMsgTrx } from "../../../utils/utils_const";
-import { ajust_tam_see_obj } from "../../../utils/utils_function";
+import {
+  ajust_tam_see,
+  ajust_tam_see_obj,
+} from "../../../utils/utils_function";
+import { URL_PASARELA_CHECK_PAY_WITH_PDP } from "../../../routes_backend";
 
 //FRAGMENT ******************** TYPING *******************************
 export type TypeUseHookGouCheckPay = () => {
@@ -35,11 +37,12 @@ export type TypeUseHookGouCheckPay = () => {
   ) => Promise<TypingOutputCheckPay>;
   trx: TypingTrx;
   summaryTrx: TypingSummaryTrx;
+  dataComponent: TypingDataComponent;
 };
-
-//FRAGMENT ******************** CONST *******************************
-const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-// const URL_GOU = `http://127.0.0.1:5000`;
+export type TypingDataComponent = {
+  destino?: string;
+  tipo_tramite?: string;
+};
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
@@ -52,6 +55,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
     msg: constMsgTrx.Search,
   });
   const [summaryTrx, setSummaryTrx] = useState<TypingSummaryTrx>({});
+  const [dataComponent, setDataComponent] = useState<TypingDataComponent>({});
 
   const ArmDataOutput = useCallback(
     (
@@ -85,12 +89,20 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
             tipo_tramite:
               res_obj_result?.tipo_tramite && res_obj_result?.tipo_tramite,
             referencia:
-              res_obj_result?.referencia && res_obj_result?.referencia,
+              res_obj_result?.referencia &&
+              ajust_tam_see(res_obj_result?.referencia, 27),
             fecha: res_obj_result?.fecha && res_obj_result?.fecha,
           },
           valor_trx: res_obj_result?.valor_trx,
           id_log: res_obj.ids?.id_log,
           id_trx: res_obj?.ids?.id_trx,
+        });
+        setDataComponent({
+          destino: res_obj_result?.destino ?? undefined,
+          tipo_tramite:
+            res_obj_result?.tipo_tramite && res_obj_result?.destino
+              ? `${res_obj_result.destino}:${res_obj_result.tipo_tramite}`
+              : undefined,
         });
       }
 
@@ -109,7 +121,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
       dataSettingTime: any
     ): Promise<TypingOutputCheckPay> => {
       const function_name = "PeticionConsultForPay";
-      const url_consult_for_pay = `${URL_GOU}/services_gou/check_pay/check_pay_with_pdp/cross`;
+      const url_consult_for_pay = `${URL_PASARELA_CHECK_PAY_WITH_PDP}`;
       const name_service = "Verificando Pago";
       let response;
       let pendiente = 0;
@@ -138,6 +150,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           return {
             ticket: response.obj?.result?.ticket,
             tipo_tramite: response.obj?.result?.tipo_tramite ?? "",
+            destino: response.obj?.result?.destino ?? "",
           };
         } catch (error: any) {
           if (!(error instanceof ErrorCustomFetch)) {
@@ -180,6 +193,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
         return {
           ticket: response.obj?.result?.ticket,
           tipo_tramite: response.obj?.result?.tipo_tramite ?? "",
+          destino: response.obj?.result?.destino ?? "",
         };
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
@@ -223,8 +237,8 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           dataComercioSimple,
           dataPath.id_hash,
           {
-            check_pay__retries: 10,
-            check_pay__delay: 30,
+            check_pay__retries: 1,
+            check_pay__delay: 3,
           }
         );
         return dataConsultForPay;
@@ -253,6 +267,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
     PeticionCheckPay,
     trx,
     summaryTrx,
+    dataComponent,
   };
   // as const;
 };
