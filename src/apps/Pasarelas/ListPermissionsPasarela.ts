@@ -1,4 +1,4 @@
-import { ListPermissionsRecargaCupoWithPasarela } from "../RecargaCupo/Gou/ListPermissionsRecargaCupoWithPasarela";
+import { ListPermissionsRecargaCupoWithPasarela } from "../RecargaCupo/Pasarelas/ListPermissionsRecargaCupoWithPasarela";
 
 const DictPermissionsPasarela: { [key: string]: any } = Object.freeze({
   ...ListPermissionsRecargaCupoWithPasarela,

@@ -9,7 +9,7 @@ import {
   TypingFormAddDataInput,
   TypingOutputErrorPrePayBase,
   TypingOutputPrePayBase,
-} from "../../../Gou/viewsHigherOrder/utils/utils_typing";
+} from "../../../Pasarelas/viewsHigherOrder/utils/utils_typing";
 import { hash } from "../../../../utils/hash";
 import {
   TempErrorFrontService,
@@ -19,7 +19,7 @@ import {
 } from "../../../../utils/fetchCustomPdp";
 import { TypingDataComercio } from "../../../../utils/TypingUtils";
 import { v4 } from "uuid";
-import { ErrorCustomPeticionPrePayBase } from "../../../Gou/viewsHigherOrder/utils/utils_exception";
+import { ErrorCustomPeticionPrePayBase } from "../../../Pasarelas/viewsHigherOrder/utils/utils_exception";
 
 //FRAGMENT ******************** TYPING *******************************
 export type TypingOthers = { [key: string]: any };

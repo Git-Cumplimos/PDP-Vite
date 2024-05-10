@@ -1,19 +1,19 @@
 import AppIcons from "../../../components/Base/AppIcons";
 
 import { ListPermissionsRecargaCupoWithPasarela } from "./ListPermissionsRecargaCupoWithPasarela";
-import WithPasarelaPay from "../../Gou/viewsHigherOrder/WithPasarelaPay";
+import WithPasarelaPay from "../../Pasarelas/viewsHigherOrder/WithPasarelaPay";
 import useHookRecargaCupoWithPasarela from "./hook/useHookRecargaCupoWithPasarela";
-import DestinoLogoGou from "../../Gou/Base/Gou/DestinoLogoGou";
+import DestinoLogoGou from "../../Pasarelas/Base/Gou/DestinoLogoGou";
 import { URL_RECARGARCUPO_WITH_PASARELA } from "./routes_backend";
-import DestinoLogoEvertec from "../../Gou/Base/Evertec/DestinoLogoEvertec";
+import DestinoLogoEvertec from "../../Pasarelas/Base/Evertec/DestinoLogoEvertec";
 import {
   constComunication as constComunicationGou,
   constQuestion as constQuestionGou,
-} from "../../Gou/Base/Gou/InfoClient";
+} from "../../Pasarelas/Base/Gou/InfoClient";
 import {
   constComunication as constComunicationEvertec,
   constQuestion as constQuestionEvertec,
-} from "../../Gou/Base/Evertec/InfoClient";
+} from "../../Pasarelas/Base/Evertec/InfoClient";
 
 const routesRecargaCupoWithPasarela = [
   {

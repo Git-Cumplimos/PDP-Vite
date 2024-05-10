@@ -26,7 +26,7 @@ import TicketsEmcali from "../apps/Emcali/components/Tickets/TicketsEmcali";
 import TicketsCajaSocial from "../apps/Corresponsalia/CorresponsaliaCajaSocial/components/TicketsCajaSocial";
 import TicketMoviliza from "../apps/Moviliza/components/TicketsMoviliza/TicketMoviliza";
 import TicketsItau from "../apps/Corresponsalia/CorresponsaliaItau/components/TicketsItau/TicketsItau";
-import TicketsGou from "../apps/Gou/Base/Gou/TicketsGou";
+import TicketsGou from "../apps/Pasarelas/Base/Gou/TicketsGou";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
