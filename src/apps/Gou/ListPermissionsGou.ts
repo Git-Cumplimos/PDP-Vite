@@ -1,7 +1,7 @@
-import { ListPermissionsRecargaCupoConGou } from "../RecargaCupo/Gou/ListPermissionsRecargaCupoConGou";
+import { ListPermissionsRecargaCupoWithPasarela } from "../RecargaCupo/Gou/ListPermissionsRecargaCupoWithPasarela";
 
 const DictPermissionsGou: { [key: string]: any } = Object.freeze({
-  ...ListPermissionsRecargaCupoConGou,
+  ...ListPermissionsRecargaCupoWithPasarela,
 });
 
 export const ListPermissionsGou = Object.keys(DictPermissionsGou).map(

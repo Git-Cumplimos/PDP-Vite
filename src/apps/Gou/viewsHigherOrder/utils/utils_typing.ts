@@ -5,7 +5,6 @@ import {
 } from "../../../../utils/TypingUtils";
 import {
   TypingDataPay,
-  TypingOutputCheckPay,
   TypingSummaryTrx,
   TypingTrx,
 } from "../../utils/utils_typing";
@@ -67,12 +66,18 @@ export type TypingOutputErrorPrePayBase = {
   id_log?: number;
   id_trx?: number;
   fecha?: string;
+  asterisk?: TypingDataModalAdd;
 };
 export type TypingOutputPrePayBase = {
   url_process: string;
   id_log: number;
   id_trx: number;
   fecha: string;
+  asterisk: TypingDataModalAdd;
+};
+
+export type TypingOutputPrePay = {
+  url_process: string;
 };
 
 export type TypingPeticionPrePayBase = (
@@ -81,8 +86,10 @@ export type TypingPeticionPrePayBase = (
 ) => Promise<TypingOutputPrePayBase>;
 
 export type TypingUseHookPasarelaSon = (
+  destino: string,
+  url_backend: string,
   dataComercio: TypingDataComercio,
-  dataInitialAddWithPasarelaPay: { [key: string]: any } | undefined,
+  dataInitialAdd: { [key: string]: any } | undefined,
   formClientDataInput: TypingFormClientDataInput,
   setFormClientDataInput: Dispatch<SetStateAction<TypingFormClientDataInput>>,
   formTrxDataInput: TypingFormTrxDataInput,
@@ -196,4 +203,4 @@ export type TypingPeticionCheckPay = (
   dataComercio: TypingDataComercio,
   dataInput: TypingDataInput,
   dataModalAdd: TypingDataModalAdd
-) => Promise<TypingOutputCheckPay>;
+) => Promise<TypingOutputPrePay>;

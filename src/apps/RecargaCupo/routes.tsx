@@ -5,7 +5,7 @@ import {
   rutasRecargaNequi,
 } from "../Nequi/routes";
 import routesRecargaCupoConGou from "./Gou/routes";
-import { ListPermissionsRecargaCupoConGou } from "./Gou/ListPermissionsRecargaCupoConGou";
+import { ListPermissionsRecargaCupoWithPasarela } from "./Gou/ListPermissionsRecargaCupoWithPasarela";
 
 const RecargaCupoMenu = lazy(() => import("./RecargaCupoMenu"));
 
@@ -15,9 +15,9 @@ const routesRecargaCupo = {
   component: RecargaCupoMenu,
   permission: [
     ...listPermissionsRecargaCupoNequi,
-    ListPermissionsRecargaCupoConGou,
+    ListPermissionsRecargaCupoWithPasarela,
   ],
-  subRoutes: [rutasRecargaNequi, routesRecargaCupoConGou],
+  subRoutes: [rutasRecargaNequi, ...routesRecargaCupoConGou],
 };
 
 export default routesRecargaCupo;

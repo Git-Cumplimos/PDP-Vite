@@ -1,15 +1,13 @@
 import React, {
   Fragment,
   FunctionComponent,
-  ReactNode,
   useCallback,
+  useState,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
 import Modal from "../../../../../components/Base/Modal";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import Button from "../../../../../components/Base/Button";
-import ButtonBar from "../../../../../components/Base/ButtonBar";
 import { formatMoney } from "../../../../../components/Base/MoneyInput";
 import { notifyError } from "../../../../../utils/notify";
 
@@ -25,33 +23,31 @@ import {
   constRelationshipSummary,
 } from "../../../utils/utils_const";
 import classes from "./PasarelaCheckPayOrigin.module.css";
+import { TypingOutputPrePay } from "../../utils/utils_typing";
 
 //FRAGMENT ******************** CSS *******************************
-const { contendorIdLog, contendorPago, labelHash } = classes;
+const { contendorIdLog, contendorPago, labelHash, contenedorButton } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type PropsPasarelaCheckPayOrigin = {
   ComponentLogo: FunctionComponent;
+  url_return_front: string;
   summaryTrx: any;
   trx: TypingTrx;
   loadingPeticion: boolean;
-  printDiv: any;
-  children: ReactNode;
+  outputPrePay: TypingOutputPrePay | null;
 };
 //FRAGMENT ******************** COMPONENT *******************************
 const PasarelaChecPayOrigin = ({
   ComponentLogo,
+  url_return_front,
   summaryTrx,
   loadingPeticion,
   trx,
-  printDiv,
-  children,
+  outputPrePay,
 }: PropsPasarelaCheckPayOrigin) => {
   const validNavigate = useNavigate();
-
-  const handlePrint = useReactToPrint({
-    content: () => printDiv.current,
-  });
+  const [disabledButton, setDisabledButton] = useState<boolean>(false);
 
   const handleCloseModal = useCallback(() => {
     if (loadingPeticion) {
@@ -64,8 +60,13 @@ const PasarelaChecPayOrigin = ({
       );
       return;
     }
-    validNavigate("../");
-  }, [loadingPeticion, validNavigate]);
+    validNavigate(url_return_front);
+  }, [loadingPeticion, validNavigate, url_return_front]);
+
+  const onSubmitContinuar = useCallback(() => {
+    window.open(outputPrePay?.url_process);
+    setDisabledButton(true);
+  }, [outputPrePay?.url_process]);
 
   return (
     <Fragment>
@@ -76,13 +77,17 @@ const PasarelaChecPayOrigin = ({
             {summaryTrx.id_log && (
               <label className={contendorIdLog}>{summaryTrx.id_log}</label>
             )}
-            <div className="px-10">
+            <div className="grid justify-center">
               <ComponentLogo></ComponentLogo>
             </div>
 
             <PaymentSummary
               title={trx.msg}
-              subtitle={summaryTrx?.msg ?? ""}
+              subtitle={
+                !disabledButton
+                  ? summaryTrx?.msg ?? ""
+                  : "Por favor continuar el pago, con el link de pago generado"
+              }
               summaryTrx={{
                 ...list_a_dict_segun_order(
                   [...summaryTrx?.summary_trx_asterisk] ?? []
@@ -114,28 +119,39 @@ const PasarelaChecPayOrigin = ({
               </div>
             </PaymentSummary>
             {!loadingPeticion && (
-              <div className="pt-4">
-                <ButtonBar>
-                  <Button onClick={() => validNavigate("../")}>
-                    Regresar al inicio
+              <div className={contenedorButton}>
+                {outputPrePay?.url_process && (
+                  <Button
+                    type={"submit"}
+                    onClick={onSubmitContinuar}
+                    disabled={disabledButton}
+                  >
+                    {!disabledButton
+                      ? "Generar link de pago"
+                      : "Ya se generó link de pago"}
                   </Button>
-                </ButtonBar>
+                )}
+                {/* {!disabledButton && (
+                  <Button design="danger" onClick={() => {}}>
+                    Cancelar Transacción
+                  </Button>
+                )} */}
+                <Button
+                  onClick={() =>
+                    validNavigate(
+                      !disabledButton ? url_return_front : "../transacciones"
+                    )
+                  }
+                >
+                  {!disabledButton
+                    ? "Regresar al inicio"
+                    : "Modulo de transacciones"}
+                </Button>
               </div>
             )}
           </Fragment>
         )}
         {/*************** Trx Search **********************/}
-        {/**************** Trx Aprobada **********************/}
-        {trx.status === "Aprobada" && (
-          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
-            {children}
-            <ButtonBar>
-              <Button onClick={handlePrint}>Imprimir</Button>
-              <Button onClick={() => validNavigate("../")}>Cerrar</Button>
-            </ButtonBar>
-          </div>
-        )}
-        {/*************** Trx Aprobada **********************/}
       </Modal>
     </Fragment>
   );

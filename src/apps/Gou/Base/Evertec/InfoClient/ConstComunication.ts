@@ -1,4 +1,4 @@
-import { TypingInfoClientConst } from "../../../Gou/viewsHigherOrder/utils/utils_typing";
+import { TypingInfoClientConst } from "../../../viewsHigherOrder/utils/utils_typing";
 
 export const constComunication: TypingInfoClientConst = {
   1: {

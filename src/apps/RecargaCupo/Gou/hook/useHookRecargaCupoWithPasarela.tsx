@@ -18,6 +18,7 @@ import {
   TypingFormTrxDataInput,
   TypingFormAddDataInput,
   TypingOutputErrorPrePayBase,
+  TypingOutputPrePayBase,
 } from "../../../Gou/viewsHigherOrder/utils/utils_typing";
 import { notifyError } from "../../../../utils/notify";
 import { hash } from "../../../../utils/hash";
@@ -28,18 +29,18 @@ import {
   ErrorCustomUseHookCode,
 } from "../../../../utils/fetchCustomPdp";
 import { TypingDataComercio } from "../../../../utils/TypingUtils";
-import { do_compare, get_value } from "../../../Gou/utils/utils_function";
 import { v4 } from "uuid";
-import { URL_RECARGARCUPO_WITH_PASARELA } from "../routes_backend";
 import { ErrorCustomPeticionPrePayBase } from "../../../Gou/viewsHigherOrder/utils/utils_exception";
 
 //FRAGMENT ******************** TYPING *******************************
 export type TypingOthers = { [key: string]: any };
 
 //FRAGMENT ******************** HOOK ***********************************
-const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
+const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
+  destino: string,
+  url_backend: string,
   dataComercio: TypingDataComercio,
-  dataInitialAddWithPasarelaPay: { [key: string]: any } | undefined,
+  dataInitialAdd: { [key: string]: any } | undefined,
   formClientDataInput: TypingFormClientDataInput,
   setFormClientDataInput: Dispatch<SetStateAction<TypingFormClientDataInput>>,
   formTrxDataInput: TypingFormTrxDataInput,
@@ -47,7 +48,7 @@ const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
   formAddDataInput: TypingFormAddDataInput,
   setFormAddDataInput: Dispatch<SetStateAction<TypingFormAddDataInput>>
 ) => {
-  const hook_name = "useHookRecargaCupoConGou";
+  const hook_name = "useHookRecargaCupoWithPasarela";
   useEffect(() => {
     const date_now = Intl.DateTimeFormat("es-CO", {
       year: "numeric",
@@ -89,93 +90,94 @@ const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
     async (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput
-    ): Promise<any> => {
+    ): Promise<TypingOutputPrePayBase> => {
       const function_name = "PeticionPrePayBase";
       const name_service = "Recargar Cupo Pago";
       let response;
       try {
-        const destino = dataInitialAddWithPasarelaPay?.destino
-          ? dataInitialAddWithPasarelaPay?.destino
-          : "";
-        const url_pre_pay = `${URL_RECARGARCUPO_WITH_PASARELA}${destino}`;
         const ip_address_fetch: any = await fetch(
           `https://api.ipify.org?format=json`
         );
         const ip_address = ip_address_fetch?.ip
           ? ip_address_fetch?.ip
           : "127.0.0.1";
-        // const body = {
-        //   comercio: {
-        //     id_comercio: dataComercio.id_comercio,
-        //     id_usuario: dataComercio.id_usuario,
-        //     id_terminal: dataComercio.id_terminal,
-        //     nombre_comercio: dataComercio.nombre_comercio,
-        //     nombre_usuario: dataComercio.nombre_usuario,
-        //     oficina_propia: dataComercio.oficina_propia,
-        //     location: {
-        //       address: dataComercio.location.address,
-        //       dane_code: dataComercio.location.dane_code,
-        //       city: dataComercio.location.city,
-        //       country: dataComercio.location.country,
-        //     },
-        //   },
-        //   id_uuid_trx: dataInput.id_unico,
-        //   id_hash: hash(dataInput.id_unico),
-        //   valor_trx: dataInput.valor_trx,
-        //   ip_address: ip_address,
-        //   referencia: dataInput.referencia,
-        //   nombres: dataInput.nombres,
-        //   apellidos: dataInput.apellidos,
-        //   documento: dataInput.documento,
-        //   tipo_documento: dataInput.tipo_documento,
-        //   correo: dataInput.correo,
-        //   celular: dataInput.celular,
-        // };
-        // response = await fetchCustomPdp(
-        //   url_pre_pay,
-        //   "POST",
-        //   name_service,
-        //   {},
-        //   body,
-        //   120
-        // );
-        response = {
-          codigo: 200,
-          msg: "Inicio Recargar Cupo inicio gou (GOU) Exitosa",
-          obj: {
-            error_msg: {},
-            error_status: false,
-            ids: {
-              id_hash:
-                "c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
-              id_log: 23,
-              id_trx: 437358,
-              id_uuid_trx: "12982799-d876-4525-ab37-21838b38f025",
-              pasarela_id_log: 6579,
-              pasarela_id_request: 34598,
-            },
-            result: {
-              asterisk: [
-                {
-                  Nombre: "Alisson Dayana",
-                },
-              ],
-              fecha: "09/05/2024 17:09:09",
-              referencia: "12982799d8764525ab3721838b38f025",
-              search: {
-                Nombre: "Alisson Dayana",
-              },
-              url_process:
-                "https://checkout.test.goupagos.com.co/spa/session/34598/d55055a7933a3553c5fd7b4ad8f86761",
-              url_return:
-                "https://cloudfront.puntodepagopruebas.com/check_pasarela_pay/c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
-              valor_trx: 10000.0,
+        const body = {
+          comercio: {
+            id_comercio: dataComercio.id_comercio,
+            id_usuario: dataComercio.id_usuario,
+            id_terminal: dataComercio.id_terminal,
+            nombre_comercio: dataComercio.nombre_comercio,
+            nombre_usuario: dataComercio.nombre_usuario,
+            oficina_propia: dataComercio.oficina_propia,
+            location: {
+              address: dataComercio.location.address,
+              dane_code: dataComercio.location.dane_code,
+              city: dataComercio.location.city,
+              country: dataComercio.location.country,
             },
           },
-          status: true,
+          id_uuid_trx: dataInput.id_unico,
+          id_hash: hash(dataInput.id_unico),
+          valor_trx: dataInput.valor_trx,
+          ip_address: ip_address,
+          referencia: dataInput.referencia,
+          nombres: dataInput.nombres,
+          apellidos: dataInput.apellidos,
+          documento: dataInput.documento,
+          tipo_documento: dataInput.tipo_documento,
+          correo: dataInput.correo,
+          celular: dataInput.celular,
         };
+        response = await fetchCustomPdp(
+          url_backend,
+          "POST",
+          name_service,
+          {},
+          body,
+          120
+        );
+        // response = {
+        //   codigo: 200,
+        //   msg: "Inicio Recargar Cupo inicio gou (GOU) Exitosa",
+        //   obj: {
+        //     error_msg: {},
+        //     error_status: false,
+        //     ids: {
+        //       id_hash:
+        //         "c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
+        //       id_log: 23,
+        //       id_trx: 437358,
+        //       id_uuid_trx: "12982799-d876-4525-ab37-21838b38f025",
+        //       pasarela_id_log: 6579,
+        //       pasarela_id_request: 34598,
+        //     },
+        //     result: {
+        //       asterisk: [
+        //         {
+        //           Nombre: "Alisson Dayana",
+        //         },
+        //       ],
+        //       fecha: "09/05/2024 17:09:09",
+        //       referencia: "12982799d8764525ab3721838b38f025",
+        //       search: {
+        //         Nombre: "Alisson Dayana",
+        //       },
+        //       url_process:
+        //         "https://checkout.test.goupagos.com.co/spa/session/34598/d55055a7933a3553c5fd7b4ad8f86761",
+        //       url_return:
+        //         "https://cloudfront.puntodepagopruebas.com/check_pasarela_pay/c7d2133b1f80b50d1894c72a7bb633f04773412e1b33ddfadcb33888c78b7220",
+        //       valor_trx: 10000.0,
+        //     },
+        //   },
+        //   status: true,
+        // };
+        const res_obj = response?.obj ?? {};
         return {
-          ticket: {},
+          url_process: res_obj.result?.url_process,
+          id_trx: res_obj?.ids?.id_trx,
+          id_log: res_obj?.ids?.id_log,
+          fecha: res_obj?.result?.fecha,
+          asterisk: res_obj?.result?.asterisk,
         };
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
@@ -193,6 +195,7 @@ const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
           outputPrePayBase.id_trx = response?.obj?.ids?.id_trx;
           outputPrePayBase.id_log = response?.obj?.ids?.id_log;
           outputPrePayBase.fecha = response?.obj?.result?.fecha;
+          outputPrePayBase.asterisk = response?.obj?.result?.asterisk;
         }
         throw new ErrorCustomPeticionPrePayBase(
           error.message,
@@ -201,7 +204,7 @@ const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
         );
       }
     },
-    [dataInitialAddWithPasarelaPay?.destino]
+    [url_backend]
   );
 
   return {
@@ -228,4 +231,4 @@ const useHookRecargaCupoConGou: TypingUseHookPasarelaSon = (
   };
 };
 
-export default useHookRecargaCupoConGou;
+export default useHookRecargaCupoWithPasarela;

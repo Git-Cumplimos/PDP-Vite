@@ -29,6 +29,8 @@ import {
   TypingPeticionPrePayBase,
   TypingUseHookWithPasarelaPay,
   TypingDataSettingValor,
+  TypingOutputPrePay,
+  TypingOutputPrePayBase,
 } from "../utils/utils_typing";
 import { PeticionSettingBase } from "../../utils/utils_peticiones";
 import { ErrorCustomPeticionPrePayBase } from "../utils/utils_exception";
@@ -103,13 +105,30 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
     async (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput
-    ): Promise<any> => {
+    ): Promise<TypingOutputPrePay> => {
       const function_name = "PeticionPrePay";
-      const name_service = "Recargar Cupo Pago";
-      let response;
+      const name_service = "Servicio Proceso Pago";
       try {
-        response = await PeticionPrePayBase(dataComercio, dataInput);
-        return response;
+        const outputPrePayBase: TypingOutputPrePayBase =
+          await PeticionPrePayBase(dataComercio, dataInput);
+
+        setSummaryTrx((old) => ({
+          ...old,
+          msg: "Por favor continuar el pago, generando el link de pago",
+          id_trx: outputPrePayBase.id_trx,
+          id_log: outputPrePayBase.id_log,
+          summary_trx_own: {
+            ...old.summary_trx_own,
+            fecha: outputPrePayBase?.fecha
+              ? outputPrePayBase?.fecha
+              : dataInput.fecha,
+          },
+          summary_trx_asterisk: outputPrePayBase.asterisk,
+        }));
+
+        return {
+          url_process: outputPrePayBase.url_process,
+        };
       } catch (error: any) {
         if (!(error instanceof ErrorCustomFetch)) {
           throw new ErrorCustomUseHookCode(
@@ -119,53 +138,21 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
             "notifyError",
             true
           );
+        } else if (error instanceof ErrorCustomPeticionPrePayBase) {
+          setSummaryTrx((old) => ({
+            ...old,
+            id_trx: error.outputPrePayBase?.id_trx,
+            id_log: error.outputPrePayBase?.id_log,
+            fecha: error.outputPrePayBase?.fecha
+              ? error.outputPrePayBase?.fecha
+              : dataInput.fecha,
+            summary_trx_asterisk: error.outputPrePayBase?.asterisk ?? [],
+          }));
         }
         throw error;
       }
     },
     [PeticionPrePayBase]
-  );
-
-  const ArmDataOutput = useCallback(
-    (res: { [key: string]: any }, status?: TypingStatusTrx) => {
-      if (status === undefined) {
-        status = "Desconocida";
-      }
-      let is_change = false;
-      const res_obj = res?.obj ?? {};
-      const res_obj_result = res_obj?.result ?? {};
-      if (Object.keys(res_obj).length !== 0) {
-        if (!summaryTrx?.id_trx) {
-          setSummaryTrx((old) => ({
-            ...old,
-            id_trx: res_obj?.ids?.id_trx ? res_obj?.ids?.id_trx : undefined,
-            id_log: res.obj?.ids?.id_log,
-          }));
-          is_change = true;
-        }
-        if (!summaryTrx?.summary_trx_asterisk) {
-          setSummaryTrx((old) => ({
-            ...old,
-            summary_trx_asterisk: res_obj_result?.asterisk
-              ? res_obj_result?.asterisk
-              : undefined,
-            id_log: res.obj?.ids?.id_log,
-          }));
-          is_change = true;
-        }
-        if (is_change === false) {
-          setSummaryTrx((old) => ({
-            ...old,
-            id_log: res.obj?.ids?.id_log,
-          }));
-        }
-      }
-      setTrx({
-        status: status,
-        msg: constMsgTrx[status],
-      });
-    },
-    [summaryTrx?.id_trx, summaryTrx?.summary_trx_asterisk]
   );
 
   const PeticionCheckPrePay = useCallback(
@@ -174,13 +161,13 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
       dataComercio: TypingDataComercio,
       dataInput: TypingDataInput,
       dataModalAdd: TypingDataModalAdd
-    ): Promise<any> => {
+    ): Promise<TypingOutputPrePay> => {
       const function_name = "PeticionCheckPrePay";
       const name_service = "Servicio Proceso Pago";
       setloadingPeticion(true);
       setloadingPeticionBlocking(true);
       let status: TypingStatusTrx = "Pendiente";
-      await setSummaryTrx({
+      setSummaryTrx({
         id_unico: id_unico_modal,
         summary_trx_asterisk: dataModalAdd,
         summary_trx_own: {
@@ -196,10 +183,12 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
         msg: constMsgTrx.Pendiente,
       });
 
-      let response: any;
       try {
-        //SECUENCIA ---------------Paso 1-------------------------------
-        response = await PeticionPrePay(dataComercio, dataInput);
+        const outputPrePay: TypingOutputPrePay = await PeticionPrePay(
+          dataComercio,
+          dataInput
+        );
+        return outputPrePay;
       } catch (error: any) {
         status = "Rechazada";
         setTrx({
@@ -218,13 +207,6 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
             "notifyError",
             true
           );
-        } else if (error instanceof ErrorCustomPeticionPrePayBase) {
-          setSummaryTrx((old) => ({
-            ...old,
-            id_trx: error.outputPrePayBase.id_trx,
-            id_log: error.outputPrePayBase.id_log,
-            fecha: error.outputPrePayBase.fecha,
-          }));
         }
         throw error;
       } finally {

@@ -28,6 +28,7 @@ import {
   TypingFormTrxDataInput,
   TypingFormAddDataInput,
   TypingInfoClient,
+  TypingOutputPrePay,
 } from "./utils/utils_typing";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
@@ -54,15 +55,15 @@ const formTrxDataInputInitial: TypingFormTrxDataInput = {
 
 //FRAGMENT ******************** COMPONENT *******************************
 const WithPasarelaPay = (
+  destino: string,
   url_backend: string,
   type_operation: number,
+  dataInitialAdd: { [key: string]: any } | undefined,
   useHookPasarelaSon: TypingUseHookPasarelaSon,
   ComponentLogo: FunctionComponent,
-  ComponectTicket: FunctionComponent<any>,
   infoClient: TypingInfoClient,
   url_return_front: string,
-  ComponectFormAdd?: FunctionComponent<PropsFormAdd>,
-  dataInitialAddWithPasarelaPay?: { [key: string]: any }
+  ComponectFormAdd?: FunctionComponent<PropsFormAdd>
 ): JSX.Element => {
   const goNavigate = useNavigate();
   const { roleInfo, pdpUser }: any = useAuth();
@@ -78,7 +79,10 @@ const WithPasarelaPay = (
   const [formAddDataInput, setFormAddDataInput] =
     useState<TypingFormAddDataInput>({});
 
-  const [ticket, setTicket] = useState<TypeInfTicket | null>(null);
+  const [outputPrePay, setOutputPrePay] = useState<TypingOutputPrePay | null>(
+    null
+  );
+
   const [dataSettingValor, setDataSettingValor] =
     useState<TypingDataSettingValor | null>({
       valor_costo_trx: 500,
@@ -117,8 +121,10 @@ const WithPasarelaPay = (
     PeticionPrePayBase,
     others,
   }: TypingOutputUseHookPasarelaSon = useHookPasarelaSon(
+    destino,
+    url_backend,
     dataComercio,
-    dataInitialAddWithPasarelaPay,
+    dataInitialAdd,
     formClientDataInput,
     setFormClientDataInput,
     formTrxDataInput,
@@ -186,8 +192,8 @@ const WithPasarelaPay = (
           },
         },
         {
-          render: ({ data }: { data: any }) => {
-            setTicket(data.ticket);
+          render: ({ data }: { data: TypingOutputPrePay }) => {
+            setOutputPrePay(data);
             return "Pago aprobado";
           },
         },
@@ -236,13 +242,12 @@ const WithPasarelaPay = (
       {trx.status !== "Search" && (
         <PasarelaCheckPayOrigin
           ComponentLogo={ComponentLogo}
+          url_return_front={url_return_front}
           summaryTrx={summaryTrx}
           trx={trx}
           loadingPeticion={loadingPeticion}
-          printDiv={printDiv}
-        >
-          <ComponectTicket ticket={ticket} refPrint={printDiv} />
-        </PasarelaCheckPayOrigin>
+          outputPrePay={outputPrePay}
+        ></PasarelaCheckPayOrigin>
       )}
     </Fragment>
   );

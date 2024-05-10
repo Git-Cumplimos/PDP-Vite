@@ -14,6 +14,12 @@
   border: 1px solid rgba(3, 3, 3, 0.326);
 }
 
+.contenedorButton {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 350px;
+  grid-template-rows: 60px 60px 60px;
+}
 .labelHash {
   max-width: 80%;
 }
