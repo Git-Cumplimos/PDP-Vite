@@ -24,9 +24,10 @@ const ReportesHistorico = () => {
   useEffect(() => {
     const getFiltersData = async () => {
       const res = await fetchGetReportesHistorico(
-        filters.fechaInicial,
-        filters.fechaFinal,
-        1
+        filters.fechaInicial.split("-").slice(0, 2).join("-"),
+        filters.fechaFinal.split("-").slice(0, 2).join("-"),
+        1,
+        "movimientos"
       );
       console.log(res);
       if (res.status) {
@@ -49,8 +50,6 @@ const ReportesHistorico = () => {
   const tableData = useMemo(() => {
     return data.map((item) => ({
       Nombre: item.archivo,
-      Tipo: "PDF",
-      "Última modificación": "Hoy",
     }));
   }, [data]);
 
@@ -78,7 +77,7 @@ const ReportesHistorico = () => {
     <>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre", "Tipo", "Última modificación"]}
+        headers={["Nombre"]}
         data={tableData}
         onSelectRow={
           // Enviar el nombre del archivo para descargar

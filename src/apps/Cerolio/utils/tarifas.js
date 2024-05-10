@@ -49,7 +49,7 @@ export const fetchUpdateTarifasByIdComercio = async (id_comercio, body) => {
   }
 };
 
-export const fetchGetDataOficinas = async (id_comercio) => {
+export const fetchGetDataOficinas = async (id_comercio = "") => {
   try {
     let params = {
       pk_id_comercio: id_comercio,

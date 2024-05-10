@@ -45,14 +45,15 @@ export const fetchGetReportesConsulta = async (
 export const fetchGetReportesHistorico = async (
   fecha_inicial = "",
   fecha_final = "",
-  comercio = ""
+  comercio = "",
+  carpeta = ""
 ) => {
   try {
     let params = {
       fecha_ini: fecha_inicial,
       fecha_fin: fecha_final,
-      fk_id_comercio_uso: comercio,
-      carpeta: "pines",
+      id_comercio: comercio,
+      carpeta: carpeta,
     };
 
     // Limpiar los parámetros vacíos

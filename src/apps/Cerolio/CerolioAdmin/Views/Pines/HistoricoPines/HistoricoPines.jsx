@@ -11,7 +11,7 @@ import Select from "../../../../../../components/Base/Select";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Table from "../../../../../../components/Base/Table";
 import { makeMoneyFormatter } from "../../../../../../utils/functions";
-import { fetchGetReportesConsulta } from "../../../../utils/reportes";
+import { fetchGetPinData } from "../../../../utils/pin";
 
 const HistoricoPines = () => {
   const [showModalReagendar, setShowModalReagendar] = useState(false);
@@ -90,31 +90,32 @@ const HistoricoPines = () => {
   ]);
 
   const formatMoney = makeMoneyFormatter(2);
-
+  // TODO Validar filtros
   useEffect(() => {
     const getFiltersData = async () => {
-      const res = await fetchGetReportesConsulta(
-        filters.fechaInicial,
-        filters.fechaFinal,
-        1,
-        filters.nombreTramite,
-        filters.pin,
-        filters.documento
+      const res = await fetchGetPinData(
+        // filters.pin
+        // filters.fechaInicial,
+        // filters.fechaFinal,
+        // 1,
+        // filters.nombreTramite,
+        // filters.documento
       );
+      console.log("HISTORICO", res);
       if (res) {
         setData(
           res.results.map((item) => ({
             ID: item.fk_id_cliente,
             PIN: item.numero_pin,
-            "Estado PIN": item.naturaleza,
+            "Estado PIN": item.estado,
             Fecha: new Date(item.fecha_uso).toLocaleDateString(),
             Hora: new Date(item.fecha_uso).toLocaleTimeString(),
-            "Estado Agenda": item.naturaleza,
+            "Estado Agenda": item.estado_cita,
             "Tipo Trámite": item.tipo_tramite,
             Trámite: item.nombre_tramite,
             "Nombre Cliente": item.nombres + " " + item.apellidos,
-            Celular: item.naturaleza,
-            "Correo electrónico": item.naturaleza,
+            Celular: item.telefono,
+            "Correo electrónico": item.email,
             Acciones: (
               <div className="flex flex-row">
                 <Button
@@ -287,7 +288,7 @@ const HistoricoPines = () => {
         {/* Input para fecha */}
         <Input label="Fecha" type="date" />
       </TableEnterprise>
-      {/* REAGENDAR */}
+      {/* TODO REAGENDAR */}
       <Modal show={showModalReagendar}>
         <h2 className="text-center">
           ¿Qué re-agenda le queda bien al cliente?
@@ -335,7 +336,7 @@ const HistoricoPines = () => {
           </Button>
         </div>
       </Modal>
-      {/* DEVOLUCIÓN PIN */}
+      {/* TODO DEVOLUCIÓN PIN */}
       <Modal show={showModalDevolucion} bigger>
         <h2 className="text-center">Devolución del PIN</h2>
         <Table

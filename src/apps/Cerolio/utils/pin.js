@@ -2,15 +2,20 @@ import fetchData from "../../../utils/fetchData";
 
 const urlCerolio = process.env.REACT_APP_URL_CEROLIO;
 
-export const fetchGetPinData = async (numero_pin = "") => {
-  if (numero_pin === "") {
-    return { maxPages: 0, results: [] };
-  }
+export const fetchGetPinData = async (numero_pin = "", estado = "") => {
   try {
-    const params = {
+    let params = {
       numero_pin: numero_pin,
-      estado: "Disponible",
+      estado: estado,
     };
+
+    // Limpiar los parámetros vacíos
+    params = Object.keys(params).reduce((acc, key) => {
+      if (params[key] !== "") {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
 
     const url = `${urlCerolio}/pines/tramitar`;
 

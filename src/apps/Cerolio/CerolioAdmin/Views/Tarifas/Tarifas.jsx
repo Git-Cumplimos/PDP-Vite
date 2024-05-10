@@ -1,13 +1,51 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Input from "../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../components/Base/TableEnterprise";
 import Modal from "../../../../../components/Base/Modal";
 import FileInput from "../../../../../components/Base/FileInput";
+import { fetchGetDataOficinas } from "../../../utils/tarifas";
+import { makeMoneyFormatter } from "../../../../../utils/functions";
 
 const Tarifas = () => {
   const [modalCargueMasivo, setModalCargueMasivo] = useState(false);
+  const [maxPages, setMaxPages] = useState(0);
+  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+
+  const [dataTarifas, setDataTarifas] = useState([]);
+
+  const getTarifasByComercio = async () => {
+    try {
+      const response = await fetchGetDataOficinas();
+      // console.log("response", response);
+      setDataTarifas(response.results);
+      setMaxPages(response.maxPages);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getTarifasByComercio();
+  }, []);
+
+  const tableTarifas = useMemo(() => {
+    const formatMoney = makeMoneyFormatter();
+    return dataTarifas.map((tarifa) => ({
+      // TODO Datos faltantes
+      "Fecha de cambio": "Fecha",
+      "ID OAT": tarifa.pk_id_oficina,
+      OAT: tarifa.nombre,
+      Nombre: "Nombre",
+      "Tarifa A": formatMoney.format(tarifa.comision_originacion.A),
+      "Tarifa B": formatMoney.format(tarifa.comision_originacion.B),
+      "Tarifa Licencia C": formatMoney.format(tarifa.comision_originacion.C),
+      "Tarifa Combos": formatMoney.format(tarifa.comision_originacion.combos),
+      Acciones: "Acciones",
+    }));
+  }, [dataTarifas]);
+
   return (
     <>
       <ButtonBar>
@@ -15,68 +53,34 @@ const Tarifas = () => {
           className="text-white bg-primary"
           onClick={() => setModalCargueMasivo(true)}
         >
+          {/* TODO Cargue masivo */}
           Cargue masivo tarifas
         </Button>
       </ButtonBar>
       <TableEnterprise
         title="Tarifas"
         headers={[
-          "ID",
           "Fecha de cambio",
           "ID OAT",
           "OAT",
           "Nombre",
           "Tarifa A",
           "Tarifa B",
-          " Tarifa Licencia C",
+          "Tarifa C",
           "Tarifa Combos",
           "Acciones",
         ]}
-        data={[
-          {
-            ID: "1",
-            "Fecha de cambio": "12/12/2021",
-            "ID OAT": "1",
-            OAT: "OAT 1",
-            Nombre: "Nombre",
-            "Tarifa A": "Tarifa A",
-            "Tarifa B": "Tarifa B",
-            "Tarifa Licencia C": "Tarifa Licencia C",
-            "Tarifa Combos": "Tarifa Combos",
-            Acciones: "Acciones",
-          },
-          {
-            ID: "2",
-            "Fecha de cambio": "12/12/2021",
-            "ID OAT": "2",
-            OAT: "OAT 2",
-            Nombre: "Nombre",
-            "Tarifa A": "Tarifa A",
-            "Tarifa B": "Tarifa B",
-            "Tarifa Licencia C": "Tarifa Licencia C",
-            "Tarifa Combos": "Tarifa Combos",
-            Acciones: "Acciones",
-          },
-          {
-            ID: "3",
-            "Fecha de cambio": "12/12/2021",
-            "ID OAT": "3",
-            OAT: "OAT 3",
-            Nombre: "Nombre",
-            "Tarifa A": "Tarifa A",
-            "Tarifa B": "Tarifa B",
-            "Tarifa Licencia C": "Tarifa Licencia C",
-            "Tarifa Combos": "Tarifa Combos",
-            Acciones: "Acciones",
-          },
-        ]}
+        data={tableTarifas}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
       >
         {/* Input para nombre */}
         <Input label="Nombre" placeholder="Nombre" />
       </TableEnterprise>
       <ButtonBar>
+        {/* TODO Descargar reporte */}
         <Button>Descargar reporte</Button>
-        <Button>Actualizar</Button>
+        <Button onClick={getTarifasByComercio}>Actualizar</Button>
       </ButtonBar>
       <Modal show={modalCargueMasivo}>
         <h1 className="text-2xl">Cargue masivo tarifas</h1>

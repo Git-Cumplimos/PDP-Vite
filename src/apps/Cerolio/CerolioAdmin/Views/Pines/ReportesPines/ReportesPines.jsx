@@ -24,9 +24,10 @@ const ReportesPines = () => {
   useEffect(() => {
     const getFiltersData = async () => {
       const res = await fetchGetReportesHistorico(
-        filters.fechaInicial,
-        filters.fechaFinal,
-        1
+        filters.fechaInicial.split("-").slice(0, 2).join("-"),
+        filters.fechaFinal.split("-").slice(0, 2).join("-"),
+        "",
+        "pines"
       );
       console.log(res);
       if (res.status) {
@@ -49,14 +50,12 @@ const ReportesPines = () => {
   const tableData = useMemo(() => {
     return data.map((item) => ({
       Nombre: item.archivo,
-      Tipo: "PDF",
-      "Última modificación": "Hoy",
     }));
   }, [data]);
 
   const descargarReporte = useCallback(
     async (i) => {
-      console.log("Descargar reporte", i);
+      // console.log("Descargar reporte", i);
       // Buscar en data el archivo con el nombre de la fila i
       // Descargar el archivo
       const archivo = data[i].url;
@@ -78,7 +77,7 @@ const ReportesPines = () => {
     <>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre", "Tipo", "Última modificación"]}
+        headers={["Nombre"]}
         data={tableData}
         onSelectRow={
           // Enviar el nombre del archivo para descargar

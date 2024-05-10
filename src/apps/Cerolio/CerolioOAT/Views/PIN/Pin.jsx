@@ -54,7 +54,7 @@ const Pin = () => {
       (item) => item.value === parseInt(userData.tipoTramite)
     ).label;
     const pinString = `${doc}${tram}${userData.numeroDocumento}`;
-    const pinData = await fetchGetPinData(pinString);
+    const pinData = await fetchGetPinData(pinString, "Disponible");
     console.log("data", pinData);
     if (pinData.results.length === 0) {
       notifyError("No se encontró un PIN disponible");

@@ -17,6 +17,38 @@ export const base_agenda = {
   attendance: 0,
 };
 
+export const fetchGetDisponibilidadByIdComercio = async (
+  fecha = "",
+  comercio = ""
+) => {
+  try {
+    let params = {
+      fecha_vigencia: fecha,
+      fk_id_comercio: comercio,
+    };
+
+    // Limpiar los parámetros vacíos
+    params = Object.keys(params).reduce((acc, key) => {
+      if (params[key] !== "") {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
+
+    const url = `${urlCerolio}/citas/get_parametrizacion_horarios`;
+
+    const res = await fetchData(url, "GET", params);
+    if (res.status) {
+      return res.obj[0];
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const fetchGetHorariosByIdComercio = async (fecha, comercio) => {
   try {
     const res = await fetchData(

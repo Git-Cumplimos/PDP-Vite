@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Input from "../../../../../components/Base/Input";
 import Button from "../../../../../components/Base/Button";
-import { base_agenda, fetchPostCrearHorario } from "../../../utils/agenda";
+import {
+  base_agenda,
+  fetchGetDisponibilidadByIdComercio,
+  fetchPostCrearHorario,
+} from "../../../utils/agenda";
 import { notify, notifyError } from "../../../../../utils/notify";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
@@ -13,6 +17,68 @@ const Agenda = () => {
   const [scheduleData, setScheduleData] = useState(base_agenda);
   const [showModalResults, setShowModalResults] = useState(false);
   const [results, setResults] = useState({});
+
+  const getSchedule = useCallback(async () => {
+    const res = await fetchGetDisponibilidadByIdComercio(
+      // Fecha en formato YYYY-MM-DD dentro de 5 días
+      new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+
+      roleInfo.id_comercio
+    );
+    console.log(res);
+    setScheduleData({
+      date: "",
+      hours: [
+        {
+          day: "Lunes",
+          startTime: res.horario_atencion.lunes.Apertura,
+          endTime: res.horario_atencion.lunes.Cierre,
+        },
+        {
+          day: "Martes",
+          startTime: res.horario_atencion.martes.Apertura,
+          endTime: res.horario_atencion.martes.Cierre,
+        },
+        {
+          day: "Miércoles",
+          startTime: res.horario_atencion.miercoles.Apertura,
+          endTime: res.horario_atencion.miercoles.Cierre,
+        },
+        {
+          day: "Jueves",
+          startTime: res.horario_atencion.jueves.Apertura,
+          endTime: res.horario_atencion.jueves.Cierre,
+        },
+        {
+          day: "Viernes",
+          startTime: res.horario_atencion.viernes.Apertura,
+          endTime: res.horario_atencion.viernes.Cierre,
+        },
+        {
+          day: "Sábado",
+          startTime: res.horario_atencion.sabado.Apertura,
+          endTime: res.horario_atencion.sabado.Cierre,
+        },
+        {
+          day: "Domingo",
+          startTime: res.horario_atencion.domingo.Apertura,
+          endTime: res.horario_atencion.domingo.Cierre,
+        },
+        {
+          day: "Festivos",
+          startTime: res.horario_atencion_festivos.Apertura,
+          endTime: res.horario_atencion_festivos.Cierre,
+        },
+      ],
+      attendance: res.numero_ventanillas,
+    });
+  }, [roleInfo]);
+
+  useEffect(() => {
+    getSchedule();
+  }, [roleInfo, getSchedule]);
 
   const updateHours = async () => {
     console.log(scheduleData);
@@ -69,7 +135,8 @@ const Agenda = () => {
       notify(res.msg);
       setResults(res.obj.resp_cancelaciones.obj);
       setShowModalResults(true);
-      setScheduleData(base_agenda);
+      // setScheduleData(base_agenda);
+      getSchedule();
     }
   };
 
@@ -151,11 +218,12 @@ const Agenda = () => {
         <Input
           label="Citas canceladas"
           type="number"
-          value={results.cantidad_citas_canceladas}
+          value={results?.cantidad_citas_canceladas}
           disabled
         />
-        {results.lista_citas_canceladas.length > 0 &&
-          results.lista_citas_canceladas?.map((cita) => (
+        {results?.lista_citas_canceladas &&
+          results?.lista_citas_canceladas.length > 0 &&
+          results?.lista_citas_canceladas?.map((cita) => (
             <p key={cita}>{cita}</p>
           ))}
       </Modal>
