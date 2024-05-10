@@ -84,12 +84,7 @@ const WithPasarelaPay = (
   );
 
   const [dataSettingValor, setDataSettingValor] =
-    useState<TypingDataSettingValor | null>({
-      valor_costo_trx: 500,
-      cant_valor_trx_maximo: 11,
-      valor_trx_maximo_exacto: 900000,
-      valor_trx_minimo_exacto: 200,
-    });
+    useState<TypingDataSettingValor | null>(null);
 
   const dataComercio: TypingDataComercio = useMemo(() => {
     const tipo_comercio = roleInfo?.tipo_comercio ?? "";
@@ -145,28 +140,28 @@ const WithPasarelaPay = (
     PeticionPrePayBase
   );
 
-  // useEffect(() => {
-  //   notifyPending(
-  //     PeticionSetting(),
-  //     {
-  //       render: () => {
-  //         return "Procesando configuración";
-  //       },
-  //     },
-  //     {
-  //       render: ({ data }: { data: TypingDataSettingValor }) => {
-  //         setDataSettingValor(data);
-  //         return "Consulta Configuración exitosa";
-  //       },
-  //     },
-  //     {
-  //       render: ({ data: error }) => {
-  //         goNavigate(url_return_front);
-  //         return error?.message ?? "Consulta Configuración Rechazada";
-  //       },
-  //     }
-  //   );
-  // }, [PeticionSetting, goNavigate, url_return_front]);
+  useEffect(() => {
+    notifyPending(
+      PeticionSetting(),
+      {
+        render: () => {
+          return "Procesando configuración";
+        },
+      },
+      {
+        render: ({ data }: { data: TypingDataSettingValor }) => {
+          setDataSettingValor(data);
+          return "Consulta Configuración exitosa";
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          goNavigate(url_return_front);
+          return error?.message ?? "Consulta Configuración Rechazada";
+        },
+      }
+    );
+  }, [PeticionSetting, goNavigate, url_return_front]);
 
   const onSubmitCheckPrePay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {
@@ -241,6 +236,7 @@ const WithPasarelaPay = (
 
       {trx.status !== "Search" && (
         <PasarelaCheckPayOrigin
+          destino={destino}
           ComponentLogo={ComponentLogo}
           url_return_front={url_return_front}
           summaryTrx={summaryTrx}

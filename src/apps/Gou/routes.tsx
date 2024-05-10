@@ -12,7 +12,7 @@ const routesPasarelaCheckPay = {
   component: GouCheckPayCross,
   permission: ListPermissionsPasarela,
   subRoutes: [],
-  // show: false,
+  show: false,
 };
 
 export default routesPasarelaCheckPay;

@@ -30,6 +30,7 @@ const { contendorIdLog, contendorPago, labelHash, contenedorButton } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type PropsPasarelaCheckPayOrigin = {
+  destino:string;
   ComponentLogo: FunctionComponent;
   url_return_front: string;
   summaryTrx: any;
@@ -39,6 +40,7 @@ type PropsPasarelaCheckPayOrigin = {
 };
 //FRAGMENT ******************** COMPONENT *******************************
 const PasarelaChecPayOrigin = ({
+  destino,
   ComponentLogo,
   url_return_front,
   summaryTrx,
@@ -77,7 +79,7 @@ const PasarelaChecPayOrigin = ({
             {summaryTrx.id_log && (
               <label className={contendorIdLog}>{summaryTrx.id_log}</label>
             )}
-            <div className="grid justify-center">
+            <div className={destino === "GOU" ? "grid justify-center": ""}>
               <ComponentLogo></ComponentLogo>
             </div>
 

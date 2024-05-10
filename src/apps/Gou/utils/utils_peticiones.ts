@@ -8,19 +8,23 @@ import {
 import { TypingDataSetting, TypingTypeSettingTime } from "./utils_typing";
 
 export const PeticionSettingBase = async (
-  url_gou: string,
+  url_pasarela_setting: string,
   type_setting_time: TypingTypeSettingTime,
   type_operation: number
 ): Promise<TypingDataSetting> => {
   const function_name = "PeticionSettingBase";
   const name_service = "consultar configuración Gou";
   try {
-    const url = `${url_gou}/services_gou/check_pay/consult_setting`;
     const params = {
       type: type_setting_time,
       type_operation,
     };
-    const response = await fetchCustomPdp(url, "GET", name_service, params);
+    const response = await fetchCustomPdp(
+      url_pasarela_setting,
+      "GET",
+      name_service,
+      params
+    );
     const setting = response?.obj?.result?.setting ?? {};
     const dataSetting: TypingDataSetting = {
       valor_costo_trx: setting?.valor_costo_trx,

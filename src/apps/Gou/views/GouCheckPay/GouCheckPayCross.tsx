@@ -5,14 +5,12 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 import Modal from "../../../../components/Base/Modal";
-import { useImgs } from "../../../../hooks/ImgsHooks";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { notifyError, notifyPending } from "../../../../utils/notify";
 import { TypeInfTicket } from "../../../../utils/TypingUtils";
 import { formatMoney } from "../../../../components/Base/MoneyInput";
 import { TempErrorFrontUser } from "../../../../utils/fetchCustomPdp";
 
-import TicketsGou from "../../Base/Gou/TicketsGou";
 import useHookGouCheckPay from "./hook/useHookGouCheckPay";
 import {
   TypingOutputCheckPay,
@@ -43,7 +41,6 @@ const { contendorBorder, contendorIdLog, contendorPago } = classes;
 //FRAGMENT ******************** COMPONENT *******************************
 const GouCheckPayCross = () => {
   const { roleInfo }: any = useAuth();
-  const { imgs } = useImgs();
   const params = useParams();
   const [dataPath, setDataPath] = useState<TypingDataPath | null>(null);
   const [ticket, setTicket] = useState<TypeInfTicket | null>(null);

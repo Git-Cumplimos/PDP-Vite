@@ -1,27 +1,16 @@
 import { useCallback, useState } from "react";
 import { TypingDataComercio } from "../../../../utils/TypingUtils";
 import {
-  ErrorCustomBackendRechazada,
   ErrorCustomFetch,
   ErrorCustomUseHookCode,
-  ErrorCustomRaise,
   TempErrorFrontService,
-  fetchCustomPdp,
-  FuctionEvaluateResponseConsultTrx,
-  fetchCustomPdpCycle,
-  defaultParamsError,
-  ErrorCustomBackendPending,
-  ErrorCustomBackend,
 } from "../../../../utils/fetchCustomPdp";
 import { constMsgTrx } from "../../utils/utils_const";
-import { ajust_tam_see } from "../../utils/utils_function";
 import {
-  TypingOutputCheckPay,
   TypingDataSetting,
   TypingStatusTrx,
   TypingSummaryTrx,
   TypingTrx,
-  TypingTypeSettingTime,
 } from "../../utils/utils_typing";
 import {
   TypingDataInput,
@@ -34,12 +23,7 @@ import {
 } from "../utils/utils_typing";
 import { PeticionSettingBase } from "../../utils/utils_peticiones";
 import { ErrorCustomPeticionPrePayBase } from "../utils/utils_exception";
-
-//FRAGMENT ******************** CONST *******************************
-// const URL_GOU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}`;
-const URL_GOU = `http://127.0.0.1:5000`;
-
-//FRAGMENT ******************** TYPING *******************************
+import { URL_PASARELA_CHECK_PAY_CONSULT_SETTING } from "../../routes_backend";
 
 //FRAGMENT ******************** HOOK *******************************
 const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
@@ -63,7 +47,7 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
       setloadingPeticionBlocking(true);
       try {
         const dataSetting: TypingDataSetting = await PeticionSettingBase(
-          URL_GOU,
+          URL_PASARELA_CHECK_PAY_CONSULT_SETTING,
           "origin",
           type_operation
         );

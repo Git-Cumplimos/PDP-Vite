@@ -21,7 +21,7 @@ const routesRecargaCupoWithPasarela = [
     label: <AppIcons Logo={"RECARGA_CELULAR"} name="GOU" />,
     component: () =>
       WithPasarelaPay(
-        "gou",
+        "GOU",
         `${URL_RECARGARCUPO_WITH_PASARELA}/gou`,
         235,
         undefined,
@@ -43,7 +43,7 @@ const routesRecargaCupoWithPasarela = [
     label: <AppIcons Logo={"RECARGA_CELULAR"} name="Evertec" />,
     component: () =>
       WithPasarelaPay(
-        "evertec",
+        "EVERTEC",
         `${URL_RECARGARCUPO_WITH_PASARELA}/evertec`,
         268,
         undefined,
