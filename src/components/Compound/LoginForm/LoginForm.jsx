@@ -255,10 +255,14 @@ const LoginForm = () => {
     setLoading(true);
     auth
       .handleverifyTotpToken(totp)
-      .then()
+      .then(() => notify("Token y contraseña reestablecidos correctamente en AWS (2/2)"))
       .catch((err) => {
         if (err.cause === "unknown") {
           notifyError(err.message);
+          return;
+        }
+        if (err.cause === "custom") {
+          // notifyError(err.message);
           return;
         }
         if (err.code === "EnableSoftwareTokenMFAException") {
@@ -270,7 +274,7 @@ const LoginForm = () => {
         if (auth.timer) {
           clearTimeout(auth.timer);
         }
-        notify("Token y contraseña reestablecidos correctamente");
+        notify("Token y contraseña reestablecidos correctamente en AWS (2/2)");
       })
       .finally(() => setLoading(false));
 

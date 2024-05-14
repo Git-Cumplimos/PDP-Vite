@@ -386,6 +386,19 @@ export const useProvideAuth = () => {
           },
         });
         if (!response.ok) {
+          if ([400, 404].includes(response.status)) {
+            let handled = false;
+            try {
+              const resJson = await response.json();
+              notifyError(resJson?.msg);
+              handled = true;
+              throw new Error(resJson?.msg, { cause: "custom" });
+            } catch (error) {
+              if (handled) {
+                throw error;
+              }
+            }
+          }
           notifyError(
             <p>
               Error consultando el servicio de verificacion de token:
@@ -403,10 +416,30 @@ export const useProvideAuth = () => {
           notifyError(resJson?.msg);
           return;
         }
-        notify(resJson?.msg);
+        // notify(resJson?.msg);
+        notify("Token de usuario validado exitosamente en PDP (1/2)");
+        setTimer((old) => {
+          clearTimeout(old);
+          return null;
+        });
       } catch (err) {
         console.error(err);
-        signOut();
+        // signOut();
+        setTimer((old) => {
+          clearTimeout(old);
+          return setTimeout(() => {
+            signOut();
+            notifyError(
+              "La sesión ha expirado, por favor intente de nuevo",
+              5000,
+              { toastId: "expired-session-not" }
+            );
+            setQr("");
+          }, 90000);
+        });
+        if (err.cause === "custom") {
+          throw err;
+        }
         throw new Error(err, { cause: "unknown" });
       }
     },
@@ -462,37 +495,36 @@ export const useProvideAuth = () => {
   }, []);
 
   const handlesetPreferredMFA = useCallback(
-    async (totp) => {
+    async () => {
       try {
-        try {
-          await verifyTOTP(totp);
-        } catch (error) {
-          throw error;
-        }
         const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
         if (preferredMFA === "SUCCESS") {
-          await confirmSignIn(totp);
           signOut();
         }
       } catch (err) {
         throw new Error(err);
       }
     },
-    [cognitoUser, confirmSignIn, signOut, verifyTOTP]
+    [cognitoUser, signOut]
   );
 
   const handleverifyTotpToken = useCallback(
     async (totp) => {
       try {
+        await verifyTOTP(totp);
+
         const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
         if (tokenValidado.accessToken.payload.token_use === "access") {
-          await handlesetPreferredMFA(totp);
+          await handlesetPreferredMFA();
         }
       } catch (err) {
+        if (err.cause === "custom") {
+          throw err;
+        }
         throw new Error(err);
       }
     },
-    [cognitoUser, handlesetPreferredMFA]
+    [cognitoUser, handlesetPreferredMFA, verifyTOTP]
   );
 
   useFetchDebounce(
