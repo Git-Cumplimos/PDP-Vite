@@ -27,6 +27,7 @@ import classes from "./PasarelaFormulario.module.css";
 import { do_compare, get_value } from "../../../utils/utils_function";
 import FormClient from "./DistinctForm/FormClient";
 import FormTrx from "./DistinctForm/FormTrx";
+import { notifyError } from "../../../../../utils/notify";
 
 //FRAGMENT ********************* CSS *********************************
 const { contendorFather } = classes;
@@ -116,12 +117,13 @@ const PasarelaFormulario = ({
               ...old,
               [ev.target.name]: value,
             }));
-          if (formDataInput_.formTrxDataInput.hasOwnProperty(ev.target.name))
+          if (formDataInput_.formTrxDataInput.hasOwnProperty(ev.target.name)) {
             formDataInput_.setFormTrxDataInput((old) => ({
               ...old,
               [ev.target.name]: value,
             }));
-          return;
+            return;
+          }
         }
         if (dataInvalid_.hasOwnProperty(ev.target.name)) {
           setDataInvalid((old) => ({
@@ -132,7 +134,10 @@ const PasarelaFormulario = ({
         const structure_compare = ev.target.id.split("/")[2];
         if (structure_compare) {
           const [, key_change, msg_invalid_do_compare] = do_compare(
-            { ...formDataInput_.formClientDataInput },
+            {
+              ...formDataInput_.formClientDataInput,
+              ...formClientDataInputCheck_,
+            },
             ev.target.name,
             value,
             structure_compare
@@ -211,6 +216,48 @@ const PasarelaFormulario = ({
     ]
   );
 
+  const onSubmitSchemaForm = useCallback(
+    (ev: MouseEvent<HTMLFormElement>) => {
+      ev.preventDefault();
+      if (
+        formClientInputs.celular !== undefined &&
+        formClientInputs["celular|confirmacion"] !== undefined
+      ) {
+        if (
+          formClientDataInput.celular !==
+          formClientDataInputCheck["celular|confirmacion"]
+        ) {
+          notifyError("Verifique el número de celular", 5000, {
+            toastId: "notify-lot",
+          });
+          return;
+        }
+      }
+      if (
+        formClientInputs.correo !== undefined &&
+        formClientInputs["correo|confirmacion"] !== undefined
+      ) {
+        if (
+          formClientDataInput.correo !==
+          formClientDataInputCheck["correo|confirmacion"]
+        ) {
+          notifyError("Verifique el correo electrónico", 5000, {
+            toastId: "notify-lot",
+          });
+          return;
+        }
+      }
+      onSubmitCheckPrePay(ev);
+    },
+    [
+      formClientInputs,
+      formClientDataInput.celular,
+      formClientDataInput.correo,
+      formClientDataInputCheck,
+      onSubmitCheckPrePay,
+    ]
+  );
+
   return (
     <div>
       <form
@@ -229,7 +276,7 @@ const PasarelaFormulario = ({
             formClientDataInputCheck
           )
         }
-        onSubmit={onSubmitCheckPrePay}
+        onSubmit={onSubmitSchemaForm}
         className="grid grid-cols-1 place-content-center place-items-center"
       >
         <fieldset className={contendorFather}>
