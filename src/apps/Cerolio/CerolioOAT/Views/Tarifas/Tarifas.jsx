@@ -99,6 +99,7 @@ const Tarifas = () => {
       />
       <h1 className="text-2xl">Tarifas</h1>
       <div className="grid grid-cols-2 gap-y-10">
+      {/* TODO No se muestra el valor cuando es 0, aunque no debería ser 0 nunca */}
         <MoneyInput
           label="Tarifa A1-A2"
           value={parseInt(dataTarifas[0]["A1-A2"])}
