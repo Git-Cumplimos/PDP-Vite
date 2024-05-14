@@ -2,11 +2,18 @@ import fetchData from "../../../utils/fetchData";
 
 const urlCerolio = process.env.REACT_APP_URL_CEROLIO;
 
-export const fetchGetPinData = async (numero_pin = "", estado = "") => {
+export const fetchGetPinData = async (
+  numero_pin = "",
+  estado = "",
+  fecha_inicial = "",
+  fecha_final = ""
+) => {
   try {
     let params = {
       numero_pin: numero_pin,
       estado: estado,
+      fecha_ini: fecha_inicial,
+      fecha_fin: fecha_final,
     };
 
     // Limpiar los parámetros vacíos
@@ -59,6 +66,62 @@ export const fetchPutUsePin = async (
     console.log(res);
     if (res) {
       return res?.obj;
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const fetchPutReagendar = async (id_pin, body) => {
+  try {
+    let params = {
+      fk_id_pin: id_pin,
+    };
+
+    // Limpiar los parámetros vacíos
+    params = Object.keys(params).reduce((acc, key) => {
+      if (params[key] !== "") {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
+
+    const url = `${urlCerolio}/citas/reagendar`;
+
+    const res = await fetchData(url, "PUT", params, body);
+    if (res) {
+      return res;
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const fetchPutDevolucion = async (id_agenda) => {
+  try {
+    let params = {
+      fk_id_pin: id_agenda,
+    };
+
+    // Limpiar los parámetros vacíos
+    params = Object.keys(params).reduce((acc, key) => {
+      if (params[key] !== "") {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
+
+    const url = `${urlCerolio}/citas/tramitar`;
+
+    const res = await fetchData(url, "PUT", params);
+    if (res) {
+      return res;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

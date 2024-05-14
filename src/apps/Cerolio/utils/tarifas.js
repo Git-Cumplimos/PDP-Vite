@@ -49,10 +49,11 @@ export const fetchUpdateTarifasByIdComercio = async (id_comercio, body) => {
   }
 };
 
-export const fetchGetDataOficinas = async (id_comercio = "") => {
+export const fetchGetDataOficinas = async (id_comercio = "", nombre = "") => {
   try {
     let params = {
       pk_id_comercio: id_comercio,
+      nombre_oficina: nombre,
     };
 
     // Limpiar los parámetros vacíos

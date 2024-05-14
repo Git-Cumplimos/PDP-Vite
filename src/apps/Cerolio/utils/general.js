@@ -1,3 +1,6 @@
+import fetchData from "../../../utils/fetchData";
+const urlCerolio = process.env.REACT_APP_URL_CEROLIO;
+
 export const addHoursAndFormat = (time1, time2) => {
   // Crear objetos Date a partir de las cadenas de tiempo
   const date1 = new Date(time1);
@@ -38,4 +41,50 @@ export const formatDate = (dateString) => {
     .padStart(2, "0")}/${year}`;
 
   return formattedDate;
+};
+
+export const fetchGetUploadToS3 = async (filename) => {
+  try {
+    if (!filename) {
+      throw new Error("No se ha especificado un nombre de archivo");
+    }
+
+    let params = {
+      filename: filename,
+    };
+
+    const url = `${urlCerolio}/S3/cargar`;
+
+    const res = await fetchData(url, "GET", params);
+    if (res) {
+      return res;
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const uploadFilePresignedUrl = async (obj, file) => {
+  const formData = new FormData();
+  Object.entries(obj?.fields).map(([key, value]) => {
+    formData.append(key, value);
+  });
+  formData.append("file", file);
+  try {
+    const res = await fetch(obj?.url, {
+      method: "POST",
+      body: formData,
+    });
+    if (res.ok) {
+      return res;
+    } else {
+      console.error(res);
+      return [];
+    }
+  } catch (err) {
+    throw err;
+  }
 };
