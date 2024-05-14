@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "../../../../../../components/Base/Button";
 import Input from "../../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../../components/Base/TableEnterprise";
@@ -10,7 +10,6 @@ import {
 import Select from "../../../../../../components/Base/Select";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Table from "../../../../../../components/Base/Table";
-import { makeMoneyFormatter } from "../../../../../../utils/functions";
 import { fetchGetPinData, fetchPutReagendar } from "../../../../utils/pin";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import FileInput from "../../../../../../components/Base/FileInput";
@@ -98,15 +97,13 @@ const HistoricoPines = () => {
 
   const [devolucionData, setDevolucionData] = useState({});
 
-  const formatMoney = makeMoneyFormatter(2);
-
   const getFiltersData = useCallback(async () => {
     const res = await fetchGetPinData(
       "",
-      filters.estado
+      filters.estado,
       // TODO HECTOR validando errores de fechas
-      // filters.fechaInicial,
-      // filters.fechaFinal
+      filters.fechaInicial,
+      filters.fechaFinal
     );
     console.log("HISTORICO", res);
     if (res) {
@@ -228,11 +225,7 @@ const HistoricoPines = () => {
         console.log("upload", upload);
         if (upload.ok) {
           // TODO terminar devolucion de pin
-          // Paso a paso: Se crea un input de archivo para el certificado de cuenta
-          // Se crea un input de texto para la observación
-          // Cuando haya un archivo cargado, permitir la devolución del PIN
-          // Se carga el archivo con la carpeta certificados_bancarios/y el id del usuario por prefirmada
-          // Se hace el put de cancelar pin con la misma carpeta y ahí se valida la cancelación
+          // Pendiente hacer peticion de cancelar pin
         } else {
           console.error(upload);
           notifyError(upload.statusText);

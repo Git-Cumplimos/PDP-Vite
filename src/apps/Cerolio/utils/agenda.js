@@ -5,14 +5,14 @@ const urlCerolio = process.env.REACT_APP_URL_CEROLIO;
 export const base_agenda = {
   date: "",
   hours: [
-    { day: "Lunes", startTime: "08:00", endTime: "19:00" },
-    { day: "Martes", startTime: "08:00", endTime: "19:00" },
-    { day: "Miércoles", startTime: "08:00", endTime: "19:00" },
-    { day: "Jueves", startTime: "08:00", endTime: "19:00" },
-    { day: "Viernes", startTime: "08:00", endTime: "19:00" },
-    { day: "Sábado", startTime: "08:00", endTime: "19:00" },
-    { day: "Domingo", startTime: "08:00", endTime: "19:00" },
-    { day: "Festivo", startTime: "08:00", endTime: "19:00" },
+    { day: "Lunes", startTime: "06:00", endTime: "20:00" },
+    { day: "Martes", startTime: "06:00", endTime: "20:00" },
+    { day: "Miércoles", startTime: "06:00", endTime: "20:00" },
+    { day: "Jueves", startTime: "06:00", endTime: "20:00" },
+    { day: "Viernes", startTime: "06:00", endTime: "20:00" },
+    { day: "Sábado", startTime: "06:00", endTime: "20:00" },
+    { day: "Domingo", startTime: "06:00", endTime: "20:00" },
+    { day: "Festivo", startTime: "06:00", endTime: "20:00" },
   ],
   attendance: 0,
 };

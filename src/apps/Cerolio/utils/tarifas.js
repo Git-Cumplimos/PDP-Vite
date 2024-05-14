@@ -77,3 +77,78 @@ export const fetchGetDataOficinas = async (id_comercio = "", nombre = "") => {
     throw err;
   }
 };
+
+export const fetchUpdateComisionesByIdComercio = async (id_comercio, body) => {
+  try {
+    const res = await fetchData(
+      `${urlCerolio}/oficinas/tramitar?pk_id_comercio=${id_comercio}`,
+      "PUT",
+      {},
+      body
+    );
+    if (res) {
+      return res;
+    } else {
+      console.error(res?.msg);
+      return res;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const fetchGetValidateUpload = async (nombre_archivo) => {
+  try {
+    let params = {
+      nombre_archivo: nombre_archivo,
+    };
+
+    const res = await fetchData(
+      `${urlCerolio}/S3/validar-archivo-comisiones`,
+      "GET",
+      params
+    );
+    if (res) {
+      return res;
+    } else {
+      console.error(res?.msg);
+      return res;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const fetchGetReporte = async (
+  pk_id_comercio = "",
+  nombre_oficina = ""
+) => {
+  try {
+    let params = {
+      pk_id_comercio: pk_id_comercio,
+      nombre_oficina: nombre_oficina,
+    };
+
+    // Limpiar los parámetros vacíos
+    params = Object.keys(params).reduce((acc, key) => {
+      if (params[key] !== "") {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
+
+    const res = await fetchData(
+      `${urlCerolio}/oficinas/archivo-comisiones-oficinas`,
+      "GET",
+      params
+    );
+    if (res) {
+      return res;
+    } else {
+      console.error(res?.msg);
+      return res;
+    }
+  } catch (err) {
+    throw err;
+  }
+};
