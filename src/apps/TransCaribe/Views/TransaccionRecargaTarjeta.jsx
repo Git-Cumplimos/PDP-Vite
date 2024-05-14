@@ -128,7 +128,7 @@ const TransaccionRecargaTarjeta = () => {
         }
       }
     },
-    [dataUsuario.telefonoCliente, revisionInputCodBarras]
+    [revisionInputCodBarras]
   );
   return (
     <>
@@ -142,7 +142,7 @@ const TransaccionRecargaTarjeta = () => {
           autoComplete="off"
           value={dataUsuario?.["NTargeta"]}
           maxLength={10}
-          minLength={10}
+          minLength={4}
           onChange={onChangeFormatNumber}
           required
           disabled={loadingPeticionRecargaTarjeta}

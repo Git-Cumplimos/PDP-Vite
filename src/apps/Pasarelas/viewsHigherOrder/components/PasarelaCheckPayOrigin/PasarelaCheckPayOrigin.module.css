@@ -1,0 +1,25 @@
+.contendorIdLog {
+  margin-top: 20px;
+  font-size: small;
+  display: grid;
+  width: 100%;
+  justify-items: end;
+}
+
+.contendorPago {
+  @apply grid grid-flow-col auto-cols-fr gap-6;
+  padding: 5px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(3, 3, 3, 0.326);
+}
+
+.contenedorButton {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: 350px;
+  grid-template-rows: 60px 60px 60px;
+}
+.labelHash {
+  max-width: 80%;
+}

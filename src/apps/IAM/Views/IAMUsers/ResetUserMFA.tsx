@@ -111,16 +111,28 @@ const ResetUserMFA = ({ userInfo }: Props) => {
           </Button>
         </ButtonBar>
       </Fieldset>
-      <Modal show={showModal} handleClose={handleClose} bigger>
-        <PaymentSummary
-          title="¿Está seguro de recuperar QR y contraseña del usuario?"
-          subtitle="Información de usuario"
-          summaryTrx={{
-            "Id de usuario": userInfo.id,
-            Correo: userInfo.email,
-            "Nombre usuario": userInfo.nombre,
-          }}
-        >
+      <Modal show={showModal} handleClose={undefined}>
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
+          <h1 className="text-2xl font-semibold">
+            ¿Está seguro de recuperar QR y contraseña del usuario?
+          </h1>
+          <h1 className="text-xl font-semibold">Información de usuario</h1>
+          <ul className="grid grid-flow-row gap-4 justify-center align-middle">
+            {Object.entries({
+              "Id de usuario": userInfo.id,
+              Correo: userInfo.email,
+              "Nombre usuario": userInfo.nombre,
+            }).map(([key, val]) => (
+              <li key={key}>
+                <h1 className="grid grid-flow-row auto-rows-fr gap-1">
+                  <strong>{key}</strong>
+                  <p className="whitespace-pre-wrap">
+                    {val}
+                  </p>
+                </h1>
+              </li>
+            ))}
+          </ul>
           <ButtonBar>
             <Button
               type="button"
@@ -138,7 +150,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
               Cancelar
             </Button>
           </ButtonBar>
-        </PaymentSummary>
+        </div>
       </Modal>
     </Fragment>
   );

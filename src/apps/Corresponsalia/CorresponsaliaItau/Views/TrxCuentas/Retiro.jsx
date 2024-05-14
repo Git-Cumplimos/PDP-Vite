@@ -142,6 +142,7 @@ const Retiro = () => {
           type="text"
           autoComplete="off"
           value={dataRetiro?.["numeroDocumento"]}
+          minLength={5}
           maxLength={12}
           onChange={onChangeFormatNumber}
           required
@@ -191,6 +192,7 @@ const Retiro = () => {
             type="button"
             onClick={() => {
               navigate(-1);
+              notifyError("Transacción cancelada por el usuario");
             }}
             disabled={loadingPeticionRetiro}
           >

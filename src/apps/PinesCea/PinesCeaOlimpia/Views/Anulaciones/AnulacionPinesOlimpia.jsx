@@ -18,7 +18,7 @@ import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 
-import { notifyError, notifyPending } from "../../../../../utils/notify";
+import { notify, notifyError, notifyPending } from "../../../../../utils/notify";
 import fetchDataPinesCea from "../../utils/fetchDataPinesCea";
 import ScreenBlocker from "../../../components/ScreenBlocker";
 import TicketOlimpia from "../../components/TicketOlimpia";
@@ -81,6 +81,7 @@ const DevolucionPinesOlimpia = () => {
   });
 
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [ticketComision, setTicketComisions] = useState(null);
   const [inquiryStatus, setInquiryStatus] = useState(null);
 
   const onChangeMoney = useMoney({
@@ -284,7 +285,7 @@ const DevolucionPinesOlimpia = () => {
             "POST",
             {},
             {
-              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA,
+              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA_CEA,
               Pin: numeroPin,
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,
@@ -325,7 +326,9 @@ const DevolucionPinesOlimpia = () => {
                 setPin(res?.obj?.result?.pin);
                 setEstadoPago(true);
                 setPaymentStatus(res?.obj?.ticket ?? {});
+                setTicketComisions(res?.obj?.ticket_costo_comision ?? {});
                 setIsLoadingPago(false);
+                notify("Transacción exitosa")
               }
             })
             .catch((err) => {
@@ -447,6 +450,9 @@ const DevolucionPinesOlimpia = () => {
         {paymentStatus ? (
           <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
             <TicketOlimpia refPrint={printDiv} ticket={paymentStatus} />
+            {ticketComision ? (
+            <TicketOlimpia refPrint={printDiv} ticket={ticketComision} />
+            ):(<></>)}
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
               <Button onClick={handleClose}>Cerrar</Button>
