@@ -36,7 +36,7 @@ const Tarifas = () => {
       setInitialDataTarifas(tarifasArray || []);
       setDataTarifas(tarifasArray || []);
       const comisiones = await fetchGetDataOficinas(roleInfo.id_comercio);
-      console.log("comisiones", comisiones);
+      // console.log("comisiones", comisiones);
       setComisiones(comisiones.results[0].comision_originacion);
     } catch (error) {
       console.error(error);
@@ -99,7 +99,6 @@ const Tarifas = () => {
       />
       <h1 className="text-2xl">Tarifas</h1>
       <div className="grid grid-cols-2 gap-y-10">
-      {/* TODO No se muestra el valor cuando es 0, aunque no debería ser 0 nunca */}
         <MoneyInput
           label="Tarifa A1-A2"
           value={parseInt(dataTarifas[0]["A1-A2"])}
@@ -155,7 +154,13 @@ const Tarifas = () => {
         <Button
           onClick={updateTarifasByComercio}
           disabled={
-            JSON.stringify(initialDataTarifas) === JSON.stringify(dataTarifas)
+            JSON.stringify(initialDataTarifas) ===
+              JSON.stringify(dataTarifas) ||
+            dataTarifas[0]["A1-A2"] === 0 ||
+            dataTarifas[0]["B1"] === 0 ||
+            dataTarifas[0]["C1"] === 0 ||
+            dataTarifas[0]["B2-C2"] === 0 ||
+            dataTarifas[0]["B3-C3"] === 0
           }
         >
           Actualizar tarifas

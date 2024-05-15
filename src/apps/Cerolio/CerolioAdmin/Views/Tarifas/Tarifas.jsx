@@ -239,9 +239,10 @@ const Tarifas = () => {
           accept=".xlsx"
           onGetFile={(file) => setFile(file[0])}
         />
+        {file && <p className="text-center">Archivo cargado: {file?.name}</p>}
         <ButtonBar>
           <Button onClick={() => setModalCargueMasivo(false)}>Cancelar</Button>
-          <Button onClick={cargueMasivo} disabled={!file}>
+          <Button onClick={cargueMasivo} disabled={!file} design="primary">
             Guardar
           </Button>
         </ButtonBar>
