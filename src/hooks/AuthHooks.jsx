@@ -417,7 +417,7 @@ export const useProvideAuth = () => {
           return;
         }
         // notify(resJson?.msg);
-        notify("Token de usuario validado exitosamente en PDP (1/2)");
+        notify("Token de usuario validado exitosamente (1/2)");
         setTimer((old) => {
           clearTimeout(old);
           return null;
