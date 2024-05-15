@@ -152,6 +152,7 @@ const svgs = {
   //CORRESPONSALIA/BCS
   CAJA_SOCIAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL.svg`,
   CAJA_SOCIAL_DEPOSITO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL_DEPOSITO.svg`,
+  BLOQUEO_COMERCIO_BCS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
 
   //CORRESPONSALIA/ITAU
   ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/ITAU/ITAU.png`,

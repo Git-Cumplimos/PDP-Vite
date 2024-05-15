@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "../../../../../../components/Base/Button";
 import Input from "../../../../../../components/Base/Input";
 import TableEnterprise from "../../../../../../components/Base/TableEnterprise";
@@ -10,18 +10,30 @@ import {
 import Select from "../../../../../../components/Base/Select";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Table from "../../../../../../components/Base/Table";
-import { makeMoneyFormatter } from "../../../../../../utils/functions";
-import { fetchGetPinData } from "../../../../utils/pin";
+import {
+  fetchGetPinData,
+  fetchPutCancelacion,
+  fetchPutReagendar,
+} from "../../../../utils/pin";
+import { notify, notifyError } from "../../../../../../utils/notify";
+import FileInput from "../../../../../../components/Base/FileInput";
+import TextArea from "../../../../../../components/Base/TextArea";
+import {
+  fetchGetUploadToS3,
+  uploadFilePresignedUrl,
+} from "../../../../utils/general";
+import { useAuth } from "../../../../../../hooks/AuthHooks";
 
 const HistoricoPines = () => {
+  const { roleInfo } = useAuth();
   const [showModalReagendar, setShowModalReagendar] = useState(false);
   const [showModalDevolucion, setShowModalDevolucion] = useState(false);
 
-  const [date, setDate] = useState(new Date());
+  const [selectedItem, setSelectedItem] = useState({});
+  const [date, setDate] = useState("");
 
   const changeDate = (date) => {
-    console.log(date);
-    setDate(date);
+    setDate(date.target.value);
   };
 
   const [hours, setHours] = useState([
@@ -47,14 +59,16 @@ const HistoricoPines = () => {
     setSelectedHour(hour);
   }, []);
 
-  const handleOpenReagendar = useCallback((e, i) => {
+  const handleOpenReagendar = useCallback((e, item) => {
     setShowModalReagendar(true);
-    console.log("Reagendar", i);
+    console.log("Reagendar", item);
+    setSelectedItem(item);
   }, []);
 
-  const handleOpenDevolverPin = useCallback((e, i) => {
+  const handleOpenDevolverPin = useCallback((e, item) => {
     setShowModalDevolucion(true);
-    console.log("Devolver PIN", i);
+    console.log("Devolver PIN", item);
+    setSelectedItem(item);
   }, []);
 
   const [maxPages, setMaxPages] = useState(0);
@@ -67,9 +81,7 @@ const HistoricoPines = () => {
       .split("T")[0],
     // Fecha final es hoy en formato YYYY-MM-DD
     fechaFinal: new Date().toISOString().split("T")[0],
-    pin: "",
-    nombreTramite: "",
-    documento: "",
+    estado: "",
   });
 
   const [data, setData] = useState([
@@ -89,136 +101,172 @@ const HistoricoPines = () => {
     },
   ]);
 
-  const formatMoney = makeMoneyFormatter(2);
-  // TODO Validar filtros
-  useEffect(() => {
-    const getFiltersData = async () => {
-      const res = await fetchGetPinData(
-        // filters.pin
-        // filters.fechaInicial,
-        // filters.fechaFinal,
-        // 1,
-        // filters.nombreTramite,
-        // filters.documento
-      );
-      console.log("HISTORICO", res);
-      if (res) {
-        setData(
-          res.results.map((item) => ({
-            ID: item.fk_id_cliente,
-            PIN: item.numero_pin,
-            "Estado PIN": item.estado,
-            Fecha: new Date(item.fecha_uso).toLocaleDateString(),
-            Hora: new Date(item.fecha_uso).toLocaleTimeString(),
-            "Estado Agenda": item.estado_cita,
-            "Tipo Trámite": item.tipo_tramite,
-            Trámite: item.nombre_tramite,
-            "Nombre Cliente": item.nombres + " " + item.apellidos,
-            Celular: item.telefono,
-            "Correo electrónico": item.email,
-            Acciones: (
-              <div className="flex flex-row">
-                <Button
-                  title="Reagendar"
-                  onClick={(e) => {
-                    handleOpenReagendar(e, item.fk_id_cliente);
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="bi bi-pencil"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
-                  </svg>
-                </Button>
-                <Button
-                  title="Devolver PIN"
-                  onClick={(e) => {
-                    handleOpenDevolverPin(e, item.fk_id_cliente);
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="bi bi-reply"
-                    viewBox="0 0
-                16 16"
-                  >
-                    <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.7 8.7 0 0 0-1.921-.306 7 7 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254l-.042-.028a.147.147 0 0 1 0-.252l.042-.028zM7.8 10.386q.103 0 .223.006c.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96z" />
-                  </svg>
-                </Button>
-              </div>
-            ),
-          }))
-        );
-        setMaxPages(res.maxPages);
-      }
-    };
-    getFiltersData();
-  }, [pageData, filters]);
+  const [devolucionData, setDevolucionData] = useState({});
 
-  const tableData = useMemo(() => {
-    return data.map((item, index) => {
-      return {
-        ID: item.fk_id_cliente,
-        PIN: item.numero_pin,
-        "Estado PIN": item.naturaleza,
-        Fecha: new Date(item.fecha_uso).toLocaleDateString(),
-        Hora: new Date(item.fecha_uso).toLocaleTimeString(),
-        "Estado Agenda": item.naturaleza,
-        "Tipo Trámite": item.tipo_tramite,
-        Trámite: item.nombre_tramite,
-        "Nombre Cliente": item.nombres + " " + item.apellidos,
-        Celular: item.naturaleza,
-        "Correo electrónico": item.naturaleza,
-        Acciones: (
-          <div className="flex flex-row">
-            <Button
-              title="Reagendar"
-              onClick={(e) => {
-                handleOpenReagendar(e, index);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-pencil"
-                viewBox="0 0 16 16"
+  const getFiltersData = useCallback(async () => {
+    const res = await fetchGetPinData(
+      "",
+      filters.estado,
+      filters.fechaInicial,
+      filters.fechaFinal
+    );
+    console.log("HISTORICO", res);
+    if (res) {
+      setData(
+        res.results.map((item) => ({
+          ID: item.fk_id_cliente,
+          PIN: item.numero_pin,
+          "Estado PIN": item.estado,
+          Fecha: item.fecha_uso
+            ? new Date(item.fecha_uso).toLocaleDateString()
+            : "Sin uso",
+          Hora: item.fecha_uso
+            ? new Date(item.fecha_uso).toLocaleTimeString()
+            : "Sin uso",
+          "Estado Agenda": item.estado_cita,
+          "Tipo Trámite": item.tipo_tramite,
+          Trámite: item.categoria,
+          "Nombre Cliente": item.nombres + " " + item.apellidos,
+          Celular: item.telefono,
+          "Correo electrónico": item.email,
+          Acciones: (
+            <div className="flex flex-row">
+              <Button
+                title="Reagendar"
+                onClick={(e) => {
+                  handleOpenReagendar(e, item);
+                }}
+                disabled={item.estado !== "Disponible"}
               >
-                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
-              </svg>
-            </Button>
-            <Button
-              title="Devolver PIN"
-              onClick={(e) => {
-                handleOpenDevolverPin(e, index);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-reply"
-                viewBox="0 0
-                16 16"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  className="bi bi-pencil"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+                </svg>
+              </Button>
+              <Button
+                title="Devolver PIN"
+                onClick={(e) => {
+                  handleOpenDevolverPin(e, item);
+                }}
               >
-                <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.7 8.7 0 0 0-1.921-.306 7 7 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254l-.042-.028a.147.147 0 0 1 0-.252l.042-.028zM7.8 10.386q.103 0 .223.006c.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96z" />
-              </svg>
-            </Button>
-          </div>
-        ),
-      };
-    });
-  }, [data, handleOpenReagendar, handleOpenDevolverPin]);
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  className="bi bi-reply"
+                  viewBox="0 0
+              16 16"
+                >
+                  <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.7 8.7 0 0 0-1.921-.306 7 7 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254l-.042-.028a.147.147 0 0 1 0-.252l.042-.028zM7.8 10.386q.103 0 .223.006c.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96z" />
+                </svg>
+              </Button>
+            </div>
+          ),
+        }))
+      );
+      setMaxPages(res.maxPages);
+    }
+  }, [filters, handleOpenDevolverPin, handleOpenReagendar]);
+
+  useEffect(() => {
+    getFiltersData();
+  }, [pageData, filters, getFiltersData]);
+
+  const reagendarPin = useCallback(
+    async (date, selectedHour) => {
+      try {
+        // console.log("Reagendar item", selectedItem);
+        const [startHour, endHour] = selectedHour.split("-");
+        const startDate = date + " " + startHour + ":00";
+        const endDate = date + " " + endHour + ":00";
+
+        const body = {
+          fk_id_cliente: selectedItem.fk_id_cliente,
+          fk_id_comercio: selectedItem.fk_id_comercio_creacion,
+          hora_inicio: startDate,
+          hora_final: endDate,
+        };
+        // console.log("body", body);
+        const res = await fetchPutReagendar(selectedItem.pk_id_pin, body);
+        // console.log(res);
+        if (res.status) {
+          notify(res.msg);
+          setDate("");
+          setSelectedHour("");
+          setSelectedItem({});
+          getFiltersData();
+          setShowModalReagendar(false);
+        } else {
+          console.error(res.msg);
+          notifyError(res.msg);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [selectedItem, getFiltersData]
+  );
+
+  const devolverPin = useCallback(async () => {
+    try {
+      console.log("Devolver item", selectedItem);
+      console.log("Devolver data", devolucionData);
+      // Creo la prefirmada
+      const certPresigned = await fetchGetUploadToS3(
+        `certificados_bancarios/${selectedItem.fk_id_cliente}.pdf`
+      );
+      console.log("certPresigned", certPresigned);
+      // Subo el archivo
+      if (certPresigned.status) {
+        const upload = await uploadFilePresignedUrl(
+          certPresigned.obj,
+          devolucionData.certificado
+        );
+        console.log("upload", upload);
+        if (upload.ok) {
+          // Espero 5 segundos para que se suba el archivo
+          setTimeout(async () => {
+
+            const body = {
+              carpeta_certificado: `certificados_bancarios/${selectedItem.fk_id_cliente}`,
+              observacion: devolucionData.observacion,
+              nombre_usuario: roleInfo.nombre_comercio,
+            };
+            console.log("body", body);
+            // Hago la devolución
+            const res = await fetchPutCancelacion(selectedItem.pk_id_pin, body);
+            console.log(res);
+            if (res.status) {
+              // Si todo sale bien, notifico y limpio los datos
+              notify(res.msg);
+              setDevolucionData({});
+              setSelectedItem({});
+              getFiltersData();
+              setShowModalDevolucion(false);
+            } else {
+              console.error(res.msg);
+              notifyError(res.msg);
+            }
+          }, 5000);
+        } else {
+          console.error(upload);
+          notifyError(upload.statusText);
+        }
+      } else {
+        console.error(certPresigned.msg);
+        notifyError(certPresigned.msg);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [devolucionData, selectedItem, roleInfo, getFiltersData]);
 
   return (
     <>
@@ -280,15 +328,14 @@ const HistoricoPines = () => {
         <Select
           label="Estado PIN"
           options={[
-            { label: "Option 1", value: "1" },
-            { label: "Option 2", value: "2" },
-            { label: "Option 3", value: "3" },
+            { label: "Sin estado", value: "" },
+            { label: "Disponible", value: "Disponible" },
+            { label: "Usado", value: "Usado" },
+            { label: "Cancelado", value: "Cancelado" },
           ]}
+          onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
         />
-        {/* Input para fecha */}
-        <Input label="Fecha" type="date" />
       </TableEnterprise>
-      {/* TODO REAGENDAR */}
       <Modal show={showModalReagendar}>
         <h2 className="text-center">
           ¿Qué re-agenda le queda bien al cliente?
@@ -319,6 +366,7 @@ const HistoricoPines = () => {
             type="button"
             onClick={() => {
               setSelectedHour("");
+              setDate("");
               setShowModalReagendar(false);
             }}
           >
@@ -328,59 +376,58 @@ const HistoricoPines = () => {
             design="primary"
             type="button"
             onClick={() => {
-              setSelectedHour("");
-              setShowModalReagendar(false);
+              reagendarPin(date, selectedHour);
             }}
+            disabled={!selectedHour || !date}
           >
             Re-agendar
           </Button>
         </div>
       </Modal>
-      {/* TODO DEVOLUCIÓN PIN */}
       <Modal show={showModalDevolucion} bigger>
         <h2 className="text-center">Devolución del PIN</h2>
-        <Table
-          headers={[
-            "Número de PIN",
-            "Lugar de Originación",
-            "Fecha de solicitud de la devolución",
-            "Observación",
-            "Nombre de quien solicita",
-            "Certificado de cuenta",
-            "Acción",
-          ]}
-          data={[
-            {
-              "Número de PIN": "Número de PIN",
-              "Lugar de Originación": "Lugar de Originación",
-              "Fecha de solicitud de la devolución":
-                "Fecha de solicitud de la devolución",
-              Observación: "Observación",
-              "Nombre de quien solicita": "Nombre de quien solicita",
-              "Certificado de cuenta": "Certificado de cuenta",
-              Acción: (
-                <Button
-                  design="primary"
-                  onClick={() => {
-                    setShowModalDevolucion(false);
-                  }}
-                  title="Devolver PIN"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    className="bi bi-reply"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.7 8.7 0 0 0-1.921-.306 7 7 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254l-.042-.028a.147.147 0 0 1 0-.252l.042-.028zM7.8 10.386q.103 0 .223.006c.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96z" />
-                  </svg>
-                </Button>
-              ),
-            },
-          ]}
-        ></Table>
+        <div className="flex flex-col gap-5 overflow-x-auto">
+          <Table
+            headers={[
+              "Número de PIN",
+              // "Lugar de Originación",
+              "Fecha de solicitud de la devolución",
+            ]}
+            data={[
+              {
+                "Número de PIN": selectedItem.numero_pin,
+                // "Lugar de Originación": "Lugar de Originación",
+                "Fecha de solicitud de la devolución":
+                  new Date().toLocaleDateString(),
+              },
+            ]}
+          ></Table>
+          <TextArea
+            label="Observación"
+            placeholder="Observación"
+            onChange={(e) =>
+              setDevolucionData({
+                ...devolucionData,
+                observacion: e.target.value,
+              })
+            }
+          />
+          <FileInput
+            label="Certificado de cuenta"
+            accept=".pdf"
+            onGetFile={(file) =>
+              setDevolucionData({
+                ...devolucionData,
+                certificado: file[0],
+              })
+            }
+          />
+          {devolucionData.certificado && (
+            <p className="text-center">
+              Archivo cargado: {devolucionData.certificado?.name}
+            </p>
+          )}
+        </div>
         <ButtonBar>
           <Button
             design="secondary"
@@ -395,9 +442,11 @@ const HistoricoPines = () => {
           <Button
             design="primary"
             type="button"
+            disabled={
+              !devolucionData.certificado || !devolucionData.observacion
+            }
             onClick={() => {
-              setSelectedHour("");
-              setShowModalDevolucion(false);
+              devolverPin();
             }}
           >
             Devolver PIN

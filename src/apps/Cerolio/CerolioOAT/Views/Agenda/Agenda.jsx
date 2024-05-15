@@ -148,9 +148,11 @@ const Agenda = () => {
       </CalendarDate> */}
         <div className="grid grid-cols-2 gap-x-5">
           {scheduleData.hours.map((hour, index) => (
-            <div key={index} className="mb-5">
-              <h3 className="text-center">{hour.day}</h3>
+            <div key={index} className="p-2 mb-5 border rounded-xl border-primary-extra-light">
+              <h3 className="font-semibold text-center">{hour.day}</h3>
               <div className="grid grid-cols-2 gap-2">
+                <div className="text-center">Hora de Apertura</div>
+                <div className="text-center">Hora de Cierre</div>
                 <Input
                   type="time"
                   value={hour.startTime}

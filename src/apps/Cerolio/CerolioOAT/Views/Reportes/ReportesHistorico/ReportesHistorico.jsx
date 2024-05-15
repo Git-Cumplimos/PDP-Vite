@@ -55,7 +55,7 @@ const ReportesHistorico = () => {
 
   const descargarReporte = useCallback(
     async (i) => {
-      console.log("Descargar reporte", i);
+      // console.log("Descargar reporte", i);
       // Buscar en data el archivo con el nombre de la fila i
       // Descargar el archivo
       const archivo = data[i].url;
