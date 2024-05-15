@@ -21,13 +21,10 @@ const Agenda = () => {
   const getSchedule = useCallback(async () => {
     const res = await fetchGetDisponibilidadByIdComercio(
       // Fecha en formato YYYY-MM-DD dentro de 5 días
-      new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0],
-
+      new Date(Date.now()).toISOString().split("T")[0],
       roleInfo.id_comercio
     );
-    console.log(res);
+    // console.log(res);
     setScheduleData({
       date: "",
       hours: [
@@ -81,12 +78,10 @@ const Agenda = () => {
   }, [roleInfo, getSchedule]);
 
   const updateHours = async () => {
-    console.log(scheduleData);
+    // console.log(scheduleData);
     const body = {
       fecha_vigencia:
-        new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0] + " 00:00:00",
+        new Date(Date.now()).toISOString().split("T")[0] + " 00:00:00",
       duracion_tiempo_cita: 120,
       fecha_inoperancia: [],
       horario_atencion: {
@@ -126,9 +121,9 @@ const Agenda = () => {
       fk_id_comercio: roleInfo.id_comercio,
       numero_ventanillas: scheduleData.attendance,
     };
-    console.log(body);
+    // console.log(body);
     const res = await fetchPostCrearHorario(body);
-    console.log(res);
+    // console.log(res);
     if (!res.status) {
       notifyError(res.msg);
     } else {
@@ -148,7 +143,10 @@ const Agenda = () => {
       </CalendarDate> */}
         <div className="grid grid-cols-2 gap-x-5">
           {scheduleData.hours.map((hour, index) => (
-            <div key={index} className="p-2 mb-5 border rounded-xl border-primary-extra-light">
+            <div
+              key={index}
+              className="p-2 mb-5 border rounded-xl border-primary-extra-light"
+            >
               <h3 className="font-semibold text-center">{hour.day}</h3>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-center">Hora de Apertura</div>
@@ -184,9 +182,10 @@ const Agenda = () => {
         <div className="">
           <Input
             label="¿Cuántas personas puedes atender por hora?"
-            type="number"
+            type="tel"
             placeholder="Número de personas"
             value={scheduleData.attendance}
+            maxLength={2}
             onChange={(e) =>
               setScheduleData({
                 ...scheduleData,
