@@ -10,7 +10,6 @@ import { addHoursAndFormat, formatDate } from "../../../utils/general";
 
 const Pin = () => {
   const { roleInfo } = useAuth();
-  console.log(roleInfo);
   const [step, setStep] = useState(0);
   const [userData, setUserData] = useState({
     tipoDocumento: 0,
@@ -55,7 +54,6 @@ const Pin = () => {
     ).label;
     const pinString = `${doc}${tram}${userData.numeroDocumento}`;
     const pinData = await fetchGetPinData(pinString, "Disponible");
-    console.log("data", pinData);
     if (pinData.results.length === 0) {
       notifyError("No se encontró un PIN disponible");
       return;
