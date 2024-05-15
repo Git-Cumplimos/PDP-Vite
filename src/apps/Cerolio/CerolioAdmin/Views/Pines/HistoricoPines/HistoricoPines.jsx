@@ -10,7 +10,11 @@ import {
 import Select from "../../../../../../components/Base/Select";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Table from "../../../../../../components/Base/Table";
-import { fetchGetPinData, fetchPutReagendar } from "../../../../utils/pin";
+import {
+  fetchGetPinData,
+  fetchPutCancelacion,
+  fetchPutReagendar,
+} from "../../../../utils/pin";
 import { notify, notifyError } from "../../../../../../utils/notify";
 import FileInput from "../../../../../../components/Base/FileInput";
 import TextArea from "../../../../../../components/Base/TextArea";
@@ -18,8 +22,10 @@ import {
   fetchGetUploadToS3,
   uploadFilePresignedUrl,
 } from "../../../../utils/general";
+import { useAuth } from "../../../../../../hooks/AuthHooks";
 
 const HistoricoPines = () => {
+  const { roleInfo } = useAuth();
   const [showModalReagendar, setShowModalReagendar] = useState(false);
   const [showModalDevolucion, setShowModalDevolucion] = useState(false);
 
@@ -101,7 +107,6 @@ const HistoricoPines = () => {
     const res = await fetchGetPinData(
       "",
       filters.estado,
-      // TODO HECTOR validando errores de fechas
       filters.fechaInicial,
       filters.fechaFinal
     );
@@ -213,10 +218,12 @@ const HistoricoPines = () => {
     try {
       console.log("Devolver item", selectedItem);
       console.log("Devolver data", devolucionData);
+      // Creo la prefirmada
       const certPresigned = await fetchGetUploadToS3(
-        `certificados_bancarios/${selectedItem.fk_id_cliente}`
+        `certificados_bancarios/${selectedItem.fk_id_cliente}.pdf`
       );
       console.log("certPresigned", certPresigned);
+      // Subo el archivo
       if (certPresigned.status) {
         const upload = await uploadFilePresignedUrl(
           certPresigned.obj,
@@ -224,8 +231,30 @@ const HistoricoPines = () => {
         );
         console.log("upload", upload);
         if (upload.ok) {
-          // TODO terminar devolucion de pin
-          // Pendiente hacer peticion de cancelar pin
+          // Espero 5 segundos para que se suba el archivo
+          setTimeout(async () => {
+
+            const body = {
+              carpeta_certificado: `certificados_bancarios/${selectedItem.fk_id_cliente}`,
+              observacion: devolucionData.observacion,
+              nombre_usuario: roleInfo.nombre_comercio,
+            };
+            console.log("body", body);
+            // Hago la devolución
+            const res = await fetchPutCancelacion(selectedItem.pk_id_pin, body);
+            console.log(res);
+            if (res.status) {
+              // Si todo sale bien, notifico y limpio los datos
+              notify(res.msg);
+              setDevolucionData({});
+              setSelectedItem({});
+              getFiltersData();
+              setShowModalDevolucion(false);
+            } else {
+              console.error(res.msg);
+              notifyError(res.msg);
+            }
+          }, 5000);
         } else {
           console.error(upload);
           notifyError(upload.statusText);
@@ -237,7 +266,7 @@ const HistoricoPines = () => {
     } catch (err) {
       console.error(err);
     }
-  }, [devolucionData, selectedItem]);
+  }, [devolucionData, selectedItem, roleInfo, getFiltersData]);
 
   return (
     <>
@@ -383,16 +412,6 @@ const HistoricoPines = () => {
               })
             }
           />
-          <Input
-            label="Nombre de quien solicita"
-            placeholder="Nombre de quien solicita"
-            onChange={(e) =>
-              setDevolucionData({
-                ...devolucionData,
-                nombreSolicita: e.target.value,
-              })
-            }
-          />
           <FileInput
             label="Certificado de cuenta"
             accept=".pdf"
@@ -403,6 +422,11 @@ const HistoricoPines = () => {
               })
             }
           />
+          {devolucionData.certificado && (
+            <p className="text-center">
+              Archivo cargado: {devolucionData.certificado?.name}
+            </p>
+          )}
         </div>
         <ButtonBar>
           <Button
@@ -419,9 +443,7 @@ const HistoricoPines = () => {
             design="primary"
             type="button"
             disabled={
-              !devolucionData.certificado ||
-              !devolucionData.observacion ||
-              !devolucionData.nombreSolicita
+              !devolucionData.certificado || !devolucionData.observacion
             }
             onClick={() => {
               devolverPin();

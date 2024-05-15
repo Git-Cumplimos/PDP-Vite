@@ -130,3 +130,31 @@ export const fetchPutDevolucion = async (id_agenda) => {
     throw err;
   }
 };
+
+export const fetchPutCancelacion = async (id_pin, body) => {
+  try {
+    let params = {
+      pk_id_pin: id_pin,
+    };
+
+    // Limpiar los parámetros vacíos
+    params = Object.keys(params).reduce((acc, key) => {
+      if (params[key] !== "") {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
+
+    const url = `${urlCerolio}/pines/cancelar`;
+
+    const res = await fetchData(url, "PUT", params, body);
+    if (res) {
+      return res;
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
