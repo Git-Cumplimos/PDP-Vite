@@ -2,7 +2,7 @@ import { useState } from "react";
 import Button from "../../../../../components/Base/Button";
 import Input from "../../../../../components/Base/Input";
 import Select from "../../../../../components/Base/Select";
-import { notifyError } from "../../../../../utils/notify";
+import { notify, notifyError } from "../../../../../utils/notify";
 import MoneyInput from "../../../../../components/Base/MoneyInput";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { fetchGetPinData, fetchPutUsePin } from "../../../utils/pin";
@@ -65,7 +65,11 @@ const Pin = () => {
     }
   };
 
-  const usePin = async () => {
+  const confirmarPin = () => {
+    setStep(2);
+  };
+
+  const usarPin = async () => {
     const body = {
       id_comercio: roleInfo.id_comercio,
       id_usuario: userData.pinData.fk_id_cliente,
@@ -84,7 +88,18 @@ const Pin = () => {
       body.valor_pago_adicional,
       body.valor_total_trx
     );
-    console.log(res);
+    if (res.status) {
+      notify(res.msg);
+      setStep(0);
+      setUserData({
+        tipoDocumento: 0,
+        numeroDocumento: "",
+        tipoTramite: 0,
+        pinData: {},
+      });
+    } else {
+      notifyError(res.msg);
+    }
   };
 
   return (
@@ -212,7 +227,7 @@ const Pin = () => {
             {/* TODO Hacer aviso de pin no disponible */}
             <Button
               disabled={userData.pinData.estado !== "Disponible"}
-              onClick={usePin}
+              onClick={confirmarPin}
               design="primary"
             >
               Usar PIN
@@ -224,15 +239,51 @@ const Pin = () => {
         <>
           <div className="flex flex-col">
             {/* Número de PIN, Trámite a realizar, Valor total del PIN, Pago realizado, Saldo a pagar - Todo en disabled */}
-            <Input label="Número de PIN" type="text" disabled />
-            <Input label="Trámite a realizar" type="text" disabled />
-            <Input label="Valor total del PIN" type="number" disabled />
-            <Input label="Pago realizado" type="number" disabled />
-            <Input label="Saldo a pagar" type="number" disabled />
+            <Input
+              label="Número de PIN"
+              type="text"
+              value={userData.pinData.numero_pin}
+              disabled
+            />
+            <Input
+              label="Trámite a realizar"
+              type="text"
+              value={userData.pinData.categoria}
+              disabled
+            />
+            <MoneyInput
+              label="Valor total del PIN"
+              type="number"
+              value={userData?.pinData.valor_tramite}
+              disabled
+            />
+            <MoneyInput
+              label="Pago realizado"
+              type="number"
+              value={userData?.pinData.pago_cerolio}
+              disabled
+            />
+            <MoneyInput
+              label="Saldo a pagar"
+              type="number"
+              value={
+                userData?.pinData.valor_tramite - userData?.pinData.pago_cerolio
+              }
+              disabled
+            />
           </div>
           <div className="flex flex-row">
-            <Button>Usar PIN</Button>
-            <Button>Volver</Button>
+            <Button onClick={() => setStep(1)} design="secondary">
+              Volver
+            </Button>
+            <Button
+              onClick={() => {
+                usarPin();
+              }}
+              design="primary"
+            >
+              Usar PIN
+            </Button>
           </div>
         </>
       )}

@@ -65,7 +65,7 @@ export const fetchPutUsePin = async (
     const res = await fetchData(url, "PUT", {}, body);
     console.log(res);
     if (res) {
-      return res?.obj;
+      return res;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };
