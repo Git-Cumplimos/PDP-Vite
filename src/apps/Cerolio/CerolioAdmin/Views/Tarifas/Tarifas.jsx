@@ -102,21 +102,25 @@ const Tarifas = () => {
     try {
       // console.log("Cargue item", selectedItem);
       // console.log("Cargue data", file);
+      const now = new Date().toISOString();
       const certPresigned = await fetchGetUploadToS3(
-        "comisiones/archivos_comisiones/comisiones"
+        `comisiones/archivos_comisiones/comisiones-${now}.xlsx`,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       );
-      console.log("certPresigned", certPresigned);
+      // console.log("certPresigned", certPresigned);
       if (certPresigned.status) {
         const upload = await uploadFilePresignedUrl(certPresigned.obj, file);
         // console.log("upload", upload);
         if (upload.ok) {
           // Esperar 5 segundos
           setTimeout(async () => {
-            const validacion = await fetchGetValidateUpload("comisiones");
+            const validacion = await fetchGetValidateUpload(
+              `comisiones-${now}.xlsx`
+            );
             // console.log("validacion", validacion);
             if (validacion.status) {
               notify(validacion.msg);
-              getTarifasByComercio();
+              await getTarifasByComercio();
               setModalCargueMasivo(false);
             } else {
               console.error(validacion.msg);
@@ -134,10 +138,11 @@ const Tarifas = () => {
     } catch (err) {
       console.error(err);
     }
+    await getTarifasByComercio();
   }, [file, getTarifasByComercio]);
 
   const updateTarifas = useCallback(async () => {
-    console.log("updateTarifas", selectedItem.comision_originacion);
+    // console.log("updateTarifas", selectedItem.comision_originacion);
     try {
       const body = {
         comision_originacion: {
@@ -151,7 +156,7 @@ const Tarifas = () => {
         selectedItem.pk_id_oficina,
         body
       );
-      console.log("res", res);
+      // console.log("res", res);
       if (res.status) {
         notify(res.msg);
         getTarifasByComercio();
@@ -171,7 +176,7 @@ const Tarifas = () => {
       const res = await fetchGetReporte();
       // roleInfo.id_comercio,
       // roleInfo.nombre_comercio
-      console.log("res", res);
+      // console.log("res", res);
       if (res.status) {
         notify(res.msg);
         // Descargar el archivo
