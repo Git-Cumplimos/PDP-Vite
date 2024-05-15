@@ -8,7 +8,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
 import { notifyError,notify } from "../../../../utils/notify";
 
-const URL_CONSULTA_COMERCIOS_BLOQUEADOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}`;
+const URL_CONSULTA_COMERCIOS_BLOQUEADOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 // const URL_CONSULTA_COMERCIOS_BLOQUEADOS = `http://127.0.0.1:5000`;
 
 const ConsultaComerciosRechazados = () => {
