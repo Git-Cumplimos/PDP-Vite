@@ -61,13 +61,13 @@ const HistoricoPines = () => {
 
   const handleOpenReagendar = useCallback((e, item) => {
     setShowModalReagendar(true);
-    console.log("Reagendar", item);
+    // console.log("Reagendar", item);
     setSelectedItem(item);
   }, []);
 
   const handleOpenDevolverPin = useCallback((e, item) => {
     setShowModalDevolucion(true);
-    console.log("Devolver PIN", item);
+    // console.log("Devolver PIN", item);
     setSelectedItem(item);
   }, []);
 
@@ -110,7 +110,7 @@ const HistoricoPines = () => {
       filters.fechaInicial,
       filters.fechaFinal
     );
-    console.log("HISTORICO", res);
+    // console.log("HISTORICO", res);
     if (res) {
       setData(
         res.results.map((item) => ({
@@ -154,6 +154,7 @@ const HistoricoPines = () => {
                 onClick={(e) => {
                   handleOpenDevolverPin(e, item);
                 }}
+                disabled={item.estado !== "Disponible"}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -216,33 +217,32 @@ const HistoricoPines = () => {
 
   const devolverPin = useCallback(async () => {
     try {
-      console.log("Devolver item", selectedItem);
-      console.log("Devolver data", devolucionData);
+      // console.log("Devolver item", selectedItem);
+      // console.log("Devolver data", devolucionData);
       // Creo la prefirmada
       const certPresigned = await fetchGetUploadToS3(
         `certificados_bancarios/${selectedItem.fk_id_cliente}.pdf`
       );
-      console.log("certPresigned", certPresigned);
+      // console.log("certPresigned", certPresigned);
       // Subo el archivo
       if (certPresigned.status) {
         const upload = await uploadFilePresignedUrl(
           certPresigned.obj,
           devolucionData.certificado
         );
-        console.log("upload", upload);
+        // console.log("upload", upload);
         if (upload.ok) {
           // Espero 5 segundos para que se suba el archivo
           setTimeout(async () => {
-
             const body = {
               carpeta_certificado: `certificados_bancarios/${selectedItem.fk_id_cliente}`,
               observacion: devolucionData.observacion,
               nombre_usuario: roleInfo.nombre_comercio,
             };
-            console.log("body", body);
+            // console.log("body", body);
             // Hago la devolución
             const res = await fetchPutCancelacion(selectedItem.pk_id_pin, body);
-            console.log(res);
+            // console.log(res);
             if (res.status) {
               // Si todo sale bien, notifico y limpio los datos
               notify(res.msg);
