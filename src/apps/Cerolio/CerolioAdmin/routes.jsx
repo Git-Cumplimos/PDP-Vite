@@ -13,7 +13,9 @@ const CerolioAdminPinesHistorico = lazy(() =>
 const CerolioAdminPinesReporte = lazy(() =>
   import("./Views/Pines/ReportesPines/ReportesPines")
 );
-const CerolioAdminTarifas = lazy(() => import("./Views/Tarifas/Tarifas"));
+const CerolioAdminComisiones = lazy(() =>
+  import("./Views/Comisiones/Comisiones")
+);
 const CerolioAdminClientes = lazy(() => import("./Views/Clientes/Clientes"));
 const listPermissions = Object.values(enumPermisosCerolioAdmin);
 export const listPermissionsCerolioAdmin = listPermissions;
@@ -45,9 +47,9 @@ const rutasCerolioAdmin = {
       ],
     },
     {
-      link: "/cerolio-admin/tarifas",
-      label: <AppIcons Logo={"MARKETPLACE"} name="Tarifas" />,
-      component: CerolioAdminTarifas,
+      link: "/cerolio-admin/comision-originacion",
+      label: <AppIcons Logo={"MARKETPLACE"} name="Comisión Originación" />,
+      component: CerolioAdminComisiones,
       permission: [enumPermisosCerolioAdmin.cerolioAdmin],
     },
     {

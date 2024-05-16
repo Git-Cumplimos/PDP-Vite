@@ -77,7 +77,7 @@ const Tarifas = () => {
       Acciones: (
         <div className="flex">
           <Button
-            title="Reagendar"
+            title="Modificar"
             onClick={(e) => {
               handleOpenModificar(e, tarifa);
             }}
@@ -210,7 +210,7 @@ const Tarifas = () => {
         </Button>
       </ButtonBar>
       <TableEnterprise
-        title="Tarifas"
+        title="Comisión Originación"
         headers={[
           "Fecha de cambio",
           "ID OAT",

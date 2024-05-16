@@ -142,6 +142,7 @@ const Pin = () => {
               userData.numeroDocumento === "" ||
               userData.tipoTramite === 0
             }
+            design="primary"
           >
             Buscar PIN
           </Button>
@@ -149,8 +150,7 @@ const Pin = () => {
       )}
       {step === 1 && (
         <>
-          <div className="flex flex-col">
-            {/* Nombres, Apellidos, Número de documento, Centro de Atención, Fecha de Atención, Hora de Atención, Tipo de Trámite, Valor Pagado, Estado de Pin - Todo en disabled */}
+          <div className="grid grid-cols-2 gap-5">
             <Input
               label="Nombres"
               type="text"
@@ -261,14 +261,21 @@ const Pin = () => {
               value={userData?.pinData.pago_cerolio}
               disabled
             />
-            <MoneyInput
-              label="Saldo a pagar"
-              type="number"
-              value={
-                userData?.pinData.valor_tramite - userData?.pinData.pago_cerolio
-              }
-              disabled
-            />
+            {userData?.pinData.valor_tramite -
+              userData?.pinData.pago_cerolio ===
+            0 ? (
+              <Input label="Saldo a pagar" type="number" value={0} disabled />
+            ) : (
+              <MoneyInput
+                label="Saldo a pagar"
+                type="number"
+                value={
+                  userData?.pinData.valor_tramite -
+                  userData?.pinData.pago_cerolio
+                }
+                disabled
+              />
+            )}
           </div>
           <div className="flex flex-row">
             <Button onClick={() => setStep(1)} design="secondary">
