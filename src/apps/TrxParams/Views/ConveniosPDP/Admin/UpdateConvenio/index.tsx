@@ -165,12 +165,15 @@ const UpdateConvenio = () => {
         (error) => {
           if (error?.cause === "custom") {
             return error.message;
-          } else {
-            console.error(error);
-            return `Error ${
-              !!pk_id_convenio ? "actualizando" : "creando"
-            } el grupo de convenio`;
           }
+          if (error?.cause === "not-ok" && error.errorJson?.msg) {
+            return error.errorJson?.msg;
+          }
+
+          console.error(error);
+          return `Error ${
+            !!pk_id_convenio ? "actualizando" : "creando"
+          } el grupo de convenio`;
         },
         [pk_id_convenio]
       ),
