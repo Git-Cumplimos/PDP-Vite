@@ -117,11 +117,14 @@ const HistoricoPines = () => {
           ID: item.fk_id_cliente,
           PIN: item.numero_pin,
           "Estado PIN": item.estado,
-          Fecha: item.fecha_uso
-            ? new Date(item.fecha_uso).toLocaleDateString()
+          Fecha: item.fecha_creacion
+            ? new Date(item.fecha_creacion).toISOString().split("T")[0]
             : "Sin uso",
-          Hora: item.fecha_uso
-            ? new Date(item.fecha_uso).toLocaleTimeString()
+          Hora: item.fecha_creacion
+            ? new Date(item.fecha_creacion)
+                .toISOString()
+                .split("T")[1]
+                .slice(0, 5)
             : "Sin uso",
           "Estado Agenda": item.estado_cita,
           "Tipo Trámite": item.tipo_tramite,
@@ -137,6 +140,7 @@ const HistoricoPines = () => {
                   handleOpenReagendar(e, item);
                 }}
                 disabled={item.estado !== "Disponible"}
+                design="primary"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -155,6 +159,7 @@ const HistoricoPines = () => {
                   handleOpenDevolverPin(e, item);
                 }}
                 disabled={item.estado !== "Disponible"}
+                design="primary"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -271,7 +276,7 @@ const HistoricoPines = () => {
   return (
     <>
       <TableEnterprise
-        title="Vista de reportes"
+        title="Tabla Histórico Pines"
         headers={[
           "ID",
           // "Lugar Originación",
