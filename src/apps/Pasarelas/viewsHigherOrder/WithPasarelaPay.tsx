@@ -28,6 +28,7 @@ import {
 } from "./utils/utils_typing";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
+import { TypingDataComercio } from "../../../utils/TypingUtils";
 
 //FRAGMENT ******************** TYPING *******************************
 
