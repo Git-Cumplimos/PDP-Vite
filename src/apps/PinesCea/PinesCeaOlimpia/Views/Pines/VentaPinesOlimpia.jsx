@@ -179,7 +179,7 @@ const VentaPinesOlimpia = () => {
             setIdRunt("");
             setCodigoAprobacion("");
             setFechaTransaccion("");
-            notifyError(res?.msg);
+            notifyError("Error Respuesta Olimpia: "+res?.msg);
             setNumeroPin("");
             setNumeroDocumento("");
             setTipoDocumentoInput(1);
@@ -197,7 +197,7 @@ const VentaPinesOlimpia = () => {
             setIdRunt("");
             setCodigoAprobacion("");
             setFechaTransaccion("");
-            notifyError("Estado de pin no permitido para para recaudo");
+            notifyError("Error Respuesta Olimpia: Estado de pin no permitido para para recaudo");
             setNumeroPin("");
             setNumeroDocumento("");
             setTipoDocumentoInput(1);
@@ -226,7 +226,7 @@ const VentaPinesOlimpia = () => {
         setNumeroDocumento("");
         setTipoDocumentoInput(1);
         // console.error(err);
-        notifyError("Error consultando pin cea Olimpia");
+        notifyError("Error Respuesta Olimpia: Error consultando pin cea Olimpia");
       });
   };
 
@@ -266,7 +266,7 @@ const VentaPinesOlimpia = () => {
           setIdRunt("");
           setCodigoAprobacion("");
           setFechaTransaccion("");
-          notifyError(res?.msg);
+          notifyError("Error Respuesta Olimpia: "+res?.msg);
           setEstadoConsulta(false);
           setIsLoadingPago(false);
           setNumeroPin("");
@@ -307,7 +307,7 @@ const VentaPinesOlimpia = () => {
                 setIdRunt("");
                 setCodigoAprobacion("");
                 setFechaTransaccion("");
-                notifyError(res2?.msg);
+                notifyError("Error Respuesta Olimpia: "+res2?.msg);
                 setEstadoConsulta(false);
                 setIsLoadingPago(false);
                 setNumeroPin("");
@@ -335,7 +335,7 @@ const VentaPinesOlimpia = () => {
               setNumeroDocumento("");
               setTipoDocumentoInput(1);
               // console.error(err);
-              notifyError("Error confirmando recaudo del pin cea Olimpia");
+              notifyError("Error Respuesta Olimpia: Error confirmando recaudo del pin cea Olimpia");
             });
         }
       })
@@ -347,7 +347,7 @@ const VentaPinesOlimpia = () => {
         setNumeroDocumento("");
         setTipoDocumentoInput(1);
         // console.error(err);
-        notifyError("Error recaudando el pin cea Olimpia");
+        notifyError("Error Respuesta Olimpia: Error recaudando el pin cea Olimpia");
       });
   };
 
@@ -379,6 +379,10 @@ const VentaPinesOlimpia = () => {
     return <Navigate to={"/"} replace />;
   }
 
+  const isNumeric = function(obj){
+    return !Array.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+  }
+
   return (
     <Fragment>
        
@@ -396,8 +400,15 @@ const VentaPinesOlimpia = () => {
         autoComplete="off"
         value={numeroPin}
         onInput={(e) => {
-          const num = (parseInt(e.target.value) || "").toString().replace("-","");
-          setNumeroPin(num);
+          if (isNumeric(e.target.value)){
+            const num = e.target.value.toString().replace("-","").replace(".","");
+            setNumeroPin(num);
+          }
+          else if (e.target.value == ""){
+            setNumeroPin("");
+          }
+          // const num = (parseInt(e.target.value) || "").toString().replace("-","");
+          // setNumeroPin(num);
         }}
         readOnly={inquiryStatus}
       />
@@ -422,8 +433,15 @@ const VentaPinesOlimpia = () => {
         autoComplete="off"
         value={numeroDocumento}
         onInput={(e) => {
-          const num = (parseInt(e.target.value) || "").toString().replace("-","");
-          setNumeroDocumento(num);
+          if (isNumeric(e.target.value)){
+            const num = e.target.value.toString().replace("-","").replace(".","");
+            setNumeroDocumento(num);
+          }
+          else if (e.target.value == ""){
+            setNumeroDocumento("");
+          }
+          // const num = (parseInt(e.target.value) || "").toString().replace("-","");
+          // setNumeroDocumento(num);
         }}
         readOnly={inquiryStatus}
       />
