@@ -5,23 +5,26 @@ import Button from "../../../components/Base/Button";
 import TablaParametrizacionCodBarrasConvenios from "../components/ParametrizacionCodBarrasConvenios";
 import UpdateParametrizacionCodBarrasConvenios from "../components/UpdateParametrizacionCodBarrasConvenios";
 
+type StrNumber = `${number}` | number;
+type StrNumberOptional = StrNumber | "" | undefined;
+
 type DataParametrizacionCodBarrasConveniosPDP = {
-  pk_codigo_convenio: number | null;
-  pk_id_autorizador: number | null;
+  pk_codigo_convenio: StrNumberOptional;
+  pk_id_autorizador: StrNumberOptional;
   cantidad_referencias: number;
   contiene_fecha_maxima: boolean | null;
   contiene_valor_pagar: boolean | null;
-  longitud_fecha: number | null;
-  longitud_referencia_1: number;
-  longitud_referencia_2: number | null;
-  longitud_referencia_3: number | null;
-  longitud_valor: number | null;
-  nombre_autorizador: string;
-  posicion_inicial_fecha: number | null;
-  posicion_inicial_referencia_1: number;
-  posicion_inicial_referencia_2: number | null;
-  posicion_inicial_referencia_3: number | null;
-  posicion_inicial_valor: number | null;
+  longitud_fecha: StrNumberOptional;
+  longitud_referencia_1: StrNumberOptional;
+  longitud_referencia_2: StrNumberOptional;
+  longitud_referencia_3: StrNumberOptional;
+  longitud_valor: StrNumberOptional;
+  nombre_autorizador: StrNumberOptional;
+  posicion_inicial_fecha: StrNumberOptional;
+  posicion_inicial_referencia_1: StrNumberOptional;
+  posicion_inicial_referencia_2: StrNumberOptional;
+  posicion_inicial_referencia_3: StrNumberOptional;
+  posicion_inicial_valor: StrNumberOptional;
 };
 
 enum enumEstadoProceso {
@@ -30,23 +33,23 @@ enum enumEstadoProceso {
   actualizacion = "ACTUALIZACION",
 }
 
-const DATA_INIT_PARAMETRIZACION = {
-  pk_codigo_convenio: 0,
-  pk_id_autorizador: 0,
+const DATA_INIT_PARAMETRIZACION: DataParametrizacionCodBarrasConveniosPDP = {
+  pk_codigo_convenio: "",
+  pk_id_autorizador: "",
   cantidad_referencias: 1,
   contiene_fecha_maxima: false,
   contiene_valor_pagar: false,
-  longitud_fecha: null,
-  longitud_referencia_1: 1,
-  longitud_referencia_2: null,
-  longitud_referencia_3: null,
-  longitud_valor: null,
+  longitud_fecha: "",
+  longitud_referencia_1: "",
+  longitud_referencia_2: "",
+  longitud_referencia_3: "",
+  longitud_valor: "",
   nombre_autorizador: "",
-  posicion_inicial_fecha: null,
-  posicion_inicial_referencia_1: 0,
-  posicion_inicial_referencia_2: null,
-  posicion_inicial_referencia_3: null,
-  posicion_inicial_valor: null,
+  posicion_inicial_fecha: "",
+  posicion_inicial_referencia_1: "",
+  posicion_inicial_referencia_2: "",
+  posicion_inicial_referencia_3: "",
+  posicion_inicial_valor: "",
 };
 
 const ParametrizacionCodBarrasConvenio = () => {

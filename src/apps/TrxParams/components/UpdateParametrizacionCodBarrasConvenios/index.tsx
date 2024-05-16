@@ -21,23 +21,26 @@ import { onChangeNumber } from "../../../../utils/functions";
 import Button from "../../../../components/Base/Button";
 import Select from "../../../../components/Base/Select";
 
+type StrNumber = `${number}` | number;
+type StrNumberOptional = StrNumber | "" | undefined;
+
 type DataParametrizacionCodBarrasConveniosPDP = {
-  pk_codigo_convenio: number | null;
-  pk_id_autorizador: number | null;
+  pk_codigo_convenio: StrNumberOptional;
+  pk_id_autorizador: StrNumberOptional;
   cantidad_referencias: number;
   contiene_fecha_maxima: boolean | null;
   contiene_valor_pagar: boolean | null;
-  longitud_fecha: number | null;
-  longitud_referencia_1: number;
-  longitud_referencia_2: number | null;
-  longitud_referencia_3: number | null;
-  longitud_valor: number | null;
-  nombre_autorizador: string;
-  posicion_inicial_fecha: number | null;
-  posicion_inicial_referencia_1: number;
-  posicion_inicial_referencia_2: number | null;
-  posicion_inicial_referencia_3: number | null;
-  posicion_inicial_valor: number | null;
+  longitud_fecha: StrNumberOptional;
+  longitud_referencia_1: StrNumberOptional;
+  longitud_referencia_2: StrNumberOptional;
+  longitud_referencia_3: StrNumberOptional;
+  longitud_valor: StrNumberOptional;
+  nombre_autorizador: StrNumberOptional;
+  posicion_inicial_fecha: StrNumberOptional;
+  posicion_inicial_referencia_1: StrNumberOptional;
+  posicion_inicial_referencia_2: StrNumberOptional;
+  posicion_inicial_referencia_3: StrNumberOptional;
+  posicion_inicial_valor: StrNumberOptional;
 };
 
 enum enumEstadoProceso {
@@ -58,8 +61,8 @@ const UpdateParametrizacionCodBarrasConvenios = ({
   dataParametrizacionCodBarras,
   estadoProceso,
 }: Props) => {
-  const navigate = useNavigate();
-  const { pk_id_conv } = useParams();
+  const validNavigate = useNavigate();
+  // const { pk_id_conv } = useParams();
 
   const [autorizadoresDisponibles, setAutorizadoresDisponibles] = useState<
     Array<{
@@ -109,16 +112,90 @@ const UpdateParametrizacionCodBarrasConvenios = ({
 
   const [updateConvenio] = useFetchDebounce(
     {
-      url: `${urlConveniosPdp}/convenios-pdp/administrar`,
+      url:
+        estadoProceso === enumEstadoProceso.creacion
+          ? `${urlConveniosPdp}/convenios-pdp/parametrizar-codigos-barras-convenios`
+          : `${urlConveniosPdp}/convenios-pdp/parametrizar-codigos-barras-convenios?pk_codigo_convenio=${dataParametrizacionCodBarrasTemp.pk_codigo_convenio}&pk_id_autorizador=${dataParametrizacionCodBarrasTemp.pk_id_autorizador}`,
       options: useMemo(
-        () => ({
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataParametrizacionCodBarrasTemp),
-        }),
-        [dataParametrizacionCodBarrasTemp]
+        () =>
+          estadoProceso === enumEstadoProceso.creacion
+            ? {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pk_codigo_convenio:
+                    dataParametrizacionCodBarrasTemp.pk_codigo_convenio,
+                  pk_id_autorizador:
+                    dataParametrizacionCodBarrasTemp.pk_id_autorizador,
+                  cantidad_referencias:
+                    dataParametrizacionCodBarrasTemp.cantidad_referencias,
+                  contiene_fecha_maxima:
+                    dataParametrizacionCodBarrasTemp.contiene_fecha_maxima,
+                  contiene_valor_pagar:
+                    dataParametrizacionCodBarrasTemp.contiene_valor_pagar,
+                  longitud_fecha:
+                    dataParametrizacionCodBarrasTemp.longitud_fecha,
+                  longitud_referencia_1:
+                    dataParametrizacionCodBarrasTemp.longitud_referencia_1,
+                  longitud_referencia_2:
+                    dataParametrizacionCodBarrasTemp.longitud_referencia_2,
+                  longitud_referencia_3:
+                    dataParametrizacionCodBarrasTemp.longitud_referencia_3,
+                  longitud_valor:
+                    dataParametrizacionCodBarrasTemp.longitud_valor,
+                  posicion_inicial_fecha:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_fecha,
+                  posicion_inicial_referencia_1:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1,
+                  posicion_inicial_referencia_2:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2,
+                  posicion_inicial_referencia_3:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3,
+                  posicion_inicial_valor:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
+                }),
+              }
+            : {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pk_codigo_convenio:
+                    dataParametrizacionCodBarrasTemp.pk_codigo_convenio,
+                  pk_id_autorizador:
+                    dataParametrizacionCodBarrasTemp.pk_id_autorizador,
+                  cantidad_referencias:
+                    dataParametrizacionCodBarrasTemp.cantidad_referencias,
+                  contiene_fecha_maxima:
+                    dataParametrizacionCodBarrasTemp.contiene_fecha_maxima,
+                  contiene_valor_pagar:
+                    dataParametrizacionCodBarrasTemp.contiene_valor_pagar,
+                  longitud_fecha:
+                    dataParametrizacionCodBarrasTemp.longitud_fecha,
+                  longitud_referencia_1:
+                    dataParametrizacionCodBarrasTemp.longitud_referencia_1,
+                  longitud_referencia_2:
+                    dataParametrizacionCodBarrasTemp.longitud_referencia_2,
+                  longitud_referencia_3:
+                    dataParametrizacionCodBarrasTemp.longitud_referencia_3,
+                  longitud_valor:
+                    dataParametrizacionCodBarrasTemp.longitud_valor,
+                  posicion_inicial_fecha:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_fecha,
+                  posicion_inicial_referencia_1:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1,
+                  posicion_inicial_referencia_2:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2,
+                  posicion_inicial_referencia_3:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3,
+                  posicion_inicial_valor:
+                    dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
+                }),
+              },
+        [dataParametrizacionCodBarrasTemp, estadoProceso]
       ),
       autoDispatch: false,
     },
@@ -133,13 +210,13 @@ const UpdateParametrizacionCodBarrasConvenios = ({
         [estadoProceso]
       ),
       onSuccess: useCallback(() => {
-        navigate(`/params-operations/convenios-recaudo/administrar`);
+        validNavigate(-1);
         return `${
           estadoProceso === enumEstadoProceso.actualizacion
             ? "Actualización"
             : "Creación"
         } de parametrización exitosa`;
-      }, [navigate, estadoProceso]),
+      }, [validNavigate, estadoProceso]),
       onError: useCallback(
         (error) => {
           if (error?.cause === "custom") {
@@ -242,6 +319,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
             ].map((data, i) => (
               <Fieldset
                 // legend={`Referencia ${i + 1}`}
+                key={i}
                 legend={
                   <div className="flex gap-2 items-center">
                     <p>{`Referencia ${i + 1}`}</p>
@@ -348,8 +426,8 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                 setDataParametrizacionCodBarrasTemp((old) => ({
                   ...old,
                   contiene_valor_pagar: !old.contiene_valor_pagar,
-                  longitud_valor: null,
-                  posicion_inicial_valor: null,
+                  longitud_valor: "",
+                  posicion_inicial_valor: "",
                 }))
               }
             />
@@ -397,8 +475,8 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                 setDataParametrizacionCodBarrasTemp((old) => ({
                   ...old,
                   contiene_fecha_maxima: !old.contiene_fecha_maxima,
-                  longitud_fecha: null,
-                  posicion_inicial_fecha: null,
+                  longitud_fecha: "",
+                  posicion_inicial_fecha: "",
                 }))
               }
             />
