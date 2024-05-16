@@ -5,14 +5,10 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
-import { v4 } from "uuid";
-import { useImgs } from "../../../hooks/ImgsHooks";
 import { notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { TypeInfTicket, TypingDataComercio } from "../../../utils/TypingUtils";
 
 import PasarelaFormulario from "./components/GouFormulario";
 import PasarelaCheckPayOrigin from "./components/PasarelaCheckPayOrigin";
@@ -82,12 +78,7 @@ const WithPasarelaPay = (
   );
 
   const [dataSettingValor, setDataSettingValor] =
-    useState<TypingDataSettingValor | null>({
-      valor_costo_trx: 500,
-      valor_trx_maximo: 1000,
-      valor_trx_minimo: 10000,
-      cant_valor_trx_maximo: 10,
-    });
+    useState<TypingDataSettingValor | null>(null);
 
   const dataComercio: TypingDataComercio = useMemo(() => {
     const tipo_comercio = roleInfo?.tipo_comercio ?? "";
@@ -143,32 +134,33 @@ const WithPasarelaPay = (
     PeticionPrePayBase
   );
 
-  // useEffect(() => {
-  //   notifyPending(
-  //     PeticionSetting(),
-  //     {
-  //       render: () => {
-  //         return "Procesando configuración";
-  //       },
-  //     },
-  //     {
-  //       render: ({ data }: { data: TypingDataSettingValor }) => {
-  //         setDataSettingValor(data);
-  //         return "Consulta Configuración exitosa";
-  //       },
-  //     },
-  //     {
-  //       render: ({ data: error }) => {
-  //         goNavigate(url_return_front);
-  //         return error?.message ?? "Consulta Configuración Rechazada";
-  //       },
-  //     }
-  //   );
-  // }, [PeticionSetting, goNavigate, url_return_front]);
+  useEffect(() => {
+    notifyPending(
+      PeticionSetting(),
+      {
+        render: () => {
+          return "Procesando configuración";
+        },
+      },
+      {
+        render: ({ data }: { data: TypingDataSettingValor }) => {
+          setDataSettingValor(data);
+          return "Consulta Configuración exitosa";
+        },
+      },
+      {
+        render: ({ data: error }) => {
+          goNavigate(url_return_front);
+          return error?.message ?? "Consulta Configuración Rechazada";
+        },
+      }
+    );
+  }, [PeticionSetting, goNavigate, url_return_front]);
 
   const onSubmitCheckPrePay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {
       ev.preventDefault();
+
       const [id_unico_modal, is_schema, dataModalAdd]: [
         string,
         boolean,
@@ -177,6 +169,7 @@ const WithPasarelaPay = (
       if (!is_schema) {
         return;
       }
+
       notifyPending(
         PeticionCheckPrePay(
           id_unico_modal,

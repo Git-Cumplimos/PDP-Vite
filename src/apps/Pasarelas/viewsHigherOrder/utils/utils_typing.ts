@@ -1,13 +1,6 @@
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction } from "react";
-import {
-  TypeInfTicket,
-  TypingDataComercio,
-} from "../../../../utils/TypingUtils";
-import {
-  TypingDataPay,
-  TypingSummaryTrx,
-  TypingTrx,
-} from "../../utils/utils_typing";
+import { TypingDataComercio } from "../../../../utils/TypingUtils";
+import { TypingSummaryTrx, TypingTrx } from "../../utils/utils_typing";
 
 export type TypingFormClientInputs = {
   nombres?: string | null | boolean;

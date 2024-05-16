@@ -133,7 +133,12 @@ const FormClient = ({
         }
       >
         {formClientInputs?.tipo_documento !== undefined && (
-          <Select label="Tipo de documento" options={options_select} />
+          <Select
+            id="tipo_documento/text"
+            name="tipo_documento"
+            label="Tipo de documento"
+            options={options_select}
+          />
         )}
       </div>
 
