@@ -242,9 +242,16 @@ const PagarMoviliza = () => {
                         }
                 }
                     else{
-                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                      navigate("/");
-                      navigate("/moviliza");
+                      if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
+                        notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
+                        navigate("/");
+                        navigate("/moviliza");
+                      }
+                      else{
+                        notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                        navigate("/");
+                        navigate("/moviliza");
+                      }
                     }
                 }
                }
@@ -277,9 +284,6 @@ const PagarMoviliza = () => {
           CallErrorPeticion(error);
         });
 
-
-
-      
     }
     ,
     [peticionBarcode, CallErrorPeticion]
@@ -423,6 +427,7 @@ const PagarMoviliza = () => {
       peticionPayMoviliza(data, dataAditional)
         .then((response) => {
           if (response?.status === true) {
+            setPaso("TransaccionExitosa");
             if (response?.msg == "Notificación de pago fallida"){
               const voucher = response?.obj?.result?.ticket
               ? response?.obj?.result?.ticket
@@ -535,6 +540,10 @@ const PagarMoviliza = () => {
       peticionPayMoviliza,
       resConsultMoviliza,
       CallErrorPeticion,
+      setInfTicket,
+      setPaso,
+      infTicket,
+      paso
     ]
   );
 
@@ -596,6 +605,7 @@ const PagarMoviliza = () => {
     loadingPeticionBarcode,
     loadingPeticionPayMoviliza,
     loadingPeticionConsultMoviliza,
+    loadingPeticionJwt
   ]);
 
   return (
@@ -693,7 +703,6 @@ const PagarMoviliza = () => {
             </ButtonBar>
           </div>
         )}
-        {/*************** Recarga Exitosa **********************/}
       </Modal>
 
       {/**************** Transaccion Fallida por notificación **********************/}
