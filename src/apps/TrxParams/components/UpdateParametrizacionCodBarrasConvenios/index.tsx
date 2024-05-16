@@ -110,7 +110,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
     }
   );
 
-  const [updateConvenio] = useFetchDebounce(
+  const [updateConvenio,loadingUpdateConvenio] = useFetchDebounce(
     {
       url:
         estadoProceso === enumEstadoProceso.creacion
@@ -278,7 +278,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
           maxLength={8}
           value={dataParametrizacionCodBarrasTemp?.pk_codigo_convenio ?? ""}
           onChange={onChangeFormatNumber}
-          disabled={estadoProceso === enumEstadoProceso.actualizacion}
+          disabled={estadoProceso === enumEstadoProceso.actualizacion || loadingUpdateConvenio}
           required
         />
         <Select
@@ -286,7 +286,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
           label={"Autorizador"}
           name={"pk_id_autorizador"}
           onChange={onChangeFormat}
-          disabled={estadoProceso === enumEstadoProceso.actualizacion}
+          disabled={estadoProceso === enumEstadoProceso.actualizacion || loadingUpdateConvenio}
           value={dataParametrizacionCodBarrasTemp.pk_id_autorizador}
           options={[{ value: "", label: "" }, ...allAuths]}
           required
@@ -302,10 +302,14 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                   bootstrapIconHover="plus-circle-fill"
                   colorName="text-primary"
                   onClick={() =>
-                    setDataParametrizacionCodBarrasTemp((old) => ({
-                      ...old,
-                      cantidad_referencias: old.cantidad_referencias + 1,
-                    }))
+                    {
+                      if (!loadingUpdateConvenio) {
+                        setDataParametrizacionCodBarrasTemp((old) => ({
+                          ...old,
+                          cantidad_referencias: old.cantidad_referencias + 1,
+                        })) 
+                      }
+                    }
                   }
                 />
               )}
@@ -332,13 +336,17 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                           bootstrapIconHover="dash-circle-fill"
                           colorName="text-primary"
                           onClick={() =>
-                            setDataParametrizacionCodBarrasTemp((old) => ({
-                              ...old,
-                              cantidad_referencias:
-                                old.cantidad_referencias - 1,
-                              [`longitud_referencia_${i + 1}`]: null,
-                              [`posicion_inicial_referencia_${i + 1}`]: null,
-                            }))
+                            {
+                              if (!loadingUpdateConvenio) {
+                                setDataParametrizacionCodBarrasTemp((old) => ({
+                                  ...old,
+                                  cantidad_referencias:
+                                    old.cantidad_referencias - 1,
+                                  [`longitud_referencia_${i + 1}`]: null,
+                                  [`posicion_inicial_referencia_${i + 1}`]: null,
+                                }))
+                              }
+                            }
                           }
                         />
                       )}
@@ -361,7 +369,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                   }
                   required
                   onChange={onChangeFormatNumber}
-                  // disabled={estadoProceso === enumEstadoProceso.actualizacion}
+                  disabled={loadingUpdateConvenio}
                 />
                 <Input
                   id={`posicion_inicial_referencia_${i + 1}`}
@@ -378,7 +386,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                   }
                   required
                   onChange={onChangeFormatNumber}
-                  // disabled={estadoProceso === enumEstadoProceso.actualizacion}
+                  disabled={loadingUpdateConvenio}
                 />
               </Fieldset>
             ))}
@@ -397,7 +405,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               value={dataParametrizacionCodBarrasTemp?.longitud_valor ?? ""}
               onChange={onChangeFormatNumber}
               required
-              // disabled={estadoProceso === enumEstadoProceso.actualizacion}
+              disabled={loadingUpdateConvenio}
             />
             <Input
               id="posicion_inicial_valor"
@@ -412,7 +420,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               }
               onChange={onChangeFormatNumber}
               required
-              // disabled={estadoProceso === enumEstadoProceso.actualizacion}
+              disabled={loadingUpdateConvenio}
             />
             <ToggleInput
               id={"contiene_valor_pagar"}
@@ -430,6 +438,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                   posicion_inicial_valor: "",
                 }))
               }
+              disabled={loadingUpdateConvenio}
             />
           </>
         </Fieldset>
@@ -446,7 +455,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               value={dataParametrizacionCodBarrasTemp?.longitud_fecha ?? ""}
               onChange={onChangeFormatNumber}
               required
-              // disabled={estadoProceso === enumEstadoProceso.actualizacion}
+              disabled={loadingUpdateConvenio}
             />
             <Input
               id="posicion_inicial_fecha"
@@ -461,7 +470,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               }
               onChange={onChangeFormatNumber}
               required
-              // disabled={estadoProceso === enumEstadoProceso.actualizacion}
+              disabled={loadingUpdateConvenio}
             />
             <ToggleInput
               id={"contiene_fecha_maxima"}
@@ -479,138 +488,13 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                   posicion_inicial_fecha: "",
                 }))
               }
+              disabled={loadingUpdateConvenio}
             />
           </>
         </Fieldset>
         <ButtonBar children={false} />
-        {/* <Fieldset
-          legend={
-            <div className="flex gap-2 items-center">
-              <p>Referencias</p>
-              {searchFilters.convenios_autorizador.length !==
-                autorizadoresDisponibles.length && (
-                <IconSwap
-                  title="Añadir autorizador"
-                  bootstrapIcon="file-earmark-plus"
-                  bootstrapIconHover="file-earmark-plus-fill"
-                  colorName="text-primary"
-                  onClick={() =>
-                    dispatch({ type: "CONVENIOS_AUTORIZADOR_ADD" })
-                  }
-                />
-              )}
-            </div>
-          }
-          className="lg:col-span-2"
-        >
-          {searchFilters.convenios_autorizador.map(
-            (convenioAuto: ConveniosAutorizador, index: number) => (
-              <Fieldset
-                legend={
-                  <div className="flex gap-4 items-center">
-                    <select
-                      id={`relaciones_${index}`}
-                      className="px-4 py-2 rounded-md bg-secondary-light text-black w-64"
-                      value={convenioAuto.pk_fk_id_autorizador}
-                      onChange={(ev: ChangeEvent<HTMLSelectElement>) =>
-                        dispatch({
-                          type: "CONVENIOS_AUTORIZADOR_EDIT_ITEM",
-                          index,
-                          item: {
-                            key: "pk_fk_id_autorizador",
-                            value: parseInt(ev.target.value) ?? "",
-                          },
-                        })
-                      }
-                      disabled={
-                        convenioAuto.pk_fk_id_autorizador !== "" &&
-                        existeCurrent(convenioAuto.pk_fk_id_autorizador)
-                      }
-                      required
-                    >
-                      {[
-                        { value: "", label: "" },
-                        ...allAuths.filter(
-                          ({ value }) =>
-                            !existe(value) ||
-                            (existe(value) &&
-                              convenioAuto.pk_fk_id_autorizador === value)
-                        ),
-                      ].map(({ value, label }) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    <ToggleInput
-                      id={"estado_convenio"}
-                      // label={"Estado"}
-                      name={"estado_convenio"}
-                      title="Activar / desactivar convenio con autorizador"
-                      self
-                      checked={
-                        searchFilters.convenios_autorizador[index]
-                          .estado_convenio
-                      }
-                      onChange={() =>
-                        dispatch({
-                          type: "CONVENIOS_AUTORIZADOR_EDIT_ITEM",
-                          index,
-                          item: {
-                            key: "estado_convenio",
-                            value: (old) => !old,
-                          },
-                        })
-                      }
-                    />
-                    {(convenioAuto.pk_fk_id_autorizador === "" ||
-                      !existeCurrent(convenioAuto.pk_fk_id_autorizador)) && (
-                      <IconSwap
-                        title="Eliminar autorizador"
-                        bootstrapIcon="trash"
-                        bootstrapIconHover="trash-fill"
-                        colorName="text-red-700"
-                        onClick={() =>
-                          dispatch({
-                            type: "CONVENIOS_AUTORIZADOR_REMOVE",
-                            index,
-                          })
-                        }
-                      />
-                    )}
-                  </div>
-                }
-                key={index}
-              >
-                <Input
-                  id={`relaciones_${index}`}
-                  label="Id convenio"
-                  name="r_vals"
-                  type="text"
-                  autoComplete="off"
-                  value={convenioAuto.id_convenio_autorizador}
-                  onChange={(ev) =>
-                    dispatch({
-                      type: "CONVENIOS_AUTORIZADOR_EDIT_ITEM",
-                      index,
-                      item: {
-                        key: "id_convenio_autorizador",
-                        value: onChangeNumber(ev),
-                      },
-                    })
-                  }
-                  maxLength={15}
-                  required
-                />
-              </Fieldset>
-            )
-          )}
-          {!!searchFilters.convenios_autorizador.length && (
-            <ButtonBar children={false} />
-          )}
-        </Fieldset> */}
         <ButtonBar className="md:col-span-2">
-          <Button type="submit">
+          <Button type="submit" disabled={loadingUpdateConvenio}>
             {estadoProceso === enumEstadoProceso.creacion
               ? "Crear"
               : "Actualizar"}{" "}
