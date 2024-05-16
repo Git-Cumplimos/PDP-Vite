@@ -230,11 +230,14 @@ const FormClient = ({
               type="email"
               autoComplete="off"
               maxLength={100}
-              example={EXAMPLE}
+              placeholder={EXAMPLE}
               min={2}
               max={3}
               isGuiaUser={/.{2,}/}
               isGuiaDominio={{ schema: [], func: isDominioAdd }}
+              msgInvalidSimple={
+                "La dirección de correo electrónico no tiene una estructura válida, por favor corríjala."
+              }
               disabled={
                 formClientInputs?.correo === true ||
                 formClientInputs?.correo === false
@@ -254,11 +257,13 @@ const FormClient = ({
                 type="email"
                 autoComplete="off"
                 maxLength={100}
-                example={EXAMPLE}
                 min={2}
                 max={3}
                 isGuiaUser={/.{2,}/}
                 isGuiaDominio={{ schema: [], func: isDominioAdd }}
+                msgInvalidSimple={
+                  "La dirección de correo electrónico no tiene una estructura válida, por favor corríjala."
+                }
                 value={formClientDataInputCheck["correo|confirmacion"]}
                 invalid={dataInvalid["correo|confirmacion"]}
                 onPaste={(ev) => ev.preventDefault()}

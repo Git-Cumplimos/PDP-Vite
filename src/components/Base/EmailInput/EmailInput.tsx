@@ -18,7 +18,8 @@ import {
 } from "./EmailTyping";
 
 export interface CustomPropsInputEmail {
-  example: string;
+  msgInvalidSimple?: string;
+  msgInvalidComplejo?: string;
   isGuiaUser?: TypingIsGuiaUser;
   isGuiaDominio?: TypingIsGuiaDominio;
   onInput?: (ev: FormEvent<HTMLInputElement>, valor: number) => void;
@@ -29,9 +30,14 @@ export interface CustomPropsInputEmail {
 type PropsInputEmail = CustomPropsInputEmail &
   Omit<CustomInputProps, "onInput" | "onChange">;
 
+const getMsgInvalid = (msgInvalidReal: string, example_?: string): string => {
+  console.log(msgInvalidReal);
+  const _example_ = example_ ? ` Ejemplo: ${example_}` : "";
+  return msgInvalidReal + _example_;
+};
+
 const guiaDominioInd = (
   valueInd_: string,
-  example_: string,
   dominioSchemaInd_: TypingDominioSchemaInd
 ): TypingMsgInvalid => {
   let msgInvalid: TypingMsgInvalid = null;
@@ -47,22 +53,22 @@ const guiaDominioInd = (
       switch (typeRegexIndex) {
         case 0:
           if (typeRegex?.test(valueInd_) === false) {
-            msgInvalid = `Correo Incorrecto ('${valueInd_}' debe ser númerico) Ejemplo: ${example_}`;
+            msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' debe ser númerico).`;
           }
           break;
         case 1:
           if (typeRegex?.test(valueInd_) === false) {
-            msgInvalid = `Correo Incorrecto ('${valueInd_}' debe ser letras y minúsculas) Ejemplo: ${example_}`;
+            msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' debe ser letras y minúsculas).`;
           }
           break;
         case 2:
           if (typeRegex?.test(valueInd_) === false) {
-            msgInvalid = `Correo Incorrecto ('${valueInd_}' debe ser letras y mayúscula) Ejemplo: ${example_}`;
+            msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' debe ser letras y mayúscula).`;
           }
           break;
         case 3:
           if (typeRegex?.test(valueInd_) === false) {
-            msgInvalid = `Correo Incorrecto ('${valueInd_}' debe ser letras) Ejemplo: ${example_}`;
+            msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' debe ser letras).`;
           }
           break;
       }
@@ -83,17 +89,17 @@ const guiaDominioInd = (
             switch (typeRegexIndex) {
               case 0:
                 if (typeRegex?.test(valueInd_) === false) {
-                  msgInvalid = `Correo Incorrecto ('${valueInd_}' debe ser minúsculas) Ejemplo: ${example_}`;
+                  msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' debe ser minúsculas).`;
                 }
                 break;
               case 1:
                 if (typeRegex?.test(valueInd_) === false) {
-                  msgInvalid = `Correo Incorrecto ('${valueInd_}' debe ser mayúsculas) Ejemplo: ${example_}`;
+                  msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' debe ser mayúsculas).`;
                 }
                 break;
             }
           } else {
-            msgInvalid = `Correo Incorrecto ('${valueInd_}' no es permitido) Ejemplo: ${example_}`;
+            msgInvalid = `La dirección de correo electrónico no tiene una estructura válida ('${valueInd_}' no es permitido).`;
           }
           break;
       }
@@ -105,7 +111,6 @@ const guiaDominioInd = (
 const guiaDominio = (
   correo_: string,
   dominio_: string,
-  example_: string,
   limitsIsGuiaDominioSchema_: number[],
   dominioSchema_: TypingDominioSchema
 ): TypingMsgInvalid => {
@@ -115,7 +120,8 @@ const guiaDominio = (
     (elemento) => elemento.trim() === ""
   );
   if (msgInvalidEmpty === "") {
-    msgInvalid = `Correo Incorrecto Ejemplo: ${example_}`;
+    msgInvalid =
+      "La dirección de correo electrónico no tiene una estructura válida.";
     return msgInvalid;
   }
   const regex1 = /^[^\s@]+@[^\s@]+/;
@@ -129,19 +135,21 @@ const guiaDominio = (
   if (!check) {
     msgInvalid =
       dominiosPunto.length < limitsIsGuiaDominioSchema_[0]
-        ? `Correo Incompleto Ejemplo: ${example_}`
-        : `Correo Incorrecto Ejemplo: ${example_}`;
+        ? "La dirección de correo electrónico no tiene la estructura completa."
+        : "La dirección de correo electrónico no tiene una estructura válida.";
     return msgInvalid;
   }
 
   if (dominiosPunto.length < limitsIsGuiaDominioSchema_[0]) {
-    msgInvalid = `Correo Incompleto Ejemplo: ${example_}`;
+    msgInvalid =
+      "La dirección de correo electrónico no tiene la estructura completa.";
     return msgInvalid;
   }
 
   if (limitsIsGuiaDominioSchema_[1]) {
     if (dominiosPunto.length > limitsIsGuiaDominioSchema_[1]) {
-      msgInvalid = `Correo Incorrecto Ejemplo: ${example_}`;
+      msgInvalid =
+        "La dirección de correo electrónico no tiene una estructura válida.";
       return msgInvalid;
     }
   }
@@ -149,7 +157,7 @@ const guiaDominio = (
   if (dominioSchema_.length === 0) return msgInvalid;
 
   const msgInvalidDominioInd = dominioSchema_.find((elemento, index) => {
-    msgInvalid = guiaDominioInd(dominiosPunto[index], example_, elemento);
+    msgInvalid = guiaDominioInd(dominiosPunto[index], elemento);
     return msgInvalid;
   });
   if (msgInvalidDominioInd) {
@@ -160,7 +168,6 @@ const guiaDominio = (
 
 const guiaCorreo = (
   correo_: string,
-  example_: string,
   limitsIsGuiaDominioSchema_: number[],
   isGuiaDominio_: TypingIsGuiaDominio,
   isGuiaUser_?: TypingIsGuiaUser
@@ -168,12 +175,14 @@ const guiaCorreo = (
   let msgInvalid: TypingMsgInvalid = null;
   if (/^\S*$/.test(correo_) === false) {
     //validar que no tenga espacios en blanco
-    msgInvalid = `Correo Incorrecto Ejemplo: ${example_}`;
+    msgInvalid =
+      "La dirección de correo electrónico no tiene una estructura válida.";
     return msgInvalid;
   }
   if (/^[^\s@]+@[^\s@]+$/.test(correo_) === false) {
     //validar que sea un correo asi sea simple
-    msgInvalid = `Correo Incorrecto Ejemplo: ${example_}`;
+    msgInvalid =
+      "La dirección de correo electrónico no tiene una estructura válida.";
     return msgInvalid;
   }
   const user_dominio = correo_.split("@");
@@ -183,7 +192,6 @@ const guiaCorreo = (
         const msgInvalidDominio1 = guiaDominio(
           correo_,
           user_dominio[1],
-          example_,
           limitsIsGuiaDominioSchema_,
           isGuiaDominio_.schema
         );
@@ -206,7 +214,8 @@ const guiaCorreo = (
   if (isGuiaUser_) {
     if (isGuiaUser_ instanceof RegExp) {
       if (isGuiaUser_.test(user_dominio[0]) === false) {
-        msgInvalid = `Correo Incorrecto Ejemplo: ${example_}`;
+        msgInvalid =
+          "La dirección de correo electrónico no tiene una estructura válida.";
         return msgInvalid;
       }
     } else if (typeof isGuiaDominio_ === "function") {
@@ -218,7 +227,15 @@ const guiaCorreo = (
 
 const EmailInput = forwardRef<HTMLInputElement, PropsInputEmail>(
   (
-    { example, isGuiaUser, isGuiaDominio, value, required = true, ...input },
+    {
+      msgInvalidSimple,
+      msgInvalidComplejo,
+      isGuiaUser,
+      isGuiaDominio,
+      value,
+      required = true,
+      ...input
+    },
     ref
   ) => {
     const inptRef = useRef<HTMLInputElement | null>(null);
@@ -248,17 +265,38 @@ const EmailInput = forwardRef<HTMLInputElement, PropsInputEmail>(
           let msgInvalid: TypingMsgInvalid = null;
           msgInvalid = guiaCorreo(
             ev.target.value,
-            example,
             limitsIsGuiaDominioSchema,
             isGuiaDominio,
             isGuiaUser
           );
-          ev.target.setCustomValidity(msgInvalid ? msgInvalid : "");
+          if (msgInvalid) {
+            ev.target.setCustomValidity(
+              msgInvalidSimple
+                ? getMsgInvalid(msgInvalidSimple, input?.placeholder)
+                : getMsgInvalid(msgInvalid, input?.placeholder)
+            );
+          } else {
+            if (ev.target?.validity?.typeMismatch === true) {
+              ev.target.setCustomValidity(
+                msgInvalidComplejo
+                  ? getMsgInvalid(msgInvalidComplejo, input?.placeholder)
+                  : ""
+              );
+            } else {
+              ev.target.setCustomValidity("");
+            }
+          }
         }
-
         return ev.target.value;
       },
-      [example, isGuiaDominio, isGuiaUser, limitsIsGuiaDominioSchema]
+      [
+        input?.placeholder,
+        isGuiaDominio,
+        isGuiaUser,
+        msgInvalidSimple,
+        msgInvalidComplejo,
+        limitsIsGuiaDominioSchema,
+      ]
     );
 
     const onInput = useCallback(
@@ -284,26 +322,34 @@ const EmailInput = forwardRef<HTMLInputElement, PropsInputEmail>(
         if (old && input?.onChange) return old;
         if (inptRef.current) {
           if (isGuiaDominio) {
-            let msgInvalid: TypingMsgInvalid = null;
-            msgInvalid = guiaCorreo(
-              inptRef.current.value,
-              example,
-              limitsIsGuiaDominioSchema,
-              isGuiaDominio,
-              isGuiaUser
-            );
-            inptRef.current.setCustomValidity(msgInvalid ? msgInvalid : "");
+            // let msgInvalid: TypingMsgInvalid = null;
+            // msgInvalid = guiaCorreo(
+            //   inptRef.current.value,
+            //   limitsIsGuiaDominioSchema,
+            //   isGuiaDominio,
+            //   input?.placeholder,
+            //   isGuiaUser
+            // );
+            // if (msgInvalidSimple) {
+            //   inptRef.current.setCustomValidity(
+            //     msgInvalid ? msgInvalidSimple : ""
+            //   );
+            // } else {
+            //   inptRef.current.setCustomValidity(msgInvalid ? msgInvalid : "");
+            // }
           }
           return true;
         }
         return old;
       });
     }, [
-      example,
+      input?.placeholder,
       input?.onChange,
       isGuiaUser,
       isGuiaDominio,
       limitsIsGuiaDominioSchema,
+      msgInvalidSimple,
+      msgInvalidComplejo,
     ]);
 
     return (
