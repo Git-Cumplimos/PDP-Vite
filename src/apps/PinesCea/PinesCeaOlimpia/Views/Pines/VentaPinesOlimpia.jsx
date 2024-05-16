@@ -379,6 +379,10 @@ const VentaPinesOlimpia = () => {
     return <Navigate to={"/"} replace />;
   }
 
+  const isNumeric = function(obj){
+    return !Array.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+  }
+
   return (
     <Fragment>
        
@@ -396,8 +400,15 @@ const VentaPinesOlimpia = () => {
         autoComplete="off"
         value={numeroPin}
         onInput={(e) => {
-          const num = (parseInt(e.target.value) || "").toString().replace("-","");
-          setNumeroPin(num);
+          if (isNumeric(e.target.value)){
+            const num = e.target.value.toString().replace("-","").replace(".","");
+            setNumeroPin(num);
+          }
+          else if (e.target.value == ""){
+            setNumeroPin("");
+          }
+          // const num = (parseInt(e.target.value) || "").toString().replace("-","");
+          // setNumeroPin(num);
         }}
         readOnly={inquiryStatus}
       />
@@ -422,8 +433,15 @@ const VentaPinesOlimpia = () => {
         autoComplete="off"
         value={numeroDocumento}
         onInput={(e) => {
-          const num = (parseInt(e.target.value) || "").toString().replace("-","");
-          setNumeroDocumento(num);
+          if (isNumeric(e.target.value)){
+            const num = e.target.value.toString().replace("-","").replace(".","");
+            setNumeroDocumento(num);
+          }
+          else if (e.target.value == ""){
+            setNumeroDocumento("");
+          }
+          // const num = (parseInt(e.target.value) || "").toString().replace("-","");
+          // setNumeroDocumento(num);
         }}
         readOnly={inquiryStatus}
       />
