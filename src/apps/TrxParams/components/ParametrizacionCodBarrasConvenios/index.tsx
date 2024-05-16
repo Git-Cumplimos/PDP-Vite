@@ -44,9 +44,9 @@ type Props = {
   setReloadFunction?: Dispatch<SetStateAction<() => void>>;
 };
 
-// const urlConveniosPdp =
-//   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
-const urlConveniosPdp = "http://localhost:5000";
+const urlConveniosPdp =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlConveniosPdp = "http://localhost:5000";
 
 const TablaParametrizacionCodBarrasConvenios = ({
   onSelect,
