@@ -161,7 +161,9 @@ export type TypingOutputUseHookWithPasarelaPay = {
 };
 
 //? PeticionSetting
-export type TypingPeticionSetting = () => Promise<TypingDataSettingValor>;
+export type TypingPeticionSetting = (
+  name_service: string
+) => Promise<TypingDataSettingValor>;
 export type TypingDataSettingValor = {
   valor_costo_trx: number;
   valor_trx_maximo?: number;

@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { notifyPending } from "../../../utils/notify";
+import { notifyError, notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
 
 import PasarelaFormulario from "./components/GouFormulario";
@@ -30,6 +30,11 @@ import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
 import { TypingDataComercio } from "../../../utils/TypingUtils";
 import { tipoDocumentoOptions } from "./components/GouFormulario/DistinctForm/FormClient";
+import {
+  ErrorCustomComponentCode,
+  ErrorCustomFetch,
+  TempErrorFrontService,
+} from "../../../utils/fetchCustomPdp";
 
 //FRAGMENT ******************** TYPING *******************************
 
@@ -139,26 +144,24 @@ const WithPasarelaPay = (
   );
 
   useEffect(() => {
-    notifyPending(
-      PeticionSetting(),
-      {
-        render: () => {
-          return "Procesando configuración";
-        },
-      },
-      {
-        render: ({ data }: { data: TypingDataSettingValor }) => {
-          setDataSettingValor(data);
-          return "Consulta Configuración exitosa";
-        },
-      },
-      {
-        render: ({ data: error }) => {
-          goNavigate(url_return_front);
-          return error?.message ?? "Consulta Configuración Rechazada";
-        },
-      }
-    );
+    const name_service = "Pasarela - setting";
+    PeticionSetting(name_service)
+      .then((data: TypingDataSettingValor) => {
+        setDataSettingValor(data);
+      })
+      .catch((error: any) => {
+        goNavigate(url_return_front);
+        if (!(error instanceof ErrorCustomFetch)) {
+          throw new ErrorCustomComponentCode(
+            TempErrorFrontService.replace("%s", "Pasarela - setting"),
+            error.message,
+            `PeticionSetting`,
+            "notifyError",
+            false
+          );
+        }
+        notifyError(error.error_msg_front, 5000, { toastId: "notify-lot" });
+      });
   }, [PeticionSetting, goNavigate, url_return_front]);
 
   const onSubmitCheckPrePay = useCallback(

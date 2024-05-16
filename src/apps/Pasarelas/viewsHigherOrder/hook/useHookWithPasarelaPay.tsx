@@ -40,13 +40,13 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
     msg: constMsgTrx.Search,
   });
 
-  const PeticionSetting =
-    useCallback(async (): Promise<TypingDataSettingValor> => {
+  const PeticionSetting = useCallback(
+    async (name_service: string): Promise<TypingDataSettingValor> => {
       const function_name = "PeticionSetting";
-      const name_service = "consultar configuracion time";
       setloadingPeticionBlocking(true);
       try {
         const dataSetting: TypingDataSetting = await PeticionSettingBase(
+          name_service,
           URL_PASARELA_CHECK_PAY_CONSULT_SETTING,
           "origin",
           type_operation
@@ -83,7 +83,9 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
       } finally {
         setloadingPeticionBlocking(false);
       }
-    }, [type_operation]);
+    },
+    [type_operation]
+  );
 
   const PeticionPrePay = useCallback(
     async (

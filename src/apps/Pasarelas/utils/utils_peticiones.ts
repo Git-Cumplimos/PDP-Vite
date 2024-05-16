@@ -8,12 +8,12 @@ import {
 import { TypingDataSetting, TypingTypeSettingTime } from "./utils_typing";
 
 export const PeticionSettingBase = async (
+  name_service: string,
   url_pasarela_setting: string,
   type_setting_time: TypingTypeSettingTime,
   type_operation: number
 ): Promise<TypingDataSetting> => {
   const function_name = "PeticionSettingBase";
-  const name_service = "consultar configuración Gou";
   try {
     const params = {
       type: type_setting_time,
