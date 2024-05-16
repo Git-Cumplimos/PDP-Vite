@@ -158,10 +158,14 @@ const WithPasarelaPay = (
     );
   }, [PeticionSetting, goNavigate, url_return_front]);
 
+  useEffect(() => {
+    console.log(formClientDataInput);
+  }, [formClientDataInput]);
+
   const onSubmitCheckPrePay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {
       ev.preventDefault();
-
+      console.log("interno", formClientDataInput);
       const [id_unico_modal, is_schema, dataModalAdd]: [
         string,
         boolean,
@@ -170,7 +174,6 @@ const WithPasarelaPay = (
       if (!is_schema) {
         return;
       }
-
       notifyPending(
         PeticionCheckPrePay(
           id_unico_modal,
