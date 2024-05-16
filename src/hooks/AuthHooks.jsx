@@ -368,9 +368,12 @@ export const useProvideAuth = () => {
   const verifyTOTP = useCallback(
     async (totp) => {
       if (!totp) {
-        notifyError("No se ha pasado el totp para verificacion");
+        // notifyError("No se ha pasado el totp para verificacion");
         signOut();
-        return;
+        throw new Error(
+          "No se ha pasado el totp para verificacion",
+          { cause: "custom" }
+        );
       }
 
       try {
@@ -390,7 +393,7 @@ export const useProvideAuth = () => {
             let handled = false;
             try {
               const resJson = await response.json();
-              notifyError(resJson?.msg);
+              // notifyError(resJson?.msg);
               handled = true;
               throw new Error(resJson?.msg, { cause: "custom" });
             } catch (error) {
@@ -399,29 +402,31 @@ export const useProvideAuth = () => {
               }
             }
           }
-          notifyError(
-            <p>
-              Error consultando el servicio de verificacion de token:
-              <br />
-              Error http: {response.statusText} ({response.status})
-            </p>
-          );
+          // notifyError(
+          //   <p>
+          //     Error consultando el servicio de verificacion de token:
+          //     <br />
+          //     Error http: {response.statusText} ({response.status})
+          //   </p>
+          // );
           throw new Error(
-            `Error consultando el servicio de verificacion de token: Error http: ${response.statusText} (${response.status})`,
+            `Error consultando el servicio de verificacion de token:\nError http: ${response.statusText} (${response.status})`,
             { cause: "custom" }
           );
         }
         const resJson = await response.json();
         if (!resJson?.status) {
           notifyError(resJson?.msg);
-          return;
+          // return;
+          throw new Error(resJson?.msg, { cause: "custom" });
         }
         // notify(resJson?.msg);
-        notify("Token de usuario validado exitosamente (1/2)");
+        // notify("Token de usuario validado exitosamente (1/2)");
         setTimer((old) => {
           clearTimeout(old);
           return null;
         });
+        return;
       } catch (err) {
         console.error(err);
         // signOut();
@@ -496,13 +501,9 @@ export const useProvideAuth = () => {
 
   const handlesetPreferredMFA = useCallback(
     async () => {
-      try {
-        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-        if (preferredMFA === "SUCCESS") {
-          signOut();
-        }
-      } catch (err) {
-        throw new Error(err);
+      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+      if (preferredMFA === "SUCCESS") {
+        signOut();
       }
     },
     [cognitoUser, signOut]
@@ -510,18 +511,11 @@ export const useProvideAuth = () => {
 
   const handleverifyTotpToken = useCallback(
     async (totp) => {
-      try {
-        await verifyTOTP(totp);
+      await verifyTOTP(totp);
 
-        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
-        if (tokenValidado.accessToken.payload.token_use === "access") {
-          await handlesetPreferredMFA();
-        }
-      } catch (err) {
-        if (err.cause === "custom") {
-          throw err;
-        }
-        throw new Error(err);
+      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+      if (tokenValidado.accessToken.payload.token_use === "access") {
+        await handlesetPreferredMFA();
       }
     },
     [cognitoUser, handlesetPreferredMFA, verifyTOTP]
