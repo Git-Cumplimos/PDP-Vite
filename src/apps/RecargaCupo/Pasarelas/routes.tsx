@@ -9,10 +9,12 @@ import DestinoLogoEvertec from "../../Pasarelas/Base/Evertec/DestinoLogoEvertec"
 import {
   constComunication as constComunicationGou,
   constQuestion as constQuestionGou,
+  consTerminosCondiciones as consTerminosCondicionesGou,
 } from "../../Pasarelas/Base/Gou/InfoClient";
 import {
   constComunication as constComunicationEvertec,
   constQuestion as constQuestionEvertec,
+  consTerminosCondiciones as consTerminosCondicionesEvertec,
 } from "../../Pasarelas/Base/Evertec/InfoClient";
 
 const routesRecargaCupoWithPasarela = [
@@ -30,7 +32,7 @@ const routesRecargaCupoWithPasarela = [
         {
           question: { const: constQuestionGou },
           comunication: { const: constComunicationGou },
-          aceptarTerminos: { const: constComunicationGou },
+          aceptarTerminos: { const: consTerminosCondicionesGou },
         },
         "../recarga-cupo",
         undefined
@@ -52,7 +54,7 @@ const routesRecargaCupoWithPasarela = [
         {
           question: { const: constQuestionEvertec },
           comunication: { const: constComunicationEvertec },
-          aceptarTerminos: { const: constComunicationEvertec },
+          aceptarTerminos: { const: consTerminosCondicionesEvertec },
         },
         "../recarga-cupo",
         undefined

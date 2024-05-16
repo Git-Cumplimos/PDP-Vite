@@ -5,14 +5,10 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
-import { v4 } from "uuid";
-import { useImgs } from "../../../hooks/ImgsHooks";
 import { notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { TypeInfTicket, TypingDataComercio } from "../../../utils/TypingUtils";
 
 import PasarelaFormulario from "./components/GouFormulario";
 import PasarelaCheckPayOrigin from "./components/PasarelaCheckPayOrigin";
@@ -32,6 +28,7 @@ import {
 } from "./utils/utils_typing";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
+import { TypingDataComercio } from "../../../utils/TypingUtils";
 
 //FRAGMENT ******************** TYPING *******************************
 
@@ -67,8 +64,6 @@ const WithPasarelaPay = (
 ): JSX.Element => {
   const goNavigate = useNavigate();
   const { roleInfo, pdpUser }: any = useAuth();
-  const { imgs } = useImgs();
-  const printDiv = useRef(null);
 
   const [formClientDataInput, setFormClientDataInput] =
     useState<TypingFormClientDataInput>(formClientDataInputInitial);
@@ -166,6 +161,7 @@ const WithPasarelaPay = (
   const onSubmitCheckPrePay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {
       ev.preventDefault();
+
       const [id_unico_modal, is_schema, dataModalAdd]: [
         string,
         boolean,
@@ -174,6 +170,7 @@ const WithPasarelaPay = (
       if (!is_schema) {
         return;
       }
+
       notifyPending(
         PeticionCheckPrePay(
           id_unico_modal,

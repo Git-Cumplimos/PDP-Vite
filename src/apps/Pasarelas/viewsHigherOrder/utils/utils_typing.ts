@@ -1,13 +1,6 @@
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction } from "react";
-import {
-  TypeInfTicket,
-  TypingDataComercio,
-} from "../../../../utils/TypingUtils";
-import {
-  TypingDataPay,
-  TypingSummaryTrx,
-  TypingTrx,
-} from "../../utils/utils_typing";
+import { TypingDataComercio } from "../../../../utils/TypingUtils";
+import { TypingSummaryTrx, TypingTrx } from "../../utils/utils_typing";
 
 export type TypingFormClientInputs = {
   nombres?: string | null | boolean;
@@ -119,6 +112,7 @@ export type TypingShowModalInfoClient =
 
 export type PropsModalInfoClient = {
   infoClient: TypingInfoClient;
+  valueReplace?: { [key: string]: string };
 };
 
 export type TypingInfoClientConst = { [key: string | number]: any };
@@ -135,6 +129,7 @@ export type PropsModalInternoAcepto = {
   setShowModalInfoClient: Dispatch<SetStateAction<TypingShowModalInfoClient>>;
   setAcepto: Dispatch<SetStateAction<boolean>>;
   infoClientConst?: TypingInfoClientConst;
+  valueReplace?: { [key: string]: string };
   children?: ReactNode;
 };
 
