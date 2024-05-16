@@ -31,7 +31,6 @@ type PropsInputEmail = CustomPropsInputEmail &
   Omit<CustomInputProps, "onInput" | "onChange">;
 
 const getMsgInvalid = (msgInvalidReal: string, example_?: string): string => {
-  console.log(msgInvalidReal);
   const _example_ = example_ ? ` Ejemplo: ${example_}` : "";
   return msgInvalidReal + _example_;
 };
@@ -322,21 +321,30 @@ const EmailInput = forwardRef<HTMLInputElement, PropsInputEmail>(
         if (old && input?.onChange) return old;
         if (inptRef.current) {
           if (isGuiaDominio) {
-            // let msgInvalid: TypingMsgInvalid = null;
-            // msgInvalid = guiaCorreo(
-            //   inptRef.current.value,
-            //   limitsIsGuiaDominioSchema,
-            //   isGuiaDominio,
-            //   input?.placeholder,
-            //   isGuiaUser
-            // );
-            // if (msgInvalidSimple) {
-            //   inptRef.current.setCustomValidity(
-            //     msgInvalid ? msgInvalidSimple : ""
-            //   );
-            // } else {
-            //   inptRef.current.setCustomValidity(msgInvalid ? msgInvalid : "");
-            // }
+            let msgInvalid: TypingMsgInvalid = null;
+            msgInvalid = guiaCorreo(
+              inptRef.current.value,
+              limitsIsGuiaDominioSchema,
+              isGuiaDominio,
+              isGuiaUser
+            );
+            if (msgInvalid) {
+              inptRef.current.setCustomValidity(
+                msgInvalidSimple
+                  ? getMsgInvalid(msgInvalidSimple, input?.placeholder)
+                  : getMsgInvalid(msgInvalid, input?.placeholder)
+              );
+            } else {
+              if (inptRef.current.validity?.typeMismatch === true) {
+                inptRef.current.setCustomValidity(
+                  msgInvalidComplejo
+                    ? getMsgInvalid(msgInvalidComplejo, input?.placeholder)
+                    : ""
+                );
+              } else {
+                inptRef.current.setCustomValidity("");
+              }
+            }
           }
           return true;
         }
