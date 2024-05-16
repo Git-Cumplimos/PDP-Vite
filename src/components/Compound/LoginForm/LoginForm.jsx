@@ -261,7 +261,7 @@ const LoginForm = () => {
       } },
       { render: () => {
         setLoading(false);
-        return "Token y contraseña reestablecidos correctamente";
+        return "Token y contraseña restablecidos correctamente";
       }},
       { render: ({data:err}) => {
         setLoading(false);
