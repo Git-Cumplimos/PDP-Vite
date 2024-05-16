@@ -9,6 +9,7 @@ import DestinoLogoEvertec from "../../Pasarelas/Base/Evertec/DestinoLogoEvertec"
 import {
   constComunication as constComunicationGou,
   constQuestion as constQuestionGou,
+  consTerminosCondiciones as consTerminosCondicionesGou,
 } from "../../Pasarelas/Base/Gou/InfoClient";
 import {
   constComunication as constComunicationEvertec,
@@ -31,7 +32,7 @@ const routesRecargaCupoWithPasarela = [
         {
           question: { const: constQuestionGou },
           comunication: { const: constComunicationGou },
-          aceptarTerminos: { const: constComunicationGou },
+          aceptarTerminos: { const: consTerminosCondicionesGou },
         },
         "../recarga-cupo",
         undefined
