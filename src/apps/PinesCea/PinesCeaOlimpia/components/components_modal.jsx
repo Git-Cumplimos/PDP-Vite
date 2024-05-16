@@ -27,7 +27,7 @@ export const ComponentsModalSummaryTrx = ({
           tipoIdentificacion == 4? "NIT":
           tipoIdentificacion == 5? "Pasaporte":"",
           "Número de identificación": numeroIdentificacion,
-          "Valor del Pin": valorTransaccion,
+          "Valor del Pin": formatMoney.format(valorTransaccion)
         }}
       >
         {!loadingPeticion ? (
