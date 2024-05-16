@@ -13,6 +13,7 @@ import {
 import {
   constComunication as constComunicationEvertec,
   constQuestion as constQuestionEvertec,
+  consTerminosCondiciones as consTerminosCondicionesEvertec,
 } from "../../Pasarelas/Base/Evertec/InfoClient";
 
 const routesRecargaCupoWithPasarela = [
@@ -52,7 +53,7 @@ const routesRecargaCupoWithPasarela = [
         {
           question: { const: constQuestionEvertec },
           comunication: { const: constComunicationEvertec },
-          aceptarTerminos: { const: constComunicationEvertec },
+          aceptarTerminos: { const: consTerminosCondicionesEvertec },
         },
         "../recarga-cupo",
         undefined

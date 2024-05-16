@@ -67,8 +67,6 @@ const WithPasarelaPay = (
 ): JSX.Element => {
   const goNavigate = useNavigate();
   const { roleInfo, pdpUser }: any = useAuth();
-  const { imgs } = useImgs();
-  const printDiv = useRef(null);
 
   const [formClientDataInput, setFormClientDataInput] =
     useState<TypingFormClientDataInput>(formClientDataInputInitial);
@@ -84,7 +82,12 @@ const WithPasarelaPay = (
   );
 
   const [dataSettingValor, setDataSettingValor] =
-    useState<TypingDataSettingValor | null>(null);
+    useState<TypingDataSettingValor | null>({
+      valor_costo_trx: 500,
+      valor_trx_maximo: 1000,
+      valor_trx_minimo: 10000,
+      cant_valor_trx_maximo: 10,
+    });
 
   const dataComercio: TypingDataComercio = useMemo(() => {
     const tipo_comercio = roleInfo?.tipo_comercio ?? "";
@@ -140,28 +143,28 @@ const WithPasarelaPay = (
     PeticionPrePayBase
   );
 
-  useEffect(() => {
-    notifyPending(
-      PeticionSetting(),
-      {
-        render: () => {
-          return "Procesando configuración";
-        },
-      },
-      {
-        render: ({ data }: { data: TypingDataSettingValor }) => {
-          setDataSettingValor(data);
-          return "Consulta Configuración exitosa";
-        },
-      },
-      {
-        render: ({ data: error }) => {
-          goNavigate(url_return_front);
-          return error?.message ?? "Consulta Configuración Rechazada";
-        },
-      }
-    );
-  }, [PeticionSetting, goNavigate, url_return_front]);
+  // useEffect(() => {
+  //   notifyPending(
+  //     PeticionSetting(),
+  //     {
+  //       render: () => {
+  //         return "Procesando configuración";
+  //       },
+  //     },
+  //     {
+  //       render: ({ data }: { data: TypingDataSettingValor }) => {
+  //         setDataSettingValor(data);
+  //         return "Consulta Configuración exitosa";
+  //       },
+  //     },
+  //     {
+  //       render: ({ data: error }) => {
+  //         goNavigate(url_return_front);
+  //         return error?.message ?? "Consulta Configuración Rechazada";
+  //       },
+  //     }
+  //   );
+  // }, [PeticionSetting, goNavigate, url_return_front]);
 
   const onSubmitCheckPrePay = useCallback(
     (ev: MouseEvent<HTMLFormElement>) => {

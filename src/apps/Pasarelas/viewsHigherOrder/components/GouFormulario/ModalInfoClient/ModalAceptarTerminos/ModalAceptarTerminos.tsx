@@ -13,6 +13,7 @@ const ModalAceptarTerminos = ({
   infoClientConst,
   children,
 }: PropsModalInternoAcepto) => {
+  console.log(infoClientConst);
   return (
     <Modal
       show={showModalInfoClient !== null ? true : false}
