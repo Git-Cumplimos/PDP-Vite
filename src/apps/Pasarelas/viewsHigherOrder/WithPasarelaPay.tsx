@@ -29,17 +29,20 @@ import {
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
 import { TypingDataComercio } from "../../../utils/TypingUtils";
+import { tipoDocumentoOptions } from "./components/GouFormulario/DistinctForm/FormClient";
 
 //FRAGMENT ******************** TYPING *******************************
 
 //FRAGMENT ******************** CONST ***********************************
+const tipoDocumentoOptionsVector = Object.keys(tipoDocumentoOptions);
 const formClientDataInputInitial: TypingFormClientDataInput = {
   nombres: "",
   apellidos: "",
   documento: "",
   celular: "",
   correo: "",
-  tipo_documento: "CC", //inicializarlo
+  tipo_documento:
+    tipoDocumentoOptionsVector.length >= 1 ? tipoDocumentoOptionsVector[0] : "", //inicializarlo necesario
 };
 
 const formTrxDataInputInitial: TypingFormTrxDataInput = {

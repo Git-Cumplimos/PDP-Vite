@@ -28,7 +28,7 @@ type PropsFormClient = {
 };
 
 //FRAGMENT ******************** CONST ***********************************
-const tipoDocumentoOptions: { [key: string]: string } = {
+export const tipoDocumentoOptions: { [key: string]: string } = {
   CC: "Cedula de Ciudadanía",
   CE: "Cédula de Extranjería",
   TI: "Tarjeta de Identidad",
