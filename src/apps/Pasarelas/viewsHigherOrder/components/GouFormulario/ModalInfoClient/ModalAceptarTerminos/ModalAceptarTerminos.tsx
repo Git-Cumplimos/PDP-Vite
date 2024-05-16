@@ -1,10 +1,11 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useMemo } from "react";
 import Modal from "../../../../../../../components/Base/Modal";
 import PaymentSummary from "../../../../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../../../../components/Base/ButtonBar";
 import Button from "../../../../../../../components/Base/Button";
 import { PropsModalInternoAcepto } from "../../../../utils/utils_typing";
 import classes from "./ModalAceptarTerminos.module.css";
+import { NameVar } from "../../../../../../Corresponsalia/CorresponsaliaDavivienda/utils/typingPagoDaviplata";
 
 //FRAGMENT ******************** CSS *******************************
 const {
@@ -19,7 +20,6 @@ const {
 //FRAGMENT ******************** SUBCOMPONENT ****************************
 const SubItem = ({ key_, info }: any) => {
   const classNameCustom = key_.split("|")[2];
-  console.log(classNameCustom);
   return (
     <label className={`${labelItem} ${classNameCustom ? classNameCustom : ""}`}>
       {info}
@@ -27,21 +27,32 @@ const SubItem = ({ key_, info }: any) => {
   );
 };
 
-const SubSwitch = ({ key_, tipo, info }: any) => {
+const SubSwitch = ({ key_, tipo, info, valueReplace }: any) => {
+  const infoFinal = useMemo(() => {
+    let infoNew = info;
+    if (valueReplace) {
+      Object.keys(valueReplace).map((nameVar_) => {
+        infoNew = infoNew.replace(nameVar_, valueReplace[nameVar_]);
+        return nameVar_;
+      });
+    }
+    return infoNew;
+  }, [info, valueReplace]);
+
   return (
     <Fragment>
-      {tipo === "title" && <label className={labelTitle}>{info}</label>}
+      {tipo === "title" && <label className={labelTitle}>{infoFinal}</label>}
       {tipo === "br" && <br />}
       {tipo === "seccion:title" && (
-        <label className={labelSeccionTitle}>{info}</label>
+        <label className={labelSeccionTitle}>{infoFinal}</label>
       )}
-      {tipo === "paragraph" && <p className={labelParagraph}>{info}</p>}
-      {tipo === "item" && <SubItem key_={key_} info={info}></SubItem>}
+      {tipo === "paragraph" && <p className={labelParagraph}>{infoFinal}</p>}
+      {tipo === "item" && <SubItem key_={key_} info={infoFinal}></SubItem>}
     </Fragment>
   );
 };
 
-const AceptarTerminosBase = ({ infoClientConst }: any) => {
+const AceptarTerminosBase = ({ infoClientConst, valueReplace }: any) => {
   return (
     <Fragment>
       <h1 className="py-5 text-2xl font-semibold grid justify-center">
@@ -54,6 +65,7 @@ const AceptarTerminosBase = ({ infoClientConst }: any) => {
               key_={key}
               tipo={key.split("|")[1]}
               info={infoClientConst[key]}
+              valueReplace={valueReplace}
             ></SubSwitch>
           );
         })}
@@ -68,6 +80,7 @@ const ModalAceptarTerminos = ({
   setShowModalInfoClient,
   setAcepto,
   infoClientConst,
+  valueReplace,
   children,
 }: PropsModalInternoAcepto) => {
   return (
@@ -81,6 +94,7 @@ const ModalAceptarTerminos = ({
           <Fragment>
             <AceptarTerminosBase
               infoClientConst={infoClientConst}
+              valueReplace={valueReplace}
             ></AceptarTerminosBase>
           </Fragment>
         )}

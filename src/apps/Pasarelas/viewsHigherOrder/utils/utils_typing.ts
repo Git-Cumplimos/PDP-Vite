@@ -119,6 +119,7 @@ export type TypingShowModalInfoClient =
 
 export type PropsModalInfoClient = {
   infoClient: TypingInfoClient;
+  valueReplace?: { [key: string]: string };
 };
 
 export type TypingInfoClientConst = { [key: string | number]: any };
@@ -135,6 +136,7 @@ export type PropsModalInternoAcepto = {
   setShowModalInfoClient: Dispatch<SetStateAction<TypingShowModalInfoClient>>;
   setAcepto: Dispatch<SetStateAction<boolean>>;
   infoClientConst?: TypingInfoClientConst;
+  valueReplace?: { [key: string]: string };
   children?: ReactNode;
 };
 

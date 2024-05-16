@@ -32,7 +32,7 @@ export const consTerminosCondiciones: TypingInfoClientConst = {
   "17|br": "br",
   "18|seccion:title": "V. Costo de los Servicios",
   "19|paragraph": `
-  Los servicios de GOU tendrán un costo de $500 para el usuario que será cargado al valor de la transacción en curso.`,
+  Los servicios de GOU tendrán un costo de \${{{valor_costo_trx}}} para el usuario que será cargado al valor de la transacción en curso.`,
   //-----------------------
   "20|br": "br",
   "21|seccion:title": "VI. Obligaciones de los Usuarios",

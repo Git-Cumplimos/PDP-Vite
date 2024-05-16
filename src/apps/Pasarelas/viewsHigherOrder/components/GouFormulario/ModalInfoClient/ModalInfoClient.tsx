@@ -11,7 +11,10 @@ import {
   TypingShowModalInfoClient,
 } from "../../../utils/utils_typing";
 
-const ModalInfoClient = ({ infoClient }: PropsModalInfoClient) => {
+const ModalInfoClient = ({
+  infoClient,
+  valueReplace,
+}: PropsModalInfoClient) => {
   const [showModalInfoClient, setShowModalInfoClient] =
     useState<TypingShowModalInfoClient>(null);
   const [acepto, setAcepto] = useState<boolean>(false);
@@ -66,6 +69,7 @@ const ModalInfoClient = ({ infoClient }: PropsModalInfoClient) => {
           showModalInfoClient={showModalInfoClient}
           setAcepto={setAcepto}
           infoClientConst={infoClient.aceptarTerminos.const}
+          valueReplace={valueReplace}
         >
           {infoClient.aceptarTerminos.modal}
         </ModalAceptarTerminos>
