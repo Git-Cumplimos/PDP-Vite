@@ -52,6 +52,7 @@ const Retiro = () => {
           id_comercio: roleInfo?.id_comercio,
           id_usuario: roleInfo?.id_usuario,
           id_terminal: roleInfo?.id_dispositivo,
+          id_uuid_trx: uniqueId,
         },
         address: roleInfo?.["direccion"],
         dane_code: roleInfo?.codigo_dane,
