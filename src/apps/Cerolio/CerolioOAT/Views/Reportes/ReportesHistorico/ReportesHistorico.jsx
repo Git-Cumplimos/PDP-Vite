@@ -29,7 +29,7 @@ const ReportesHistorico = () => {
         1,
         "movimientos"
       );
-      console.log(res);
+      // console.log(res);
       if (res.status) {
         const arr = Object.keys(res.obj.carpetas).map(
           (key) => res.obj.carpetas[key]
@@ -39,7 +39,7 @@ const ReportesHistorico = () => {
           (acc, val) => acc.concat(val),
           []
         );
-        console.log(carpetasArray);
+        // console.log(carpetasArray);
         setData(carpetasArray);
         setMaxPages(res.obj.maxPages);
       }

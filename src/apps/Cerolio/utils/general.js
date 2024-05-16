@@ -43,7 +43,7 @@ export const formatDate = (dateString) => {
   return formattedDate;
 };
 
-export const fetchGetUploadToS3 = async (filename) => {
+export const fetchGetUploadToS3 = async (filename, contentType) => {
   try {
     if (!filename) {
       throw new Error("No se ha especificado un nombre de archivo");
@@ -51,6 +51,7 @@ export const fetchGetUploadToS3 = async (filename) => {
 
     let params = {
       filename: filename,
+      contentType: contentType,
     };
 
     const url = `${urlCerolio}/S3/cargar`;

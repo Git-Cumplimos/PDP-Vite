@@ -297,7 +297,13 @@ const PasarelaFormulario = ({
               setFormTrxDataInput={setFormTrxDataInput}
             ></FormTrx>
           )}
-          <ModalInfoClient infoClient={infoClient}></ModalInfoClient>
+          <ModalInfoClient
+            infoClient={infoClient}
+            valueReplace={{
+              "{{{valor_costo_trx}}}":
+                dataSettingValor.valor_costo_trx.toString(),
+            }}
+          ></ModalInfoClient>
         </fieldset>
         <div className="grid grid-cols-2">
           <ButtonBar className={"lg:col-span-2"}>

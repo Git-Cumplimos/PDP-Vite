@@ -58,14 +58,12 @@ export const fetchPutUsePin = async (
     },
     valor_total_trx: valor_total_trx,
   };
-  console.log(body);
   try {
     const url = `${urlCerolio}/pines/tramitar`;
 
     const res = await fetchData(url, "PUT", {}, body);
-    console.log(res);
     if (res) {
-      return res?.obj;
+      return res;
     } else {
       console.error(res?.msg);
       return { maxPages: 0, results: [] };

@@ -10,6 +10,11 @@ import {
   TypingFormClientDataInputCheck,
 } from "../PasarelaFormulario";
 import classes from "../PasarelaFormulario.module.css";
+import EmailInput from "../../../../../../components/Base/EmailInput";
+import {
+  TypingDominioSchemaFunc,
+  TypingMsgInvalid,
+} from "../../../../../../components/Base/EmailInput/EmailTyping";
 
 //FRAGMENT ********************* CSS *********************************
 const { contendorFormClient } = classes;
@@ -23,7 +28,7 @@ type PropsFormClient = {
 };
 
 //FRAGMENT ******************** CONST ***********************************
-const tipoDocumentoOptions: { [key: string]: string } = {
+export const tipoDocumentoOptions: { [key: string]: string } = {
   CC: "Cedula de Ciudadanía",
   CE: "Cédula de Extranjería",
   TI: "Tarjeta de Identidad",
@@ -36,6 +41,23 @@ const options_select: Array<{ value: string; label: string }> = Object.keys(
   value: key_,
   label: tipoDocumentoOptions[key_],
 }));
+const EXAMPLE = "user@gmail.com";
+
+//FRAGMENT ******************** FUNCTION ***********************************
+const isDominioAdd: TypingDominioSchemaFunc = (
+  correo_: string,
+  dominio_: string
+) => {
+  let msgInvalid: TypingMsgInvalid = null;
+  const dominiosPunto = dominio_.split(".");
+  if (dominiosPunto[dominiosPunto.length - 1]) {
+    if (dominiosPunto[dominiosPunto.length - 1].length <= 1) {
+      msgInvalid = `Correo Incorrecto Ejemplo: ${EXAMPLE}`;
+      return msgInvalid;
+    }
+  }
+  return msgInvalid;
+};
 
 //FRAGMENT ******************** COMPONENT ***************************
 const FormClient = ({
@@ -111,7 +133,12 @@ const FormClient = ({
         }
       >
         {formClientInputs?.tipo_documento !== undefined && (
-          <Select label="Tipo de documento" options={options_select} />
+          <Select
+            id="tipo_documento/text"
+            name="tipo_documento"
+            label="Tipo de documento"
+            options={options_select}
+          />
         )}
       </div>
 
@@ -195,7 +222,7 @@ const FormClient = ({
       {formClientInputs?.correo !== undefined && (
         <Fragment>
           <div className="pt-5 col-span-2">
-            <Input
+            <EmailInput
               required
               id="correo/email/correo|confirmacion=>correo"
               name="correo"
@@ -203,6 +230,11 @@ const FormClient = ({
               type="email"
               autoComplete="off"
               maxLength={100}
+              example={EXAMPLE}
+              min={2}
+              max={3}
+              isGuiaUser={/.{2,}/}
+              isGuiaDominio={{ schema: [], func: isDominioAdd }}
               disabled={
                 formClientInputs?.correo === true ||
                 formClientInputs?.correo === false
@@ -214,7 +246,7 @@ const FormClient = ({
           </div>
           {formClientInputs?.["correo|confirmacion"] !== undefined && (
             <div className="col-span-2">
-              <Input
+              <EmailInput
                 required
                 id="correo|confirmacion/email/correo|confirmacion=>correo"
                 name="correo|confirmacion"
@@ -222,6 +254,11 @@ const FormClient = ({
                 type="email"
                 autoComplete="off"
                 maxLength={100}
+                example={EXAMPLE}
+                min={2}
+                max={3}
+                isGuiaUser={/.{2,}/}
+                isGuiaDominio={{ schema: [], func: isDominioAdd }}
                 value={formClientDataInputCheck["correo|confirmacion"]}
                 invalid={dataInvalid["correo|confirmacion"]}
                 onPaste={(ev) => ev.preventDefault()}
