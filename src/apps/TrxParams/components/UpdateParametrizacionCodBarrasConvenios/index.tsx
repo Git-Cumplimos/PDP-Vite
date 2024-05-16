@@ -110,93 +110,57 @@ const UpdateParametrizacionCodBarrasConvenios = ({
     }
   );
 
-  const [updateConvenio,loadingUpdateConvenio] = useFetchDebounce(
+  const [updateConvenio, loadingUpdateConvenio] = useFetchDebounce(
     {
       url:
         estadoProceso === enumEstadoProceso.creacion
           ? `${urlConveniosPdp}/convenios-pdp/parametrizar-codigos-barras-convenios`
           : `${urlConveniosPdp}/convenios-pdp/parametrizar-codigos-barras-convenios?pk_codigo_convenio=${dataParametrizacionCodBarrasTemp.pk_codigo_convenio}&pk_id_autorizador=${dataParametrizacionCodBarrasTemp.pk_id_autorizador}`,
-      options: useMemo(
-        () =>
-          estadoProceso === enumEstadoProceso.creacion
-            ? {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  pk_codigo_convenio:
-                    dataParametrizacionCodBarrasTemp.pk_codigo_convenio,
-                  pk_id_autorizador:
-                    dataParametrizacionCodBarrasTemp.pk_id_autorizador,
-                  cantidad_referencias:
-                    dataParametrizacionCodBarrasTemp.cantidad_referencias,
-                  contiene_fecha_maxima:
-                    dataParametrizacionCodBarrasTemp.contiene_fecha_maxima,
-                  contiene_valor_pagar:
-                    dataParametrizacionCodBarrasTemp.contiene_valor_pagar,
-                  longitud_fecha:
-                    dataParametrizacionCodBarrasTemp.longitud_fecha,
-                  longitud_referencia_1:
-                    dataParametrizacionCodBarrasTemp.longitud_referencia_1,
-                  longitud_referencia_2:
-                    dataParametrizacionCodBarrasTemp.longitud_referencia_2,
-                  longitud_referencia_3:
-                    dataParametrizacionCodBarrasTemp.longitud_referencia_3,
-                  longitud_valor:
-                    dataParametrizacionCodBarrasTemp.longitud_valor,
-                  posicion_inicial_fecha:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_fecha,
-                  posicion_inicial_referencia_1:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1,
-                  posicion_inicial_referencia_2:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2,
-                  posicion_inicial_referencia_3:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3,
-                  posicion_inicial_valor:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
-                }),
-              }
-            : {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  pk_codigo_convenio:
-                    dataParametrizacionCodBarrasTemp.pk_codigo_convenio,
-                  pk_id_autorizador:
-                    dataParametrizacionCodBarrasTemp.pk_id_autorizador,
-                  cantidad_referencias:
-                    dataParametrizacionCodBarrasTemp.cantidad_referencias,
-                  contiene_fecha_maxima:
-                    dataParametrizacionCodBarrasTemp.contiene_fecha_maxima,
-                  contiene_valor_pagar:
-                    dataParametrizacionCodBarrasTemp.contiene_valor_pagar,
-                  longitud_fecha:
-                    dataParametrizacionCodBarrasTemp.longitud_fecha,
-                  longitud_referencia_1:
-                    dataParametrizacionCodBarrasTemp.longitud_referencia_1,
-                  longitud_referencia_2:
-                    dataParametrizacionCodBarrasTemp.longitud_referencia_2,
-                  longitud_referencia_3:
-                    dataParametrizacionCodBarrasTemp.longitud_referencia_3,
-                  longitud_valor:
-                    dataParametrizacionCodBarrasTemp.longitud_valor,
-                  posicion_inicial_fecha:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_fecha,
-                  posicion_inicial_referencia_1:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1,
-                  posicion_inicial_referencia_2:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2,
-                  posicion_inicial_referencia_3:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3,
-                  posicion_inicial_valor:
-                    dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
-                }),
+      options: useMemo(() => {
+        let dataBody = {
+          pk_codigo_convenio:
+            dataParametrizacionCodBarrasTemp.pk_codigo_convenio,
+          pk_id_autorizador: dataParametrizacionCodBarrasTemp.pk_id_autorizador,
+          cantidad_referencias:
+            dataParametrizacionCodBarrasTemp.cantidad_referencias,
+          contiene_fecha_maxima:
+            dataParametrizacionCodBarrasTemp.contiene_fecha_maxima,
+          contiene_valor_pagar:
+            dataParametrizacionCodBarrasTemp.contiene_valor_pagar,
+          longitud_referencia_1:
+            dataParametrizacionCodBarrasTemp.longitud_referencia_1,
+          posicion_inicial_referencia_1:
+            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1,
+          posicion_inicial_valor:
+            dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
+          longitud_fecha: dataParametrizacionCodBarrasTemp.longitud_fecha,
+          longitud_referencia_2:
+            dataParametrizacionCodBarrasTemp.longitud_referencia_2,
+          longitud_referencia_3:
+            dataParametrizacionCodBarrasTemp.longitud_referencia_3,
+          posicion_inicial_fecha:
+            dataParametrizacionCodBarrasTemp.posicion_inicial_fecha,
+          posicion_inicial_referencia_2:
+            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2,
+          posicion_inicial_referencia_3:
+            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3,
+        };
+        return estadoProceso === enumEstadoProceso.creacion
+          ? {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-        [dataParametrizacionCodBarrasTemp, estadoProceso]
-      ),
+              body: JSON.stringify(dataBody),
+            }
+          : {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dataBody),
+            };
+      }, [dataParametrizacionCodBarrasTemp, estadoProceso]),
       autoDispatch: false,
     },
     {
@@ -278,7 +242,10 @@ const UpdateParametrizacionCodBarrasConvenios = ({
           maxLength={8}
           value={dataParametrizacionCodBarrasTemp?.pk_codigo_convenio ?? ""}
           onChange={onChangeFormatNumber}
-          disabled={estadoProceso === enumEstadoProceso.actualizacion || loadingUpdateConvenio}
+          disabled={
+            estadoProceso === enumEstadoProceso.actualizacion ||
+            loadingUpdateConvenio
+          }
           required
         />
         <Select
@@ -286,7 +253,10 @@ const UpdateParametrizacionCodBarrasConvenios = ({
           label={"Autorizador"}
           name={"pk_id_autorizador"}
           onChange={onChangeFormat}
-          disabled={estadoProceso === enumEstadoProceso.actualizacion || loadingUpdateConvenio}
+          disabled={
+            estadoProceso === enumEstadoProceso.actualizacion ||
+            loadingUpdateConvenio
+          }
           value={dataParametrizacionCodBarrasTemp.pk_id_autorizador}
           options={[{ value: "", label: "" }, ...allAuths]}
           required
@@ -301,16 +271,14 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                   bootstrapIcon="plus-circle"
                   bootstrapIconHover="plus-circle-fill"
                   colorName="text-primary"
-                  onClick={() =>
-                    {
-                      if (!loadingUpdateConvenio) {
-                        setDataParametrizacionCodBarrasTemp((old) => ({
-                          ...old,
-                          cantidad_referencias: old.cantidad_referencias + 1,
-                        })) 
-                      }
+                  onClick={() => {
+                    if (!loadingUpdateConvenio) {
+                      setDataParametrizacionCodBarrasTemp((old) => ({
+                        ...old,
+                        cantidad_referencias: old.cantidad_referencias + 1,
+                      }));
                     }
-                  }
+                  }}
                 />
               )}
             </div>
@@ -335,19 +303,17 @@ const UpdateParametrizacionCodBarrasConvenios = ({
                           bootstrapIcon="dash-circle"
                           bootstrapIconHover="dash-circle-fill"
                           colorName="text-primary"
-                          onClick={() =>
-                            {
-                              if (!loadingUpdateConvenio) {
-                                setDataParametrizacionCodBarrasTemp((old) => ({
-                                  ...old,
-                                  cantidad_referencias:
-                                    old.cantidad_referencias - 1,
-                                  [`longitud_referencia_${i + 1}`]: null,
-                                  [`posicion_inicial_referencia_${i + 1}`]: null,
-                                }))
-                              }
+                          onClick={() => {
+                            if (!loadingUpdateConvenio) {
+                              setDataParametrizacionCodBarrasTemp((old) => ({
+                                ...old,
+                                cantidad_referencias:
+                                  old.cantidad_referencias - 1,
+                                [`longitud_referencia_${i + 1}`]: null,
+                                [`posicion_inicial_referencia_${i + 1}`]: null,
+                              }));
                             }
-                          }
+                          }}
                         />
                       )}
                   </div>
@@ -405,7 +371,11 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               value={dataParametrizacionCodBarrasTemp?.longitud_valor ?? ""}
               onChange={onChangeFormatNumber}
               required
-              disabled={loadingUpdateConvenio}
+              disabled={
+                loadingUpdateConvenio ||
+                (!dataParametrizacionCodBarrasTemp.contiene_valor_pagar ??
+                  false)
+              }
             />
             <Input
               id="posicion_inicial_valor"
@@ -420,7 +390,11 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               }
               onChange={onChangeFormatNumber}
               required
-              disabled={loadingUpdateConvenio}
+              disabled={
+                loadingUpdateConvenio ||
+                (!dataParametrizacionCodBarrasTemp.contiene_valor_pagar ??
+                  false)
+              }
             />
             <ToggleInput
               id={"contiene_valor_pagar"}
@@ -455,7 +429,11 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               value={dataParametrizacionCodBarrasTemp?.longitud_fecha ?? ""}
               onChange={onChangeFormatNumber}
               required
-              disabled={loadingUpdateConvenio}
+              disabled={
+                loadingUpdateConvenio ||
+                (!dataParametrizacionCodBarrasTemp.contiene_fecha_maxima ??
+                  false)
+              }
             />
             <Input
               id="posicion_inicial_fecha"
@@ -470,7 +448,11 @@ const UpdateParametrizacionCodBarrasConvenios = ({
               }
               onChange={onChangeFormatNumber}
               required
-              disabled={loadingUpdateConvenio}
+              disabled={
+                loadingUpdateConvenio ||
+                (!dataParametrizacionCodBarrasTemp.contiene_fecha_maxima ??
+                  false)
+              }
             />
             <ToggleInput
               id={"contiene_fecha_maxima"}
