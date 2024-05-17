@@ -8,7 +8,7 @@ const ReportesHistorico = () => {
   const { roleInfo } = useAuth();
 
   const [maxPages, setMaxPages] = useState(0);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [{ page, limit }, setPageData] = useState({ page: 1, limit: 10 });
 
   const [filters, setFilters] = useState({
     // Fecha inicial es una semana antes de hoy en formato YYYY-MM-DD
@@ -27,7 +27,9 @@ const ReportesHistorico = () => {
         filters.fechaInicial.split("-").slice(0, 2).join("-"),
         filters.fechaFinal.split("-").slice(0, 2).join("-"),
         1,
-        "movimientos"
+        "movimientos",
+        page,
+        limit
       );
       // console.log(res);
       if (res.status) {
@@ -45,7 +47,7 @@ const ReportesHistorico = () => {
       }
     };
     getFiltersData();
-  }, [pageData, filters, roleInfo]);
+  }, [filters, roleInfo, page, limit]);
 
   const tableData = useMemo(() => {
     return data.map((item) => ({
@@ -83,9 +85,8 @@ const ReportesHistorico = () => {
           // Enviar el nombre del archivo para descargar
           (e, i) => descargarReporte(i)
         }
-        setMaxPages={setMaxPages}
-        pageData={pageData}
-        setPageData={setPageData}
+        maxPage={maxPages}
+        onSetPageData={setPageData}
       >
         {/* Input para fecha */}
         <Input

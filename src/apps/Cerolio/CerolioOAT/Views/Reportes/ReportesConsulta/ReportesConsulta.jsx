@@ -7,7 +7,7 @@ import { makeMoneyFormatter } from "../../../../../../utils/functions";
 
 const ReportesConsulta = () => {
   const [maxPages, setMaxPages] = useState(0);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [{ page, limit }, setPageData] = useState({ page: 1, limit: 10 });
 
   const [filters, setFilters] = useState({
     // Fecha inicial es una semana antes de hoy en formato YYYY-MM-DD
@@ -34,9 +34,8 @@ const ReportesConsulta = () => {
     },
   ]);
 
-  const formatMoney = makeMoneyFormatter(2);
-
   useEffect(() => {
+    const formatMoney = makeMoneyFormatter(2);
     const getFiltersData = async () => {
       const res = await fetchGetReportesConsulta(
         filters.fechaInicial,
@@ -44,7 +43,9 @@ const ReportesConsulta = () => {
         1,
         filters.nombreTramite,
         filters.pin,
-        filters.documento
+        filters.documento,
+        page,
+        limit
       );
       if (res) {
         setData(
@@ -63,7 +64,7 @@ const ReportesConsulta = () => {
       }
     };
     getFiltersData();
-  }, [pageData, filters]);
+  }, [filters, page, limit]);
 
   return (
     <>

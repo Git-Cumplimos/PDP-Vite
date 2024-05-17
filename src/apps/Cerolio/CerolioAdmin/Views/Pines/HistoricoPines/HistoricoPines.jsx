@@ -36,7 +36,7 @@ const HistoricoPines = () => {
     setDate(date.target.value);
   };
 
-  const [hours, setHours] = useState([
+  const hours = [
     { hour: "06:00-07:00" },
     { hour: "07:00-08:00" },
     { hour: "08:00-09:00" },
@@ -51,7 +51,7 @@ const HistoricoPines = () => {
     { hour: "17:00-18:00" },
     { hour: "18:00-19:00" },
     { hour: "19:00-20:00" },
-  ]);
+  ];
 
   const [selectedHour, setSelectedHour] = useState("");
 
@@ -72,7 +72,7 @@ const HistoricoPines = () => {
   }, []);
 
   const [maxPages, setMaxPages] = useState(0);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [{ page, limit }, setPageData] = useState({ page: 1, limit: 10 });
 
   const [filters, setFilters] = useState({
     // Fecha inicial es una semana antes de hoy en formato YYYY-MM-DD
@@ -82,6 +82,8 @@ const HistoricoPines = () => {
     // Fecha final es hoy en formato YYYY-MM-DD
     fechaFinal: new Date().toISOString().split("T")[0],
     estado: "",
+    limit: 10,
+    page: 1,
   });
 
   const [data, setData] = useState([
@@ -108,9 +110,10 @@ const HistoricoPines = () => {
       "",
       filters.estado,
       filters.fechaInicial,
-      filters.fechaFinal
+      filters.fechaFinal,
+      page,
+      limit
     );
-    // console.log("HISTORICO", res);
     if (res) {
       setData(
         res.results.map((item) => ({
@@ -179,11 +182,11 @@ const HistoricoPines = () => {
       );
       setMaxPages(res.maxPages);
     }
-  }, [filters, handleOpenDevolverPin, handleOpenReagendar]);
+  }, [filters, handleOpenDevolverPin, handleOpenReagendar, page, limit]);
 
   useEffect(() => {
     getFiltersData();
-  }, [pageData, filters, getFiltersData]);
+  }, [filters, getFiltersData]);
 
   const reagendarPin = useCallback(
     async (date, selectedHour) => {
@@ -293,6 +296,9 @@ const HistoricoPines = () => {
           "Acciones",
         ]}
         data={data}
+        onSetPageData={setPageData}
+        maxPage={maxPages}
+        // onSetPageData={(pageData) => setFilters({ ...filters, ...pageData })}
       >
         {/* Input para fecha inicial y fecha final - rango */}
         <Input

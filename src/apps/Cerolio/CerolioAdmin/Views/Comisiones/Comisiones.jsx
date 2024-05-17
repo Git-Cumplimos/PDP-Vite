@@ -30,24 +30,29 @@ const Tarifas = () => {
     nombre: "",
   });
   const [maxPages, setMaxPages] = useState(0);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
+  const [{ page, limit }, setPageData] = useState({ page: 1, limit: 10 });
 
   const [dataTarifas, setDataTarifas] = useState([]);
 
   const getTarifasByComercio = useCallback(async () => {
     try {
-      const response = await fetchGetDataOficinas("", filters.nombre);
+      const response = await fetchGetDataOficinas(
+        "",
+        filters.nombre,
+        page,
+        limit
+      );
       // console.log("response", response);
       setDataTarifas(response.results);
       setMaxPages(response.maxPages);
     } catch (error) {
       console.error(error);
     }
-  }, [filters]);
+  }, [filters, page, limit]);
 
   useEffect(() => {
     getTarifasByComercio();
-  }, [filters, pageData, getTarifasByComercio]);
+  }, [filters, getTarifasByComercio, page, limit]);
 
   const handleOpenModificar = useCallback((e, item) => {
     setModalActualizarTarifa(true);
@@ -78,6 +83,7 @@ const Tarifas = () => {
         <div className="flex">
           <Button
             title="Modificar"
+            design="primary"
             onClick={(e) => {
               handleOpenModificar(e, tarifa);
             }}
