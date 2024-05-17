@@ -8,7 +8,9 @@ export const fetchGetReportesConsulta = async (
   comercio = "",
   nombre_tramite = "",
   numero_pin = "",
-  documento = ""
+  documento = "",
+  page = 1,
+  limit = 10
 ) => {
   try {
     let params = {
@@ -18,6 +20,8 @@ export const fetchGetReportesConsulta = async (
       nombre_tramite: nombre_tramite,
       numero_pin: numero_pin,
       numero_documento: documento,
+      page: page,
+      limit: limit,
     };
 
     // Limpiar los parámetros vacíos
@@ -46,7 +50,9 @@ export const fetchGetReportesHistorico = async (
   fecha_inicial = "",
   fecha_final = "",
   comercio = "",
-  carpeta = ""
+  carpeta = "",
+  page = 1,
+  limit = 10
 ) => {
   try {
     let params = {
@@ -54,6 +60,8 @@ export const fetchGetReportesHistorico = async (
       fecha_fin: fecha_final,
       id_comercio: comercio,
       carpeta: carpeta,
+      page: page,
+      limit: limit,
     };
 
     // Limpiar los parámetros vacíos

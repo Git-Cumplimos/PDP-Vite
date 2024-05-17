@@ -6,7 +6,9 @@ export const fetchGetPinData = async (
   numero_pin = "",
   estado = "",
   fecha_inicial = "",
-  fecha_final = ""
+  fecha_final = "",
+  page = 1,
+  limit = 10
 ) => {
   try {
     let params = {
@@ -14,6 +16,8 @@ export const fetchGetPinData = async (
       estado: estado,
       fecha_ini: fecha_inicial,
       fecha_fin: fecha_final,
+      page: page,
+      limit: limit,
     };
 
     // Limpiar los parámetros vacíos
