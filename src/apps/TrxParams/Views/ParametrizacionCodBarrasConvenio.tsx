@@ -4,6 +4,7 @@ import ButtonBar from "../../../components/Base/ButtonBar";
 import Button from "../../../components/Base/Button";
 import TablaParametrizacionCodBarrasConvenios from "../components/ParametrizacionCodBarrasConvenios";
 import UpdateParametrizacionCodBarrasConvenios from "../components/UpdateParametrizacionCodBarrasConvenios";
+import CrearParametrizacionCodBarrasConveniosMasivo from "../components/CrearParametrizacionCodBarrasConveniosMasivo";
 
 type StrNumber = `${number}` | number;
 type StrNumberOptional = StrNumber | "" | undefined;
@@ -61,6 +62,7 @@ const ParametrizacionCodBarrasConvenio = () => {
   const [estadoProceso, setEstadoProceso] = useState<enumEstadoProceso>(
     enumEstadoProceso.consulta
   );
+  const [showMassive, setShowMassive] = useState<boolean>(false);
   return (
     <>
       {estadoProceso === enumEstadoProceso.consulta ? (
@@ -74,12 +76,20 @@ const ParametrizacionCodBarrasConvenio = () => {
             >
               Crear parametrización
             </Button>
+            <Button type="submit" onClick={() => setShowMassive(true)}>
+              Cargar parametrizaciones masivamente
+            </Button>
           </ButtonBar>
           <TablaParametrizacionCodBarrasConvenios
             onSelect={(selected) => {
               setConveniosPdp(selected);
               setEstadoProceso(enumEstadoProceso.actualizacion);
             }}
+          />
+          <CrearParametrizacionCodBarrasConveniosMasivo
+            showMassive={showMassive}
+            setShowMassive={setShowMassive}
+            // searchCommercesFn={searchCommercesFn}
           />
         </>
       ) : (
