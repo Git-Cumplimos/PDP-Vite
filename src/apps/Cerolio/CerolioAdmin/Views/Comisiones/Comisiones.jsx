@@ -259,7 +259,7 @@ const Tarifas = () => {
         </ButtonBar>
       </Modal>
       <Modal show={modalActualizarTarifa}>
-        <h1 className="text-2xl">Actualizar tarifa</h1>
+        <h1 className="mb-3 text-2xl">Actualizar tarifa</h1>
         <div className="flex flex-col gap-5">
           <MoneyInput
             label="Tarifa A"
@@ -323,7 +323,9 @@ const Tarifas = () => {
           >
             Cancelar
           </Button>
-          <Button onClick={updateTarifas}>Guardar</Button>
+          <Button onClick={updateTarifas} design="primary">
+            Guardar
+          </Button>
         </ButtonBar>
       </Modal>
     </>

@@ -12,11 +12,9 @@ const ReportesPines = () => {
 
   const [filters, setFilters] = useState({
     // Fecha inicial es una semana antes de hoy en formato YYYY-MM-DD
-    fechaInicial: new Date(new Date().setDate(new Date().getDate() - 7))
-      .toISOString()
-      .split("T")[0],
+    fechaInicial: "",
     // Fecha final es hoy en formato YYYY-MM-DD
-    fechaFinal: new Date().toISOString().split("T")[0],
+    fechaFinal: "",
   });
 
   const [data, setData] = useState([]);
