@@ -2,10 +2,10 @@ import { TypingInfoClientConst } from "../../../viewsHigherOrder/utils/utils_typ
 
 export const constQuestion: TypingInfoClientConst = {
   1: {
-    que: "1. ¿Realizar la transacción por Gou me genera un costo adicional?",
+    que: "1. ¿Realizar la transacción por PLACE TO PAY me genera un costo adicional?",
     res: {
       paragraph:
-        "Realizar su transacción haciendo uso de nuestra pasarela GOU no le generará un costo adicional.",
+        "Realizar su transacción haciendo uso de nuestra pasarela PLACE TO PAY no le generará un costo adicional.",
     },
   },
   2: {
