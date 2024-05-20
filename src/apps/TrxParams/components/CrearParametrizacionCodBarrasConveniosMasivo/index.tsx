@@ -144,7 +144,7 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
             <Button
               type="button"
               onClick={downloadFormatParam}
-              disabled={!fileUpload}
+              disabled={fileUpload}
             >
               Descargar archivo de ejemplo
             </Button>
