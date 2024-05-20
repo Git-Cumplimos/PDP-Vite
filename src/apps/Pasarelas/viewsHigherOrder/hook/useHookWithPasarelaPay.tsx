@@ -132,7 +132,9 @@ const useHookWithPasarelaPay: TypingUseHookWithPasarelaPay = (
             fecha: error.outputPrePayBase?.fecha
               ? error.outputPrePayBase?.fecha
               : dataInput.fecha,
-            summary_trx_asterisk: error.outputPrePayBase?.asterisk ?? [],
+            summary_trx_asterisk: error.outputPrePayBase.asterisk
+              ? error.outputPrePayBase.asterisk
+              : old.summary_trx_asterisk,
           }));
         }
         throw error;

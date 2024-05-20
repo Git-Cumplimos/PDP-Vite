@@ -5,6 +5,7 @@ import { TypingSummaryTrx, TypingTrx } from "../../utils/utils_typing";
 export type TypingFormClientInputs = {
   nombres?: string | null | boolean;
   apellidos?: string | null | boolean;
+  company?: string | null | boolean;
   correo?: string | null | boolean;
   celular?: string | null | boolean;
   documento?: string | null | boolean;
@@ -16,6 +17,7 @@ export type TypingFormClientInputs = {
 export type TypingFormClientDataInput = {
   nombres: string;
   apellidos: string;
+  company: string;
   correo: string;
   celular: string;
   documento: string;

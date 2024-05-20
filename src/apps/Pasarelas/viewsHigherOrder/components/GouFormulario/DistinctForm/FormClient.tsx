@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useMemo } from "react";
 import Input from "../../../../../../components/Base/Input";
 import Select from "../../../../../../components/Base/Select";
 import {
@@ -35,12 +35,6 @@ export const tipoDocumentoOptions: { [key: string]: string } = {
   NIT: "Número de Identificación Tributaria",
   RUT: "Registro Único Tributario",
 };
-const options_select: Array<{ value: string; label: string }> = Object.keys(
-  tipoDocumentoOptions
-).map((key_: string) => ({
-  value: key_,
-  label: tipoDocumentoOptions[key_],
-}));
 const EXAMPLE = "user@gmail.com";
 
 //FRAGMENT ******************** FUNCTION ***********************************
@@ -66,64 +60,18 @@ const FormClient = ({
   formClientDataInputCheck,
   dataInvalid,
 }: PropsFormClient) => {
+  const optionsSelect: Array<{ value: string; label: string }> = useMemo(() => {
+    if (formClientInputs?.company === undefined) {
+      delete tipoDocumentoOptions.NIT;
+    }
+    return Object.keys(tipoDocumentoOptions).map((key_: string) => ({
+      value: key_,
+      label: tipoDocumentoOptions[key_],
+    }));
+  }, [formClientInputs?.company]);
+
   return (
     <fieldset className={contendorFormClient}>
-      <div
-        className={
-          formClientInputs?.nombres !== undefined &&
-          formClientInputs?.apellidos !== undefined
-            ? ""
-            : "col-span-2"
-        }
-      >
-        {formClientInputs?.nombres !== undefined && (
-          <Input
-            required
-            id="nombres/text"
-            name="nombres"
-            label="Nombres"
-            type="text"
-            autoComplete="off"
-            maxLength={20}
-            disabled={
-              formClientInputs?.nombres === true ||
-              formClientInputs?.nombres === false
-                ? true
-                : false
-            }
-            value={formClientDataInput.nombres}
-          />
-        )}
-      </div>
-
-      <div
-        className={
-          formClientInputs?.nombres !== undefined &&
-          formClientInputs?.apellidos !== undefined
-            ? ""
-            : "col-span-2"
-        }
-      >
-        {formClientInputs?.apellidos !== undefined && (
-          <Input
-            required
-            id="apellidos/text"
-            name="apellidos"
-            label="Apellidos"
-            type="text"
-            autoComplete="off"
-            maxLength={20}
-            disabled={
-              formClientInputs?.apellidos === true ||
-              formClientInputs?.apellidos === false
-                ? true
-                : false
-            }
-            value={formClientDataInput.apellidos ?? ""}
-          />
-        )}
-      </div>
-
       <div
         className={
           formClientInputs?.tipo_documento !== undefined &&
@@ -137,7 +85,7 @@ const FormClient = ({
             id="tipo_documento/text"
             name="tipo_documento"
             label="Tipo de documento"
-            options={options_select}
+            options={optionsSelect}
           />
         )}
       </div>
@@ -170,6 +118,86 @@ const FormClient = ({
           />
         )}
       </div>
+
+      <div
+        className={
+          formClientInputs?.nombres !== undefined &&
+          formClientInputs?.apellidos !== undefined
+            ? ""
+            : "col-span-2"
+        }
+      >
+        {formClientInputs?.nombres !== undefined &&
+          formClientDataInput.tipo_documento !== "NIT" && (
+            <Input
+              required
+              id="nombres/text"
+              name="nombres"
+              label="Nombres"
+              type="text"
+              autoComplete="off"
+              maxLength={20}
+              disabled={
+                formClientInputs?.nombres === true ||
+                formClientInputs?.nombres === false
+                  ? true
+                  : false
+              }
+              value={formClientDataInput.nombres}
+            />
+          )}
+      </div>
+
+      <div
+        className={
+          formClientInputs?.nombres !== undefined &&
+          formClientInputs?.apellidos !== undefined
+            ? ""
+            : "col-span-2"
+        }
+      >
+        {formClientInputs?.apellidos !== undefined &&
+          formClientDataInput.tipo_documento !== "NIT" && (
+            <Input
+              required
+              id="apellidos/text"
+              name="apellidos"
+              label="Apellidos"
+              type="text"
+              autoComplete="off"
+              maxLength={20}
+              disabled={
+                formClientInputs?.apellidos === true ||
+                formClientInputs?.apellidos === false
+                  ? true
+                  : false
+              }
+              value={formClientDataInput.apellidos}
+            />
+          )}
+      </div>
+
+      {formClientInputs?.company !== undefined &&
+        formClientDataInput.tipo_documento === "NIT" && (
+          <div className="pb-5 col-span-2">
+            <Input
+              required
+              id="company/text"
+              name="company"
+              label="Nombre de la empresa"
+              type="text"
+              autoComplete="off"
+              maxLength={100}
+              disabled={
+                formClientInputs?.company === true ||
+                formClientInputs?.company === false
+                  ? true
+                  : false
+              }
+              value={formClientDataInput.company}
+            />
+          </div>
+        )}
 
       {formClientInputs?.celular !== undefined && (
         <Fragment>
