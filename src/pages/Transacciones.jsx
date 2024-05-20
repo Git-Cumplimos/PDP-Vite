@@ -27,6 +27,7 @@ import TicketsCajaSocial from "../apps/Corresponsalia/CorresponsaliaCajaSocial/c
 import TicketMoviliza from "../apps/Moviliza/components/TicketsMoviliza/TicketMoviliza";
 import TicketsItau from "../apps/Corresponsalia/CorresponsaliaItau/components/TicketsItau/TicketsItau";
 import TicketsGou from "../apps/Pasarelas/Base/Gou/TicketsGou";
+import TicketsEvertec from "../apps/Pasarelas/Base/Evertec/TicketsEvertec";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -474,6 +475,14 @@ const Transacciones = () => {
             ) : selected?.ticket?.autorizador === 118 ||
               selected?.id_autorizador === 118 ? (
               <TicketsGou
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 151 ||
+              selected?.id_autorizador === 151 ? (
+              <TicketsEvertec
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}
