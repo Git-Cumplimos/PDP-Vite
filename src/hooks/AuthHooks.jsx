@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
-import { notify, notifyError } from "../utils/notify";
+import { notifyError } from "../utils/notify";
 import useFetchDebounce from "./useFetchDebounce";
 import controlgroup from "../layouts/AdminLayout/ControlGroup";
 
@@ -171,6 +171,8 @@ export const AuthContext = createContext({
   parameters: null,
   qr: null,
   ...initialUser,
+  showModalPublicidad: false,
+  setShowModalPublicidad: () => {},
 });
 
 export const useAuth = () => {
@@ -184,6 +186,7 @@ export const useProvideAuth = () => {
   const [, setSuserInactive] = useState("");
 
   const [timer, setTimer] = useState(null);
+  const [showModalPublicidad, setShowModalPublicidad] = useState(false);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
@@ -242,6 +245,7 @@ export const useProvideAuth = () => {
           clearTimeout(old);
           return null;
         });
+        setShowModalPublicidad(true);
       } catch (err) {
         console.log(err);
         if (err.code === "NotAuthorizedException") {
@@ -789,5 +793,7 @@ export const useProvideAuth = () => {
     validateUser,
     updateCommerceQuota,
     ...userState,
+    showModalPublicidad,
+    setShowModalPublicidad,
   };
 };
