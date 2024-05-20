@@ -61,7 +61,6 @@ const UpdateParametrizacionCodBarrasConvenios = ({
   estadoProceso,
 }: Props) => {
   const validNavigate = useNavigate();
-  // const { pk_id_conv } = useParams();
 
   const [autorizadoresDisponibles, setAutorizadoresDisponibles] = useState<
     Array<{
