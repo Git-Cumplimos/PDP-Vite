@@ -47,6 +47,7 @@ type PropsPasarelaFormulario = {
   setFormTrxDataInput: Dispatch<SetStateAction<TypingFormTrxDataInput>>;
   formAddDataInput: TypingFormAddDataInput;
   setFormAddDataInput: Dispatch<SetStateAction<TypingFormAddDataInput>>;
+  handleCloseNinguno: () => void;
   children: ReactNode;
 };
 export type TypingFormClientDataInputCheck = {
@@ -86,6 +87,7 @@ const PasarelaFormulario = ({
   setFormTrxDataInput,
   formAddDataInput,
   setFormAddDataInput,
+  handleCloseNinguno,
   children,
 }: PropsPasarelaFormulario) => {
   const [formClientDataInputCheck, setFormClientDataInputCheck] =
@@ -308,9 +310,9 @@ const PasarelaFormulario = ({
         <div className="grid grid-cols-2">
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>Realizar Pago</Button>
-            {/* <Button onClick={() => handleCloseNinguno(true, routeInicial)}>
+            <Button type="button" onClick={handleCloseNinguno}>
               Cancelar
-            </Button> */}
+            </Button>
           </ButtonBar>
         </div>
       </form>

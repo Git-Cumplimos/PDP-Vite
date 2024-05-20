@@ -92,10 +92,10 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
         const ip_address_fetch: any = await fetch(
           `https://api.ipify.org?format=json`
         );
-        const ip_address = ip_address_fetch?.ip
-          ? ip_address_fetch?.ip
+        const ip_address_json = await ip_address_fetch.json();
+        const ip_address = ip_address_json?.ip
+          ? ip_address_json?.ip
           : "127.0.0.1";
-
         const body: { [key: string]: any } = {
           comercio: {
             id_comercio: dataComercio.id_comercio,
