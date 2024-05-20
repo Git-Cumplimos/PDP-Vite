@@ -144,6 +144,13 @@ const WithPasarelaPay = (
     PeticionPrePayBase
   );
 
+  const handleCloseNinguno = () => {
+    notifyError("Transacción cancelada por el usuario", 3000, {
+      toastId: "notifyError-HandleCloseTrx",
+    });
+    goNavigate(url_return_front);
+  };
+
   useEffect(() => {
     const name_service = "Pasarela - setting";
     PeticionSetting(name_service)
@@ -228,6 +235,7 @@ const WithPasarelaPay = (
           formTrxDataInput={formTrxDataInput}
           setFormTrxDataInput={setFormTrxDataInput}
           formAddDataInput={formAddDataInput}
+          handleCloseNinguno={handleCloseNinguno}
           setFormAddDataInput={setFormAddDataInput}
         >
           {ComponectFormAdd && (
