@@ -33,7 +33,20 @@ const HistoricoPines = () => {
   const [date, setDate] = useState("");
 
   const changeDate = (date) => {
-    setDate(date.target.value);
+    const fechaActual = new Date();
+    fechaActual.setHours(0, 0, 0, 0);
+
+    const [year, month, day] = date.target.value.split("-");
+    const fechaSeleccionada = new Date(year, month - 1, day);
+    fechaSeleccionada.setHours(0, 0, 0, 0);
+
+    if (fechaSeleccionada < fechaActual) {
+      notifyError("No puedes seleccionar una fecha anterior a hoy");
+      setDate("");
+      return;
+    } else {
+      setDate(date.target.value);
+    }
   };
 
   const hours = [
@@ -76,11 +89,9 @@ const HistoricoPines = () => {
 
   const [filters, setFilters] = useState({
     // Fecha inicial es una semana antes de hoy en formato YYYY-MM-DD
-    fechaInicial: new Date(new Date().setDate(new Date().getDate() - 7))
-      .toISOString()
-      .split("T")[0],
+    fechaInicial: "",
     // Fecha final es hoy en formato YYYY-MM-DD
-    fechaFinal: new Date().toISOString().split("T")[0],
+    fechaFinal: "",
     estado: "",
     limit: 10,
     page: 1,
@@ -88,11 +99,11 @@ const HistoricoPines = () => {
 
   const [data, setData] = useState([
     {
-      ID: "",
+      "ID PIN": "",
       PIN: "",
       "Estado PIN": "",
-      Fecha: "",
-      Hora: "",
+      "Fecha Registro": "",
+      "Hora Registro": "",
       "Estado Agenda": "",
       "Tipo Trámite": "",
       Trámite: "",
@@ -117,7 +128,7 @@ const HistoricoPines = () => {
     if (res) {
       setData(
         res.results.map((item) => ({
-          ID: item.fk_id_cliente,
+          "ID PIN": item.pk_id_pin,
           PIN: item.numero_pin,
           "Estado PIN": item.estado,
           Fecha: item.fecha_creacion
@@ -276,17 +287,25 @@ const HistoricoPines = () => {
     }
   }, [devolucionData, selectedItem, roleInfo, getFiltersData]);
 
+  const formatTimeTo12Hour = (timeString) => {
+    const [hour, minute] = timeString.split(":").map(Number);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 || 12; // Convertir 0 horas a 12 para el formato de 12 horas
+    const formattedMinute = minute.toString().padStart(2, "0");
+    return `${formattedHour}:${formattedMinute} ${ampm}`;
+  };
+
   return (
     <>
       <TableEnterprise
         title="Tabla Histórico Pines"
         headers={[
-          "ID",
+          "ID PIN",
           // "Lugar Originación",
           "PIN",
           "Estado PIN",
-          "Fecha",
-          "Hora",
+          "Fecha Registro",
+          "Hora Registro",
           "Estado Agenda",
           "Tipo Trámite",
           "Trámite",
@@ -347,15 +366,15 @@ const HistoricoPines = () => {
           onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
         />
       </TableEnterprise>
-      <Modal show={showModalReagendar}>
-        <h2 className="text-center">
+      <Modal show={showModalReagendar} bigger>
+        <h2 className="mb-5 text-center">
           ¿Qué re-agenda le queda bien al cliente?
         </h2>
         <div className="grid grid-cols-2 gap-5">
           <CalendarDate value={date} onChange={changeDate}>
             <CalendarMonth />
           </CalendarDate>
-          <div className="grid items-center grid-cols-3 gap-5">
+          <div className="grid items-center grid-cols-2 gap-5">
             {hours.map((hour, index) => (
               <button
                 key={hour.hour}
@@ -368,10 +387,14 @@ const HistoricoPines = () => {
                   selectHour(hour.hour);
                 }}
               >
-                {hour.hour}
+                {hour.hour.split("-").map(formatTimeTo12Hour).join(" - ")}
               </button>
             ))}
           </div>
+        </div>
+        {/* {JSON.stringify(date)}
+        {JSON.stringify(selectedHour)} */}
+        <ButtonBar>
           <Button
             design="secondary"
             type="button"
@@ -393,7 +416,7 @@ const HistoricoPines = () => {
           >
             Re-agendar
           </Button>
-        </div>
+        </ButtonBar>
       </Modal>
       <Modal show={showModalDevolucion} bigger>
         <h2 className="text-center">Devolución del PIN</h2>
