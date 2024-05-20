@@ -82,7 +82,7 @@ const Agenda = () => {
     const body = {
       fecha_vigencia:
         new Date(Date.now()).toISOString().split("T")[0] + " 00:00:00",
-      duracion_tiempo_cita: 120,
+      duracion_tiempo_cita: 60,
       fecha_inoperancia: [],
       horario_atencion: {
         lunes: {
