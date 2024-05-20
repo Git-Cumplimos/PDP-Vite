@@ -43,6 +43,7 @@ const tipoDocumentoOptionsVector = Object.keys(tipoDocumentoOptions);
 const formClientDataInputInitial: TypingFormClientDataInput = {
   nombres: "",
   apellidos: "",
+  company: "",
   documento: "",
   celular: "",
   correo: "",
