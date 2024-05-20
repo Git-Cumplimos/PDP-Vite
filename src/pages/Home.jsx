@@ -7,17 +7,17 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useMemo } from "react";
 import { useImgs } from "../hooks/ImgsHooks";
 import { useWindowSize } from "../hooks/WindowSizeHooks";
+import Modal from "../components/Base/Modal";
+import { useAuth } from "../hooks/AuthHooks";
 // import ReconoSERID from "../components/Compound/ReconoSERID/ReconoSERID";
 
+const urlAssets = process.env.REACT_APP_ASSETS_URL;
+
 const Home = () => {
+  const { showModalPublicidad, setShowModalPublicidad } = useAuth();
   const { urlsPrivateApps, urlsCategorias } = useUrls();
   const { banners } = useImgs();
   const [width] = useWindowSize();
-
-  // const [emails, setEmails] = useState([
-  //   "directora.mercadeo@puntodepago.com.co",
-  //   "maria.valero@puntodepago.com.co",
-  // ]);
 
   const imgsCarousel = useMemo(() => {
     return Object.entries(banners).map(([name, url]) => ({ name, url }));
@@ -25,6 +25,12 @@ const Home = () => {
 
   return (
     <>
+      <Modal show={showModalPublicidad} handleClose={() => setShowModalPublicidad(false)}>
+        <img
+          src={`${urlAssets}/assets/svg/recaudo/MODAL_PUBLICIDAD/MODAL_PUBLICIDAD.jpg`}
+          alt="Informacion punto de pago"
+        />
+      </Modal>
       <Carousel
         autoPlay
         infiniteLoop
