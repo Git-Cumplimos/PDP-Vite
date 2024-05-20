@@ -14,21 +14,22 @@ import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   showMassive: boolean;
   setShowMassive: Dispatch<React.SetStateAction<boolean>>;
-  // searchCommercesFn: () => void | Promise<void>;
 };
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-// const urlComercios = `http://localhost:5000`;
+const urlConvenios =
+  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlConvenios = `http://localhost:5000`;
 
 const CrearParametrizacionCodBarrasConveniosMasivo = ({
   showMassive,
   setShowMassive,
-}: // searchCommercesFn,
-Props) => {
+}: Props) => {
+  const validNavigate = useNavigate();
   const { pdpUser } = useAuth();
   const [fileUpload, setFileUpload] = useState<File>();
 
@@ -43,7 +44,10 @@ Props) => {
   }, [setShowMassive]);
 
   const [downloadFormatParam] = useFetchDebounce(
-    { url: `${urlComercios}/comercios/masivo`, autoDispatch: false },
+    {
+      url: `${urlConvenios}/convenios-pdp/parametrizar-codigos-barras-convenios-masivo`,
+      autoDispatch: false,
+    },
     {
       onPending: useCallback(() => "Buscando formato", []),
       onSuccess: useCallback((res) => {
@@ -65,7 +69,7 @@ Props) => {
 
   const [uploadParamFile, loadingUploadFile] = useFetchDebounce(
     {
-      url: `${urlComercios}/comercios/masivo`,
+      url: `${urlConvenios}/convenios-pdp/parametrizar-codigos-barras-convenios-masivo`,
       autoDispatch: false,
       options: useMemo(() => {
         const formData = new FormData();
@@ -103,6 +107,7 @@ Props) => {
           }
           // searchCommercesFn?.();
           handleClose();
+          validNavigate(-1);
           return "Carga satisfactoria";
         },
         [handleClose]
@@ -136,11 +141,12 @@ Props) => {
       >
         <Form onSubmit={onSubmit}>
           <ButtonBar>
-            <Button type="button" onClick={downloadFormatParam}>
+            <Button
+              type="button"
+              onClick={downloadFormatParam}
+              disabled={!fileUpload}
+            >
               Descargar archivo de ejemplo
-            </Button>
-            <Button type="submit" disabled={!fileUpload || loadingUploadFile}>
-              Subir archivo
             </Button>
           </ButtonBar>
           {!fileUpload && (
@@ -155,22 +161,32 @@ Props) => {
             />
           )}
           {fileUpload && (
-            <Fieldset legend={"Archivo cargado"}>
-              <div>
-                <div className="grid grid-cols-8 gap-4 justify-items-center">
-                  <span className="text-3xl text-primary-light col-span-1 bi bi-file-earmark-plus-fill" />
-                  <p className="col-span-6 self-center">{fileUpload.name}</p>
-                  <span
-                    className="text-3xl text-red-700 col-span-1 bi bi-trash-fill cursor-pointer"
-                    onClick={
-                      loadingUploadFile
-                        ? () => {}
-                        : () => setFileUpload(undefined)
-                    }
-                  />
+            <>
+              <Fieldset legend={"Archivo cargado"}>
+                <div>
+                  <div className="grid grid-cols-8 gap-4 justify-items-center">
+                    <span className="text-3xl text-primary-light col-span-1 bi bi-file-earmark-plus-fill" />
+                    <p className="col-span-6 self-center">{fileUpload.name}</p>
+                    <span
+                      className="text-3xl text-red-700 col-span-1 bi bi-trash-fill cursor-pointer"
+                      onClick={
+                        loadingUploadFile
+                          ? () => {}
+                          : () => setFileUpload(undefined)
+                      }
+                    />
+                  </div>
                 </div>
-              </div>
-            </Fieldset>
+              </Fieldset>
+              <ButtonBar>
+                <Button
+                  type="submit"
+                  disabled={!fileUpload || loadingUploadFile}
+                >
+                  Subir archivo
+                </Button>
+              </ButtonBar>
+            </>
           )}
         </Form>
       </Modal>
