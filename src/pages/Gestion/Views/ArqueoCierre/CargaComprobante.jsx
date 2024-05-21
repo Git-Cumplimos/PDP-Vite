@@ -31,12 +31,15 @@ import Magnifier from "react-magnifier";
 import ButtonLink from "../../../../components/Base/ButtonLink";
 import Modal from "../../../../components/Base/Modal/Modal";
 import SearchEntidadesExternas from "../../components/CargarComprobantes/SearchEntidadesExternas";
+import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 
 const formatMoney = makeMoneyFormatter(0);
 
+const url_user = process.env.REACT_APP_URL_IAM_PDP;
+
 const CargaComprobante = () => {
   const navigate = useNavigate();
-  const { roleInfo,userPermissions,quotaInfo,userInfo } = useAuth();
+  const { roleInfo,userPermissions,quotaInfo,userInfo,pdpUser} = useAuth();
   const formRef = useRef(null);
   const [tiposComprobantes, setTiposComprobantes] = useState([]);
 
@@ -51,6 +54,7 @@ const CargaComprobante = () => {
   const [comprobanteNumber, setComprobanteNumber] = useState("");
   const [valorComprobante, setValorComprobante] = useState(0.0);
   const [valorEfectivoPdp, setvalorEfectivoPdp] = useState(0.0);
+
   const [valorEfectivoBoveda, setvalorEfectivoBoveda] = useState(0.0);
   const [valorEfectivoRedesExternas, setvalorEfectivoRedesExternas] = useState(0.0);
   const [observaciones, setObservaciones] = useState("");
@@ -62,6 +66,16 @@ const CargaComprobante = () => {
   });
   const [valorEnCaja, setValorEnCaja] = useState(0);
   const [valor_Boveda, setValorEnBoveda] = useState(0);
+
+  const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio);
+  const [nameComercio, setNameComercio] = useState(roleInfo?.nombre_comercio);
+  const [idUser, setIdUser] = useState(pdpUser?.uuid);
+  const [nameUser, setNameUser] = useState(pdpUser?.uname);
+
+  const [idUserTransfer, setIdUserTransfer] = useState("");
+  const [valorEfectivoTransferir, setvalorEcfectivoTransferir] = useState(0.0);
+  const [nameUserRecibe, setNameUserRecibe] = useState("");
+
   // const [valoresExternos, setValoresExternos] = useState({});
 
   const [limitesMontos, setLimitesMontos] = useState({
@@ -76,9 +90,19 @@ const CargaComprobante = () => {
   const staticInfo = useMemo(
     () => ({
       "Id comercio": roleInfo?.id_comercio ?? 59,
-      "Id usuario": roleInfo?.id_usuario ?? 8202,
       "Nombre comercio": roleInfo?.nombre_comercio,
+      "Id usuario": roleInfo?.id_usuario ?? 8202,
       "Nombre usuario": userInfo?.attributes?.name
+    }),
+    [roleInfo?.id_comercio, roleInfo?.id_usuario, userInfo?.attributes?.name, roleInfo?.nombre_comercio]
+  );
+
+  const staticInfo2 = useMemo(
+    () => ({
+      "Id comercio": roleInfo?.id_comercio ?? 59,
+      "Nombre comercio": roleInfo?.nombre_comercio,
+      "Id Usuario que transfiere": roleInfo?.id_usuario ?? 8202,
+      "Nombre usuario que transfiere": userInfo?.attributes?.name
     }),
     [roleInfo?.id_comercio, roleInfo?.id_usuario, userInfo?.attributes?.name, roleInfo?.nombre_comercio]
   );
@@ -354,7 +378,6 @@ const CargaComprobante = () => {
     roleInfo?.id_dispositivo,
   ]);
 
-
   // const EntityExt = useCallback(() =>{
   //   setShowModal(true);
   // }, []);
@@ -362,6 +385,57 @@ const CargaComprobante = () => {
   const handleClose2 = useCallback(() => {
     setShowModal(false);
   }, []);
+
+  const handleUser = useCallback(async (ev) => {
+    if (ev !== "") {
+      setIdUser(ev)
+      const nameUser = await getUser(`${url_user}/user-unique?uuid=${ev}`);
+      setNameUser(nameUser?.uname)
+    }else{
+      setNameUser(null)
+    }
+  }, []);
+
+  const handleUserRecibe = useCallback(async (ev) => {
+    if (ev !== "") {
+      setIdUserTransfer(ev)
+      const nameUser = await getUser(`${url_user}/user-unique?uuid=${ev}`);
+      console.log(nameUser)
+      setNameUserRecibe(nameUser)
+    }else{
+      setNameUserRecibe(null)
+    }
+  }, []);
+
+  const handleComercio = useCallback((ev) => {
+    if (ev !== "") {
+      setIdComercio(ev)
+      getUser(`${url_user}/user-unique?uuid=${ev}`);
+    }else{
+      setNameComercio(null)
+    }
+  }, []);
+
+  const [getUser] = useFetchDispatchDebounce(
+    {
+      onSuccess: useCallback((res) => {return res?.obj}, []),
+      onError: useCallback((error) => {
+        if (error?.cause === "custom") {
+          // notifyError(error.message);
+          return null
+        } else {
+          console.error(error);
+        }
+      }, []),
+    },
+    { delay: 100 }
+  );
+
+  // useEffect(() => {
+  //   if (pdpUser?.fk_id_comercio === null){
+  //     getUser(`${url_user}/user-unique?uuid=${pdpUser?.uuid}`);
+  //   }
+  // }, []);
 
   // const renderInputs = () => {
   //   return selectedEntidadesExt.entidades_agregar.map(entidad => (
@@ -427,6 +501,9 @@ const CargaComprobante = () => {
             setvalorEfectivoPdp(0.0)
             setvalorEfectivoBoveda(0.0)
             setvalorEfectivoRedesExternas(0.0)
+            setvalorEcfectivoTransferir(0.0)
+            setIdUserTransfer("")
+            setNameUserRecibe("")
             setFile(null)
             setImage(null)
             setSelectedEntidadesExt((old) => {return {...old,entidades_agregar: [],};});
@@ -441,254 +518,369 @@ const CargaComprobante = () => {
             legend={"Información del movimiento"}
             className="lg:col-span-2"
           >
-            {Object.entries(staticInfo).map(([key, val]) => (
-              <Input
-                key={key}
-                id={key}
-                label={key}
-                type="text"
-                value={val}
-                disabled
-              />
-            ))}
-            {movementType !== "Movimiento a bóveda" ?
-            <>
-              <Select
-                id="searchEntities"
-                name="tipoComp"
-                label={`Buscar ${
-                  movementType === "Consignación Bancaria"
-                    ? "bancos"
-                    : "transportadoras"
-                }`}
-                options={[
-                  { value: "", label: "" },
-                  ...foundEntities.map(({ pk_nombre_entidad }) => ({
-                    value: pk_nombre_entidad,
-                    label: pk_nombre_entidad,
-                  })),
-                ]}
-                value={selectedEntity}
-                onChange={(e) => {
-                  const tempMap = new Map(
-                    foundEntities.map(({ pk_nombre_entidad, parametros }) => [
-                      pk_nombre_entidad,
-                      parametros,
-                    ])
-                  );
-                  if (foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta != null) {
-                    setEntityIndex(foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta)
-                  }else{setEntityIndex([])}
-                  setSelectedEntity(e.target.value);
-                  setLimitesMontos((old) => ({
-                    min: tempMap.get(e.target.value)?.monto_minimo ?? old.min,
-                    max: tempMap.get(e.target.value)?.monto_maximo ?? old.max,
-                  }));
-                }}
-                required
-              />
-              {movementType === "Consignación Bancaria" && (
+          {pdpUser?.fk_id_comercio !== null?
+            movementType !== "Transferencia de efectivo entre cajeros" ?
+              Object.entries(staticInfo).map(([key, val]) => (
+                <Input
+                  key={key}
+                  id={key}
+                  label={key}
+                  type="text"
+                  value={val}
+                  disabled
+                />
+              ))
+            :
+              Object.entries(staticInfo2).map(([key, val]) => (
+                <Input
+                  key={key}
+                  id={key}
+                  label={key}
+                  type="text"
+                  value={val}
+                  disabled
+                />
+              ))
+          :
+          <>
+            <Input
+              id="id_comercio"
+              name="id_comercio"  
+              label={`Id comercio`}
+              autoComplete="off"
+              type="tel"
+              defaultValue={idComercio}
+              onChange={(ev) => {handleComercio(ev.target.value)}}
+              required
+            />
+            <Input
+              id="name_comercio"
+              name="name_comercio"  
+              label={`Nombre comercio`}
+              autoComplete="off"
+              type="tel"
+              defaultValue={nameComercio}
+              value={nameComercio === null?"":nameComercio}
+              disabled
+              required
+            />
+            <Input
+              id="id_user"
+              name="id_user"  
+              label={`Id Usuario que transfiere`}
+              autoComplete="off"
+              type="tel"
+              defaultValue={idUser}
+              onChange={(ev) => {handleUser(ev.target.value)}}
+              required
+            />
+            <Input
+              id="name_user"
+              name="name_user"  
+              label={`Nombre usuario que transfiere`}
+              autoComplete="off"
+              type="tel"
+              defaultValue={nameUser}
+              value={nameUser === null?"":nameUser}
+              disabled
+              required
+            />
+          </>
+          }
+          {movementType !== "Transferencia de efectivo entre cajeros"?<>
+            {movementType !== "Movimiento a bóveda"?
+              <>
                 <Select
-                  id="accountNum"
-                  name="accountNum"
-                  label="Número de cuenta"
+                  id="searchEntities"
+                  name="tipoComp"
+                  label={`Buscar ${
+                    movementType === "Consignación Bancaria"
+                      ? "bancos"
+                      : "transportadoras"
+                  }`}
                   options={[
                     { value: "", label: "" },
-                    ...EntityIndex.map((pk_numero_cuenta) => ({
-                      value: pk_numero_cuenta,
-                      label: pk_numero_cuenta,
+                    ...foundEntities.map(({ pk_nombre_entidad }) => ({
+                      value: pk_nombre_entidad,
+                      label: pk_nombre_entidad,
                     })),
                   ]}
-                  value={accountNumber}
-                  onChange={(ev) => {
-                    setAccountNumber(ev.target.value)
+                  value={selectedEntity}
+                  onChange={(e) => {
+                    const tempMap = new Map(
+                      foundEntities.map(({ pk_nombre_entidad, parametros }) => [
+                        pk_nombre_entidad,
+                        parametros,
+                      ])
+                    );
+                    if (foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta != null) {
+                      setEntityIndex(foundEntities[e?.target?.selectedIndex-1]?.pk_numero_cuenta)
+                    }else{setEntityIndex([])}
+                    setSelectedEntity(e.target.value);
+                    setLimitesMontos((old) => ({
+                      min: tempMap.get(e.target.value)?.monto_minimo ?? old.min,
+                      max: tempMap.get(e.target.value)?.monto_maximo ?? old.max,
+                    }));
                   }}
                   required
-                  type="tel"
                 />
-              )}
-              <Input
-                id="comprobanteNum"
-                name="comprobanteNum"
-                label="Número de comprobante"
-                type="tel"
-                autoComplete="off"
-                minLength={"4"}
-                maxLength={"19"}
-                onInput={(ev) => setComprobanteNumber(onChangeAccountNumber(ev))}
-                required
-              />
-              {movementType === "Consignación Bancaria" || movementType === "Entrega transportadora" ?(<>
-                {roleInfo?.tipo_comercio === "OFICINAS PROPIAS"?<>
-                  <Input
-                    id="valor_caja_pdp"
-                    name="valor_caja_pdp"  
-                    label={`Valor efectivo Caja`}
-                    autoComplete="off"
+                {movementType === "Consignación Bancaria" && (
+                  <Select
+                    id="accountNum"
+                    name="accountNum"
+                    label="Número de cuenta"
+                    options={[
+                      { value: "", label: "" },
+                      ...EntityIndex.map((pk_numero_cuenta) => ({
+                        value: pk_numero_cuenta,
+                        label: pk_numero_cuenta,
+                      })),
+                    ]}
+                    value={accountNumber}
+                    onChange={(ev) => {
+                      setAccountNumber(ev.target.value)
+                    }}
+                    required
                     type="tel"
-                    // minLength={"5"}
-                    maxLength={"13"}
-                    onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
-                    onBlur={valuesComprobante}
-                    // required
                   />
-                  <Input
-                    id="valor_boveda"
-                    name="valor_boveda"  
-                    label={`Valor efectivo Bóveda`}
-                    autoComplete="off"
-                    type="tel"
-                    maxLength={"12"}
-                    onInput={(ev) => setvalorEfectivoBoveda(onChangeMoney(ev))}
-                    onBlur={valuesComprobante}
-                  />
-                  <Input
-                    id="valor_redes_externas"
-                    name="valor_redes_externas"  
-                    label={`Valor efectivo Redes Externas`}
-                    autoComplete="off"
-                    type="tel"
-                    maxLength={"12"}
-                    onInput={(ev) => setvalorEfectivoRedesExternas(onChangeMoney(ev))}
-                    onBlur={valuesComprobante}
-                  />
+                )}
+                <Input
+                  id="comprobanteNum"
+                  name="comprobanteNum"
+                  label="Número de comprobante"
+                  type="tel"
+                  autoComplete="off"
+                  minLength={"4"}
+                  maxLength={"19"}
+                  onInput={(ev) => setComprobanteNumber(onChangeAccountNumber(ev))}
+                  required
+                />
+                {movementType === "Consignación Bancaria" || movementType === "Entrega transportadora" ?(<>
+                  {roleInfo?.tipo_comercio === "OFICINAS PROPIAS"?<>
+                    <Input
+                      id="valor_caja_pdp"
+                      name="valor_caja_pdp"  
+                      label={`Valor efectivo Caja`}
+                      autoComplete="off"
+                      type="tel"
+                      // minLength={"5"}
+                      maxLength={"13"}
+                      onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
+                      onBlur={valuesComprobante}
+                      // required
+                    />
+                    <Input
+                      id="valor_boveda"
+                      name="valor_boveda"  
+                      label={`Valor efectivo Bóveda`}
+                      autoComplete="off"
+                      type="tel"
+                      maxLength={"12"}
+                      onInput={(ev) => setvalorEfectivoBoveda(onChangeMoney(ev))}
+                      onBlur={valuesComprobante}
+                    />
+                    <Input
+                      id="valor_redes_externas"
+                      name="valor_redes_externas"  
+                      label={`Valor efectivo Redes Externas`}
+                      autoComplete="off"
+                      type="tel"
+                      maxLength={"12"}
+                      onInput={(ev) => setvalorEfectivoRedesExternas(onChangeMoney(ev))}
+                      onBlur={valuesComprobante}
+                    />
+                    <Input
+                      id="valor"
+                      name="valor"  
+                      label={`Valor total`}
+                      type="tel"
+                      value={formatMoney.format(valorComprobante)}
+                      disabled
+                    />
+                  </>:<>
+                    <Input
+                      id="valor_caja_pdp"
+                      name="valor_caja_pdp"  
+                      label={`Valor efectivo`}
+                      autoComplete="off"
+                      type="tel"
+                      minLength={"5"}
+                      maxLength={"13"}
+                      onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
+                      onBlur={valuesComprobante}
+                      required
+                    />
+                  </>}
+                  {/* {renderInputs()} */}
+                  {/* <ButtonBar>
+                    <Button type="button" onClick={() => EntityExt()}>
+                      Agregar valores redes externas
+                    </Button>
+                  </ButtonBar> */}
+                </>):(
                   <Input
                     id="valor"
                     name="valor"  
-                    label={`Valor total`}
-                    type="tel"
-                    value={formatMoney.format(valorComprobante)}
-                    disabled
-                  />
-                </>:<>
-                  <Input
-                    id="valor_caja_pdp"
-                    name="valor_caja_pdp"  
-                    label={`Valor efectivo`}
+                    label={`Valor ${movementType.split(/\s/)[0].toLowerCase()}`}
                     autoComplete="off"
                     type="tel"
                     minLength={"5"}
                     maxLength={"13"}
-                    onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
-                    onBlur={valuesComprobante}
+                    onInput={(ev) => setValorComprobante(onChangeMoney(ev))}
                     required
+                  />  
+                )}
+              </>:<>
+                <Select
+                  id="tipo_movimiento"
+                  name="tipo_movimiento"
+                  label="Tipo de movimiento"
+                  options={[
+                    { value: "", label: "" },
+                    ...(rolIngreso?[{ value: "Ingreso a bóveda", label: "Ingreso a bóveda" }]:[]),
+                    ...(rolRetiro?[{ value: "Retiro de bóveda", label: "Retiro de bóveda" }]:[]),
+                  ]}
+                  value={TipoMovimiento}
+                  onChange={(ev) => {
+                    settipoMovimiento(ev.target.value)
+                  }}
+                  required
+                  type="tel"
+                />
+                {TipoMovimiento === "Ingreso a bóveda"?
+                  <Input
+                    id="efectivo_caja"
+                    name="efectivo_caja"  
+                    label={`Efectivo en caja`}
+                    type="tel"
+                    value={formatMoney.format(valorEnCaja)}
+                    disabled
                   />
-                </>}
-                {/* {renderInputs()} */}
-                {/* <ButtonBar>
-                  <Button type="button" onClick={() => EntityExt()}>
-                    Agregar valores redes externas
-                  </Button>
-                </ButtonBar> */}
-              </>):(
+                :null}
+                {TipoMovimiento === "Retiro de bóveda"?
+                  <Input
+                    id="efectivo_boveda"
+                    name="efectivo_boveda"  
+                    label={`Efectivo en bóveda`}
+                    type="tel"
+                    value={formatMoney.format(valor_Boveda)}
+                    disabled
+                  />
+                :null}
                 <Input
                   id="valor"
-                  name="valor"  
-                  label={`Valor ${movementType.split(/\s/)[0].toLowerCase()}`}
+                  name="valor"
+                  label={`Valor del movimiento`}
                   autoComplete="off"
                   type="tel"
-                  minLength={"5"}
-                  maxLength={"13"}
+                  maxLength={"12"}
                   onInput={(ev) => setValorComprobante(onChangeMoney(ev))}
                   required
-                />  
-              )}
-            </>:<>
-              <Select
-                id="tipo_movimiento"
-                name="tipo_movimiento"
-                label="Tipo de movimiento"
-                options={[
-                  { value: "", label: "" },
-                  ...(rolIngreso?[{ value: "Ingreso a bóveda", label: "Ingreso a bóveda" }]:[]),
-                  ...(rolRetiro?[{ value: "Retiro de bóveda", label: "Retiro de bóveda" }]:[]),
-                ]}
-                value={TipoMovimiento}
-                onChange={(ev) => {
-                  settipoMovimiento(ev.target.value)
+                />
+              </>}
+              <TextArea
+                id="observaciones"
+                name="observaciones"
+                label="Observaciones"
+                className="w-full place-self-stretch"
+                autoComplete="off"
+                maxLength={"60"}
+                onInput={(e) => {
+                  setObservaciones(e.target.value.trimLeft());
+                  e.target.value = e.target.value.trimLeft();
                 }}
+                info={`Máximo 60 caracteres`}
                 required
-                type="tel"
               />
-              {TipoMovimiento === "Ingreso a bóveda"?
-                <Input
-                  id="efectivo_caja"
-                  name="efectivo_caja"  
-                  label={`Efectivo en caja`}
-                  type="tel"
-                  value={formatMoney.format(valorEnCaja)}
-                  disabled
-                />
+              {movementType !== "Movimiento a bóveda" ?
+                !file ? (
+                  <FileInput
+                    label={"Elegir archivo (comprobante)"}
+                    onGetFile={onFileChange}
+                    name="file"
+                    accept=".png,.jpg,.jpeg"
+                    allowDrop={true}
+                  />
+                ) : (
+                  <>
+                    <div className="text-center my-4 mx-auto md:mx-4 flex flex-row flex-wrap justify-around">
+                      <div className="">
+                        <div className="flex flex-row justify-center">
+                          <h3 className="text-sm">{file?.name ?? ""}</h3>
+                          <span
+                            className="bi bi-x-lg text-2xl ml-5 self-center cursor-pointer"
+                            onClick={() => setFile(null)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="lg:col-span-2">
+                      <div className="text-2xl mt-2 mb-3">                            
+                        {file && (
+                          <div style={{ width: '30%', margin: '0 auto' }}>
+                            <Magnifier src={image} zoomFactor={2} alt="Uploaded" style={{ width: '100%' }}/>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )
               :null}
-              {TipoMovimiento === "Retiro de bóveda"?
-                <Input
-                  id="efectivo_boveda"
-                  name="efectivo_boveda"  
-                  label={`Efectivo en bóveda`}
-                  type="tel"
-                  value={formatMoney.format(valor_Boveda)}
-                  disabled
-                />
-              :null}
+            </>:<>
               <Input
-                id="valor"
-                name="valor"
-                label={`Valor del movimiento`}
+                id="id_usuario_recibido"
+                name="id_usuario_recibido"  
+                label={`Id Usuario que recibe`}
+                autoComplete="off"
+                type="tel"
+                maxLength={"15"}
+                defaultValue={idUserTransfer}
+                onChange={(ev) => {handleUserRecibe(ev.target.value)}}
+                required
+              />
+              <Input
+                id="name_usuario_recibe"
+                name="name_usuario_recibe"  
+                label={`Nombre usuario que recibe`}
+                autoComplete="off"
+                type="tel"
+                value={nameUserRecibe === null?"":nameUserRecibe?.uname}
+                required
+                disabled
+              />
+              <Input
+                id="valor_transferir_recibe"
+                name="valor_transferir_recibe"  
+                label={`Valor a transferir`}
                 autoComplete="off"
                 type="tel"
                 maxLength={"12"}
-                onInput={(ev) => setValorComprobante(onChangeMoney(ev))}
+                onInput={(ev) => setvalorEcfectivoTransferir(onChangeMoney(ev))}
                 required
               />
+              <TextArea
+                id="observaciones"
+                name="observaciones"
+                label="Observaciones"
+                className="w-full place-self-stretch"
+                autoComplete="off"
+                maxLength={"100"}
+                onInput={(e) => {
+                  setObservaciones(e.target.value.trimLeft());
+                  e.target.value = e.target.value.trimLeft();
+                }}
+                info={`Máximo 100 caracteres`}
+                required
+              />
+              <Input
+                id="total_efectivo_cajero"
+                name="total_efectivo_cajero"  
+                label={`Total efectivo cajero`}
+                type="tel"
+                value={formatMoney.format(valor_Boveda)}
+                disabled
+              />
             </>}
-            <TextArea
-              id="observaciones"
-              name="observaciones"
-              label="Observaciones"
-              className="w-full place-self-stretch"
-              autoComplete="off"
-              maxLength={"60"}
-              onInput={(e) => {
-                setObservaciones(e.target.value.trimLeft());
-                e.target.value = e.target.value.trimLeft();
-              }}
-              info={`Máximo 60 caracteres`}
-              required
-            />
-            {movementType !== "Movimiento a bóveda" ?
-              !file ? (
-                <FileInput
-                  label={"Elegir archivo (comprobante)"}
-                  onGetFile={onFileChange}
-                  name="file"
-                  accept=".png,.jpg,.jpeg"
-                  allowDrop={true}
-                />
-              ) : (
-                <>
-                  <div className="text-center my-4 mx-auto md:mx-4 flex flex-row flex-wrap justify-around">
-                    <div className="">
-                      <div className="flex flex-row justify-center">
-                        <h3 className="text-sm">{file?.name ?? ""}</h3>
-                        <span
-                          className="bi bi-x-lg text-2xl ml-5 self-center cursor-pointer"
-                          onClick={() => setFile(null)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="lg:col-span-2">
-                    <div className="text-2xl mt-2 mb-3">                            
-                      {file && (
-                        <div style={{ width: '30%', margin: '0 auto' }}>
-                          <Magnifier src={image} zoomFactor={2} alt="Uploaded" style={{ width: '100%' }}/>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )
-            :null}
             <ButtonBar className="lg:col-span-2">
               <ButtonLink
                 to={"/gestion/arqueo"}
