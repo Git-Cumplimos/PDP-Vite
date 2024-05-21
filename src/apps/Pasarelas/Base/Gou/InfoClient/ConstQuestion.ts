@@ -19,9 +19,7 @@ export const constQuestion: TypingInfoClientConst = {
   `,
   //-----------------------
   "7|questions": "4. ¿Puedo realizar el pago cualquier día y a cualquier hora?",
-  "8|paragraph": `Si aún no has finalizado tu pago, podrás volver al paso inicial y elegir la forma de pago que prefieras. Una vez finalizada la compra no es posible cambiar la forma de pago.
-
-  ESTABLECIMIENTO DE COMERCIO: el punto anterior aplica a la forma de pago, pero deberán mencionar las políticas de devolución que tenga la tienda para dar cumplimiento al artículo 51 de la Ley del Estatuto del Consumidor.
+  "8|paragraph": `Sí, en Soluciones en Red SAS podrás realizar tus compras en línea los 7 días de la semana, las 24 horas del día a sólo un clic de distancia.
   `,
   //-----------------------
   "9|questions": "5. ¿Puedo cambiar la forma de pago?",
