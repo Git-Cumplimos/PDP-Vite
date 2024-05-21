@@ -1,8 +1,8 @@
 import { TypingInfoClientConst } from "../../../viewsHigherOrder/utils/utils_typing";
 
 export const constQuestion: TypingInfoClientConst = {
-  "1|questions": "1. ¿Qué es GOU?",
-  "2|paragraph": `GOU es la plataforma de pagos electrónicos que usa Soluciones en Red SAS para procesar en línea las transacciones generadas en la tienda virtual con las formas de pago habilitadas para tal fin.
+  "1|questions": "1. ¿Qué es Placetopay?",
+  "2|paragraph": `Placetopay es la plataforma de pagos electrónicos que usa Soluciones en Red SAS para procesar en línea las transacciones generadas en la tienda virtual con las formas de pago habilitadas para tal fin.
   `,
   //-----------------------
   "3|questions": "2. ¿Cómo puedo pagar?",
@@ -11,11 +11,11 @@ export const constQuestion: TypingInfoClientConst = {
   //-----------------------
   "5|questions":
     "3. ¿Es seguro ingresar mis datos bancarios en este sitio web?",
-  "6|paragraph": `Para proteger tus datos Soluciones en Red SAS delega en GOU la captura de la información sensible. Nuestra plataforma de pagos cumple con los más altos estándares exigidos por la norma internacional PCI DSS de seguridad en transacciones con tarjeta de crédito. Además tiene certificado de seguridad SSL expedido por GeoTrust una compañía Verisign, el cual garantiza comunicaciones seguras mediante la encriptación de todos los datos hacia y desde el sitio; de esta manera te podrás sentir seguro a la hora de ingresar la información de su tarjeta.
+  "6|paragraph": `Para proteger tus datos Soluciones en Red SAS delega en Placetopay la captura de la información sensible. Nuestra plataforma de pagos cumple con los más altos estándares exigidos por la norma internacional PCI DSS de seguridad en transacciones con tarjeta de crédito. Además tiene certificado de seguridad SSL expedido por GeoTrust una compañía Verisign, el cual garantiza comunicaciones seguras mediante la encriptación de todos los datos hacia y desde el sitio; de esta manera te podrás sentir seguro a la hora de ingresar la información de su tarjeta.
 
-  Durante el proceso de pago, en el navegador se muestra el nombre de la organización autenticada, la autoridad que lo certifica y la barra de dirección cambia a color verde. Estas características son visibles de inmediato y dan garantía y confianza para completar la transacción en GOU.
+  Durante el proceso de pago, en el navegador se muestra el nombre de la organización autenticada, la autoridad que lo certifica y la barra de dirección cambia a color verde. Estas características son visibles de inmediato y dan garantía y confianza para completar la transacción en Placetopay.
 
-  GOU también cuenta con el monitoreo constante de McAfee Secure y la firma de mensajes electrónicos con Certicámara.
+  Placetopay también cuenta con el monitoreo constante de McAfee Secure y la firma de mensajes electrónicos con Certicámara.
   `,
   //-----------------------
   "7|questions": "4. ¿Puedo realizar el pago cualquier día y a cualquier hora?",
@@ -30,15 +30,15 @@ export const constQuestion: TypingInfoClientConst = {
   //-----------------------
   "11|questions":
     "6. ¿Pagar electrónicamente tiene algún valor para mí como comprador?",
-  "12|paragraph": `No, los pagos electrónicos realizados a través de GOU no generan costos adicionales para el comprador.
+  "12|paragraph": `No, los pagos electrónicos realizados a través de Placetopay no generan costos adicionales para el comprador.
   `,
   //-----------------------
   "13|questions": "7. ¿Qué debo hacer si mi transacción no concluyó?",
-  "14|paragraph": `En primera instancia, revisar si llegó un email de confirmación de la transacción a la cuenta de correo electrónico inscrita en el momento de realizar el pago, en caso de no haberlo recibido, deberás contactar a (PERSONA RESPONSABLE AL INTERIOR DEL COMERCIO) para confirmar el estado de la transacción.
+  "14|paragraph": `En primera instancia, revisar si llegó un email de confirmación de la transacción a la cuenta de correo electrónico inscrita en el momento de realizar el pago, en caso de no haberlo recibido, deberás contactar a servicioalcliente@puntodepago.com.co para confirmar el estado de la transacción.
   `,
   //-----------------------
   "15|questions": "8. ¿Qué debo hacer si no recibí el comprobante de pago?",
-  "16|paragraph": `Por cada transacción aprobada a través de GOU, recibirás un comprobante del pago con la referencia de compra en la dirección de correo electrónico que indicaste al momento de pagar.
+  "16|paragraph": `Por cada transacción aprobada a través de Placetopay, recibirás un comprobante del pago con la referencia de compra en la dirección de correo electrónico que indicaste al momento de pagar.
 
   Si no lo recibes, podrás contactar a servicioalcliente@puntodepago.com.co o a la línea +573102976460 o al correo electrónico comercio@comercio.com, para solicitar el reenvío del comprobante a la misma dirección de correo electrónico registrada al momento de pagar.`,
 };
