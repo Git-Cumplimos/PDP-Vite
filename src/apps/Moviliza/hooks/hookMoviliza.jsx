@@ -38,9 +38,9 @@ export const useFetchMoviliza= (
             if (banderaConsulta) {
                 try {
                     let data_consulta = {
-                        idComercio: data_?.comercio?.id_comercio,
-                        idUsuario: data_?.comercio?.id_usuario,
-                        idTerminal: data_?.comercio?.id_terminal,
+                        id_comercio: data_?.id_comercio,
+                        id_usuario: data_?.id_usuario,
+                        id_terminal: data_?.id_terminal,
                         id_uuid_trx: data_additional_?.id_uuid_trx,
                     };
                     for (let i = 0; i <= 4; i++) { 
