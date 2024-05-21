@@ -358,7 +358,7 @@ const HistoricoPines = () => {
         <Select
           label="Estado PIN"
           options={[
-            { label: "Sin estado", value: "" },
+            { label: "", value: "" },
             { label: "Disponible", value: "Disponible" },
             { label: "Usado", value: "Usado" },
             { label: "Cancelado", value: "Cancelado" },
