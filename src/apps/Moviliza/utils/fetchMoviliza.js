@@ -132,11 +132,14 @@ export const EvaluateResponse = (res, name_ = "") => {
   //para los errores customizados del backend
   try {
     if (
-      res?.status === false &&
-      (res?.obj?.error_status === true || res?.obj?.error === true) &&
-      res?.obj?.error_msg
+      res?.status === false
     ) {
-      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`);
+      if (res?.obj?.mensaje != null){
+        throw new ErrorCustomBackend(`${"Respuesta Moviliza: "+res?.obj?.mensaje}`, `${"Respuesta Moviliza: "+res?.obj?.mensaje}`);
+        }
+    else{
+        throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`);
+    }
     }
   } catch (error) {
     if (error instanceof ErrorCustomBackend) {
