@@ -2,6 +2,7 @@ import React, {
   Fragment,
   FunctionComponent,
   MouseEvent,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -66,7 +67,7 @@ const WithPasarelaPay = (
   type_operation: number,
   dataInitialAdd: { [key: string]: any } | undefined,
   useHookPasarelaSon: TypingUseHookPasarelaSon,
-  ComponentLogo: FunctionComponent,
+  componentLogo: ReactNode,
   infoClient: TypingInfoClient,
   url_return_front: string,
   ComponectFormAdd?: FunctionComponent<PropsFormAdd>
@@ -223,7 +224,7 @@ const WithPasarelaPay = (
       <SimpleLoading show={loadingPeticionBlocking}></SimpleLoading>
       {dataSettingValor && (
         <PasarelaFormulario
-          ComponentLogo={ComponentLogo}
+          componentLogo={componentLogo}
           infoClient={infoClient}
           dataSettingValor={dataSettingValor}
           onChangeDataInputSon={onChangeDataInputSon}
@@ -247,7 +248,7 @@ const WithPasarelaPay = (
       {trx.status !== "Search" && (
         <PasarelaCheckPayOrigin
           destino={destino}
-          ComponentLogo={ComponentLogo}
+          componentLogo={componentLogo}
           url_return_front={url_return_front}
           summaryTrx={summaryTrx}
           trx={trx}

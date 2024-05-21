@@ -1,21 +1,73 @@
 import { Fragment } from "react";
 import Modal from "../../../../../../../components/Base/Modal";
 import classes from "./ModalQuestions.module.css";
-import { PropsModalInterno } from "../../../../utils/utils_typing";
+import {
+  PropsModalInterno,
+  TypingInfoClientConst,
+} from "../../../../utils/utils_typing";
 
 //FRAGMENT ******************** CSS *******************************
-const {
-  containerPrincipal,
-  containerPerItemFather,
-  containerRes,
-  labelQuestion,
-} = classes;
+const { containerPrincipal, labelQuestion, labelParagraph } = classes;
+
+//FRAGMENT ******************** SUBCOMPONENT *******************************
+const SubSwitch = ({
+  key_,
+  tipo,
+  info,
+  valueReplace,
+}: {
+  key_: string;
+  tipo: string;
+  info: string;
+  valueReplace: { [key: string]: string };
+}) => {
+  return (
+    <Fragment>
+      {tipo === "questions" && (
+        <label className={labelQuestion} id={key_}>
+          {info}
+        </label>
+      )}
+      {tipo === "br" && <br />}
+      {tipo === "paragraph" && <p className={labelParagraph}>{info}</p>}
+    </Fragment>
+  );
+};
+
+const ModalQuestionsBase = ({
+  infoClientConst,
+  valueReplace,
+}: {
+  infoClientConst: TypingInfoClientConst;
+  valueReplace: { [key: string]: string };
+}) => {
+  return (
+    <Fragment>
+      <h1 className="py-5 text-2xl font-semibold grid justify-center">
+        Preguntas Frecuentes
+      </h1>
+      <div className={containerPrincipal}>
+        {Object.keys(infoClientConst).map((key) => {
+          return (
+            <SubSwitch
+              key_={key}
+              tipo={key.split("|")[1]}
+              info={infoClientConst[key]}
+              valueReplace={valueReplace}
+            ></SubSwitch>
+          );
+        })}
+      </div>
+    </Fragment>
+  );
+};
 
 //FRAGMENT ******************** COMPONENT *******************************
 const ModalQuestions = ({
   showModalInfoClient,
   setShowModalInfoClient,
   infoClientConst,
+  valueReplace,
   children,
 }: PropsModalInterno) => {
   return (
@@ -23,47 +75,12 @@ const ModalQuestions = ({
       show={showModalInfoClient !== null ? true : false}
       handleClose={() => setShowModalInfoClient(null)}
     >
-      <h1 className="py-5 text-2xl font-semibold grid justify-center">
-        Preguntas Frecuentes
-      </h1>
       {children && !infoClientConst && children}
       {infoClientConst && !children && (
-        <div className={containerPrincipal}>
-          {Object.keys(infoClientConst).map((key) => {
-            const resObj = infoClientConst[key].res;
-            const resList = Object.keys(resObj);
-            return (
-              <div
-                className={containerPerItemFather}
-                id={`PerItemFather ${key}`}
-              >
-                <label className={labelQuestion} id={`Question ${key}`}>
-                  {infoClientConst[key].que}
-                </label>
-                <div className={containerRes}>
-                  {resObj.paragraph && (
-                    <label id={`Res ${key} paragraph`}>
-                      {resObj.paragraph}
-                    </label>
-                  )}
-                  {resList.length > 0 && (
-                    <Fragment>
-                      {resList.map((item) => (
-                        <Fragment>
-                          {item !== "paragraph" && (
-                            <label id={`Res ${key} item ${item}`}>
-                              {`- ${resObj[item]}`}
-                            </label>
-                          )}
-                        </Fragment>
-                      ))}
-                    </Fragment>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <ModalQuestionsBase
+          infoClientConst={infoClientConst}
+          valueReplace={valueReplace ? valueReplace : {}}
+        ></ModalQuestionsBase>
       )}
     </Modal>
   );

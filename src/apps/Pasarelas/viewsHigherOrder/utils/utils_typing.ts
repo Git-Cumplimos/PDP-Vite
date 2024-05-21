@@ -123,6 +123,7 @@ export type PropsModalInterno = {
   showModalInfoClient: TypingShowModalInfoClient;
   setShowModalInfoClient: Dispatch<SetStateAction<TypingShowModalInfoClient>>;
   infoClientConst?: TypingInfoClientConst;
+  valueReplace?: { [key: string]: string };
   children?: ReactNode;
 };
 
