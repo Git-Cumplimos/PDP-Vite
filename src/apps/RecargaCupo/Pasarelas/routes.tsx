@@ -28,7 +28,7 @@ const routesRecargaCupoWithPasarela = [
         235,
         undefined,
         useHookRecargaCupoWithPasarela,
-        DestinoLogoGou,
+        <DestinoLogoGou></DestinoLogoGou>,
         {
           question: { const: constQuestionGou },
           comunication: { const: constComunicationGou },
@@ -50,7 +50,7 @@ const routesRecargaCupoWithPasarela = [
         268,
         undefined,
         useHookRecargaCupoWithPasarela,
-        DestinoLogoEvertec,
+        <DestinoLogoEvertec></DestinoLogoEvertec>,
         {
           question: { const: constQuestionEvertec },
           comunication: { const: constComunicationEvertec },

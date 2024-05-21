@@ -1,7 +1,6 @@
 import React, {
   ChangeEvent,
   Dispatch,
-  FunctionComponent,
   MouseEvent,
   ReactNode,
   SetStateAction,
@@ -34,7 +33,7 @@ const { contendorFather } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type PropsPasarelaFormulario = {
-  ComponentLogo: FunctionComponent;
+  componentLogo: ReactNode;
   infoClient: TypingInfoClient;
   dataSettingValor: TypingDataSettingValor;
   onChangeDataInputSon?: TypingOnChangeDataInputSon;
@@ -74,7 +73,7 @@ export const dataInvalidInitial: TypingDataInvalid = {
 
 //FRAGMENT ******************** COMPONENT ***************************
 const PasarelaFormulario = ({
-  ComponentLogo,
+  componentLogo,
   infoClient,
   dataSettingValor,
   onChangeDataInputSon,
@@ -282,7 +281,7 @@ const PasarelaFormulario = ({
         className="grid grid-cols-1 place-content-center place-items-center"
       >
         <fieldset className={contendorFather}>
-          <ComponentLogo></ComponentLogo>
+          {componentLogo}
           {formClientDataInput && (
             <FormClient
               formClientInputs={formClientInputs}

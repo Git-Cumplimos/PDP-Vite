@@ -1,11 +1,9 @@
 import React, { Fragment, useMemo } from "react";
 import Modal from "../../../../../../../components/Base/Modal";
-import PaymentSummary from "../../../../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../../../../components/Base/ButtonBar";
 import Button from "../../../../../../../components/Base/Button";
 import { PropsModalInternoAcepto } from "../../../../utils/utils_typing";
 import classes from "./ModalAceptarTerminos.module.css";
-import { NameVar } from "../../../../../../Corresponsalia/CorresponsaliaDavivienda/utils/typingPagoDaviplata";
 
 //FRAGMENT ******************** CSS *******************************
 const {
