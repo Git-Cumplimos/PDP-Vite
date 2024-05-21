@@ -232,27 +232,21 @@ const PagarMoviliza = () => {
                       if (response?.obj?.mensaje != null){
                         if (response?.obj?.mensaje=="Error autenticando adminot "){
                           notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                         else{
                           notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                 }
                     else{
                       if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
                         notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
-                        navigate("/");
-                        navigate("/moviliza");
                       }
                       else{
                         notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                        navigate("/");
-                        navigate("/moviliza");
                       }
                     }
+                    navigate("/");
+                    navigate("/moviliza");
                 }
                }
             )
@@ -337,27 +331,21 @@ const PagarMoviliza = () => {
                       if (response?.obj?.mensaje != null){
                         if (response?.obj?.mensaje=="Error autenticando adminot "){
                           notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                         else{
                           notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                 }
                     else{
                       if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
                         notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
-                        navigate("/");
-                        navigate("/moviliza");
                       }
                       else{
                         notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                        navigate("/");
-                        navigate("/moviliza");
                       }
                     }
+                    navigate("/");
+                    navigate("/moviliza");
                 }
                }
             )
@@ -537,13 +525,13 @@ const PagarMoviliza = () => {
       numeroMoviliza,
       pdpUser,
       roleInfo,
-      peticionPayMoviliza,
+      // peticionPayMoviliza,
       resConsultMoviliza,
-      CallErrorPeticion,
-      setInfTicket,
-      setPaso,
-      infTicket,
-      paso
+      // CallErrorPeticion,
+      // setInfTicket,
+      // setPaso,
+      // infTicket,
+      // paso
     ]
   );
 
