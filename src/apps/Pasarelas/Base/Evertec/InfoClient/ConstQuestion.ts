@@ -34,11 +34,11 @@ export const constQuestion: TypingInfoClientConst = {
   `,
   //-----------------------
   "13|questions": "7. ¿Qué debo hacer si mi transacción no concluyó?",
-  "14|paragraph": `En primera instancia, revisar si llegó un email de confirmación de la transacción a la cuenta de correo electrónico inscrita en el momento de realizar el pago, en caso de no haberlo recibido, deberás contactar a (PERSONA RESPONSABLE AL INTERIOR DEL COMERCIO) para confirmar el estado de la transacción.
+  "14|paragraph": `En primera instancia, revisar si llegó un email de confirmación de la transacción a la cuenta de correo electrónico inscrita en el momento de realizar el pago, en caso de no haberlo recibido, deberás contactar a Servicio al cliente para confirmar el estado de la transacción.
   `,
   //-----------------------
   "15|questions": "8. ¿Qué debo hacer si no recibí el comprobante de pago?",
   "16|paragraph": `Por cada transacción aprobada a través de Placetopay, recibirás un comprobante del pago con la referencia de compra en la dirección de correo electrónico que indicaste al momento de pagar.
 
-  Si no lo recibes, podrás contactar a servicioalcliente@puntodepago.com.co o a la línea +573102976460 o al correo electrónico comercio@comercio.com, para solicitar el reenvío del comprobante a la misma dirección de correo electrónico registrada al momento de pagar.`,
+  Si no lo recibes, podrás contactar a Servicio al cliente o a la línea +573102976460 o al correo electrónico servicioalcliente@puntodepago.com.co, para solicitar el reenvío del comprobante a la misma dirección de correo electrónico registrada al momento de pagar.`,
 };
