@@ -592,8 +592,7 @@ const PagarMoviliza = () => {
     HandleCloseTrxExitosa,
     loadingPeticionBarcode,
     loadingPeticionPayMoviliza,
-    loadingPeticionConsultMoviliza,
-    loadingPeticionJwt
+    loadingPeticionConsultMoviliza
   ]);
 
   return (
