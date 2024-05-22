@@ -646,6 +646,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                     ]
                   )
                 ),
+                ...(convenio?.solicita_otra_ref === "1" && {[`${convenio?.["nombre_otra_ref"]}.`]:dataRecaudo?.otraReferencia}),
                 "Valor a pagar": formatMoney.format(dataRecaudo?.valorTrx),
               }}
             >
@@ -686,6 +687,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                     ]
                   )
                 ),
+                ...(convenio?.solicita_otra_ref === "1" && {[`${convenio?.["nombre_otra_ref"]}.`]:dataRecaudo?.otraReferencia}),
                 [`${
                   convenio.permite_modificar_valor === "1"
                     ? "Valor consultado"
