@@ -38,6 +38,8 @@ const DATA_RECAUDO_INIT = {
   otraReferenciaValidacion: "",
   valorTrxValidacion: 0,
   valorTrxOriginal: 0,
+  valorTrxConsultado: 0,
+  valorTrxOriginalCodBarras: 0,
   fechaCaducidad: "",
 };
 
@@ -85,6 +87,7 @@ const PagoRecaudoServiciosCajaSocial = ({
         ref3: dataCodigoBarras.codigos_referencia[2] ?? "",
         otraReferencia: "",
         valorTrxOriginal: dataCodigoBarras.pago[0] ?? 0,
+        valorTrxOriginalCodBarras: dataCodigoBarras.pago[0] ?? 0,
         valorTrx: dataCodigoBarras.pago[0] ?? 0,
         fechaCaducidad: dataCodigoBarras.fecha_caducidad[0] ?? "",
       }));
@@ -206,7 +209,8 @@ const PagoRecaudoServiciosCajaSocial = ({
               return {
                 ...old,
                 valorTrx: res?.obj.valor_consultado,
-                valorTrxOriginal: res?.obj.valor_consultado,
+                valorTrxOriginal: old.valorTrxOriginalCodBarras !== 0 ? old.valorTrxOriginalCodBarras : res?.obj.valor_consultado,
+                valorTrxConsultado: res?.obj.valor_consultado
               };
             });
             setEstadoPeticion("response");
@@ -453,7 +457,7 @@ const PagoRecaudoServiciosCajaSocial = ({
           )}
           {tipoRecaudo === "codigoBarras" && (
             <>
-              {dataCodigoBarras.pago.length > 0 && (
+              {dataCodigoBarras.pago.length > 0 && convenio.tipo_recaudo === "01" && (
                 <MoneyInput
                   id="valorTrxOriginal"
                   name="valorTrxOriginal"
@@ -686,7 +690,9 @@ const PagoRecaudoServiciosCajaSocial = ({
                   convenio.permite_modificar_valor === "1"
                     ? "Valor consultado"
                     : "Valor a pagar"
-                }`]: formatMoney.format(dataRecaudo.valorTrxOriginal),
+                }`]: convenio.permite_modificar_valor === "1"
+                ? formatMoney.format(dataRecaudo.valorTrxConsultado)
+                : formatMoney.format(dataRecaudo.valorTrxOriginal),
               }}
             >
               <Form onSubmit={pagoRecaudoServicios}>
