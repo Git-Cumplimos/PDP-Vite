@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import HNavbar from "../../../../components/Base/HNavbar/HNavbar";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { fetchGetDataOficinas } from "../../utils/tarifas";
+import { fetchGetDataOficinasValidation } from "../../utils/tarifas";
 import { notifyError } from "../../../../utils/notify";
 import { useNavigate } from "react-router-dom";
 
@@ -11,8 +11,7 @@ const Cerolio = ({ subRoutes }) => {
 
   const validateComercio = useCallback(async () => {
     try {
-      const res = await fetchGetDataOficinas(roleInfo.id_comercio);
-      console.log(res);
+      const res = await fetchGetDataOficinasValidation(roleInfo.id_comercio);
       if (res.results.length > 0) {
         return res;
       } else {
@@ -25,6 +24,11 @@ const Cerolio = ({ subRoutes }) => {
   }, [roleInfo]);
 
   useEffect(() => {
+    if (!roleInfo.id_comercio) {
+      notifyError("No se pudo obtener la información del comercio.");
+      navigate(-1);
+      return;
+    }
     validateComercio();
   }, [roleInfo, validateComercio]);
 

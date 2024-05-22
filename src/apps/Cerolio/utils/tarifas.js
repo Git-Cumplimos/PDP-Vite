@@ -85,6 +85,26 @@ export const fetchGetDataOficinas = async (
   }
 };
 
+export const fetchGetDataOficinasValidation = async (id_comercio = "") => {
+  try {
+    let params = {
+      pk_id_comercio: id_comercio,
+    };
+
+    const url = `${urlCerolio}/oficinas/tramitar`;
+
+    const res = await fetchData(url, "GET", params);
+    if (res?.status) {
+      return res?.obj;
+    } else {
+      console.error(res?.msg);
+      return { maxPages: 0, results: [] };
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const fetchUpdateComisionesByIdComercio = async (id_comercio, body) => {
   try {
     const res = await fetchData(
@@ -159,3 +179,4 @@ export const fetchGetReporte = async (
     throw err;
   }
 };
+

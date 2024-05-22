@@ -50,6 +50,8 @@ const ReportesPines = () => {
   const tableData = useMemo(() => {
     return data.map((item) => ({
       Nombre: item.archivo,
+      Tipo: "Archivo",
+      "Última modificación": "Hoy",
     }));
   }, [data]);
 
@@ -77,7 +79,7 @@ const ReportesPines = () => {
     <>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre"]}
+        headers={["Nombre", "Tipo", "Última modificación"]}
         data={tableData}
         onSelectRow={
           // Enviar el nombre del archivo para descargar
