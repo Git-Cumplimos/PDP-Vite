@@ -87,7 +87,7 @@ const ReportesHistorico = () => {
         onSetPageData={setPageData}
       >
         {/* Input para fecha */}
-        <Input
+        {/* <Input
           label="Fecha Inicial"
           type="date"
           onChange={(e) =>
@@ -102,6 +102,18 @@ const ReportesHistorico = () => {
             setFilters({ ...filters, fechaFinal: e.target.value })
           }
           value={filters.fechaFinal}
+        /> */}
+        <Input
+          type="month"
+          label="Fecha"
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              fechaInicial: e.target.value + "-01",
+              fechaFinal: e.target.value + "-31",
+            })
+          }
+          value={filters.fechaInicial.split("-").slice(0, 2).join("-")}
         />
       </TableEnterprise>
     </>
@@ -109,3 +121,4 @@ const ReportesHistorico = () => {
 };
 
 export default ReportesHistorico;
+

@@ -110,6 +110,7 @@ const ReportesConsulta = () => {
         <Select
           label="Nombre Trámite"
           options={[
+            { label: "", value: "" },
             {
               label: "Licencia por primera vez",
               value: "Licencia por primera vez",
