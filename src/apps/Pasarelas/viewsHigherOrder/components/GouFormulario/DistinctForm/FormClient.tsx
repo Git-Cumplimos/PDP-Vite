@@ -136,7 +136,7 @@ const FormClient = ({
               label="Nombres"
               type="text"
               autoComplete="off"
-              maxLength={20}
+              maxLength={40}
               disabled={
                 formClientInputs?.nombres === true ||
                 formClientInputs?.nombres === false
@@ -165,7 +165,7 @@ const FormClient = ({
               label="Apellidos"
               type="text"
               autoComplete="off"
-              maxLength={20}
+              maxLength={40}
               disabled={
                 formClientInputs?.apellidos === true ||
                 formClientInputs?.apellidos === false
