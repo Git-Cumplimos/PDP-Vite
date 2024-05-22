@@ -362,6 +362,8 @@ const HistoricoPines = () => {
             { label: "Disponible", value: "Disponible" },
             { label: "Usado", value: "Usado" },
             { label: "Cancelado", value: "Cancelado" },
+            { label: "Creado", value: "Creado" },
+            { label: "Sin recaudo", value: "Sin recaudo" },
           ]}
           onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
         />
@@ -370,6 +372,9 @@ const HistoricoPines = () => {
         <h2 className="mb-5 text-center">
           ¿Qué re-agenda le queda bien al cliente?
         </h2>
+        <p className="mb-5 font-semibold text-center">
+          {selectedItem?.nombre_oficina}
+        </p>
         <div className="grid grid-cols-2 gap-5">
           <CalendarDate value={date} onChange={changeDate}>
             <CalendarMonth />
