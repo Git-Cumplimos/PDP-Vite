@@ -121,7 +121,7 @@ const PagoProductosPropiosItau = () => {
   }, []);
   return (
     <>
-      <h1 className="text-3xl">Pago productos Propios Itaú</h1>
+      <h1 className="text-3xl">Pago Productos Propios Itaú</h1>
       <Form onSubmit={makeCashOut} grid>
         <Select
           id="tipoDocumento"
