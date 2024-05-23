@@ -37,6 +37,7 @@ const Tarifas = () => {
         setHasTarifas(false);
         return;
       }
+      setHasTarifas(true);
       const tarifas = response?.results[0]?.tarifas;
       const tarifasArray = [tarifas];
       setInitialDataTarifas(tarifasArray || []);
@@ -84,10 +85,10 @@ const Tarifas = () => {
       const response = await fetchCreateTarifasByIdComercio(body);
       // console.log(response);
       if (response?.status) {
-        notify("Tarifas create correctamente");
+        notify("Tarifas creadas correctamente");
         await getTarifasByComercio();
       } else {
-        notifyError("No se pudo actualizar las tarifas");
+        notifyError("No se pudo crear las tarifas");
       }
     } catch (error) {
       console.error(error);
