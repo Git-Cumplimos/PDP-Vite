@@ -692,9 +692,7 @@ const PagoRecaudoServiciosCajaSocial = ({
                   convenio.permite_modificar_valor === "1"
                     ? "Valor consultado"
                     : "Valor a pagar"
-                }`]: convenio.permite_modificar_valor === "1"
-                ? formatMoney.format(dataRecaudo.valorTrxConsultado)
-                : formatMoney.format(dataRecaudo.valorTrxOriginal),
+                }`]: formatMoney.format(dataRecaudo.valorTrxConsultado)
               }}
             >
               <Form onSubmit={pagoRecaudoServicios}>
