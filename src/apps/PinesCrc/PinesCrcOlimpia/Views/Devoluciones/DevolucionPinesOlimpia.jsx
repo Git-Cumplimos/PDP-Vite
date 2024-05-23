@@ -18,7 +18,7 @@ import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import useMoney from "../../../../../hooks/useMoney";
 
-import { notifyError, notifyPending } from "../../../../../utils/notify";
+import { notifyError, notify, notifyPending } from "../../../../../utils/notify";
 import fetchData from "../../../../../utils/fetchData";
 import ScreenBlocker from "../../../components/ScreenBlocker";
 import TicketOlimpia from "../../components/TicketOlimpia";
@@ -179,7 +179,7 @@ const DevolucionPinesOlimpia = () => {
         setEstadoConsulta(false);
         setNumeroPin("");
         // console.error(err);
-        notifyError("Error consultando pin referenciado Olimpia");
+        notifyError("Error Respuesta Olimpia: Error consultando pin referenciado Olimpia");
       });
   };
 
@@ -232,6 +232,7 @@ const DevolucionPinesOlimpia = () => {
           setEstadoPago(true);
           setPaymentStatus(res?.obj?.ticket ?? {});
           setIsLoadingPago(false);
+          notify("Transacción exitosa")
         }
       })
       .catch((err) => {
@@ -240,7 +241,7 @@ const DevolucionPinesOlimpia = () => {
         setIsLoadingPago(false);
         setNumeroPin("");
         // console.error(err);
-        notifyError("Error confirmando el recaudo de pin Olimpia");
+        notifyError("Error Respuesta Olimpia: Error confirmando el recaudo de pin Olimpia");
       });
   };
 
