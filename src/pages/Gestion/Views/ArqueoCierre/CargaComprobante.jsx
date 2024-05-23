@@ -22,6 +22,7 @@ import {
   buscarTiposComprobantes,
   movimientoBoveda,
   verValorBoveda,
+  movimientoEfectivoEntreCajeros,
 } from "../../utils/fetchCaja";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
@@ -30,8 +31,9 @@ import Input from "../../../../components/Base/Input";
 import Magnifier from "react-magnifier";
 import ButtonLink from "../../../../components/Base/ButtonLink";
 import Modal from "../../../../components/Base/Modal/Modal";
-import SearchEntidadesExternas from "../../components/CargarComprobantes/SearchEntidadesExternas";
+// import SearchEntidadesExternas from "../../components/CargarComprobantes/SearchEntidadesExternas";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 
 const formatMoney = makeMoneyFormatter(0);
 
@@ -61,18 +63,17 @@ const CargaComprobante = () => {
   const [rolIngreso, setRolIngreso] = useState(false);
   const [rolRetiro, setRolRetiro] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [selectedEntidadesExt, setSelectedEntidadesExt] = useState({
-    entidades_agregar: [],
-  });
+  // const [selectedEntidadesExt, setSelectedEntidadesExt] = useState({
+  //   entidades_agregar: [],
+  // });
   const [valorEnCaja, setValorEnCaja] = useState(0);
   const [valor_Boveda, setValorEnBoveda] = useState(0);
+  // const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio);
+  // const [nameComercio, setNameComercio] = useState(roleInfo?.nombre_comercio);
+  // const [idUser, setIdUser] = useState(pdpUser?.uuid);
+  // const [nameUser, setNameUser] = useState(pdpUser?.uname);
 
-  const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio);
-  const [nameComercio, setNameComercio] = useState(roleInfo?.nombre_comercio);
-  const [idUser, setIdUser] = useState(pdpUser?.uuid);
-  const [nameUser, setNameUser] = useState(pdpUser?.uname);
-
-  const [idUserTransfer, setIdUserTransfer] = useState("");
+  const [idUserRecibe, setIdUserRecibe] = useState("");
   const [valorEfectivoTransferir, setvalorEcfectivoTransferir] = useState(0.0);
   const [nameUserRecibe, setNameUserRecibe] = useState("");
 
@@ -92,9 +93,9 @@ const CargaComprobante = () => {
       "Id comercio": roleInfo?.id_comercio ?? 59,
       "Nombre comercio": roleInfo?.nombre_comercio,
       "Id usuario": roleInfo?.id_usuario ?? 8202,
-      "Nombre usuario": userInfo?.attributes?.name
+      "Nombre usuario": pdpUser?.uname
     }),
-    [roleInfo?.id_comercio, roleInfo?.id_usuario, userInfo?.attributes?.name, roleInfo?.nombre_comercio]
+    [roleInfo?.id_comercio, roleInfo?.id_usuario, pdpUser?.uname, roleInfo?.nombre_comercio]
   );
 
   const staticInfo2 = useMemo(
@@ -102,9 +103,9 @@ const CargaComprobante = () => {
       "Id comercio": roleInfo?.id_comercio ?? 59,
       "Nombre comercio": roleInfo?.nombre_comercio,
       "Id Usuario que transfiere": roleInfo?.id_usuario ?? 8202,
-      "Nombre usuario que transfiere": userInfo?.attributes?.name
+      "Nombre usuario que transfiere": pdpUser?.uname
     }),
-    [roleInfo?.id_comercio, roleInfo?.id_usuario, userInfo?.attributes?.name, roleInfo?.nombre_comercio]
+    [roleInfo?.id_comercio, roleInfo?.id_usuario, pdpUser?.uname, roleInfo?.nombre_comercio]
   );
 
   const searchEntities = useCallback((is_transport) => {
@@ -150,111 +151,128 @@ const CargaComprobante = () => {
       //   id_terminal: roleInfo?.id_dispositivo,
       // });
       // var valor_Boveda = valores?.obj[0]?.valor_boveda !== undefined?parseInt(valores?.obj[0]?.valor_boveda):0
+      if (movementType !== "Transferencia de efectivo entre cajeros") {
+        if (movementType !== "Movimiento a bóveda") {
+          // var sumExter = 0
+          // Object.values(valoresExternos).map((e)=> sumExter += e)
+          // if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
+          if (parseInt(valorComprobante) !== 0) {
+            // if (movementType !== "Recibido transportadora") {          
+            //   if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
+            //     throw new Error("Efectivo insuficiente en Caja", {
+            //       cause: "custom",
+            //     });
+            //   }
+            //   if (valor_Boveda < valorEfectivoBoveda) {
+            //     throw new Error("Efectivo insuficiente en bóveda", {
+            //       cause: "custom",
+            //     });
+            //   }
+            // }
 
-      if (movementType !== "Movimiento a bóveda") {
-        // var sumExter = 0
-        // Object.values(valoresExternos).map((e)=> sumExter += e)
-        // if (parseInt(valorComprobante) !== 0 || (Object.keys(valoresExternos).length !== 0 && sumExter !== 0)) {
-        if (parseInt(valorComprobante) !== 0) {
-          // if (movementType !== "Recibido transportadora") {          
-          //   if ((quotaInfo?.quota-valor_Boveda) < valorEfectivoPdp) {
-          //     throw new Error("Efectivo insuficiente en Caja", {
-          //       cause: "custom",
-          //     });
-          //   }
-          //   if (valor_Boveda < valorEfectivoBoveda) {
-          //     throw new Error("Efectivo insuficiente en bóveda", {
-          //       cause: "custom",
-          //     });
-          //   }
-          // }
-
-          if (!selectedEntity) {
-            throw new Error("No se ha seleccionado una entidad", {
+            if (!selectedEntity) {
+              throw new Error("No se ha seleccionado una entidad", {
+                cause: "custom",
+              });
+            }
+            if (!file) {
+              throw new Error("No se ha seleccionado un archivo", {
+                cause: "custom",
+              });
+            }
+      
+            /**
+             * Pedir url prefirmada
+             */
+            const resFile = await subirComprobante({
+              filename: `comprobantes/${roleInfo?.id_comercio};${
+                roleInfo?.id_comercio
+              }_${roleInfo?.id_usuario}_${roleInfo?.id_dispositivo}_comprobante.${
+                file?.name?.split(/\./)?.[1]
+              }`,
+              contentType: file?.type,
+            });
+      
+            /**
+             * Armar peticion para subir a s3
+             */
+            const { url, fields } = resFile.obj;
+            const filename = fields.key;
+      
+            const reqBody = {
+              fk_nombre_entidad: selectedEntity,
+              fk_tipo_comprobante: movementType,
+              id_comercio: roleInfo?.id_comercio,
+              nombre_comercio: roleInfo?.nombre_comercio,
+              id_usuario: roleInfo?.id_usuario,
+              id_terminal: roleInfo?.id_dispositivo,
+              nro_comprobante: comprobanteNumber,
+              valor_movimiento: valorComprobante,
+              observaciones: observaciones,
+              archivo: filename,
+              valor_efectivo_pdp: valorEfectivoPdp,
+              valor_efectivo_boveda: valorEfectivoBoveda,
+              valores_externos: valorEfectivoRedesExternas,
+            };
+            if (movementType === "Consignación Bancaria") {
+              reqBody["nro_cuenta"] = accountNumber;
+            }
+            await agregarComprobante(reqBody);
+      
+            const formData = new FormData();
+            for (var key in fields) {
+              formData.append(key, fields[key]);
+            }
+            formData.set("file", file);
+            await fetch(url, {
+              method: "POST",
+              body: formData,
+              mode: "no-cors",
+            });
+          }else{
+            throw new Error("Registre un valor para el comprobante", {
               cause: "custom",
             });
           }
-          if (!file) {
-            throw new Error("No se ha seleccionado un archivo", {
-              cause: "custom",
-            });
+        }else{
+          if(TipoMovimiento === "Ingreso a bóveda"){
+            if((quotaInfo?.quota-valor_Boveda) < valorComprobante) {
+              throw new Error("Efectivo insuficiente en Caja", {
+                cause: "custom",
+              });
+            }
           }
-    
-          /**
-           * Pedir url prefirmada
-           */
-          const resFile = await subirComprobante({
-            filename: `comprobantes/${roleInfo?.id_comercio};${
-              roleInfo?.id_comercio
-            }_${roleInfo?.id_usuario}_${roleInfo?.id_dispositivo}_comprobante.${
-              file?.name?.split(/\./)?.[1]
-            }`,
-            contentType: file?.type,
-          });
-    
-          /**
-           * Armar peticion para subir a s3
-           */
-          const { url, fields } = resFile.obj;
-          const filename = fields.key;
-    
           const reqBody = {
-            fk_nombre_entidad: selectedEntity,
-            fk_tipo_comprobante: movementType,
             id_comercio: roleInfo?.id_comercio,
-            nombre_comercio: roleInfo?.nombre_comercio,
             id_usuario: roleInfo?.id_usuario,
             id_terminal: roleInfo?.id_dispositivo,
-            nro_comprobante: comprobanteNumber,
             valor_movimiento: valorComprobante,
             observaciones: observaciones,
-            archivo: filename,
-            valor_efectivo_pdp: valorEfectivoPdp,
-            valor_efectivo_boveda: valorEfectivoBoveda,
-            valores_externos: valorEfectivoRedesExternas,
+            tipo_movimiento: TipoMovimiento,
           };
-          if (movementType === "Consignación Bancaria") {
-            reqBody["nro_cuenta"] = accountNumber;
-          }
-          /* const resComprobante =  */ await agregarComprobante(reqBody);
-    
-          const formData = new FormData();
-          for (var key in fields) {
-            formData.append(key, fields[key]);
-          }
-          formData.set("file", file);
-          await fetch(url, {
-            method: "POST",
-            body: formData,
-            mode: "no-cors",
-          });
-        }else{
-          throw new Error("Registre un valor para el comprobante", {
-            cause: "custom",
-          });
+          await movimientoBoveda(reqBody);
         }
       }else{
-        if(TipoMovimiento === "Ingreso a bóveda"){
-          if((quotaInfo?.quota-valor_Boveda) < valorComprobante) {
-            throw new Error("Efectivo insuficiente en Caja", {
-              cause: "custom",
-            });
-          }
-        }
         const reqBody = {
           id_comercio: roleInfo?.id_comercio,
+          nombre_comercio: roleInfo?.nombre_comercio,
           id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
-          valor_movimiento: valorComprobante,
+          nombre_usuario: pdpUser?.uname,
+          id_usuario_recibe: idUserRecibe,
+          nombre_usuario_recibe: nameUserRecibe,
+          valor_movimiento: valorEfectivoTransferir,
           observaciones: observaciones,
-          tipo_movimiento: TipoMovimiento,
         };
-        await movimientoBoveda(reqBody);
+          await movimientoEfectivoEntreCajeros(reqBody);
       }
     } catch (error) {
       throw error;
     }
   }, [
+    idUserRecibe,
+    nameUserRecibe,
+    valorEfectivoTransferir,
+    pdpUser?.uname,
     valor_Boveda,
     file,
     movementType,
@@ -272,7 +290,8 @@ const CargaComprobante = () => {
     valorEfectivoBoveda,
     // valoresExternos,
     roleInfo?.nombre_comercio,
-    valorEfectivoRedesExternas
+    valorEfectivoRedesExternas,
+    // nameUserRecibe
   ]);
 
   const onFileChange = useCallback((files) => {   
@@ -300,8 +319,8 @@ const CargaComprobante = () => {
         },
         {
           render: () => {
-            navigate("/gestion/arqueo");
-            if (movementType === "Movimiento a bóveda") {
+            // navigate("/gestion/arqueo");
+            if (movementType === "Movimiento a bóveda" || movementType === "Transferencia de efectivo entre cajeros") {
               return "Movimiento exitoso";
             }else{
               return "Comprobante subido exitosamente";
@@ -317,7 +336,7 @@ const CargaComprobante = () => {
             return "Peticion fallida";
           },
         }
-      );
+      );           
     },
     [uploadComprobante, navigate, movementType]
   );
@@ -386,33 +405,15 @@ const CargaComprobante = () => {
     setShowModal(false);
   }, []);
 
-  const handleUser = useCallback(async (ev) => {
-    if (ev !== "") {
-      setIdUser(ev)
-      const nameUser = await getUser(`${url_user}/user-unique?uuid=${ev}`);
-      setNameUser(nameUser?.uname)
-    }else{
-      setNameUser(null)
-    }
-  }, []);
-
   const handleUserRecibe = useCallback(async (ev) => {
     if (ev !== "") {
-      setIdUserTransfer(ev)
-      const nameUser = await getUser(`${url_user}/user-unique?uuid=${ev}`);
-      console.log(nameUser)
+      var valor = ev.replace(/[^0-9]/g, '');
+      setIdUserRecibe(valor)
+      const nameUser = await getUser(`${url_user}/user-unique?uuid=${valor}`);
       setNameUserRecibe(nameUser)
     }else{
-      setNameUserRecibe(null)
-    }
-  }, []);
-
-  const handleComercio = useCallback((ev) => {
-    if (ev !== "") {
-      setIdComercio(ev)
-      getUser(`${url_user}/user-unique?uuid=${ev}`);
-    }else{
-      setNameComercio(null)
+      setIdUserRecibe("")
+      setNameUserRecibe("")
     }
   }, []);
 
@@ -430,12 +431,6 @@ const CargaComprobante = () => {
     },
     { delay: 100 }
   );
-
-  // useEffect(() => {
-  //   if (pdpUser?.fk_id_comercio === null){
-  //     getUser(`${url_user}/user-unique?uuid=${pdpUser?.uuid}`);
-  //   }
-  // }, []);
 
   // const renderInputs = () => {
   //   return selectedEntidadesExt.entidades_agregar.map(entidad => (
@@ -482,6 +477,29 @@ const CargaComprobante = () => {
   //   });
   // };
 
+  const handleCheck = useCallback(() => {
+    if (nameUserRecibe !== null && nameUserRecibe !== "") {
+      if (nameUserRecibe?.active === true) {
+        if (nameUserRecibe?.fk_id_comercio === roleInfo?.id_comercio) {
+          if (nameUserRecibe?.email === pdpUser?.email) {
+            setShowModal(true)
+          }else{
+            notifyError("No esta permitido hacer transferencia entre el mismo usuario")
+          }
+        }else{
+          notifyError("El usuario que recibe no esta asociado al mismo comercio")
+        }
+      }else{
+        notifyError("El usuario que recibe no esta activo")
+      }
+    }else{
+      notifyError("El id usuario que recibe no existe")
+    }
+  }, [nameUserRecibe,
+    pdpUser?.email,
+    roleInfo?.id_comercio
+  ]);
+
   return (
     <Fragment>
       <h1 className="text-3xl mt-10 mb-8">Bóveda, Consignaciones y Transportadora</h1>
@@ -502,11 +520,11 @@ const CargaComprobante = () => {
             setvalorEfectivoBoveda(0.0)
             setvalorEfectivoRedesExternas(0.0)
             setvalorEcfectivoTransferir(0.0)
-            setIdUserTransfer("")
+            setIdUserRecibe("")
             setNameUserRecibe("")
             setFile(null)
             setImage(null)
-            setSelectedEntidadesExt((old) => {return {...old,entidades_agregar: [],};});
+            // setSelectedEntidadesExt((old) => {return {...old,entidades_agregar: [],};});
             // setValoresExternos({})
           }}
         />
@@ -518,74 +536,28 @@ const CargaComprobante = () => {
             legend={"Información del movimiento"}
             className="lg:col-span-2"
           >
-          {pdpUser?.fk_id_comercio !== null?
-            movementType !== "Transferencia de efectivo entre cajeros" ?
-              Object.entries(staticInfo).map(([key, val]) => (
-                <Input
-                  key={key}
-                  id={key}
-                  label={key}
-                  type="text"
-                  value={val}
-                  disabled
-                />
-              ))
-            :
-              Object.entries(staticInfo2).map(([key, val]) => (
-                <Input
-                  key={key}
-                  id={key}
-                  label={key}
-                  type="text"
-                  value={val}
-                  disabled
-                />
-              ))
+          {movementType !== "Transferencia de efectivo entre cajeros" ?
+            Object.entries(staticInfo).map(([key, val]) => (
+              <Input
+                key={key}
+                id={key}
+                label={key}
+                type="text"
+                value={val}
+                disabled
+              />
+            ))
           :
-          <>
-            <Input
-              id="id_comercio"
-              name="id_comercio"  
-              label={`Id comercio`}
-              autoComplete="off"
-              type="tel"
-              defaultValue={idComercio}
-              onChange={(ev) => {handleComercio(ev.target.value)}}
-              required
-            />
-            <Input
-              id="name_comercio"
-              name="name_comercio"  
-              label={`Nombre comercio`}
-              autoComplete="off"
-              type="tel"
-              defaultValue={nameComercio}
-              value={nameComercio === null?"":nameComercio}
-              disabled
-              required
-            />
-            <Input
-              id="id_user"
-              name="id_user"  
-              label={`Id Usuario que transfiere`}
-              autoComplete="off"
-              type="tel"
-              defaultValue={idUser}
-              onChange={(ev) => {handleUser(ev.target.value)}}
-              required
-            />
-            <Input
-              id="name_user"
-              name="name_user"  
-              label={`Nombre usuario que transfiere`}
-              autoComplete="off"
-              type="tel"
-              defaultValue={nameUser}
-              value={nameUser === null?"":nameUser}
-              disabled
-              required
-            />
-          </>
+            Object.entries(staticInfo2).map(([key, val]) => (
+              <Input
+                key={key}
+                id={key}
+                label={key}
+                type="text"
+                value={val}
+                disabled
+              />
+            ))
           }
           {movementType !== "Transferencia de efectivo entre cajeros"?<>
             {movementType !== "Movimiento a bóveda"?
@@ -663,11 +635,9 @@ const CargaComprobante = () => {
                       label={`Valor efectivo Caja`}
                       autoComplete="off"
                       type="tel"
-                      // minLength={"5"}
                       maxLength={"13"}
                       onInput={(ev) => setvalorEfectivoPdp(onChangeMoney(ev))}
                       onBlur={valuesComprobante}
-                      // required
                     />
                     <Input
                       id="valor_boveda"
@@ -834,7 +804,7 @@ const CargaComprobante = () => {
                 autoComplete="off"
                 type="tel"
                 maxLength={"15"}
-                defaultValue={idUserTransfer}
+                value={idUserRecibe}
                 onChange={(ev) => {handleUserRecibe(ev.target.value)}}
                 required
               />
@@ -844,7 +814,7 @@ const CargaComprobante = () => {
                 label={`Nombre usuario que recibe`}
                 autoComplete="off"
                 type="tel"
-                value={nameUserRecibe === null?"":nameUserRecibe?.uname}
+                value={nameUserRecibe === ""?"":nameUserRecibe?.uname}
                 required
                 disabled
               />
@@ -888,17 +858,56 @@ const CargaComprobante = () => {
               >
                 Cancelar
               </ButtonLink>
-              <Button type="submit" className="text-center">
-                Realizar movimiento
-              </Button>
+              {movementType !== "Transferencia de efectivo entre cajeros" ?
+                <Button type="submit" className="text-center">
+                  Realizar movimiento
+                </Button>
+              :
+                <Button type="" className="text-center" onClick={() => handleCheck()}
+                disabled={
+                  idUserRecibe === "" ||
+                  valorEfectivoTransferir === 0.0 ||
+                  observaciones === ""}
+                >
+                  Realizar movimiento
+                </Button>
+              }
             </ButtonBar>
-            <Modal show={showModal} handleClose={handleClose2}>
+
+            {/* <Modal show={showModal} handleClose={handleClose2}>
               <SearchEntidadesExternas
                 setSelectedEntidadesExt={setSelectedEntidadesExt}
                 handleClose={handleClose2}
                 selectedEntidadesExt={selectedEntidadesExt}
               />
+            </Modal> */}
+
+            <Modal show={showModal} handleClose={handleClose2}>
+              <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+                <>
+                  <PaymentSummary 
+                    title = {"¿Está seguro de realizar la transferencia de efectivo?"} 
+                    subtitle = {"Resumen del movimiento"}
+                    summaryTrx={
+                      {"Id usuario que transfiere": roleInfo?.id_usuario,
+                        "Nombre usuario que transfiere": userInfo?.attributes?.name,
+                        "Id usuario que recibe": idUserRecibe,
+                        "Nombre usuario que recibe": nameUserRecibe?.uname,
+                      }
+                    }>
+                  </PaymentSummary>
+                  <ButtonBar>
+                    <Button onClick={() => {handleClose2()}}>
+                      Cancelar
+                    </Button>
+                    <Button type='submit' onClick={() => onSubmit}>
+                      Aceptar
+                    </Button>
+                  </ButtonBar>
+                </>
+              </div>
             </Modal>
+
           </Fieldset>
         </Form>
       )}
