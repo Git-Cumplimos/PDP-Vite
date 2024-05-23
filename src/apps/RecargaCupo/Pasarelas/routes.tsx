@@ -59,7 +59,9 @@ const routesRecargaCupoWithPasarela = [
         "../recarga-cupo",
         undefined
       ),
-    permission: [ListPermissionsRecargaCupoWithPasarela.RECARGA_CUPO_CON_GOU],
+    permission: [
+      ListPermissionsRecargaCupoWithPasarela.RECARGA_CUPO_CON_EVERTEC,
+    ],
     subRoutes: [],
   },
 ];
