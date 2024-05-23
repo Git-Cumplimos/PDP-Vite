@@ -110,6 +110,7 @@ export const buscarListaComerciosCierreCaja = buildGetFunction(`${urlCierreCaja}
 export const descargarComprobante = buildGetFunction(`${urlComprobantes}/download-file`);
 export const agregarComprobante = buildPostFunction(`${urlComprobantes}/administrar`);
 export const movimientoBoveda = buildPostFunction(`${urlComprobantes}/movimiento-boveda`);
+export const movimientoEfectivoEntreCajeros = buildPostFunction(`${urlComprobantes}/movimiento-entre-cajeros`);
 export const verHistoricoBoveda = buildGetFunction(`${urlComprobantes}/movimiento-boveda`);
 export const verValorBoveda = buildGetFunction(`${urlComprobantes}/boveda`);
 export const buscarComprobantes = buildGetFunction(`${urlComprobantes}/administrar`);
