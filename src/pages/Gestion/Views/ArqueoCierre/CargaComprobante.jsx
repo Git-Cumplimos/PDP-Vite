@@ -213,6 +213,7 @@ const CargaComprobante = () => {
               valor_efectivo_pdp: valorEfectivoPdp,
               valor_efectivo_boveda: valorEfectivoBoveda,
               valores_externos: valorEfectivoRedesExternas,
+              tipo_comercio: roleInfo?.tipo_comercio,
             };
             if (movementType === "Consignación Bancaria") {
               reqBody["nro_cuenta"] = accountNumber;
@@ -291,7 +292,7 @@ const CargaComprobante = () => {
     // valoresExternos,
     roleInfo?.nombre_comercio,
     valorEfectivoRedesExternas,
-    // nameUserRecibe
+    roleInfo?.tipo_comercio
   ]);
 
   const onFileChange = useCallback((files) => {   

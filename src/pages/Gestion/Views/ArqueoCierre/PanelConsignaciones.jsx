@@ -190,8 +190,6 @@ const PanelConsignaciones = () => {
     }
   };
 
-
-  console.log(selected)
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Validación de comprobante</h1>
@@ -367,7 +365,7 @@ const PanelConsignaciones = () => {
             value={selected?.fk_tipo_comprobante ?? ""}
             disabled
           />
-          {selected?.fk_tipo_comprobante !== "Recibido transportadora"?
+          {selected?.fk_tipo_comprobante !== "Recibido transportadora" && selected?.tipo_comercio === 'OFICINAS PROPIAS'?
           <>
             <Input
               id="valor_efectivo_pdp"
