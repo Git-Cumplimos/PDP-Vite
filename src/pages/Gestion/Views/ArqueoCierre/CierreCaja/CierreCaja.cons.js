@@ -32,7 +32,7 @@ export const LABEL_FINAL_DATE = "Fecha fin";
 export const LABEL_FIND_COMMERCE = "Buscar Comercio";
 export const LABEL_LOADING = "Cargando";
 export const LABEL_NA = "NA";
-export const LABEL_TITLE_MODULE = "Cierre de caja";
+export const LABEL_TITLE_MODULE = "Reporte por Categoría";
 export const LABEL_COLUMN_BALANCE = "Saldo final del d\u00eda";
 
 // Utils

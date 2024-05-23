@@ -568,8 +568,8 @@ const CargaComprobante = () => {
                   name="tipoComp"
                   label={`Buscar ${
                     movementType === "Consignación Bancaria"
-                      ? "bancos"
-                      : "transportadoras"
+                      ? "Bancos"
+                      : "Transportadoras"
                   }`}
                   options={[
                     { value: "", label: "" },
@@ -633,7 +633,7 @@ const CargaComprobante = () => {
                     <Input
                       id="valor_caja_pdp"
                       name="valor_caja_pdp"  
-                      label={`Valor efectivo Caja`}
+                      label={`Valor efectivo caja`}
                       autoComplete="off"
                       type="tel"
                       maxLength={"13"}
@@ -643,7 +643,7 @@ const CargaComprobante = () => {
                     <Input
                       id="valor_boveda"
                       name="valor_boveda"  
-                      label={`Valor efectivo Bóveda`}
+                      label={`Valor efectivo bóveda`}
                       autoComplete="off"
                       type="tel"
                       maxLength={"12"}
@@ -653,7 +653,7 @@ const CargaComprobante = () => {
                     <Input
                       id="valor_redes_externas"
                       name="valor_redes_externas"  
-                      label={`Valor efectivo Redes Externas`}
+                      label={`Valor efectivo redes externas`} 
                       autoComplete="off"
                       type="tel"
                       maxLength={"12"}
