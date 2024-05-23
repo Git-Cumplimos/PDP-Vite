@@ -190,7 +190,8 @@ const PanelConsignaciones = () => {
     }
   };
 
-  console.log(comprobantes)
+
+  console.log(selected)
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Validación de comprobante</h1>
@@ -375,6 +376,7 @@ const PanelConsignaciones = () => {
               value={formatMoney.format(selected?.valor_efectivo_pdp) ?? ""}
               disabled
             />
+
             <Input
               id="valor_efectivo_boveda"
               label="Valor efectivo bóveda"

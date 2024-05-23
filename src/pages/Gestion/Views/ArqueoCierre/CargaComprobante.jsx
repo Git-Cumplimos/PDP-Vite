@@ -319,7 +319,7 @@ const CargaComprobante = () => {
         },
         {
           render: () => {
-            // navigate("/gestion/arqueo");
+            navigate("/gestion/arqueo");
             if (movementType === "Movimiento a bóveda" || movementType === "Transferencia de efectivo entre cajeros") {
               return "Movimiento exitoso";
             }else{
