@@ -41,6 +41,8 @@ const DATA_PAGO_INIT = {
   tipoProductoPropio: "OC",
   tipoIdentificacion: "",
   numeroIdentificacion: "",
+  primerosDigitosTarjeta: "",
+  ultimosDigitosTarjeta: "",
 };
 const TIPO_PAGO_PRODUCTOS_PROPIOS = {
   "": "",
@@ -92,19 +94,24 @@ const PagoProductosPropiosCajaSocial = () => {
       let numeroProducto = dataPago.numeroProducto;
       if (typeof ev?.preventDefault === "function") {
         ev.preventDefault();
-        if (
-          !algoCheckCuentaCreditoBMCajaSocial(numeroProducto) &&
-          !algoCheckCreditoLendingCajaSocial(numeroProducto) &&
-          !algoCheckTCCreditoRotativoCajaSocial(numeroProducto)
-        )
-          return notifyError("Número de producto ingresado errado");
-        if (
-          algoCheckTCCreditoRotativoCajaSocial(numeroProducto) &&
-          algoCheckTarjetaCreditoBinCajaSocial(numeroProducto)
-        )
-          return notifyError(
-            "Error respuesta PDP: (No se permite el pago de tarjetas manualmente)"
-          );
+        if (dataPago.tipoProductoPropio === "OC") {
+          if (
+            !algoCheckCuentaCreditoBMCajaSocial(numeroProducto) &&
+            !algoCheckCreditoLendingCajaSocial(numeroProducto) &&
+            !algoCheckTCCreditoRotativoCajaSocial(numeroProducto)
+          )
+            return notifyError("Número de producto ingresado errado");
+          if (
+            algoCheckTCCreditoRotativoCajaSocial(numeroProducto) &&
+            algoCheckTarjetaCreditoBinCajaSocial(numeroProducto)
+          )
+            return notifyError(
+              "Error respuesta PDP: (No se permite el pago de tarjetas manualmente)"
+            );
+        } else {
+          numeroProducto = `${dataPago.primerosDigitosTarjeta}******${dataPago.ultimosDigitosTarjeta}`;
+          setDataPago((old) => ({ ...old, numeroProducto: numeroProducto }));
+        }
       } else {
         let codigoBarras = ev;
         codigoBarras = codigoBarras.replace("]C1", "");
@@ -133,9 +140,16 @@ const PagoProductosPropiosCajaSocial = () => {
         pago_productos_propios_caja_social: {
           numero_producto: numeroProducto,
           codigo_barras: dataPago.estadoLecturaPago === "codigoBarras",
+          tipo_producto_propio: dataPago.tipoProductoPropio,
         },
         id_user_pdp: pdpUser.uuid,
       };
+      if (dataPago.tipoProductoPropio === "TC") {
+        data["pago_productos_propios_caja_social"]["numero_identificacion"] =
+          dataPago?.numeroIdentificacion;
+        data["pago_productos_propios_caja_social"]["tipo_identificacion"] =
+          dataPago?.tipoIdentificacion;
+      }
       notifyPending(
         peticionConsultaPagoProductosPropios({}, data),
         {
@@ -190,10 +204,17 @@ const PagoProductosPropiosCajaSocial = () => {
           codigo_barras: dataPago.estadoLecturaPago === "codigoBarras",
           valor_minimo: resConsulta?.trn?.minCurAmt?.amt,
           valor_maximo: resConsulta?.trn?.totalCurAmt?.amt,
+          tipo_producto_propio: dataPago?.tipoProductoPropio,
         },
         id_trx: resConsulta?.id_trx,
         id_user_pdp: pdpUser.uuid,
       };
+      if (dataPago.tipoProductoPropio === "TC") {
+        data["pago_productos_propios_caja_social"]["numero_identificacion"] =
+          dataPago.numeroIdentificacion;
+        data["pago_productos_propios_caja_social"]["tipo_identificacion"] =
+          dataPago.tipoIdentificacion;
+      }
       const dataAditional = {
         id_uuid_trx: uniqueId,
       };
@@ -272,13 +293,33 @@ const PagoProductosPropiosCajaSocial = () => {
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (["numeroProducto", "numeroIdentificacion"].includes(ev.target.name)) {
+    if (
+      [
+        "numeroProducto",
+        "numeroIdentificacion",
+        "primerosDigitosTarjeta",
+        "ultimosDigitosTarjeta",
+      ].includes(ev.target.name)
+    ) {
       if (!isNaN(value)) {
         value = value.replace(/[\s\.\-+eE]/g, "");
         setDataPago((old) => {
           return { ...old, [ev.target.name]: value };
         });
       }
+    } else if (ev.target.name === "tipoProductoPropio") {
+      setDataPago((old) => {
+        return {
+          ...old,
+          ...DATA_PAGO_INIT,
+          [ev.target.name]: value,
+          estadoLecturaPago: "manual",
+        };
+      });
+    } else if (ev.target.name === "estadoLecturaPago") {
+      setDataPago((old) => {
+        return { ...old, ...DATA_PAGO_INIT, [ev.target.name]: value };
+      });
     } else {
       setDataPago((old) => {
         return { ...old, [ev.target.name]: value };
@@ -371,7 +412,7 @@ const PagoProductosPropiosCajaSocial = () => {
                 loadingPeticionPagoProductosPropios || loadingPeticionConsulta
               }
             />
-            {dataPago.tipoProductoPropio === "TC" && (
+            {dataPago.tipoProductoPropio === "TC" ? (
               <>
                 <Select
                   id="tipoIdentificacion"
@@ -402,23 +443,63 @@ const PagoProductosPropiosCajaSocial = () => {
                   }
                   required
                 />
+                <Fieldset legend="Datos producto">
+                  <Input
+                    id="primerosDigitosTarjeta"
+                    name="primerosDigitosTarjeta"
+                    label={"Primeros seis dígitos tarjeta de crédito"}
+                    type="text"
+                    autoComplete="off"
+                    minLength={6}
+                    maxLength={6}
+                    value={dataPago?.primerosDigitosTarjeta}
+                    onChange={onChangeFormat}
+                    disabled={
+                      loadingPeticionPagoProductosPropios ||
+                      loadingPeticionConsulta
+                    }
+                    required
+                  />
+                  <Input
+                    id="ultimosDigitosTarjeta"
+                    name="ultimosDigitosTarjeta"
+                    label={"Últimos cuatro dígitos tarjeta de crédito"}
+                    type="text"
+                    autoComplete="off"
+                    minLength={4}
+                    maxLength={4}
+                    value={dataPago?.ultimosDigitosTarjeta}
+                    onChange={onChangeFormat}
+                    disabled={
+                      loadingPeticionPagoProductosPropios ||
+                      loadingPeticionConsulta
+                    }
+                    required
+                  />
+                </Fieldset>
+              </>
+            ) : (
+              <>
+                <Fieldset legend="Datos producto">
+                  <Input
+                    id="numeroProducto"
+                    name="numeroProducto"
+                    label={"Número de producto"}
+                    type="text"
+                    autoComplete="off"
+                    minLength={11}
+                    maxLength={16}
+                    value={dataPago?.numeroProducto}
+                    onChange={onChangeFormat}
+                    disabled={
+                      loadingPeticionPagoProductosPropios ||
+                      loadingPeticionConsulta
+                    }
+                    required
+                  />
+                </Fieldset>
               </>
             )}
-            <Input
-              id="numeroProducto"
-              name="numeroProducto"
-              label={"Número de producto"}
-              type="text"
-              autoComplete="off"
-              minLength={11}
-              maxLength={16}
-              value={dataPago?.numeroProducto}
-              onChange={onChangeFormat}
-              disabled={
-                loadingPeticionPagoProductosPropios || loadingPeticionConsulta
-              }
-              required
-            />
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
