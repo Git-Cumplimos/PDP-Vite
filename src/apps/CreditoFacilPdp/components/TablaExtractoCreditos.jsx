@@ -16,80 +16,80 @@ const TablaExtractoCreditos = ({
   });
   const [filterData, setFilterData] = useState({
     noDesembolso: "",
-    noPrestamo:""
+    noPrestamo: "",
   });
   const dataTable = useMemo(() => {
     const startIndex = (page - 1) * limit;
     const endIndex = Math.min(startIndex + limit, dataCreditos.length);
-    const tableObjCreditos = dataCreditos.map(
-      ({
-        Agrupacion,
-        Calificacion,
-        Calificacionactual,
-        Codigoasesor,
-        Codigore,
-        Cuotasmora,
-        Cuotaspagadas,
-        Diasmoraacumulado,
-        Diasmorapromedio,
-        Estado,
-        Fechadesembolso,
-        Fechadeultimopago,
-        Fechavencimientoproximo,
-        Formapago,
-        Frecuenciapagocapital,
-        Frecuenciapagointeres,
-        Id,
-        Idsucursal,
-        Idtercero,
-        Nombreasesor,
-        Nombrere,
-        Numeroprestamo,
-        Saldo,
-        Sucursal,
-        Tasaprestamo,
-        Terceroprestamo,
-        Tipocredito,
-        Valorcuotaactual,
-        Valordecuota,
-        Valordesembolso,
-        Valorinteresanticipado,
-        Valorpagototal,
-        Valorpagototalcausado,
-        Valorparaestaraldia,
-        cuotas,
-      }) => {
-        return {
-          numeroPrestamo:Numeroprestamo,
-          desembolso: Id,
-          saldoCredito: formatMoney.format(Saldo),
-          cuotas: cuotas,
-          estado: Estado,
-          fechaDesembolso: new Date(Fechadesembolso).toLocaleDateString(
-            "es-ES",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          ),
-        };
-      }
-    )
-    .filter((data) =>
-      data.desembolso.toString().match(filterData.noDesembolso)
-    )
-    .filter((data) =>
-      data.numeroPrestamo.toString().match(filterData.noPrestamo)
-    );
+    const tableObjCreditos = dataCreditos
+      .map(
+        ({
+          Agrupacion,
+          Calificacion,
+          Calificacionactual,
+          Codigoasesor,
+          Codigore,
+          Cuotasmora,
+          Cuotaspagadas,
+          Diasmoraacumulado,
+          Diasmorapromedio,
+          Estado,
+          Fechadesembolso,
+          Fechadeultimopago,
+          Fechavencimientoproximo,
+          Formapago,
+          Frecuenciapagocapital,
+          Frecuenciapagointeres,
+          Id,
+          Idsucursal,
+          Idtercero,
+          Nombreasesor,
+          Nombrere,
+          Numeroprestamo,
+          Saldo,
+          Sucursal,
+          Tasaprestamo,
+          Terceroprestamo,
+          Tipocredito,
+          Valorcuotaactual,
+          Valordecuota,
+          Valordesembolso,
+          Valorinteresanticipado,
+          Valorpagototal,
+          Valorpagototalcausado,
+          Valorparaestaraldia,
+          cuotas,
+        }) => {
+          return {
+            numeroPrestamo: Numeroprestamo,
+            desembolso: Id,
+            saldoCredito: formatMoney.format(Saldo),
+            cuotas: cuotas,
+            estado: Estado,
+            fechaDesembolso: new Date(Fechadesembolso).toLocaleDateString(
+              "es-ES",
+              {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              }
+            ),
+          };
+        }
+      )
+      .filter((data) =>
+        data.desembolso.toString().match(filterData.noDesembolso)
+      )
+      .filter((data) =>
+        data.numeroPrestamo.toString().match(filterData.noPrestamo)
+      );
     const currentPageCuotas = tableObjCreditos.slice(startIndex, endIndex);
     const totalPages = Math.ceil(tableObjCreditos.length / limit);
 
     setMaxPages(totalPages);
     setPageData({ page, limit });
 
-    return currentPageCuotas
-      
+    return currentPageCuotas;
   }, [dataCreditos, page, limit, filterData]);
 
   const onSelect = useCallback(
@@ -106,7 +106,7 @@ const TablaExtractoCreditos = ({
       title={"Créditos comercio"}
       maxPage={maxPages}
       headers={[
-        "No. Prestamo",
+        "No. Crédito",
         "No. Desembolso",
         "Saldo del crédito",
         "No. cuotas",
@@ -138,7 +138,7 @@ const TablaExtractoCreditos = ({
       />
       <Input
         id={"noPrestamo"}
-        label={"No. Prestamo"}
+        label={"No. Crédito"}
         name={"noPrestamo"}
         type="tel"
         autoComplete="off"
