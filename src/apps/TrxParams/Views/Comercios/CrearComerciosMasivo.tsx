@@ -47,7 +47,7 @@ const CrearComerciosMasivo = ({
     {
       onPending: useCallback(() => "Buscando formato", []),
       onSuccess: useCallback((res) => {
-        for (let url of (res?.obj ?? [])){
+        for (let url of (res?.obj ?? [])) {
           window.open(url, "_blank");
         }
         return "Formato obtenido";
@@ -89,7 +89,19 @@ const CrearComerciosMasivo = ({
                 .blob()
                 .then((blob: Blob) => {
                   const urlFile = URL.createObjectURL(blob);
-                  window.open(urlFile, "_blank");
+                  try {
+                    const filename = response.headers.get("Content-Disposition").split("; ")?.[1].split("=")?.[1] + ".csv";
+                    const a = document.createElement("a");
+                    a.href = urlFile;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    URL.revokeObjectURL(urlFile);
+                    document.body.removeChild(a);
+
+                  } catch {
+                    window.open(urlFile, '_blank');
+                  }
                 })
                 .catch((error: any) => console.error(error));
             } else {
@@ -134,7 +146,7 @@ const CrearComerciosMasivo = ({
     <Fragment>
       <Modal
         show={showMassive}
-        handleClose={loadingUploadFile ? () => {} : handleClose}
+        handleClose={loadingUploadFile ? () => { } : handleClose}
       >
         <Form onSubmit={onSubmit}>
           <ButtonBar>
@@ -166,7 +178,7 @@ const CrearComerciosMasivo = ({
                     className="text-3xl text-red-700 col-span-1 bi bi-trash-fill cursor-pointer"
                     onClick={
                       loadingUploadFile
-                        ? () => {}
+                        ? () => { }
                         : () => setFileUpload(undefined)
                     }
                   />
