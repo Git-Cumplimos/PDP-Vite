@@ -47,7 +47,9 @@ const CrearComerciosMasivo = ({
     {
       onPending: useCallback(() => "Buscando formato", []),
       onSuccess: useCallback((res) => {
-        window.open(res?.obj, "_blank");
+        for (let url of (res?.obj ?? [])){
+          window.open(url, "_blank");
+        }
         return "Formato obtenido";
       }, []),
       onError: useCallback((error) => {
