@@ -38,12 +38,25 @@ const DATA_PAGO_INIT = {
   tipoPago: "1",
   valorDiferentePagoProductosPropios: 0,
   numeroProducto: "",
+  tipoProductoPropio: "OC",
+  tipoIdentificacion: "",
+  numeroIdentificacion: "",
 };
 const TIPO_PAGO_PRODUCTOS_PROPIOS = {
   "": "",
   "Pago mínimo": "1",
   "Pago total": "2",
   "Pago valor diferente": "3",
+};
+const TIPO_PRODUCTOS_PROPIOS = {
+  "Otros créditos": "OC",
+  "Tarjeta de crédito": "TC",
+};
+const DATA_TIPO_IDENTIFICACION = {
+  "": "",
+  "Cédula de ciudadanía": "CC",
+  NIT: "NI",
+  "Cédula de extranjería": "CE",
 };
 const PagoProductosPropiosCajaSocial = () => {
   const uniqueId = v4();
@@ -259,7 +272,7 @@ const PagoProductosPropiosCajaSocial = () => {
   );
   const onChangeFormat = useCallback((ev) => {
     let value = ev.target.value;
-    if (ev.target.name === "numeroProducto") {
+    if (["numeroProducto", "numeroIdentificacion"].includes(ev.target.name)) {
       if (!isNaN(value)) {
         value = value.replace(/[\s\.\-+eE]/g, "");
         setDataPago((old) => {
@@ -346,6 +359,51 @@ const PagoProductosPropiosCajaSocial = () => {
           </>
         ) : (
           <>
+            <Select
+              id="tipoProductoPropio"
+              name="tipoProductoPropio"
+              label="Indique el tipo de crédito a pagar"
+              options={TIPO_PRODUCTOS_PROPIOS}
+              value={dataPago?.tipoProductoPropio}
+              onChange={onChangeFormat}
+              required
+              disabled={
+                loadingPeticionPagoProductosPropios || loadingPeticionConsulta
+              }
+            />
+            {dataPago.tipoProductoPropio === "TC" && (
+              <>
+                <Select
+                  id="tipoIdentificacion"
+                  name="tipoIdentificacion"
+                  label="Tipo de identificación"
+                  options={DATA_TIPO_IDENTIFICACION}
+                  value={dataPago?.tipoIdentificacion}
+                  onChange={onChangeFormat}
+                  required
+                  disabled={
+                    loadingPeticionPagoProductosPropios ||
+                    loadingPeticionConsulta
+                  }
+                />
+                <Input
+                  id="numeroIdentificacion"
+                  name="numeroIdentificacion"
+                  label={"Número de documento"}
+                  type="text"
+                  autoComplete="off"
+                  minLength={3}
+                  maxLength={15}
+                  value={dataPago?.numeroIdentificacion}
+                  onChange={onChangeFormat}
+                  disabled={
+                    loadingPeticionPagoProductosPropios ||
+                    loadingPeticionConsulta
+                  }
+                  required
+                />
+              </>
+            )}
             <Input
               id="numeroProducto"
               name="numeroProducto"
