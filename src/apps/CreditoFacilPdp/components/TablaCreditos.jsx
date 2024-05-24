@@ -104,7 +104,7 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
         "Saldo",
         "Desembolso",
         "Último pago",
-        "Proximo pago",
+        "Próximo pago",
       ]}
       data={dataTable}
       onSelectRow={onSelect}
