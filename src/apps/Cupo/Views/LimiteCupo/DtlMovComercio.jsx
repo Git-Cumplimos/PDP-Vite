@@ -9,190 +9,213 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useFetch } from "../../../../hooks/useFetch";
 import { notifyError } from "../../../../utils/notify";
+import { getConsultaDtlMovCupo } from "../../utils/fetchFunctions";
 import {
-  getConsultaDtlMovCupo,
   PeticionDescargarPdf,
 } from "../../utils/fetchCupo";
+import { validateDates } from "../../../../utils/functions";
+
+import useFetchDispatchDebounce, { ErrorPDPFetch } from "../../../../hooks/useFetchDispatchDebounce";
+import useMap from "../../../../hooks/useMap";
+
+const initialSearchFilters = new Map([
+  ["fk_id_comercio", ""],
+  ["nombre_comercio", ""],
+  ["sortBy", "pk_id_dtl_mov"],
+  ["sortDir", "DESC"],
+  ["tipo_afectacion", null],
+  ["fk_tipo_de_movimiento", null],
+  ["date_end", null],
+  ["date_ini", null],
+  ["page", 1],
+  ["limit", 10],
+]);
 
 const DtlMovComercio = () => {
   const [dtlCupo, setDtlCupo] = useState(null);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [fechaini, setFechaini] = useState();
-  const [fechaEnd, setFechaEnd] = useState();
+  const [fechaini, setFechaini] = useState(null);
+  const [fechaEnd, setFechaEnd] = useState(null);
   const [loadData, crearData] = useFetch(PeticionDescargarPdf);
   const [tipoAfectacion, setTipoAfectacion] = useState(null);
   const [tipoTransaccion, setTipoTransaccion] = useState(null);
   const { roleInfo } = useAuth();
-  const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio ?? null);
+  const [idComercio, setIdComercio] = useState(null);
+  const [nombreComercio, setNombreComercio] = useState(null);
 
-  const onChangeId = useCallback((ev) => {
-    const formData = new FormData(ev.target.form);
-    const idComer = (
-      (formData.get("Id comercio") ?? "").match(/\d/g) ?? []
-    ).join("");
-    setIdComercio(idComer);
-  }, []);
+  const [searchFilters, { setAll: setSearchFilters, set: setSingleFilter }] =
+    useMap(initialSearchFilters);
 
-  useEffect(() => {
-    if (roleInfo?.id_comercio) {
-      setIdComercio(roleInfo?.id_comercio);
-    }
-  }, [roleInfo?.id_comercio]);
+  const [fetchTrxs] = useFetchDispatchDebounce({
+    onSuccess: useCallback((res) => {
+      setDtlCupo(res?.obj ?? {});
+      // setNombreComercio((res?.obj?.results ?? [{}])[0].nombre_comercio ?? "");
+    }, []),
+    onError: useCallback((error) => {
+      setDtlCupo(null);
+      if (error instanceof ErrorPDPFetch) {
+        notifyError(error.message);
+      }
+      else if (!(error instanceof DOMException)) {
+        notifyError("Error al cargar Datos ");
+      }
+    }, []),
+  }, { delay: 2000 });
 
-  useEffect(() => {
-    getConsultaDtlMovCupo(
-      idComercio,
+  const searchDetalleComercio = useCallback(() => {
+    // if (!idComercio) return false
+
+    setSingleFilter("page", (old) => page ?? old);
+    setSingleFilter("limit", (old) => limit ?? old)
+    setSingleFilter("fk_id_comercio", idComercio ?? "");
+    setSingleFilter("nombre_comercio", nombreComercio ?? "")
+    if (tipoAfectacion) setSingleFilter("tipo_afectacion", tipoAfectacion ?? "");
+    if (tipoTransaccion) setSingleFilter("fk_tipo_de_movimiento", tipoTransaccion ?? "")
+    if ((fechaini && fechaEnd) && (fechaEnd >= fechaini)) {
+      setSingleFilter("date_ini", fechaini ?? "")
+      setSingleFilter("date_end", fechaEnd ?? "");
+    };
+
+    const tempMap = new Map(searchFilters);
+    const url = getConsultaDtlMovCupo()
+    tempMap.forEach((val, key, map) => {
+      if (!val) {
+        map.delete(key);
+      }
+    });
+    const queries = new URLSearchParams(tempMap.entries()).toString();
+    fetchTrxs(`${url}?${queries}`);
+  },
+    [
       page,
       limit,
-      fechaEnd,
-      fechaini,
+      idComercio,
+      tipoAfectacion,
       tipoTransaccion,
-      tipoAfectacion
-    )
-      .then((objUdusrio) => {
-        setDtlCupo(objUdusrio);
-      })
-      .catch((reason) => {
-        console.log(reason.message);
-        notifyError("Error al cargar Datos ");
-      });
-  }, [
-    idComercio,
-    tipoTransaccion,
-    tipoAfectacion,
-    page,
-    limit,
-    fechaini,
-    fechaEnd,
-  ]);
+      nombreComercio,
+      fechaini,
+      fechaEnd,
+      searchFilters,
+      setSingleFilter,
+      fetchTrxs,
+    ]
+  );
+
+
+  useEffect(() => {
+    setIdComercio(roleInfo?.id_comercio ?? "");
+    // setNombreComercio(roleInfo?.["nombre comercio"] ?? null);
+  }, [roleInfo]);
+
+  useEffect(() => {
+    searchDetalleComercio();
+  }, [searchDetalleComercio]);
+
   const onChange = useCallback((ev) => {
+    const formData = new FormData(ev.target.form);
     if (ev.target.name === "fecha_inico") {
       setFechaini(ev.target.value);
-    } else if (ev.target.name === "fecha_final") {
+    }
+    else if (ev.target.name === "fecha_final") {
       setFechaEnd(ev.target.value);
     }
+    else if (ev.target.name === "nombre_comercio") {
+      setNombreComercio(ev.target.value);
+    }
+    else if (ev.target.name === "id_comercio") {
+      const idComer = (
+        (formData.get("id_comercio") ?? "").match(/\d/g) ?? []
+      ).join("");
+      setIdComercio(idComer);
+    }
   }, []);
+
   const onSubmitDownload = useCallback(
     (e) => {
       e.preventDefault();
-      if (idComercio !== "") {
-        if (fechaEnd !== null || fechaini !== null) {
-          crearData(
-            idComercio,
-            fechaEnd,
-            fechaini,
-            tipoTransaccion,
-            tipoAfectacion
-          );
-        }
+      if (["", null].includes(idComercio)) {
+        notifyError("El id del comercio no puede estar vacío, por favor digite ese campo.")
+        return false
       }
+      if (fechaEnd === null || fechaini === null) {
+        notifyError("Las fechas no pueden estar vacías, por favor digite esos campos")
+        return false
+      }
+      if (
+        new Date(fechaEnd) <= new Date(fechaini)
+      ) {
+        notifyError("La fecha final debe ser mayor a la inicial");
+        return false;
+      }
+      if ((!validateDates(fechaini,15) || !validateDates(fechaEnd,15))){
+        return false
+      }
+
+      crearData(
+        idComercio,
+        fechaEnd,
+        fechaini,
+        tipoTransaccion,
+        tipoAfectacion
+      );
     },
     [idComercio, fechaEnd, fechaini, tipoTransaccion, tipoAfectacion, crearData]
-  );
-  const onSubmitComercio = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (e.nativeEvent.submitter.name === "buscarComercio") {
-        getConsultaDtlMovCupo(
-          idComercio,
-          page,
-          limit,
-          fechaEnd,
-          fechaini,
-          tipoTransaccion,
-          tipoAfectacion
-        )
-          .then((objUdusrio) => {
-            setDtlCupo(objUdusrio);
-          })
-          .catch((reason) => {
-            console.log(reason.message);
-            notifyError("Error al cargar Datos ");
-          });
-      }
-    },
-    [
-      idComercio,
-      page,
-      limit,
-      fechaEnd,
-      fechaini,
-      tipoAfectacion,
-      tipoTransaccion,
-    ]
   );
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Detalle movimientos cupo comercios</h1>
-      {!roleInfo?.id_comercio ? (
-        <Form grid onSubmit={onSubmitComercio}>
-          <Input
-            id="idCliente"
-            name="Id comercio"
-            label="Id comercio"
-            type="text"
-            autoComplete="off"
-            minLength={"0"}
-            maxLength={"10"}
-            value={idComercio ?? ""}
-            onChange={onChangeId}
-            required
-          />
-          <ButtonBar>
-            <Button type={"submit"} name="buscarComercio">
-              Buscar comercio
-            </Button>
-          </ButtonBar>
-        </Form>
-      ) : (
-        ""
-      )}
+
       <TableEnterprise
         title="Detalle movimientos cupo comercios"
         headers={[
           "Id detalle movimiento",
+          "Id comercio",
+          "Nombre comercio",
           "Tipo de movimiento",
           "Tipo de afectación",
           "Valor afectación",
           "Fecha afectación",
           "Hora afectación",
-          "Deuda actual",
-          "Cupo canje",
+          "Cartera actual", // Deuda
+          "Deuda", // Cupo canje
           "Usuario",
           "Id transacción",
           "Descripción afectación",
         ]}
-        data={
-          dtlCupo?.results.map(
-            ({
-              pk_id_dtl_mov,
-              tipo_movimiento,
-              nombre,
-              valor_afectacion,
-              fecha_afectacion,
-              hora_afectacion,
-              deuda_dsp_afectacion,
-              cupo_canje_dsp_afectacion,
-              usuario,
-              fk_id_trx,
-              motivo_afectacion,
-            }) => ({
-              pk_id_dtl_mov,
-              tipo_movimiento,
-              nombre,
-              valor_afectacion: formatMoney.format(valor_afectacion),
-              fecha_afectacion,
-              hora_afectacion,
-              deuda_dsp_afectacion: formatMoney.format(deuda_dsp_afectacion),
-              cupo_canje_dsp_afectacion: formatMoney.format(
-                cupo_canje_dsp_afectacion
-              ),
-              usuario,
-              fk_id_trx,
-              motivo_afectacion,
-            })
-          ) ?? []
+        data={(dtlCupo?.results ?? []).map(
+          ({
+            pk_id_dtl_mov,
+            fk_id_comercio,
+            nombre_comercio,
+            tipo_movimiento,
+            nombre,
+            valor_afectacion,
+            fecha_afectacion,
+            hora_afectacion,
+            deuda_dsp_afectacion,
+            cupo_canje_dsp_afectacion,
+            usuario,
+            fk_id_trx,
+            motivo_afectacion,
+          }) => ({
+            pk_id_dtl_mov,
+            fk_id_comercio,
+            nombre_comercio: nombre_comercio ?? "",
+            tipo_movimiento,
+            nombre,
+            valor_afectacion: formatMoney.format(valor_afectacion ?? 0),
+            fecha_afectacion,
+            hora_afectacion,
+            deuda_dsp_afectacion: formatMoney.format(deuda_dsp_afectacion ?? 0),
+            cupo_canje_dsp_afectacion: formatMoney.format(
+              cupo_canje_dsp_afectacion ?? 0
+            ),
+            usuario,
+            fk_id_trx,
+            motivo_afectacion,
+          })
+        ) ?? []
         }
         onSetPageData={(pagedata) => {
           setPage(pagedata.page);
@@ -200,13 +223,41 @@ const DtlMovComercio = () => {
         }}
         maxPage={dtlCupo?.maxPages}
       >
-        <Form onChange={onChange} grid>
+        <Form onChange={(ev) => onChange(ev)} grid>
+          {!roleInfo?.id_comercio && (
+            <>
+              <Input
+                id="id_comercio"
+                name="id_comercio"
+                label="Id comercio"
+                type="text"
+                autoComplete="off"
+                minLength={"0"}
+                maxLength={"10"}
+                value={idComercio ?? ""}
+                // onChange={(ev) => onChangeId(ev)}
+                required
+              />
+              <Input
+                id="nombre_comercio"
+                name="nombre_comercio"
+                label="Nombre comercio"
+                type="text"
+                autoComplete="off"
+                value={nombreComercio ?? ""}
+                minLength={"0"}
+                maxLength={"30"}
+              />
+            </>
+
+          )}
           <Input
             id="fecha_inico"
             name="fecha_inico"
             label="Fecha inicio"
             type="datetime-local"
             autoComplete="off"
+            value={fechaini ?? ""}
             required
           />
           <Input
@@ -215,6 +266,7 @@ const DtlMovComercio = () => {
             label="Fecha final"
             type="datetime-local"
             autoComplete="off"
+            value={fechaEnd ?? ""}
             required
           />
           <Select
@@ -251,6 +303,7 @@ const DtlMovComercio = () => {
           Descargar reporte
         </Button>
       </ButtonBar>
+
     </Fragment>
   );
 };

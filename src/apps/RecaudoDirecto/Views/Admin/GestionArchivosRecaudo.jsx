@@ -120,6 +120,11 @@ const GestionArchivosRecaudo = () => {
 
   const DescargarReporte = useCallback(
     async (e) => {
+      const fechaActual = new Date();
+      const año = fechaActual.getFullYear();
+      const mes = (fechaActual.getMonth() + 1).toString().padStart(2, '0');
+      const dia = fechaActual.getDate().toString().padStart(2, '0');
+      const fechaFormateada = `${año}-${mes}-${dia}`;
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const timebody = Object.fromEntries(
@@ -128,37 +133,71 @@ const GestionArchivosRecaudo = () => {
       const body = {
         convenio_id: selected.pk_id_convenio_directo,
         nombre_convenio:selected.nombre_convenio,
+        tipo_archivo:selected.fk_nombre_tipo_archivo,
         ...timebody
       }
-      const tipoArchivo = {
-        'Reporte Generico csv': downloadCsvRecaudo,
-        'Asobancaria 2001': downloadTxtRecaudo
-      };
-      try {
-        tipoArchivo[selected.fk_nombre_tipo_archivo](body)
-          .then(async (res) => {
-            if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
-              descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
-              return;
-            }
-            if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
-              descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
-              return;
-            }
-            notifyError('Funcion para este archivo en desarrollo')
-          })
-          .catch((err) => {
-            if (err?.cause === "custom") {
-              notifyError(err?.message);
-              return;
-            }
-            notifyError(err);
-            handleClose();
-          });
-      } catch (e) { console.log(e) }
-
-      handleClose();
-    }, [handleClose, selected]);
+      if (body.convenio_id === 2) {
+        if (body.fecha_inicial >= fechaFormateada) {
+          notifyError('Error al generar el reporte, se debe seleccionar una fecha menor a la del día de hoy')
+        }else{
+          const tipoArchivo = {
+            'Asobancaria 2011': downloadTxtRecaudo,
+          };
+          try {
+            tipoArchivo[selected.fk_nombre_tipo_archivo](body)
+              .then(async (res) => {
+                if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2011') {
+                  descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+                  return;
+                }
+                notifyError('Funcion para este archivo en desarrollo')
+              })
+              .catch((err) => {
+                if (err?.cause === "custom") {
+                  notifyError(err?.message);
+                  return;
+                }
+                notifyError(err);
+                handleClose();
+              });
+          } catch (e) { console.log(e) }
+          handleClose();
+        }
+      }else{
+        const tipoArchivo = {
+          'Reporte Generico csv': downloadCsvRecaudo,
+          'Asobancaria 2001': downloadTxtRecaudo,
+          'Asobancaria 2011': downloadTxtRecaudo,
+        };
+        try {
+          tipoArchivo[selected.fk_nombre_tipo_archivo](body)
+            .then(async (res) => {
+              if (selected.fk_nombre_tipo_archivo === 'Reporte Generico csv') {
+                descargarCSV(`Reporte_${selected?.nombre_convenio}`, res)
+                return;
+              }
+              if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2001') {
+                descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+                return;
+              }
+              if (selected.fk_nombre_tipo_archivo === 'Asobancaria 2011') {
+                descargarTXT(`Reporte_${selected?.nombre_convenio}`, res)
+                return;
+              }
+              notifyError('Funcion para este archivo en desarrollo')
+            })
+            .catch((err) => {
+              if (err?.cause === "custom") {
+                notifyError(err?.message);
+                return;
+              }
+              notifyError(err);
+              handleClose();
+            });
+        } catch (e) { console.log(e) }
+        handleClose();
+      }
+  }, [handleClose, selected]);
 
   const DescargarErrores = useCallback(
     async () => {
@@ -180,11 +219,9 @@ const GestionArchivosRecaudo = () => {
           return null
         })
       }
-
       descargarCSV('Errores_del_archivo', errores)
       handleClose();
     }, [handleClose, showModalErrors]);
-
 
   return (
     <Fragment>

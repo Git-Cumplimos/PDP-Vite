@@ -3,14 +3,7 @@ import Input from "../../../../../components/Base/Input";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Button from "../../../../../components/Base/Button";
 import Modal from "../../../../../components/Base/Modal";
-import {
-  Fragment,
-  useState,
-  useCallback,
-  useRef,
-  useEffect,
-  useMemo,
-} from "react";
+import { Fragment, useState, useCallback, useRef, useEffect } from "react";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 import TicketsAgrario from "../../components/TicketsBancoAgrario/TicketsAgrario";
 import { useReactToPrint } from "react-to-print";
@@ -24,8 +17,6 @@ import { useFetch } from "../../../../../hooks/useFetch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import Select from "../../../../../components/Base/Select";
 import SimpleLoading from "../../../../../components/Base/SimpleLoading";
-import useMoney from "../../../../../hooks/useMoney";
-import { makeMoneyFormatter } from "../../../../../utils/functions";
 import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
 import { useMFA } from "../../../../../components/Base/MFAScreen";
 
@@ -34,23 +25,12 @@ const Deposito = () => {
 
   const { submitEventSetter } = useMFA();
 
-  const [limitesMontos, setLimitesMontos] = useState({
-    max: enumParametrosBancoAgrario.maxDepositoCuentas,
-    min: enumParametrosBancoAgrario.minDepositoCuentas,
-  });
-
-  const onChangeMoney = useMoney({
-    limits: [limitesMontos.min, limitesMontos.max],
-    equalError: false,
-  });
-
   const { roleInfo, pdpUser } = useAuth();
 
   const [
     loadingDepositoCorresponsalBancoAgrario,
     fetchDepositoCorresponsalBancoAgrario,
   ] = useFetch(depositoBancoAgrario);
-  const [, fetchTypes] = useFetch();
   const validNavigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -69,7 +49,8 @@ const Deposito = () => {
   const onSubmitModal = useCallback(
     (e) => {
       e.preventDefault();
-      const { min, max } = limitesMontos;
+      const min = enumParametrosBancoAgrario.MIN_DEPOSITO_CUENTAS_AGRARIO;
+      const max = enumParametrosBancoAgrario.MAX_DEPOSITO_CUENTAS_AGRARIO;
       if (valor >= min && valor <= max) {
         const summary = {
           "Tipo de cuenta": tipoCuenta === "01" ? "Ahorros" : "Corriente",
@@ -89,7 +70,7 @@ const Deposito = () => {
         );
       }
     },
-    [valor, numCuenta, tipoCuenta, limitesMontos]
+    [valor, numCuenta, tipoCuenta]
   );
 
   const printDiv = useRef();
@@ -134,13 +115,6 @@ const Deposito = () => {
     setSummary([]);
     validNavigate(-1);
   }, [validNavigate]);
-
-  const onMoneyChange = useCallback(
-    (e, valor) => {
-      setValor(valor);
-    },
-    [valor]
-  );
 
   const goToRecaudo = useCallback(() => {
     navigate(-1);
@@ -241,34 +215,26 @@ const Deposito = () => {
             }}
             required
           />
-          <Input
+          <MoneyInput
             id="valor"
             name="valor"
             label="Valor a depositar"
             autoComplete="off"
             type="text"
-            minLength={"15"}
-            maxLength={"15"}
-            min={limitesMontos?.min}
-            max={limitesMontos?.max}
-            value={makeMoneyFormatter(0).format(valor)}
-            onInput={(ev) => setValor(onChangeMoney(ev))}
+            maxLength={"9"}
+            equalError={false}
+            equalErrorMin={false}
+            min={enumParametrosBancoAgrario.MIN_DEPOSITO_CUENTAS_AGRARIO}
+            max={enumParametrosBancoAgrario.MAX_DEPOSITO_CUENTAS_AGRARIO}
+            value={valor}
+            onInput={(ev, val) => setValor(val)}
             required
           />
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>Continuar</Button>
           </ButtonBar>
         </Form>
-        <Modal
-          show={showModal}
-          handleClose={
-            paymentStatus
-              ? goToRecaudo
-              : loadingDepositoCorresponsalBancoAgrario
-              ? () => {}
-              : handleClose
-          }
-        >
+        <Modal show={showModal}>
           {paymentStatus ? (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketsAgrario ticket={objTicketActual} refPrint={printDiv} />

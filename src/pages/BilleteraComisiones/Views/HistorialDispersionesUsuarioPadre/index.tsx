@@ -205,7 +205,7 @@ const HistorialDispersionesUsuarioPadre = (props: Props) => {
         <Input
           id="pk_id_dispersion"
           name="pk_id_dispersion"
-          label={"Id dispersion"}
+          label={"Id dispersión"}
           type="tel"
           maxLength={10}
           autoComplete="off"

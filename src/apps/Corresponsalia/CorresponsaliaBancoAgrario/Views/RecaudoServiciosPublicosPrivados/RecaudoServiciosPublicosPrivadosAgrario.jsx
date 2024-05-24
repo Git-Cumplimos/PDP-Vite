@@ -269,10 +269,12 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           name="valCashOut"
           label="Valor a pagar"
           type="text"
-          min={enumParametrosBancoAgrario.minRecaudo}
-          max={enumParametrosBancoAgrario.maxRecaudo}
+          min={enumParametrosBancoAgrario.MIN_RECAUDO_AGRARIO}
+          max={enumParametrosBancoAgrario.MAX_RECAUDO_AGRARIO}
           autoComplete="off"
-          maxLength={"12"}
+          equalError={false}
+          equalErrorMin={false}
+          maxLength={"9"}
           value={parseInt(datosTrans.valor)}
           onInput={(e, val) => {
             setDatosTrans((old) => {
@@ -294,7 +296,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
           <Button type="submit">Realizar pago</Button>
         </ButtonBar>
       </Form>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal}>
         <>
           {estadoPeticion === 0 ? (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">

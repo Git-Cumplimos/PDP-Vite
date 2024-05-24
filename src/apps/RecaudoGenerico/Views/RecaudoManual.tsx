@@ -1,30 +1,25 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-
-import TableEnterprise from "../../../components/Base/TableEnterprise/TableEnterprise";
 import Input from "../../../components/Base/Input";
-import fetchData from "../../../utils/fetchData";
 import useDelayedCallback from "../../../hooks/useDelayedCallback";
-import { useAuth } from "../../../hooks/AuthHooks";
 import { useNavigate } from "react-router-dom";
 import DataTable from "../../../components/Base/DataTable";
 import {
-  ErrorCustomComponentCode,
   ErrorCustomFetch,
   descriptionErrorFront,
   fetchCustom,
 } from "../utils/fetchUtils";
-import { notifyError, notifyPending } from "../../../utils/notify";
+import { notifyError } from "../../../utils/notify";
 
 //------ typíng--------
 type TypeListaInd = {
-  pk_id_convenio: number;
+  id_pdp_convenio: number;
   id_relacion_convenio_autorizador: number[];
-  nombre_convenio: string;
+  name_pdp_convenio: string;
   ean_convenio: string | null;
 };
 type TypeSearchFilters = {
   id_relacion_convenio_autorizador: string;
-  nombre_convenio: string;
+  name_pdp_convenio: string;
   ean_convenio: string;
   limit: number;
   page: number;
@@ -34,7 +29,7 @@ type TypeSearchFilters = {
 const url = `${process.env.REACT_APP_URL_RECAUDO_GENERICO}/backend/recaudo-generico/convenios/consultar-convenios-manual`;
 const searchFiltersInitial: TypeSearchFilters = {
   id_relacion_convenio_autorizador: "",
-  nombre_convenio: "",
+  name_pdp_convenio: "",
   ean_convenio: "",
   limit: 10,
   page: 1,
@@ -43,10 +38,6 @@ const searchFiltersInitial: TypeSearchFilters = {
 //------ componente--------
 const RecaudoManual = () => {
   const navigate = useNavigate();
-  const [conv, setConv] = useState([]);
-  const [autorizadores, setAutorizadores] = useState([]);
-  const [maxPage, setMaxPage] = useState(0);
-  const [pageData, setPageData] = useState({ page: 1, limit: 10 });
   const [searchFilters, setSearchFilters] =
     useState<TypeSearchFilters>(searchFiltersInitial);
   const [dataConsult, setDataConsult] = useState<TypeListaInd[] | null>(null);
@@ -68,10 +59,10 @@ const RecaudoManual = () => {
               searchFilters.id_relacion_convenio_autorizador,
           };
         }
-        if (searchFilters.nombre_convenio !== "") {
+        if (searchFilters.name_pdp_convenio !== "") {
           params = {
             ...params,
-            nombre_convenio: searchFilters.nombre_convenio,
+            name_pdp_convenio: searchFilters.name_pdp_convenio,
           };
         }
         if (searchFilters.ean_convenio !== "") {
@@ -94,7 +85,7 @@ const RecaudoManual = () => {
       }
     }, [
       searchFilters.id_relacion_convenio_autorizador,
-      searchFilters.nombre_convenio,
+      searchFilters.name_pdp_convenio,
       searchFilters.ean_convenio,
       searchFilters.limit,
       searchFilters.page,
@@ -119,15 +110,15 @@ const RecaudoManual = () => {
         data={
           dataConsult?.map(
             ({
-              pk_id_convenio,
+              id_pdp_convenio,
               id_relacion_convenio_autorizador,
-              nombre_convenio,
+              name_pdp_convenio,
               ean_convenio,
             }: TypeListaInd) => ({
-              "Código de convenio": pk_id_convenio,
+              "Código de convenio": id_pdp_convenio,
               "Código de convenio(autorizador)":
                 id_relacion_convenio_autorizador,
-              "Nombre de convenio": nombre_convenio,
+              "Nombre de convenio": name_pdp_convenio,
               EAN: ean_convenio,
             })
           ) ?? []
@@ -137,8 +128,8 @@ const RecaudoManual = () => {
             const dataConsultInd: TypeListaInd = dataConsult[index];
             navigate("../recaudo-generico/trx", {
               state: {
-                pk_id_convenio: dataConsultInd.pk_id_convenio,
-                convenio_name: dataConsultInd.nombre_convenio,
+                id_pdp_convenio: dataConsultInd.id_pdp_convenio,
+                name_pdp_convenio: dataConsultInd.name_pdp_convenio,
               },
             });
           }
@@ -189,12 +180,12 @@ const RecaudoManual = () => {
           }
         />
         <Input
-          id="nombre_convenio"
-          name="nombre_convenio"
+          id="name_pdp_convenio"
+          name="name_pdp_convenio"
           label="Nombre convenio"
           type="text"
           maxLength={30}
-          value={searchFilters.nombre_convenio}
+          value={searchFilters.name_pdp_convenio}
           onChange={(ev) =>
             setSearchFilters((old) => ({
               ...old,

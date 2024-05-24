@@ -5,62 +5,66 @@ import { notifyError } from "./notify";
 type StringObject = { [key: string]: string };
 type AnyObject = { [key: string]: string };
 
-export const fetchDataTotp = async (
-  url: string = "",
-  method: string = "GET",
-  queries: StringObject = {},
-  data: AnyObject = {},
-  headers: StringObject = {},
-  authenticate: boolean = true,
-  timeout: number = 60000
-): Promise<any> => {
-  const commerceUseTotp = JSON.parse(
-    window.localStorage.getItem("commerce_use_totp") ?? "null"
-  );
-  const currentTotp = JSON.parse(
-    window.localStorage.getItem("current_totp") ?? "null"
-  );
-
-  if (!commerceUseTotp) {
-    return await fetchData(
-      url,
-      method,
-      queries,
-      data,
-      headers,
-      authenticate,
-      timeout
+const createFetchDataTotp =
+  (notifyTotpError: boolean) =>
+  async (
+    url: string = "",
+    method: string = "GET",
+    queries: StringObject = {},
+    data: AnyObject = {},
+    headers: StringObject = {},
+    authenticate: boolean = true,
+    timeout: number = 60000
+  ): Promise<any> => {
+    const commerceUseTotp = JSON.parse(
+      window.localStorage.getItem("commerce_use_totp") ?? "null"
     );
-  }
-  if (!currentTotp) {
-    notifyError("Error intentando peticion: totp invalido");
-    return;
-  }
-  try {
-    const newheaders = structuredClone(headers);
-    newheaders["X-Pdp-Totp"] = currentTotp;
-
-    const res = await fetchData(
-      url,
-      method,
-      queries,
-      data,
-      newheaders,
-      authenticate,
-      timeout
+    const currentTotp = JSON.parse(
+      window.localStorage.getItem("current_totp") ?? "null"
     );
-    return res;
-  } catch (error: any) {
-    if (error?.cause === "custom-403") {
-      notifyError(error?.message);
+
+    if (!commerceUseTotp) {
+      return await fetchData(
+        url,
+        method,
+        queries,
+        data,
+        headers,
+        authenticate,
+        timeout
+      );
     }
-    throw error;
-  } finally {
-    window.localStorage.setItem("current_totp", JSON.stringify(null));
-  }
-};
+    if (!currentTotp) {
+      notifyError("Error intentando peticion: totp invalido");
+      return;
+    }
+    try {
+      const newheaders = structuredClone(headers);
+      newheaders["X-Pdp-Totp"] = currentTotp;
 
-export const fetchSecureTotp = async (
+      const res = await fetchData(
+        url,
+        method,
+        queries,
+        data,
+        newheaders,
+        authenticate,
+        timeout
+      );
+      return res;
+    } catch (error: any) {
+      if (error?.cause === "custom-403") {
+        if (notifyTotpError) {
+          notifyError(error?.message);
+        }
+      }
+      throw error;
+    } finally {
+      window.localStorage.setItem("current_totp", JSON.stringify(null));
+    }
+  };
+
+const createFetchSecureTotp = (notifyTotpError: boolean) => async (
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> => {
@@ -88,7 +92,9 @@ export const fetchSecureTotp = async (
     const response = await fetchSecure(input, newinit);
     if (response.status === 403) {
       const _msg = (await response.json())?.message;
-      notifyError(_msg);
+      if (notifyTotpError) {
+        notifyError(_msg);
+      }
       throw new Error(_msg, { cause: "custom-403" });
     }
     return response;
@@ -98,3 +104,10 @@ export const fetchSecureTotp = async (
     window.localStorage.setItem("current_totp", JSON.stringify(null));
   }
 };
+
+
+export const fetchDataTotp = createFetchDataTotp(true);
+export const fetchDataTotpNoMsg = createFetchDataTotp(false);
+
+export const fetchSecureTotp = createFetchSecureTotp(true);
+export const fetchSecureTotpNoMsg = createFetchSecureTotp(false);

@@ -21,6 +21,21 @@ const PagoCreditoFacilPDP = lazy(() =>
 const DesembolsoCEACRC = lazy(() =>
   import("./Views/CreditoFacil/DesembolsoCEACRC")
 );
+const ExtractosCreditosComerciosPDP = lazy(() =>
+  import("./Views/CreditoFacil/ExtractosCreditosComerciosPDP")
+);
+
+const CargueMasivoCredito = lazy(() =>
+  import("./Views/Admin/CargueMasivoCredito")
+);
+
+const ValidacionDocumentos = lazy(() =>
+  import("./Views/CreditoFacil/ValidacionDocumentos")
+);
+
+const ValidacionDocumentosAdmin = lazy(() =>
+  import("./Views/Admin/ValidacionDocumentosAdmin")
+);
 
 const CreditosPDP = lazy(() => import("./CreditosPDP"));
 
@@ -37,7 +52,7 @@ const rutasCreditosPdp = {
   subRoutes: [
     {
       link: "/creditos-pdp/credito-facil",
-      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Crédito Fácil" />,
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Solicitud de Crédito" />,
       component: RealizarCreditoFacil,
       permission: [enumPermisosCreditoPdp.REALIZAR_CREDITO_FACIL],
     },
@@ -58,6 +73,45 @@ const rutasCreditosPdp = {
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Gestión de Terceros" />,
       component: GestionTercerosCreditoFacil,
       permission: [enumPermisosCreditoPdpAdmin.GESTION_TERCEROS_CREDITO_FACIL],
+    },
+    {
+      link: "/creditos-pdp/cargue-masivo-creditos",
+      label: (
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Consulta y Cargue Masivo de Créditos"
+        />
+      ),
+      component: CargueMasivoCredito,
+      permission: [enumPermisosCreditoPdpAdmin.CARGUE_MASIVO_CREDITO_FACIL],
+    },
+    {
+      link: "/creditos-pdp/extracto-creditos",
+      label: <AppIcons Logo={"RECARGA_CELULAR"} name="Extracto Créditos" />,
+      component: ExtractosCreditosComerciosPDP,
+      permission: [enumPermisosCreditoPdp.EXTRACTOS_CREDITOS_COMERCIO],
+    },
+    {
+      link: "/creditos-pdp/validacion-documentos-creditos",
+      label: (
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Consulta y Validación de Documentos"
+        />
+      ),
+      component: ValidacionDocumentos,
+      permission: [enumPermisosCreditoPdp.VALIDACION_DOCUMENTOS],
+    },
+    {
+      link: "/creditos-pdp/validacion-documentos-analista",
+      label: (
+        <AppIcons
+          Logo={"RECARGA_CELULAR"}
+          name="Consulta y Validación de Documentos"
+        />
+      ),
+      component: ValidacionDocumentosAdmin,
+      permission: [enumPermisosCreditoPdpAdmin.VALIDACION_DOCUMENTOS_ADMIN],
     },
   ],
 };

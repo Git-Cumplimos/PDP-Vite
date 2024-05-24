@@ -1,6 +1,7 @@
 export type SearchFilters = {
   pk_comercio: string;
   nombre_comercio: string;
+  email_comercio: string;
   page: number;
   limit: number;
 };
@@ -8,12 +9,14 @@ export type SearchFilters = {
 export const initialSearchObj: SearchFilters = {
   pk_comercio: "",
   nombre_comercio: "",
+  email_comercio: "",
   page: 1,
   limit: 10,
 };
 
 const SET_PK_COMERCIO = "SET_PK_COMERCIO";
 const SET_NOMBRE_COMERCIO = "SET_NOMBRE_COMERCIO";
+const SET_EMAIL_COMERCIO = "SET_EMAIL_COMERCIO";
 const SET_PAGE = "SET_PAGE";
 const SET_LIMIT = "SET_LIMIT";
 const SET_ALL = "SET_ALL";
@@ -25,6 +28,10 @@ export type ACTIONTYPE =
     }
   | {
       type: "SET_NOMBRE_COMERCIO";
+      value: string | (() => string) | ((old: string) => string);
+    }
+  | {
+      type: "SET_EMAIL_COMERCIO";
       value: string | (() => string) | ((old: string) => string);
     }
   | {
@@ -43,7 +50,10 @@ export type ACTIONTYPE =
         | ((old: SearchFilters) => SearchFilters);
     };
 
-export const reducerCommerceFilters = (state: SearchFilters, action: ACTIONTYPE) => {
+export const reducerCommerceFilters = (
+  state: SearchFilters,
+  action: ACTIONTYPE
+) => {
   switch (action.type) {
     case SET_PK_COMERCIO:
       const newValPkComercio =
@@ -67,6 +77,17 @@ export const reducerCommerceFilters = (state: SearchFilters, action: ACTIONTYPE)
       const cloneNombreComercio = structuredClone(state);
       cloneNombreComercio.nombre_comercio = newValNombreComercio;
       return cloneNombreComercio;
+    case SET_EMAIL_COMERCIO:
+      const newValEmailComercio =
+        action.value instanceof Function
+          ? action.value(state.email_comercio)
+          : action.value;
+      if (state.email_comercio === newValEmailComercio) {
+        return state;
+      }
+      const cloneEmailComercio = structuredClone(state);
+      cloneEmailComercio.email_comercio = newValEmailComercio;
+      return cloneEmailComercio;
     case SET_PAGE:
       const newValPage =
         action.value instanceof Function
@@ -100,6 +121,7 @@ export const reducerCommerceFilters = (state: SearchFilters, action: ACTIONTYPE)
           state.page === newValAll.page,
           state.pk_comercio === newValAll.pk_comercio,
           state.nombre_comercio === newValAll.nombre_comercio,
+          state.email_comercio === newValAll.email_comercio,
         ].every(Boolean)
       ) {
         return state;

@@ -57,54 +57,6 @@ export const postCupoComercio = async (bodyObj) => {
   }
 };
 
-export const getConsultaDtlMovCupo = async (
-  fk_id_comercio,
-  page,
-  limit,
-  date_end,
-  date_ini,
-  fk_tipo_de_movimiento,
-  tipo_afectacion
-) => {
-  const busqueda = {
-    fk_id_comercio,
-    page,
-    limit,
-  };
-  busqueda.sortBy = "pk_id_dtl_mov";
-  busqueda.sortDir = "DESC";
-  // console.log(busqueda);
-  if (date_end && date_ini) {
-    if (date_end >= date_ini) {
-      busqueda.date_end = date_end;
-      busqueda.date_ini = date_ini;
-    } else {
-    }
-  }
-  if (tipo_afectacion) {
-    busqueda.tipo_afectacion = tipo_afectacion;
-  }
-  if (fk_tipo_de_movimiento) {
-    busqueda.fk_tipo_de_movimiento = fk_tipo_de_movimiento;
-  }
-  try {
-    const res = await fetchData(
-      `${urlCupo}/servicio-cupo/dtlcupo/sinpdf`,
-      "GET",
-      busqueda,
-      {},
-      false
-    );
-    if (res?.status) {
-      return { ...res?.obj };
-    } else {
-      console.error(res?.msg);
-      return { maxPages: 0, results: [] };
-    }
-  } catch (err) {
-    throw err;
-  }
-};
 
 export const postDtlCambioLimiteCanje = async (bodyObj) => {
   if (!bodyObj) {
@@ -128,38 +80,6 @@ export const postDtlCambioLimiteCanje = async (bodyObj) => {
   }
 };
 
-export const getConsultaAsignacionCupoLimite = async (
-  fk_id_comercio,
-  page,
-  limit
-) => {
-  const busqueda = { limit };
-  busqueda.sortBy = "fecha_afectacion";
-  busqueda.sortDir = "DESC";
-  if (fk_id_comercio) {
-    busqueda.fk_id_comercio = fk_id_comercio;
-  }
-  if (page) {
-    busqueda.page = page;
-  }
-  try {
-    const res = await fetchData(
-      `${urlCupo}/servicio-cupo/modificacion-cupo`,
-      "GET",
-      busqueda,
-      {},
-      false
-    );
-    if (res?.status) {
-      return { ...res?.obj };
-    } else {
-      console.error(res?.msg);
-      return { maxPages: 0, results: [] };
-    }
-  } catch (err) {
-    throw err;
-  }
-};
 
 export const putAjusteCupo = async (argsObj, bodyObj) => {
   if (!argsObj || !bodyObj) {

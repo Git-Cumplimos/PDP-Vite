@@ -1,10 +1,13 @@
-import React, { Fragment, FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { notifyError } from "../../../../../utils/notify";
 import { useImgs } from "../../../../../hooks/ImgsHooks";
 
-import { PropOperadoresComponent } from "../../TypeDinamic";
+import {
+  PropOperadoresComponent,
+  TypePropsComponentBody,
+} from "../../TypeDinamic";
 import useHookFetchLayouts, {
   errorFront_servicio,
 } from "../../hook/useHookFetchLayouts";
@@ -16,16 +19,17 @@ import { ErrorCustomFetch } from "../../utils/fetchUtils";
 const { Lineadivisora, Mensaje } = classes;
 
 const WithTelefoniaMovil = (
-  ComponectBody: FunctionComponent<any>,
-  componectName: string
-) => {
+  ComponectBody: FunctionComponent<TypePropsComponentBody>,
+  componectName: "Recargas" | "Paquetes"
+): JSX.Element => {
   const [operadores, setOperadores] = useState<PropOperadoresComponent[]>([]);
   const [operadorCurrent, setOperadorCurrent] =
     useState<PropOperadoresComponent | null>(null);
+  const [loadingPeticionGlobal, setLoadingPeticionGlobal] =
+    useState<Boolean>(false);
   const [loadingPeticionOperadores, peticionOperadores] = useHookFetchLayouts(
     componectName.toLowerCase()
   );
-  const [stateComponectBody, setStateComponectBody] = useState<boolean>(false);
 
   const validNavigate = useNavigate();
 
@@ -43,7 +47,6 @@ const WithTelefoniaMovil = (
           validNavigate("/telefonia-movil");
         } else {
           setOperadores(resPromise);
-          setOperadorCurrent(resPromise?.[0]);
         }
       })
       .catch((error: any) => {
@@ -62,12 +65,11 @@ const WithTelefoniaMovil = (
 
   return (
     <div>
-      {operadores.length > 0 && operadorCurrent !== null ? (
+      {operadores.length > 0 ? (
         <LayoutTelefoniaMovil
           operadores={operadores}
-          operadorCurrent={operadorCurrent}
           setOperadorCurrent={setOperadorCurrent}
-          setStateComponectBody={setStateComponectBody}
+          loadingPeticionGlobal={loadingPeticionGlobal}
         />
       ) : (
         <></>
@@ -80,10 +82,12 @@ const WithTelefoniaMovil = (
       )}
 
       <div className={Lineadivisora}></div>
-      {operadores.length > 0 &&
-      operadorCurrent !== null &&
-      stateComponectBody === true ? (
-        <ComponectBody operadorCurrent={operadorCurrent}>
+      {operadores.length > 0 && operadorCurrent !== null ? (
+        <ComponectBody
+          operadorCurrent={operadorCurrent}
+          setLoadingPeticionGlobal={setLoadingPeticionGlobal}
+          loadingPeticionGlobal={loadingPeticionGlobal}
+        >
           <img
             className="w-24 "
             src={`${svgs?.TELEFONIA_MOVIL}${operadorCurrent?.logo}`}

@@ -1,14 +1,16 @@
 import classes from "./ToggleInput.module.css";
 
+const { formItem, toggle, slider, round } = classes;
+
 const ToggleInput = ({
-  label,
+  label = "",
   title = "Activar / desactivar opcion",
+  self = false,
   ...select
 }) => {
-  const { formItem, toggle, slider, round } = classes;
   const { id: _id } = select;
 
-  return (
+  return !self ? (
     <div className={formItem} title={title}>
       {label && label !== "" && <label htmlFor={_id}>{label}</label>}
       <label className={toggle}>
@@ -16,6 +18,11 @@ const ToggleInput = ({
         <span className={`${slider} ${round}`} />
       </label>
     </div>
+  ) : (
+    <label className={toggle} title={title}>
+      <input id={_id} type="checkbox" {...select} />
+      <span className={`${slider} ${round}`} />
+    </label>
   );
 };
 

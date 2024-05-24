@@ -26,8 +26,9 @@ const allowDrag = (e) => {
   }
 };
 
+const { formItem, dropzone, File } = classes;
+
 const FileInput = ({ label, onGetFile, allowDrop = true, ...input }) => {
-  const { formItem, dropzone, File } = classes;
   const { id: _id, disabled } = input;
 
   const inputRef = useRef(null);

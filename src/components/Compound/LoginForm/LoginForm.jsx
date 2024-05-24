@@ -1,7 +1,6 @@
 import { Fragment, useState } from "react";
 
 import { useAuth } from "../../../hooks/AuthHooks";
-import { decryptAES } from "../../../utils/cryptoUtils";
 import RightArrow from "../../Base/RightArrow/RightArrow";
 import classes from "./LoginForm.module.css";
 import QRCode from "qrcode.react";
@@ -25,12 +24,14 @@ const LoginForm = () => {
   const [forgotPassSubmit, setForgotPassSubmit] = useState(false);
   const [code, setCode] = useState("");
   const [disabled, setDisabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const auth = useAuth();
 
   const handleCognito = (event) => {
     event.preventDefault();
 
+    setLoading(true);
     auth
       .signIn(username, password)
       .then(() => {})
@@ -40,29 +41,33 @@ const LoginForm = () => {
         } else {
           notifyError(err.message);
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleTOTP = (event) => {
     event.preventDefault();
+    setLoading(true);
     auth
       .confirmSignIn(totp)
       .then()
       .catch((err) => {
         if (err.code === "CodeMismatchException") {
-          notifyError("Codigo TOTP invalido");
+          notifyError("Código TOTP invalido");
         } else if (err.code === "NotAuthorizedException") {
           notifyError("La sesion ha expirado");
           setPassword("");
         } else {
           notifyError(err.message);
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleChangePW = (event) => {
     event.preventDefault();
     if (newPass === confirmPass) {
+      setLoading(true);
       auth
         .handleChangePass(
           names,
@@ -95,7 +100,8 @@ const LoginForm = () => {
           } else {
             notifyError("Por favor valide todos los campos");
           }
-        });
+        })
+        .finally(() => setLoading(false));
     } else {
       notifyError("Las contraseñas no coinciden");
     }
@@ -104,6 +110,7 @@ const LoginForm = () => {
   const handleChangeExisting = (event) => {
     event.preventDefault();
     if (newPass === confirmPass) {
+      setLoading(true);
       auth
         .handleChangePass(
           auth.parameters.name,
@@ -136,7 +143,8 @@ const LoginForm = () => {
           } else {
             notifyError("Por favor valide todos los campos");
           }
-        });
+        })
+        .finally(() => setLoading(false));
     } else {
       notifyError("Las contraseñas no coinciden");
     }
@@ -161,6 +169,7 @@ const LoginForm = () => {
       }),
       {
         render: () => {
+          setLoading(true);
           return "Validando usuario";
         },
       },
@@ -186,12 +195,14 @@ const LoginForm = () => {
                 return;
               }
               console.error(err);
-            });
+            })
+            .finally(() => setLoading(false));
           return "Usuario encontrado";
         },
       },
       {
         render: ({ data: err }) => {
+          setLoading(false);
           if (err?.cause === "custom") {
             return err?.message;
           }
@@ -204,6 +215,7 @@ const LoginForm = () => {
   const handleForgotPasswordSubmit = (event) => {
     event.preventDefault();
     if (newPass === confirmPass) {
+      setLoading(true);
       auth
         .forgotPasswordSubmit(username, code, confirmPass)
         .then((res) => {
@@ -230,7 +242,8 @@ const LoginForm = () => {
               </h6>
             );
           }
-        });
+        })
+        .finally(() => setLoading(false));
     } else {
       notifyError("Las contraseñas no coinciden");
     }
@@ -239,26 +252,36 @@ const LoginForm = () => {
   const handleTOTPconfirm = (event) => {
     event.preventDefault();
 
-    auth
-      .handleverifyTotpToken(totp)
-      .then()
-      .catch((err) => {
-        console.log(err);
+    
+    notifyPending(
+      auth.handleverifyTotpToken(totp),
+      { render: () => {
+        setLoading(true);
+        return "Verificando token";
+      } },
+      { render: () => {
+        setLoading(false);
+        return "Token y contraseña restablecidos correctamente";
+      }},
+      { render: ({data:err}) => {
+        setLoading(false);
         if (err.cause === "unknown") {
-          notifyError(err.message);
-          return;
+          console.error(err);
+          return err.message;
+        }
+        if (err.cause === "custom") {
+          return err.message;
         }
         if (err.code === "EnableSoftwareTokenMFAException") {
-          notifyError(
-            "Ha ingresado un código antiguo, escanee el QR e intente de nuevo"
-          );
-          return;
+          return "Ha ingresado un código antiguo, escanee el QR e intente de nuevo";
         }
         if (auth.timer) {
           clearTimeout(auth.timer);
         }
-        notify("Token y contraseña reestablecidos correctamente");
-      });
+        console.error(err);
+        return "Error en verificacion de token sin controlar";
+      }}
+    )
 
     setNames("");
     setLastName("");
@@ -292,8 +315,8 @@ const LoginForm = () => {
               }}
             />
           </div>
-          <div className={field}>
-            <button type="submit">Validar codigo</button>
+          <div className={field} disabled={loading}>
+            <button type="submit">Validar código</button>
           </div>
         </form>
       </div>
@@ -308,10 +331,10 @@ const LoginForm = () => {
         <hr />
         <form
           onSubmit={
-            auth.parameters.name === "" ? handleChangePW : handleChangeExisting
+            !auth.parameters?.name ? handleChangePW : handleChangeExisting
           }
         >
-          {auth.parameters.name === "" && (
+          {!auth.parameters?.name && (
             <Fragment>
               <div className={field}>
                 <label htmlFor="names">Nombres:</label>
@@ -392,7 +415,7 @@ const LoginForm = () => {
               }}
             />
           </div>
-          <div className={field}>
+          <div className={field} disabled={loading}>
             <button type="submit">Actualizar contraseña</button>
           </div>
         </form>
@@ -427,7 +450,7 @@ const LoginForm = () => {
               }}
             />
           </div>
-          <div className={field}>
+          <div className={field} disabled={loading}>
             <button type="submit">Finalizar</button>
           </div>
         </form>
@@ -496,7 +519,7 @@ const LoginForm = () => {
               }}
             />
           </div>
-          <div className={field}>
+          <div className={field} disabled={loading}>
             <button type="submit">Modificar contraseña</button>
           </div>
         </form>
@@ -560,7 +583,7 @@ const LoginForm = () => {
           />
         </div>
         <div className={field}>
-          <button type="submit">Ingresar</button>
+          <button type="submit" disabled={loading}>Ingresar</button>
         </div>
         <div className={field}>
           <button
@@ -568,6 +591,7 @@ const LoginForm = () => {
             onClick={() => {
               setForgotPass(true);
             }}
+            disabled={loading}
           >
             ¿Olvido contraseña?
           </button>

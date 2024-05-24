@@ -7,6 +7,7 @@ type Props = {
   colorName: string;
   bootstrapIcon: string;
   bootstrapIconHover: string;
+  title?: string
 };
 
 const commonClasses = "cursor-pointer";
@@ -20,9 +21,10 @@ const IconSwap = ({
   colorName,
   bootstrapIcon,
   bootstrapIconHover,
+  title
 }: Props) => {
   return (
-    <div className={`group relative ${className}`} onClick={onClick}>
+    <div className={`group relative ${className}`} onClick={onClick} title={title}>
       <span
         className={`${size} ${commonClasses} ${colorName} ${defaultClasses} bi bi-${bootstrapIcon}`}
       />

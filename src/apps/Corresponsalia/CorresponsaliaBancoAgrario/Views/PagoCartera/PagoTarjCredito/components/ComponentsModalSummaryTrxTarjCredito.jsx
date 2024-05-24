@@ -21,6 +21,9 @@ export const ComponentsModalSummaryTrxTarjCredito = ({
       {!loadingPeticion ? (
         <>
           <ButtonBar>
+            <Button disabled={loadingPeticion} onClick={handleClose}>
+              Cancelar
+            </Button>
             <Button
               type={"submit"}
               disabled={loadingPeticion}
@@ -30,9 +33,6 @@ export const ComponentsModalSummaryTrxTarjCredito = ({
               }}
             >
               Realizar Pago
-            </Button>
-            <Button disabled={loadingPeticion} onClick={handleClose}>
-              Cancelar
             </Button>
           </ButtonBar>
         </>

@@ -3,7 +3,6 @@ import { TypingRoutes } from "../../utils/TypingUtils";
 import HNavbar from "../../components/Base/HNavbar/HNavbar";
 import Recargas from "./DynamicTelefoniaMovil/views/Recargas";
 import WithTelefoniaMovil from "./DynamicTelefoniaMovil/components/WithTelefoniaMovil/WithTelefoniaMovil";
-import { useBackendPaquetesMovistar } from "./ServiciosOperadores/Movistar/BackendPaquetes";
 import { TypeSubModules } from "./DynamicTelefoniaMovil/TypeDinamic";
 import Paquetes from "./DynamicTelefoniaMovil/views/Paquetes";
 import { useBackendRecargasDefault } from "./DynamicTelefoniaMovil/ServiciosBackendAutotorizadores/BackendRecargasDefault";

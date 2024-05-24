@@ -5,21 +5,18 @@ import Button from "../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../components/Base/ButtonBar";
 import Form from "../../../../../../components/Base/Form";
 import Modal from "../../../../../../components/Base/Modal";
-import Select from "../../../../../../components/Base/Select";
 import { useAuth } from "../../../../../../hooks/AuthHooks";
 import { notify, notifyError } from "../../../../../../utils/notify";
-import { enumParametrosPagoCartera } from "../../../utils/enumParametrosPagoCartera";
 import { ErrorCustom } from "../../../utils/fetchCarteraCredito";
 import { ComponentsModalSummaryTrxTarjCredito } from "./components/ComponentsModalSummaryTrxTarjCredito";
-import classes from "../../Runt/PagarRunt.module.css";
 import TicketsAgrario from "../../../components/TicketsBancoAgrario/TicketsAgrario/TicketsAgrario";
 import { v4 } from "uuid";
 import { useFetchPagoCartera } from "../../../hooks/hookPagoCartera";
 import SimpleLoading from "../../../../../../components/Base/SimpleLoading/SimpleLoading";
 import Input from "../../../../../../components/Base/Input/Input";
 import { makeMoneyFormatter } from "../../../../../../utils/functions";
-import useMoney from "../../../../../../hooks/useMoney";
-const { styleComponents } = classes;
+import MoneyInput from "../../../../../../components/Base/MoneyInput";
+import { enumParametrosBancoAgrario } from "../../../utils/enumParametrosBancoAgrario";
 const url_pago_cartera_tarjcredito = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
 const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const PagoTarjCredito = () => {
@@ -93,20 +90,20 @@ const PagoTarjCredito = () => {
       if (isNaN(valor_pagar)) {
         return notifyError("El valor no es un numero");
       } else if (
-        valor_pagar > enumParametrosPagoCartera.maxPagoCarteraTarjCredito
+        valor_pagar > enumParametrosBancoAgrario.MAX_PAGO_CARTERA_AGRARIO
       ) {
         return notifyError(
           `Supera el valor máximo de ${makeMoneyFormatter(0).format(
-            enumParametrosPagoCartera.maxPagoCarteraTarjCredito
+            enumParametrosBancoAgrario.MAX_PAGO_CARTERA_AGRARIO
           )} para pago tarjeta.`
         );
       } else if (
-        valor_pagar < enumParametrosPagoCartera.minPagoCarteraTarjCredito
+        valor_pagar < enumParametrosBancoAgrario.MIN_PAGO_CARTERA_AGRARIO
       ) {
         return notifyError(
           `El valor mínimo para pago tarjeta es de ${makeMoneyFormatter(
             0
-          ).format(enumParametrosPagoCartera.minPagoCarteraTarjCredito)}.`
+          ).format(enumParametrosBancoAgrario.MIN_PAGO_CARTERA_AGRARIO)}.`
         );
       }
       const data = {
@@ -180,6 +177,7 @@ const PagoTarjCredito = () => {
       roleInfo,
       peticionPayCarteraTarjCredito,
       CallErrorPeticion,
+      uniqueId,
     ]
   );
 
@@ -231,30 +229,8 @@ const PagoTarjCredito = () => {
     validNavigate(-1);
   }, [validNavigate]);
 
-  const HandleCloseModal = useCallback(() => {
-    setShowModalGeneric((old) => {
-      return { ...old, showModalTicket: false };
-    });
-    setShowModalGeneric((old) => {
-      return { ...old, showModal: false };
-    });
-    if (
-      datosTarjCredito?.confirmacionTicket === "ResumenTrx" &&
-      !loadingPeticionPayCarteraTarjCredito
-    ) {
-      HandleCloseTrx();
-    } else if (datosTarjCredito?.confirmacionTicket === "TransaccionExitosa") {
-      HandleCloseTrxExitosa();
-    }
-  }, [
-    datosTarjCredito,
-    HandleCloseTrx,
-    HandleCloseTrxExitosa,
-    loadingPeticionPayCarteraTarjCredito,
-  ]);
-
   function onChangeInput(e) {
-    const { name, value } = e.target;
+    const { value } = e.target;
     const numericValue = value.replace(/[^0-9]/g, "").slice(0, 16);
     const num = numericValue.replace(/[\s\.\-+eE]/g, "");
     setDatosTarjCredito((old) => {
@@ -266,13 +242,6 @@ const PagoTarjCredito = () => {
       });
     }
   }
-  const onChangeMoney = useMoney({
-    limits: [
-      enumParametrosPagoCartera.minPagoCarteraTarjCredito,
-      enumParametrosPagoCartera.maxPagoCarteraTarjCredito,
-    ],
-    equalError: false,
-  });
 
   return (
     <Fragment>
@@ -292,22 +261,21 @@ const PagoTarjCredito = () => {
           onChange={onChangeInput}
           required
         ></Input>
-        <Input
+        <MoneyInput
           id="valCashOut"
           name="ValorPagar"
           label="Valor a pagar"
           autoComplete="off"
           type="text"
-          minLength={"4"}
-          maxLength={"12"}
-          min={enumParametrosPagoCartera.minPagoCarteraTarjCredito}
-          max={enumParametrosPagoCartera.maxPagoCarteraTarjCredito}
-          value={makeMoneyFormatter(0).format(
-            datosTarjCredito?.inputValorTarCredi
-          )}
-          onInput={(ev) =>
+          maxLength={"9"}
+          equalError={false}
+          equalErrorMin={false}
+          min={enumParametrosBancoAgrario.MIN_PAGO_TARJETA_CREDITO_AGRARIO}
+          max={enumParametrosBancoAgrario.MAX_PAGO_TARJETA_CREDITO_AGRARIO}
+          value={datosTarjCredito?.inputValorTarCredi}
+          onInput={(ev, val) =>
             setDatosTarjCredito((old) => {
-              return { ...old, inputValorTarCredi: onChangeMoney(ev) };
+              return { ...old, inputValorTarCredi: val };
             })
           }
           required
@@ -340,10 +308,7 @@ const PagoTarjCredito = () => {
       </Form>
 
       {datosTarjCredito?.confirmacionDatos === true && (
-        <Modal
-          show={showModalGeneric?.showModal}
-          handleClose={HandleCloseModal}
-        >
+        <Modal show={showModalGeneric?.showModal}>
           <ComponentsModalSummaryTrxTarjCredito
             numero_tarjcredito={datosTarjCredito?.inputNumTarCredi}
             valor_pagar={datosTarjCredito?.inputValorTarCredi}
@@ -355,10 +320,7 @@ const PagoTarjCredito = () => {
       )}
       {infTicket &&
         datosTarjCredito?.confirmacionTicket === "TransaccionExitosa" && (
-          <Modal
-            show={showModalGeneric?.showModalTicket}
-            handleClose={HandleCloseModal}
-          >
+          <Modal show={showModalGeneric?.showModalTicket}>
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <TicketsAgrario refPrint={printDiv} ticket={infTicket} />
               <ButtonBar>

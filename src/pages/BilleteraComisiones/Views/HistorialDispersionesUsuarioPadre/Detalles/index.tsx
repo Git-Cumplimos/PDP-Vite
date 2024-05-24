@@ -100,7 +100,7 @@ const DetallesHistoricoDUP = (props: Props) => {
             },
           });
         } else {
-          notifyError("Transaccion sin finalizar");
+          notifyError("Transacción sin finalizar");
         }
       } else {
         if (currentDisp?.estado === "ERROR") {
@@ -116,7 +116,7 @@ const DetallesHistoricoDUP = (props: Props) => {
             },
           });
         } else {
-          notifyError("Estado de la transaccion invalido");
+          notifyError("Estado de la transacción invalido");
         }
       }
     },
@@ -171,7 +171,7 @@ const DetallesHistoricoDUP = (props: Props) => {
         title="Transferencias"
         headers={[
           "Id comercio",
-          "Id transaccion",
+          "Id transacción",
           "Estado",
           "Valor",
           "Fecha de inicio",

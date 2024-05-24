@@ -3,7 +3,7 @@ import Button from "../../../../../components/Base/Button";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Form from "../../../../../components/Base/Form";
 import Input from "../../../../../components/Base/Input";
-import { notifyPending,notifyError } from "../../../../../utils/notify";
+import { notifyPending,notifyError,notify } from "../../../../../utils/notify";
 import Select from "../../../../../components/Base/Select";
 import TextArea from "../../../../../components/Base/TextArea";
 import ButtonLink from "../../../../../components/Base/ButtonLink";
@@ -56,26 +56,17 @@ const ReporteSobranteFaltantes = () => {
       body['id_comercio']=id_comercio;
       body['pk_id_cajero']=id_user;
       if (body?.pk_id_transaccion !== '') {
-        notifyPending(
-          buscarIdTrx(body),
-          {
-            render: () => {
-              setIsLoading(true);
-              return "Buscando ID de la transacción";
-            },
-          },
-          {
-            render: ({ data: response }) => {
-              if (response?.obj !== null) {
-                insertFaltantesSobr(body)
-                return "ID de transacción válido";
-              }else{
-                setIsLoading(false);
-                return "Número de la transacción ingresado no corresponde a una transacción del comercio";
-              }
-            },
-          },
-        );
+        buscarIdTrx(body)
+        .then((res) => {
+          if (res?.obj !== null) {
+            insertFaltantesSobr(body)
+            notify("ID de transacción válido")
+          }else{
+            setIsLoading(false);
+            notifyError("Número de la transacción ingresado no corresponde a una transacción del comercio");
+          }
+        })
+        .catch(() => {});
       }else{
         delete body.pk_id_transaccion
         insertFaltantesSobr(body)
@@ -87,7 +78,7 @@ const ReporteSobranteFaltantes = () => {
   const handleChangeCurrenci = (e) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '').slice(0, 7);
-    const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const finalValue = `$${formattedValue}`;
     setValorNovedad(finalValue);
   };

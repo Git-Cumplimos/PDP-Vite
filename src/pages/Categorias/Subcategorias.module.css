@@ -1,0 +1,19 @@
+nav.navbar {
+  @apply px-4;
+}
+
+nav.navbar > ul.list {
+  @apply flex flex-row flex-wrap;
+}
+
+nav.navbar > ul.text {
+  @apply mx-4 mb-4 justify-around text-lg gap-6;
+}
+
+nav.navbar > ul.icon {
+  @apply my-4 justify-center gap-4;
+}
+
+nav.navbar > ul.text > li {
+  @apply px-4;
+}

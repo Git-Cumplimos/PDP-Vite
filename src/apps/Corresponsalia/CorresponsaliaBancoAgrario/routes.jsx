@@ -137,8 +137,7 @@ const rutasAgrarioCB = {
       link: "/runt/pagar-runt",
       label: <AppIcons Logo={"DAVIVIENDA_PAGO_POR_GIRO"} name={"Pagar RUNT"} />,
       component: PagarRunt,
-      permission: [...listPermissionsAgrario],
-      subRoutes: [],
+      permission: [enumPermisosAgrario.agrario_cb_runt],
     },
     {
       link: "/corresponsalia/corresponsalia-banco-agrario/recaudo-de-productos-propios",

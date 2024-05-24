@@ -1,6 +1,7 @@
 export enum PermissionsCaja {
   VerReporteTrxCierre = 6108,
   VerHistoricoCierresCaja = 6107,
+  VerArqueoCierresCaja = 6012,
   VerHistoricoNotasDebitoCredito = 6106,
   AgregarNotasCredito = 6105,
   AgregarNotasDebito = 6104,

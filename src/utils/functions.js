@@ -1,5 +1,6 @@
 import { Auth } from "aws-amplify";
 import { Buffer } from "buffer";
+import { notifyError } from "./notify";
 
 const CryptoJS = require("crypto-js");
 
@@ -62,22 +63,28 @@ export const onHandleNegativeNumbers = (ev) => {
  * @param {*} ev
  * @returns digits in text
  */
-export const onChangeNumber = (ev) => {
+export const onChangeNumber = (ev, setValidity = true) => {
   let caret_pos = ev.target.selectionStart ?? 0;
   const len = ev.target.value.length;
 
   ev.target.value = ((ev.target.value ?? "").match(/\d/g) ?? []).join("");
+  const lenAfter = ev.target.value.length;
 
-  if (ev.target.value.length < ev.target.minLength && ev.target.required) {
-    ev.target.setCustomValidity(
-      `Aumenta la longitud del texto a ${ev.target.minLength} caracteres como minimo (actualmente, el texto tiene ${ev.target.value.length} caracteres)`
-    );
-  } else {
-    ev.target.setCustomValidity("");
+  if (setValidity) {
+    if (
+      lenAfter < ev.target.minLength &&
+      (ev.target.required || lenAfter)
+    ) {
+      ev.target.setCustomValidity(
+        `Aumenta la longitud del texto a ${ev.target.minLength} caracteres como minimo (actualmente, el texto tiene ${lenAfter} caracteres)`
+      );
+    } else {
+      ev.target.setCustomValidity("");
+    }
   }
 
   ev.target.focus();
-  caret_pos += ev.target.value.length - len;
+  caret_pos += lenAfter - len;
   ev.target.setSelectionRange(caret_pos, caret_pos);
 
   return ev.target.value;
@@ -85,6 +92,10 @@ export const onChangeNumber = (ev) => {
 
 export const toPhoneNumber = (num = "") => {
   let reg = /(\d{1,3}[-.\s]?)?(\d{1,3}[-.\s]?)?(\d{1,4})/;
+  if (num.length > 10) {
+    reg = /(\d{1,3}[-.\s]?)?(\d{1,3}[-.\s]?)?(\d{1,4})?(\d{1,4})/;
+  }
+
   return (
     num
       .match(reg)
@@ -205,3 +216,32 @@ export function decrypt3DES(data, k1, k2, k3) {
   }).toString();
   return decrypted;
 }
+
+const transformData = (data) => {
+  if (String(data).length >= 2) return String(data);
+  else return `0${String(data)}`;
+};
+
+export const validateDates = (searchDate, fechaMax = 7) => {
+  let limitMin = new Date();
+  let limitMax = new Date();
+  limitMin.setDate(limitMin.getDate() - fechaMax);
+  limitMax.setDate(limitMax.getDate() + 1);
+  limitMin = `${limitMin.getFullYear()}-${transformData(
+    limitMin.getMonth() + 1
+  )}-${transformData(limitMin.getDate())}`;
+  limitMax = `${limitMax.getFullYear()}-${transformData(
+    limitMax.getMonth() + 1
+  )}-${transformData(limitMax.getDate())}`;
+  let error = false;
+  if (searchDate >= limitMax) {
+    error = true;
+    notifyError("La fecha máxima es el día actual");
+  }
+  if (searchDate < limitMin) {
+    error = true;
+    notifyError(`La fecha mínima permitida es de ${fechaMax} dias atrás`);
+  }
+
+  return error ? false : true;
+};

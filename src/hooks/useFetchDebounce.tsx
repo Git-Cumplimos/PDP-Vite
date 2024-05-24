@@ -79,7 +79,11 @@ const useFetchDebounce = (
   ]);
 
   const wholeDispacher = useCallback(
-    () => fetchIf && dispatcher(url, copyOptions),
+    () => {
+      if (fetchIf) {
+        return dispatcher(url, copyOptions);
+      }
+    },
     [dispatcher, url, copyOptions, fetchIf]
   );
 

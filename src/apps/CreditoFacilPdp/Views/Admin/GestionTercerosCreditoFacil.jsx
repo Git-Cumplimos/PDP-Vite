@@ -245,7 +245,7 @@ const GestionTercerosCreditoFacil = () => {
           render: ({ data: res }) => {
             setStateProc("consulta");
             closeModule();
-            return "Creación satisfactoria";
+            return res?.msg ?? "Creación satisfactoria";
           },
         },
         {
@@ -584,7 +584,11 @@ const GestionTercerosCreditoFacil = () => {
               <Button
                 type="button"
                 onClick={(e) => {
-                  notifyError("Creación cancelada por el usuario");
+                  notifyError(
+                    dataSiian.Id === 0
+                      ? "Creación cancelada por el usuario"
+                      : "Actualización cancelada por el usuario"
+                  );
                   closeModule(e);
                 }}
                 disabled={
@@ -601,7 +605,7 @@ const GestionTercerosCreditoFacil = () => {
                   loadingPeticionCreacionTerceros
                 }
               >
-                Crear tercero
+                {dataSiian.Id === 0 ? "Crear tercero" : "Actualizar tercero"}
               </Button>
             </ButtonBar>
           </Form>

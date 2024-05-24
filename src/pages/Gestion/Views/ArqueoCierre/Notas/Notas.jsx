@@ -33,11 +33,8 @@ const Notas = ({ type }) => {
   const onSubmit = useCallback(
     (ev) => {
       ev.preventDefault();
-
       const tempMap = new Map(datosNota);
-
       tempMap.set("razon_ajuste", tempMap.get("razon_ajuste").trim());
-
       notifyPending(
         agregarNota(Object.fromEntries(tempMap)),
         {

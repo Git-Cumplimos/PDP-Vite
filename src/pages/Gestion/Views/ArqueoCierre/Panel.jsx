@@ -18,6 +18,7 @@ const formatMoney = makeMoneyFormatter(0);
 
 const tiposOficinas = ["OFICINAS PROPIAS", "KIOSCO","DROGUERIA"];
 let Num = 0;
+let totalExtrdiaAnterior = 0;
 
 const Panel = () => {
   const navigate = useNavigate();
@@ -151,8 +152,8 @@ const Panel = () => {
       if (typeof(elemento.valor) === "string") {
         if (elemento.valor.includes("$")) {
           originalData[i].valor = elemento.valor.replace("$","");
-        }while (elemento.valor.includes(",")) {
-          originalData[i].valor = elemento.valor.replace(",","");
+        }while (elemento.valor.includes(".")) {
+          originalData[i].valor = elemento.valor.replace(".","");
         }
         originalData[i].valor = parseInt(originalData[i].valor)
       }
@@ -180,19 +181,29 @@ const Panel = () => {
         render: ({ data: res }) => {
           setLoading(false);
           const cierre = res?.obj;
+          cierre?.externos_día_anterior?.data.map((elemento) => {
+            totalExtrdiaAnterior=totalExtrdiaAnterior+elemento.valor;
+          })
           const tempTicket = {
             title: "Cierre de caja",
             timeInfo: {
-              "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+              "Fecha de cierre": Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
               }).format(new Date()),
-              Hora: Intl.DateTimeFormat("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(new Date()),
+              Hora: (() => {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+                return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+              })(),
+              // Hora: Intl.DateTimeFormat("es-CO", {
+              //   hour: "2-digit",
+              //   minute: "2-digit",
+              //   second: "2-digit",
+              // }).format(new Date()),
             },
             commerceInfo: [
               ["Id Comercio", cierre?.id_comercio],
@@ -206,73 +217,85 @@ const Panel = () => {
             ],
             cajaInfo: [
               [
-                "Movimientos del día",
-                formatMoney.format(cierre?.total_movimientos),
-              ],
-              ["", ""],
-              [
-                "Efectivo cierre día anterior",
+                "Saldo Cierre día Anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],
+              // [
+              //   "Saldo Externos Día Anterior",
+              //   formatMoney.format(totalExtrdiaAnterior),
+              // ],
+              // ["", ""],
+              // [
+              //   "Saldo Cierre Día Anterior",
+              //   formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
+              // ],
+              // ["", ""],
               [
-                "Efectivo PDP - Consignaciones y Transportadora",
-                formatMoney.format((Num>=0?cierre?.total_efectivo_en_caja-Num:cierre?.total_efectivo_en_caja+(-Num)) 
-                + cierre?.total_recibido_transportadora + cierre?.total_notas 
-                - (cierre?.total_consignaciones>0?cierre?.total_consignaciones:cierre?.total_consignaciones*-1) 
-                - (cierre?.total_entregado_transportadora>0?cierre?.total_entregado_transportadora:cierre?.total_entregado_transportadora*-1)
-                - cierre?.total_consignaciones_externos - cierre?.total_entrega_externos),
+                "Saldo PDP + Externos Del Día",
+                formatMoney.format(cierre?.total_movimientos+Num),
               ],
               ["", ""],
+              // [
+              //   "Saldo Externos Fin del Día",
+              //   formatMoney.format(Num),
+              // ],
+              // ["", ""],
               [
-                "Efectivo en caja PDP + Externos",
-                formatMoney.format(cierre?.total_efectivo_en_caja 
-                + cierre?.total_recibido_transportadora + cierre?.total_notas 
-                - (cierre?.total_consignaciones>0?cierre?.total_consignaciones:cierre?.total_consignaciones*-1) 
-                - (cierre?.total_entregado_transportadora>0?cierre?.total_entregado_transportadora:cierre?.total_entregado_transportadora*-1)
-                - cierre?.total_consignaciones_externos - cierre?.total_entrega_externos),
+                "Total Saldo Fin Del Día",
+                formatMoney.format(cierre?.total_efectivo_en_caja),
               ],
               ["", ""],
             ],
             trxInfo: [
+              ["Total Arqueo de Caja", formatMoney.format(totalArqueo)],
+              ["", ""],
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Estimación faltante",
-                formatMoney.format(cierre?.total_estimacion_faltante),
+                "Pendiente Consignaciones Bancarias y Transportadora",
+                formatMoney.format(cierre?.total_consignaciones_transportadora_pendiente),
               ],
               ["", ""],
               [
-                "Consignaciones bancarias PDP",
-                formatMoney.format(cierre?.total_consignaciones),
+                "Pendiente Recibido Transportadora",
+                formatMoney.format(cierre?.total_recibido_transportadora_pendiente),
               ],
               ["", ""],
               [
-                "Entregado PDP a transportadora",
-                formatMoney.format(cierre?.total_entregado_transportadora),
+                "Consignaciones Bancarias y Transportadora",
+                formatMoney.format(cierre?.total_consignaciones_transportadora),
               ],
               ["", ""],
+              // [
+              //   "Consignaciones Bancarias y Transportadora Externos",
+              //   formatMoney.format(cierre?.total_consignaciones_transportadora_externos),
+              // ],
+              // ["", ""],
               [
-                "Recibido de transportadora",
+                "Recibido Transportadora",
                 formatMoney.format(cierre?.total_recibido_transportadora),
               ],
               ["", ""],
               [
-                "Notas débito o crédito",
+                "Notas Débito o Crédito",
                 formatMoney.format(cierre?.total_notas),
+              ],
+              ["", ""],
+              [
+                "Total Plataformas Externa",
+                formatMoney.format(Num),
               ],
               ["", ""],
             ],
           };
-          dataPlfExt.map((elemento) => 
-            tempTicket.trxInfo.push([
-              elemento.pk_nombre_plataforma,
-              formatMoney.format(elemento.valor)],["", ""])
-          )
-          tempTicket.trxInfo.push(["Consignaciones bancarias externos",formatMoney.format(cierre?.total_consignaciones_externos)],["", ""])
-          tempTicket.trxInfo.push(["Entregado a transportadora externos",formatMoney.format(cierre?.total_entrega_externos)],["", ""])
+          // dataPlfExt.map((elemento) => 
+          //   tempTicket.trxInfo.push([
+          //     elemento.pk_nombre_plataforma,
+          //     formatMoney.format(elemento.valor)],["", ""])
+          // )
           setResumenCierre(tempTicket);
           return res?.msg;
         },
@@ -289,7 +312,14 @@ const Panel = () => {
       },
       { toastId: "busqueda-cierre-123" }
     );
-  }, [denominaciones, nombreComercio, roleInfo, userInfo?.attributes?.name]);
+  }, [
+    denominaciones, 
+    nombreComercio, 
+    roleInfo, 
+    userInfo?.attributes?.name,
+    totalCierres,
+    totalArqueo
+  ]);
 
   const printDiv = useRef();
 
@@ -304,7 +334,7 @@ const Panel = () => {
     if (isNegative) {
       numericValue = numericValue.slice(1); // Elimina el signo "-" para el formato interno
     }
-    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const updateData = dataPlfExt.map((value,i) => {
         if(value.pk_nombre_plataforma !== key.pk_nombre_plataforma){
           return value

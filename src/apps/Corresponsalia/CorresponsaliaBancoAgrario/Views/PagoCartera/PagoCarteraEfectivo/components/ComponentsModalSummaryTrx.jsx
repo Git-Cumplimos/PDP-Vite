@@ -1,12 +1,14 @@
-import React, { Fragment, useState } from "react";
+import { useState } from "react";
 import Button from "../../../../../../../components/Base/Button";
 import ButtonBar from "../../../../../../../components/Base/ButtonBar";
-import { formatMoney } from "../../../../../../../components/Base/MoneyInput";
+import MoneyInput, {
+  formatMoney,
+} from "../../../../../../../components/Base/MoneyInput";
 import PaymentSummary from "../../../../../../../components/Compound/PaymentSummary";
 import Select from "../../../../../../../components/Base/Select/Select";
-import classes from "../../../Runt/PagarRunt.module.css";
 import { notify } from "../../../../../../../utils/notify";
-const { styleComponents } = classes;
+import Form from "../../../../../../../components/Base/Form";
+import { enumParametrosBancoAgrario } from "../../../../utils/enumParametrosBancoAgrario";
 export const ComponentsModalSummaryTrx = ({
   documento,
   numero_obligacion,
@@ -18,8 +20,11 @@ export const ComponentsModalSummaryTrx = ({
   handleClose,
   posicion,
 }) => {
-  const [labelSeleccionado, setLabelSeleccionado] = useState("");
-  const [pagoTotal, setPagoTotal] = useState(false);
+  const [labelSeleccionado, setLabelSeleccionado] = useState({
+    label: "Otro Valor",
+    seleccion: "0",
+  });
+  const [pagoTotal, setPagoTotal] = useState(0);
   const [choice_numero_obligacion, setChoicePagoTotal] = useState(
     summary[posicion]?.numero_obligacion
   );
@@ -51,53 +56,82 @@ export const ComponentsModalSummaryTrx = ({
             id="searchBySorteo"
             name="id_tipo_transaccion"
             options={[
-              { value: "", label: "" },
               {
-                value: summary[posicion]?.valor_deuda,
+                value: "0",
+                label: `Otro Valor`,
+              },
+              {
+                value: "1",
                 label: `Valor total deuda`,
               },
               {
-                value: summary[posicion]?.valor_pagar_fechaCorte,
+                value: "2",
                 label: `Valor a fecha de corte`,
               },
             ]}
-            value={pagoTotal}
+            value={labelSeleccionado.seleccion}
             onChange={(ev) => {
-              setPagoTotal(ev.target.value);
+              const valorSeleccion = ev.target.value;
               const selectedOption = ev.target.options[ev.target.selectedIndex];
-              setLabelSeleccionado(selectedOption.label);
+              if (valorSeleccion === "1")
+                setPagoTotal(summary[posicion]?.valor_deuda);
+              if (valorSeleccion === "2")
+                setPagoTotal(summary[posicion]?.valor_pagar_fechaCorte);
+              setLabelSeleccionado((old) => ({
+                ...old,
+                label: selectedOption.label,
+                seleccion: valorSeleccion,
+              }));
             }}
           />
         ),
       }}
     >
       {!loadingPeticion ? (
-        <>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (pagoTotal !== 0) {
+              peticion(
+                e,
+                pagoTotal,
+                choice_numero_obligacion,
+                labelSeleccionado.label
+              );
+            } else {
+              notify("Seleccione el tipo de abono");
+            }
+          }}
+          grid
+        >
+          {labelSeleccionado.label === "Otro Valor" && (
+            <MoneyInput
+              id="valCashOut"
+              name="valCashOut"
+              label="Valor a pagar"
+              type="text"
+              min={enumParametrosBancoAgrario.MIN_PAGO_CARTERA_AGRARIO}
+              max={enumParametrosBancoAgrario.MAX_PAGO_CARTERA_AGRARIO}
+              autoComplete="off"
+              equalError={false}
+              equalErrorMin={false}
+              maxLength={"9"}
+              value={pagoTotal}
+              onInput={(e, val) => {
+                setPagoTotal(val);
+              }}
+              required
+            />
+          )}
           <ButtonBar>
             <Button disabled={loadingPeticion} onClick={handleClose}>
               Cancelar
             </Button>
-            <Button
-              type={"submit"}
-              disabled={loadingPeticion}
-              onClick={(e) => {
-                e.preventDefault();
-                if (pagoTotal !== false) {
-                  peticion(
-                    e,
-                    pagoTotal,
-                    choice_numero_obligacion,
-                    labelSeleccionado
-                  );
-                } else {
-                  notify("Seleccione el tipo de abono");
-                }
-              }}
-            >
+            <Button type={"submit"} disabled={loadingPeticion}>
               Realizar Pago
             </Button>
           </ButtonBar>
-        </>
+        </Form>
       ) : (
         <h1 className="text-2xl font-semibold">Procesando . . .</h1>
       )}
