@@ -343,7 +343,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
               title="¿Está seguro de realizar el pago?"
               subtitle="Resumen de transacción"
               summaryTrx={{
-                "Número crédito": dataCreditoUnique?.Id,
+                "Número crédito": dataCreditoUnique?.Numeroprestamo,
                 "Tipo de documento": dataInput?.nombreTipoDocumento,
                 // "Forma de pago": dataInput?.nombreFormaPago,
                 "Tipo de abono": dataInput?.nombreTipoAbono,
