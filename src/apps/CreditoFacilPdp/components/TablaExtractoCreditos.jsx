@@ -66,14 +66,11 @@ const TablaExtractoCreditos = ({
             saldoCredito: formatMoney.format(Saldo),
             cuotas: cuotas,
             estado: Estado,
-            fechaDesembolso: new Date(Fechadesembolso).toLocaleDateString(
-              "es-ES",
-              {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              }
-            ),
+            fechaDesembolso: new Intl.DateTimeFormat("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }).format(new Date(Fechadesembolso)),
           };
         }
       )
