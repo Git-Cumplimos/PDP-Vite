@@ -173,6 +173,7 @@ export const AuthContext = createContext({
   ...initialUser,
   showModalPublicidad: false,
   setShowModalPublicidad: () => {},
+  notLoadedPermissions: true,
 });
 
 export const useAuth = () => {
@@ -187,6 +188,7 @@ export const useProvideAuth = () => {
 
   const [timer, setTimer] = useState(null);
   const [showModalPublicidad, setShowModalPublicidad] = useState(false);
+  const [notLoadedPermissions, setNotLoadedPermissions] = useState(true);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
@@ -670,6 +672,9 @@ export const useProvideAuth = () => {
       ),
     },
     {
+      onPending: useCallback(() => {
+        setNotLoadedPermissions(true);
+      }, []),
       onSuccess: useCallback(
         (res) => {
           const pdpU = res?.obj?.pdpU;
@@ -698,6 +703,9 @@ export const useProvideAuth = () => {
         },
         [signOut]
       ),
+      onFinally: useCallback(() => {
+        setNotLoadedPermissions(false);
+      }, []),
     }
   );
 
@@ -795,5 +803,6 @@ export const useProvideAuth = () => {
     ...userState,
     showModalPublicidad,
     setShowModalPublicidad,
+    notLoadedPermissions,
   };
 };

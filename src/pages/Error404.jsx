@@ -5,12 +5,17 @@ import ButtonBar from "../components/Base/ButtonBar";
 
 const Error404 = () => {
   const navigate = useNavigate();
-  const { userPermissions, isSignedIn } = useAuth();
+  const { userPermissions, isSignedIn, notLoadedPermissions } = useAuth();
 
   const location = useLocation();
 
   return isSignedIn ? (
-    userPermissions ? (
+    notLoadedPermissions ? (
+      <div className="mx-auto w-auto md:w-1/2 text-center pt-4">
+        <h1 className="text-4xl">Cargando ...</h1>
+        {/* <p className="text-2xl">Not found</p> */}
+      </div>
+    ) : userPermissions ? (
       <div className="m-auto w-auto md:w-1/2 text-center">
         <h1 className="text-4xl">404</h1>
         <p className="text-2xl">Not found</p>
