@@ -298,7 +298,11 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             minLength={5}
             maxLength={10}
             autoComplete="off"
-            min={Math.ceil(dataCreditoUnique?.Valorcuotaactual)}
+            min={
+              dataCreditoUnique?.Valorcuotaactual !== 0
+                ? Math.ceil(dataCreditoUnique?.Valorcuotaactual)
+                : 1
+            }
             max={Math.ceil(dataCreditoUnique?.Saldo)}
             value={dataInput?.valor ?? ""}
             onInput={onChangeFormatNum}
