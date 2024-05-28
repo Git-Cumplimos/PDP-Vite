@@ -19,6 +19,7 @@ import AddressForm, {
 import { CitySearchTable } from "../../../../../components/Compound/CitySearch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { onChangeNumber } from "../../../../../utils/functions";
+import { onChangeNit } from "../../../utils/functions";
 
 type Props = {
   setRlPks: (_: {
@@ -355,7 +356,12 @@ const RepresentanteLegal = ({
             setPropietarioRLExists(false);
             setUpdateRl(false);
             // Clean number on event and not on setState
-            const newNumId = onChangeNumber(ev, false);
+            let newNumId = ev.target.value;
+            if ( 8 === propietarioRL.pk_tipo_identificacion_rl) {
+              newNumId = onChangeNit(ev);
+            } else {
+              newNumId = onChangeNumber(ev, false);
+            }
             setPropietarioRL((old) => ({
               ...initialPropietarioRL,
               pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
