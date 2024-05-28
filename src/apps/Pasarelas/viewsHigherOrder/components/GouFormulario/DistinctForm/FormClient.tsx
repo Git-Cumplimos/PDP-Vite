@@ -144,6 +144,7 @@ const FormClient = ({
                   : false
               }
               value={formClientDataInput.nombres}
+              invalid={dataInvalid.nombres}
             />
           )}
       </div>
@@ -173,6 +174,7 @@ const FormClient = ({
                   : false
               }
               value={formClientDataInput.apellidos}
+              invalid={dataInvalid.apellidos}
             />
           )}
       </div>
