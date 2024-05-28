@@ -10,7 +10,7 @@ export const get_value = (structure: string, value_: string) => {
       value = value_.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, "");
       is_change = true;
       msg_invalid = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g.test(value_)
-        ? "solo se bebe ingresar letras"
+        ? "solo se debe ingresar letras"
         : "";
       break;
     }
