@@ -131,7 +131,7 @@ const FormClient = ({
           formClientDataInput.tipo_documento !== "NIT" && (
             <Input
               required
-              id="nombres/text"
+              id="nombres/letters"
               name="nombres"
               label="Nombres"
               type="text"
@@ -160,7 +160,7 @@ const FormClient = ({
           formClientDataInput.tipo_documento !== "NIT" && (
             <Input
               required
-              id="apellidos/text"
+              id="apellidos/letters"
               name="apellidos"
               label="Apellidos"
               type="text"
