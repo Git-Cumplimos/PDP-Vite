@@ -7,13 +7,11 @@ export const get_value = (structure: string, value_: string) => {
   let msg_invalid = "";
   switch (type) {
     case "letters": {
-      if (value_.match(/^[ a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/g)) {
-        is_change = true;
-        value = (value_.match(/^[ a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/g) ?? []).join("");
-        msg_invalid = "";
-      } else {
-        msg_invalid = "solo se bebe ingresar letras";
-      }
+      value = value_.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, "");
+      is_change = true;
+      msg_invalid = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g.test(value_)
+        ? "solo se bebe ingresar letras"
+        : "";
       break;
     }
     case "email": {
