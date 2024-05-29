@@ -1,17 +1,11 @@
 import { ChangeEvent, Dispatch, ReactNode, SetStateAction } from "react";
-import {
-  TypeInfTicket,
-  TypingDataComercio,
-} from "../../../../utils/TypingUtils";
-import {
-  TypingDataPay,
-  TypingSummaryTrx,
-  TypingTrx,
-} from "../../utils/utils_typing";
+import { TypingDataComercio } from "../../../../utils/TypingUtils";
+import { TypingSummaryTrx, TypingTrx } from "../../utils/utils_typing";
 
 export type TypingFormClientInputs = {
   nombres?: string | null | boolean;
   apellidos?: string | null | boolean;
+  company?: string | null | boolean;
   correo?: string | null | boolean;
   celular?: string | null | boolean;
   documento?: string | null | boolean;
@@ -23,6 +17,7 @@ export type TypingFormClientInputs = {
 export type TypingFormClientDataInput = {
   nombres: string;
   apellidos: string;
+  company: string;
   correo: string;
   celular: string;
   documento: string;
@@ -119,6 +114,7 @@ export type TypingShowModalInfoClient =
 
 export type PropsModalInfoClient = {
   infoClient: TypingInfoClient;
+  valueReplace?: { [key: string]: string };
 };
 
 export type TypingInfoClientConst = { [key: string | number]: any };
@@ -127,6 +123,7 @@ export type PropsModalInterno = {
   showModalInfoClient: TypingShowModalInfoClient;
   setShowModalInfoClient: Dispatch<SetStateAction<TypingShowModalInfoClient>>;
   infoClientConst?: TypingInfoClientConst;
+  valueReplace?: { [key: string]: string };
   children?: ReactNode;
 };
 
@@ -135,6 +132,7 @@ export type PropsModalInternoAcepto = {
   setShowModalInfoClient: Dispatch<SetStateAction<TypingShowModalInfoClient>>;
   setAcepto: Dispatch<SetStateAction<boolean>>;
   infoClientConst?: TypingInfoClientConst;
+  valueReplace?: { [key: string]: string };
   children?: ReactNode;
 };
 
@@ -166,7 +164,9 @@ export type TypingOutputUseHookWithPasarelaPay = {
 };
 
 //? PeticionSetting
-export type TypingPeticionSetting = () => Promise<TypingDataSettingValor>;
+export type TypingPeticionSetting = (
+  name_service: string
+) => Promise<TypingDataSettingValor>;
 export type TypingDataSettingValor = {
   valor_costo_trx: number;
   valor_trx_maximo?: number;

@@ -237,7 +237,7 @@ const useHookGouCheckPay: TypeUseHookGouCheckPay = () => {
           dataComercioSimple,
           dataPath.id_hash,
           {
-            check_pay__retries: 12,
+            check_pay__retries: 4,
             check_pay__delay: 30,
           }
         );

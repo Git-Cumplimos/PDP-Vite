@@ -16,4 +16,5 @@ export const enumPermisosTrx = Object.freeze({
   grupos_convenios: 21,
   lineas_negocio: 2001,
   categorizacion: 191,
+  PARAMETRIZACION_CODIGOS_BARRAS_CONVENIOS: 20,
 });

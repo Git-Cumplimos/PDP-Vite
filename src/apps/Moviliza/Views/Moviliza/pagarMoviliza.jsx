@@ -98,7 +98,34 @@ const PagarMoviliza = () => {
     if (error instanceof ErrorCustom) {
       switch (error.name) {
         case "ErrorCustomBackend":
-          notifyError(error.message);
+          if (error.message != null){
+            HandleCloseTrxExitosa();
+            let mensaje = error.message.replace("Error respuesta PDP: (Error:", "")
+            mensaje = mensaje.replace("(", "")
+            mensaje = mensaje.replace("))", "")
+            mensaje = mensaje.replace(")", "")
+            if (error.message=="Error respuesta Moviliza: Error autenticando adminot "){
+              notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
+            }
+            else if (error.message=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
+              notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
+            }
+            else if (error.message == "Error respuesta PDP: (Error: Error respuesta PDP: Falla realizando notificación Moviliza)"){
+              setShowModalMsg(true)
+            }
+            else if (error.message == "Error respuesta PDP: (Error: Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))"){
+              notifyError("Error respuesta PDP: (El comercio no cuenta con cupo suficiente para ejecutar la transacción [0020003]))");
+            }
+            else if (error.message){
+              notifyError(mensaje);
+            }
+            else{
+              notifyError("Error respuesta PDP: Transacción Moviliza no exitosa");
+            }
+      }
+        else{        
+            notifyError("Error respuesta PDP: Transacción Moviliza no exitosa"); //---
+        }
           break;
         case "msgCustomBackend":
           notifyError(error.message);
@@ -232,30 +259,31 @@ const PagarMoviliza = () => {
                       if (response?.obj?.mensaje != null){
                         if (response?.obj?.mensaje=="Error autenticando adminot "){
                           notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                         else{
                           notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                 }
                     else{
-                      notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                      navigate("/");
-                      navigate("/moviliza");
+                      if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
+                        notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
+                      }
+                      else{
+                        notifyError("Error respuesta PDP: Error al realizar consulta"); //---
+                      }
                     }
+                    navigate("/");
+                    navigate("/moviliza");
                 }
                }
             )
             .catch((error) => {
-              navigate("/");
-              navigate("/moviliza");
+              CallErrorPeticion(error)
+            navigate("/");
+            navigate("/moviliza");
               if (error?.cause === "custom") {
                 return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
               }
-              notifyError("Error respuesta PDP: Error al realizar consulta");
             })  
 
 
@@ -277,9 +305,6 @@ const PagarMoviliza = () => {
           CallErrorPeticion(error);
         });
 
-
-
-      
     }
     ,
     [peticionBarcode, CallErrorPeticion]
@@ -333,37 +358,31 @@ const PagarMoviliza = () => {
                       if (response?.obj?.mensaje != null){
                         if (response?.obj?.mensaje=="Error autenticando adminot "){
                           notifyError("Error respuesta Moviliza: No fue posible realizar autenticación para consulta"); //---
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                         else{
                           notifyError ("Respuesta Moviliza: "+response?.obj?.mensaje)
-                          navigate("/");
-                          navigate("/moviliza");
                         }
                 }
                     else{
                       if (response?.msg=="Error respuesta PDP: (Error: La dispersión de la liquidación ya se realizó anteriormente)"){
                         notifyError("Error respuesta PDP: La dispersión de la liquidación ya se realizó anteriormente"); //---
-                        navigate("/");
-                        navigate("/moviliza");
                       }
                       else{
                         notifyError("Error respuesta PDP: Error al realizar consulta"); //---
-                        navigate("/");
-                        navigate("/moviliza");
                       }
                     }
+                    navigate("/");
+                    navigate("/moviliza");
                 }
                }
             )
             .catch((error) => {
-              navigate("/");
-              navigate("/moviliza");
+            CallErrorPeticion(error)
+            navigate("/");
+            navigate("/moviliza");
               if (error?.cause === "custom") {
                 return <p style={{ whiteSpace: "pre-wrap" }}>{error?.message}</p>;
               }
-              notifyError("Error respuesta PDP: Error al realizar consulta");
             })
       }
     })
@@ -423,6 +442,7 @@ const PagarMoviliza = () => {
       peticionPayMoviliza(data, dataAditional)
         .then((response) => {
           if (response?.status === true) {
+            setPaso("TransaccionExitosa");
             if (response?.msg == "Notificación de pago fallida"){
               const voucher = response?.obj?.result?.ticket
               ? response?.obj?.result?.ticket
@@ -470,6 +490,8 @@ const PagarMoviliza = () => {
         })
         .catch((error) => {
           CallErrorPeticion(error);
+          navigate("/");
+          navigate("/moviliza");
         });
 
         // const data2 = {
@@ -532,9 +554,13 @@ const PagarMoviliza = () => {
       numeroMoviliza,
       pdpUser,
       roleInfo,
-      peticionPayMoviliza,
+      // peticionPayMoviliza,
       resConsultMoviliza,
-      CallErrorPeticion,
+      // CallErrorPeticion,
+      // setInfTicket,
+      // setPaso,
+      // infTicket,
+      // paso
     ]
   );
 
@@ -595,7 +621,7 @@ const PagarMoviliza = () => {
     HandleCloseTrxExitosa,
     loadingPeticionBarcode,
     loadingPeticionPayMoviliza,
-    loadingPeticionConsultMoviliza,
+    loadingPeticionConsultMoviliza
   ]);
 
   return (
@@ -693,7 +719,6 @@ const PagarMoviliza = () => {
             </ButtonBar>
           </div>
         )}
-        {/*************** Recarga Exitosa **********************/}
       </Modal>
 
       {/**************** Transaccion Fallida por notificación **********************/}

@@ -2,17 +2,14 @@ import React, {
   Fragment,
   FunctionComponent,
   MouseEvent,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
-import { v4 } from "uuid";
-import { useImgs } from "../../../hooks/ImgsHooks";
-import { notifyPending } from "../../../utils/notify";
+import { notifyError, notifyPending } from "../../../utils/notify";
 import { useAuth } from "../../../hooks/AuthHooks";
-import { TypeInfTicket, TypingDataComercio } from "../../../utils/TypingUtils";
 
 import PasarelaFormulario from "./components/GouFormulario";
 import PasarelaCheckPayOrigin from "./components/PasarelaCheckPayOrigin";
@@ -32,17 +29,27 @@ import {
 } from "./utils/utils_typing";
 import SimpleLoading from "../../../components/Base/SimpleLoading";
 import { useNavigate } from "react-router-dom";
+import { TypingDataComercio } from "../../../utils/TypingUtils";
+import { tipoDocumentoOptions } from "./components/GouFormulario/DistinctForm/FormClient";
+import {
+  ErrorCustomComponentCode,
+  ErrorCustomFetch,
+  TempErrorFrontService,
+} from "../../../utils/fetchCustomPdp";
 
 //FRAGMENT ******************** TYPING *******************************
 
 //FRAGMENT ******************** CONST ***********************************
+const tipoDocumentoOptionsVector = Object.keys(tipoDocumentoOptions);
 const formClientDataInputInitial: TypingFormClientDataInput = {
   nombres: "",
   apellidos: "",
+  company: "",
   documento: "",
   celular: "",
   correo: "",
-  tipo_documento: "",
+  tipo_documento:
+    tipoDocumentoOptionsVector.length >= 1 ? tipoDocumentoOptionsVector[0] : "", //inicializarlo necesario
 };
 
 const formTrxDataInputInitial: TypingFormTrxDataInput = {
@@ -60,15 +67,13 @@ const WithPasarelaPay = (
   type_operation: number,
   dataInitialAdd: { [key: string]: any } | undefined,
   useHookPasarelaSon: TypingUseHookPasarelaSon,
-  ComponentLogo: FunctionComponent,
+  componentLogo: ReactNode,
   infoClient: TypingInfoClient,
   url_return_front: string,
   ComponectFormAdd?: FunctionComponent<PropsFormAdd>
 ): JSX.Element => {
   const goNavigate = useNavigate();
   const { roleInfo, pdpUser }: any = useAuth();
-  const { imgs } = useImgs();
-  const printDiv = useRef(null);
 
   const [formClientDataInput, setFormClientDataInput] =
     useState<TypingFormClientDataInput>(formClientDataInputInitial);
@@ -140,27 +145,32 @@ const WithPasarelaPay = (
     PeticionPrePayBase
   );
 
+  const handleCloseNinguno = () => {
+    notifyError("Transacción cancelada por el usuario", 3000, {
+      toastId: "notifyError-HandleCloseTrx",
+    });
+    goNavigate(url_return_front);
+  };
+
   useEffect(() => {
-    notifyPending(
-      PeticionSetting(),
-      {
-        render: () => {
-          return "Procesando configuración";
-        },
-      },
-      {
-        render: ({ data }: { data: TypingDataSettingValor }) => {
-          setDataSettingValor(data);
-          return "Consulta Configuración exitosa";
-        },
-      },
-      {
-        render: ({ data: error }) => {
-          goNavigate(url_return_front);
-          return error?.message ?? "Consulta Configuración Rechazada";
-        },
-      }
-    );
+    const name_service = "Pasarela - setting";
+    PeticionSetting(name_service)
+      .then((data: TypingDataSettingValor) => {
+        setDataSettingValor(data);
+      })
+      .catch((error: any) => {
+        goNavigate(url_return_front);
+        if (!(error instanceof ErrorCustomFetch)) {
+          throw new ErrorCustomComponentCode(
+            TempErrorFrontService.replace("%s", "Pasarela - setting"),
+            error.message,
+            `PeticionSetting`,
+            "notifyError",
+            false
+          );
+        }
+        notifyError(error.error_msg_front, 5000, { toastId: "notify-lot" });
+      });
   }, [PeticionSetting, goNavigate, url_return_front]);
 
   const onSubmitCheckPrePay = useCallback(
@@ -214,7 +224,7 @@ const WithPasarelaPay = (
       <SimpleLoading show={loadingPeticionBlocking}></SimpleLoading>
       {dataSettingValor && (
         <PasarelaFormulario
-          ComponentLogo={ComponentLogo}
+          componentLogo={componentLogo}
           infoClient={infoClient}
           dataSettingValor={dataSettingValor}
           onChangeDataInputSon={onChangeDataInputSon}
@@ -226,6 +236,7 @@ const WithPasarelaPay = (
           formTrxDataInput={formTrxDataInput}
           setFormTrxDataInput={setFormTrxDataInput}
           formAddDataInput={formAddDataInput}
+          handleCloseNinguno={handleCloseNinguno}
           setFormAddDataInput={setFormAddDataInput}
         >
           {ComponectFormAdd && (
@@ -237,7 +248,7 @@ const WithPasarelaPay = (
       {trx.status !== "Search" && (
         <PasarelaCheckPayOrigin
           destino={destino}
-          ComponentLogo={ComponentLogo}
+          componentLogo={componentLogo}
           url_return_front={url_return_front}
           summaryTrx={summaryTrx}
           trx={trx}

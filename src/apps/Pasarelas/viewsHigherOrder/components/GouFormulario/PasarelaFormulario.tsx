@@ -1,7 +1,6 @@
 import React, {
   ChangeEvent,
   Dispatch,
-  FunctionComponent,
   MouseEvent,
   ReactNode,
   SetStateAction,
@@ -27,13 +26,14 @@ import classes from "./PasarelaFormulario.module.css";
 import { do_compare, get_value } from "../../../utils/utils_function";
 import FormClient from "./DistinctForm/FormClient";
 import FormTrx from "./DistinctForm/FormTrx";
+import { notifyError } from "../../../../../utils/notify";
 
 //FRAGMENT ********************* CSS *********************************
 const { contendorFather } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type PropsPasarelaFormulario = {
-  ComponentLogo: FunctionComponent;
+  componentLogo: ReactNode;
   infoClient: TypingInfoClient;
   dataSettingValor: TypingDataSettingValor;
   onChangeDataInputSon?: TypingOnChangeDataInputSon;
@@ -46,6 +46,7 @@ type PropsPasarelaFormulario = {
   setFormTrxDataInput: Dispatch<SetStateAction<TypingFormTrxDataInput>>;
   formAddDataInput: TypingFormAddDataInput;
   setFormAddDataInput: Dispatch<SetStateAction<TypingFormAddDataInput>>;
+  handleCloseNinguno: () => void;
   children: ReactNode;
 };
 export type TypingFormClientDataInputCheck = {
@@ -54,6 +55,8 @@ export type TypingFormClientDataInputCheck = {
 };
 
 export type TypingDataInvalid = {
+  nombres: string;
+  apellidos: string;
   "correo|confirmacion": string;
   celular: string;
   "celular|confirmacion": string;
@@ -65,6 +68,8 @@ export const formClientDataInputCheckInitial: TypingFormClientDataInputCheck = {
   "celular|confirmacion": "",
 };
 export const dataInvalidInitial: TypingDataInvalid = {
+  nombres: "",
+  apellidos: "",
   "correo|confirmacion": "",
   celular: "",
   "celular|confirmacion": "",
@@ -72,7 +77,7 @@ export const dataInvalidInitial: TypingDataInvalid = {
 
 //FRAGMENT ******************** COMPONENT ***************************
 const PasarelaFormulario = ({
-  ComponentLogo,
+  componentLogo,
   infoClient,
   dataSettingValor,
   onChangeDataInputSon,
@@ -85,6 +90,7 @@ const PasarelaFormulario = ({
   setFormTrxDataInput,
   formAddDataInput,
   setFormAddDataInput,
+  handleCloseNinguno,
   children,
 }: PropsPasarelaFormulario) => {
   const [formClientDataInputCheck, setFormClientDataInputCheck] =
@@ -116,12 +122,13 @@ const PasarelaFormulario = ({
               ...old,
               [ev.target.name]: value,
             }));
-          if (formDataInput_.formTrxDataInput.hasOwnProperty(ev.target.name))
+          if (formDataInput_.formTrxDataInput.hasOwnProperty(ev.target.name)) {
             formDataInput_.setFormTrxDataInput((old) => ({
               ...old,
               [ev.target.name]: value,
             }));
-          return;
+            return;
+          }
         }
         if (dataInvalid_.hasOwnProperty(ev.target.name)) {
           setDataInvalid((old) => ({
@@ -132,7 +139,10 @@ const PasarelaFormulario = ({
         const structure_compare = ev.target.id.split("/")[2];
         if (structure_compare) {
           const [, key_change, msg_invalid_do_compare] = do_compare(
-            { ...formDataInput_.formClientDataInput },
+            {
+              ...formDataInput_.formClientDataInput,
+              ...formClientDataInputCheck_,
+            },
             ev.target.name,
             value,
             structure_compare
@@ -211,6 +221,48 @@ const PasarelaFormulario = ({
     ]
   );
 
+  const onSubmitSchemaForm = useCallback(
+    (ev: MouseEvent<HTMLFormElement>) => {
+      ev.preventDefault();
+      if (
+        formClientInputs.celular !== undefined &&
+        formClientInputs["celular|confirmacion"] !== undefined
+      ) {
+        if (
+          formClientDataInput.celular !==
+          formClientDataInputCheck["celular|confirmacion"]
+        ) {
+          notifyError("Verifique el número de celular", 5000, {
+            toastId: "notify-lot",
+          });
+          return;
+        }
+      }
+      if (
+        formClientInputs.correo !== undefined &&
+        formClientInputs["correo|confirmacion"] !== undefined
+      ) {
+        if (
+          formClientDataInput.correo !==
+          formClientDataInputCheck["correo|confirmacion"]
+        ) {
+          notifyError("Verifique el correo electrónico", 5000, {
+            toastId: "notify-lot",
+          });
+          return;
+        }
+      }
+      onSubmitCheckPrePay(ev);
+    },
+    [
+      formClientInputs,
+      formClientDataInput.celular,
+      formClientDataInput.correo,
+      formClientDataInputCheck,
+      onSubmitCheckPrePay,
+    ]
+  );
+
   return (
     <div>
       <form
@@ -229,11 +281,11 @@ const PasarelaFormulario = ({
             formClientDataInputCheck
           )
         }
-        onSubmit={onSubmitCheckPrePay}
+        onSubmit={onSubmitSchemaForm}
         className="grid grid-cols-1 place-content-center place-items-center"
       >
         <fieldset className={contendorFather}>
-          <ComponentLogo></ComponentLogo>
+          {componentLogo}
           {formClientDataInput && (
             <FormClient
               formClientInputs={formClientInputs}
@@ -250,14 +302,20 @@ const PasarelaFormulario = ({
               setFormTrxDataInput={setFormTrxDataInput}
             ></FormTrx>
           )}
-          <ModalInfoClient infoClient={infoClient}></ModalInfoClient>
+          <ModalInfoClient
+            infoClient={infoClient}
+            valueReplace={{
+              "{{{valor_costo_trx}}}":
+                dataSettingValor.valor_costo_trx.toString(),
+            }}
+          ></ModalInfoClient>
         </fieldset>
         <div className="grid grid-cols-2">
           <ButtonBar className={"lg:col-span-2"}>
             <Button type={"submit"}>Realizar Pago</Button>
-            {/* <Button onClick={() => handleCloseNinguno(true, routeInicial)}>
+            <Button type="button" onClick={handleCloseNinguno}>
               Cancelar
-            </Button> */}
+            </Button>
           </ButtonBar>
         </div>
       </form>

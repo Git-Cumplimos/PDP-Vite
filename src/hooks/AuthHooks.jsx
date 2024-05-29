@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
-import { notify, notifyError } from "../utils/notify";
+import { notifyError } from "../utils/notify";
 import useFetchDebounce from "./useFetchDebounce";
 import controlgroup from "../layouts/AdminLayout/ControlGroup";
 
@@ -171,6 +171,9 @@ export const AuthContext = createContext({
   parameters: null,
   qr: null,
   ...initialUser,
+  showModalPublicidad: false,
+  setShowModalPublicidad: () => {},
+  notLoadedPermissions: true,
 });
 
 export const useAuth = () => {
@@ -184,6 +187,8 @@ export const useProvideAuth = () => {
   const [, setSuserInactive] = useState("");
 
   const [timer, setTimer] = useState(null);
+  const [showModalPublicidad, setShowModalPublicidad] = useState(false);
+  const [notLoadedPermissions, setNotLoadedPermissions] = useState(true);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
@@ -242,6 +247,7 @@ export const useProvideAuth = () => {
           clearTimeout(old);
           return null;
         });
+        setShowModalPublicidad(true);
       } catch (err) {
         console.log(err);
         if (err.code === "NotAuthorizedException") {
@@ -368,9 +374,12 @@ export const useProvideAuth = () => {
   const verifyTOTP = useCallback(
     async (totp) => {
       if (!totp) {
-        notifyError("No se ha pasado el totp para verificacion");
+        // notifyError("No se ha pasado el totp para verificacion");
         signOut();
-        return;
+        throw new Error(
+          "No se ha pasado el totp para verificacion",
+          { cause: "custom" }
+        );
       }
 
       try {
@@ -386,27 +395,62 @@ export const useProvideAuth = () => {
           },
         });
         if (!response.ok) {
-          notifyError(
-            <p>
-              Error consultando el servicio de verificacion de token:
-              <br />
-              Error http: {response.statusText} ({response.status})
-            </p>
-          );
+          if ([400, 404].includes(response.status)) {
+            let handled = false;
+            try {
+              const resJson = await response.json();
+              // notifyError(resJson?.msg);
+              handled = true;
+              throw new Error(resJson?.msg, { cause: "custom" });
+            } catch (error) {
+              if (handled) {
+                throw error;
+              }
+            }
+          }
+          // notifyError(
+          //   <p>
+          //     Error consultando el servicio de verificacion de token:
+          //     <br />
+          //     Error http: {response.statusText} ({response.status})
+          //   </p>
+          // );
           throw new Error(
-            `Error consultando el servicio de verificacion de token: Error http: ${response.statusText} (${response.status})`,
+            `Error consultando el servicio de verificacion de token:\nError http: ${response.statusText} (${response.status})`,
             { cause: "custom" }
           );
         }
         const resJson = await response.json();
         if (!resJson?.status) {
           notifyError(resJson?.msg);
-          return;
+          // return;
+          throw new Error(resJson?.msg, { cause: "custom" });
         }
-        notify(resJson?.msg);
+        // notify(resJson?.msg);
+        // notify("Token de usuario validado exitosamente (1/2)");
+        setTimer((old) => {
+          clearTimeout(old);
+          return null;
+        });
+        return;
       } catch (err) {
         console.error(err);
-        signOut();
+        // signOut();
+        setTimer((old) => {
+          clearTimeout(old);
+          return setTimeout(() => {
+            signOut();
+            notifyError(
+              "La sesión ha expirado, por favor intente de nuevo",
+              5000,
+              { toastId: "expired-session-not" }
+            );
+            setQr("");
+          }, 90000);
+        });
+        if (err.cause === "custom") {
+          throw err;
+        }
         throw new Error(err, { cause: "unknown" });
       }
     },
@@ -462,37 +506,25 @@ export const useProvideAuth = () => {
   }, []);
 
   const handlesetPreferredMFA = useCallback(
-    async (totp) => {
-      try {
-        try {
-          await verifyTOTP(totp);
-        } catch (error) {
-          throw error;
-        }
-        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-        if (preferredMFA === "SUCCESS") {
-          await confirmSignIn(totp);
-          signOut();
-        }
-      } catch (err) {
-        throw new Error(err);
+    async () => {
+      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+      if (preferredMFA === "SUCCESS") {
+        signOut();
       }
     },
-    [cognitoUser, confirmSignIn, signOut, verifyTOTP]
+    [cognitoUser, signOut]
   );
 
   const handleverifyTotpToken = useCallback(
     async (totp) => {
-      try {
-        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
-        if (tokenValidado.accessToken.payload.token_use === "access") {
-          await handlesetPreferredMFA(totp);
-        }
-      } catch (err) {
-        throw new Error(err);
+      await verifyTOTP(totp);
+
+      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+      if (tokenValidado.accessToken.payload.token_use === "access") {
+        await handlesetPreferredMFA();
       }
     },
-    [cognitoUser, handlesetPreferredMFA]
+    [cognitoUser, handlesetPreferredMFA, verifyTOTP]
   );
 
   useFetchDebounce(
@@ -640,6 +672,9 @@ export const useProvideAuth = () => {
       ),
     },
     {
+      onPending: useCallback(() => {
+        setNotLoadedPermissions(true);
+      }, []),
       onSuccess: useCallback(
         (res) => {
           const pdpU = res?.obj?.pdpU;
@@ -668,6 +703,9 @@ export const useProvideAuth = () => {
         },
         [signOut]
       ),
+      onFinally: useCallback(() => {
+        setNotLoadedPermissions(false);
+      }, []),
     }
   );
 
@@ -763,5 +801,8 @@ export const useProvideAuth = () => {
     validateUser,
     updateCommerceQuota,
     ...userState,
+    showModalPublicidad,
+    setShowModalPublicidad,
+    notLoadedPermissions,
   };
 };

@@ -65,7 +65,10 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
       true,
       [
         {
-          Nombre: `${formClientDataInput.nombres} ${formClientDataInput.apellidos}`,
+          Nombre:
+            formClientDataInput.tipo_documento !== "NIT"
+              ? `${formClientDataInput.nombres} ${formClientDataInput.apellidos}`
+              : `${formClientDataInput.company}`,
         },
       ],
     ];
@@ -73,6 +76,8 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
     formTrxDataInput.id_unico,
     formClientDataInput.nombres,
     formClientDataInput.apellidos,
+    formClientDataInput.company,
+    formClientDataInput.tipo_documento,
   ]);
 
   const PeticionPrePayBase: TypingPeticionPrePayBase = useCallback(
@@ -87,10 +92,11 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
         const ip_address_fetch: any = await fetch(
           `https://api.ipify.org?format=json`
         );
-        const ip_address = ip_address_fetch?.ip
-          ? ip_address_fetch?.ip
+        const ip_address_json = await ip_address_fetch.json();
+        const ip_address = ip_address_json?.ip
+          ? ip_address_json?.ip
           : "127.0.0.1";
-        const body = {
+        const body: { [key: string]: any } = {
           comercio: {
             id_comercio: dataComercio.id_comercio,
             id_usuario: dataComercio.id_usuario,
@@ -110,13 +116,17 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
           valor_trx: dataInput.valor_trx,
           ip_address: ip_address,
           referencia: dataInput.referencia,
-          nombres: dataInput.nombres,
-          apellidos: dataInput.apellidos,
           documento: dataInput.documento,
           tipo_documento: dataInput.tipo_documento,
           correo: dataInput.correo,
           celular: dataInput.celular,
         };
+        if (dataInput.tipo_documento !== "NIT") {
+          body.nombres = dataInput.nombres;
+          body.apellidos = dataInput.apellidos;
+        } else {
+          body.company = dataInput.company;
+        }
         response = await fetchCustomPdp(
           url_backend,
           "POST",
@@ -165,6 +175,7 @@ const useHookRecargaCupoWithPasarela: TypingUseHookPasarelaSon = (
     formClientInputs: {
       nombres: null,
       apellidos: null,
+      company: null,
       correo: null,
       celular: null,
       documento: null,

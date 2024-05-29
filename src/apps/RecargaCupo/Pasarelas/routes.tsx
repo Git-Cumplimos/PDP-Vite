@@ -9,10 +9,12 @@ import DestinoLogoEvertec from "../../Pasarelas/Base/Evertec/DestinoLogoEvertec"
 import {
   constComunication as constComunicationGou,
   constQuestion as constQuestionGou,
+  consTerminosCondiciones as consTerminosCondicionesGou,
 } from "../../Pasarelas/Base/Gou/InfoClient";
 import {
   constComunication as constComunicationEvertec,
   constQuestion as constQuestionEvertec,
+  consTerminosCondiciones as consTerminosCondicionesEvertec,
 } from "../../Pasarelas/Base/Evertec/InfoClient";
 
 const routesRecargaCupoWithPasarela = [
@@ -26,11 +28,11 @@ const routesRecargaCupoWithPasarela = [
         235,
         undefined,
         useHookRecargaCupoWithPasarela,
-        DestinoLogoGou,
+        <DestinoLogoGou></DestinoLogoGou>,
         {
           question: { const: constQuestionGou },
           comunication: { const: constComunicationGou },
-          aceptarTerminos: { const: constComunicationGou },
+          aceptarTerminos: { const: consTerminosCondicionesGou },
         },
         "../recarga-cupo",
         undefined
@@ -48,16 +50,18 @@ const routesRecargaCupoWithPasarela = [
         268,
         undefined,
         useHookRecargaCupoWithPasarela,
-        DestinoLogoEvertec,
+        <DestinoLogoEvertec></DestinoLogoEvertec>,
         {
           question: { const: constQuestionEvertec },
           comunication: { const: constComunicationEvertec },
-          aceptarTerminos: { const: constComunicationEvertec },
+          aceptarTerminos: { const: consTerminosCondicionesEvertec },
         },
         "../recarga-cupo",
         undefined
       ),
-    permission: [ListPermissionsRecargaCupoWithPasarela.RECARGA_CUPO_CON_GOU],
+    permission: [
+      ListPermissionsRecargaCupoWithPasarela.RECARGA_CUPO_CON_EVERTEC,
+    ],
     subRoutes: [],
   },
 ];
