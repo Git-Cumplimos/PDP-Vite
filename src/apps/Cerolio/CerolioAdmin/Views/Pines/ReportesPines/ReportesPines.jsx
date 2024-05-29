@@ -50,6 +50,8 @@ const ReportesPines = () => {
   const tableData = useMemo(() => {
     return data.map((item) => ({
       Nombre: item.archivo,
+      Tipo: "Archivo",
+      "Última modificación": "Hoy",
     }));
   }, [data]);
 
@@ -77,7 +79,7 @@ const ReportesPines = () => {
     <>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre"]}
+        headers={["Nombre", "Tipo", "Última modificación"]}
         data={tableData}
         onSelectRow={
           // Enviar el nombre del archivo para descargar
@@ -87,7 +89,7 @@ const ReportesPines = () => {
         onSetPageData={setPageData}
       >
         {/* Input para fecha */}
-        <Input
+        {/* <Input
           label="Fecha Inicial"
           type="date"
           onChange={(e) =>
@@ -102,6 +104,18 @@ const ReportesPines = () => {
             setFilters({ ...filters, fechaFinal: e.target.value })
           }
           value={filters.fechaFinal}
+        /> */}
+        <Input
+          type="month"
+          label="Fecha"
+          onChange={(e) =>
+            setFilters({
+              ...filters,
+              fechaInicial: e.target.value + "-01",
+              fechaFinal: e.target.value + "-31",
+            })
+          }
+          value={filters.fechaInicial.split("-").slice(0, 2).join("-")}
         />
       </TableEnterprise>
     </>
@@ -109,3 +123,4 @@ const ReportesPines = () => {
 };
 
 export default ReportesPines;
+

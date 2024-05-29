@@ -358,10 +358,12 @@ const HistoricoPines = () => {
         <Select
           label="Estado PIN"
           options={[
-            { label: "Sin estado", value: "" },
+            { label: "", value: "" },
             { label: "Disponible", value: "Disponible" },
             { label: "Usado", value: "Usado" },
             { label: "Cancelado", value: "Cancelado" },
+            { label: "Creado", value: "Creado" },
+            { label: "Sin recaudo", value: "Sin recaudo" },
           ]}
           onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
         />
@@ -370,6 +372,9 @@ const HistoricoPines = () => {
         <h2 className="mb-5 text-center">
           ¿Qué re-agenda le queda bien al cliente?
         </h2>
+        <p className="mb-5 font-semibold text-center">
+          {selectedItem?.nombre_oficina}
+        </p>
         <div className="grid grid-cols-2 gap-5">
           <CalendarDate value={date} onChange={changeDate}>
             <CalendarMonth />
@@ -392,6 +397,36 @@ const HistoricoPines = () => {
             ))}
           </div>
         </div>
+        {/* {JSON.stringify(selectedItem)} */}
+        {selectedItem?.hora_inicio && selectedItem?.hora_fin && (
+          <div className="flex flex-col items-center justify-center my-5 text-center gap-y-5">
+            <p>
+              <span className="font-semibold">Fecha anterior:</span>{" "}
+              {new Date(selectedItem?.hora_inicio).toISOString().split("T")[0]}{" "}
+              {formatTimeTo12Hour(
+                new Date(selectedItem.hora_inicio)
+                  .toISOString()
+                  .split("T")[1]
+                  .slice(0, 5)
+              )}
+              {" - "}
+              {formatTimeTo12Hour(
+                new Date(selectedItem?.hora_fin)
+                  .toISOString()
+                  .split("T")[1]
+                  .slice(0, 5)
+              )}
+            </p>
+            {date && selectedHour && (
+              <p>
+                <span className="font-semibold">Fecha nueva:</span> {date}{" "}
+                {formatTimeTo12Hour(selectedHour.split("-")[0])}
+                {" - "}
+                {formatTimeTo12Hour(selectedHour.split("-")[1])}
+              </p>
+            )}
+          </div>
+        )}
         {/* {JSON.stringify(date)}
         {JSON.stringify(selectedHour)} */}
         <ButtonBar>
@@ -426,6 +461,8 @@ const HistoricoPines = () => {
               "Número de PIN",
               // "Lugar de Originación",
               "Fecha de solicitud de la devolución",
+              "Estado actual",
+              "Nombre de quien solicita",
             ]}
             data={[
               {
@@ -433,6 +470,8 @@ const HistoricoPines = () => {
                 // "Lugar de Originación": "Lugar de Originación",
                 "Fecha de solicitud de la devolución":
                   new Date().toLocaleDateString(),
+                "Estado actual": selectedItem.estado ?? "",
+                "Nombre de quien solicita": roleInfo.nombre_comercio,
               },
             ]}
           ></Table>
@@ -449,12 +488,17 @@ const HistoricoPines = () => {
           <FileInput
             label="Certificado de cuenta"
             accept=".pdf"
-            onGetFile={(file) =>
+            onGetFile={(file) => {
+              // Validar que sea un archivo PDF
+              if (file[0].type !== "application/pdf") {
+                notifyError("El archivo debe ser un PDF");
+                return;
+              }
               setDevolucionData({
                 ...devolucionData,
                 certificado: file[0],
-              })
-            }
+              });
+            }}
           />
           {devolucionData.certificado && (
             <p className="text-center">
@@ -492,3 +536,4 @@ const HistoricoPines = () => {
 };
 
 export default HistoricoPines;
+
