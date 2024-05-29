@@ -12,11 +12,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import MoneyInput, {
   formatMoney,
 } from "../../../../components/Base/MoneyInput/MoneyInput";
-import { enumParametrosCreditosPDP } from "../../utils/enumParametrosCreditosPdp";
-import { useReactToPrint } from "react-to-print";
 import Select from "../../../../components/Base/Select/Select";
-import { useFetch } from "../../../../hooks/useFetch";
-import { fetchCustom } from "../../utils/fetchCreditoFacil";
 import {
   postConsultaCreditosCEACRC,
   useFetchCreditoFacil,
@@ -37,18 +33,6 @@ const DesembolsoCEACRC = () => {
     limit: 10,
   });
   const [maxPages, setMaxPages] = useState(0);
-  // const [dataCredito, setDataCredito] = useState({
-  //   valorPreaprobado: 0,
-  //   valorSimulacion: 0,
-  //   validacionValor: false,
-  //   consultDecisor: {},
-  //   consultSiian: {},
-  //   estadoPeticion: 0,
-  //   formPeticion: 0,
-  //   showModal: false,
-  //   showModalOtp: false,
-  //   cosultEnvioOtp: {},
-  // });
   const [filteredComercio, setFilteredComercio] = useState(listadoCuotas);
   const [filtroBusqueda, setFiltroBusqueda] = useState("");
   const [filtroFecha, setFiltroFecha] = useState("");
@@ -73,7 +57,7 @@ const DesembolsoCEACRC = () => {
       if (!res?.status) {
         notifyError(res?.msg);
       } else {
-        setListadoCuotas(res?.obj?.data);
+        setListadoCuotas(res?.obj);
       }
     });
   };
@@ -93,14 +77,16 @@ const DesembolsoCEACRC = () => {
 
     if (filtroBusqueda) {
       filteredResults = filteredResults.filter((cuota) =>
-        cuota.Identificacion.toString().toLowerCase().includes(filtroBusqueda)
+        cuota.id_comercio.toString().toLowerCase().includes(filtroBusqueda)
       );
     }
 
     if (filtroFecha) {
-      filteredResults = filteredResults.filter((cuota) =>
-        cuota.FechaSolicitud.includes(filtroFecha)
-      );
+      filteredResults = filteredResults.filter((cuota) => {
+        const fechaAprobacion = new Date(cuota.fecha_aprobacion_documento);
+        const yearMonth = fechaAprobacion.toISOString().slice(0, 7); // Formato "YYYY-MM"
+        return yearMonth === filtroFecha;
+      });
     }
 
     setFilteredComercio(filteredResults);
@@ -121,32 +107,33 @@ const DesembolsoCEACRC = () => {
 
     return currentPageCuotas.map(
       ({
-        Identificacion,
-        NombreComercio,
-        Id,
-        Monto,
-        Cuotasmora,
-        FechaSolicitud,
-        Etapa,
-        Nombreasesor,
+        id_comercio,
+        nombre_comercio,
+        pk_tbl_creditos_pdp_validacion_documentos,
+        valor_credito,
+        plazo,
+        fecha_ingreso,
+        estado,
+        usuario_documentos,
+        fecha_aprobacion_documento
       }) => ({
-        IdComercio: Identificacion,
-        NombreComercio: NombreComercio,
-        NroSolicitud: Id,
-        ValorCredito: formatMoney.format(Monto),
-        Cuotas: Cuotasmora,
-        FechaPreaprobado: new Date(FechaSolicitud).toLocaleDateString("es-ES", {
+        IdComercio: id_comercio,
+        NombreComercio: nombre_comercio,
+        NroSolicitud: pk_tbl_creditos_pdp_validacion_documentos,
+        ValorCredito: formatMoney.format(valor_credito),
+        Cuotas: plazo,
+        FechaPreaprobado: new Date(fecha_ingreso).toLocaleDateString("es-ES", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
         }),
-        EstadoCredito: Etapa,
-        NombreAsesor: Nombreasesor,
-        Fechadesembolso: new Date(FechaSolicitud).toLocaleDateString("es-ES", {
+        EstadoCredito: estado,
+        NombreAsesor: usuario_documentos,
+        FechaAprobacion: new Date(fecha_aprobacion_documento).toLocaleDateString("es-ES", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
-        }),
+        })
       })
     );
   }, [filteredComercio, page, limit]);
