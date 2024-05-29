@@ -151,7 +151,6 @@ const TablaParametrizacionCodBarrasConvenios = ({
               }
             }}
             onClickPrev={(_) => {
-              console.log(waitPage);
               if (!waitPage) {
                 dispatch({
                   type: "SET_PAGE",
