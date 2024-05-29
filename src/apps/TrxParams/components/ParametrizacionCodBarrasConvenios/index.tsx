@@ -147,17 +147,21 @@ const TablaParametrizacionCodBarrasConvenios = ({
                   value: (oldPage) =>
                     nextPageGDC && !waitPage ? oldPage + 1 : oldPage,
                 });
-                setWaitPage(true);
+                if (nextPageGDC) setWaitPage(true);
               }
             }}
             onClickPrev={(_) => {
+              console.log(waitPage);
               if (!waitPage) {
                 dispatch({
                   type: "SET_PAGE",
-                  value: (oldPage) =>
-                    oldPage > 1 && !waitPage ? oldPage - 1 : oldPage,
+                  value: (oldPage) => {
+                    if (oldPage > 1) setWaitPage(true);
+                    const value =
+                      oldPage > 1 && !waitPage ? oldPage - 1 : oldPage;
+                    return value;
+                  },
                 });
-                setWaitPage(true);
               }
             }}
           />
