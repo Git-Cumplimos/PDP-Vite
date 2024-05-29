@@ -118,7 +118,7 @@ const Pin = () => {
             />
             <Input
               label="Número de Documento"
-              type="text"
+              type="number"
               onChange={(e) =>
                 setUserData({ ...userData, numeroDocumento: e.target.value })
               }
