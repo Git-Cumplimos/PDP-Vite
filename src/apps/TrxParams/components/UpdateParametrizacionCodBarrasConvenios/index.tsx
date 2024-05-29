@@ -132,6 +132,7 @@ const UpdateParametrizacionCodBarrasConvenios = ({
           posicion_inicial_valor:
             dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
           longitud_fecha: dataParametrizacionCodBarrasTemp.longitud_fecha,
+          longitud_valor: dataParametrizacionCodBarrasTemp.longitud_valor,
           longitud_referencia_2:
             dataParametrizacionCodBarrasTemp.longitud_referencia_2,
           longitud_referencia_3:

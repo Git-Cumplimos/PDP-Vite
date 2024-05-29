@@ -57,6 +57,7 @@ const TablaParametrizacionCodBarrasConvenios = ({
   >([]);
   const [autorizadoresRecaudo, setAutorizadoresRecaudo] = useState([]);
   const [nextPageGDC, setNextPageGDC] = useState(false);
+  const [waitPage, setWaitPage] = useState(false);
 
   const [searchFilters, dispatch] = useReducer(
     reducerFilters,
@@ -79,7 +80,7 @@ const TablaParametrizacionCodBarrasConvenios = ({
       })
     );
   }, [conveniosPdp]);
-  const [searchCurrentConvs] = useFetchDebounce(
+  const [searchCurrentConvs, loadingData] = useFetchDebounce(
     {
       url: useMemo(() => {
         const baseUrl = `${urlConveniosPdp}/convenios-pdp/parametrizar-codigos-barras-convenios`;
@@ -94,6 +95,7 @@ const TablaParametrizacionCodBarrasConvenios = ({
     },
     {
       onSuccess: useCallback((res) => {
+        setWaitPage(false);
         setConveniosPdp(res?.obj?.results ?? []);
         setNextPageGDC(res?.obj?.next_exist ?? false);
         setAutorizadoresRecaudo(res?.obj?.autorizadores_disponibles ?? []);
@@ -129,23 +131,34 @@ const TablaParametrizacionCodBarrasConvenios = ({
         <Fragment>
           <DataTable.LimitSelector
             defaultValue={searchFilters.limit}
-            onChangeLimit={(limit) =>
-              dispatch({ type: "SET_LIMIT", value: limit })
-            }
+            onChangeLimit={(limit) => {
+              if (!waitPage) {
+                dispatch({ type: "SET_LIMIT", value: limit });
+                setWaitPage(true);
+              }
+            }}
           />
           <DataTable.PaginationButtons
-            onClickNext={(_) =>
-              dispatch({
-                type: "SET_PAGE",
-                value: (oldPage) => (nextPageGDC ? oldPage + 1 : oldPage),
-              })
-            }
-            onClickPrev={(_) =>
-              dispatch({
-                type: "SET_PAGE",
-                value: (oldPage) => (oldPage > 1 ? oldPage - 1 : oldPage),
-              })
-            }
+            onClickNext={(_) => {
+              if (!waitPage) {
+                dispatch({
+                  type: "SET_PAGE",
+                  value: (oldPage) =>
+                    nextPageGDC && !waitPage ? oldPage + 1 : oldPage,
+                });
+                setWaitPage(true);
+              }
+            }}
+            onClickPrev={(_) => {
+              if (!waitPage) {
+                dispatch({
+                  type: "SET_PAGE",
+                  value: (oldPage) =>
+                    oldPage > 1 && !waitPage ? oldPage - 1 : oldPage,
+                });
+                setWaitPage(true);
+              }
+            }}
           />
         </Fragment>
       }
