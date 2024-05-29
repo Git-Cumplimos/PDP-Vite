@@ -101,6 +101,7 @@ const TablaParametrizacionCodBarrasConvenios = ({
         setAutorizadoresRecaudo(res?.obj?.autorizadores_disponibles ?? []);
       }, []),
       onError: useCallback((error) => {
+        setWaitPage(false);
         if (error?.cause === "custom") {
           // notifyError(error.message);
           console.error(error.message);
