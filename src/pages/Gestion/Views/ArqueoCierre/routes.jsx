@@ -21,6 +21,7 @@ const HistoricoBoveda = lazy(() => import("./HistoricoBoveda"));
  */
 const PanelHistorico = lazy(() => import("./PanelHistorico"));
 const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
+const AnalisisTransferenciaEfectivo = lazy(() => import("./AnalisisTransferenciaEfectivo"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
 const PlataformasExternas = lazy(() => import("./PlataformasExternas"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
@@ -140,7 +141,12 @@ export const rutasArqueo = [
     component: ReporteSobranteFaltantes,
     permission: [PermissionsCaja.ReporteSobrantesFaltantes],
   },
-
+  {
+    link: "/gestion/arqueo/validar-transferencia-efectivo",
+    label: <AppIcons Logo={"RECAUDO"} name="Análisis transferencia entre cajeros e histórico" />,
+    component: AnalisisTransferenciaEfectivo,
+    permission: [PermissionsCaja.AnalisisTransferenciaEfectivo],
+  },
 
 ];
 
