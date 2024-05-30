@@ -91,7 +91,26 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
                 .blob()
                 .then((blob: Blob) => {
                   const urlFile = URL.createObjectURL(blob);
-                  window.open(urlFile, "_blank");
+                  const a = document.createElement("a");
+                  a.href = urlFile;
+                  const actualDate = new Intl.DateTimeFormat("es-ES", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    second: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: false,
+                  }).format(new Date());
+                  a.download =
+                    `Errores_parametrizacion_masiva_convenios_${actualDate}`.replace(
+                      ",",
+                      ""
+                    );
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  // window.open(urlFile, "_blank");
                 })
                 .catch((error: any) => console.error(error));
             } else {
