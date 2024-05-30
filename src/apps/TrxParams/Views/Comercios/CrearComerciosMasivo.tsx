@@ -111,9 +111,9 @@ const CrearComerciosMasivo = ({
                 .catch((error: any) => console.error(error));
             }
             // throw new Error("Error con archivo cargado", { cause: "custom" });
-            notifyError("Error con archivo cargado");
-            // return "Error con archivo cargado";
-            return "Carga finalizada";
+            // notifyError("Error con archivo cargado");
+            return "Error con archivo cargado";
+            // return "Carga finalizada";
           }
           searchCommercesFn?.();
           handleClose();
