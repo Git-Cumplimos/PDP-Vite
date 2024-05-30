@@ -24,7 +24,7 @@ const calcularDigitoVerificacion = (myNit) => {
       x += y * vpri[z - i];
     }
     y = x % 11;
-    console.log("RESP", y > 1 ? 11 - y : y)
+    // console.log("RESP", y > 1 ? 11 - y : y)
     return y > 1 ? 11 - y : y;
   };
 
@@ -47,7 +47,6 @@ export const onChangeNit = (ev) => {
       if (matches[1]) {
         newStr = `${newStr}${matches[1]}.`;
         if (matches[2] && ev.target.value.match(/(\d{3})/g)) {
-          console.log("entro")
           newStr = `${newStr}${matches[2]}-${calcularDigitoVerificacion(
             `${ev.target.value}-`
           )}`;

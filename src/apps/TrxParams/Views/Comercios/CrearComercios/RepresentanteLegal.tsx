@@ -481,7 +481,7 @@ const RepresentanteLegal = ({
           name="barrio_rl"
           type="text"
           minLength={4}
-          maxLength={20}
+          maxLength={50}
           value={propietarioRL.barrio_rl}
           onChange={(ev) => {
             setPropietarioRL((old) => ({

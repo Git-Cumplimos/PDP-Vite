@@ -28,6 +28,7 @@ import { onChangeNumber } from "../../../../../utils/functions";
 import { fetchZonas } from "../../../utils/fetchZonas";
 import RepresentanteLegal from "./RepresentanteLegal";
 import AddressForm from "../../../../../components/Base/AddressForm";
+import { onChangeNit } from "../../../utils/functions";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -702,7 +703,7 @@ const CrearComercios = () => {
             label="Tipo de documento"
             required={true}
             options={docTypes ?? []}
-            onChange={onChangeFormat}
+            onChange={onChangeFormat} 
             value={comercio?.fk_tipo_identificacion}
           />
           <Input
@@ -714,10 +715,16 @@ const CrearComercios = () => {
             maxLength="12"
             required
             value={comercio?.numero_identificacion}
-            onInput={(e) => {
+            onInput={(ev) => {
+              let newNumId = ev.target.value;
+              if ( 8 === parseInt(comercio?.fk_tipo_identificacion)) {
+                newNumId = onChangeNit(ev);
+              } else {
+                newNumId = onChangeNumber(ev);
+              }
               setComercio((old) => ({
                 ...old,
-                numero_identificacion: onChangeNumber(e),
+                numero_identificacion: newNumId,
               }));
             }}
             autoComplete="off"
