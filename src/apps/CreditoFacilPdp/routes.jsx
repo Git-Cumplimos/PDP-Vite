@@ -18,9 +18,7 @@ const GestionTercerosCreditoFacil = lazy(() =>
 const PagoCreditoFacilPDP = lazy(() =>
   import("./Views/CreditoFacil/PagoCreditoFacilPDP")
 );
-const DesembolsoCEACRC = lazy(() =>
-  import("./Views/CreditoFacil/DesembolsoCEACRC")
-);
+
 const ExtractosCreditosComerciosPDP = lazy(() =>
   import("./Views/CreditoFacil/ExtractosCreditosComerciosPDP")
 );
@@ -36,6 +34,8 @@ const ValidacionDocumentos = lazy(() =>
 const ValidacionDocumentosAdmin = lazy(() =>
   import("./Views/Admin/ValidacionDocumentosAdmin")
 );
+
+const DesembolsoCEACRC = lazy(() => import("./Views/Admin/DesembolsoCEACRC"));
 
 const CreditosPDP = lazy(() => import("./CreditosPDP"));
 
@@ -66,7 +66,7 @@ const rutasCreditosPdp = {
       link: "/creditos-pdp/desembolso-cea-crc",
       label: <AppIcons Logo={"RECARGA_CELULAR"} name="Desembolso de Crédito" />,
       component: DesembolsoCEACRC,
-      permission: [enumPermisosCreditoPdp.DESEMBOLSO_CEA_CRC],
+      permission: [enumPermisosCreditoPdpAdmin.DESEMBOLSO_CEA_CRC],
     },
     {
       link: "/creditos-pdp/gestion-terceros",
