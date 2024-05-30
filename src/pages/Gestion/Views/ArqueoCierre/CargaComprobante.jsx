@@ -68,11 +68,6 @@ const CargaComprobante = () => {
   // });
   const [valorEnCaja, setValorEnCaja] = useState(0);
   const [valor_Boveda, setValorEnBoveda] = useState(0);
-  // const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio);
-  // const [nameComercio, setNameComercio] = useState(roleInfo?.nombre_comercio);
-  // const [idUser, setIdUser] = useState(pdpUser?.uuid);
-  // const [nameUser, setNameUser] = useState(pdpUser?.uname);
-
   const [idUserRecibe, setIdUserRecibe] = useState("");
   const [valorEfectivoTransferir, setvalorEcfectivoTransferir] = useState(0.0);
   const [nameUserRecibe, setNameUserRecibe] = useState("");
@@ -260,11 +255,12 @@ const CargaComprobante = () => {
           id_usuario: roleInfo?.id_usuario,
           nombre_usuario: pdpUser?.uname,
           id_usuario_recibe: idUserRecibe,
-          nombre_usuario_recibe: nameUserRecibe,
+          nombre_usuario_recibe: nameUserRecibe?.uname,
           valor_movimiento: valorEfectivoTransferir,
           observaciones: observaciones,
+          id_terminal: roleInfo?.id_dispositivo,
         };
-          await movimientoEfectivoEntreCajeros(reqBody);
+        await movimientoEfectivoEntreCajeros(reqBody);
       }
     } catch (error) {
       throw error;
@@ -482,7 +478,7 @@ const CargaComprobante = () => {
     if (nameUserRecibe !== null && nameUserRecibe !== "") {
       if (nameUserRecibe?.active === true) {
         if (nameUserRecibe?.fk_id_comercio === roleInfo?.id_comercio) {
-          if (nameUserRecibe?.email === pdpUser?.email) {
+          if (nameUserRecibe?.email !== pdpUser?.email) {
             setShowModal(true)
           }else{
             notifyError("No esta permitido hacer transferencia entre el mismo usuario")
@@ -566,7 +562,7 @@ const CargaComprobante = () => {
                 <Select
                   id="searchEntities"
                   name="tipoComp"
-                  label={`Buscar ${
+                  label={`${
                     movementType === "Consignación Bancaria"
                       ? "Bancos"
                       : "Transportadoras"
@@ -842,14 +838,6 @@ const CargaComprobante = () => {
                 }}
                 info={`Máximo 100 caracteres`}
                 required
-              />
-              <Input
-                id="total_efectivo_cajero"
-                name="total_efectivo_cajero"  
-                label={`Total efectivo cajero`}
-                type="tel"
-                value={formatMoney.format(valor_Boveda)}
-                disabled
               />
             </>}
             <ButtonBar className="lg:col-span-2">
