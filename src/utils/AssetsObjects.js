@@ -51,6 +51,10 @@ const svgs = {
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
 
+  //MODULO PASARELAS
+  LogoModuloEvertec: `${urlAssets}/assets/svg/LogoModuloEvertec.svg`,
+  LogoModuloGou: `${urlAssets}/assets/img/LogoModuloGou.png`,
+
   //TRANSACCIONES
   TRANSACCIONES: `${urlAssets}/assets/svg/recaudo/TRANSACCIONES/TRANSACCIONES.svg`,
 
