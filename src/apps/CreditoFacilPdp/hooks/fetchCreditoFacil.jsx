@@ -7,6 +7,7 @@ import fetchData from "../../../utils/fetchData";
 const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
 const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
 const URL_ENVIAR_CODIGO_OTP = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/generar-codigo-otp`;
+const URL_CONSULTAR_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/consulta-creditos`;
 const URL_CONSULTAR_CREDITOS_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/consulta-creditos`;
 const URL_CONSULTAR_VALIDACION_DOCUMENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consulta-creditos`;
 const URL_TERMINOS_CONDICIONES_CEA_CRC = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/terminos-condiciones-cea-crc`;
@@ -237,6 +238,15 @@ export const postEnviarCodigoOtp = async (bodyObj) => {
   }
 };
 
+export const postConsultaCreditosCEACRC = async () => {
+  try {
+    const res = await fetchData(URL_CONSULTAR_CREDITOS, "GET");
+    return res;
+  } catch (err) {
+    console.error(err);
+  }
+};
+    
 export const postConsultaCreditosPendienteDesembolsar = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";
