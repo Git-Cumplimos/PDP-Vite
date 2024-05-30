@@ -1,8 +1,7 @@
-import { useCallback, useRef, useState, useEffect, useMemo } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
-import { notifyError, notifyPending, notify } from "../../../../utils/notify";
-import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import Input from "../../../../components/Base/Input/Input";
 import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
@@ -18,6 +17,8 @@ import {
   useFetchCreditoFacil,
 } from "../../hooks/fetchCreditoFacil";
 import TableEnterprise from "../../../../components/Base/TableEnterprise";
+import FormAceptarTerminosCEACRC from "../../components/FormAceptarTerminosCEACRC";
+import { postTerminosCondicionesCEACRC } from "../../hooks/fetchCreditoFacil";
 
 const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/check-estado-desembolso-credito-facil`;
 const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/desembolso`;
@@ -38,6 +39,10 @@ const DesembolsoCEACRC = () => {
   const [filtroFecha, setFiltroFecha] = useState("");
   const [dataCredito, setDataCredito] = useState({});
   const [formasPago, setFormasPago] = useState("19");
+  const [isModalOpenPDF, setModalOpenPDF] = useState(false);
+  const [isChecked, setChecked] = useState(false);
+  const [url, setUrl] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const optionsFormasPago = [
     { value: "19", label: "Cuenta Corriente Banco Colpatria" },
@@ -50,6 +55,28 @@ const DesembolsoCEACRC = () => {
 
   useEffect(() => {
     consultaCreditos();
+  }, []);
+
+  const openModal = useCallback(() => {
+    if (isChecked) {
+      setChecked(false);
+    } else {
+      postTerminosCondicionesCEACRC().then((res) => {
+        if (!res?.status) {
+          notifyError(res?.msg);
+          navigate(-1);
+        } else {
+          setUrl(res?.obj?.url);
+          setModalOpenPDF(true);
+          setShowModal(true);
+        }
+      });
+    }
+  }, [isChecked]);
+
+  const handleAccept = useCallback(() => {
+    setModalOpen(false);
+    setChecked(true);
   }, []);
 
   const consultaCreditos = async () => {
@@ -115,7 +142,7 @@ const DesembolsoCEACRC = () => {
         fecha_ingreso,
         estado,
         usuario_documentos,
-        fecha_aprobacion_documento
+        fecha_aprobacion_documento,
       }) => ({
         IdComercio: id_comercio,
         NombreComercio: nombre_comercio,
@@ -129,11 +156,13 @@ const DesembolsoCEACRC = () => {
         }),
         EstadoCredito: estado,
         NombreAsesor: usuario_documentos,
-        FechaAprobacion: new Date(fecha_aprobacion_documento).toLocaleDateString("es-ES", {
+        FechaAprobacion: new Date(
+          fecha_aprobacion_documento
+        ).toLocaleDateString("es-ES", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
-        })
+        }),
       })
     );
   }, [filteredComercio, page, limit]);
@@ -148,7 +177,9 @@ const DesembolsoCEACRC = () => {
           roleInfo?.tipo_comercio === "KIOSCO"
             ? true
             : false,
-        valor_total_trx: parseInt(valor_trx.replace(/[$\s]/g, '').split('.').join('')),
+        valor_total_trx: parseInt(
+          valor_trx.replace(/[$\s]/g, "").split(".").join("")
+        ),
         nombre_comercio: dataCredito?.NombreComercio,
         nombre_usuario: pdpUser?.uname ?? "",
         address: roleInfo?.["direccion"],
@@ -226,8 +257,12 @@ const DesembolsoCEACRC = () => {
                 }`}</h2>
                 <Select
                   id="formasPagoCredito"
-                  style={{ fontSize: 'medium' }} 
-                  label={<span style={{ fontSize: 'medium' }}>Forma de desembolso</span>}
+                  style={{ fontSize: "medium" }}
+                  label={
+                    <span style={{ fontSize: "medium" }}>
+                      Forma de desembolso
+                    </span>
+                  }
                   options={optionsFormasPago}
                   value={formasPago}
                   onChange={(e) => {
@@ -238,6 +273,45 @@ const DesembolsoCEACRC = () => {
                 <h2 className="text-x ml-10">{`Usuario que aprueba: ${
                   pdpUser?.uname ?? ""
                 }`}</h2>
+                <div className="text-center">
+                  <label className="text-xl">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onClick={openModal}
+                      onChange={() => {}}
+                      required
+                    />
+                    <span className="ml-2">Acepta Términos y Condiciones</span>
+                  </label>
+                </div>
+                {isModalOpen && (
+                  <Modal
+                    show={dataCredito?.showModal}
+                    className="flex align-middle"
+                  >
+                    <object
+                      title="PDF Viewer"
+                      data={url}
+                      type="application/pdf"
+                      width="100%"
+                      height="500vh"
+                    ></object>
+                    <ButtonBar>
+                      <Button type="submit" onClick={handleAccept}>
+                        Aceptar
+                      </Button>
+                    </ButtonBar>
+                  </Modal>
+                )}
+                {isModalOpenPDF && (
+                  <FormAceptarTerminosCEACRC
+                    setModalOpenPDF={setModalOpenPDF}
+                    url={url}
+                    showModal={showModal}
+                    setChecked={setChecked}
+                  />
+                )}
                 <>
                   <ButtonBar>
                     <Button
@@ -250,12 +324,14 @@ const DesembolsoCEACRC = () => {
                     >
                       Cancelar
                     </Button>
-                    <Button
-                      type="submit"
-                      disabled={loadingPeticionDesembolsoCredito}
-                    >
-                      Desembolsar
-                    </Button>
+                    {isChecked && (
+                      <Button
+                        type="submit"
+                        disabled={loadingPeticionDesembolsoCredito}
+                      >
+                        Desembolsar
+                      </Button>
+                    )}
                   </ButtonBar>
                 </>
               </div>
