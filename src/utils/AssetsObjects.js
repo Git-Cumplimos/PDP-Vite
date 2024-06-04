@@ -9,11 +9,15 @@ const images = {
   PINVUS: `${urlAssets}/assets/img/LogoPinVus.jpg`,
   MiLicencia: `${urlAssets}/assets/img/logo-milicencia.jpg`,
   LogoOccidente: `${urlAssets}/assets/img/banco-de-occidente.png`,
+  logoCajaSocial: `${urlAssets}/assets/img/logo-Banco-Caja-Social.png`,
+  logoItau: `${urlAssets}/assets/img/logo-Banco-Itau.png`,
   LogoDale: `${urlAssets}/assets/img/Logo-Dale.png`,
   ScotiabankColpatria: `${urlAssets}/assets/img/ScotiabankColpatria.webp`,
   LogoAgrario: `${urlAssets}/assets/img/Banco-agrario.jpg`,
   LogoPowwi: `${urlAssets}/assets/img/LogoPowwi.png`,
   LogoEmcali: `${urlAssets}/assets/img/LogoEmcali.png`,
+  LogoGou: `${urlAssets}/assets/img/LogoGou.png`,
+  LogoEvertec: `${urlAssets}/assets/img/LogoEventec.svg`,
 };
 
 const svgs = {
@@ -46,6 +50,10 @@ const svgs = {
   CARGAR: `${urlAssets}/assets/svg/CARGAR.svg`,
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
+
+  //MODULO PASARELAS
+  LogoModuloEvertec: `${urlAssets}/assets/svg/LogoModuloEvertec.svg`,
+  LogoModuloGou: `${urlAssets}/assets/img/LogoModuloGou.png`,
 
   //TRANSACCIONES
   TRANSACCIONES: `${urlAssets}/assets/svg/recaudo/TRANSACCIONES/TRANSACCIONES.svg`,
@@ -144,6 +152,15 @@ const svgs = {
   AVAL_CONVENIO_RECAUDO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AVAL/AVAL_CONVENIO_RECAUDO.svg`,
   //CORRESPONSALIA/AGRARIO
   AGRARIO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/AGRARIO/AGRARIO.svg`,
+
+  //CORRESPONSALIA/BCS
+  CAJA_SOCIAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL.svg`,
+  CAJA_SOCIAL_DEPOSITO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL_DEPOSITO.svg`,
+  BLOQUEO_COMERCIO_BCS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
+
+  //CORRESPONSALIA/ITAU
+  ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/ITAU/ITAU.png`,
+
   //CORRESPONSALIA/RECAUDO MULTIPLE
   RECAUDO_MULTIPLE: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE.svg`,
   RECAUDO_MULTIPLE_CARGAR: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/RECAUDO_MULTIPLE/RECAUDO_MULTIPLE_CARGAR.svg`,
@@ -222,6 +239,9 @@ const svgs = {
   PRODUCTOS_FINANCIEROS: `${urlAssets}/assets/svg/recaudo/PRODUCTOS_FINANCIEROS.svg`,
   RETIRO: `${urlAssets}/assets/svg/recaudo/RETIROSYDEPOSITOS.svg`,
   DescargarReporte: `${urlAssets}/assets/img/descargar reporte.png`,
+
+  //ITAU
+  BLOQUEO_CONVENIOS_ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
 };
 
 const banners = {
@@ -230,6 +250,7 @@ const banners = {
   BANNER_3: `${urlAssets}/assets/img/banners/BANNER_3.jpg`,
   BANNER_4: `${urlAssets}/assets/img/banners/BANNER_4.jpg`,
   BANNER_5: `${urlAssets}/assets/img/banners/BANNER_5.jpg`,
+  BANNER_6: `${urlAssets}/assets/img/banners/BANNER_6.jpg`,
 };
 
 export { images, svgs, banners };

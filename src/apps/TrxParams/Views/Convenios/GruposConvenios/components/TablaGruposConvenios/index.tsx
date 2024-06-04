@@ -89,7 +89,7 @@ const TablaGruposConvenios = ({ onSelect, setReloadFunction }: Props) => {
   );
 
   useEffect(() => {
-    setReloadFunction?.(searchCurrentConvs);
+    setReloadFunction?.(() => searchCurrentConvs);
   }, [setReloadFunction, searchCurrentConvs]);
 
   return (

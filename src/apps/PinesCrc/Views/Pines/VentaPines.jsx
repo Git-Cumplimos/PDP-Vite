@@ -301,7 +301,8 @@ const VentaPines = () => {
           referencia : pin_desencriptado,
           documento : documento,
           valor_pin : valVentaPines,
-          estado : res?.status?"Aprobado":"Declinado"
+          estado : res?.status?"Aprobado":"Declinado",
+          tipo_pin : "CRC"
         }
         registroTrx(infoPinCrc)
           // notifyPending(
@@ -343,7 +344,8 @@ const VentaPines = () => {
             referencia : "",
             documento : documento,
             valor_pin : valVentaPines,
-            estado : "Declinado"
+            estado : "Declinado",
+            tipo_pin : "CRC"
           }
           registroTrx(infoPinCrc)
           // notifyPending(

@@ -14,7 +14,17 @@ const AppIcons = ({ Logo = "", name }) => {
       <div className="aspect-w-1 aspect-h-1">
         <img src={logo} alt={name !== undefined ? name : Logo} />
       </div>
-      {name !== undefined ? <h1>{name}</h1> : null}
+      {name !== undefined ? (
+        <h2
+          className={`${
+            name.split(" ").some((word) => word.length > 15)
+              ? "break-words"
+              : ""
+          }`}
+        >
+          {name}
+        </h2>
+      ) : null}
     </div>
   );
 };

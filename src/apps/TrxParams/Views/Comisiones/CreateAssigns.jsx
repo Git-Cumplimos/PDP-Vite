@@ -122,7 +122,7 @@ const CreateAssigns = () => {
   );
 
   const fetchAssignsFunc = useCallback(() => {
-    if (params.id) {
+    if (params.id && params.id !== "crear") {
       setIsUploading(true);
       fetchAsignacionesComisiones({
         pk_asignacion_comisiones: params.id,

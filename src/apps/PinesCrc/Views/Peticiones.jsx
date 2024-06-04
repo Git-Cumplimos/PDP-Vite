@@ -67,7 +67,8 @@ const Peticiones = () => {
       ...pageData,
       ...Object.fromEntries(
         Object.entries(newSearchFilters).filter(([, val]) => val)
-      )
+      ),
+      tipo_pin: "CRC"
     }
     setTable([])
     setIsLoading(true)

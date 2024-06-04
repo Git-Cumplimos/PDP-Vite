@@ -9,7 +9,7 @@ import {
 import classes from "./Form.module.css";
 
 interface Props extends ComponentPropsWithRef<"form"> {
-  grid: boolean;
+  grid?: boolean;
   formDir?: "row" | "col";
   onLazyChange?: {
     callback: (ev: FormEvent<HTMLFormElement>) => void;

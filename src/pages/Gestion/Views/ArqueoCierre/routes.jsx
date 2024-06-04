@@ -21,6 +21,7 @@ const HistoricoBoveda = lazy(() => import("./HistoricoBoveda"));
  */
 const PanelHistorico = lazy(() => import("./PanelHistorico"));
 const PanelConsignaciones = lazy(() => import("./PanelConsignaciones"));
+const AnalisisTransferenciaEfectivo = lazy(() => import("./AnalisisTransferenciaEfectivo"));
 const ParametrizacionRecaudo = lazy(() => import("./ParametrizacionRecaudo"));
 const PlataformasExternas = lazy(() => import("./PlataformasExternas"));
 const NotasCDHistorico = lazy(() => import("./Notas/NotasHistorico"));
@@ -36,27 +37,27 @@ export const rutasArqueo = [
     show: false,
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/reporte",
+    link: "/gestion/arqueo/arqueo-cierre-reporte",
     label: <AppIcons Logo={"RECAUDO"} name="Arqueo y cierre" />,
     // label: <AppIcons Logo={"RECAUDO"} name="Reporte de transacciones" />,
     component: ReporteTrx,
     permission: [PermissionsCaja.RealizarArqueoCierre],
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/reporte-efectivo-trxs",
+    link: "/gestion/arqueo/arqueo-cierre-reporte-efectivo-trxs",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte Efectivo Arqueo de Caja" />,
     component: ReporteEfectivo,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/reporte-tarjeta-trxs",
+    link: "/gestion/arqueo/arqueo-cierre-reporte-tarjeta-trxs",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte Tarjeta Arqueo de Caja" />,
     component: ReporteTarjeta,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
   {
-    link: "/gestion/arqueo/arqueo-cierre/cierre-caja",
-    label: <AppIcons Logo={"RECAUDO"} name="Cierre de caja" />,
+    link: "/gestion/arqueo/arqueo-cierre-caja",
+    label: <AppIcons Logo={"RECAUDO"} name="Reporte por Categoría" />,
     component: CierreCaja,
     permission: [PermissionsCaja.VerReporteTrxCierre],
   },
@@ -120,7 +121,7 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/reporte-arqueo",
     label: <AppIcons Logo={"RECAUDO"} name="Reportes arqueo y cierre de caja" />,
     component: ReportesCierre,
-    permission: [PermissionsCaja.VerHistoricoCierresCaja],
+    permission: [PermissionsCaja.VerArqueoCierresCaja],
   },
   {
     link: "/gestion/arqueo/validacion-sobrantes-faltantes",
@@ -140,7 +141,12 @@ export const rutasArqueo = [
     component: ReporteSobranteFaltantes,
     permission: [PermissionsCaja.ReporteSobrantesFaltantes],
   },
-
+  {
+    link: "/gestion/arqueo/validar-transferencia-efectivo",
+    label: <AppIcons Logo={"RECAUDO"} name="Análisis transferencia entre cajeros e histórico" />,
+    component: AnalisisTransferenciaEfectivo,
+    permission: [PermissionsCaja.AnalisisTransferenciaEfectivo],
+  },
 
 ];
 

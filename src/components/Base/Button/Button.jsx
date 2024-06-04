@@ -1,8 +1,23 @@
 import { useState, useEffect } from "react";
 import classes from "./Button.module.css";
 
-const Button = ({ self = false, ...button }) => {
-  const { formItem } = classes;
+const { formItem, primary, secondary, danger } = classes;
+
+const selectBtnStyle = (design) => {
+  switch (design) {
+    case "primary":
+      return primary;
+    case "secondary":
+      return secondary;
+    case "danger":
+      return danger;
+
+    default:
+      return secondary;
+  }
+};
+
+const Button = ({ self = false, design = "", ...button }) => {
   const onClickInitFunc = button.onClick;
   const [isClicking, setIsClicking] = useState(false);
   const [timerOnSubmit, setTimerOnSubmit] = useState(null);
@@ -42,11 +57,22 @@ const Button = ({ self = false, ...button }) => {
   button.onKeyDown = (e) => {
     if (e.key === "Enter" || e.key === " ") e.preventDefault();
   };
+
   return self ? (
     <button {...button} disabled={isClicking || button.disabled} />
   ) : (
     <div className={formItem}>
-      <button {...button} disabled={isClicking || button.disabled} />
+      <button
+        {...button}
+        className={`${
+          design && typeof design === "string"
+            ? selectBtnStyle(design)
+            : ["submit", ""].includes(button?.type)
+            ? primary
+            : secondary
+        }`}
+        disabled={isClicking || button.disabled}
+      />
     </div>
   );
 };

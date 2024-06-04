@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useReducer } from "react";
 import ButtonBar from "../ButtonBar";
 import Button from "../Button";
+import { onChangeNumber } from "../../../utils/functions";
 
 const diffTypes = ["VI"];
 const mainStreetTypes = [
@@ -26,7 +27,7 @@ const mainStreetTypes = [
   { label: "Vía", value: "VI" },
 ];
 
-const initialAddress = {
+export const initialAddress = {
   mainStreet: {
     name: "",
     number: "",
@@ -184,8 +185,8 @@ const reducerAddress = (addressState, action) => {
 
 const AddressForm = ({
   onCancel = () => {},
-  onSuccess = () => {},
-  editAddress = null,
+  onSuccess = (_, __) => {},
+  editAddress = initialAddress,
 }) => {
   const [addressState, dispatch] = useReducer(
     reducerAddress,
@@ -193,21 +194,32 @@ const AddressForm = ({
   );
 
   const onChangeAddress = useCallback(
-    (ev) => dispatch({ type: ev.target.name, payload: ev.target.value }),
-    []
+    (ev) => {
+      if (ev.target.name === UPDATE_MAIN_STREET_NUMBER) {
+        dispatch({
+          type: ev.target.name,
+          payload:
+            addressState.mainStreet.name !== "VI"
+              ? onChangeNumber(ev)
+              : ev.target.value,
+        });
+        return;
+      }
+      if (
+        [UPDATE_SECONDARY_STREET_NUMBER, UPDATE_THIRD_STREET_NUMBER].includes(
+          ev.target.name
+        )
+      ) {
+        dispatch({ type: ev.target.name, payload: onChangeNumber(ev) });
+        return;
+      }
+      dispatch({ type: ev.target.name, payload: ev.target.value });
+    },
+    [addressState.mainStreet.name]
   );
 
   return (
-    <form
-      className="grid grid-flow-row gap-2 my-4"
-      onSubmit={useCallback(
-        (ev) => {
-          ev.preventDefault();
-          onSuccess?.(buildAddress(addressState), addressState);
-        },
-        [onSuccess, addressState]
-      )}
-    >
+    <div className="grid grid-flow-row gap-2 my-4">
       {!diffTypes.includes(addressState.mainStreet.name) ? (
         <Fragment>
           <div className="grid grid-cols-6 gap-2">
@@ -479,9 +491,22 @@ const AddressForm = ({
         >
           Limpiar
         </Button>
-        <Button type="submit">Aceptar</Button>
+        <Button
+          design="primary"
+          type="button"
+          onClick={useCallback(
+            (ev) => {
+              ev.stopPropagation();
+              ev.preventDefault();
+              onSuccess?.(buildAddress(addressState), addressState);
+            },
+            [onSuccess, addressState]
+          )}
+        >
+          Aceptar
+        </Button>
       </ButtonBar>
-    </form>
+    </div>
   );
 };
 

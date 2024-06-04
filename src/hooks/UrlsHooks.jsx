@@ -1,4 +1,11 @@
-import { createContext, lazy, useContext, useMemo } from "react";
+import {
+  createContext,
+  lazy,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Route, Routes } from "react-router-dom";
 import { useAuth } from "./AuthHooks";
 import { allUrlsPrivateApps } from "../utils/appsRoutes";
@@ -13,6 +20,14 @@ import { privateUrls } from "../pages/routes";
 import PrivateRoute from "../components/Compound/PrivateRoute";
 import SubPage from "../components/Base/SubPage";
 import rutasBilleteraComisiones from "../pages/BilleteraComisiones/routes";
+// Categorias
+import { fetchCategoriasByZona } from "../pages/Categorias/utils/fetchHome";
+import Subcategorias from "../pages/Categorias/Subcategorias";
+import { useProvideImgsWithDispatch } from "./ImgsHooks";
+import { fetchCategoriasImgs } from "../apps/TrxParams/utils/fetchParametrosCategorias";
+
+// Categorias
+const Categoria = lazy(() => import("../pages/Categorias/Categorias"));
 
 const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
@@ -176,6 +191,125 @@ export const useProvideUrls = () => {
     }
   }, [userPermissions, commerceInfo?.estado, pdpUser?.fk_id_comercio]);
 
+  const [urlsCategorias, setUrlsCategorias] = useState([]);
+
+  const { imgs, svgs, dispatchImgs } = useProvideImgsWithDispatch();
+
+  useEffect(() => {
+    const fetchImgs = async () => {
+      const res = await fetchCategoriasImgs();
+      if (res?.status) {
+        // Actualizar imágenes en el contexto
+        res?.obj.forEach(({ nombre, img_url }) => {
+          dispatchImgs({
+            type: "SET_IMGS",
+            payload: { name: nombre, img: img_url },
+          });
+        });
+        dispatchImgs({
+          type: "FETCH_IMGS",
+          payload: { dispatch: dispatchImgs },
+        });
+      } else {
+        setUrlsCategorias([]);
+      }
+    };
+
+    const fetchUrlsCategorias = async (id_zona) => {
+      const formData = new FormData();
+      if (id_zona) {
+        formData.append("id_zona", id_zona);
+        const res = await fetchCategoriasByZona(formData);
+        if (res?.status) {
+          const urlsCategoriasFiltrado = res?.obj.map((props) => {
+            const link = `/${props.nombre.replace(/\s+/g, "-")}`;
+            const subcategoriasFiltradas = props.subcategorias.filter(
+              (subcategoria) =>
+                subcategoria.comercios || subcategoria.comercios?.length > 0
+            );
+            const subcats = subcategoriasFiltradas.map((subcategoria) => {
+              const linkSubcat = `${link}/${subcategoria.nombre.replace(
+                /\s+/g,
+                "-"
+              )}`;
+              const logo = (
+                <AppIcons
+                  Logo={
+                    subcategoria.img_url ? subcategoria.img_url : "MARKETPLACE"
+                  }
+                  name={subcategoria.nombre}
+                />
+              );
+              return {
+                link: linkSubcat,
+                label: logo,
+                status: subcategoria.status,
+                component: (props) => (
+                  <Subcategorias
+                    {...props}
+                    comercios={subcategoria.comercios}
+                    title={subcategoria.nombre}
+                    label={subcategoria.img_url}
+                  />
+                ),
+                props: {
+                  nombre: subcategoria.nombre,
+                  img_url: logo,
+                  id_categoria: subcategoria.id_categoria,
+                  id_subcategoria: subcategoria.id_subcategoria,
+                },
+              };
+            });
+            if (subcategoriasFiltradas.length === 0) {
+              return {
+                link: null,
+                label: null,
+                status: null,
+                component: null,
+                props: null,
+                subRoutes: null,
+              };
+            }
+            return {
+              link,
+              label: (
+                <AppIcons
+                  Logo={props.img_url ? props.img_url : "MARKETPLACE"}
+                  name={props.nombre}
+                />
+              ),
+              component: (props) => (
+                <Categoria {...props} subcategorias={subcats} />
+              ),
+              props: {
+                nombre: props.nombre,
+                img_url: props.img_url,
+                id_categoria: props.id_categoria,
+              },
+              subRoutes: subcats,
+            };
+          });
+          setUrlsCategorias(urlsCategoriasFiltrado);
+        } else {
+          setUrlsCategorias([]);
+        }
+      }
+    };
+
+    // Validar que esté autenticado para hacer la petición
+    if (urlsCategorias?.length === 0 && userPermissions?.length > 0) {
+      fetchImgs();
+      fetchUrlsCategorias(commerceInfo?.zona_comercio);
+    }
+  }, [
+    userPermissions,
+    urlsCategorias?.length,
+    commerceInfo?.zona_comercio,
+    dispatchImgs,
+    imgs,
+    svgs,
+  ]);
+
   const urlsGestion = useMemo(() => {
     if (Array.isArray(userPermissions) && userPermissions.length > 0) {
       return [...filterPermissions(rutasGestion, userPermissions)];
@@ -218,6 +352,7 @@ export const useProvideUrls = () => {
           {toRoute(urlsReportes, true, SubPage)}
           {toRoute(urlsInformacionGeneral, true, SubPage)}
           {toRoute(urlsBilleteraComisiones, true, SubPage)}
+          {toRoute(urlsCategorias, true, SubPage)}
         </Route>
         <Route path="/login" element={<LoginLayout />}>
           {toRoute(loginUrls, false)}
@@ -233,6 +368,7 @@ export const useProvideUrls = () => {
     urlsReportes,
     urlsInformacionGeneral,
     urlsBilleteraComisiones,
+    urlsCategorias,
   ]);
 
   return {
@@ -244,5 +380,6 @@ export const useProvideUrls = () => {
     urlsReportes,
     urlsInformacionGeneral,
     urlsBilleteraComisiones,
+    urlsCategorias,
   };
 };

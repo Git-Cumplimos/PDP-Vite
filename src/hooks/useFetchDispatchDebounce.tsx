@@ -49,6 +49,27 @@ const handlePDPFetchResponse = async (response: Response) => {
   return jsonResponse;
 };
 
+const handleNotOk = async (response: Response) => {
+  if (response.ok) {
+    return response;
+  }
+
+  if (response.headers.get("Content-Type") === "application/json") {
+    const jsonResponse = await response.json();
+    throw new ErrorPDPFetch(
+      jsonResponse?.msg ?? jsonResponse?.message ?? "Error en la peticion",
+      jsonResponse,
+      {
+        cause: "not-ok",
+      }
+    );
+  }
+
+  throw new ErrorPDPFetch(response.statusText, await response.text(), {
+    cause: "not-ok",
+  });
+};
+
 const defaultOnPending: () => ReactNode = () => "Procesando peticion";
 const defaultOnSuccess: (response: Response | any) => ReactNode = (_) =>
   "Peticion exitosa";
@@ -108,7 +129,7 @@ const useFetchDispatchDebounce = (
         if (!checkStatus) {
           return response;
         }
-        return await handlePDPFetchResponse(response);
+        return await handlePDPFetchResponse(await handleNotOk(response));
       } catch (error: any) {
         // if (error?.name !== "AbortError") {
         // }

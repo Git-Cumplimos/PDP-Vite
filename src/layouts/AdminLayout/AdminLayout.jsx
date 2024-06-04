@@ -15,13 +15,16 @@ import { useImgs } from "../../hooks/ImgsHooks";
 import { useWindowSize } from "../../hooks/WindowSizeHooks";
 import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
-import { searchCierre,verValorBoveda } from "../../pages/Gestion/utils/fetchCaja";
+import {
+  searchCierre,
+  verValorBoveda,
+} from "../../pages/Gestion/utils/fetchCaja";
 import { notifyError } from "../../utils/notify";
 import ButtonBar from "../../components/Base/ButtonBar";
 import Fieldset from "../../components/Base/Fieldset";
 import Input from "../../components/Base/Input";
 import Form from "../../components/Base/Form";
-import {getConsultaCupoComercio}  from "../../apps/Cupo/utils/fetchFunctions";
+import { getConsultaCupoComercio } from "../../apps/Cupo/utils/fetchFunctions";
 import ModalAlert from "./ModalAlert";
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
@@ -29,7 +32,6 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   currency: "COP",
   maximumFractionDigits: 0,
 });
-
 
 const AdminLayout = () => {
   const {
@@ -40,19 +42,28 @@ const AdminLayout = () => {
     saldoCupo,
     comision,
     diasSobregiro,
+    valMinConsignar,
   } = classes;
 
-  const urlAssets = process.env.REACT_APP_ASSETS_URL;
   const montoMaximoCaja = process.env.REACT_APP_MAX_MONTO_CAJA;
   const porcentajeAlerta1 = process.env.REACT_APP_PORCENTAJE_ALERTA_1;
   const porcentajeAlerta2 = process.env.REACT_APP_PORCENTAJE_ALERTA_2;
 
-  const { quotaInfo, roleInfo, signOut, userPermissions, userInfo } = useAuth();
+  const {
+    quotaInfo,
+    roleInfo,
+    signOut,
+    registerDevice,
+    fetchDevice,
+    userPermissions,
+    userInfo,
+  } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { urlsPrivate: urls } = useUrls();
 
-  const [showModalPublicidad, setShowModalPublicidad] = useState(true);
+  const [accept, setAccept] = useState(false);
+  const [device, setDevice] = useState(false);
   const [showModalCupo, setShowModalCupo] = useState(false);
   const [cupoComercio, setCupoComercio] = useState(false);
   const [ModalAlertBoveda, setModalAlertBoveda] = useState(true);
@@ -60,7 +71,7 @@ const AdminLayout = () => {
   const [valorBoveda, setValorBoveda] = useState();
   const [valorCaja, setMontoMaximoCaja] = useState(montoMaximoCaja);
   const [conteoAlertaBoveda, setConteoAlertaBoveda] = useState(1);
-  
+
   const saldoDisponible = useMemo(() => {
     return formatMoney.format(quotaInfo?.quota ?? 0);
   }, [quotaInfo?.quota]);
@@ -78,34 +89,55 @@ const AdminLayout = () => {
     [roleInfo]
   );
 
+  const valorMinConsignar = useMemo(() => {
+    let val = (
+      (
+        parseFloat(quotaInfo?.sobregirovalue ?? 0) - parseFloat(quotaInfo?.quota ?? 0)
+      ) + (
+        parseFloat(quotaInfo?.deuda ?? 0)
+      )
+    )
+    if (val < 0) val = 0
+    return formatMoney.format(val ?? 0);
+  }, [
+    quotaInfo?.quota,
+    quotaInfo?.sobregirovalue,
+    quotaInfo?.deuda
+  ]);
+
   const [clientWidth] = useWindowSize();
 
   const closeCash = useCallback(() => {
-    navigate(`/gestion/arqueo/arqueo-cierre/reporte`);
+    navigate(`/gestion/arqueo/arqueo-cierre-reporte`);
   }, [navigate]);
 
   const navigateCommission = useCallback(() => {
     navigate(`/billetera-comisiones`);
   }, [navigate]);
 
-  const consultaCupoComercios = useCallback((id_comercio) => {
-    if (!showModalCupo && roleInfo?.id_comercio) {
-      getConsultaCupoComercio({'pk_id_comercio':id_comercio ?? roleInfo?.id_comercio})
-      .then((res) => {
-        if (!res?.obj || res?.obj?.length === 0) {
-          setShowModalCupo(false)
-          notifyError("No se encontraron comercios con ese id");
-          return;
-        } 
-        setShowModalCupo(true)
-        setCupoComercio(res?.obj ?? []);
-      })
-      .catch((reason) => {
-        setShowModalCupo(false)
-        notifyError("Error al cargar Datos del cupo");
-      });
-    }
-  },[roleInfo?.id_comercio,showModalCupo]);
+  const consultaCupoComercios = useCallback(
+    (id_comercio) => {
+      if (!showModalCupo && roleInfo?.id_comercio) {
+        getConsultaCupoComercio({
+          pk_id_comercio: id_comercio ?? roleInfo?.id_comercio,
+        })
+          .then((res) => {
+            if (!res?.obj || res?.obj?.length === 0) {
+              setShowModalCupo(false);
+              notifyError("No se encontraron comercios con ese id");
+              return;
+            }
+            setShowModalCupo(true);
+            setCupoComercio(res?.obj ?? []);
+          })
+          .catch((reason) => {
+            setShowModalCupo(false);
+            notifyError("Error al cargar Datos del cupo");
+          });
+      }
+    },
+    [roleInfo?.id_comercio, showModalCupo]
+  );
 
   const {
     svgs: { backIcon2 },
@@ -166,21 +198,36 @@ const AdminLayout = () => {
   ]);
 
   const handleCloseBoveda = useCallback(() => {
-    setModalAlertBoveda(false)
-    let valorporcentajeAlerta1 = montoMaximoCaja*porcentajeAlerta1/100
-    let valorporcentajeAlerta2 = montoMaximoCaja*porcentajeAlerta2/100
+    setModalAlertBoveda(false);
+    let valorporcentajeAlerta1 = (montoMaximoCaja * porcentajeAlerta1) / 100;
+    let valorporcentajeAlerta2 = (montoMaximoCaja * porcentajeAlerta2) / 100;
     if (conteoAlertaBoveda === 1) {
-      setMontoMaximoCaja(parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta1))
-      setConteoAlertaBoveda(2)
-    }if(conteoAlertaBoveda === 2){
-      setMontoMaximoCaja(parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta2))
-      setConteoAlertaBoveda(3)
-    }if(conteoAlertaBoveda === 3){
+      setMontoMaximoCaja(
+        parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta1)
+      );
+      setConteoAlertaBoveda(2);
+    }
+    if (conteoAlertaBoveda === 2) {
+      setMontoMaximoCaja(
+        parseInt(montoMaximoCaja) + parseInt(valorporcentajeAlerta2)
+      );
+      setConteoAlertaBoveda(3);
+    }
+    if (conteoAlertaBoveda === 3) {
       navigate(`/gestion/arqueo/carga-comprobante`);
     }
-  }, [porcentajeAlerta1,montoMaximoCaja,porcentajeAlerta2,conteoAlertaBoveda,navigate]);
+  }, [
+    porcentajeAlerta1,
+    montoMaximoCaja,
+    porcentajeAlerta2,
+    conteoAlertaBoveda,
+    navigate,
+  ]);
 
   useEffect(() => {
+    fetchDevice().then((response) => {
+      setDevice(response);
+    });
     const conditions = [
       roleInfo?.id_usuario !== undefined,
       roleInfo?.id_comercio !== undefined,
@@ -195,14 +242,21 @@ const AdminLayout = () => {
         id_terminal: roleInfo?.id_dispositivo,
       })
         .then((res) => {
-          setModalAlertBoveda(true)
-          setValorBoveda(res?.obj[0]?.valor_boveda === undefined?0:res?.obj[0]?.valor_boveda)
-          if (parseInt(quotaInfo?.quota)> 0) {
-            if ((parseInt(quotaInfo?.quota) - parseInt(res?.obj[0]?.valor_boveda)) < montoMaximoCaja) {
-              setConteoAlertaBoveda(1)
-              setMontoMaximoCaja(montoMaximoCaja)
+          setModalAlertBoveda(true);
+          setValorBoveda(
+            res?.obj[0]?.valor_boveda === undefined
+              ? 0
+              : res?.obj[0]?.valor_boveda
+          );
+          if (parseInt(quotaInfo?.quota) > 0) {
+            if (
+              parseInt(quotaInfo?.quota) - parseInt(res?.obj[0]?.valor_boveda) <
+              montoMaximoCaja
+            ) {
+              setConteoAlertaBoveda(1);
+              setMontoMaximoCaja(montoMaximoCaja);
             }
-          } 
+          }
         })
         .catch((error) => {
           if (error?.cause === "custom") {
@@ -211,21 +265,23 @@ const AdminLayout = () => {
           console.error(error?.message);
         });
     }
-  }, [userPermissions,
-      roleInfo?.id_usuario,
-      roleInfo?.id_comercio,
-      roleInfo?.id_dispositivo,
-      quotaInfo?.quota,
-      pathname,
-      montoMaximoCaja]);
+  }, [
+    userPermissions,
+    roleInfo?.id_usuario,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    quotaInfo?.quota,
+    pathname,
+    montoMaximoCaja,
+  ]);
 
   const showModalAlertBoveda = useMemo(() => {
     return (
-      (parseInt(quotaInfo?.quota)-parseInt(valorBoveda)) >= valorCaja &&
+      parseInt(quotaInfo?.quota) - parseInt(valorBoveda) >= valorCaja &&
       !pathname.includes("/gestion/arqueo/carga-comprobante") &&
       ModalAlertBoveda
     );
-  }, [valorBoveda, quotaInfo,pathname,valorCaja,ModalAlertBoveda]);
+  }, [valorBoveda, quotaInfo, pathname, valorCaja, ModalAlertBoveda]);
 
   const infoCaja = useMemo(() => {
     return (
@@ -236,11 +292,13 @@ const AdminLayout = () => {
   }, [cajaState, pathname]);
 
   const handleCloseCupo = useCallback(() => {
-    setShowModalCupo(false)
+    setShowModalCupo(false);
   }, []);
-  const handleClose = useCallback(() => {
-    setShowModalPublicidad(false);
-  }, []);
+
+  const handleCloseDevice = useCallback(() => {
+    registerDevice(accept);
+    setDevice(false);
+  }, [accept]);
 
   return (
     <div className={adminLayout}>
@@ -253,13 +311,18 @@ const AdminLayout = () => {
             <RightArrow small />
           </div>
           <div className={usrData}>
-            <div 
-              className={saldoCupo} 
-              onClick={()=>{
-                consultaCupoComercios(roleInfo?.id_comercio)
-              }
-            }>
+            <div
+              className={saldoCupo}
+              onClick={() => {
+                consultaCupoComercios(roleInfo?.id_comercio);
+              }}
+            >
               Cupo disponible {saldoDisponible || "$0.00"}
+            </div>
+          </div>
+          <div className={usrData}>
+            <div className={valMinConsignar}>
+              Valor Mínimo a Consignar {valorMinConsignar || "$0.00"}
             </div>
           </div>
           <div className={usrData}>
@@ -281,14 +344,15 @@ const AdminLayout = () => {
         <Modal show={showModalAlertBoveda}>
           <div className="items-center text-center">
             <h1>
-            Señor usuario, ha superado el valor de efectivo en caja. Por favor realice el movimiento a bóveda
+              Señor usuario, ha superado el valor de efectivo en caja. Por favor
+              realice el movimiento a bóveda
               <ButtonBar>
                 <Button
                   className="btn mx-auto d-block"
                   type="submit"
                   onClick={() => handleCloseBoveda()}
                 >
-                  {conteoAlertaBoveda !== 3 ?"Cerrar":"Movimiento Bóveda"}
+                  {conteoAlertaBoveda !== 3 ? "Cerrar" : "Movimiento Bóveda"}
                 </Button>
               </ButtonBar>
             </h1>
@@ -331,11 +395,69 @@ const AdminLayout = () => {
             ""
           )}
         </Modal>
-        <Modal show={showModalPublicidad} handleClose={handleClose}>
-          <img
-            src={`${urlAssets}/assets/svg/recaudo/MODAL_PUBLICIDAD/MODAL_PUBLICIDAD.jpg`}
-            alt="Proximamente Corresponsal Colpatria"
-          ></img>
+        <Modal show={device}>
+          <div className="items-center text-justify">
+            <h1>Disclaimer:</h1>
+            <h2>
+              Los comercios, clientes y/o terceros que se encuentren autorizados
+              para el uso del siguiente dispositivo de procesamiento; se
+              comprometen a ejecutar y aplicar los controles de seguridad
+              definidos por Soluciones en Red S.A.S. para proteger y asegurar de
+              manera física y lógica el dispositivo, con el objeto de no poner
+              en riesgo la información Pública, Semiprivada, privada y/o
+              Sensible que afecte directa o indirectamente el buen uso de los
+              servicios prestados por Soluciones en Red S.A.S. CONTROLES: 
+              Garantizar las medidas de seguridad físicas de estos dispositivos
+              cuando se dejan desatendidos; se deben resguardar en lugares bajo
+              llave y/o vigilados.  Todos los equipos deben implementar un
+              esquema de autenticación a través de contraseñas, One-Time
+              Password) y doble factor de autenticación los cuales no pueden ser
+              compartidos con otras personas. • Los dispositivos móviles de
+              almacenamiento y procesamiento deben implementar una solución que
+              permita la detección y eliminación de software malicioso
+              (antivirus) • En ninguna circunstancia los comercios deben
+              instalar software no legal en los dispositivos de procesamiento. •
+              Los equipos de procesamiento deben encontrarse al día en
+              actualizaciones de seguridad del sistema operativo y validar que
+              esta actividad se realice de manera periódica. • Las credenciales
+              (Usuario, contraseña y OTP) deben ser de uso únicamente personal y
+              no se debe compartir con ninguna persona.
+              <ButtonBar>
+                <label className="text">
+                  <input
+                    type="radio"
+                    value={!accept}
+                    name="challenge"
+                    onChange={() => {
+                      setAccept(false);
+                    }}
+                  />
+                  <span className="ml-2">No acepta</span>
+                </label>
+                <label className="text">
+                  <input
+                    type="radio"
+                    value={accept}
+                    name="challenge"
+                    onChange={() => {
+                      setAccept(true);
+                    }}
+                  />
+                  <span className="ml-2">Acepta</span>
+                </label>
+              </ButtonBar>
+            </h2>
+            <ButtonBar>
+              <Button
+                type="submit"
+                onClick={() => {
+                  handleCloseDevice();
+                }}
+              >
+                Continuar
+              </Button>
+            </ButtonBar>
+          </div>
         </Modal>
         <Modal show={showModalCupo} handleClose={handleCloseCupo}>
           <Form
@@ -350,23 +472,39 @@ const AdminLayout = () => {
                 name="sobregiro"
                 label="Sobregiro"
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.sobregiro)).toLocaleString() ?? 0}`}
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.sobregiro))
+                  ) ?? 0
+                }
+                disabled={true}
+              />
+              {/* <Input
+                id="deuda" // cartera
+                name="deuda" // cartera
+                label={
+                  parseInt(cupoComercio[0]?.deuda) >= 1
+                    ? "Cartera al comercio"
+                    : "Cartera del comercio"
+                }
+                autoComplete="off"
+                value={
+                  formatMoney.format(
+                    parseInt(cupoComercio[0]?.deuda)
+                  ) ?? 0
+                }
                 disabled={true}
               />
               <Input
-                id="deuda"
-                name="deuda"
-                label={parseInt(cupoComercio[0]?.deuda) >= 1 ? "Deuda al comercio":"Deuda del comercio"}
-                autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.deuda)).toLocaleString() ?? 0}`}
-                disabled={true}
-              />      
-              <Input
                 id="cupo_en_canje"
                 name="cupo_en_canje"
-                label="Cupo en canje"
+                label="Deuda" // Cupo en canje
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.cupo_en_canje)).toLocaleString() ?? 0}`}
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.cupo_en_canje))
+                  ) ?? 0
+                }
                 disabled={true}
               />
               <Input
@@ -374,7 +512,19 @@ const AdminLayout = () => {
                 name="base_caja"
                 label="Base caja"
                 autoComplete="off"
-                value={`$ ${Math.abs(parseInt(cupoComercio[0]?.base_caja)).toLocaleString() ?? 0}`}
+                value={
+                  formatMoney.format(
+                    Math.abs(parseInt(cupoComercio[0]?.base_caja))
+                  ) ?? 0
+                }
+                disabled={true}
+              /> */}
+              <Input
+                id="dias_max_sobregiro"
+                name="dias_max_sobregiro"
+                label="Días máximos sobregiro"
+                autoComplete="off"
+                value={cupoComercio[0]?.dias_max_sobregiro ?? 0}
                 disabled={true}
               />
             </Fieldset>

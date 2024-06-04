@@ -23,6 +23,11 @@ import { onChangeNumber } from "../utils/functions";
 import MoneyRange from "../components/Compound/MoneyRange/MoneyRange";
 import TicketsDale from "../apps/Corresponsalia/CorresponsaliaGrupoAval/components/TicketsDale/TicketsDale";
 import TicketsEmcali from "../apps/Emcali/components/Tickets/TicketsEmcali";
+import TicketsCajaSocial from "../apps/Corresponsalia/CorresponsaliaCajaSocial/components/TicketsCajaSocial";
+import TicketMoviliza from "../apps/Moviliza/components/TicketsMoviliza/TicketMoviliza";
+import TicketsItau from "../apps/Corresponsalia/CorresponsaliaItau/components/TicketsItau/TicketsItau";
+import TicketsGou from "../apps/Pasarelas/Base/Gou/TicketsGou";
+import TicketsEvertec from "../apps/Pasarelas/Base/Evertec/TicketsEvertec";
 
 const dateFormatter = Intl.DateTimeFormat("es-CO", {
   year: "numeric",
@@ -367,6 +372,13 @@ const Transacciones = () => {
                 ticket={selected?.ticket}
                 stateTrx={selected?.status_trx}
               />
+            ) : selected?.id_tipo_transaccion === 124 ? (
+              <TicketMoviliza
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
             ) : selected?.ticket?.autorizador === 16 ||
               selected?.id_autorizador === 16 ? (
               <TicketsAgrario
@@ -447,6 +459,38 @@ const Transacciones = () => {
               />
             ) : selected?.id_autorizador === 56 ? (
               <TicketsEmcali
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 89 ||
+              selected?.id_autorizador === 89 ? (
+              <TicketsCajaSocial
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 118 ||
+              selected?.id_autorizador === 118 ? (
+              <TicketsGou
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 151 ||
+              selected?.id_autorizador === 151 ? (
+              <TicketsEvertec
+                refPrint={printDiv}
+                type="Reimpresión"
+                ticket={selected?.ticket}
+                stateTrx={selected?.status_trx}
+              />
+            ) : selected?.ticket?.autorizador === 64 ||
+              selected?.id_autorizador === 64 ? (
+              <TicketsItau
                 refPrint={printDiv}
                 type="Reimpresión"
                 ticket={selected?.ticket}

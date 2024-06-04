@@ -11,8 +11,9 @@ import {
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import fetchData from "../utils/fetchData";
-import { notify, notifyError } from "../utils/notify";
+import { notifyError } from "../utils/notify";
 import useFetchDebounce from "./useFetchDebounce";
+import controlgroup from "../layouts/AdminLayout/ControlGroup";
 
 const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
 const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
@@ -20,6 +21,7 @@ const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
 const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
 const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
 const url_user = process.env.REACT_APP_URL_COGNITO;
+const url_device = process.env.REACT_APP_URL_COGNITO_DEVICE;
 const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
 const url_pdp_commerce = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 
@@ -156,6 +158,8 @@ const reducerAuth = (userState, action) => {
 export const AuthContext = createContext({
   signIn: () => {},
   confirmSignIn: () => {},
+  registerDevice: () => {},
+  fetchDevice: () => {},
   signOut: () => {},
   infoTicket,
   handleverifyTotpToken: () => {},
@@ -167,6 +171,9 @@ export const AuthContext = createContext({
   parameters: null,
   qr: null,
   ...initialUser,
+  showModalPublicidad: false,
+  setShowModalPublicidad: () => {},
+  notLoadedPermissions: true,
 });
 
 export const useAuth = () => {
@@ -180,6 +187,8 @@ export const useProvideAuth = () => {
   const [, setSuserInactive] = useState("");
 
   const [timer, setTimer] = useState(null);
+  const [showModalPublicidad, setShowModalPublicidad] = useState(false);
+  const [notLoadedPermissions, setNotLoadedPermissions] = useState(true);
 
   const [userState, dispatchAuth] = useReducer(reducerAuth, initialUser);
 
@@ -238,7 +247,9 @@ export const useProvideAuth = () => {
           clearTimeout(old);
           return null;
         });
+        setShowModalPublicidad(true);
       } catch (err) {
+        console.log(err);
         if (err.code === "NotAuthorizedException") {
           dispatchAuth({ type: SIGN_OUT });
         }
@@ -247,6 +258,36 @@ export const useProvideAuth = () => {
     },
     [cognitoUser, navigate, state, pathname]
   );
+
+  const registerDevice = useCallback(async (challengeParam) => {
+    try {
+      if (challengeParam) {
+        const response = await Auth.rememberDevice();
+        console.log(response);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }, []);
+
+  const fetchDevice = useCallback(async () => {
+    try {
+      const user = await Auth.currentAuthenticatedUser();
+      const email = user["attributes"]["email"];
+      const isControlGroup = controlgroup.includes(email);
+      if (isControlGroup) {
+        const device_id =
+          user["signInUserSession"]["accessToken"]["payload"]["device_key"];
+        const devices = await Auth.fetchDevices();
+        const checkDevice = devices.some((item) => item?.id === device_id);
+        if (checkDevice) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    } catch {}
+  }, []);
 
   const signOut = useCallback(() => {
     Auth.signOut()
@@ -310,11 +351,18 @@ export const useProvideAuth = () => {
         }
 
         const strQr = resJson?.obj?.otpauth_url;
-        console.log(strQr);
         setQr(strQr);
         setTimer((old) => {
           clearTimeout(old);
-          return null;
+          return setTimeout(() => {
+            signOut();
+            notifyError(
+              "La sesión ha expirado, por favor intente de nuevo",
+              5000,
+              { toastId: "expired-session-not" }
+            );
+            setQr("");
+          }, 90000);
         });
       } catch (err) {
         console.error(err);
@@ -326,9 +374,12 @@ export const useProvideAuth = () => {
   const verifyTOTP = useCallback(
     async (totp) => {
       if (!totp) {
-        notifyError("No se ha pasado el totp para verificacion");
+        // notifyError("No se ha pasado el totp para verificacion");
         signOut();
-        return;
+        throw new Error(
+          "No se ha pasado el totp para verificacion",
+          { cause: "custom" }
+        );
       }
 
       try {
@@ -344,24 +395,62 @@ export const useProvideAuth = () => {
           },
         });
         if (!response.ok) {
-          notifyError(
-            <p>
-              Error consultando el servicio de verificacion de token:
-              <br />
-              Error http: {response.statusText} ({response.status})
-            </p>
+          if ([400, 404].includes(response.status)) {
+            let handled = false;
+            try {
+              const resJson = await response.json();
+              // notifyError(resJson?.msg);
+              handled = true;
+              throw new Error(resJson?.msg, { cause: "custom" });
+            } catch (error) {
+              if (handled) {
+                throw error;
+              }
+            }
+          }
+          // notifyError(
+          //   <p>
+          //     Error consultando el servicio de verificacion de token:
+          //     <br />
+          //     Error http: {response.statusText} ({response.status})
+          //   </p>
+          // );
+          throw new Error(
+            `Error consultando el servicio de verificacion de token:\nError http: ${response.statusText} (${response.status})`,
+            { cause: "custom" }
           );
-          return;
         }
         const resJson = await response.json();
         if (!resJson?.status) {
           notifyError(resJson?.msg);
-          return;
+          // return;
+          throw new Error(resJson?.msg, { cause: "custom" });
         }
-        notify(resJson?.msg);
+        // notify(resJson?.msg);
+        // notify("Token de usuario validado exitosamente (1/2)");
+        setTimer((old) => {
+          clearTimeout(old);
+          return null;
+        });
+        return;
       } catch (err) {
         console.error(err);
-        signOut();
+        // signOut();
+        setTimer((old) => {
+          clearTimeout(old);
+          return setTimeout(() => {
+            signOut();
+            notifyError(
+              "La sesión ha expirado, por favor intente de nuevo",
+              5000,
+              { toastId: "expired-session-not" }
+            );
+            setQr("");
+          }, 90000);
+        });
+        if (err.cause === "custom") {
+          throw err;
+        }
         throw new Error(err, { cause: "unknown" });
       }
     },
@@ -417,33 +506,25 @@ export const useProvideAuth = () => {
   }, []);
 
   const handlesetPreferredMFA = useCallback(
-    async (totp) => {
-      try {
-        await verifyTOTP(totp);
-        const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
-        if (preferredMFA === "SUCCESS") {
-          await confirmSignIn(totp);
-          signOut();
-        }
-      } catch (err) {
-        throw new Error(err);
+    async () => {
+      const preferredMFA = await Auth.setPreferredMFA(cognitoUser, "TOTP");
+      if (preferredMFA === "SUCCESS") {
+        signOut();
       }
     },
-    [cognitoUser, confirmSignIn, signOut, verifyTOTP]
+    [cognitoUser, signOut]
   );
 
   const handleverifyTotpToken = useCallback(
     async (totp) => {
-      try {
-        const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
-        if (tokenValidado.accessToken.payload.token_use === "access") {
-          await handlesetPreferredMFA(totp);
-        }
-      } catch (err) {
-        throw new Error(err);
+      await verifyTOTP(totp);
+
+      const tokenValidado = await Auth.verifyTotpToken(cognitoUser, totp);
+      if (tokenValidado.accessToken.payload.token_use === "access") {
+        await handlesetPreferredMFA();
       }
     },
-    [cognitoUser, handlesetPreferredMFA]
+    [cognitoUser, handlesetPreferredMFA, verifyTOTP]
   );
 
   useFetchDebounce(
@@ -510,6 +591,7 @@ export const useProvideAuth = () => {
         tempRole.comision = quota["comisiones"];
         tempRole.sobregiro = quota["dias sobregiro"] ?? 0;
         tempRole.sobregirovalue = quota["sobregiro"];
+        tempRole.deuda = quota["cupo_canje"] ?? 0;
         tempRole.alerta = quota["alerta cupo"];
         tempRole.tipo_pago_comision = quota["tipo pago comision"] ?? "";
         dispatchAuth({ type: SET_QUOTA, payload: { quota: tempRole } });
@@ -518,7 +600,7 @@ export const useProvideAuth = () => {
         dispatchAuth({
           type: SET_QUOTA,
           payload: {
-            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "" },
+            quota: { quota: 0, comision: 0, sobregiro: 0, alerta: "", deuda : 0 },
           },
         });
         if (error?.cause === "custom") {
@@ -590,6 +672,9 @@ export const useProvideAuth = () => {
       ),
     },
     {
+      onPending: useCallback(() => {
+        setNotLoadedPermissions(true);
+      }, []),
       onSuccess: useCallback(
         (res) => {
           const pdpU = res?.obj?.pdpU;
@@ -618,6 +703,9 @@ export const useProvideAuth = () => {
         },
         [signOut]
       ),
+      onFinally: useCallback(() => {
+        setNotLoadedPermissions(false);
+      }, []),
     }
   );
 
@@ -660,9 +748,7 @@ export const useProvideAuth = () => {
           )
           .catch(() => {});
       })
-      .catch(() => {
-        dispatchAuth({ type: SIGN_OUT });
-      });
+      .catch(() => signOut());
     // if (Auth.user === null || Auth.user === undefined) {
     // } else {
     //   dispatchAuth({ type: SIGN_OUT });
@@ -671,7 +757,7 @@ export const useProvideAuth = () => {
     //     payload: { loggedUser: Auth.user },
     //   });
     // }
-  }, [pathname]);
+  }, [pathname, signOut]);
 
   useEffect(() => {
     const isPdpCommerce = !!pdpUser?.fk_id_comercio;
@@ -703,6 +789,8 @@ export const useProvideAuth = () => {
     handleChangePass,
     signIn,
     confirmSignIn,
+    registerDevice,
+    fetchDevice,
     signOut,
     forgotPassword,
     forgotPasswordSubmit,
@@ -713,5 +801,8 @@ export const useProvideAuth = () => {
     validateUser,
     updateCommerceQuota,
     ...userState,
+    showModalPublicidad,
+    setShowModalPublicidad,
+    notLoadedPermissions,
   };
 };

@@ -10,6 +10,7 @@ import TablaGruposConvenios from "./components/TablaGruposConvenios";
 
 const urlGruposConvenios =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+// const urlGruposConvenios = "http://localhost:5000";
 
 const GruposConvenios = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const GruposConvenios = () => {
 
   const handleCloseReload = useCallback(() => {
     handleClose();
-    reloadConvGroups();
+    reloadConvGroups?.();
     setNombreNuevoGrupo("");
   }, [handleClose, reloadConvGroups]);
 
@@ -82,7 +83,7 @@ const GruposConvenios = () => {
         onSelect={useCallback(
           (convGroup) =>
             navigate(
-              `/params-operations/convenios-recaudo/grupos-convenios/edit/${convGroup.pk_tbl_grupo_convenios}`
+              `/params-operations/convenios-recaudo/grupos-convenios/${convGroup.pk_tbl_grupo_convenios}`
             ),
           [navigate]
         )}
@@ -104,6 +105,7 @@ const GruposConvenios = () => {
             maxLength={30}
             required
             disabled={loadingUpdate}
+            onChange={(ev) => setNombreNuevoGrupo(ev.target.value)}
           />
           <ButtonBar>
             <Button

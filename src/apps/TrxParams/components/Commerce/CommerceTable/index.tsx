@@ -1,7 +1,10 @@
 import React, {
+  Dispatch,
   Fragment,
   MouseEvent,
+  SetStateAction,
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   useState,
@@ -17,11 +20,12 @@ type Props = {
     comerce_data: any,
     ev: MouseEvent<HTMLTableRowElement>
   ) => void;
+  setSearchCommercesFn?: Dispatch<SetStateAction<() => void | Promise<void>>>;
 };
 
 const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
 
-const CommerceTable = ({ onSelectComerce }: Props) => {
+const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
   const [comercios, setComercios] = useState<any[]>([]);
   const [isNextPage, setIsNextPage] = useState(false);
 
@@ -37,16 +41,19 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
           comercio_padre,
           nombre_comercio,
           numero_identificacion,
+          email_comercio,
           pk_comercio,
         }: {
           comercio_padre: string;
           nombre_comercio: string;
           numero_identificacion: number;
+          email_comercio: string;
           pk_comercio: number;
         }) => ({
           Id: pk_comercio,
           Comercio: nombre_comercio,
           Documento: numero_identificacion,
+          Email: email_comercio,
           "Comercio padre": comercio_padre ?? "Sin comercio padre",
         })
       ),
@@ -58,7 +65,7 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
     [comercios, onSelectComerce]
   );
 
-  useFetchDebounce(
+  const [searchCommercesFn] = useFetchDebounce(
     {
       url: useMemo(
         () =>
@@ -79,11 +86,15 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
     }
   );
 
+  useEffect(() => {
+    setSearchCommercesFn?.(() => searchCommercesFn);
+  }, [setSearchCommercesFn, searchCommercesFn]);
+
   return (
     <Fragment>
       <DataTable
         title="Comercios"
-        headers={["Id", "Comercio", "Documento", "Comercio padre"]}
+        headers={["Id", "Comercio", "Documento", "Email", "Comercio padre"]}
         data={tableComercios}
         onClickRow={onSelectComercios}
         tblFooter={
@@ -115,9 +126,7 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
             type: "SET_ALL",
             value: (old) => ({
               ...old,
-              [ev.target.name]: ["pk_comercio"].includes(
-                ev.target.name
-              )
+              [ev.target.name]: ["pk_comercio"].includes(ev.target.name)
                 ? onChangeNumber(ev)
                 : ev.target.value,
               page: 1,
@@ -142,6 +151,15 @@ const CommerceTable = ({ onSelectComerce }: Props) => {
           maxLength={60}
           autoComplete="off"
           defaultValue={searchFilters.nombre_comercio}
+        />
+        <Input
+          id="email_comercio"
+          name="email_comercio"
+          label={"Email comercio"}
+          type="email"
+          maxLength={100}
+          autoComplete="off"
+          defaultValue={searchFilters.email_comercio}
         />
       </DataTable>
     </Fragment>

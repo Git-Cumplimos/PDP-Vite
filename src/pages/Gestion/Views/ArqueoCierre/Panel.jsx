@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment, useCallback, useMemo, useRef} from "reac
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { searchCierre, confirmaCierre, buscarPlataformaExt} from "../../utils/fetchCaja";
+import { searchCierre, confirmaCierre, buscarPlataformaExt,EfectivoEntreCajerosPending} from "../../utils/fetchCaja";
 import { notifyError,notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
 import Input from "../../../../components/Base/Input";
@@ -22,9 +22,9 @@ let totalExtrdiaAnterior = 0;
 
 const Panel = () => {
   const navigate = useNavigate();
-  const { roleInfo, userInfo, signOut } = useAuth();
+  const { roleInfo, userInfo, signOut, pdpUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [estado, setEstado] = useState(true);
+  const [estado, setEstado] = useState(false);
   const [totalCierres, setTotalCierres] = useState(false);
   const [denominaciones, setDenominaciones] = useState([
     [100000, 0],
@@ -79,7 +79,53 @@ const Panel = () => {
       });
   },[]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const conditions = [
+  //     validTipoComercio,
+  //     roleInfo?.id_usuario !== undefined,
+  //     roleInfo?.id_comercio !== undefined,
+  //     roleInfo?.id_dispositivo !== undefined,
+  //   ];
+  //   if (conditions.every((val) => val)) {
+  //     notifyPending(
+  //       searchCierre({
+  //         id_usuario: roleInfo?.id_usuario,
+  //         id_comercio: roleInfo?.id_comercio,
+  //         id_terminal: roleInfo?.id_dispositivo,
+  //         nombre_comercio: nombreComercio,
+  //         nombre_usuario: userInfo?.attributes?.name,
+  //         direccion_comercio: roleInfo?.direccion,
+  //       }),
+  //       {
+  //         render: () => {
+  //           setLoading(true);
+  //           buscarPlataforma()
+  //           return "Consultando cierre de caja";
+  //         },
+  //       },
+  //       {
+  //         render: ({ data: res }) => {
+  //           setLoading(false);
+  //           setTotalCierres(res?.obj);
+  //           return res?.msg;
+  //         },
+  //       },
+  //       {
+  //         render: ({ data: error }) => {
+  //           setLoading(false);
+  //           if (error?.cause === "custom") {
+  //             return error?.message;
+  //           }
+  //           console.error(error?.message);
+  //           return "Busqueda fallida";
+  //         },
+  //       },
+  //       { toastId: "busqueda-cierre-123" }
+  //     );
+  //   }
+  // }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio,buscarPlataforma]);
+
+  const hadleSearchCierre = useCallback(() => {
     const conditions = [
       validTipoComercio,
       roleInfo?.id_usuario !== undefined,
@@ -152,8 +198,8 @@ const Panel = () => {
       if (typeof(elemento.valor) === "string") {
         if (elemento.valor.includes("$")) {
           originalData[i].valor = elemento.valor.replace("$","");
-        }while (elemento.valor.includes(",")) {
-          originalData[i].valor = elemento.valor.replace(",","");
+        }while (elemento.valor.includes(".")) {
+          originalData[i].valor = elemento.valor.replace(".","");
         }
         originalData[i].valor = parseInt(originalData[i].valor)
       }
@@ -164,6 +210,7 @@ const Panel = () => {
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
         id_usuario: roleInfo?.id_usuario,
+        id_usuario_pdp: pdpUser?.uuid,
         nombre_comercio: nombreComercio,
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
@@ -179,6 +226,7 @@ const Panel = () => {
       },
       {
         render: ({ data: res }) => {
+          console.log(res)
           setLoading(false);
           const cierre = res?.obj;
           cierre?.externos_día_anterior?.data.map((elemento) => {
@@ -187,16 +235,23 @@ const Panel = () => {
           const tempTicket = {
             title: "Cierre de caja",
             timeInfo: {
-              "Fecha de pago": Intl.DateTimeFormat("es-CO", {
+              "Fecha de cierre": Intl.DateTimeFormat("es-CO", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
               }).format(new Date()),
-              Hora: Intl.DateTimeFormat("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              }).format(new Date()),
+              Hora: (() => {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+                return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+              })(),
+              // Hora: Intl.DateTimeFormat("es-CO", {
+              //   hour: "2-digit",
+              //   minute: "2-digit",
+              //   second: "2-digit",
+              // }).format(new Date()),
             },
             commerceInfo: [
               ["Id Comercio", cierre?.id_comercio],
@@ -220,13 +275,20 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Saldo Cierre Día Anterior",
+                "Total Cierre Día Anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
               ],
               ["", ""],
               [
-                "Saldo PDP Fin del Día",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
+                "Saldo PDP Fin Del Día",
+                formatMoney.format(
+                  cierre?.total_movimientos + 
+                  cierre?.total_efectivo_cierre_día_anterior + 
+                  cierre?.total_recibido_transportadora - 
+                  cierre?.total_consignaciones_transportadora + 
+                  cierre?.total_transferencias +
+                  cierre?.total_notas
+                ),
               ],
               ["", ""],
               [
@@ -235,23 +297,33 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Saldo Total del Día",
-                formatMoney.format(cierre?.total_efectivo_en_caja+Num),
-              ],
-              ["", ""],
-              [
-                "Efectivo en Caja",
-                formatMoney.format(totalArqueo),
+                "Total Efectivo Del Cierre",
+                formatMoney.format(
+                  cierre?.total_efectivo_en_caja +
+                  cierre?.total_recibido_transportadora -
+                  cierre?.total_consignaciones_transportadora +
+                  cierre?.total_transferencias +
+                  cierre?.total_notas +
+                  Num -
+                  cierre?.total_consignaciones_transportadora_externos
+                ),
               ],
               ["", ""],
             ],
             trxInfo: [
+              ["Total Arqueo de Caja", formatMoney.format(totalArqueo)],
+              ["", ""],
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
               ["", ""],
               [
-                "Pendiente Consignaciones Bancarias y Transportadora PDP",
+                "Transferencia Entre Cajeros",
+                formatMoney.format(cierre?.total_transferencias),
+              ],
+              ["", ""],
+              [
+                "Pendiente Consignaciones Bancarias y Transportadora",
                 formatMoney.format(cierre?.total_consignaciones_transportadora_pendiente),
               ],
               ["", ""],
@@ -261,15 +333,15 @@ const Panel = () => {
               ],
               ["", ""],
               [
-                "Consignaciones Bancarias y Transportadora PDP",
+                "Consignaciones Bancarias y Transportadora",
                 formatMoney.format(cierre?.total_consignaciones_transportadora),
               ],
               ["", ""],
-              [
-                "Consignaciones Bancarias y Transportadora Externos",
-                formatMoney.format(cierre?.total_consignaciones_transportadora_externos),
-              ],
-              ["", ""],
+              // [
+              //   "Consignaciones Bancarias y Transportadora Externos",
+              //   formatMoney.format(cierre?.total_consignaciones_transportadora_externos),
+              // ],
+              // ["", ""],
               [
                 "Recibido Transportadora",
                 formatMoney.format(cierre?.total_recibido_transportadora),
@@ -280,13 +352,18 @@ const Panel = () => {
                 formatMoney.format(cierre?.total_notas),
               ],
               ["", ""],
+              [
+                "Total Plataformas Externa",
+                formatMoney.format(Num),
+              ],
+              ["", ""],
             ],
           };
-          dataPlfExt.map((elemento) => 
-            tempTicket.trxInfo.push([
-              elemento.pk_nombre_plataforma,
-              formatMoney.format(elemento.valor)],["", ""])
-          )
+          // dataPlfExt.map((elemento) => 
+          //   tempTicket.trxInfo.push([
+          //     elemento.pk_nombre_plataforma,
+          //     formatMoney.format(elemento.valor)],["", ""])
+          // )
           setResumenCierre(tempTicket);
           return res?.msg;
         },
@@ -303,7 +380,15 @@ const Panel = () => {
       },
       { toastId: "busqueda-cierre-123" }
     );
-  }, [denominaciones, nombreComercio, roleInfo, userInfo?.attributes?.name]);
+  }, [
+    pdpUser?.uuid,
+    denominaciones, 
+    nombreComercio, 
+    roleInfo, 
+    userInfo?.attributes?.name,
+    totalCierres,
+    totalArqueo
+  ]);
 
   const printDiv = useRef();
 
@@ -318,7 +403,7 @@ const Panel = () => {
     if (isNegative) {
       numericValue = numericValue.slice(1); // Elimina el signo "-" para el formato interno
     }
-    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    let formattedValue = (isNegative ? "-" : "") + "$" + numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const updateData = dataPlfExt.map((value,i) => {
         if(value.pk_nombre_plataforma !== key.pk_nombre_plataforma){
           return value
@@ -331,6 +416,42 @@ const Panel = () => {
     })
     setDataPlfExt(updateData)
   }, [dataPlfExt]);
+
+  const searchTrnasferencias = useCallback(() => {
+    EfectivoEntreCajerosPending({
+      id_usuario_recibe: pdpUser?.uuid,
+      id_comercio: roleInfo?.id_comercio,
+      id_terminal: roleInfo?.id_dispositivo,
+      id_usuario: roleInfo?.id_usuario,
+    }) 
+      .then((res) => {
+        if (res?.obj?.length !== 0) {
+          closeModalFunction()
+          notifyError("Cierre no habilitado, Tiene movimientos entre cajero pendientes.")
+        }else{
+          setEstado(true)
+          hadleSearchCierre()
+        }
+      })
+      .catch((err) => {
+        if (err?.cause === "custom") {
+          return err?.message;
+        }
+        console.error(err?.message);
+        return "Peticion fallida";
+      });
+  }, [
+    // hadleSearchCierre,
+    closeModalFunction,
+    pdpUser?.uuid,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    roleInfo?.id_usuario,
+  ]);
+
+  useEffect(() => {
+    searchTrnasferencias()
+  }, [searchTrnasferencias]);
 
   return (
     validTipoComercio && (

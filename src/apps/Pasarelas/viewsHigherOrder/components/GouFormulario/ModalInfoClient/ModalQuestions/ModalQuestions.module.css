@@ -1,0 +1,21 @@
+.containerPrincipal {
+  display: grid;
+  align-items: left;
+  grid-gap: 13px;
+  overflow-y: scroll;
+  max-height: 500px;
+  border: 1px solid rgba(3, 3, 3, 0.326);
+  padding-left: 15px;
+  padding-right: 5px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.labelParagraph {
+  text-align: justify;
+  white-space: pre-line;
+}
+
+.labelQuestion {
+  font-weight: 500;
+}

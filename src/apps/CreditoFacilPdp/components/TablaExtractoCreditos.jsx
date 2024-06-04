@@ -16,17 +16,12 @@ const TablaExtractoCreditos = ({
   });
   const [filterData, setFilterData] = useState({
     noDesembolso: "",
+    noPrestamo: "",
   });
   const dataTable = useMemo(() => {
     const startIndex = (page - 1) * limit;
     const endIndex = Math.min(startIndex + limit, dataCreditos.length);
-    const currentPageCuotas = dataCreditos.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(dataCreditos.length / limit);
-
-    setMaxPages(totalPages);
-    setPageData({ page, limit });
-
-    return currentPageCuotas
+    const tableObjCreditos = dataCreditos
       .map(
         ({
           Agrupacion,
@@ -66,25 +61,33 @@ const TablaExtractoCreditos = ({
           cuotas,
         }) => {
           return {
+            numeroPrestamo: Numeroprestamo,
             desembolso: Id,
-            valorCredito: formatMoney.format(Saldo),
+            saldoCredito: formatMoney.format(Saldo),
             cuotas: cuotas,
             estado: Estado,
-            fechaDesembolso: new Date(Fechadesembolso).toLocaleDateString(
-              "es-ES",
-              {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              }
-            ),
+            fechaDesembolso: new Intl.DateTimeFormat("es-ES", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }).format(new Date(Fechadesembolso)),
           };
         }
       )
       .filter((data) =>
         data.desembolso.toString().match(filterData.noDesembolso)
+      )
+      .filter((data) =>
+        data.numeroPrestamo.toString().match(filterData.noPrestamo)
       );
-  }, [dataCreditos, page, limit, filterData.noDesembolso]);
+    const currentPageCuotas = tableObjCreditos.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(tableObjCreditos.length / limit);
+
+    setMaxPages(totalPages);
+    setPageData({ page, limit });
+
+    return currentPageCuotas;
+  }, [dataCreditos, page, limit, filterData]);
 
   const onSelect = useCallback(
     (ev, i) => {
@@ -100,8 +103,9 @@ const TablaExtractoCreditos = ({
       title={"Créditos comercio"}
       maxPage={maxPages}
       headers={[
+        "No. Crédito",
         "No. Desembolso",
-        "Valor del crédito",
+        "Saldo del crédito",
         "No. cuotas",
         "Estado",
         "Fecha Desembolso",
@@ -127,6 +131,19 @@ const TablaExtractoCreditos = ({
           ev.target.value = onChangeNumber(ev);
         }}
         defaultValue={filterData?.noDesembolso ?? ""}
+        required
+      />
+      <Input
+        id={"noPrestamo"}
+        label={"No. Crédito"}
+        name={"noPrestamo"}
+        type="tel"
+        autoComplete="off"
+        maxLength={"12"}
+        onChange={(ev) => {
+          ev.target.value = onChangeNumber(ev);
+        }}
+        defaultValue={filterData?.noPrestamo ?? ""}
         required
       />
     </TableEnterprise>

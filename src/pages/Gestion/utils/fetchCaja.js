@@ -44,8 +44,8 @@ const buildPostFunction = (url) => {
     try {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
-        if (res?.msg === "Error incompatible entre datos del comercio") {
-          throw new Error("Error incompatible entre datos del comercio", { cause: "custom" });
+        if (res?.msg === "Los datos ingresados del comercio y usuario no existen") {
+          throw new Error("Los datos ingresados del comercio y usuario no existen", { cause: "custom" });
         }
         if (res?.msg === "Exception (decorated fcn): Efectivo insuficiente en boveda") {
           throw new Error("Efectivo insuficiente en la bóveda", { cause: "custom" });
@@ -110,6 +110,10 @@ export const buscarListaComerciosCierreCaja = buildGetFunction(`${urlCierreCaja}
 export const descargarComprobante = buildGetFunction(`${urlComprobantes}/download-file`);
 export const agregarComprobante = buildPostFunction(`${urlComprobantes}/administrar`);
 export const movimientoBoveda = buildPostFunction(`${urlComprobantes}/movimiento-boveda`);
+export const movimientoEfectivoEntreCajeros = buildPostFunction(`${urlComprobantes}/movimiento-entre-cajeros`);
+export const historicoEfectivoEntreCajeros = buildGetFunction(`${urlComprobantes}/movimiento-entre-cajeros`);
+export const EfectivoEntreCajerosPending = buildGetFunction(`${urlComprobantes}/movimiento-entre-cajeros-pendientes`);
+export const editarTransferencia = buildPutFunction(`${urlComprobantes}/movimiento-entre-cajeros`);
 export const verHistoricoBoveda = buildGetFunction(`${urlComprobantes}/movimiento-boveda`);
 export const verValorBoveda = buildGetFunction(`${urlComprobantes}/boveda`);
 export const buscarComprobantes = buildGetFunction(`${urlComprobantes}/administrar`);

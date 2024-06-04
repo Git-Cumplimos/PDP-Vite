@@ -1,4 +1,10 @@
-import React, { ChangeEvent, forwardRef, useCallback, useMemo } from "react";
+import React, {
+  ChangeEvent,
+  forwardRef,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import Input, {
   CustomInputProps,
 } from "../../../../../../components/Base/Input";
@@ -69,18 +75,37 @@ type Props = CustomProps & Omit<CustomInputProps, "onInput" | "onChange">;
 
 const NitInput = forwardRef<HTMLInputElement, Props>(
   ({ onChange, value: origValue, ...props }, ref) => {
+    const [backspaceActive, setBackspaceActive] = useState(false);
+
     const onChangeNit = useCallback(
       (ev: ChangeEvent<HTMLInputElement>) => {
         let nitInput = ev.target.value;
 
+        if (backspaceActive && ev.target.value.at(-1) === "-") {
+          nitInput = ev.target.value.slice(0, -1);
+        }
+        setBackspaceActive(false);
+
         let caret_pos = ev.target.selectionStart ?? 0;
         const len = ev.target.value.length;
 
-        const newNit = formatNit(nitInput);
+        const newNit = formatNit(
+          nitInput
+            ?.split("")
+            ?.filter(
+              (val, ind) =>
+                !isNaN(parseInt(val)) || val === "." || (val === "-" && ind === 11)
+            )
+            ?.join("") ?? ""
+        );
         ev.target.value = newNit;
         onChange?.(ev, ev.target.value);
-        if (!newNit.match(/([0-9]{3}.[0-9]{3}.[0-9]{3}-{1}[0-9]{1})/g)) {
-          ev.target.setCustomValidity("Nit invalido");
+        if (nitInput) {
+          if (!newNit.match(/([0-9]{3}.[0-9]{3}.[0-9]{3}-{1}[0-9]{1})/g)) {
+            ev.target.setCustomValidity("Nit inválido");
+          } else {
+            ev.target.setCustomValidity("");
+          }
         } else {
           ev.target.setCustomValidity("");
         }
@@ -89,7 +114,7 @@ const NitInput = forwardRef<HTMLInputElement, Props>(
         caret_pos += ev.target.value.length - len;
         ev.target.setSelectionRange(caret_pos, caret_pos);
       },
-      [onChange]
+      [onChange, backspaceActive]
     );
 
     const value = useMemo(() => {
@@ -115,6 +140,11 @@ const NitInput = forwardRef<HTMLInputElement, Props>(
         maxLength={13}
         value={value}
         onChange={onChangeNit}
+        onKeyDown={(ev) => {
+          if (ev.key === "Backspace" || ev.key === "Delete") {
+            setBackspaceActive(true);
+          }
+        }}
       />
     );
   }

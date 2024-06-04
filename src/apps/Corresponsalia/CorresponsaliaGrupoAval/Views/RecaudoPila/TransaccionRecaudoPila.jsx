@@ -55,7 +55,7 @@ const TransaccionRecaudoPila = () => {
 
   const optionsDocumento = [
     { value: "2", label: "Número de planilla" },
-    { value: "3", label: "Número de documento" },
+    // { value: "3", label: "Número de documento" },
   ];
 
   const printDiv = useRef();

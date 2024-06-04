@@ -23,7 +23,8 @@ const Select = ({ label = "", options, self = false, info = "", ...select }) => 
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <div>
+        <div className="w-full">
+        {/* <div> */}
           <select id={_id} {...select}>
             {options.map(({ value, label }, idx) => {
               return (

@@ -55,28 +55,25 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
         Valorparaestaraldia,
       }) => {
         return {
-          id: Id,
+          id: Numeroprestamo,
           estado: Estado,
           valorCuota: formatMoney.format(Valorcuotaactual),
           saldo: formatMoney.format(Saldo),
-          desembolso: new Date(Fechadesembolso).toLocaleDateString("es-ES", {
+          desembolso: new Intl.DateTimeFormat("es-ES", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
-          }),
-          ultimoPago: new Date(Fechadeultimopago).toLocaleDateString("es-ES", {
+          }).format(new Date(Fechadesembolso)),
+          ultimoPago: new Intl.DateTimeFormat("es-ES", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
-          }),
-          proximoPago: new Date(Fechavencimientoproximo).toLocaleDateString(
-            "es-ES",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          ),
+          }).format(new Date(Fechadeultimopago)),
+          proximoPago: new Intl.DateTimeFormat("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(new Date(Fechavencimientoproximo)),
         };
       }
     );
@@ -85,7 +82,9 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
   const onSelect = useCallback(
     (ev, i) => {
       const idData = dataTable[i]?.id;
-      const dataCredito = dataCreditos.filter((data) => data.Id === idData);
+      const dataCredito = dataCreditos.filter(
+        (data) => data.Numeroprestamo === idData
+      );
       setDataCreditoUnique(dataCredito[0] ?? {});
     },
     [dataTable, dataCreditos]
@@ -102,7 +101,7 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
         "Saldo",
         "Desembolso",
         "Último pago",
-        "Proximo pago",
+        "Próximo pago",
       ]}
       data={dataTable}
       onSelectRow={onSelect}

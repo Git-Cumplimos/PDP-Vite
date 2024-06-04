@@ -32,8 +32,14 @@ const ModifiLimiteCanje = () => {
     max: 9999999999,
     min: 0,
   };
-  const { roleInfo } = useAuth();
+  const { roleInfo, pdpUser } = useAuth();
   const navegateValid = useNavigate();
+
+  const formatMoney = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
 
   // useEffect(() => {
   //   if (cupoComer?.length === 0) {
@@ -68,9 +74,9 @@ const ModifiLimiteCanje = () => {
         valor !== null &&
         valor !== ""
       ) {
-        const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario ?? -1,};
+        const datosComercio = { fk_id_comercio: idComercio, usuario: roleInfo.id_usuario ?? pdpUser?.uuid ?? -1,};
         const data = {};
-        if (baseCaja && baseCaja !== "") data.base_Caja = baseCaja
+        if (baseCaja !== null && baseCaja !== "") data.base_Caja = baseCaja
         if (diasMaxSobregiro && diasMaxSobregiro !== "") data.dias_max_sobregiro = parseInt(diasMaxSobregiro)
         if (valor !== cupoComer?.sobregiro) data.sobregiro = valor
         
@@ -109,6 +115,7 @@ const ModifiLimiteCanje = () => {
       navegateValid,
       cupoComer,
       submitName,
+      pdpUser,
     ]
   );
   const onMoneyChange = useCallback((e, valor) => {
@@ -178,20 +185,30 @@ const ModifiLimiteCanje = () => {
         ) : (
           <>
             <Input
-              id="deuda"
-              name="deuda"
-              label="Deuda del comercio"
+              id="nombre_comercio"
+              name="Nombre comercio"
+              label="Nombre comercio"
+              type="text"
+              value={cupoComer[0]?.nombre_comercio ?? ""}
+              autoComplete="off"
+              disabled={true}
+              required
+            />
+            <Input
+              id="deuda" // cartera
+              name="deuda" // cartera 
+              label={parseInt(cupoComer[0]?.deuda) >= 1 ? "Cartera al comercio" : "Cartera del comercio"}
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
-              value={`$ ${parseInt(cupoComer[0]?.deuda).toLocaleString() ?? 0}`}
+              value={formatMoney.format(parseInt(cupoComer[0]?.deuda)) ?? 0}
               disabled={true}
               required
               />
             <MoneyInput
               id="cupo_en_canje"
               name="cupo_en_canje"
-              label="Cupo en canje"
+              label="Deuda" // Cupo en canje
               autoComplete="off"
               min={limitesMontos?.min}
               max={limitesMontos?.max}
@@ -207,6 +224,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
+              equalErrorMin={false}
               value={valor ?? parseInt(cupoComer[0]?.sobregiro)}
               onInput={onMoneyChange}
               required
@@ -219,6 +237,7 @@ const ModifiLimiteCanje = () => {
               maxLength={"14"}
               min={limitesMontos?.min}
               max={limitesMontos?.max}
+              equalErrorMin={false}
               value={baseCaja ?? parseInt(cupoComer[0]?.base_caja)}
               onInput={onMoneyChange}
               required
@@ -226,7 +245,7 @@ const ModifiLimiteCanje = () => {
             <Input
               id="dias_max_sobregiro"
               name="dias_max_sobregiro"
-              label="Dias máximos sobregiro"
+              label="Días máximos sobregiro"
               type="tel"
               autoComplete="off"
               minLength={0}
@@ -246,7 +265,7 @@ const ModifiLimiteCanje = () => {
       {cupoComer?.length === 1 ? (
           <Modal show={submitName} handleClose={() => setSubmitName("")}>
             <PaymentSummary
-              title="Esta seguro de modificar el limite de cupo del comercio?"
+              title="Esta seguro de modificar la configuración del comercio?"
               subtitle=""
             >
               <ButtonBar className={"lg:col-span-2"}>

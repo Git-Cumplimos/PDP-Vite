@@ -13,6 +13,7 @@ const DaviplataCB = lazy(() => import("./Views/Daviplata"));
 const CashIn = lazy(() => import("./Views/Daviplata/Deposito"));
 const CashOut = lazy(() => import("./Views/Daviplata/Retiro"));
 const PagoGiro = lazy(() => import("./Views/Daviplata/PagoGiro"));
+const PagoDaviplata = lazy(() => import("./Views//Daviplata/PagoDaviplata"));
 
 const AhorrosCorrienteCB = lazy(() => import("./Views/AhorrosCorriente"));
 const DepositoCB = lazy(() => import("./Views/AhorrosCorriente/Deposito"));
@@ -206,6 +207,14 @@ const rutasDaviviendaCB = {
       ],
     },
   ],
+};
+
+export const routesDaviplata = {
+  link: "/daviplata/pago_daviplata",
+  label: <AppIcons Logo={"DAVIPLATA"} name="Pago Con DaviPlata" />,
+  component: PagoDaviplata,
+  permission: [enumPermisosDavivienda.daviplata_pago],
+  subRoutes: [],
 };
 
 export default rutasDaviviendaCB;

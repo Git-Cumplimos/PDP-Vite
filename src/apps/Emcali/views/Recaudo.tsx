@@ -68,7 +68,8 @@ const infServiceBackend: TypeInf = {
     method: "POST",
   },
   consult: {
-    url: `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/transacciones/consulta-por-referencia`,
+    // url: `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/transacciones/consulta-por-referencia`,
+    url: `http://127.0.0.1:5000/backend_emcali/transacciones/consulta-por-referencia`,
     name: "Emcali - consulta",
     method: "POST",
   },
@@ -196,13 +197,23 @@ const Recaudo = () => {
   const onSubmitConsult = useCallback(
     (e: MouseEvent<HTMLInputElement>) => {
       e.preventDefault();
+      // const data = {
+      //   comercio: {
+      //     id_comercio: roleInfo?.["id_comercio"] ?? "",
+      //     id_usuario: roleInfo?.["id_usuario"] ?? "",
+      //     id_terminal: roleInfo?.["id_dispositivo"] ?? "",
+      //     nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+      //     nombre_usuario: pdpUser?.["uname"] ?? "",
+      //   },
+      //   numcupon: inputData.numcupon,
+      // };
       const data = {
         comercio: {
-          id_comercio: roleInfo?.["id_comercio"] ?? "",
-          id_usuario: roleInfo?.["id_usuario"] ?? "",
-          id_terminal: roleInfo?.["id_dispositivo"] ?? "",
-          nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
-          nombre_usuario: pdpUser?.["uname"] ?? "",
+          id_comercio: 10166,
+          id_usuario: 500,
+          id_terminal: 245,
+          nombre_comercio: "PDP SOPO",
+          nombre_usuario: "sopo",
         },
         numcupon: inputData.numcupon,
       };
@@ -440,9 +451,7 @@ const Recaudo = () => {
             }}
           >
             <ButtonBar>
-              <Button type="submit" onClick={onSubmitPay}>
-                Realizar Pago
-              </Button>
+              <Button type="submit">Realizar Pago</Button>
               <Button onClick={() => HandleCloseTrx(true)}>Cancelar</Button>
             </ButtonBar>
           </PaymentSummary>

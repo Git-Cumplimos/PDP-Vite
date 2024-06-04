@@ -6,6 +6,7 @@ import {
   useRef,
   forwardRef,
   useState,
+  ReactNode,
 } from "react";
 import classes from "./Input.module.css";
 
@@ -22,11 +23,11 @@ export interface CustomInputProps extends ComponentPropsWithRef<"input"> {
   invalid?: string;
   actionBtn?: {
     callback: (ev: MouseEvent<HTMLButtonElement>) => void;
-    label: string;
+    label: ReactNode;
   };
 }
 
-const { formItem, invalid: invalidCls, btn } = classes;
+const { formItem, invalid: invalidCls, btn, custom_radiobutton } = classes;
 const { div_input_form_item } = classes2;
 const Input = forwardRef<HTMLInputElement, CustomInputProps>(
   (
@@ -85,22 +86,43 @@ const Input = forwardRef<HTMLInputElement, CustomInputProps>(
     ) : (
       <div className={`${div_input_form_item} ${formItem}`}>
         {label && label !== "" && <label htmlFor={_id}>{label}</label>}
-        <div>
-          <input
-            id={_id}
-            type={type}
-            {...input}
-            ref={(realInput) => {
-              inputRef.current = realInput;
-              if (ref) {
-                if (typeof ref === "function") {
-                  ref(realInput);
-                } else {
-                  ref.current = realInput;
+        <div className="w-full">
+          {type === "radio" ? (
+            <label htmlFor={_id}>
+              <input
+                id={_id}
+                type={type}
+                {...input}
+                ref={(realInput) => {
+                  inputRef.current = realInput;
+                  if (ref) {
+                    if (typeof ref === "function") {
+                      ref(realInput);
+                    } else {
+                      ref.current = realInput;
+                    }
+                  }
+                }}
+              />
+              <span className={custom_radiobutton} />
+            </label>
+          ) : (
+            <input
+              id={_id}
+              type={type}
+              {...input}
+              ref={(realInput) => {
+                inputRef.current = realInput;
+                if (ref) {
+                  if (typeof ref === "function") {
+                    ref(realInput);
+                  } else {
+                    ref.current = realInput;
+                  }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          )}
           {info && <p>{info}</p>}
           {inputRef.current?.value !== "" && invalid && (
             <p className={`${invalidCls}`}>{invalid}</p>
