@@ -324,7 +324,7 @@ const DesembolsoCEACRC = () => {
                     >
                       Cancelar
                     </Button>
-                    {!isChecked && (
+                    {isChecked && (
                       <Button
                         type="submit"
                         disabled={loadingPeticionDesembolsoCredito}
