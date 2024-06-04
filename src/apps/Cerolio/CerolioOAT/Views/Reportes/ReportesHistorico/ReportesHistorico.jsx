@@ -24,7 +24,7 @@ const ReportesHistorico = () => {
       const res = await fetchGetReportesHistorico(
         filters.fechaInicial.split("-").slice(0, 2).join("-"),
         filters.fechaFinal.split("-").slice(0, 2).join("-"),
-        1,
+        roleInfo.id_comercio,
         "movimientos",
         page,
         limit
@@ -123,3 +123,4 @@ const ReportesHistorico = () => {
 };
 
 export default ReportesHistorico;
+

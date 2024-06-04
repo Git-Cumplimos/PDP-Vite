@@ -166,32 +166,26 @@ const Agenda = () => {
       setResults(res.obj.resp_cancelaciones.obj);
       console.log("Respuestaaa", res);
       setShowModalResults(true);
-      // setScheduleData(base_agenda);
-      getSchedule();
+      if (!res.obj.resp_cancelaciones.obj.url_descargaS3) {
+        return;
+      } else {
+        notify("Descargando archivo de cancelaciones...");
+        // Descargar automaticamente el archivo Excel
+        const file = res.obj.resp_cancelaciones.obj.url_descargaS3;
+        const link = document.createElement("a");
+        link.href = file;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        link.remove();
+      }
+      await getSchedule();
     }
   };
-
-  const addInoperanceDate = () => {
-    setInoperanceDates([...inoperanceDates, ""]);
-  };
-
-  // const handleDateChange = (date) => {
-  //   const isDuplicate = inoperanceDates?.some(
-  //     (inoperanceDate) => inoperanceDate.getTime() === date.getTime()
-  //   );
-  //   if (!isDuplicate) {
-  //     setInoperanceDates([...inoperanceDates, date]);
-  //   } else {
-  //     notifyError("La fecha ya ha sido seleccionada.");
-  //   }
-  // };
 
   return (
     <>
       <div className="flex flex-col w-full my-2">
-        {/* <CalendarDate value={scheduleData.date} onChange={changeDate}>
-        <CalendarMonth />
-      </CalendarDate> */}
         <div className="grid grid-cols-2 gap-x-5">
           {scheduleData.hours.map((hour, index) => (
             <div
@@ -320,18 +314,13 @@ const Agenda = () => {
           value={results?.cantidad_citas_canceladas}
           disabled
         />
-        {results?.lista_citas_canceladas &&
-          results?.lista_citas_canceladas.length > 0 &&
-          results?.lista_citas_canceladas?.map((cita) => (
-            <>
-              <p>Nombre Cliente: {cita.nombre_cliente}</p>
-              <p>Hora de cita:</p>
-              <p>Celular: {cita.celular}</p>
-            </>
-          ))}
+        {results?.url_descargaS3 && (
+          <p>Se descargó un archivo con las citas canceladas.</p>
+        )}
       </Modal>
     </>
   );
 };
 
 export default Agenda;
+
