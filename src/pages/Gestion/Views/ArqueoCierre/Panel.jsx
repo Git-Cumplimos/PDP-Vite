@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment, useCallback, useMemo, useRef} from "reac
 import Modal from "../../../../components/Base/Modal";
 import Button from "../../../../components/Base/Button";
 import { useAuth } from "../../../../hooks/AuthHooks";
-import { searchCierre, confirmaCierre, buscarPlataformaExt} from "../../utils/fetchCaja";
+import { searchCierre, confirmaCierre, buscarPlataformaExt,EfectivoEntreCajerosPending} from "../../utils/fetchCaja";
 import { notifyError,notifyPending } from "../../../../utils/notify";
 import Fieldset from "../../../../components/Base/Fieldset";
 import Input from "../../../../components/Base/Input";
@@ -22,9 +22,9 @@ let totalExtrdiaAnterior = 0;
 
 const Panel = () => {
   const navigate = useNavigate();
-  const { roleInfo, userInfo, signOut } = useAuth();
+  const { roleInfo, userInfo, signOut, pdpUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [estado, setEstado] = useState(true);
+  const [estado, setEstado] = useState(false);
   const [totalCierres, setTotalCierres] = useState(false);
   const [denominaciones, setDenominaciones] = useState([
     [100000, 0],
@@ -79,7 +79,53 @@ const Panel = () => {
       });
   },[]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const conditions = [
+  //     validTipoComercio,
+  //     roleInfo?.id_usuario !== undefined,
+  //     roleInfo?.id_comercio !== undefined,
+  //     roleInfo?.id_dispositivo !== undefined,
+  //   ];
+  //   if (conditions.every((val) => val)) {
+  //     notifyPending(
+  //       searchCierre({
+  //         id_usuario: roleInfo?.id_usuario,
+  //         id_comercio: roleInfo?.id_comercio,
+  //         id_terminal: roleInfo?.id_dispositivo,
+  //         nombre_comercio: nombreComercio,
+  //         nombre_usuario: userInfo?.attributes?.name,
+  //         direccion_comercio: roleInfo?.direccion,
+  //       }),
+  //       {
+  //         render: () => {
+  //           setLoading(true);
+  //           buscarPlataforma()
+  //           return "Consultando cierre de caja";
+  //         },
+  //       },
+  //       {
+  //         render: ({ data: res }) => {
+  //           setLoading(false);
+  //           setTotalCierres(res?.obj);
+  //           return res?.msg;
+  //         },
+  //       },
+  //       {
+  //         render: ({ data: error }) => {
+  //           setLoading(false);
+  //           if (error?.cause === "custom") {
+  //             return error?.message;
+  //           }
+  //           console.error(error?.message);
+  //           return "Busqueda fallida";
+  //         },
+  //       },
+  //       { toastId: "busqueda-cierre-123" }
+  //     );
+  //   }
+  // }, [nombreComercio, roleInfo, userInfo?.attributes?.name, validTipoComercio,buscarPlataforma]);
+
+  const hadleSearchCierre = useCallback(() => {
     const conditions = [
       validTipoComercio,
       roleInfo?.id_usuario !== undefined,
@@ -164,6 +210,7 @@ const Panel = () => {
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
         id_usuario: roleInfo?.id_usuario,
+        id_usuario_pdp: pdpUser?.uuid,
         nombre_comercio: nombreComercio,
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
@@ -179,6 +226,7 @@ const Panel = () => {
       },
       {
         render: ({ data: res }) => {
+          console.log(res)
           setLoading(false);
           const cierre = res?.obj;
           cierre?.externos_día_anterior?.data.map((elemento) => {
@@ -217,33 +265,48 @@ const Panel = () => {
             ],
             cajaInfo: [
               [
-                "Saldo Cierre día Anterior",
+                "Saldo PDP Día Anterior",
                 formatMoney.format(cierre?.total_efectivo_cierre_día_anterior),
               ],
               ["", ""],
-              // [
-              //   "Saldo Externos Día Anterior",
-              //   formatMoney.format(totalExtrdiaAnterior),
-              // ],
-              // ["", ""],
-              // [
-              //   "Saldo Cierre Día Anterior",
-              //   formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
-              // ],
-              // ["", ""],
               [
-                "Saldo PDP + Externos Del Día",
-                formatMoney.format(cierre?.total_movimientos+Num),
+                "Saldo Externos Día Anterior",
+                formatMoney.format(totalExtrdiaAnterior),
               ],
               ["", ""],
-              // [
-              //   "Saldo Externos Fin del Día",
-              //   formatMoney.format(Num),
-              // ],
-              // ["", ""],
               [
-                "Total Saldo Fin Del Día",
-                formatMoney.format(cierre?.total_efectivo_en_caja),
+                "Total Cierre Día Anterior",
+                formatMoney.format(cierre?.total_efectivo_cierre_día_anterior+totalExtrdiaAnterior),
+              ],
+              ["", ""],
+              [
+                "Saldo PDP Fin Del Día",
+                formatMoney.format(
+                  cierre?.total_movimientos + 
+                  cierre?.total_efectivo_cierre_día_anterior + 
+                  cierre?.total_recibido_transportadora - 
+                  cierre?.total_consignaciones_transportadora + 
+                  cierre?.total_transferencias +
+                  cierre?.total_notas
+                ),
+              ],
+              ["", ""],
+              [
+                "Saldo Externos Fin del Día",
+                formatMoney.format(Num),
+              ],
+              ["", ""],
+              [
+                "Total Efectivo Del Cierre",
+                formatMoney.format(
+                  cierre?.total_efectivo_en_caja +
+                  cierre?.total_recibido_transportadora -
+                  cierre?.total_consignaciones_transportadora +
+                  cierre?.total_transferencias +
+                  cierre?.total_notas +
+                  Num -
+                  cierre?.total_consignaciones_transportadora_externos
+                ),
               ],
               ["", ""],
             ],
@@ -253,6 +316,11 @@ const Panel = () => {
               ["Sobrante", formatMoney.format(cierre?.total_sobrante)],
               ["", ""],
               ["Faltante", formatMoney.format(cierre?.total_faltante)],
+              ["", ""],
+              [
+                "Transferencia Entre Cajeros",
+                formatMoney.format(cierre?.total_transferencias),
+              ],
               ["", ""],
               [
                 "Pendiente Consignaciones Bancarias y Transportadora",
@@ -313,6 +381,7 @@ const Panel = () => {
       { toastId: "busqueda-cierre-123" }
     );
   }, [
+    pdpUser?.uuid,
     denominaciones, 
     nombreComercio, 
     roleInfo, 
@@ -347,6 +416,42 @@ const Panel = () => {
     })
     setDataPlfExt(updateData)
   }, [dataPlfExt]);
+
+  const searchTrnasferencias = useCallback(() => {
+    EfectivoEntreCajerosPending({
+      id_usuario_recibe: pdpUser?.uuid,
+      id_comercio: roleInfo?.id_comercio,
+      id_terminal: roleInfo?.id_dispositivo,
+      id_usuario: roleInfo?.id_usuario,
+    }) 
+      .then((res) => {
+        if (res?.obj?.length !== 0) {
+          closeModalFunction()
+          notifyError("Cierre no habilitado, Tiene movimientos entre cajero pendientes.")
+        }else{
+          setEstado(true)
+          hadleSearchCierre()
+        }
+      })
+      .catch((err) => {
+        if (err?.cause === "custom") {
+          return err?.message;
+        }
+        console.error(err?.message);
+        return "Peticion fallida";
+      });
+  }, [
+    // hadleSearchCierre,
+    closeModalFunction,
+    pdpUser?.uuid,
+    roleInfo?.id_comercio,
+    roleInfo?.id_dispositivo,
+    roleInfo?.id_usuario,
+  ]);
+
+  useEffect(() => {
+    searchTrnasferencias()
+  }, [searchTrnasferencias]);
 
   return (
     validTipoComercio && (

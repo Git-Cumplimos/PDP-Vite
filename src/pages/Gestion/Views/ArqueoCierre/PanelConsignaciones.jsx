@@ -190,7 +190,6 @@ const PanelConsignaciones = () => {
     }
   };
 
-  console.log(comprobantes)
   return (
     <Fragment>
       <h1 className="text-3xl mt-6">Validación de comprobante</h1>
@@ -366,7 +365,7 @@ const PanelConsignaciones = () => {
             value={selected?.fk_tipo_comprobante ?? ""}
             disabled
           />
-          {selected?.fk_tipo_comprobante !== "Recibido transportadora"?
+          {selected?.fk_tipo_comprobante !== "Recibido transportadora" && selected?.tipo_comercio === 'OFICINAS PROPIAS'?
           <>
             <Input
               id="valor_efectivo_pdp"
@@ -375,6 +374,7 @@ const PanelConsignaciones = () => {
               value={formatMoney.format(selected?.valor_efectivo_pdp) ?? ""}
               disabled
             />
+
             <Input
               id="valor_efectivo_boveda"
               label="Valor efectivo bóveda"

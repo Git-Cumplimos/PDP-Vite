@@ -1,3 +1,5 @@
+import React, { FunctionComponent, ReactNode, isValidElement } from "react";
+
 export const get_value = (structure: string, value_: string) => {
   const type = structure;
   let value = "";
@@ -5,13 +7,11 @@ export const get_value = (structure: string, value_: string) => {
   let msg_invalid = "";
   switch (type) {
     case "letters": {
-      if (value_.match(/^[ a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/g)) {
-        is_change = true;
-        value = (value_.match(/^[ a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/g) ?? []).join("");
-        msg_invalid = "";
-      } else {
-        msg_invalid = "solo se bebe ingresar letras";
-      }
+      value = value_.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, "");
+      is_change = true;
+      msg_invalid = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g.test(value_)
+        ? "solo se debe ingresar letras"
+        : "";
       break;
     }
     case "email": {
@@ -162,3 +162,32 @@ export const dict_summary_trx_own = (
   });
   return summary_trx_own_new;
 };
+
+export function isFunctionComponent<P = {}>(
+  component: any
+): component is FunctionComponent<P> {
+  // Verificar si es una función
+  if (typeof component !== "function") {
+    return false;
+  }
+
+  // Intentar renderizar el componente y verificar si es un elemento React válido
+  try {
+    const element = component({});
+    return isValidElement(element);
+  } catch (error: any) {
+    return false;
+  }
+}
+
+export function isReactNode(node: any): node is ReactNode {
+  return (
+    typeof node === "string" ||
+    typeof node === "number" ||
+    typeof node === "boolean" ||
+    node === null ||
+    node === undefined ||
+    React.isValidElement(node) ||
+    (Array.isArray(node) && node.every(isReactNode))
+  );
+}

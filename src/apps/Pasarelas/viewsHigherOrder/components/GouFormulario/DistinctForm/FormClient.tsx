@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useMemo } from "react";
 import Input from "../../../../../../components/Base/Input";
 import Select from "../../../../../../components/Base/Select";
 import {
@@ -10,6 +10,11 @@ import {
   TypingFormClientDataInputCheck,
 } from "../PasarelaFormulario";
 import classes from "../PasarelaFormulario.module.css";
+import EmailInput from "../../../../../../components/Base/EmailInput";
+import {
+  TypingDominioSchemaFunc,
+  TypingMsgInvalid,
+} from "../../../../../../components/Base/EmailInput/EmailTyping";
 
 //FRAGMENT ********************* CSS *********************************
 const { contendorFormClient } = classes;
@@ -23,19 +28,30 @@ type PropsFormClient = {
 };
 
 //FRAGMENT ******************** CONST ***********************************
-const tipoDocumentoOptions: { [key: string]: string } = {
+export const tipoDocumentoOptions: { [key: string]: string } = {
   CC: "Cedula de Ciudadanía",
   CE: "Cédula de Extranjería",
   TI: "Tarjeta de Identidad",
   NIT: "Número de Identificación Tributaria",
   RUT: "Registro Único Tributario",
 };
-const options_select: Array<{ value: string; label: string }> = Object.keys(
-  tipoDocumentoOptions
-).map((key_: string) => ({
-  value: key_,
-  label: tipoDocumentoOptions[key_],
-}));
+const EXAMPLE = "user@gmail.com";
+
+//FRAGMENT ******************** FUNCTION ***********************************
+const isDominioAdd: TypingDominioSchemaFunc = (
+  correo_: string,
+  dominio_: string
+) => {
+  let msgInvalid: TypingMsgInvalid = null;
+  const dominiosPunto = dominio_.split(".");
+  if (dominiosPunto[dominiosPunto.length - 1]) {
+    if (dominiosPunto[dominiosPunto.length - 1].length <= 1) {
+      msgInvalid = `Correo Incorrecto Ejemplo: ${EXAMPLE}`;
+      return msgInvalid;
+    }
+  }
+  return msgInvalid;
+};
 
 //FRAGMENT ******************** COMPONENT ***************************
 const FormClient = ({
@@ -44,64 +60,18 @@ const FormClient = ({
   formClientDataInputCheck,
   dataInvalid,
 }: PropsFormClient) => {
+  const optionsSelect: Array<{ value: string; label: string }> = useMemo(() => {
+    if (formClientInputs?.company === undefined) {
+      delete tipoDocumentoOptions.NIT;
+    }
+    return Object.keys(tipoDocumentoOptions).map((key_: string) => ({
+      value: key_,
+      label: tipoDocumentoOptions[key_],
+    }));
+  }, [formClientInputs?.company]);
+
   return (
     <fieldset className={contendorFormClient}>
-      <div
-        className={
-          formClientInputs?.nombres !== undefined &&
-          formClientInputs?.apellidos !== undefined
-            ? ""
-            : "col-span-2"
-        }
-      >
-        {formClientInputs?.nombres !== undefined && (
-          <Input
-            required
-            id="nombres/text"
-            name="nombres"
-            label="Nombres"
-            type="text"
-            autoComplete="off"
-            maxLength={20}
-            disabled={
-              formClientInputs?.nombres === true ||
-              formClientInputs?.nombres === false
-                ? true
-                : false
-            }
-            value={formClientDataInput.nombres}
-          />
-        )}
-      </div>
-
-      <div
-        className={
-          formClientInputs?.nombres !== undefined &&
-          formClientInputs?.apellidos !== undefined
-            ? ""
-            : "col-span-2"
-        }
-      >
-        {formClientInputs?.apellidos !== undefined && (
-          <Input
-            required
-            id="apellidos/text"
-            name="apellidos"
-            label="Apellidos"
-            type="text"
-            autoComplete="off"
-            maxLength={20}
-            disabled={
-              formClientInputs?.apellidos === true ||
-              formClientInputs?.apellidos === false
-                ? true
-                : false
-            }
-            value={formClientDataInput.apellidos ?? ""}
-          />
-        )}
-      </div>
-
       <div
         className={
           formClientInputs?.tipo_documento !== undefined &&
@@ -111,7 +81,12 @@ const FormClient = ({
         }
       >
         {formClientInputs?.tipo_documento !== undefined && (
-          <Select label="Tipo de documento" options={options_select} />
+          <Select
+            id="tipo_documento/text"
+            name="tipo_documento"
+            label="Tipo de documento"
+            options={optionsSelect}
+          />
         )}
       </div>
 
@@ -143,6 +118,88 @@ const FormClient = ({
           />
         )}
       </div>
+
+      <div
+        className={
+          formClientInputs?.nombres !== undefined &&
+          formClientInputs?.apellidos !== undefined
+            ? ""
+            : "col-span-2"
+        }
+      >
+        {formClientInputs?.nombres !== undefined &&
+          formClientDataInput.tipo_documento !== "NIT" && (
+            <Input
+              required
+              id="nombres/letters"
+              name="nombres"
+              label="Nombres"
+              type="text"
+              autoComplete="off"
+              maxLength={40}
+              disabled={
+                formClientInputs?.nombres === true ||
+                formClientInputs?.nombres === false
+                  ? true
+                  : false
+              }
+              value={formClientDataInput.nombres}
+              invalid={dataInvalid.nombres}
+            />
+          )}
+      </div>
+
+      <div
+        className={
+          formClientInputs?.nombres !== undefined &&
+          formClientInputs?.apellidos !== undefined
+            ? ""
+            : "col-span-2"
+        }
+      >
+        {formClientInputs?.apellidos !== undefined &&
+          formClientDataInput.tipo_documento !== "NIT" && (
+            <Input
+              required
+              id="apellidos/letters"
+              name="apellidos"
+              label="Apellidos"
+              type="text"
+              autoComplete="off"
+              maxLength={40}
+              disabled={
+                formClientInputs?.apellidos === true ||
+                formClientInputs?.apellidos === false
+                  ? true
+                  : false
+              }
+              value={formClientDataInput.apellidos}
+              invalid={dataInvalid.apellidos}
+            />
+          )}
+      </div>
+
+      {formClientInputs?.company !== undefined &&
+        formClientDataInput.tipo_documento === "NIT" && (
+          <div className="pb-5 col-span-2">
+            <Input
+              required
+              id="company/text"
+              name="company"
+              label="Nombre de la empresa"
+              type="text"
+              autoComplete="off"
+              maxLength={100}
+              disabled={
+                formClientInputs?.company === true ||
+                formClientInputs?.company === false
+                  ? true
+                  : false
+              }
+              value={formClientDataInput.company}
+            />
+          </div>
+        )}
 
       {formClientInputs?.celular !== undefined && (
         <Fragment>
@@ -195,7 +252,7 @@ const FormClient = ({
       {formClientInputs?.correo !== undefined && (
         <Fragment>
           <div className="pt-5 col-span-2">
-            <Input
+            <EmailInput
               required
               id="correo/email/correo|confirmacion=>correo"
               name="correo"
@@ -203,6 +260,14 @@ const FormClient = ({
               type="email"
               autoComplete="off"
               maxLength={100}
+              placeholder={EXAMPLE}
+              min={2}
+              max={3}
+              isGuiaUser={/.{2,}/}
+              isGuiaDominio={{ schema: [], func: isDominioAdd }}
+              msgInvalidSimple={
+                "La dirección de correo electrónico no tiene una estructura válida, por favor corríjala."
+              }
               disabled={
                 formClientInputs?.correo === true ||
                 formClientInputs?.correo === false
@@ -214,7 +279,7 @@ const FormClient = ({
           </div>
           {formClientInputs?.["correo|confirmacion"] !== undefined && (
             <div className="col-span-2">
-              <Input
+              <EmailInput
                 required
                 id="correo|confirmacion/email/correo|confirmacion=>correo"
                 name="correo|confirmacion"
@@ -222,6 +287,13 @@ const FormClient = ({
                 type="email"
                 autoComplete="off"
                 maxLength={100}
+                min={2}
+                max={3}
+                isGuiaUser={/.{2,}/}
+                isGuiaDominio={{ schema: [], func: isDominioAdd }}
+                msgInvalidSimple={
+                  "La dirección de correo electrónico no tiene una estructura válida, por favor corríjala."
+                }
                 value={formClientDataInputCheck["correo|confirmacion"]}
                 invalid={dataInvalid["correo|confirmacion"]}
                 onPaste={(ev) => ev.preventDefault()}

@@ -96,6 +96,7 @@ const ParamsOperations = lazy(() =>
 );
 const TypesTrxs = lazy(() => import("../ParamsOperations/Views/TypesTrxs"));
 const LineasNegocio = lazy(() => import("./Views/LineasNegocio/LineasNegocio"));
+const ParametrizacionCodBarrasConvenio = lazy(() => import("./Views/ParametrizacionCodBarrasConvenio"));
 
 const listPermissions = Object.values(enumPermisosTrx);
 export const listPermissionsTrx = listPermissions.splice(
@@ -331,6 +332,12 @@ const rutasConfiguraciones = {
           component: EditGruposConvenios,
           permission: [enumPermisosTrx.grupos_comercios],
           show: false,
+        },
+        {
+          link: "/params-operations/convenios-recaudo/parametrizar-codigos-barras-convenios",
+          label: <AppIcons Logo={"RECAUDO"} name={"Parametrizar códigos de barras convenios"} />,
+          component: ParametrizacionCodBarrasConvenio,
+          permission: [enumPermisosTrx.PARAMETRIZACION_CODIGOS_BARRAS_CONVENIOS],
         },
       ],
     },

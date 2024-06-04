@@ -1,6 +1,6 @@
 import React, {
   Fragment,
-  FunctionComponent,
+  ReactNode,
   useCallback,
   useState,
 } from "react";
@@ -30,8 +30,8 @@ const { contendorIdLog, contendorPago, labelHash, contenedorButton } = classes;
 
 //FRAGMENT ******************** TYPING *******************************
 type PropsPasarelaCheckPayOrigin = {
-  destino:string;
-  ComponentLogo: FunctionComponent;
+  destino: string;
+  componentLogo: ReactNode;
   url_return_front: string;
   summaryTrx: any;
   trx: TypingTrx;
@@ -41,7 +41,7 @@ type PropsPasarelaCheckPayOrigin = {
 //FRAGMENT ******************** COMPONENT *******************************
 const PasarelaChecPayOrigin = ({
   destino,
-  ComponentLogo,
+  componentLogo,
   url_return_front,
   summaryTrx,
   loadingPeticion,
@@ -79,8 +79,8 @@ const PasarelaChecPayOrigin = ({
             {summaryTrx.id_log && (
               <label className={contendorIdLog}>{summaryTrx.id_log}</label>
             )}
-            <div className={destino === "GOU" ? "grid justify-center": ""}>
-              <ComponentLogo></ComponentLogo>
+            <div className={destino === "GOU" ? "grid justify-center" : ""}>
+              {componentLogo}
             </div>
 
             <PaymentSummary

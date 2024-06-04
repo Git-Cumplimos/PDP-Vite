@@ -51,6 +51,10 @@ const svgs = {
   DESCARGAR: `${urlAssets}/assets/svg/DESCARGAR.svg`,
   SORTEO01: `${urlAssets}/assets/img/SORTEO-01.png`,
 
+  //MODULO PASARELAS
+  LogoModuloEvertec: `${urlAssets}/assets/svg/LogoModuloEvertec.svg`,
+  LogoModuloGou: `${urlAssets}/assets/img/LogoModuloGou.png`,
+
   //TRANSACCIONES
   TRANSACCIONES: `${urlAssets}/assets/svg/recaudo/TRANSACCIONES/TRANSACCIONES.svg`,
 
@@ -152,6 +156,7 @@ const svgs = {
   //CORRESPONSALIA/BCS
   CAJA_SOCIAL: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL.svg`,
   CAJA_SOCIAL_DEPOSITO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/CAJA_SOCIAL/CAJA_SOCIAL_DEPOSITO.svg`,
+  BLOQUEO_COMERCIO_BCS: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
 
   //CORRESPONSALIA/ITAU
   ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/ITAU/ITAU.png`,

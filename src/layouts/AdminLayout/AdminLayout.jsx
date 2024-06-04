@@ -45,7 +45,6 @@ const AdminLayout = () => {
     valMinConsignar,
   } = classes;
 
-  const urlAssets = process.env.REACT_APP_ASSETS_URL;
   const montoMaximoCaja = process.env.REACT_APP_MAX_MONTO_CAJA;
   const porcentajeAlerta1 = process.env.REACT_APP_PORCENTAJE_ALERTA_1;
   const porcentajeAlerta2 = process.env.REACT_APP_PORCENTAJE_ALERTA_2;
@@ -65,7 +64,6 @@ const AdminLayout = () => {
 
   const [accept, setAccept] = useState(false);
   const [device, setDevice] = useState(false);
-  const [showModalPublicidad, setShowModalPublicidad] = useState(true);
   const [showModalCupo, setShowModalCupo] = useState(false);
   const [cupoComercio, setCupoComercio] = useState(false);
   const [ModalAlertBoveda, setModalAlertBoveda] = useState(true);
@@ -296,9 +294,6 @@ const AdminLayout = () => {
   const handleCloseCupo = useCallback(() => {
     setShowModalCupo(false);
   }, []);
-  const handleClose = useCallback(() => {
-    setShowModalPublicidad(false);
-  }, []);
 
   const handleCloseDevice = useCallback(() => {
     registerDevice(accept);
@@ -399,12 +394,6 @@ const AdminLayout = () => {
           ) : (
             ""
           )}
-        </Modal>
-        <Modal show={showModalPublicidad} handleClose={handleClose}>
-          <img
-            src={`${urlAssets}/assets/svg/recaudo/MODAL_PUBLICIDAD/MODAL_PUBLICIDAD.jpg`}
-            alt="Proximamente Corresponsal Colpatria"
-          ></img>
         </Modal>
         <Modal show={device}>
           <div className="items-center text-justify">

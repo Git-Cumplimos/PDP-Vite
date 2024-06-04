@@ -252,27 +252,36 @@ const LoginForm = () => {
   const handleTOTPconfirm = (event) => {
     event.preventDefault();
 
-    setLoading(true);
-    auth
-      .handleverifyTotpToken(totp)
-      .then()
-      .catch((err) => {
+    
+    notifyPending(
+      auth.handleverifyTotpToken(totp),
+      { render: () => {
+        setLoading(true);
+        return "Verificando token";
+      } },
+      { render: () => {
+        setLoading(false);
+        return "Token y contraseña restablecidos correctamente";
+      }},
+      { render: ({data:err}) => {
+        setLoading(false);
         if (err.cause === "unknown") {
-          notifyError(err.message);
-          return;
+          console.error(err);
+          return err.message;
+        }
+        if (err.cause === "custom") {
+          return err.message;
         }
         if (err.code === "EnableSoftwareTokenMFAException") {
-          notifyError(
-            "Ha ingresado un código antiguo, escanee el QR e intente de nuevo"
-          );
-          return;
+          return "Ha ingresado un código antiguo, escanee el QR e intente de nuevo";
         }
         if (auth.timer) {
           clearTimeout(auth.timer);
         }
-        notify("Token y contraseña reestablecidos correctamente");
-      })
-      .finally(() => setLoading(false));
+        console.error(err);
+        return "Error en verificacion de token sin controlar";
+      }}
+    )
 
     setNames("");
     setLastName("");

@@ -7,17 +7,13 @@ const AppIcons = lazy(() => import("../../../components/Base/AppIcons"));
 /**
  * Corresponsalia Itau
  */
-const CorresponsaliaItau = lazy(() =>
-  import("./CorresponsaliaItau")
-);
+const CorresponsaliaItau = lazy(() => import("./CorresponsaliaItau"));
 
 const RecaudoServiciosPublicosPrivadosMenuItau = lazy(() =>
   import("./Views/RecaudoServiciosPublicosPrivadosMenuItau")
 );
 const RecaudoManualServiciosItau = lazy(() =>
-  import(
-    "./Views/RecaudoServiciosPublicosPrivados/RecaudoManualServiciosItau"
-  )
+  import("./Views/RecaudoServiciosPublicosPrivados/RecaudoManualServiciosItau")
 );
 const RecaudoCodBarrasServiciosCodigoBarrasItau = lazy(() =>
   import(
@@ -25,16 +21,15 @@ const RecaudoCodBarrasServiciosCodigoBarrasItau = lazy(() =>
   )
 );
 
-
 const SeleccionConvenioRecaudoServiciosItau = lazy(() =>
   import(
     "./Views/RecaudoServiciosPublicosPrivados/SeleccionConvenioRecaudoServiciosItau"
   )
 );
 
-const RetiroItau = lazy(() =>
-  import("./Views/TrxCuentas/Retiro")
-);
+const RetiroItau = lazy(() => import("./Views/TrxCuentas/Retiro"));
+
+const PagoProductosPropiosItau = lazy(() => import("./Views/TrxCuentas/PagoProductosPropiosItau"));
 
 export const listPermissionsItau = Object.values(enumPermisosItau);
 
@@ -54,17 +49,13 @@ const rutasItauCB = {
         />
       ),
       component: RecaudoServiciosPublicosPrivadosMenuItau,
-      permission: [
-        enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
-      ],
+      permission: [enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU],
       subRoutes: [
         {
           link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/seleccion-convenio",
           label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: SeleccionConvenioRecaudoServiciosItau,
-          permission: [
-            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
-          ],
+          permission: [enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU],
         },
         {
           link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/codigo-barras",
@@ -72,17 +63,13 @@ const rutasItauCB = {
             <AppIcons Logo={"MARKETPLACE"} name="Recaudo código de barras" />
           ),
           component: RecaudoCodBarrasServiciosCodigoBarrasItau,
-          permission: [
-            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
-          ],
+          permission: [enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU],
         },
         {
           link: "/corresponsalia/corresponsalia-itau/recaudo-servicios-publicos-privados/recaudo-manual",
           label: <AppIcons Logo={"MARKETPLACE"} name="Recaudo manual" />,
           component: RecaudoManualServiciosItau,
-          permission: [
-            enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU,
-          ],
+          permission: [enumPermisosItau.RECAUDO_SERVICIOS_PUBLICOS_ITAU],
           show: false,
         },
       ],
@@ -92,6 +79,12 @@ const rutasItauCB = {
       label: <AppIcons Logo={"MARKETPLACE"} name="Retiro" />,
       component: RetiroItau,
       permission: [enumPermisosItau.RETIRO_ITAU],
+    },
+    {
+      link: "/corresponsalia/corresponsalia-itau/pago-productos-propios",
+      label: <AppIcons Logo={"MARKETPLACE"} name="Pago Productos Propios" />,
+      component: PagoProductosPropiosItau,
+      permission: [enumPermisosItau.PAGO_PRODUCTOS_PROPIOS_ITAU],
     },
   ],
 };
