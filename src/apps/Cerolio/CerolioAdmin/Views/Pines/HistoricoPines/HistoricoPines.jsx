@@ -364,6 +364,7 @@ const HistoricoPines = () => {
             { label: "Cancelado", value: "Cancelado" },
             { label: "Creado", value: "Creado" },
             { label: "Sin recaudo", value: "Sin recaudo" },
+            { label: "Vencido", value: "Vencido" },
           ]}
           onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
         />
