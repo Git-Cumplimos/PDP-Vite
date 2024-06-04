@@ -4,8 +4,10 @@ import Select from "../../../../../../components/Base/Select";
 import TableEnterprise from "../../../../../../components/Base/TableEnterprise";
 import { fetchGetReportesConsulta } from "../../../../utils/reportes";
 import { makeMoneyFormatter } from "../../../../../../utils/functions";
+import { useAuth } from "../../../../../../hooks/AuthHooks";
 
 const ReportesConsulta = () => {
+  const { roleInfo } = useAuth();
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({ page: 1, limit: 10 });
 
@@ -38,7 +40,7 @@ const ReportesConsulta = () => {
       const res = await fetchGetReportesConsulta(
         filters.fechaInicial,
         filters.fechaFinal,
-        1,
+        roleInfo.id_comercio,
         filters.nombreTramite,
         filters.pin,
         filters.documento,
