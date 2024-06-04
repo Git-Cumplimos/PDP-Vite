@@ -164,6 +164,7 @@ const Agenda = () => {
     } else {
       notify(res.msg);
       setResults(res.obj.resp_cancelaciones.obj);
+      console.log("Respuestaaa", res);
       setShowModalResults(true);
       // setScheduleData(base_agenda);
       getSchedule();
@@ -265,7 +266,7 @@ const Agenda = () => {
                 startDate={inoperanceDates[0]}
                 // endDate={inoperanceDates[inoperanceDates.length - 1]}
                 inline
-                locale="es-CO"
+                // locale="es-CO"
                 // multiple
               />
             </div>
@@ -322,7 +323,11 @@ const Agenda = () => {
         {results?.lista_citas_canceladas &&
           results?.lista_citas_canceladas.length > 0 &&
           results?.lista_citas_canceladas?.map((cita) => (
-            <p key={cita}>{cita}</p>
+            <>
+              <p>Nombre Cliente: {cita.nombre_cliente}</p>
+              <p>Hora de cita:</p>
+              <p>Celular: {cita.celular}</p>
+            </>
           ))}
       </Modal>
     </>

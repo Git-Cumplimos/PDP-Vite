@@ -7,7 +7,7 @@ import { makeMoneyFormatter } from "../../../../../../utils/functions";
 import { useAuth } from "../../../../../../hooks/AuthHooks";
 
 const ReportesConsulta = () => {
-   const { roleInfo } = useAuth();
+  const { roleInfo } = useAuth();
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({ page: 1, limit: 10 });
 
