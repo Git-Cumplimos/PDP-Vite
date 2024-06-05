@@ -43,6 +43,7 @@ const Panel = () => {
   const [resumenCierre, setResumenCierre] = useState(null);
   const [next, setNext] = useState(0);
   const [dataPlfExt, setDataPlfExt] = useState(null);
+  const [showModalAlertTransferencias, setShowModalAlertTransferencias] = useState(false);
 
   const nombreComercio = useMemo(
     () => roleInfo?.["nombre comercio"],
@@ -427,8 +428,7 @@ const Panel = () => {
     }) 
       .then((res) => {
         if (res?.obj?.length !== 0) {
-          closeModalFunction()
-          notifyError("Cierre no habilitado, Tiene movimientos entre cajero pendientes.")
+          setShowModalAlertTransferencias(true)
         }else{
           setEstado(true)
           hadleSearchCierre()
@@ -442,8 +442,6 @@ const Panel = () => {
         return "Peticion fallida";
       });
   }, [
-    // hadleSearchCierre,
-    closeModalFunction,
     pdpUser?.uuid,
     roleInfo?.id_comercio,
     roleInfo?.id_dispositivo,
@@ -453,6 +451,12 @@ const Panel = () => {
   useEffect(() => {
     searchTrnasferencias()
   }, [searchTrnasferencias]);
+
+  const handleCloseAlertTransferencia = useCallback(() => {
+    navigate(`/gestion/arqueo/validar-transferencia-efectivo`);
+  }, [
+    navigate,
+  ]);
 
   return (
     validTipoComercio && (
@@ -588,6 +592,22 @@ const Panel = () => {
               </ButtonBar>
             </div>
           )}
+        </Modal>
+        <Modal show={showModalAlertTransferencias}>
+          <div className="items-center text-center">
+            <h1>
+              Cierre no habilitado, Tiene movimientos entre cajero pendientes.
+              <ButtonBar>
+                <Button
+                  className="btn mx-auto d-block"
+                  type="submit"
+                  onClick={() => handleCloseAlertTransferencia()}
+                >
+                  {"Transferencia Entre Cajeros"}
+                </Button>
+              </ButtonBar>
+            </h1>
+          </div>
         </Modal>
       </Fragment>
     )

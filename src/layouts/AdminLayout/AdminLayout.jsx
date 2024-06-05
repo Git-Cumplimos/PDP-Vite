@@ -73,6 +73,10 @@ const AdminLayout = () => {
   const [valorCaja, setMontoMaximoCaja] = useState(montoMaximoCaja);
   const [conteoAlertaBoveda, setConteoAlertaBoveda] = useState(1);
 
+  const excludedRoutes = [
+    "/gestion/arqueo/validar-transferencia-efectivo"
+  ];
+
   const saldoDisponible = useMemo(() => {
     return formatMoney.format(quotaInfo?.quota ?? 0);
   }, [quotaInfo?.quota]);
@@ -269,12 +273,16 @@ const AdminLayout = () => {
   }, [valorBoveda, quotaInfo, pathname, valorCaja, ModalAlertBoveda]);
 
   const infoCaja = useMemo(() => {
+    const isExcludedRoute = excludedRoutes.some((route) => pathname.startsWith(route));
     return (
-      (cajaState === 1 &&
-        !pathname.startsWith("/gestion/arqueo/arqueo-cierre")) ||
-      cajaState === 4
+      !isExcludedRoute && (
+        (cajaState === 1 && !pathname.startsWith("/gestion/arqueo/arqueo-cierre")) ||
+        cajaState === 4
+      )
     );
   }, [cajaState, pathname]);
+
+
 
   const handleCloseCupo = useCallback(() => {
     setShowModalCupo(false);
