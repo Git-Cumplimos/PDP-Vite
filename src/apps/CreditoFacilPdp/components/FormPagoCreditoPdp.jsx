@@ -324,7 +324,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             value={dataInput?.observaciones ?? ""}
             onChange={onChangeFormat}
             disabled={loadingPeticionPagoCredito}
-            required
+            // required
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">
