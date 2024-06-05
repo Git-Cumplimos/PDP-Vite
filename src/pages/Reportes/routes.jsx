@@ -20,6 +20,9 @@ const ReportesComisionesPadres = lazy(() =>
 const ReporteDeComercios = lazy(() =>
   import("./views/ReporteDeComercios")
 );
+const ReporteMovimientoPasarela = lazy(() =>
+  import("./views/ReporteMovimientoPasarela")
+);
 export const rutasReportes = [
   {
     link: "/reportes/koncilia",
@@ -94,5 +97,16 @@ export const rutasReportes = [
     ),
     component: ReporteUsuarios,
     permission: [25002],
+  },
+  {
+    link: "/reportes/movimientos_pasarela",
+    label: (
+      <AppIcons
+        Logo={"RECAUDO"}
+        name="Reporte Pasarelas"
+      />
+    ),
+    component: ReporteMovimientoPasarela,
+    permission: [25001],
   },
 ];
