@@ -22,6 +22,7 @@ const Pin = () => {
     { label: "CC", value: 1 },
     { label: "CE", value: 2 },
     { label: "TI", value: 3 },
+    { label: "PPT", value: 4 },
   ];
 
   const tramites = [
@@ -222,7 +223,6 @@ const Pin = () => {
             >
               Volver
             </Button>
-            {/* TODO Hacer aviso de pin no disponible */}
             <Button
               disabled={userData.pinData.estado !== "Disponible"}
               onClick={confirmarPin}
@@ -236,7 +236,6 @@ const Pin = () => {
       {step === 2 && (
         <>
           <div className="flex flex-col">
-            {/* Número de PIN, Trámite a realizar, Valor total del PIN, Pago realizado, Saldo a pagar - Todo en disabled */}
             <Input
               label="Número de PIN"
               type="text"
@@ -297,3 +296,4 @@ const Pin = () => {
 };
 
 export default Pin;
+
