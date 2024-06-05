@@ -97,10 +97,10 @@ const PanelHistorico = () => {
     data?.entidades_externas?.data?.map(
       (elemento) => (Num = Num + elemento?.valor)
     );
-    // let totalExtrdiaAnterior = 0
-    // if (data?.externos_día_anterior !== null) {
-    //   data?.externos_día_anterior?.data?.map((elemento) => totalExtrdiaAnterior=totalExtrdiaAnterior+elemento?.valor)
-    // }
+    let totalExtrdiaAnterior = 0
+    if (data?.externos_día_anterior !== null) {
+      data?.externos_día_anterior?.data?.map((elemento) => totalExtrdiaAnterior=totalExtrdiaAnterior+elemento?.valor)
+    }
     const fecha = new Date(data.created);
     const hora = fecha.getHours();
     const minutos = fecha.getMinutes();
@@ -130,33 +130,52 @@ const PanelHistorico = () => {
         ["", ""],
       ],
       cajaInfo: [
+        // [
+        //   "Saldo Cierre día Anterior",
+        //   formatMoney.format(
+        //     Num <= 0
+        //       ? data?.total_efectivo_cierre_día_anterior + Num
+        //       : data?.total_efectivo_cierre_día_anterior - Num
+        //   ),
+        // ],
         [
-          "Saldo Cierre día Anterior",
+          "Saldo PDP día anterior",
+          formatMoney.format(data?.total_efectivo_cierre_día_anterior),
+        ],
+        ["", ""],
+        ["Saldo Externos Día Anterior",formatMoney.format(totalExtrdiaAnterior)],
+        ["", ""],
+        ["Total cierre día anterior",formatMoney.format(data?.total_efectivo_cierre_día_anterior + totalExtrdiaAnterior)],
+        ["", ""],
+        [
+          "Saldo PDP fin del día",
           formatMoney.format(
-            Num <= 0
-              ? data?.total_efectivo_cierre_día_anterior + Num
-              : data?.total_efectivo_cierre_día_anterior - Num
+            data?.total_efectivo_en_caja + 
+            data?.total_recibido_transportadora -
+            data?.total_consignaciones_transportadora +
+            data?.total_transferencias +
+            data?.total_notas
           ),
         ],
         ["", ""],
-        // ["Saldo Externos Día Anterior",formatMoney.format(totalExtrdiaAnterior)],
-        // ["", ""],
-        // ["Saldo Cierre Día Anterior",formatMoney.format(data?.total_efectivo_cierre_día_anterior + totalExtrdiaAnterior)],
-        // ["", ""],
-        [
-          "Saldo PDP + Externos Del Día",
-          formatMoney.format(data?.total_movimientos + Num),
-        ],
+        ["Saldo Externos Fin del Día",formatMoney.format(totalExtrdiaAnterior+Num)],
         ["", ""],
-        // ["Saldo Externos Fin del Día",formatMoney.format(Num)],
-        // ["", ""],
-        // ["Saldo Total del Día",formatMoney.format(data?.total_efectivo_en_caja+Num)],
-        // ["", ""],
-        [
-          "Total Saldo Fin Del Día",
-          formatMoney.format(data?.total_efectivo_en_caja),
-        ],
+        ["Total Efectivo Del Cierre",formatMoney.format(
+          data?.total_efectivo_en_caja + 
+          data?.total_recibido_transportadora -
+          data?.total_consignaciones_transportadora +
+          data?.total_transferencias +
+          data?.total_notas +
+          totalExtrdiaAnterior +
+          Num -
+          data?.total_consignaciones_transportadora_externos
+        ),],
         ["", ""],
+        // [
+        //   "Total Saldo Fin Del Día",
+        //   formatMoney.format(data?.total_efectivo_en_caja),
+        // ],
+        // ["", ""],
       ],
       trxInfo: [
         ["Total Arqueo de Caja", formatMoney.format(data?.total_arqueo)],
@@ -164,6 +183,8 @@ const PanelHistorico = () => {
         ["Sobrante", formatMoney.format(data?.total_sobrante)],
         ["", ""],
         ["Faltante", formatMoney.format(data?.total_faltante)],
+        ["", ""],
+        ["Transferencia Entre Cajeros", formatMoney.format(data?.total_transferencias)],
         ["", ""],
         [
           "Pendiente Consignaciones Bancarias y Transportadora",
@@ -222,47 +243,89 @@ const PanelHistorico = () => {
           ...pageData,
         })
           .then((res) => {
+            console.log(res)
             const newData = [];
             res?.obj?.results?.map((itemData) => {
               var totalvalorEntidades = 0;
-              // var totalvalorEntidadesDiaAnterior = 0
+              var totalvalorEntidadesDiaAnterior = 0
               totalvalorEntidades = (
                 itemData?.entidades_externas?.data ?? []
               ).reduce((total, val) => total + val.valor, 0);
-              // totalvalorEntidadesDiaAnterior= (itemData?.externos_día_anterior?.data?? []).reduce((total,val) => total+val.valor,0)
+              totalvalorEntidadesDiaAnterior= (itemData?.externos_día_anterior?.data?? []).reduce((total,val) => total+val.valor,0)
               const valJson = {
                 Idcierre: itemData?.pk_id_cierre,
                 Idcomercio: itemData?.id_comercio,
+                NameComercio: itemData?.nombre_comercio,
                 Idusuario: itemData?.id_usuario,
-                SaldoCierreDíaAnterior: Math.round(
-                  totalvalorEntidades <= 0
-                    ? itemData?.total_efectivo_cierre_día_anterior +
-                        totalvalorEntidades
-                    : itemData?.total_efectivo_cierre_día_anterior -
-                        totalvalorEntidades
-                ),
-                SaldoPDPExternosDia: Math.round(
-                  itemData?.total_movimientos + totalvalorEntidades
-                ),
-                TotalSaldoFinDia: Math.round(itemData?.total_efectivo_en_caja),
-                TotalArqueoCaja: Math.round(itemData?.total_arqueo),
-                Sobrante: Math.round(itemData?.total_sobrante),
-                Faltante: Math.round(itemData?.total_faltante),
-                PendienteConsignacionTransportadoraPDP: Math.round(
+                NameUsuario: itemData?.nombre_usuario,
+                SaldoPDPCierreDíaAnterior: formatCurrency(Math.round(itemData?.total_efectivo_cierre_día_anterior)),
+                SaldoExternosDiaAnterior: formatCurrency(Math.round(totalvalorEntidadesDiaAnterior)),
+                TotalCierreDiaAnterior: formatCurrency(Math.round(totalvalorEntidadesDiaAnterior + itemData?.total_efectivo_cierre_día_anterior)),
+                SaldoPDPFinDia: formatCurrency(Math.round(itemData?.total_efectivo_en_caja +
+                  itemData?.total_recibido_transportadora -
+                  itemData?.total_consignaciones_transportadora +
+                  itemData?.total_transferencias +
+                  itemData?.total_notas)),
+                SaldoExternosFinDia: formatCurrency(Math.round(totalvalorEntidadesDiaAnterior + totalvalorEntidades)),
+                TotalEfectivoCierre: formatCurrency(Math.round(itemData?.total_efectivo_en_caja +
+                  itemData?.total_recibido_transportadora -
+                  itemData?.total_consignaciones_transportadora +
+                  itemData?.total_transferencias +
+                  itemData?.total_notas +
+                  totalvalorEntidadesDiaAnterior + 
+                  totalvalorEntidades +
+                  itemData?.total_consignaciones_transportadora_externos
+                )),
+                // SaldoCierreDíaAnterior: Math.round(
+                //   totalvalorEntidades <= 0
+                //     ? itemData?.total_efectivo_cierre_día_anterior +
+                //         totalvalorEntidades
+                //     : itemData?.total_efectivo_cierre_día_anterior -
+                //         totalvalorEntidades
+                // ),
+                // SaldoPDPExternosDia: Math.round(
+                //   itemData?.total_movimientos + totalvalorEntidades
+                // ),
+                // TotalSaldoFinDia: Math.round(itemData?.total_efectivo_en_caja),
+                TotalArqueoCaja: formatCurrency(Math.round(itemData?.total_arqueo)),
+                Sobrante: formatCurrency(Math.round(itemData?.total_sobrante)),
+                Faltante: formatCurrency(Math.round(itemData?.total_faltante)),
+                TransferenciaEntreCajeros: formatCurrency(Math.round(itemData?.total_transferencias)),
+                PendienteConsignacionTransportadoraPDP: formatCurrency(Math.round(
                   itemData?.total_consignaciones_transportadora_pendiente
-                ),
-                PendienteRecibidoTrnasportadora: Math.round(
+                )),
+                PendienteRecibidoTransportadora: formatCurrency(Math.round(
                   itemData?.total_recibido_transportadora_pendiente
-                ),
-                ConsignacionTransportadoraPDP: Math.round(
+                )),
+                ConsignacionTransportadoraPDP: formatCurrency(Math.round(
                   itemData?.total_consignaciones_transportadora
-                ),
-                RecibidoTransportadora: Math.round(
+                )),
+                RecibidoTransportadora: formatCurrency(Math.round(
                   itemData?.total_recibido_transportadora
-                ),
-                notas: itemData?.total_notas,
-                // 'ConsignacionTransportadoraExternos': Math.round(itemData?.total_consignaciones_transportadora_externos),
-                // 'RecubidoTransportadora': Math.round(itemData?.total_recibido_transportadora),
+                )),
+                notas: formatCurrency(Math.round(itemData?.total_notas)),
+                Cantidad100000: itemData?.arqueo["100000"],
+                Total100000: formatCurrency(Math.round(itemData?.arqueo["100000"] * 100000)),
+                Cantidad50000: itemData?.arqueo["50000"],
+                Total50000: formatCurrency(Math.round(itemData?.arqueo["50000"] * 50000)),
+                Cantidad20000: itemData?.arqueo["20000"],
+                Total20000: formatCurrency(Math.round(itemData?.arqueo["20000"] * 20000)),
+                Cantidad10000: itemData?.arqueo["10000"],
+                Total10000: formatCurrency(Math.round(itemData?.arqueo["10000"] * 10000)),
+                Cantidad5000: itemData?.arqueo["5000"],
+                Total5000: formatCurrency(Math.round(itemData?.arqueo["5000"] * 5000)),
+                Cantidad2000: itemData?.arqueo["2000"],
+                Total2000: formatCurrency(Math.round(itemData?.arqueo["2000"] * 2000)),
+                Cantidad1000: itemData?.arqueo["1000"],
+                Total1000: formatCurrency(Math.round(itemData?.arqueo["1000"] * 1000)),
+                Cantidad500: itemData?.arqueo["500"],
+                Total500: formatCurrency(Math.round(itemData?.arqueo["500"] * 500)),
+                Cantidad200: itemData?.arqueo["200"],
+                Total200: formatCurrency(Math.round(itemData?.arqueo["200"] * 200)),
+                Cantidad100: itemData?.arqueo["100"],
+                Total100: formatCurrency(Math.round(itemData?.arqueo["100"] * 100)),
+                Cantidad50: itemData?.arqueo["50"],
+                Total50: formatCurrency(Math.round(itemData?.arqueo["50"] * 50)),
               };
               entidades.map((val) => (valJson[val] = "0"));
               if (itemData.hasOwnProperty("entidades_externas")) {
@@ -282,10 +345,7 @@ const PanelHistorico = () => {
             });
             const concatenadosParcil = entidades;
             const concatenadosFinal = concatenadosParcil.join(",");
-            const headers =
-              "Id cierre,Id comercio,Id usuario,Saldo Cierre Dia Anterior,Saldo PDP + Externos del Dia,Total Saldo Fin del Dia,Total Arqueo de Caja,Sobrante,Faltante,Pendiente Consignaciones y Transportadora,Pendiente Recibido Transportadora,Consignaciones Bancarias y Transportadora,Recibido Transportadora,Notas Debito o Credito," +
-              concatenadosFinal +
-              ",Estado Cierre,Fecha y Hora Cierre";
+            const headers = `Id cierre,Id comercio,Nombre Comercio,Id usuario,Nombre Usuario,Saldo PDP Dia Anterior,Saldo Externos Dia Anterior,Total Cierre Dia Anterior,Saldo PDP Fin Del Dia,Saldo Externos Fin Del Dia,Total Efectivo Del Cierre,Total Arqueo de Caja,Sobrante,Faltante,Pendiente Transferencia Entre Cajeros,Transferencia Entre Cajeros,Pendiente Consignaciones y Transportadora,Pendiente Recibido Transportadora,Consignaciones Bancarias y Transportadora,Recibido Transportadora,Notas Debito o Credito,Cantidad Denominacion de $100.000,Total Denominacion de $100.000,Cantidad Denominacion de $50.000,Total Denominacion de $50.000,Cantidad Denominacion de $20.000,Total Denominacion de $20.000,Cantidad Denominacion de $10.000,Total Denominacion de $10.000,Cantidad Denominacion de $5.000,Total Denominacion de $5.000,Cantidad Denominacion de $2.000,Total Denominacion de $2.000,Cantidad Denominacion de $1.000,Total Denominacion de $1.000,Cantidad Denominacion de $500,Total Denominacion de $500,Cantidad Denominacion de $200,Total Denominacion de $200,Cantidad Denominacion de $100,Total Denominacion de $100,Cantidad Denominacion de $50,Total Denominacion de $50,${concatenadosFinal},Estado Cierre,Fecha y Hora Cierre`;
             const main = newData.map((item) => {
               return Object.values(item).toString();
             });
@@ -323,7 +383,10 @@ const PanelHistorico = () => {
     [searchInfo, pageData]
   );
 
-  console.log(receipt);
+  function formatCurrency(value) {
+    return '$ ' + Number(value).toLocaleString('es-ES');
+  }
+
   return (
     <Fragment>
       <ButtonBar>
@@ -349,8 +412,8 @@ const PanelHistorico = () => {
           "Saldo Externos Día Anterior",
           "Total Cierre Día Anterior",
           "Saldo PDP Fin Del Día",
-          // "Saldo Externos Fin Del Día",
-          // "Total Efectivo Del Cierre",
+          "Saldo Externos Fin Del Día",
+          "Total Efectivo Del Cierre",
           "Total Arqueo de Caja",
           "Sobrante",
           "Faltante",
@@ -375,10 +438,11 @@ const PanelHistorico = () => {
             total_efectivo_cierre_día_anterior,
             externos_día_anterior,
             total_efectivo_en_caja,
-            total_transferencias,
+            total_fectivo_cierre,
             total_arqueo,
             total_sobrante,
             total_faltante,
+            total_transferencias,
             total_consignaciones_transportadora_pendiente,
             total_recibido_transportadora_pendiente,
             total_consignaciones_transportadora,
@@ -386,11 +450,11 @@ const PanelHistorico = () => {
             total_notas,
             entidades_externas,
             created,
-
             // externos_día_anterior,
             // Saldo_Cierre_Dia_Anterior,
-            // total_consignaciones_transportadora_externos,
+            total_consignaciones_transportadora_externos,
             // total_movimientos,
+            externos_fin_dia,
           }) => ({
             pk_id_cierre,
             id_comercio,
@@ -423,14 +487,38 @@ const PanelHistorico = () => {
                     )
             ),
             total_efectivo_en_caja: formatMoney.format(
-              total_efectivo_cierre_día_anterior +
                 total_efectivo_en_caja +
                 total_recibido_transportadora -
                 total_consignaciones_transportadora +
                 total_transferencias +
                 total_notas
             ),
-
+            externos_fin_dia:formatMoney.format( 
+              (externos_día_anterior?.data ?? []).reduce(
+                (total, val) => total + val.valor,
+                0
+              ) +
+              (entidades_externas?.data ?? []).reduce(
+                (total, val) => total + val.valor,
+                0
+              )
+            ),
+            total_fectivo_cierre:formatMoney.format(
+              total_efectivo_en_caja +
+              total_recibido_transportadora -
+              total_consignaciones_transportadora +
+              total_transferencias +
+              total_notas +
+              (externos_día_anterior?.data ?? []).reduce(
+                (total, val) => total + val.valor,
+                0
+              ) +
+              (entidades_externas?.data ?? []).reduce(
+                (total, val) => total + val.valor,
+                0
+              ) -
+              total_consignaciones_transportadora_externos
+            ),
             total_arqueo: formatMoney.format(total_arqueo),
             total_sobrante: formatMoney.format(total_sobrante),
             total_faltante: formatMoney.format(total_faltante),
