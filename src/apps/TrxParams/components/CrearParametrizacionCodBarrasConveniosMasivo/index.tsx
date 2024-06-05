@@ -12,9 +12,11 @@ import FileInput from "../../../../components/Base/FileInput";
 import Modal from "../../../../components/Base/Modal";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import Fieldset from "../../../../components/Base/Fieldset";
-import { notifyError } from "../../../../utils/notify";
+import { notifyPending } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
+import { useFetchCargueMasivo } from "../../hooks/fetchCargueMasivo";
 
 type Props = {
   showMassive: boolean;
@@ -23,6 +25,8 @@ type Props = {
 
 const urlConvenios =
   process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const URL_CARGUE_ARCHIVO_PARAM = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp/parametrizar-codigos-barras-convenios-masivo`;
+const URL_ESTADO_CARGUE_ARCHIVO_PARAM = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp/comprobar-cargue-archivo-param-cod-barras`;
 // const urlConvenios = `http://localhost:5000`;
 
 const CrearParametrizacionCodBarrasConveniosMasivo = ({
@@ -31,8 +35,13 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
 }: Props) => {
   const validNavigate = useNavigate();
   const { pdpUser } = useAuth();
+  const [uuidTemp, setUuidTemp] = useState(v4());
   const [fileUpload, setFileUpload] = useState<File>();
-
+  const [loadingPeticionConsulta, peticionCargueMasivo] = useFetchCargueMasivo(
+    URL_CARGUE_ARCHIVO_PARAM,
+    URL_ESTADO_CARGUE_ARCHIVO_PARAM,
+    "Cargue masivo parametrización código de barras"
+  );
   const currentUserId = useMemo(
     () => (pdpUser ?? { uuid: 0 })?.uuid,
     [pdpUser]
@@ -41,6 +50,7 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
   const handleClose = useCallback(() => {
     setShowMassive(false);
     setFileUpload(undefined);
+    setUuidTemp(v4());
   }, [setShowMassive]);
 
   const [downloadFormatParam] = useFetchDebounce(
@@ -66,31 +76,38 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
     },
     { notify: true }
   );
-
-  const [uploadParamFile, loadingUploadFile] = useFetchDebounce(
-    {
-      url: `${urlConvenios}/convenios-pdp/parametrizar-codigos-barras-convenios-masivo`,
-      autoDispatch: false,
-      options: useMemo(() => {
-        const formData = new FormData();
-        formData.append("file", fileUpload as Blob);
-        formData.append("usuario_ultima_actualizacion", `${currentUserId}`);
-        return {
-          method: "POST",
-          body: formData,
-        };
-      }, [fileUpload, currentUserId]),
-    },
-    {
-      onPending: useCallback(() => "Cargando archivo", []),
-      onSuccess: useCallback(
-        (response) => {
-          if (!response.ok) {
-            if (response.headers.get("Content-Type")?.includes("csv")) {
-              response
-                .blob()
-                .then((blob: Blob) => {
-                  const urlFile = URL.createObjectURL(blob);
+  const realizarCargueMasivo = useCallback(
+    (ev) => {
+      ev.preventDefault();
+      const formData = new FormData();
+      formData.append("file", fileUpload as Blob);
+      formData.append("usuario_ultima_actualizacion", `${currentUserId}`);
+      formData.append("uuid_proceso_archivo", uuidTemp);
+      const dataAditional = {
+        id_uuid_trx: uuidTemp,
+      };
+      if (typeof peticionCargueMasivo === "function") {
+        notifyPending(
+          peticionCargueMasivo(formData, dataAditional),
+          {
+            render: () => {
+              return "Cargando archivo";
+            },
+          },
+          {
+            render: ({ data: res }) => {
+              handleClose();
+              validNavigate(-1);
+              return "Carga satisfactoria";
+            },
+          },
+          {
+            render: ({ data: error }) => {
+              if (error.hasOwnProperty("optionalObject")) {
+                if (error.optionalObject.hasOwnProperty("archivoErrores")) {
+                  const urlFile = URL.createObjectURL(
+                    error.optionalObject.archivoErrores
+                  );
                   const a = document.createElement("a");
                   a.href = urlFile;
                   const actualDate = new Intl.DateTimeFormat("es-ES", {
@@ -110,55 +127,26 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
                   document.body.appendChild(a);
                   a.click();
                   document.body.removeChild(a);
-                  // window.open(urlFile, "_blank");
-                })
-                .catch((error: any) => console.error(error));
-            } else {
-              response
-                .json()
-                .then((res: any) => console.log(res))
-                .catch((error: any) => console.error(error));
-            }
-            // throw new Error("Error con archivo cargado", { cause: "custom" });
-            notifyError("Error con archivo cargado");
-            // return "Error con archivo cargado";
-            return "Carga finalizada";
+                }
+              }
+              validNavigate(-1);
+              handleClose();
+              return error?.message ?? "Error cargando el archivo";
+            },
           }
-          // searchCommercesFn?.();
-          handleClose();
-          validNavigate(-1);
-          return "Carga satisfactoria";
-        },
-        [handleClose]
-      ),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          // notifyError(error.message);
-          return error.message;
-        } else {
-          console.error(error);
-          return "Error cargando el archivo";
-        }
-      }, []),
+        );
+      }
     },
-    { notify: true, checkStatus: false }
-  );
-
-  const onSubmit = useCallback(
-    (ev) => {
-      ev.preventDefault();
-      uploadParamFile();
-    },
-    [uploadParamFile]
+    [fileUpload, uuidTemp, currentUserId]
   );
 
   return (
     <Fragment>
       <Modal
         show={showMassive}
-        handleClose={loadingUploadFile ? () => {} : handleClose}
+        handleClose={loadingPeticionConsulta ? () => {} : handleClose}
       >
-        <Form onSubmit={onSubmit}>
+        <Form onSubmit={realizarCargueMasivo}>
           <ButtonBar>
             <Button
               type="button"
@@ -172,7 +160,6 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
             <FileInput
               label={"Adjuntar archivo de parametrizaciones a cargar"}
               onGetFile={(files: Array<File>) => {
-                // console.log(files);
                 setFileUpload(files[0]);
               }}
               accept=".csv"
@@ -189,7 +176,7 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
                     <span
                       className="text-3xl text-red-700 col-span-1 bi bi-trash-fill cursor-pointer"
                       onClick={
-                        loadingUploadFile
+                        loadingPeticionConsulta
                           ? () => {}
                           : () => setFileUpload(undefined)
                       }
@@ -200,7 +187,7 @@ const CrearParametrizacionCodBarrasConveniosMasivo = ({
               <ButtonBar>
                 <Button
                   type="submit"
-                  disabled={!fileUpload || loadingUploadFile}
+                  disabled={!fileUpload || loadingPeticionConsulta}
                 >
                   Subir archivo
                 </Button>
