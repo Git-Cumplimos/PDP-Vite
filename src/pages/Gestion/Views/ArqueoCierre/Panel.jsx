@@ -293,7 +293,7 @@ const Panel = () => {
               ["", ""],
               [
                 "Saldo Externos Fin del Día",
-                formatMoney.format(Num),
+                formatMoney.format(Num + totalExtrdiaAnterior),
               ],
               ["", ""],
               [
@@ -304,6 +304,7 @@ const Panel = () => {
                   cierre?.total_consignaciones_transportadora +
                   cierre?.total_transferencias +
                   cierre?.total_notas +
+                  totalExtrdiaAnterior +
                   Num -
                   cierre?.total_consignaciones_transportadora_externos
                 ),
