@@ -10,16 +10,17 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Modal from "../../../../../components/Base/Modal";
+import {
+  CalendarDate,
+  CalendarMonth,
+} from "../../../../../components/Base/Calendar/Calendar";
 
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 const Agenda = () => {
   const { roleInfo } = useAuth();
 
   const [scheduleData, setScheduleData] = useState(base_agenda);
   const [showModalResults, setShowModalResults] = useState(false);
   const [results, setResults] = useState({});
-  const [inoperanceDates, setInoperanceDates] = useState([]);
 
   const getSchedule = useCallback(async () => {
     const res = await fetchGetDisponibilidadByIdComercio(
@@ -27,7 +28,6 @@ const Agenda = () => {
       new Date(Date.now()).toISOString().split("T")[0],
       roleInfo.id_comercio
     );
-    // console.log(res);
     setScheduleData({
       date: "",
       hours: [
@@ -73,52 +73,40 @@ const Agenda = () => {
         },
       ],
       attendance: res.numero_ventanillas,
+      fecha_inoperancia: res.fecha_inoperancia,
     });
-    setInoperanceDates(res.fecha_inoperancia.map((date) => new Date(date)));
   }, [roleInfo]);
 
   useEffect(() => {
     getSchedule();
   }, [roleInfo, getSchedule]);
-  // const handleDateChange = useCallback(
-  //   (date) => {
-  //     console.log("inoperanceDates", inoperanceDates);
-  //     const isDuplicate = inoperanceDates?.some(
-  //       (inoperanceDate) => inoperanceDate.getTime() === date.getTime()
-  //     );
-  //     if (!isDuplicate) {
-  //       setInoperanceDates([...inoperanceDates, date]);
-  //     } else {
-  //       notifyError("La fecha ya ha sido seleccionada.");
-  //     }
-  //   },
-  //   [inoperanceDates]
-  // );
+
   const handleDateChange = useCallback(
     (date) => {
-      const isDuplicate = inoperanceDates?.some(
-        (inoperanceDate) =>
-          inoperanceDate.getFullYear() === date.getFullYear() &&
-          inoperanceDate.getMonth() === date.getMonth() &&
-          inoperanceDate.getDate() === date.getDate()
+      const isDuplicate = scheduleData.fecha_inoperancia?.some(
+        (inoperanceDate) => inoperanceDate === date.target.value
       );
       if (!isDuplicate) {
-        setInoperanceDates([...inoperanceDates, date]);
+        setScheduleData({
+          ...scheduleData,
+          fecha_inoperancia: [
+            ...scheduleData.fecha_inoperancia,
+            date.target.value,
+          ],
+        });
       } else {
         notifyError("La fecha ya ha sido seleccionada.");
       }
     },
-    [inoperanceDates]
+    [scheduleData]
   );
+
   const updateHours = async () => {
-    // console.log(scheduleData);
     const body = {
       fecha_vigencia:
         new Date(Date.now()).toISOString().split("T")[0] + " 00:00:00",
       duracion_tiempo_cita: 60,
-      fecha_inoperancia: inoperanceDates.map(
-        (date) => date.toISOString().split("T")[0]
-      ),
+      fecha_inoperancia: scheduleData.fecha_inoperancia,
       horario_atencion: {
         lunes: {
           Apertura: scheduleData.hours[0].startTime,
@@ -156,15 +144,12 @@ const Agenda = () => {
       fk_id_comercio: roleInfo.id_comercio,
       numero_ventanillas: scheduleData.attendance,
     };
-    // console.log(body);
     const res = await fetchPostCrearHorario(body);
-    // console.log(res);
     if (!res.status) {
       notifyError(res.msg);
     } else {
       notify(res.msg);
       setResults(res.obj.resp_cancelaciones.obj);
-      console.log("Respuestaaa", res);
       setShowModalResults(true);
       if (!res.obj.resp_cancelaciones.obj.url_descargaS3) {
         return;
@@ -249,34 +234,31 @@ const Agenda = () => {
             Agregar Inoperancia
           </Button> */}
           <div className="grid grid-cols-2 gap-x-4">
-            {/* <div className="flex flex-row gap-x-5"> */}
             <div className="flex justify-center w-auto">
-              <DatePicker
-                // showTimeSelect
-
-                selected={scheduleData?.inoperancia & null}
-                // onChange={(date) => setInoperanceDates([...inoperanceDates, date])}
+              <CalendarDate
+                value={scheduleData?.inoperancia}
                 onChange={handleDateChange}
-                startDate={inoperanceDates[0]}
-                // endDate={inoperanceDates[inoperanceDates.length - 1]}
-                inline
-                // locale="es-CO"
-                // multiple
-              />
+              >
+                <CalendarMonth />
+              </CalendarDate>
             </div>
             <div className="grid grid-cols-4 gap-x-5">
-              {inoperanceDates.map((date, index) => (
+              {scheduleData.fecha_inoperancia.map((date, index) => (
                 <div
                   className="flex flex-col items-center justify-center p-2 border rounded-xl border-primary-extra-light max-h-16"
                   key={index}
                 >
-                  {date && date.toLocaleDateString()}
-
+                  {date && date}
                   <button
+                    className="w-20 p-1 text-center text-white bg-red-500 rounded-md"
                     onClick={() =>
-                      setInoperanceDates(
-                        inoperanceDates.filter((_, i) => i !== index)
-                      )
+                      setScheduleData({
+                        ...scheduleData,
+                        fecha_inoperancia:
+                          scheduleData.fecha_inoperancia.filter(
+                            (_, i) => i !== index
+                          ),
+                      })
                     }
                   >
                     Eliminar
