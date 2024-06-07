@@ -150,11 +150,7 @@ const PanelHistorico = () => {
         [
           "Saldo PDP fin del día",
           formatMoney.format(
-            data?.total_efectivo_en_caja + 
-            data?.total_recibido_transportadora -
-            data?.total_consignaciones_transportadora +
-            data?.total_transferencias +
-            data?.total_notas
+            data?.total_efectivo_en_caja
           ),
         ],
         ["", ""],
@@ -162,10 +158,6 @@ const PanelHistorico = () => {
         ["", ""],
         ["Total Efectivo Del Cierre",formatMoney.format(
           data?.total_efectivo_en_caja + 
-          data?.total_recibido_transportadora -
-          data?.total_consignaciones_transportadora +
-          data?.total_transferencias +
-          data?.total_notas +
           totalExtrdiaAnterior +
           Num -
           data?.total_consignaciones_transportadora_externos
@@ -243,7 +235,6 @@ const PanelHistorico = () => {
           ...pageData,
         })
           .then((res) => {
-            console.log(res)
             const newData = [];
             res?.obj?.results?.map((itemData) => {
               var totalvalorEntidades = 0;
@@ -261,19 +252,11 @@ const PanelHistorico = () => {
                 SaldoPDPCierreDíaAnterior: formatCurrency(Math.round(itemData?.total_efectivo_cierre_día_anterior)),
                 SaldoExternosDiaAnterior: formatCurrency(Math.round(totalvalorEntidadesDiaAnterior)),
                 TotalCierreDiaAnterior: formatCurrency(Math.round(totalvalorEntidadesDiaAnterior + itemData?.total_efectivo_cierre_día_anterior)),
-                SaldoPDPFinDia: formatCurrency(Math.round(itemData?.total_efectivo_en_caja +
-                  itemData?.total_recibido_transportadora -
-                  itemData?.total_consignaciones_transportadora +
-                  itemData?.total_transferencias +
-                  itemData?.total_notas)),
+                SaldoPDPFinDia: formatCurrency(Math.round(itemData?.total_efectivo_en_caja)),
                 SaldoExternosFinDia: formatCurrency(Math.round(totalvalorEntidadesDiaAnterior + totalvalorEntidades)),
                 TotalEfectivoCierre: formatCurrency(Math.round(itemData?.total_efectivo_en_caja +
-                  itemData?.total_recibido_transportadora -
-                  itemData?.total_consignaciones_transportadora +
-                  itemData?.total_transferencias +
-                  itemData?.total_notas +
                   totalvalorEntidadesDiaAnterior + 
-                  totalvalorEntidades +
+                  totalvalorEntidades -
                   itemData?.total_consignaciones_transportadora_externos
                 )),
                 // SaldoCierreDíaAnterior: Math.round(
@@ -345,7 +328,7 @@ const PanelHistorico = () => {
             });
             const concatenadosParcil = entidades;
             const concatenadosFinal = concatenadosParcil.join(",");
-            const headers = `Id cierre,Id comercio,Nombre Comercio,Id usuario,Nombre Usuario,Saldo PDP Dia Anterior,Saldo Externos Dia Anterior,Total Cierre Dia Anterior,Saldo PDP Fin Del Dia,Saldo Externos Fin Del Dia,Total Efectivo Del Cierre,Total Arqueo de Caja,Sobrante,Faltante,Pendiente Transferencia Entre Cajeros,Transferencia Entre Cajeros,Pendiente Consignaciones y Transportadora,Pendiente Recibido Transportadora,Consignaciones Bancarias y Transportadora,Recibido Transportadora,Notas Debito o Credito,Cantidad Denominacion de $100.000,Total Denominacion de $100.000,Cantidad Denominacion de $50.000,Total Denominacion de $50.000,Cantidad Denominacion de $20.000,Total Denominacion de $20.000,Cantidad Denominacion de $10.000,Total Denominacion de $10.000,Cantidad Denominacion de $5.000,Total Denominacion de $5.000,Cantidad Denominacion de $2.000,Total Denominacion de $2.000,Cantidad Denominacion de $1.000,Total Denominacion de $1.000,Cantidad Denominacion de $500,Total Denominacion de $500,Cantidad Denominacion de $200,Total Denominacion de $200,Cantidad Denominacion de $100,Total Denominacion de $100,Cantidad Denominacion de $50,Total Denominacion de $50,${concatenadosFinal},Estado Cierre,Fecha y Hora Cierre`;
+            const headers = `Id cierre,Id comercio,Nombre Comercio,Id usuario,Nombre Usuario,Saldo PDP Dia Anterior,Saldo Externos Dia Anterior,Total Cierre Dia Anterior,Saldo PDP Fin Del Dia,Saldo Externos Fin Del Dia,Total Efectivo Del Cierre,Total Arqueo de Caja,Sobrante,Faltante,Transferencia Entre Cajeros,Pendiente Consignaciones y Transportadora,Pendiente Recibido Transportadora,Consignaciones Bancarias y Transportadora,Recibido Transportadora,Notas Debito o Credito,Cantidad Denominacion de $100.000,Total Denominacion de $100.000,Cantidad Denominacion de $50.000,Total Denominacion de $50.000,Cantidad Denominacion de $20.000,Total Denominacion de $20.000,Cantidad Denominacion de $10.000,Total Denominacion de $10.000,Cantidad Denominacion de $5.000,Total Denominacion de $5.000,Cantidad Denominacion de $2.000,Total Denominacion de $2.000,Cantidad Denominacion de $1.000,Total Denominacion de $1.000,Cantidad Denominacion de $500,Total Denominacion de $500,Cantidad Denominacion de $200,Total Denominacion de $200,Cantidad Denominacion de $100,Total Denominacion de $100,Cantidad Denominacion de $50,Total Denominacion de $50,${concatenadosFinal},Estado Cierre,Fecha y Hora Cierre`;
             const main = newData.map((item) => {
               return Object.values(item).toString();
             });
@@ -387,6 +370,7 @@ const PanelHistorico = () => {
     return '$ ' + Number(value).toLocaleString('es-ES');
   }
 
+  console.log(receipt)
   return (
     <Fragment>
       <ButtonBar>
@@ -453,7 +437,7 @@ const PanelHistorico = () => {
             // externos_día_anterior,
             // Saldo_Cierre_Dia_Anterior,
             total_consignaciones_transportadora_externos,
-            // total_movimientos,
+            total_movimientos,
             externos_fin_dia,
           }) => ({
             pk_id_cierre,
@@ -471,27 +455,14 @@ const PanelHistorico = () => {
               )
             ),
             total_efectivo_cierre_día_anterior: formatMoney.format(
-              (entidades_externas?.data ?? []).reduce(
+              total_efectivo_cierre_día_anterior +
+              (externos_día_anterior?.data ?? []).reduce(
                 (total, val) => total + val.valor,
                 0
-              ) <= 0
-                ? total_efectivo_cierre_día_anterior +
-                    (entidades_externas?.data ?? []).reduce(
-                      (total, val) => total + val.valor,
-                      0
-                    )
-                : total_efectivo_cierre_día_anterior -
-                    (entidades_externas?.data ?? []).reduce(
-                      (total, val) => total + val.valor,
-                      0
-                    )
+              )
             ),
             total_efectivo_en_caja: formatMoney.format(
-                total_efectivo_en_caja +
-                total_recibido_transportadora -
-                total_consignaciones_transportadora +
-                total_transferencias +
-                total_notas
+              total_efectivo_en_caja
             ),
             externos_fin_dia:formatMoney.format( 
               (externos_día_anterior?.data ?? []).reduce(
@@ -505,10 +476,6 @@ const PanelHistorico = () => {
             ),
             total_fectivo_cierre:formatMoney.format(
               total_efectivo_en_caja +
-              total_recibido_transportadora -
-              total_consignaciones_transportadora +
-              total_transferencias +
-              total_notas +
               (externos_día_anterior?.data ?? []).reduce(
                 (total, val) => total + val.valor,
                 0

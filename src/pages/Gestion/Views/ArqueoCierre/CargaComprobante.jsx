@@ -23,6 +23,7 @@ import {
   movimientoBoveda,
   verValorBoveda,
   movimientoEfectivoEntreCajeros,
+  getUser,
 } from "../../utils/fetchCaja";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
@@ -32,16 +33,16 @@ import Magnifier from "react-magnifier";
 import ButtonLink from "../../../../components/Base/ButtonLink";
 import Modal from "../../../../components/Base/Modal/Modal";
 // import SearchEntidadesExternas from "../../components/CargarComprobantes/SearchEntidadesExternas";
-import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+// import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const url_user = process.env.REACT_APP_URL_IAM_PDP;
+// const url_user = process.env.REACT_APP_URL_IAM_PDP;
 
 const CargaComprobante = () => {
   const navigate = useNavigate();
-  const { roleInfo,userPermissions,quotaInfo,userInfo,pdpUser} = useAuth();
+  const { roleInfo,userPermissions,quotaInfo,pdpUser} = useAuth();
   const formRef = useRef(null);
   const [tiposComprobantes, setTiposComprobantes] = useState([]);
 
@@ -406,28 +407,16 @@ const CargaComprobante = () => {
     if (ev !== "") {
       var valor = ev.replace(/[^0-9]/g, '');
       setIdUserRecibe(valor)
-      const nameUser = await getUser(`${url_user}/user-unique?uuid=${valor}`);
-      setNameUserRecibe(nameUser)
+      if (valor !== "") {
+        const nameUser = await getUser({id_user:valor});
+        setNameUserRecibe(nameUser?.obj)
+      }
     }else{
       setIdUserRecibe("")
       setNameUserRecibe("")
     }
   }, []);
 
-  const [getUser] = useFetchDispatchDebounce(
-    {
-      onSuccess: useCallback((res) => {return res?.obj}, []),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          // notifyError(error.message);
-          return null
-        } else {
-          console.error(error);
-        }
-      }, []),
-    },
-    { delay: 100 }
-  );
 
   // const renderInputs = () => {
   //   return selectedEntidadesExt.entidades_agregar.map(entidad => (
@@ -811,7 +800,7 @@ const CargaComprobante = () => {
                 label={`Nombre usuario que recibe`}
                 autoComplete="off"
                 type="tel"
-                value={nameUserRecibe === ""?"":nameUserRecibe?.uname}
+                value={nameUserRecibe === "" || nameUserRecibe === null ?"":nameUserRecibe?.uname}
                 required
                 disabled
               />
@@ -879,7 +868,7 @@ const CargaComprobante = () => {
                     subtitle = {"Resumen del movimiento"}
                     summaryTrx={
                       {"Id usuario que transfiere": roleInfo?.id_usuario,
-                        "Nombre usuario que transfiere": userInfo?.attributes?.name,
+                        "Nombre usuario que transfiere": pdpUser?.uname,
                         "Id usuario que recibe": idUserRecibe,
                         "Nombre usuario que recibe": nameUserRecibe?.uname,
                       }
