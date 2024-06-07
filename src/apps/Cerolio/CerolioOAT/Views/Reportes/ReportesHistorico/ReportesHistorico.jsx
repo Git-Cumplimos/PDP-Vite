@@ -24,7 +24,7 @@ const ReportesHistorico = () => {
       const res = await fetchGetReportesHistorico(
         filters.fechaInicial.split("-").slice(0, 2).join("-"),
         filters.fechaFinal.split("-").slice(0, 2).join("-"),
-        1,
+        roleInfo.id_comercio,
         "movimientos",
         page,
         limit
@@ -50,8 +50,8 @@ const ReportesHistorico = () => {
   const tableData = useMemo(() => {
     return data.map((item) => ({
       Nombre: item.archivo,
-      Tipo: "Archivo",
-      "Última modificación": "Hoy",
+      /*       Tipo: "Archivo",
+      "Última modificación": "Hoy", */
     }));
   }, [data]);
 
@@ -79,7 +79,7 @@ const ReportesHistorico = () => {
     <>
       <TableEnterprise
         title="Vista de reportes"
-        headers={["Nombre", "Tipo", "Última modificación"]}
+        headers={["Nombre" /* , "Tipo", "Última modificación" */]}
         data={tableData}
         onSelectRow={
           // Enviar el nombre del archivo para descargar
