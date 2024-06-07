@@ -1,13 +1,10 @@
 import { Fragment, useEffect, useMemo, useState, useCallback, } from "react";
 import Input from "../../../components/Base/Input";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
-import { useFetch } from "../../../hooks/useFetch";
-import { notifyError,notify } from "../../../utils/notify";
+import { notify } from "../../../utils/notify";
 import useFetchDebounce from "../../../hooks/useFetchDebounce";
 
-// const url = process.env.REACT_APP_URL_CAJA;
 const url = process.env.REACT_APP_URL_PASARELAS;
-
 
 const ReporteMovimientoPasarela = () => {
   const [fecha, setFecha] = useState("");
