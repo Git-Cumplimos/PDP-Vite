@@ -211,7 +211,7 @@ const Panel = () => {
         id_comercio: roleInfo?.id_comercio,
         id_terminal: roleInfo?.id_dispositivo,
         id_usuario: roleInfo?.id_usuario,
-        id_usuario_pdp: pdpUser?.uuid,
+        id_usuario_pdp: roleInfo?.id_usuario,
         nombre_comercio: nombreComercio,
         nombre_usuario: userInfo?.attributes?.name,
         direccion_comercio: roleInfo?.direccion,
@@ -284,11 +284,7 @@ const Panel = () => {
                 "Saldo PDP Fin Del Día",
                 formatMoney.format(
                   cierre?.total_movimientos + 
-                  cierre?.total_efectivo_cierre_día_anterior + 
-                  cierre?.total_recibido_transportadora - 
-                  cierre?.total_consignaciones_transportadora + 
-                  cierre?.total_transferencias +
-                  cierre?.total_notas
+                  cierre?.total_efectivo_cierre_día_anterior
                 ),
               ],
               ["", ""],
@@ -300,11 +296,8 @@ const Panel = () => {
               [
                 "Total Efectivo Del Cierre",
                 formatMoney.format(
-                  cierre?.total_efectivo_en_caja +
-                  cierre?.total_recibido_transportadora -
-                  cierre?.total_consignaciones_transportadora +
-                  cierre?.total_transferencias +
-                  cierre?.total_notas +
+                  cierre?.total_movimientos + 
+                  cierre?.total_efectivo_cierre_día_anterior +
                   totalExtrdiaAnterior +
                   Num -
                   cierre?.total_consignaciones_transportadora_externos
@@ -421,7 +414,7 @@ const Panel = () => {
 
   const searchTrnasferencias = useCallback(() => {
     EfectivoEntreCajerosPending({
-      id_usuario_recibe: pdpUser?.uuid,
+      id_usuario_recibe: roleInfo?.id_usuario,
       id_comercio: roleInfo?.id_comercio,
       id_terminal: roleInfo?.id_dispositivo,
       id_usuario: roleInfo?.id_usuario,
@@ -442,7 +435,7 @@ const Panel = () => {
         return "Peticion fallida";
       });
   }, [
-    pdpUser?.uuid,
+    // pdpUser?.uuid,
     roleInfo?.id_comercio,
     roleInfo?.id_dispositivo,
     roleInfo?.id_usuario,

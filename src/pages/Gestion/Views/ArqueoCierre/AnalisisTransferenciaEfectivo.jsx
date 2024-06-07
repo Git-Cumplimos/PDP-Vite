@@ -37,11 +37,11 @@ const estadoRevisionSelect = new Map([
 const AnalisisTransferenciaEfectivo = () => {
   const [maxPages, setMaxPages] = useState(1);
   const [pageData, setPageData] = useState({ page: 1, limit: 10 });
-  const { roleInfo,pdpUser} = useAuth();
+  const { roleInfo} = useAuth();
   const [searchInfo, setSearchInfo] = useState({
     created: "",
     fk_estado_revision: "1",
-    id_usuario_recibe: pdpUser?.uuid,
+    id_usuario_recibe: roleInfo?.id_usuario,
     id_usuario: roleInfo?.id_usuario,
   });
   const [transferencias, setTransferencias] = useState([]);
