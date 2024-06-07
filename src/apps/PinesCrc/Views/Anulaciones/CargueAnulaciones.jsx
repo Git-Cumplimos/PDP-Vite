@@ -139,15 +139,15 @@ const FileInputX = () => {
     }
   };
 
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-    notifyError("El usuario canceló el proceso de anulacion");
-    navigate("/GestionTransaccional/AnulacionesPinesCRC/CargueArchivo");
-    document.getElementById("anulaciones").value = ""; // <- limpia el valor del campo de archivo
-    setArchivo([]);
-    setNombreDocumento("");
-    setDisabledBtn(true);
-  }, []);
+  // const handleClose = useCallback(() => {
+  //   setShowModal(false);
+  //   notifyError("El usuario canceló el proceso de anulacion");
+  //   navigate("/GestionTransaccional/AnulacionesPinesCRC/CargueArchivo");
+  //   document.getElementById("anulaciones").value = ""; // <- limpia el valor del campo de archivo
+  //   setArchivo([]);
+  //   setNombreDocumento("");
+  //   setDisabledBtn(true);
+  // }, []);
 
 
 
@@ -204,7 +204,7 @@ const FileInputX = () => {
           Cargar archivo
         </Button>
       </div>
-      <Modal show={showModal} handleClose={handleClose}>
+      <Modal show={showModal} > 
         {/* <br />
         <h1 className="text-xl font-semibold">
           ¿Está seguro de cargar el archivo de anulaciones?
