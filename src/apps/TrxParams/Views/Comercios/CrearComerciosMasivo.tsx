@@ -14,6 +14,7 @@ import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import Fieldset from "../../../../components/Base/Fieldset";
 import { notifyError } from "../../../../utils/notify";
 import { useAuth } from "../../../../hooks/AuthHooks";
+import { toast } from "react-toastify";
 
 type Props = {
   showMassive: boolean;
@@ -21,8 +22,16 @@ type Props = {
   searchCommercesFn: () => void | Promise<void>;
 };
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-// const urlComercios = `http://localhost:5000`;
+// const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `http://localhost:5000`;
+
+const toastIdCarga = "carga-archivo-123";
+const toastDoneOptions = {
+  isLoading: false,
+  autoClose: 5000,
+  closeButton: true,
+  draggable: true,
+};
 
 const CrearComerciosMasivo = ({
   showMassive,
@@ -47,7 +56,7 @@ const CrearComerciosMasivo = ({
     {
       onPending: useCallback(() => "Buscando formato", []),
       onSuccess: useCallback((res) => {
-        for (let url of (res?.obj ?? [])) {
+        for (let url of res?.obj ?? []) {
           window.open(url, "_blank");
         }
         return "Formato obtenido";
@@ -80,9 +89,12 @@ const CrearComerciosMasivo = ({
       }, [fileUpload, currentUserId]),
     },
     {
-      onPending: useCallback(() => "Cargando archivo", []),
+      onPending: useCallback(
+        () => toast.loading("Cargando archivo", { toastId: toastIdCarga }),
+        []
+      ),
       onSuccess: useCallback(
-        (response) => {
+        async (response) => {
           if (!response.ok) {
             if (response.headers.get("Content-Type")?.includes("csv")) {
               response
@@ -90,7 +102,11 @@ const CrearComerciosMasivo = ({
                 .then((blob: Blob) => {
                   const urlFile = URL.createObjectURL(blob);
                   try {
-                    const filename = response.headers.get("Content-Disposition").split("; ")?.[1].split("=")?.[1] + ".csv";
+                    const filename =
+                      response.headers
+                        .get("Content-Disposition")
+                        .split("; ")?.[1]
+                        .split("=")?.[1] + ".csv";
                     const a = document.createElement("a");
                     a.href = urlFile;
                     a.download = filename;
@@ -98,40 +114,58 @@ const CrearComerciosMasivo = ({
                     a.click();
                     URL.revokeObjectURL(urlFile);
                     document.body.removeChild(a);
-
                   } catch {
-                    window.open(urlFile, '_blank');
+                    window.open(urlFile, "_blank");
                   }
                 })
                 .catch((error: any) => console.error(error));
             } else {
-              response
-                .json()
-                .then((res: any) => console.log(res))
-                .catch((error: any) => console.error(error));
+              const res = await response.json();
+
+              if (res && "msg" in res) {
+                toast.update(toastIdCarga, {
+                  render: res?.msg,
+                  type: "warning",
+                  ...toastDoneOptions
+                });
+                return;
+              }
             }
-            // throw new Error("Error con archivo cargado", { cause: "custom" });
-            // notifyError("Error con archivo cargado");
-            return "Error con archivo cargado";
-            // return "Carga finalizada";
+            toast.update(toastIdCarga, {
+              render: "Error con archivo cargado",
+              type: "warning",
+              ...toastDoneOptions
+            });
+            return;
           }
           searchCommercesFn?.();
           handleClose();
-          return "Carga satisfactoria";
+          toast.update(toastIdCarga, {
+            render: "Carga satisfactoria",
+            type: "info",
+            ...toastDoneOptions
+          });
         },
         [handleClose, searchCommercesFn]
       ),
       onError: useCallback((error) => {
         if (error?.cause === "custom") {
-          // notifyError(error.message);
-          return error.message;
+          toast.update(toastIdCarga, {
+            render: error.message,
+            type: "warning",
+            ...toastDoneOptions
+          });
         } else {
           console.error(error);
-          return "Error cargando el archivo";
+          toast.update(toastIdCarga, {
+            render: "Error cargando el archivo",
+            type: "warning",
+            ...toastDoneOptions
+          });
         }
       }, []),
     },
-    { notify: true, checkStatus: false }
+    { checkStatus: false }
   );
 
   const onSubmit = useCallback(
@@ -146,7 +180,7 @@ const CrearComerciosMasivo = ({
     <Fragment>
       <Modal
         show={showMassive}
-        handleClose={loadingUploadFile ? () => { } : handleClose}
+        handleClose={loadingUploadFile ? () => {} : handleClose}
       >
         <Form onSubmit={onSubmit}>
           <ButtonBar>
@@ -161,7 +195,12 @@ const CrearComerciosMasivo = ({
             <FileInput
               label={"Adjuntar archivo de comercios a cargar"}
               onGetFile={(files: Array<File>) => {
-                // console.log(files);
+                if (files[0].type !== "text/csv") {
+                  notifyError(
+                    "Solo se permite un archivo separado por comas (csv)"
+                  );
+                  return;
+                }
                 setFileUpload(files[0]);
               }}
               accept=".csv"
@@ -178,7 +217,7 @@ const CrearComerciosMasivo = ({
                     className="text-3xl text-red-700 col-span-1 bi bi-trash-fill cursor-pointer"
                     onClick={
                       loadingUploadFile
-                        ? () => { }
+                        ? () => {}
                         : () => setFileUpload(undefined)
                     }
                   />
