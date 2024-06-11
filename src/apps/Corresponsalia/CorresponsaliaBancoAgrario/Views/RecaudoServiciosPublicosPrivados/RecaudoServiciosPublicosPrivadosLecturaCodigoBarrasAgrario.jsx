@@ -71,11 +71,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
           notify(autoArr?.msg);
           let dateStatus = false;
           if (
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0
           ) {
             const dateVenc = new Date(
-              datosEnvio?.datosCodigoBarras?.fechaCaducidad[0]
+              datosEnvio?.datosCodigoBarras?.fecha_caducidad[0]
             );
             dateVenc.setHours(dateVenc.getHours() + 5);
             const dateActual = new Date();
@@ -94,9 +94,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
           setDatosTransaccion((old) => {
             return {
               ...old,
-              ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
-              ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
-              ref3: autoArr?.obj.datosCodigoBarras.codigosReferencia[2] ?? "",
+              ref1: autoArr?.obj.datosCodigoBarras.codigos_referencia[0] ?? "",
+              ref2: autoArr?.obj.datosCodigoBarras.codigos_referencia[1] ?? "",
+              ref3: autoArr?.obj.datosCodigoBarras.codigos_referencia[2] ?? "",
               showValor: formatMoney.format(valorTrx) ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
@@ -149,10 +149,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     e.preventDefault();
     for (
       let i = 0;
-      i < datosEnvio.datosCodigoBarras.codigosReferencia.length;
+      i < datosEnvio.datosCodigoBarras.codigos_referencia.length;
       i++
     ) {
-      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0) {
+      if (parseInt(datosEnvio.datosCodigoBarras.codigos_referencia[i]) <= 0) {
         return notifyError("La referencia no puede ser 0");
       }
     }
@@ -186,7 +186,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     let objRecaudo = {
       nombreConvenio: datosEnvio?.datosConvenio?.nombre_convenio,
       codigoConvenio: datosEnvio?.datosConvenio?.codigo,
-      referencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0],
+      referencia1: datosEnvio.datosCodigoBarras.codigos_referencia[0],
     };
     if (
       datosEnvio?.datosConvenio?.nombre_ref2 &&
@@ -194,7 +194,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g)
     ) {
       objRecaudo["referencia2"] =
-        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "";
+        datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? "";
     }
     if (
       datosEnvio?.datosConvenio?.nombre_ref3 &&
@@ -202,7 +202,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
       !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g)
     ) {
       objRecaudo["referencia3"] =
-        datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? "";
+        datosEnvio.datosCodigoBarras.codigos_referencia[2] ?? "";
     }
     setIsUploading(true);
     postRecaudoConveniosAgrario({
@@ -343,7 +343,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   required
                   disabled={true}
                   value={
-                    datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                    datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
                   }
                   autoComplete="off"
                   onInput={onChangeFormat}
@@ -362,7 +362,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   required
                   disabled={true}
                   value={
-                    datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                    datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? ""
                   }
                   autoComplete="off"
                   onInput={onChangeFormat}
@@ -381,23 +381,23 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   required
                   disabled={true}
                   value={
-                    datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
+                    datosEnvio.datosCodigoBarras.codigos_referencia[2] ?? ""
                   }
                   autoComplete="off"
                   onInput={onChangeFormat}
                 ></Input>
               )}
-            {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
+            {datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0 ? (
               <Input
-                id="fechaCaducidad"
+                id="fecha_caducidad"
                 label="Fecha de caducidad"
                 type="text"
-                name="fechaCaducidad"
+                name="fecha_caducidad"
                 minLength="0"
                 maxLength="32"
                 disabled={true}
-                value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
+                value={datosEnvio.datosCodigoBarras.fecha_caducidad[0] ?? ""}
                 onInput={(e) => {}}
               ></Input>
             ) : (
@@ -450,21 +450,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   {datosEnvio?.datosConvenio?.nombre_ref1 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref1?.match(/-/g) && (
                       <h2>{`Referencia 1: ${
-                        datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                        datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
                       }`}</h2>
                     )}
                   {datosEnvio?.datosConvenio?.nombre_ref2 &&
                     datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
                       <h2>{`Referencia 2: ${
-                        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                        datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? ""
                       }`}</h2>
                     )}
                   {datosEnvio?.datosConvenio?.nombre_ref3 &&
                     datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
                     !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
                       <h2>{`Referencia 3: ${
-                        datosEnvio.datosCodigoBarras.codigosReferencia[2] ?? ""
+                        datosEnvio.datosCodigoBarras.codigos_referencia[2] ?? ""
                       }`}</h2>
                     )}
                   <h2 className="text-base">
