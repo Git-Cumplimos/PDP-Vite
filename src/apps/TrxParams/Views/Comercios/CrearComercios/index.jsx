@@ -678,7 +678,7 @@ const CrearComercios = () => {
             type="text"
             name="nombre_comercio"
             minLength="1"
-            maxLength="50"
+            maxLength="100"
             required
             value={comercio?.nombre_comercio}
             onInput={onChangeFormat}
@@ -690,7 +690,7 @@ const CrearComercios = () => {
             type="email"
             name="email_comercio"
             minLength="1"
-            maxLength="50"
+            maxLength="100"
             required
             value={comercio?.email_comercio}
             onInput={onChangeFormat}
@@ -1165,7 +1165,7 @@ const CrearComercios = () => {
                       key={index}
                       id={`${key}_${index}`}
                       label={`${key}`}
-                      type="text"
+                      type="tel"
                       name={`${key}_${index}`}
                       minLength="1"
                       maxLength="20"
@@ -1193,7 +1193,7 @@ const CrearComercios = () => {
                             ...old,
                             codigos_institucionales: {
                               ...old.codigos_institucionales,
-                              [key]: e.target.value,
+                              [key]: onChangeNumber(e),
                             },
                           };
                         });
