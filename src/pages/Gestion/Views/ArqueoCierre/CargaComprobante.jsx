@@ -387,12 +387,15 @@ const CargaComprobante = () => {
         console.error('Error al obtener los datos:', error);
       }
     };
-    fetchData();
+    if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
+      fetchData();
+    }
   }, [
     quotaInfo?.quota,
     roleInfo?.id_usuario,
     roleInfo?.id_comercio,
     roleInfo?.id_dispositivo,
+    roleInfo?.tipo_comercio
   ]);
 
   // const EntityExt = useCallback(() =>{
