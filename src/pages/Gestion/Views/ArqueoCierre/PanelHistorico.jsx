@@ -336,12 +336,13 @@ const PanelHistorico = () => {
             const blob = new Blob([csv], { type: "application/csv" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            const now = Intl.DateTimeFormat("es-CO", {
-              year: "2-digit",
-              month: "2-digit",
-              day: "2-digit",
-            }).format(new Date());
-            a.download = "Reporte Cierre de Caja " + now + ".csv";
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('es-CO', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            }).split('/').reverse().join('-');
+            a.download = "Reporte Cierre de Caja " + formattedDate + ".csv";
             a.href = url;
             a.style.play = "none";
             document.body.appendChild(a);
@@ -370,7 +371,6 @@ const PanelHistorico = () => {
     return '$ ' + Number(value).toLocaleString('es-ES');
   }
 
-  console.log(receipt)
   return (
     <Fragment>
       <ButtonBar>
