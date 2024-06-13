@@ -94,6 +94,7 @@ import rutasItauCB, {
   listPermissionsItau,
 } from "../apps/Corresponsalia/CorresponsaliaItau/routes";
 
+import routesBloqueosCierreFinanciero from "../apps/BloqueosCierreFinanciero/routes";
 import routesItau from "../apps/ConveniosItau/routes";
 import routesGestionBCS from "../apps/GestionBCS/routes";
 import rutasCerolioOAT from "../apps/Cerolio/CerolioOAT/routes";
@@ -497,6 +498,7 @@ const allUrlsPrivateApps = [
       rutasGestionGrupoAval,
       rutasGestionAgrario,
       routesItau,
+      routesBloqueosCierreFinanciero,
       routesGestionBCS,
     ],
   },
