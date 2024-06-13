@@ -80,14 +80,10 @@ const ExtractosCreditosComerciosPDP = () => {
     if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
       validNavigate("/");
     } else {
-      fetchComercio();
+      consultaCredito();
     }
   }, []);
-  useEffect(() => {
-    consultaCredito();
-    return () => {};
-  }, []);
-  const fetchComercio = useCallback(() => {
+  const consultaCredito = useCallback(() => {
     let hasKeys = true;
     const keys = [
       "id_comercio",
@@ -107,10 +103,8 @@ const ExtractosCreditosComerciosPDP = () => {
       notifyError(
         "El usuario no cuenta con datos de comercio, no se permite la transaccion"
       );
-      validNavigate("/");
+      return validNavigate("/");
     }
-  }, [roleInfo, validNavigate]);
-  const consultaCredito = useCallback(() => {
     const data = {
       id_comercio: roleInfo?.id_comercio,
     };
@@ -135,7 +129,7 @@ const ExtractosCreditosComerciosPDP = () => {
         },
       }
     );
-  }, [validNavigate, roleInfo.id_comercio]);
+  }, [validNavigate, roleInfo]);
   const generacionExtractos = useCallback(
     (tipo_extracto) => (ev) => {
       const data = {
