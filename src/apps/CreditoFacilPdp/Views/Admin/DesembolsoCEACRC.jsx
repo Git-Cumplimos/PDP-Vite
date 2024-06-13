@@ -185,8 +185,8 @@ const DesembolsoCEACRC = () => {
         address: roleInfo?.["direccion"],
         comercio: {
           id_comercio: parseInt(dataCredito?.IdComercio),
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
+          id_usuario: roleInfo?.id_usuario ?? pdpUser?.uuid,
+          id_terminal: roleInfo?.id_dispositivo ?? pdpUser?.uuid,
           id_uuid_trx: uniqueId,
         },
         Datos: {
