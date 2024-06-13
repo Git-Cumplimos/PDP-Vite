@@ -111,12 +111,12 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
         }
       }
       if (convenio?.ctrol_ref1_cnb === "1") {
-        if(parseInt(datosTrans?.ref1) <= 0 ) {
+        if (parseInt(datosTrans?.ref1) <= 0) {
           return notifyError("La referencia no puede ser 0");
         }
       }
       if (convenio?.ctrol_ref2_cnb === "1") {
-        if(parseInt(datosTrans?.ref2) <= 0 ) {
+        if (parseInt(datosTrans?.ref2) <= 0) {
           return notifyError("La referencia no puede ser 0");
         }
       }
@@ -206,7 +206,6 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                   const prom = await new Promise((resolve, reject) =>
                     setTimeout(() => {
                       postCheckReintentoRecaudoConveniosDavivienda({
-
                         idComercio: roleInfo?.id_comercio,
                         idUsuario: roleInfo?.id_usuario,
                         idTerminal: roleInfo?.id_dispositivo,
@@ -274,12 +273,12 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
         });
     } else {
       if (convenio?.ctrol_ref1_cnb === "1") {
-        if(parseInt(datosTrans?.ref1) <= 0 ) {
+        if (parseInt(datosTrans?.ref1) <= 0) {
           return notifyError("La referencia no puede ser 0");
         }
       }
       if (convenio?.ctrol_ref2_cnb === "1") {
-        if(parseInt(datosTrans?.ref2) <= 0 ) {
+        if (parseInt(datosTrans?.ref2) <= 0) {
           return notifyError("La referencia no puede ser 0");
         }
       }
@@ -354,7 +353,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
       return {
         ...old,
         commerceInfo: [
-          /*id transaccion recarga*/
+          /*id transacción recarga*/
           /*id_comercio*/
           ["Id comercio", roleInfo?.id_comercio ? roleInfo?.id_comercio : ""],
           /*id_dispositivo*/
@@ -377,10 +376,10 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10 mt-5'>
+      <h1 className="text-3xl text-center mb-10 mt-5">
         Recaudo servicios públicos y privados
       </h1>
-      <h1 className='text-2xl text-center mb-10'>{`Convenio: ${
+      <h1 className="text-2xl text-center mb-10">{`Convenio: ${
         convenio?.nom_convenio_cnb ?? ""
       }`}</h1>
 
@@ -389,19 +388,20 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
           convenio?.ctrol_ref2_cnb === "1" &&
           dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
         }
-        onSubmit={onSubmit}>
+        onSubmit={onSubmit}
+      >
         {convenio?.ctrol_ref1_cnb === "1" && (
           <>
             <Input
-              id='ref1'
+              id="ref1"
               label={convenio?.nom_ref1_cnb}
-              type='text'
-              name='ref1'
-              minLength='1'
-              maxLength='32'
+              type="text"
+              name="ref1"
+              minLength="1"
+              maxLength="32"
               required
               value={datosTrans.ref1}
-              autoComplete='off'
+              autoComplete="off"
               onInput={(e) => {
                 let valor = e.target.value;
                 let num = valor.replace(/[\s\.\-+eE]/g, "");
@@ -410,18 +410,19 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                     return { ...old, ref1: num };
                   });
                 }
-              }}></Input>
+              }}
+            ></Input>
           </>
         )}
         {convenio?.ctrol_ref2_cnb === "1" && (
           <Input
-            id='ref2'
+            id="ref2"
             label={convenio?.nom_ref2_cnb}
-            type='text'
-            name='ref2'
-            minLength='1'
-            maxLength='32'
-            autoComplete='off'
+            type="text"
+            name="ref2"
+            minLength="1"
+            maxLength="32"
+            autoComplete="off"
             required
             value={datosTrans.ref2}
             onInput={(e) => {
@@ -432,15 +433,16 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                   return { ...old, ref2: num };
                 });
               }
-            }}></Input>
+            }}
+          ></Input>
         )}
         {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb) && (
           <MoneyInput
-            id='valCashOut'
-            name='valCashOut'
-            label='Valor'
-            type='text'
-            autoComplete='off'
+            id="valCashOut"
+            name="valCashOut"
+            label="Valor"
+            type="text"
+            autoComplete="off"
             maxLength={"20"}
             value={datosTrans.valor ?? ""}
             onInput={(ev, val) => {
@@ -461,8 +463,9 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
             dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
               ? "lg:col-span-2"
               : ""
-          }>
-          <Button type='submit'>
+          }
+        >
+          <Button type="submit">
             {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
               ? "Realizar pago"
               : "Realizar consulta"}
@@ -470,23 +473,23 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
         </ButtonBar>
       </Form>
       <Modal show={showModal}>
-        <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+        <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
           {estadoPeticion === 0 ? (
             <>
-              <h1 className='text-2xl text-center mb-10 font-semibold'>
+              <h1 className="text-2xl text-center mb-10 font-semibold">
                 Ingrese nuevamente los datos de la transacción
               </h1>
               <Form grid onSubmit={onSubmitValidacion}>
                 {convenio?.ctrol_ref1_cnb === "1" && (
                   <Input
-                    id='ref1'
+                    id="ref1"
                     label={convenio?.nom_ref1_cnb}
-                    type='text'
-                    name='ref1'
-                    minLength='1'
-                    maxLength='32'
+                    type="text"
+                    name="ref1"
+                    minLength="1"
+                    maxLength="32"
                     required
-                    autoComplete='off'
+                    autoComplete="off"
                     value={datosTransValidacion.ref1}
                     onInput={(e) => {
                       let valor = e.target.value;
@@ -496,17 +499,18 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                           return { ...old, ref1: num };
                         });
                       }
-                    }}></Input>
+                    }}
+                  ></Input>
                 )}
                 {convenio?.ctrol_ref2_cnb === "1" && (
                   <Input
-                    id='ref2'
+                    id="ref2"
                     label={convenio?.nom_ref2_cnb}
-                    type='text'
-                    name='ref2'
-                    minLength='1'
-                    autoComplete='off'
-                    maxLength='32'
+                    type="text"
+                    name="ref2"
+                    minLength="1"
+                    autoComplete="off"
+                    maxLength="32"
                     required
                     value={datosTransValidacion.ref2}
                     onInput={(e) => {
@@ -517,17 +521,18 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                           return { ...old, ref2: num };
                         });
                       }
-                    }}></Input>
+                    }}
+                  ></Input>
                 )}
                 {dataConveniosPagar.includes(
                   convenio?.num_ind_consulta_cnb
                 ) && (
                   <MoneyInput
-                    id='valor'
-                    name='valor'
-                    label='Valor a pagar'
-                    autoComplete='off'
-                    type='tel'
+                    id="valor"
+                    name="valor"
+                    label="Valor a pagar"
+                    autoComplete="off"
+                    type="tel"
                     minLength={"0"}
                     maxLength={"20"}
                     value={datosTransValidacion.valor ?? ""}
@@ -545,10 +550,10 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                   />
                 )}
                 <ButtonBar>
-                  <Button type='button' onClick={handleClose}>
+                  <Button type="button" onClick={handleClose}>
                     Cancelar
                   </Button>
-                  <Button type='submit'>
+                  <Button type="submit">
                     {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
                       ? "Realizar pago"
                       : "Realizar consulta"}
@@ -558,7 +563,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
             </>
           ) : estadoPeticion === 1 ? (
             <>
-              <h1 className='text-2xl text-center mb-5 font-semibold'>
+              <h1 className="text-2xl text-center mb-5 font-semibold">
                 Resultado consulta
               </h1>
               <h2>{`Nombre convenio: ${datosConsulta.consultaDavivienda.valNombreConvenio}`}</h2>
@@ -569,7 +574,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
               {convenio?.ctrol_ref2_cnb === "1" && (
                 <h2>{`${convenio?.nom_ref2_cnb}: ${datosTransValidacion.ref2}`}</h2>
               )}
-              <h2 className='text-base'>
+              <h2 className="text-base">
                 {`Valor consultado: ${formatMoney.format(
                   datosConsulta.consultaDavivienda.numValorTotalFactura
                 )} `}
@@ -580,11 +585,11 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                 convenio?.ind_mayor_vlr_cnb !== "0") ? (
                 <Form grid onSubmit={onSubmitValidacion}>
                   <MoneyInput
-                    id='valor'
-                    name='valor'
-                    label='Valor a pagar'
-                    autoComplete='off'
-                    type='tel'
+                    id="valor"
+                    name="valor"
+                    label="Valor a pagar"
+                    autoComplete="off"
+                    type="tel"
                     minLength={"2"}
                     maxLength={"20"}
                     value={datosTransValidacion.valor ?? ""}
@@ -602,14 +607,14 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                   />
                   <ButtonBar>
                     <Button onClick={handleClose}>Cancelar</Button>
-                    <Button type='submit'>Realizar pago</Button>
+                    <Button type="submit">Realizar pago</Button>
                   </ButtonBar>
                 </Form>
               ) : (
                 <>
                   <ButtonBar>
                     <Button onClick={handleClose}>Cancelar</Button>
-                    <Button type='submit' onClick={onSubmitValidacion}>
+                    <Button type="submit" onClick={onSubmitValidacion}>
                       Realizar pago
                     </Button>
                   </ButtonBar>
@@ -622,22 +627,24 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
                 <ButtonBar>
                   <Button onClick={handlePrint}>Imprimir</Button>
                   <Button
-                    type='submit'
+                    type="submit"
                     onClick={() => {
                       handleClose();
                       navigate(-1);
-                    }}>
+                    }}
+                  >
                     Aceptar
                   </Button>
                 </ButtonBar>
               </h2>
               <TicketsDavivienda
                 ticket={objTicketActual}
-                refPrint={printDiv}></TicketsDavivienda>
+                refPrint={printDiv}
+              ></TicketsDavivienda>
             </>
           ) : estadoPeticion === 4 ? (
             <>
-              <h1 className='text-2xl font-semibold'>
+              <h1 className="text-2xl font-semibold">
                 {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
                   ? "¿Está seguro de realizar el pago del servicio?"
                   : "¿Está seguro de realizar la consulta servicio?"}
@@ -656,7 +663,7 @@ const RecaudoServiciosPublicosPrivadosOperaciones = () => {
               )}
               <ButtonBar>
                 <Button onClick={handleClose}>Cancelar</Button>
-                <Button type='submit' onClick={onSubmitValidacion}>
+                <Button type="submit" onClick={onSubmitValidacion}>
                   {dataConveniosPagar.includes(convenio?.num_ind_consulta_cnb)
                     ? "Realizar pago"
                     : "Realizar consulta"}

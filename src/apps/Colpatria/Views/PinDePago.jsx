@@ -185,7 +185,7 @@ const PinDePago = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error consultando parametros de la transaccion");
+        notifyError("Error consultando parametros de la transacción");
       });
   }, []);
 
@@ -216,7 +216,7 @@ const PinDePago = () => {
 
   if (!hasData) {
     notifyError(
-      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      "El usuario no cuenta con datos de comercio, no se permite la transacción"
     );
     return <Navigate to={"/"} replace />;
   }

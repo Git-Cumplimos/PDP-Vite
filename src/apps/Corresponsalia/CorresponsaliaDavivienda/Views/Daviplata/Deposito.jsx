@@ -83,7 +83,7 @@ const Deposito = () => {
       }
       if (!hasKeys) {
         notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+          "El usuario no cuenta con datos de comercio, no se permite la transacción"
         );
         navigate("/");
       }
@@ -164,7 +164,7 @@ const Deposito = () => {
                 setSummary(summary);
                 setShowModal(true);
               }
-              //notify("Transaccion satisfactoria");
+              //notify("Transacción satisfactoria");
             })
             .catch((err) => {
               setIsUploading(false);
@@ -239,7 +239,7 @@ const Deposito = () => {
           setIsUploading(false);
           handleClose();
         } else {
-          notify("Transaccion satisfactoria");
+          notify("Transacción satisfactoria");
           setPaymentStatus(res?.obj?.ticket);
         }
       })
