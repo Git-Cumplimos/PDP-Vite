@@ -185,8 +185,8 @@ const DesembolsoCEACRC = () => {
         address: roleInfo?.["direccion"],
         comercio: {
           id_comercio: parseInt(dataCredito?.IdComercio),
-          id_usuario: roleInfo?.id_usuario,
-          id_terminal: roleInfo?.id_dispositivo,
+          id_usuario: roleInfo?.id_usuario ?? pdpUser?.uuid,
+          id_terminal: roleInfo?.id_dispositivo ?? pdpUser?.uuid,
           id_uuid_trx: uniqueId,
         },
         Datos: {
@@ -318,7 +318,7 @@ const DesembolsoCEACRC = () => {
                       type="button"
                       onClick={(e) => {
                         navigate(-1);
-                        notifyError("Transacción cancelada por el usuario");
+                        notifyError("El desembolso fue cancelado por el usuario");
                       }}
                       disabled={loadingPeticionDesembolsoCredito}
                     >
@@ -340,7 +340,7 @@ const DesembolsoCEACRC = () => {
         </Modal>
       ) : (
         <TableEnterprise
-          title=""
+          title="Desembolso de Créditos"
           headers={[
             "Id Comercio",
             "Nombre Comercio",
@@ -370,7 +370,10 @@ const DesembolsoCEACRC = () => {
             type="text"
             autoComplete="off"
             value={filtroBusqueda}
-            onInput={handleSearchComercioChange}
+            onInput={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+              handleSearchComercioChange({ target: { value } });
+            }}
             onBlur={() =>
               handleSearchComercioChange({ target: { value: filtroBusqueda } })
             }
