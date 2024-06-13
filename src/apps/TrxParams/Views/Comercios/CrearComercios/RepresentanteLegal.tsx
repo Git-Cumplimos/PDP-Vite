@@ -19,7 +19,7 @@ import AddressForm, {
 import { CitySearchTable } from "../../../../../components/Compound/CitySearch";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import { onChangeNumber } from "../../../../../utils/functions";
-import { onChangeNit } from "../../../utils/functions";
+import NitInput from "../../ConveniosPDP/components/NitInput";
 
 type Props = {
   setRlPks: (_: {
@@ -195,8 +195,10 @@ const RepresentanteLegal = ({
       fetchIf: useMemo(
         () =>
           Boolean(propietarioRL.pk_tipo_identificacion_rl) &&
-          Boolean(propietarioRL.pk_numero_identificacion_rl)
-          && propietarioRL.pk_numero_identificacion_rl.length >= 5,
+          Boolean(propietarioRL.pk_numero_identificacion_rl) &&
+          propietarioRL.pk_tipo_identificacion_rl !== 8
+            ? propietarioRL.pk_numero_identificacion_rl.length >= 5
+            : propietarioRL.pk_numero_identificacion_rl.length === 13,
         [
           propietarioRL.pk_tipo_identificacion_rl,
           propietarioRL.pk_numero_identificacion_rl,
@@ -248,8 +250,14 @@ const RepresentanteLegal = ({
       ),
       fetchIf: useMemo(
         () =>
-          updateRl && propietarioRL2Send.pk_numero_identificacion_rl.length >= 5,
-        [updateRl, propietarioRL2Send.pk_numero_identificacion_rl.length]
+          updateRl && propietarioRL2Send.pk_tipo_identificacion_rl !== 8
+            ? propietarioRL2Send.pk_numero_identificacion_rl.length >= 5
+            : propietarioRL2Send.pk_numero_identificacion_rl.length === 13,
+        [
+          updateRl,
+          propietarioRL2Send.pk_numero_identificacion_rl.length,
+          propietarioRL2Send.pk_tipo_identificacion_rl,
+        ]
       ),
     },
     {
@@ -344,33 +352,52 @@ const RepresentanteLegal = ({
           }}
           required={!areAllFieldsEmpty}
         />
-        <Input
-          label="Número de identificación"
-          id="pk_numero_identificacion_rl"
-          name="pk_numero_identificacion_rl"
-          type="tel"
-          minLength={!areAllFieldsEmpty ? 5 : 0}
-          maxLength={12}
-          value={propietarioRL.pk_numero_identificacion_rl}
-          onChange={(ev) => {
-            setPropietarioRLExists(false);
-            setUpdateRl(false);
-            // Clean number on event and not on setState
-            let newNumId = ev.target.value;
-            if ( 8 === propietarioRL.pk_tipo_identificacion_rl) {
-              newNumId = onChangeNit(ev);
-            } else {
-              newNumId = onChangeNumber(ev, false);
-            }
-            setPropietarioRL((old) => ({
-              ...initialPropietarioRL,
-              pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
-              pk_numero_identificacion_rl: newNumId,
-            }));
-          }}
-          autoComplete="off"
-          required={!areAllFieldsEmpty}
-        />
+        {propietarioRL.pk_tipo_identificacion_rl !== 8 ? (
+          <Input
+            label="Número de identificación"
+            id="pk_numero_identificacion_rl"
+            name="pk_numero_identificacion_rl"
+            type="tel"
+            minLength={!areAllFieldsEmpty ? 5 : 0}
+            maxLength={12}
+            value={propietarioRL.pk_numero_identificacion_rl}
+            onChange={(ev) => {
+              setPropietarioRLExists(false);
+              setUpdateRl(false);
+              // Clean number on event and not on setState
+              const newNumId = onChangeNumber(ev, false);
+              setPropietarioRL((old) => ({
+                ...initialPropietarioRL,
+                pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
+                pk_numero_identificacion_rl: newNumId,
+              }));
+            }}
+            autoComplete="off"
+            required={!areAllFieldsEmpty}
+          />
+        ) : (
+          <NitInput
+            label="Número de identificación"
+            id="pk_numero_identificacion_rl"
+            name="pk_numero_identificacion_rl"
+            type="tel"
+            minLength={!areAllFieldsEmpty ? 5 : 0}
+            maxLength={12}
+            value={propietarioRL.pk_numero_identificacion_rl}
+            onChange={(_, nit) => {
+              setPropietarioRLExists(false);
+              setUpdateRl(false);
+
+              setPropietarioRL((old) => ({
+                ...initialPropietarioRL,
+                pk_tipo_identificacion_rl: old.pk_tipo_identificacion_rl,
+                pk_numero_identificacion_rl: nit,
+              }));
+            }}
+            autoComplete="off"
+            required={!areAllFieldsEmpty}
+          />
+        )}
         <Input
           label="Nombre"
           id="nombre_rl"
