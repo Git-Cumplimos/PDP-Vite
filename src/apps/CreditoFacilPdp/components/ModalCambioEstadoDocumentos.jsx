@@ -14,12 +14,12 @@ const URL_ACTUALIZAR_DOCUMENTO_TBL_MOVIMIENTOS = `${process.env.REACT_APP_URL_CO
 const URL_MODIFICAR_ARCHIVO_S3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-modificar`;
 
 const documentTypes = [
-  { key: "Pagare.pdf", label: "Pagaré Firmado" },
-  { key: "CedulaRepresentante.pdf", label: "Cédula del Representante Legal" },
-  { key: "EstadoFinanciero.pdf", label: "Estados Financieros" },
-  { key: "CamaraComercio.pdf", label: "Cámara de Comercio" },
-  { key: "Contrato.pdf", label: "Contrato" },
-  { key: "CertificacionBancaria.pdf", label: "Certificación Bancaria" },
+  { key: "Pagare", label: "Pagaré Firmado" },
+  { key: "CedulaRepresentante", label: "Cédula del Representante Legal" },
+  { key: "EstadoFinanciero", label: "Estados Financieros" },
+  { key: "CamaraComercio", label: "Cámara de Comercio" },
+  { key: "Contrato", label: "Contrato" },
+  { key: "CertificacionBancaria", label: "Certificación Bancaria" },
 ];
 
 const ModalCambioEstadoDocumentos = ({
@@ -108,12 +108,12 @@ const ModalCambioEstadoDocumentos = ({
           {estadoDocumento === "Aprobado" ? (
             <h1 className="text-xl text-center mt-2 font-semibold">
               ¿Está seguro de aprobar el documento{" "}
-              {documentTypes.find((doc) => doc.key === nameFile)?.label}?
+              {documentTypes.find((doc) => nameFile.includes(doc.key))?.label}?
             </h1>
           ) : (
             <h1 className="text-xl text-center mt-2 font-semibold">
               ¿Está seguro de rechazar el documento{" "}
-              {documentTypes.find((doc) => doc.key === nameFile)?.label}?
+              {documentTypes.find((doc) => nameFile.includes(doc.key))?.label}?
             </h1>
           )}
 
