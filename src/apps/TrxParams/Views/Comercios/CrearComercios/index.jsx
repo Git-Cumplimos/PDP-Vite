@@ -716,7 +716,7 @@ const CrearComercios = () => {
               maxLength="12"
               required
               value={comercio?.numero_identificacion}
-              onInput={(e) => {
+              onChange={(e) => {
                 setComercio((old) => ({
                   ...old,
                   numero_identificacion: onChangeNumber(e),
@@ -726,7 +726,7 @@ const CrearComercios = () => {
             />
           ) : (
             <NitInput
-              label="Número de identificación nit"
+              label="Número de identificación"
               id="numero_identificacion"
               name="numero_identificacion"
               type="tel"
