@@ -73,6 +73,9 @@ export const fetchCustomPost = async (url_, name_, data_) => {
     ) {
       throw new msgCustomBackend(`${Peticion?.msg}`, `${Peticion?.msg}`);
     }
+    if (Peticion?.status === false && Peticion?.msg) {
+      throw new ErrorCustomBackend(`${Peticion?.msg}`, `${Peticion?.msg}`);
+    }
   } catch (error) {
     if (error instanceof ErrorCustomBackend) {
       throw error;

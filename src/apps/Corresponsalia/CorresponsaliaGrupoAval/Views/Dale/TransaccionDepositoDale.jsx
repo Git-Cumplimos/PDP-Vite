@@ -58,7 +58,11 @@ const TransaccionDepositoDale = () => {
         setConvenio(autoArr?.results[0]);
         setIsUploading(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err.message ?? "");
+        notifyError(err.message ?? "");
+        navigate(-1);
+      });
   };
   const printDiv = useRef();
 
