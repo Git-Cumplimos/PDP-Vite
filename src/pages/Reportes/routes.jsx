@@ -63,7 +63,7 @@ export const rutasReportes = [
       />
     ),
     component: ReporteConsignacionesTransportadora,
-    permission: [25001],
+    permission: [25003],
   },
   {
     link: "/reportes/comisiones-usuario-padre",
