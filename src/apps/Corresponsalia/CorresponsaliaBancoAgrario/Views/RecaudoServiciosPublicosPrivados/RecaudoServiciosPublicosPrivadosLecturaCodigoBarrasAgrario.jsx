@@ -190,16 +190,14 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
     };
     if (
       datosEnvio?.datosConvenio?.nombre_ref2 &&
-      datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
-      !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g)
+      datosEnvio?.datosConvenio?.nombre_ref2 !== ""
     ) {
       objRecaudo["referencia2"] =
         datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? "";
     }
     if (
       datosEnvio?.datosConvenio?.nombre_ref3 &&
-      datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
-      !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g)
+      datosEnvio?.datosConvenio?.nombre_ref3 !== ""
     ) {
       objRecaudo["referencia3"] =
         datosEnvio.datosCodigoBarras.codigos_referencia[2] ?? "";
@@ -331,27 +329,23 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
             datosEnvio?.datosConvenio?.nombre_convenio ?? ""
           }`}</h1>
           <Form grid onSubmit={onSubmitConfirm}>
-            {datosEnvio?.datosConvenio?.nombre_ref1 !== "" &&
-              !datosEnvio?.datosConvenio?.nombre_ref1?.match(/-/g) && (
-                <Input
-                  id="ref1"
-                  label={datosEnvio?.datosConvenio?.nombre_ref1}
-                  type="text"
-                  name="ref1"
-                  minLength={datosEnvio?.datosConvenio?.longitud_min_ref1}
-                  maxLength={datosEnvio?.datosConvenio?.longitud_max_ref1}
-                  required
-                  disabled={true}
-                  value={
-                    datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
-                  }
-                  autoComplete="off"
-                  onInput={onChangeFormat}
-                />
-              )}
+            {datosEnvio?.datosConvenio?.nombre_ref1 !== "" && (
+              <Input
+                id="ref1"
+                label={datosEnvio?.datosConvenio?.nombre_ref1}
+                type="text"
+                name="ref1"
+                minLength={datosEnvio?.datosConvenio?.longitud_min_ref1}
+                maxLength={datosEnvio?.datosConvenio?.longitud_max_ref1}
+                required
+                disabled={true}
+                value={datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""}
+                autoComplete="off"
+                onInput={onChangeFormat}
+              />
+            )}
             {datosEnvio?.datosConvenio?.nombre_ref2 &&
-              datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
-              !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
+              datosEnvio?.datosConvenio?.nombre_ref2 !== "" && (
                 <Input
                   id="ref2"
                   label={datosEnvio?.datosConvenio?.nombre_ref2}
@@ -369,8 +363,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 ></Input>
               )}
             {datosEnvio?.datosConvenio?.nombre_ref3 &&
-              datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
-              !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
+              datosEnvio?.datosConvenio?.nombre_ref3 !== "" && (
                 <Input
                   id="ref3"
                   label={datosEnvio?.datosConvenio?.nombre_ref3}
@@ -447,22 +440,19 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                   </h1>
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.nombre_convenio}`}</h2>
                   <h2>{`Número convenio: ${datosEnvio?.datosConvenio?.codigo}`}</h2>
-                  {datosEnvio?.datosConvenio?.nombre_ref1 !== "" &&
-                    !datosEnvio?.datosConvenio?.nombre_ref1?.match(/-/g) && (
-                      <h2>{`Referencia 1: ${
-                        datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
-                      }`}</h2>
-                    )}
+                  {datosEnvio?.datosConvenio?.nombre_ref1 !== "" && (
+                    <h2>{`Referencia 1: ${
+                      datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
+                    }`}</h2>
+                  )}
                   {datosEnvio?.datosConvenio?.nombre_ref2 &&
-                    datosEnvio?.datosConvenio?.nombre_ref2 !== "" &&
-                    !datosEnvio?.datosConvenio?.nombre_ref2?.match(/-/g) && (
+                    datosEnvio?.datosConvenio?.nombre_ref2 !== "" && (
                       <h2>{`Referencia 2: ${
                         datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? ""
                       }`}</h2>
                     )}
                   {datosEnvio?.datosConvenio?.nombre_ref3 &&
-                    datosEnvio?.datosConvenio?.nombre_ref3 !== "" &&
-                    !datosEnvio?.datosConvenio?.nombre_ref3?.match(/-/g) && (
+                    datosEnvio?.datosConvenio?.nombre_ref3 !== "" && (
                       <h2>{`Referencia 3: ${
                         datosEnvio.datosCodigoBarras.codigos_referencia[2] ?? ""
                       }`}</h2>

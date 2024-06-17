@@ -215,11 +215,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
       }`}</h1>
 
       <Form
-        grid={
-          (convenio?.nombre_ref2 !== "" &&
-            !convenio?.nombre_ref2?.match(/-/g)) ||
-          (convenio?.nombre_ref3 !== "" && !convenio?.nombre_ref3?.match(/-/g))
-        }
+        grid={convenio?.nombre_ref2 !== "" || convenio?.nombre_ref3 !== ""}
         onSubmit={onSubmit}
       >
         {convenio?.nombre_ref1 !== "" && (
@@ -285,10 +281,7 @@ const RecaudoServiciosPublicosPrivadosAgrario = () => {
         />
         <ButtonBar
           className={
-            (convenio?.nombre_ref2 !== "" &&
-              !convenio?.nombre_ref2?.match(/-/g)) ||
-            (convenio?.nombre_ref3 !== "" &&
-              !convenio?.nombre_ref3?.match(/-/g))
+            convenio?.nombre_ref2 !== "" || convenio?.nombre_ref3 !== ""
               ? "lg:col-span-2"
               : ""
           }
