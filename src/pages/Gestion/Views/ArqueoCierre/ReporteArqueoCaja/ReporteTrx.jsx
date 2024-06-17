@@ -154,6 +154,7 @@ const ReporteTrx = ({ tipo_reporte = "" }) => {
       nombre_comercio: nombreComercio,
       nombre_usuario: userInfo?.attributes?.name,
       direccion_comercio: roleInfo?.direccion,
+      tipo_comercio: roleInfo?.tipo_comercio,
     })
       .then((res) => {
         if (res?.obj === 1) {

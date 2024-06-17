@@ -47,19 +47,19 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/arqueo-cierre-reporte-efectivo-trxs",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte Efectivo Arqueo de Caja" />,
     component: ReporteEfectivo,
-    permission: [PermissionsCaja.VerReporteTrxCierre],
+    permission: [PermissionsCaja.VerReporteEfectivoTrxCierre],
   },
   {
     link: "/gestion/arqueo/arqueo-cierre-reporte-tarjeta-trxs",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte Tarjeta Arqueo de Caja" />,
     component: ReporteTarjeta,
-    permission: [PermissionsCaja.VerReporteTrxCierre],
+    permission: [PermissionsCaja.VerReporteTarjetaTrxCierre],
   },
   {
     link: "/gestion/arqueo/arqueo-cierre-caja",
     label: <AppIcons Logo={"RECAUDO"} name="Reporte por Categoría" />,
     component: CierreCaja,
-    permission: [PermissionsCaja.VerReporteTrxCierre],
+    permission: [PermissionsCaja.VerReporteCategoriaTrxCierre],
   },
   {
     link: "/gestion/arqueo/carga-comprobante",
@@ -77,13 +77,13 @@ export const rutasArqueo = [
     link: "/gestion/arqueo/parametrizar-cuenta",
     label: <AppIcons Logo={"RECAUDO"} name="Parametrizar Transportadoras y Entidades Bancarias" />,
     component: ParametrizacionRecaudo,
-    permission: [PermissionsCaja.AgregarEntidades],
+    permission: [PermissionsCaja.AgregarEntidadesBancarias],
   },
   {
     link: "/gestion/arqueo/plataformas-externas",
     label: <AppIcons Logo={"RECAUDO"} name="Creación Plataforma Externos" />,
     component: PlataformasExternas,
-    permission: [PermissionsCaja.AgregarEntidades],
+    permission: [PermissionsCaja.AgregarEntidadesexternas],
   },
   {
     link: "/gestion/arqueo/historial-cierre",
