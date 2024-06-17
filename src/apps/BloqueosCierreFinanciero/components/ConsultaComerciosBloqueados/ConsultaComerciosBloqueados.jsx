@@ -1,74 +1,76 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchCustom } from "../../utils/fetchConveniosItau";
+import { fetchCustom } from "../../utils/fetchComerciosCierreFinanciero";
 import TableEnterprise from "../../../../components/Base/TableEnterprise/TableEnterprise";
 import Input from "../../../../components/Base/Input/Input";
 import { useFetch } from "../../../../hooks/useFetch";
 
 
-const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}/convenios_itau/consulta_bloqueos`;
-// const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000/convenios_itau/consulta_bloqueos`;
+// const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/bloqueo_cierre_financiero/consulta_bloqueos`;
+const URL_COMERCIOS = `http://127.0.0.1:5000/bloqueo_cierre_financiero/consulta_bloqueos`;
 
 const ConsultaComerciosBloqueados = ({
   navigate,
 }) => {
-  const [dataConvenios, setDataConvenios] = useState({
-    id_convenio: "",
+  const [dataComercio, setDataComercio] = useState({
+    id_comercio: "",
+    descripcion: "",
   });
-  const [Convenios, setConvenios] = useState([]);
+  const [Comercio, setComercio] = useState([]);
   const [maxPages, setMaxPages] = useState(0);
   const [{ page, limit }, setPageData] = useState({
     page: 1,
     limit: 10,
   });
 
-  const tableConvenios = useMemo(() => {
+  const tableComercio = useMemo(() => {
     return [
-      ...Convenios.map(
+      ...Comercio.map(
         ({
-          id_convenio,
+          id_comercio,
           descripcion,
         }) => {
           return {
-            id_convenio: id_convenio,
+            id_comercio: id_comercio,
             descripcion: descripcion ?? "",
           };  
         }
       ),
     ];
-  }, [Convenios]);
+  }, [Comercio]);
 
-  const [loadingPeticionConsultaConvenios, peticionConsultaConvenios] = useFetch(
-    fetchCustom(URL_CORRESPONSALIA_ITAU, "POST", "Consultar convenios bloqueados")
+  const [loadingPeticionConsultaComercios, peticionConsultaComercios] = useFetch(
+    fetchCustom(URL_COMERCIOS, "POST", "Consultar Comercio bloqueados")
   );
 
-  const fetchConveniosFunc = useCallback(() => {
+  const fetchComerciosFunc = useCallback(() => {
       let obj = {};
-      if (dataConvenios.id_convenio) obj["id_convenio"] = dataConvenios.id_convenio;
-      peticionConsultaConvenios({},{
+      if (dataComercio.id_comercio) obj["id_comercio"] = dataComercio.id_comercio;
+      if (dataComercio.descripcion) obj["descripcion"] = dataComercio.descripcion;
+      peticionConsultaComercios({},{
         ...obj,
         page,
         limit,
-        sortBy: "id_convenio",
+        sortBy: "id_comercio",
         sortDir: "DESC",
       })
         .then((autoArr) => {
           setMaxPages(autoArr?.obj?.maxPages);
-          setConvenios(autoArr?.obj?.results ?? []);
+          setComercio(autoArr?.obj?.results ?? []);
         })
         .catch((err) => console.error(err));
-    }, [page, limit, dataConvenios]);
+    }, [page, limit, dataComercio]);
 
   useEffect(() => {
-    fetchConveniosFunc();
-  }, [dataConvenios,page,limit]);
+    fetchComerciosFunc();
+  }, [dataComercio,page,limit]);
 
-  const selectConvenio = useCallback(
+  const selectComercio = useCallback(
     (ev, i) => {
       ev.preventDefault();
-      navigate(`${Convenios[i]?.id_convenio}`);
+      navigate(`${Comercio[i]?.id_comercio}`);
     },
     [
-      Convenios,
+      Comercio,
       navigate
     ]
   );
@@ -76,28 +78,42 @@ const ConsultaComerciosBloqueados = ({
   return (
     <>
       <TableEnterprise
-        title={'Bloqueo Convenios Itaú'}
+        title={'Comercios Bloqueados'}
         maxPage={maxPages}
-        headers={['Número Convenio Itaú','Descripción Convenio']}
-        data={tableConvenios}
-        onSelectRow={selectConvenio}
+        headers={['Id Comercio','Nombre Comercio']}
+        data={tableComercio}
+        onSelectRow={selectComercio}
         onSetPageData={setPageData}>
         <Input
-          id='id_convenio'
-          label='Número Convenio Itaú'
+          id='id_comercio'
+          label='Id Comercio'
           type='text'
-          name='id_convenio'
-          minLength='1'
-          maxLength='4'
-          value={dataConvenios.id_convenio}
+          name='id_comercio'
+          // minLength='1'
+          maxLength='15'
+          value={dataComercio.id_comercio}
           onInput={(e) => {
             if (!isNaN(e.target.value)) {
               const valor = e.target.value;
               const num = valor.replace(/[\s\.-]/g, "");
-              setDataConvenios((old) => {
-                return { ...old, id_convenio: num };
+              setDataComercio((old) => {
+                return { ...old, id_comercio: num };
               });
             }
+          }}
+        ></Input>
+        <Input
+          id='descripcion'
+          label='Nombre Comercio'
+          type='text'
+          name='descripcion'
+          // minLength='1'
+          maxLength='30'
+          value={dataComercio.descripcion}
+          onInput={(e) => {
+            setDataComercio((old) => {
+              return { ...old, descripcion: e.target.value };
+            });
           }}
         ></Input>
       </TableEnterprise>

@@ -1,12 +1,12 @@
 import fetchData from "../../../utils/fetchData";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import { fetchDataTotpNoMsg } from "../../../utils/MFA";
 
-const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}`;
-// const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000`;
+// const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const URL_COMERCIOS = `http://127.0.0.1:5000`;
 
-export const bloquearConveniosItau = async (bodyObj) => {
+export const bloquearComerciosCierreFinanciero = async (bodyObj) => {
   if (!bodyObj) {
     return new Promise((resolve, reject) => {
       resolve("Sin datos body");
@@ -23,7 +23,7 @@ export const bloquearConveniosItau = async (bodyObj) => {
 
   try {
     const res = await fetchData(
-      `${URL_CORRESPONSALIA_ITAU}/convenios_itau/crear_bloqueo`,
+      `${URL_COMERCIOS}/bloqueo_cierre_financiero/crear_bloqueo`,
       "POST",
       {},
       dataObj,
@@ -84,8 +84,8 @@ export const fetchCustom = (
     let parseObj = JSON.stringify(data_);
     let dataObj = {
       data: cifrarAES(
-        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
-        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
+        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
         parseObj
       ),
     };
@@ -99,8 +99,8 @@ export const fetchCustom = (
         Peticion = await fetchFunc(urlCompleto, "POST", {}, dataObj, {}, true);
         const dataDecrypt = Peticion?.obj?.data ?? "";
         const obj = decryptAES(
-          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
-          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
+          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
           dataDecrypt
         );
         Peticion.obj = JSON.parse(obj);
