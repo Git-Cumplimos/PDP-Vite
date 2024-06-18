@@ -21,9 +21,9 @@ import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
 import { useMFA } from "../../../../components/Base/MFAScreen";
 import { useFetchPowwi } from "../../hooks/fetchPowwi";
 
-const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/consulta-deposito-powwi`;
-const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/deposito-powwi`;
-const URL_CONSULTAR_TRANSACCION_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}//corresponsalia-powwi/consulta-estado-deposito-powwi`;
+const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/consulta-deposito-powwi`;
+const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/deposito-powwi`;
+const URL_CONSULTAR_TRANSACCION_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}//corresponsalia-powwi/consulta-estado-deposito-powwi`;
 
 const Deposito = () => {
   const navigate = useNavigate();
