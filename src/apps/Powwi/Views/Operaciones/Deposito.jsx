@@ -105,7 +105,7 @@ const Deposito = () => {
   const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(
     fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo")
   );
-  
+
   const [loadingPeticionDeposito, peticionDeposito] = useFetchPowwi(
     URL_DEPOSITO,
     URL_CONSULTAR_TRANSACCION_DEPOSITO,
@@ -431,9 +431,7 @@ const Deposito = () => {
             </Button>
           </ButtonBar>
         </Form>
-        <Modal
-          show={showModal}
-        >
+        <Modal show={showModal}>
           {paymentStatus ? (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <Tickets refPrint={printDiv} ticket={paymentStatus} />
