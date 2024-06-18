@@ -398,13 +398,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
               <></>
             )}
             <MoneyInput
-              id="valCashOut"
-              name="valCashOut"
+              id="valorSinModificar"
+              name="valorSinModificar"
               label="Valor a pagar original"
-              type="text"
+              type="tel"
               decimalDigits={2}
+              maxLength={12}
               autoComplete="off"
-              maxLength={"15"}
+              min={enumParametrosBancoAgrario?.MIN_RECAUDO_AGRARIO}
+              max={enumParametrosBancoAgrario?.MAX_RECAUDO_AGRARIO}
               disabled={datosEnvio.datosCodigoBarras.pago.length > 0}
               defaultValuevalue={datosTransaccion.valorSinModificar ?? 0}
               onInput={(e, valor) => {
@@ -416,6 +418,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
                 }
               }}
               required
+              equalError={false}
+              equalErrorMin={false}
             />
             <ButtonBar className="lg:col-span-2">
               <Button
