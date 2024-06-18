@@ -17,6 +17,7 @@ import {
 } from "../../utils/fetchFunctions";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
+import IAMRecoverQRMassive from "./IAMRecoverQRMassive";
 
 const url = process.env.REACT_APP_URL_IAM_PDP;
 
@@ -235,6 +236,7 @@ const IAMUsers = () => {
         >
           Creacion masiva de usuarios
         </Button>
+        <IAMRecoverQRMassive />
       </ButtonBar>
       <DataTable
         title="Usuarios punto de pago"
@@ -293,7 +295,7 @@ const IAMUsers = () => {
             const copy = new Map(old)
               .set(
                 ev.target.name,
-                ["uuid"].includes(ev.target.name) || ["fk_id_comercio"].includes(ev.target.name)
+                ["uuid", "fk_id_comercio"].includes(ev.target.name)
                   ? onChangeNumber(ev)
                   : ev.target.value
               )
