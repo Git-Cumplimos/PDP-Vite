@@ -20,7 +20,6 @@ import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
 import { useMFA } from "../../../../components/Base/MFAScreen";
 import { useFetchPowwi } from "../../hooks/fetchPowwi";
-import { Console } from "console";
 
 const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/consulta-deposito-powwi`;
 const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/deposito-powwi`;
@@ -31,8 +30,8 @@ const Deposito = () => {
   const { roleInfo } = useAuth();
   const { submitEventSetter } = useMFA();
   const [limitesMontos] = useState({
-    max: enumParametrosPowwi.maxDepositoCuentas,
-    min: enumParametrosPowwi.minDepositoCuentas,
+    max: enumParametrosPowwi.MAX_DEPOSITO_SERVICIOS_POWWI,
+    min: enumParametrosPowwi.MIN_DEPOSITO_SERVICIOS_POWWI,
   });
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
@@ -103,9 +102,6 @@ const Deposito = () => {
     setUuid(v4());
   }, []);
 
-  // const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(funcConsultaCosto);
-  // const [loadingPeticionDeposito, peticionDeposito] = useFetch(funcDeposito);
-
   const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(
     fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo")
   );
@@ -113,7 +109,7 @@ const Deposito = () => {
   const [loadingPeticionDeposito, peticionDeposito] = useFetchPowwi(
     URL_DEPOSITO,
     URL_CONSULTAR_TRANSACCION_DEPOSITO,
-    "Realizar Deposito Powwi",
+    "Realizar Depósito Powwi",
     true
   );
 
@@ -437,9 +433,6 @@ const Deposito = () => {
         </Form>
         <Modal
           show={showModal}
-          handleClose={
-            paymentStatus || loadingPeticionDeposito ? () => {} : handleClose
-          }
         >
           {paymentStatus ? (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">

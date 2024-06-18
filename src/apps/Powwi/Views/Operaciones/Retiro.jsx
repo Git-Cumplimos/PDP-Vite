@@ -25,16 +25,18 @@ import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { cifrarAES } from "../../../../utils/cryptoUtils"
 import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
+import { useFetchPowwi } from "../../hooks/fetchPowwi";
 
-const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/consultaRetiroPowwi`;
-const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/retiroCorresponsalPowwi`;
+const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/consulta-retiro-powwi`;
+const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/retiro-powwi`;
+const URL_CONSULTAR_TRANSACCION_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}//corresponsalia-powwi/consulta-estado-retiro-powwi`;
 
 const Retiro = () => {
   const navigate = useNavigate();
   const { roleInfo, infoTicket } = useAuth();
   const [limitesMontos, setLimitesMontos] = useState({
-    max: enumParametrosPowwi.maxRetiroCuentas,
-    min: enumParametrosPowwi.minRetiroCuentas,
+    max: enumParametrosPowwi.MAX_RETIRO_SERVICIOS_POWWI,
+    min: enumParametrosPowwi.MIN_RETIRO_SERVICIOS_POWWI,
   });
   const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
@@ -104,8 +106,11 @@ const Retiro = () => {
   const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(
     fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo")
   );
-  const [loadingPeticionRetiro, peticionRetiro] = useFetch(
-    fetchCustom(URL_RETIRO, "POST", "Retiro")
+  
+  const [loadingPeticionRetiro, peticionRetiro] = useFetchPowwi(
+    URL_RETIRO,
+    URL_CONSULTAR_TRANSACCION_RETIRO,
+    "Realizar Retiro Powwi",
   );
 
   const onSubmitRetiro = useCallback(
@@ -209,6 +214,7 @@ const Retiro = () => {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
+        id_uuid_trx: uuid,
       },
       address: roleInfo?.direccion,
       dane_code: roleInfo?.codigo_dane,
@@ -218,21 +224,19 @@ const Retiro = () => {
       oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
-      id_uuid_trx: uuid,
       costo_trx: datosConsulta?.costoTotal,
       Datos: {
         tipoIdentificacionCliente: datosTrx.tipoDocumento,
         identificacionCliente: datosTrx.userDoc,
         numeroProducto: "(+57)"+datosTrx.numeroTelefono,
-        otp: cifrarAES(
-          `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-          `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
-          datosTrx.otp
-        ),
+        otp: datosTrx.otp,
       },
     };
+    const dataAditional = {
+      id_uuid_trx: uuid,
+    };
     notifyPending(
-      peticionRetiro({}, data),
+      peticionRetiro(data, dataAditional),
       {
         render: () => {
           return "Procesando transacción";
@@ -242,7 +246,7 @@ const Retiro = () => {
         render: ({ data: res }) => {
           setIsUploading(false);
           setPaymentStatus(res?.obj?.ticket ?? {});
-          return "Transaccion satisfactoria";
+          return "Transacción satisfactoria";
         },
       },
       {
@@ -253,7 +257,7 @@ const Retiro = () => {
             return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
           }
           console.error(err?.message);
-          return err?.message ?? "Consulta fallida";
+          return err?.message ?? "Transacción fallida";
         },
       }
     );
@@ -399,14 +403,14 @@ const Retiro = () => {
         </Form>
         <Modal
           show={showModal}
-          handleClose={paymentStatus || loadingPeticionRetiro ? () => {} : handleClose}>
+        >
           {paymentStatus ? (
             <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary summaryTrx={summary} title='Respuesta de consulta Powwi' subtitle = "Resumen de la transacción">

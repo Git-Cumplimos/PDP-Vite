@@ -1,7 +1,7 @@
 export const enumParametrosPowwi = Object.freeze({
-    maxDepositoCuentas : 1000000,
-    minDepositoCuentas : 100,
-    maxRetiroCuentas : 1000000,
-    minRetiroCuentas : 100,
+    MIN_DEPOSITO_SERVICIOS_POWWI: 1000,
+    MAX_DEPOSITO_SERVICIOS_POWWI: 1000000,
+    MIN_RETIRO_SERVICIOS_POWWI: 1000,
+    MAX_RETIRO_SERVICIOS_POWWI: 1000000,
   });
 
