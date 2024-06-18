@@ -18,6 +18,7 @@ import {
   postRecaudoConveniosAgrario,
 } from "../../utils/fetchRecaudoServiciosPublicosPrivados";
 import { enumParametrosBancoAgrario } from "../../utils/enumParametrosBancoAgrario";
+import MoneyInput from "../../../../../components/Base/MoneyInput";
 
 const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
   const { roleInfo, pdpUser } = useAuth();
@@ -396,24 +397,26 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAgrario = () => {
             ) : (
               <></>
             )}
-            {datosEnvio.datosCodigoBarras.pago[0] && (
-              <MoneyInputDec
-                id="valCashOut"
-                name="valCashOut"
-                label="Valor a pagar original"
-                type="text"
-                autoComplete="off"
-                maxLength={"15"}
-                disabled={true}
-                value={datosTransaccion.valorSinModificar ?? ""}
-                onInput={(e, valor) => {
-                  if (!isNaN(valor)) {
-                    const num = valor;
-                  }
-                }}
-                required
-              ></MoneyInputDec>
-            )}
+            <MoneyInput
+              id="valCashOut"
+              name="valCashOut"
+              label="Valor a pagar original"
+              type="text"
+              decimalDigits={2}
+              autoComplete="off"
+              maxLength={"15"}
+              disabled={datosEnvio.datosCodigoBarras.pago.length > 0}
+              defaultValuevalue={datosTransaccion.valorSinModificar ?? 0}
+              onInput={(e, valor) => {
+                if (!isNaN(valor)) {
+                  setDatosTransaccion((old) => ({
+                    ...old,
+                    valorSinModificar: valor,
+                  }));
+                }
+              }}
+              required
+            />
             <ButtonBar className="lg:col-span-2">
               <Button
                 type="button"
