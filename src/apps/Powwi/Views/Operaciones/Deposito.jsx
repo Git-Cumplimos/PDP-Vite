@@ -19,12 +19,12 @@ import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
 import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
 import { useMFA } from "../../../../components/Base/MFAScreen";
+import { useFetchPowwi } from "../../hooks/fetchPowwi";
+import { Console } from "console";
 
-const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/consultaDepositoPowwi`;
-const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/depositoCorresponsalPowwi`;
-
-const funcConsultaCosto = fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo");
-const funcDeposito = fetchCustom(URL_DEPOSITO, "POST", "Déposito", true, true, true);
+const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/consulta-deposito-powwi`;
+const URL_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsalia-powwi/deposito-powwi`;
+const URL_CONSULTAR_TRANSACCION_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}//corresponsalia-powwi/consulta-estado-deposito-powwi`;
 
 const Deposito = () => {
   const navigate = useNavigate();
@@ -103,8 +103,19 @@ const Deposito = () => {
     setUuid(v4());
   }, []);
 
-  const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(funcConsultaCosto);
-  const [loadingPeticionDeposito, peticionDeposito] = useFetch(funcDeposito);
+  // const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(funcConsultaCosto);
+  // const [loadingPeticionDeposito, peticionDeposito] = useFetch(funcDeposito);
+
+  const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(
+    fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo")
+  );
+  
+  const [loadingPeticionDeposito, peticionDeposito] = useFetchPowwi(
+    URL_DEPOSITO,
+    URL_CONSULTAR_TRANSACCION_DEPOSITO,
+    "Realizar Deposito Powwi",
+    true
+  );
 
   const onSubmitDeposito = useCallback(
     (e) => {
@@ -213,6 +224,7 @@ const Deposito = () => {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
+        id_uuid_trx: uuid,
       },
       address: roleInfo?.direccion,
       dane_code: roleInfo?.codigo_dane,
@@ -226,7 +238,6 @@ const Deposito = () => {
           : false,
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
-      id_uuid_trx: uuid,
       costo_trx: datosConsulta?.costoTotal,
       Datos: {
         tipoIdentificacionCliente: datosTrx.tipoDocumento,
@@ -236,8 +247,11 @@ const Deposito = () => {
         identDepositante: datosTrx.userDocDepositante,
       },
     };
+    const dataAditional = {
+      id_uuid_trx: uuid,
+    };
     notifyPending(
-      peticionDeposito({}, data),
+      peticionDeposito(data, dataAditional),
       {
         render: () => {
           return "Procesando transacción";
@@ -429,11 +443,11 @@ const Deposito = () => {
         >
           {paymentStatus ? (
             <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
             <PaymentSummary

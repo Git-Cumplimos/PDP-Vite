@@ -1,6 +1,7 @@
-import { fetchDataTotp } from "../../../utils/MFA";
+import { fetchDataTotpNoMsg } from "../../../utils/MFA";
+import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import fetchData from "../../../utils/fetchData";
-import { notify, notifyError } from "../../../utils/notify";
+import { notify } from "../../../utils/notify";
 
 export const fetchCustom = (
   url_,
@@ -33,16 +34,27 @@ export const fetchCustom = (
 
     //Petición
     let Peticion;
+    let parseObj = JSON.stringify(data_);
+    let dataObj = {
+      data: cifrarAES(
+        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        parseObj
+      ),
+    };
     try {
-      const fetchFunc = totp ? fetchDataTotp : fetchData;
+      const fetchFunc = totp ? fetchDataTotpNoMsg : fetchData;
       if (metodo_ === "GET") {
         Peticion = await fetchFunc(urlCompleto, "GET", {}, {}, {}, true);
       } else if (metodo_ === "PUT") {
-        Peticion = await fetchFunc(urlCompleto, "PUT", {}, data_, {}, true);
+        Peticion = await fetchFunc(urlCompleto, "PUT", {}, dataObj, {}, true);
       } else if (metodo_ === "POST") {
-        Peticion = await fetchFunc(urlCompleto, "POST", {}, data_, {}, true);
+        Peticion = await fetchFunc(urlCompleto, "POST", {}, dataObj, {}, true);
       }
     } catch (error) {
+      if (error.message.includes("La OTP no es válida")) {
+        throw new ErrorCustomFetch(error.message, error.message);
+      }
       throw new ErrorCustomFetch(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
         error.message
@@ -98,7 +110,18 @@ export const fetchCustom = (
         );
       }
     }
-
+    try {
+      const dataDecrypt = Peticion?.obj?.data ?? "";
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        dataDecrypt
+      );
+      Peticion.obj = JSON.parse(obj);
+    } catch (error) {
+      console.error(`No se puede desencriptar`);
+      throw error;
+    }
     //evaluar la respuesta que llega del backend
     try {
       if (evaluate === true) {
@@ -128,7 +151,13 @@ export const EvaluateResponse = (res, name_ = "") => {
   //para los errores customizados del backend
   try {
     if (res?.status === false) {
-      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`);
+      let tempObject = {};
+      if (res.hasOwnProperty("obj")) {
+        if (res.obj.hasOwnProperty("ticket")) {
+          tempObject["ticket"] = res.obj.ticket;
+        }
+      }
+      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`, tempObject);
     }
   } catch (error) {
     if (error instanceof ErrorCustomBackend) {
@@ -158,11 +187,12 @@ export const EvaluateResponse = (res, name_ = "") => {
 };
 
 export class ErrorCustom extends Error {
-  constructor(message, name, error_msg, notificacion) {
+  constructor(message, name, error_msg, notificacion, optionalObject) {
     super(message);
     this.name = name;
     this.error_msg = error_msg;
     this.notificacion = notificacion;
+    this.optionalObject = optionalObject;
     if (this.notificacion === "notifyError") {
       console.log(message);
     } else if (this.notificacion === "notify") {
@@ -179,31 +209,48 @@ export class ErrorCustom extends Error {
 }
 
 export class ErrorCustomFetch extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomFetch", error_msg, "notifyError");
+  constructor(message, error_msg, optionalObject = {}) {
+    super(
+      message,
+      "ErrorCustomFetch",
+      error_msg,
+      "notifyError",
+      optionalObject
+    );
   }
 }
 
 export class ErrorCustomTimeout extends ErrorCustom {
-  constructor(message, error_msg, notificacion = "notifyError") {
-    super(message, "ErrorCustomTimeout", error_msg, notificacion);
+  constructor(
+    message,
+    error_msg,
+    notificacion = "notifyError",
+    optionalObject = {}
+  ) {
+    super(
+      message,
+      "ErrorCustomTimeout",
+      error_msg,
+      notificacion,
+      optionalObject
+    );
   }
 }
 
 export class ErrorCustomBackend extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomBackend", error_msg, null);
+  constructor(message, error_msg, optionalObject = {}) {
+    super(message, "ErrorCustomBackend", error_msg, null, optionalObject);
   }
 }
 
 export class ErrorCustomBackendUser extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "ErrorCustomBackendUser", error_msg, null);
+  constructor(message, error_msg, optionalObject = {}) {
+    super(message, "ErrorCustomBackendUser", error_msg, null, optionalObject);
   }
 }
 
 export class msgCustomBackend extends ErrorCustom {
-  constructor(message, error_msg) {
-    super(message, "msgCustomBackend", error_msg, null);
+  constructor(message, error_msg, optionalObject = {}) {
+    super(message, "msgCustomBackend", error_msg, null, optionalObject);
   }
 }
