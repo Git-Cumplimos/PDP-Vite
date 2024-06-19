@@ -773,7 +773,7 @@ const CrearComercios = () => {
             label="Teléfono fijo"
             type="tel"
             name="telefono_fijo_comercio"
-            minLength="1"
+            minLength="10"
             maxLength="10"
             required
             value={comercio?.telefono_fijo_comercio}
@@ -1013,7 +1013,7 @@ const CrearComercios = () => {
             label="Teléfono"
             type="tel"
             name="tel_contacto1_comercio"
-            minLength="1"
+            minLength="10"
             maxLength="10"
             required
             value={comercio?.tel_contacto1_comercio}
@@ -1054,7 +1054,7 @@ const CrearComercios = () => {
             label="Teléfono"
             type="tel"
             name="tel_contacto2_comercio"
-            minLength="1"
+            minLength="10"
             maxLength="10"
             value={comercio?.tel_contacto2_comercio}
             onInput={(e) => {
