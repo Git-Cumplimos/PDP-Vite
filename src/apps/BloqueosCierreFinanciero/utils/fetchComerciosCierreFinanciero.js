@@ -2,9 +2,10 @@ import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import { fetchDataTotpNoMsg } from "../../../utils/MFA";
+import { fetchSecure } from "../../../utils/functions";
 
-// const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const URL_COMERCIOS = `http://127.0.0.1:5000`;
+const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const URL_COMERCIOS = `http://127.0.0.1:5000`;
 
 export const bloquearComerciosCierreFinanciero = async (bodyObj) => {
   if (!bodyObj) {
@@ -49,6 +50,45 @@ export const bloquearComerciosCierreFinanciero = async (bodyObj) => {
     throw err;
   }
 };
+
+const buildPostFunctionMassive = (url) => {
+  return async (body) => {
+    try {
+      const response = await fetchSecure(url,
+        {
+          method: 'POST',
+          body,
+        });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+};
+
+const buildPostFunction = (url) => {
+  return async (body) => {
+    if (!body) {
+      throw new Error("Sin datos en el body", { cause: "custom" });
+    }
+    try {
+      const res = await fetchData(url, "POST", {}, body);
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+
+        throw new Error(res, { cause: "custom" });
+      }
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  };
+};
+
+export const updateComercioMassive = buildPostFunctionMassive(`${URL_COMERCIOS}/bloqueo_cierre_financiero/masivo`);
+export const verifyFileComerceMassive = buildPostFunction(`${URL_COMERCIOS}/bloqueo_cierre_financiero/file-comerce-massive`);
 
 export const fetchCustom = (
   url_,

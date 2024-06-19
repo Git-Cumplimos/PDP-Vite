@@ -12,13 +12,15 @@ import {
 } from "../../utils/fetchComerciosCierreFinanciero";
 import { fetchCustom } from "../../utils/fetchComerciosCierreFinanciero";
 import Modal from "../../../../components/Base/Modal/Modal";
+import { useAuth } from "../../../../hooks/AuthHooks";
 
-// const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
-const URL_COMERCIOS = `http://127.0.0.1:5000`;
+const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const URL_COMERCIOS = `http://127.0.0.1:5000`;
 
 const CrearBloqueosComercios = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const { pdpUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [dataComercio, setDataComercio] = useState({
     id_comercio: "",
@@ -51,7 +53,7 @@ const CrearBloqueosComercios = () => {
 
   const delComercio = useCallback(() => {
     if (params?.id) {
-      const data = {id_comercio: params?.id}
+      const data = {id_comercio: params?.id, usuario_ultima_actualizacion: pdpUser?.uuid}
       peticionEliminarComercio({},data)
         .then((res) => {
           if (res?.status) {
@@ -73,7 +75,7 @@ const CrearBloqueosComercios = () => {
   },[navigate,params?.id,peticionEliminarComercio]);
 
   const onSubmit = useCallback(() => {
-    const data = {id_comercio: dataComercio?.id_comercio}
+    const data = {id_comercio: dataComercio?.id_comercio, usuario_ultima_actualizacion: pdpUser?.uuid}
       peticionCrearBloqueo(data)
         .then((res) => {
           if (res?.status) {
@@ -98,7 +100,7 @@ const CrearBloqueosComercios = () => {
           notifyError("Peticion fallida");
         });
     },
-    [navigate,dataComercio,peticionCrearBloqueo]
+    [navigate,dataComercio,peticionCrearBloqueo,pdpUser?.uuid]
   );
 
   useEffect(() => {
