@@ -58,7 +58,7 @@ const ReporteMovimientoPasarela = () => {
         );
         setFileList(listOfFiles);
         setUrlList(listOfUrl);
-        setMaxPages(res?.obj?.maxpages || 1);
+        setMaxPages(res?.obj?.result?.maxpages || 1);
         handleClose();
         return "Listado de archivo de movimiento exitosa";
       }, [handleClose]),
@@ -75,6 +75,8 @@ const ReporteMovimientoPasarela = () => {
 
   useEffect(() => {
     File()
+    console.log("pageData-->",pageData)
+    console.log("url-->",url)
   }, [File,pageData,fecha]);
 
   const searchDate = useCallback((ev) => {
