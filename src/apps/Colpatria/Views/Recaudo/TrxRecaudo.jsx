@@ -113,10 +113,10 @@ const TrxRecaudo = () => {
             onInput={(e, val) => {
               if (!isNaN(val)) {
                 const num = val;
+                setValTrxRecaudo(num);
                 setValidacionPago((old) => {
                   return { ...old, valorCodBarras: num };
                 });
-                setValTrxRecaudo(num);
               }
             }}
             required
@@ -213,7 +213,7 @@ const TrxRecaudo = () => {
               datosConvenio?.fk_tipo_valor === 3 &&
               validacionPago?.trueCodbarras
             ) {
-              setValTrxRecaudo(validacionPago?.valorCodBarras);
+              setValTrxRecaudo(parseInt(validacionPago?.valorCodBarras) ?? 0);
             } else {
               setValidacionPago((old) => ({
                 ...old,
@@ -253,7 +253,7 @@ const TrxRecaudo = () => {
       ev.preventDefault();
       if (
         datosConvenio?.fk_tipo_valor !== 3 &&
-        validacionPago?.trueCodbarras  && 
+        validacionPago?.trueCodbarras &&
         validacionPago?.peticion !== 3
       ) {
         setValTrxRecaudo(0);
@@ -602,10 +602,7 @@ const TrxRecaudo = () => {
           <form onSubmit={onMakePayment}>
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
-                <Button
-                  type="submit"
-                  disabled={loadingSell}
-                >
+                <Button type="submit" disabled={loadingSell}>
                   Aceptar
                 </Button>
                 <Button onClick={handleClose} disabled={loadingSell}>
@@ -654,7 +651,9 @@ const TrxRecaudo = () => {
                 <Button onClick={handleClose} disabled={loadingSell}>
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={loadingSell}>Realizar pago</Button>
+                <Button type="submit" disabled={loadingSell}>
+                  Realizar pago
+                </Button>
               </ButtonBar>
             </Form>
           </>
