@@ -37,7 +37,6 @@ const ReporteMovimientoPasarela = () => {
     {
       onPending: useCallback(() => "Enlistando archivos", []),
       onSuccess: useCallback((res) => {
-        console.log("res-->",res)
         const listOfFiles = (res?.obj?.result?.archivos || []).map(
           ({ archivo, tipo, fecha}) => ({
             archivo,
@@ -75,8 +74,6 @@ const ReporteMovimientoPasarela = () => {
 
   useEffect(() => {
     File()
-    console.log("pageData-->",pageData)
-    console.log("url-->",url)
   }, [File,pageData,fecha]);
 
   const searchDate = useCallback((ev) => {
