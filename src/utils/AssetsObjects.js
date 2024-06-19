@@ -242,6 +242,9 @@ const svgs = {
 
   //ITAU
   BLOQUEO_CONVENIOS_ITAU: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
+  
+  //BLOQUEO_CIERRE_FINANCIERO
+  BLOQUEO_COMERCIOS_CIERRE_FINANCIERO: `${urlAssets}/assets/svg/recaudo/CORRESPONSALIA/COLPATRIA/COLPATRIA_GESTION.svg`,
 };
 
 const banners = {
