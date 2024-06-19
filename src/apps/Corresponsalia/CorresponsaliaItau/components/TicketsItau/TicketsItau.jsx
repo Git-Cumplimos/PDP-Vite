@@ -1,6 +1,10 @@
 import Tickets from "../../../../../components/Base/Tickets/Tickets";
 import { useImgs } from "../../../../../hooks/ImgsHooks";
 
+const logoSize = 79.9;
+const margin = logoSize / 3;
+const marginLeft = 2 * margin;
+
 const TicketsItau = ({
   refPrint,
   type = "ORIGINAL",
@@ -23,20 +27,25 @@ const TicketsItau = ({
       type={type}
       whitespaceDisclaimer={true}
     >
-      <div className="flex flex-col mx-2 my-1 gap-1">
-        <div className="flex flex-row justify-center items-center w-full">
-          <div className="flex flex-row mx-auto items-center gap-4">
+      <div className="flex flex-col">
+        <div className="">
+          <div className="flex flex-row" style={{width:'301px', marginTop: '-8px'}}>
             <div className="mx-auto w-30 h-14">
-              <div className="aspect-w-20 aspect-h-20">
-                <img src={LogoPdp} alt="Logo punto de pago" />
+              <div style={{margin: '0px'}}>
+                <img src={LogoPdp} 
+                alt="Logo punto de pago" 
+                style={{marginTop: '30px'}}/>
               </div>
             </div>
-            <div className="mx-auto w-22 h-22">
-              <div className="aspect-w-5 aspect-h-5">
+            <div>
+              <div style={{marginLeft: '-29px'}}>
                 <img
                   src={LogoPng}
+                  width={79.9}
+                  height={79.9}
                   alt="Logo punto de pago"
                   className="object-contain"
+                  style={{margin: `${margin}px`, marginLeft: `${marginLeft}px`}}
                 />
               </div>
             </div>

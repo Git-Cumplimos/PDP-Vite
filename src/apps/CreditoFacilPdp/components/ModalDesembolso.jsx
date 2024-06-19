@@ -64,10 +64,14 @@ const ModalDesembolso = ({ dataCredito }) => {
         },
         {
           render: ({ data: error }) => {
-            if (error?.message) {
+            if (error?.message === "La OTP no es válida") {
+              // navigate(-1);
+              return error?.message;
+            } else if (error?.message){
               navigate(-1);
               return error?.message;
-            } else {
+            }
+            else {
               navigate(-1);
               return "Desembolso del Crédito fallido";
             }

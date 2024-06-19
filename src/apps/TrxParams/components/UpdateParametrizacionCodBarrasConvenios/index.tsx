@@ -120,28 +120,32 @@ const UpdateParametrizacionCodBarrasConvenios = ({
             dataParametrizacionCodBarrasTemp.pk_codigo_convenio,
           pk_id_autorizador: dataParametrizacionCodBarrasTemp.pk_id_autorizador,
           cantidad_referencias:
-            dataParametrizacionCodBarrasTemp.cantidad_referencias,
+            dataParametrizacionCodBarrasTemp.cantidad_referencias ?? 1,
           contiene_fecha_maxima:
-            dataParametrizacionCodBarrasTemp.contiene_fecha_maxima,
+            dataParametrizacionCodBarrasTemp.contiene_fecha_maxima ?? false,
           contiene_valor_pagar:
-            dataParametrizacionCodBarrasTemp.contiene_valor_pagar,
+            dataParametrizacionCodBarrasTemp.contiene_valor_pagar ?? false,
           longitud_referencia_1:
-            dataParametrizacionCodBarrasTemp.longitud_referencia_1,
+            dataParametrizacionCodBarrasTemp.longitud_referencia_1 ?? "",
           posicion_inicial_referencia_1:
-            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1,
+            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_1 ??
+            "",
           posicion_inicial_valor:
-            dataParametrizacionCodBarrasTemp.posicion_inicial_valor,
-          longitud_fecha: dataParametrizacionCodBarrasTemp.longitud_fecha,
+            dataParametrizacionCodBarrasTemp.posicion_inicial_valor ?? "",
+          longitud_fecha: dataParametrizacionCodBarrasTemp.longitud_fecha ?? "",
+          longitud_valor: dataParametrizacionCodBarrasTemp.longitud_valor ?? "",
           longitud_referencia_2:
-            dataParametrizacionCodBarrasTemp.longitud_referencia_2,
+            dataParametrizacionCodBarrasTemp.longitud_referencia_2 ?? "",
           longitud_referencia_3:
-            dataParametrizacionCodBarrasTemp.longitud_referencia_3,
+            dataParametrizacionCodBarrasTemp.longitud_referencia_3 ?? "",
           posicion_inicial_fecha:
-            dataParametrizacionCodBarrasTemp.posicion_inicial_fecha,
+            dataParametrizacionCodBarrasTemp.posicion_inicial_fecha ?? "",
           posicion_inicial_referencia_2:
-            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2,
+            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_2 ??
+            "",
           posicion_inicial_referencia_3:
-            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3,
+            dataParametrizacionCodBarrasTemp.posicion_inicial_referencia_3 ??
+            "",
         };
         return estadoProceso === enumEstadoProceso.creacion
           ? {

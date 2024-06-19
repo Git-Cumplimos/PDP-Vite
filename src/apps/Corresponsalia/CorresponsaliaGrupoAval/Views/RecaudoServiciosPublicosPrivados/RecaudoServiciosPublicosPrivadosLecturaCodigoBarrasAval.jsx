@@ -78,11 +78,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           notify(autoArr?.msg);
           let dateStatus = false;
           if (
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0
           ) {
             const dateVenc = new Date(
-              datosEnvio?.datosCodigoBarras?.fechaCaducidad[0]
+              datosEnvio?.datosCodigoBarras?.fecha_caducidad[0]
             );
             dateVenc.setHours(dateVenc.getHours() + 5);
             const dateActual = new Date();
@@ -101,8 +101,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
           setDatosTransaccion((old) => {
             return {
               ...old,
-              ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
-              ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
+              ref1: autoArr?.obj.datosCodigoBarras.codigos_referencia[0] ?? "",
+              ref2: autoArr?.obj.datosCodigoBarras.codigos_referencia[1] ?? "",
               showValor: valorTrx ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
@@ -163,10 +163,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
     e.preventDefault();
     for (
       let i = 0;
-      i < datosEnvio.datosCodigoBarras.codigosReferencia.length;
+      i < datosEnvio.datosCodigoBarras.codigos_referencia.length;
       i++
     ) {
-      if (parseInt(datosEnvio.datosCodigoBarras.codigosReferencia[i]) <= 0) {
+      if (parseInt(datosEnvio.datosCodigoBarras.codigos_referencia[i]) <= 0) {
         return notifyError("La referencia no puede ser 0");
       }
     }
@@ -189,7 +189,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
       },
       recaudoAval: {
         numeroConvenio: datosEnvio?.datosConvenio?.nura,
-        valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
+        valReferencia1:
+          datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? "",
         codigoBarras: codBarras.replace(/[\x1D]/g, ""),
         location: {
           address: roleInfo?.["direccion"],
@@ -273,7 +274,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
         103: datosConsulta?.tipoRecaudo?.["103"] ?? "",
         104: datosConsulta?.tipoRecaudo?.["104"] ?? "",
         numeroConvenio: datosEnvio?.datosConvenio?.nura,
-        valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
+        valReferencia1:
+          datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? "",
         location: {
           address: roleInfo?.["direccion"],
           dane_code: roleInfo?.codigo_dane,
@@ -393,8 +395,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
             //     datosEnvio.datosCodigoBarras.pago[0])
             // }
             grid={
-              (datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-                datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0) ||
+              (datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+                datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0) ||
               datosEnvio.datosCodigoBarras.pago[0]
             }
           >
@@ -406,7 +408,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               minLength="32"
               maxLength="32"
               disabled={true}
-              value={datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""}
+              value={datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""}
               onInput={(e) => {
                 // setDatosTransaccion((old) => {
                 //   return { ...old, ref1: e.target.value };
@@ -414,8 +416,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
               }}
             ></Input>
 
-            {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
+            {datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0 ? (
               <Input
                 id="ref2"
                 label="Fecha de caducidad"
@@ -424,7 +426,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 minLength="32"
                 maxLength="32"
                 disabled={true}
-                value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
+                value={datosEnvio.datosCodigoBarras.fecha_caducidad[0] ?? ""}
                 onInput={(e) => {
                   // setDatosTransaccion((old) => {
                   //   return { ...old, ref2: e.target.value };
@@ -458,7 +460,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type="submit" disabled={showModal}>Realizar consulta</Button>
+                <Button type="submit" disabled={showModal}>
+                  Realizar consulta
+                </Button>
               )}
             </ButtonBar>
           </Form>
@@ -472,7 +476,7 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.convenio}`}</h2>
                   <h2>{`Número convenio: ${datosEnvio?.datosConvenio?.nura}`}</h2>
                   <h2>{`Referencia 1: ${
-                    datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                    datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
                   }`}</h2>
                   <h2 className="text-base font-semibold">
                     {`${
@@ -518,7 +522,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         >
                           Cancelar
                         </Button>
-                        <Button type="submit" disabled={peticion !== 2 && showModal}>
+                        <Button
+                          type="submit"
+                          disabled={peticion !== 2 && showModal}
+                        >
                           Realizar pago
                         </Button>
                       </ButtonBar>
@@ -556,7 +563,10 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarrasAval = () => {
                         >
                           Cancelar
                         </Button>
-                        <Button type="submit" disabled={peticion !== 2 && showModal}>
+                        <Button
+                          type="submit"
+                          disabled={peticion !== 2 && showModal}
+                        >
                           Realizar pago
                         </Button>
                       </ButtonBar>

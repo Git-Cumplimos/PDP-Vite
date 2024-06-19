@@ -20,7 +20,7 @@ import {
 const routesRecargaCupoWithPasarela = [
   {
     link: "/recarga-cupo/with-gou",
-    label: <AppIcons Logo={"RECARGA_CELULAR"} name="GOU" />,
+    label: <AppIcons Logo={"LogoModuloGou"} name="GOU" />,
     component: () =>
       WithPasarelaPay(
         "GOU",
@@ -42,7 +42,7 @@ const routesRecargaCupoWithPasarela = [
   },
   {
     link: "/recarga-cupo/with-evertec",
-    label: <AppIcons Logo={"RECARGA_CELULAR"} name="Evertec" />,
+    label: <AppIcons Logo={"LogoModuloEvertec"} name="PSE" />,
     component: () =>
       WithPasarelaPay(
         "EVERTEC",

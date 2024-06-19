@@ -55,6 +55,8 @@ export type TypingFormClientDataInputCheck = {
 };
 
 export type TypingDataInvalid = {
+  nombres: string;
+  apellidos: string;
   "correo|confirmacion": string;
   celular: string;
   "celular|confirmacion": string;
@@ -66,6 +68,8 @@ export const formClientDataInputCheckInitial: TypingFormClientDataInputCheck = {
   "celular|confirmacion": "",
 };
 export const dataInvalidInitial: TypingDataInvalid = {
+  nombres: "",
+  apellidos: "",
   "correo|confirmacion": "",
   celular: "",
   "celular|confirmacion": "",

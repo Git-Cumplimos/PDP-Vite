@@ -60,7 +60,7 @@ const ConsultarPago = () => {
     }
   }, []);
 
-  //********************Funciones para cerrar el Modal**************************
+  //******************** Funciones para cerrar el Modal **************************
   const HandleCloseTrx = useCallback(() => {
     notifyError("Respuesta PDP: Transacción cancelada");
     validNavigate("/moviliza");

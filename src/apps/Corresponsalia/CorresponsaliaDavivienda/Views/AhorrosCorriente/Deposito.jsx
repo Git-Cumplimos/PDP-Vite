@@ -91,7 +91,7 @@ const Deposito = () => {
       }
       if (!hasKeys) {
         notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+          "El usuario no cuenta con datos de comercio, no se permite la transacción"
         );
         navigate("/");
       }
@@ -215,7 +215,9 @@ const Deposito = () => {
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
       nomdepositante: summary["Nombre titular"],
-      nomComercio: roleInfo?.["nombre comercio"] ? roleInfo?.["nombre comercio"]: "No hay datos",
+      nomComercio: roleInfo?.["nombre comercio"]
+        ? roleInfo?.["nombre comercio"]
+        : "No hay datos",
       nomMunicipio: roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos",
       tip_id_depositante: tipoDocumento,
       mostrar_costo:
@@ -232,7 +234,7 @@ const Deposito = () => {
           handleClose();
           return;
         }
-        notify("Transaccion satisfactoria");
+        notify("Transacción satisfactoria");
         setPaymentStatus(res?.obj?.ticket);
       })
       .catch((err) => {
@@ -256,12 +258,12 @@ const Deposito = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Depósitos</h1>
+        <h1 className="text-3xl mt-6">Depósitos</h1>
         <br></br>
         <Form onSubmit={onSubmitDeposit} grid>
           <Select
-            id='tipoCuenta'
-            label='Tipo de cuenta'
+            id="tipoCuenta"
+            label="Tipo de cuenta"
             options={options}
             value={tipoCuenta}
             required
@@ -270,11 +272,11 @@ const Deposito = () => {
             }}
           />
           <Input
-            id='numCuenta'
-            name='numCuenta'
-            label='Número de cuenta'
-            type='text'
-            autoComplete='off'
+            id="numCuenta"
+            name="numCuenta"
+            label="Número de cuenta"
+            type="text"
+            autoComplete="off"
             minLength={"10"}
             maxLength={"16"}
             value={numCuenta}
@@ -287,8 +289,8 @@ const Deposito = () => {
             required
           />
           <Select
-            id='tipoDocumento'
-            label='Tipo de documento'
+            id="tipoDocumento"
+            label="Tipo de documento"
             options={optionsDocumento}
             value={tipoDocumento}
             required
@@ -297,11 +299,11 @@ const Deposito = () => {
             }}
           />
           <Input
-            id='docCliente'
-            name='docCliente'
-            label='Documento depositante'
-            type='text'
-            autoComplete='off'
+            id="docCliente"
+            name="docCliente"
+            label="Documento depositante"
+            type="text"
+            autoComplete="off"
             minLength={"5"}
             maxLength={"11"}
             value={userDoc}
@@ -314,11 +316,11 @@ const Deposito = () => {
             required
           />
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a depositar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a depositar"
+            autoComplete="off"
+            type="text"
             minLength={"1"}
             maxLength={"15"}
             min={limitesMontos?.min}
@@ -327,9 +329,9 @@ const Deposito = () => {
             equalErrorMin={false}
             value={parseInt(valor)}
             onInput={(e, valor) => {
-              if (!isNaN(valor)){
+              if (!isNaN(valor)) {
                 const num = valor;
-                setValor(num)
+                setValor(num);
               }
             }}
             required
@@ -348,9 +350,10 @@ const Deposito = () => {
               : loadingDepositoCorresponsal
               ? () => {}
               : handleClose
-          }>
+          }
+        >
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
@@ -361,14 +364,16 @@ const Deposito = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type='submit'
+                  type="submit"
                   onClick={submitEventSetter(onMakePayment)}
-                  disabled={loadingDepositoCorresponsal}>
+                  disabled={loadingDepositoCorresponsal}
+                >
                   Aceptar
                 </Button>
                 <Button
                   onClick={handleClose}
-                  disabled={loadingDepositoCorresponsal}>
+                  disabled={loadingDepositoCorresponsal}
+                >
                   Cancelar
                 </Button>
               </ButtonBar>

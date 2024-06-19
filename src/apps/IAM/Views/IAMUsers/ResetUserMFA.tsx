@@ -3,7 +3,6 @@ import Fieldset from "../../../../components/Base/Fieldset";
 import ToggleInput from "../../../../components/Base/ToggleInput";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Modal from "../../../../components/Base/Modal";
-import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import Button from "../../../../components/Base/Button";
 import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import { useNavigate } from "react-router-dom";
@@ -24,10 +23,15 @@ const url = process.env.REACT_APP_URL_IAM_PDP;
 
 const ResetUserMFA = ({ userInfo }: Props) => {
   const navigate = useNavigate();
-  const { userPermissions } = useAuth();
+  const { userPermissions, pdpUser } = useAuth();
 
   const [allowResetUser, setAllowResetUser] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const currentUserId = useMemo(
+    () => (pdpUser ?? { uuid: 0 })?.uuid,
+    [pdpUser]
+  );
 
   const listaPermisos = useMemo(
     () =>
@@ -49,9 +53,12 @@ const ResetUserMFA = ({ userInfo }: Props) => {
         () => ({
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: userInfo.email }),
+          body: JSON.stringify({
+            email: userInfo.email,
+            usuario_ultima_actualizacion: currentUserId,
+          }),
         }),
-        [userInfo.email]
+        [userInfo.email, currentUserId]
       ),
       autoDispatch: false,
     },
@@ -126,9 +133,7 @@ const ResetUserMFA = ({ userInfo }: Props) => {
               <li key={key}>
                 <h1 className="grid grid-flow-row auto-rows-fr gap-1">
                   <strong>{key}</strong>
-                  <p className="whitespace-pre-wrap">
-                    {val}
-                  </p>
+                  <p className="whitespace-pre-wrap">{val}</p>
                 </h1>
               </li>
             ))}

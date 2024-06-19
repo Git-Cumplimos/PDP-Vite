@@ -132,14 +132,14 @@ const Deposito = () => {
         {
           render() {
             setLoadingDeposit(true);
-            return "Procesando transaccion";
+            return "Procesando transacción";
           },
         },
         {
           render({ data: res }) {
             setLoadingDeposit(false);
             setPaymentStatus(res?.obj?.ticket ?? {});
-            return "Transaccion satisfactoria";
+            return "Transacción satisfactoria";
           },
         },
         {
@@ -150,7 +150,7 @@ const Deposito = () => {
               return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
             }
             console.error(err?.message);
-            return "Transaccion fallida";
+            return "Transacción fallida";
           },
         }
       );
@@ -192,7 +192,7 @@ const Deposito = () => {
       })
       .catch((err) => {
         console.error(err);
-        notifyError("Error consultando parametros de la transaccion");
+        notifyError("Error consultando parametros de la transacción");
       });
   }, []);
 
@@ -223,24 +223,25 @@ const Deposito = () => {
 
   if (!hasData) {
     notifyError(
-      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      "El usuario no cuenta con datos de comercio, no se permite la transacción"
     );
     return <Navigate to={"/"} replace />;
   }
 
   return (
     <Fragment>
-      <h1 className='text-3xl mt-6'>Depósitos Colpatria</h1>
+      <h1 className="text-3xl mt-6">Depósitos Colpatria</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           setShowModal(true);
         }}
-        grid>
+        grid
+      >
         <Select
-          id='accType'
-          name='accType'
-          label='Tipo de cuenta'
+          id="accType"
+          name="accType"
+          label="Tipo de cuenta"
           options={{
             "": "",
             ...Object.fromEntries(
@@ -275,11 +276,11 @@ const Deposito = () => {
           required
         />
         <Input
-          id='valor'
-          name='valor'
-          label='Valor a depositar'
-          autoComplete='off'
-          type='tel'
+          id="valor"
+          name="valor"
+          label="Valor a depositar"
+          autoComplete="off"
+          type="tel"
           minLength={"5"}
           maxLength={"13"}
           onInput={(ev) => setValDeposito(onChangeMoney(ev))}
@@ -291,9 +292,10 @@ const Deposito = () => {
       </Form>
       <Modal
         show={showModal}
-        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}>
+        handleClose={paymentStatus || loadingDeposit ? () => {} : handleClose}
+      >
         {paymentStatus ? (
-          <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+          <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
             <TicketColpatria refPrint={printDiv} ticket={paymentStatus} />
             <ButtonBar>
               <Button onClick={handlePrint}>Imprimir</Button>
@@ -306,9 +308,10 @@ const Deposito = () => {
           <PaymentSummary summaryTrx={summary}>
             <ButtonBar>
               <Button
-                type='submit'
+                type="submit"
                 onClick={submitEventSetter(onMakePayment)}
-                disabled={loadingDeposit}>
+                disabled={loadingDeposit}
+              >
                 Aceptar
               </Button>
               <Button onClick={handleClose} disabled={loadingDeposit}>

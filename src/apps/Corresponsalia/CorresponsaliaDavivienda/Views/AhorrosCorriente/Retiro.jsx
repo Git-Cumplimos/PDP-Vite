@@ -87,7 +87,7 @@ const Retiro = () => {
       }
       if (!hasKeys) {
         notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+          "El usuario no cuenta con datos de comercio, no se permite la transacción"
         );
         navigate("/");
       }
@@ -210,7 +210,9 @@ const Retiro = () => {
           ? true
           : false,
       numTipoDocumento: tipoDocumento,
-      nomComercio: roleInfo?.["nombre comercio"] ? roleInfo?.["nombre comercio"]: "No hay datos",
+      nomComercio: roleInfo?.["nombre comercio"]
+        ? roleInfo?.["nombre comercio"]
+        : "No hay datos",
       nomMunicipio: roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos",
       numNumeroDocumento: userDoc,
       numValorRetiro: valor,
@@ -218,9 +220,12 @@ const Retiro = () => {
       // valToken: "valToken",
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
-      mostrar_costo: process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === 'true' ? true : false,
+      mostrar_costo:
+        process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
+          ? true
+          : false,
     };
-    
+
     fetchRetiroCorresponsal(body)
       .then((res) => {
         setIsUploading(false);
@@ -229,7 +234,7 @@ const Retiro = () => {
           handleClose();
           return;
         }
-        notify("Transaccion satisfactoria");
+        notify("Transacción satisfactoria");
         setPaymentStatus(res?.obj?.ticket);
       })
       .catch((err) => {
@@ -250,11 +255,11 @@ const Retiro = () => {
     <>
       <SimpleLoading show={isUploading} />
       <Fragment>
-        <h1 className='text-3xl mt-6'>Retiros</h1>
+        <h1 className="text-3xl mt-6">Retiros</h1>
         <Form onSubmit={onSubmitRetiro} grid>
           <Select
-            id='tipoDocumento'
-            label='Tipo de documento'
+            id="tipoDocumento"
+            label="Tipo de documento"
             options={optionsDocumento}
             value={tipoDocumento}
             onChange={(e) => {
@@ -263,11 +268,11 @@ const Retiro = () => {
             required
           />
           <Input
-            id='docCliente'
-            name='docCliente'
-            label='Documento cliente'
-            type='text'
-            autoComplete='off'
+            id="docCliente"
+            name="docCliente"
+            label="Documento cliente"
+            type="text"
+            autoComplete="off"
             minLength={"5"}
             maxLength={"11"}
             value={userDoc}
@@ -280,13 +285,13 @@ const Retiro = () => {
             required
           />
           <HideInput
-            id='otp'
-            label='Número OTP'
-            type='text'
-            name='otp'
+            id="otp"
+            label="Número OTP"
+            type="text"
+            name="otp"
             minLength={"6"}
             maxLength={"6"}
-            autoComplete='off'
+            autoComplete="off"
             required
             value={otp}
             onInput={(e, valor) => {
@@ -294,13 +299,14 @@ const Retiro = () => {
               if (!isNaN(valor)) {
                 setOtp(num);
               }
-            }}></HideInput>
+            }}
+          ></HideInput>
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a retirar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a retirar"
+            autoComplete="off"
+            type="text"
             minLength={"1"}
             maxLength={"15"}
             min={limitesMontos?.min}
@@ -309,9 +315,9 @@ const Retiro = () => {
             equalErrorMin={false}
             value={parseInt(valor)}
             onInput={(e, valor) => {
-              if (!isNaN(valor)){
+              if (!isNaN(valor)) {
                 const num = valor;
-                setValor(num)
+                setValor(num);
               }
             }}
             required
@@ -330,9 +336,10 @@ const Retiro = () => {
               : loadingRetiroCorresponsal
               ? () => {}
               : handleClose
-          }>
+          }
+        >
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
@@ -343,14 +350,16 @@ const Retiro = () => {
             <PaymentSummary summaryTrx={summary}>
               <ButtonBar>
                 <Button
-                  type='submit'
+                  type="submit"
                   onClick={onMakePayment}
-                  disabled={loadingRetiroCorresponsal}>
+                  disabled={loadingRetiroCorresponsal}
+                >
                   Aceptar
                 </Button>
                 <Button
                   onClick={handleClose}
-                  disabled={loadingRetiroCorresponsal}>
+                  disabled={loadingRetiroCorresponsal}
+                >
                   Cancelar
                 </Button>
               </ButtonBar>

@@ -1,3 +1,4 @@
+import React, { Fragment } from "react";
 import Button from "../../../../components/Base/Button/Button";
 import FileInput from "../../../../components/Base/FileInput/FileInput";
 import classes from "./FileInputX.module.css";
@@ -7,6 +8,7 @@ import { notify, notifyError} from "../../../../utils/notify";
 import { Validar_archivo } from "../../utils/fetchValidarArchivo";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import Modal from "../../../../components/Base/Modal";
+import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../hooks/AuthHooks";
@@ -137,9 +139,15 @@ const FileInputX = () => {
     }
   };
 
-  const handleClose = useCallback(() => {
-    setShowModal(false);
-  }, []);
+  // const handleClose = useCallback(() => {
+  //   setShowModal(false);
+  //   notifyError("El usuario canceló el proceso de anulacion");
+  //   navigate("/GestionTransaccional/AnulacionesPinesCRC/CargueArchivo");
+  //   document.getElementById("anulaciones").value = ""; // <- limpia el valor del campo de archivo
+  //   setArchivo([]);
+  //   setNombreDocumento("");
+  //   setDisabledBtn(true);
+  // }, []);
 
 
 
@@ -196,18 +204,24 @@ const FileInputX = () => {
           Cargar archivo
         </Button>
       </div>
-      <Modal show={showModal} handleClose={handleClose}>
-        <br />
+      <Modal show={showModal} > 
+        {/* <br />
         <h1 className="text-xl font-semibold">
           ¿Está seguro de cargar el archivo de anulaciones?
-        </h1>
-
-        <ButtonBar>
-          <Button type="submit" onClick={(e) => EnviarArchivos(e)}>
-            Aceptar
-          </Button>
-          <Button onClick={(e) => CancelarDocumento(e)}>Cancelar</Button>
-        </ButtonBar>
+        </h1> */}
+      <Fragment>
+        <PaymentSummary
+          title=""
+          subtitle="¿Está seguro de cargar el archivo de anulaciones?"
+        >
+          <ButtonBar>
+            <Button type="submit" onClick={(e) => EnviarArchivos(e)}>
+              Aceptar
+            </Button>
+            <Button onClick={(e) => CancelarDocumento(e)}>Cancelar</Button>
+          </ButtonBar>
+        </PaymentSummary>
+      </Fragment>
       </Modal>
     </div>
   );

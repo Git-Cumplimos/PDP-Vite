@@ -23,6 +23,7 @@ import {
   movimientoBoveda,
   verValorBoveda,
   movimientoEfectivoEntreCajeros,
+  getUser,
 } from "../../utils/fetchCaja";
 import { useAuth } from "../../../../hooks/AuthHooks";
 import useMoney from "../../../../hooks/useMoney";
@@ -32,16 +33,16 @@ import Magnifier from "react-magnifier";
 import ButtonLink from "../../../../components/Base/ButtonLink";
 import Modal from "../../../../components/Base/Modal/Modal";
 // import SearchEntidadesExternas from "../../components/CargarComprobantes/SearchEntidadesExternas";
-import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
+// import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 
 const formatMoney = makeMoneyFormatter(0);
 
-const url_user = process.env.REACT_APP_URL_IAM_PDP;
+// const url_user = process.env.REACT_APP_URL_IAM_PDP;
 
 const CargaComprobante = () => {
   const navigate = useNavigate();
-  const { roleInfo,userPermissions,quotaInfo,userInfo,pdpUser} = useAuth();
+  const { roleInfo,userPermissions,quotaInfo,pdpUser} = useAuth();
   const formRef = useRef(null);
   const [tiposComprobantes, setTiposComprobantes] = useState([]);
 
@@ -68,11 +69,6 @@ const CargaComprobante = () => {
   // });
   const [valorEnCaja, setValorEnCaja] = useState(0);
   const [valor_Boveda, setValorEnBoveda] = useState(0);
-  // const [idComercio, setIdComercio] = useState(roleInfo?.id_comercio);
-  // const [nameComercio, setNameComercio] = useState(roleInfo?.nombre_comercio);
-  // const [idUser, setIdUser] = useState(pdpUser?.uuid);
-  // const [nameUser, setNameUser] = useState(pdpUser?.uname);
-
   const [idUserRecibe, setIdUserRecibe] = useState("");
   const [valorEfectivoTransferir, setvalorEcfectivoTransferir] = useState(0.0);
   const [nameUserRecibe, setNameUserRecibe] = useState("");
@@ -260,11 +256,12 @@ const CargaComprobante = () => {
           id_usuario: roleInfo?.id_usuario,
           nombre_usuario: pdpUser?.uname,
           id_usuario_recibe: idUserRecibe,
-          nombre_usuario_recibe: nameUserRecibe,
+          nombre_usuario_recibe: nameUserRecibe?.uname,
           valor_movimiento: valorEfectivoTransferir,
           observaciones: observaciones,
+          id_terminal: roleInfo?.id_dispositivo,
         };
-          await movimientoEfectivoEntreCajeros(reqBody);
+        await movimientoEfectivoEntreCajeros(reqBody);
       }
     } catch (error) {
       throw error;
@@ -390,12 +387,15 @@ const CargaComprobante = () => {
         console.error('Error al obtener los datos:', error);
       }
     };
-    fetchData();
+    if (roleInfo?.tipo_comercio === "OFICINAS PROPIAS") {
+      fetchData();
+    }
   }, [
     quotaInfo?.quota,
     roleInfo?.id_usuario,
     roleInfo?.id_comercio,
     roleInfo?.id_dispositivo,
+    roleInfo?.tipo_comercio
   ]);
 
   // const EntityExt = useCallback(() =>{
@@ -410,28 +410,16 @@ const CargaComprobante = () => {
     if (ev !== "") {
       var valor = ev.replace(/[^0-9]/g, '');
       setIdUserRecibe(valor)
-      const nameUser = await getUser(`${url_user}/user-unique?uuid=${valor}`);
-      setNameUserRecibe(nameUser)
+      if (valor !== "") {
+        const nameUser = await getUser({id_user:valor});
+        setNameUserRecibe(nameUser?.obj)
+      }
     }else{
       setIdUserRecibe("")
       setNameUserRecibe("")
     }
   }, []);
 
-  const [getUser] = useFetchDispatchDebounce(
-    {
-      onSuccess: useCallback((res) => {return res?.obj}, []),
-      onError: useCallback((error) => {
-        if (error?.cause === "custom") {
-          // notifyError(error.message);
-          return null
-        } else {
-          console.error(error);
-        }
-      }, []),
-    },
-    { delay: 100 }
-  );
 
   // const renderInputs = () => {
   //   return selectedEntidadesExt.entidades_agregar.map(entidad => (
@@ -482,7 +470,7 @@ const CargaComprobante = () => {
     if (nameUserRecibe !== null && nameUserRecibe !== "") {
       if (nameUserRecibe?.active === true) {
         if (nameUserRecibe?.fk_id_comercio === roleInfo?.id_comercio) {
-          if (nameUserRecibe?.email === pdpUser?.email) {
+          if (nameUserRecibe?.email !== pdpUser?.email) {
             setShowModal(true)
           }else{
             notifyError("No esta permitido hacer transferencia entre el mismo usuario")
@@ -566,7 +554,7 @@ const CargaComprobante = () => {
                 <Select
                   id="searchEntities"
                   name="tipoComp"
-                  label={`Buscar ${
+                  label={`${
                     movementType === "Consignación Bancaria"
                       ? "Bancos"
                       : "Transportadoras"
@@ -815,7 +803,7 @@ const CargaComprobante = () => {
                 label={`Nombre usuario que recibe`}
                 autoComplete="off"
                 type="tel"
-                value={nameUserRecibe === ""?"":nameUserRecibe?.uname}
+                value={nameUserRecibe === "" || nameUserRecibe === null ?"":nameUserRecibe?.uname}
                 required
                 disabled
               />
@@ -842,14 +830,6 @@ const CargaComprobante = () => {
                 }}
                 info={`Máximo 100 caracteres`}
                 required
-              />
-              <Input
-                id="total_efectivo_cajero"
-                name="total_efectivo_cajero"  
-                label={`Total efectivo cajero`}
-                type="tel"
-                value={formatMoney.format(valor_Boveda)}
-                disabled
               />
             </>}
             <ButtonBar className="lg:col-span-2">
@@ -891,7 +871,7 @@ const CargaComprobante = () => {
                     subtitle = {"Resumen del movimiento"}
                     summaryTrx={
                       {"Id usuario que transfiere": roleInfo?.id_usuario,
-                        "Nombre usuario que transfiere": userInfo?.attributes?.name,
+                        "Nombre usuario que transfiere": pdpUser?.uname,
                         "Id usuario que recibe": idUserRecibe,
                         "Nombre usuario que recibe": nameUserRecibe?.uname,
                       }

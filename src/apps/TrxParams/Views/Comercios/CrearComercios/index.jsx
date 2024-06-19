@@ -28,6 +28,7 @@ import { onChangeNumber } from "../../../../../utils/functions";
 import { fetchZonas } from "../../../utils/fetchZonas";
 import RepresentanteLegal from "./RepresentanteLegal";
 import AddressForm from "../../../../../components/Base/AddressForm";
+import NitInput from "../../ConveniosPDP/components/NitInput";
 
 const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
 const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
@@ -689,7 +690,7 @@ const CrearComercios = () => {
             type="email"
             name="email_comercio"
             minLength="1"
-            maxLength="50"
+            maxLength="100"
             required
             value={comercio?.email_comercio}
             onInput={onChangeFormat}
@@ -705,23 +706,43 @@ const CrearComercios = () => {
             onChange={onChangeFormat}
             value={comercio?.fk_tipo_identificacion}
           />
-          <Input
-            id="numero_identificacion"
-            label="Número de identificación"
-            type="tel"
-            name="numero_identificacion"
-            minLength="5"
-            maxLength="12"
-            required
-            value={comercio?.numero_identificacion}
-            onInput={(e) => {
-              setComercio((old) => ({
-                ...old,
-                numero_identificacion: onChangeNumber(e),
-              }));
-            }}
-            autoComplete="off"
-          />
+          {comercio?.fk_tipo_identificacion !== "8" ? (
+            <Input
+              id="numero_identificacion"
+              label="Número de identificación"
+              type="tel"
+              name="numero_identificacion"
+              minLength="1"
+              maxLength="12"
+              required
+              value={comercio?.numero_identificacion}
+              onChange={(e) => {
+                setComercio((old) => ({
+                  ...old,
+                  numero_identificacion: onChangeNumber(e),
+                }));
+              }}
+              autoComplete="off"
+            />
+          ) : (
+            <NitInput
+              label="Número de identificación"
+              id="numero_identificacion"
+              name="numero_identificacion"
+              type="tel"
+              minLength={1}
+              maxLength={12}
+              value={comercio?.numero_identificacion}
+              onChange={(_, nit) =>
+                setComercio((old) => ({
+                  ...old,
+                  numero_identificacion: nit,
+                }))
+              }
+              autoComplete="off"
+              required
+            />
+          )}
           <Select
             className="place-self-stretch"
             id="tipo_persona"
@@ -1158,7 +1179,7 @@ const CrearComercios = () => {
                       key={index}
                       id={`${key}_${index}`}
                       label={`${key}`}
-                      type="text"
+                      type="tel"
                       name={`${key}_${index}`}
                       minLength="1"
                       maxLength="20"
@@ -1186,7 +1207,7 @@ const CrearComercios = () => {
                             ...old,
                             codigos_institucionales: {
                               ...old.codigos_institucionales,
-                              [key]: e.target.value,
+                              [key]: onChangeNumber(e),
                             },
                           };
                         });
