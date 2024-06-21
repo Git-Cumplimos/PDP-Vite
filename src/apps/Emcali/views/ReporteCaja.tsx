@@ -9,17 +9,17 @@ import {
     useFetchEmcali,
     TypeServicesBackendEmcali,
     ErrorFetchEmcali,
-  } from "../hooks/useFetchEmcali";
+} from "../hooks/useFetchEmcali";
 
 //Typing
 type TypeDataInput = {
     filename: string;
-  };
+};
 //Constantes
 const dataInitial: number[] = [];
 const dataInputInitial = {
     filename: "",
-  };
+};
 const url_consulta = `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/reporte-en-caja`;
 const url_descarga = `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/read-reporte-caja-s3`;
 // const url_descarga = `http://emcali-servicios-pdp-bk-cert.us-east-2.elasticbeanstalk.com/backend_emcali/read-reporte-caja-s3?filename=reporteCaja_2023-08-07.xlsx`;

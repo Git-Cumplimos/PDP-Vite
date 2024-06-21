@@ -113,6 +113,39 @@ const Recaudo = () => {
     setPaso("LecturaEmcali");
   }, []);
 
+  const fetchComercio = useCallback(() => {
+    let hasKeys = true;
+    const keys = [
+      "id_comercio",
+      "id_usuario",
+      "tipo_comercio",
+      "id_dispositivo",
+      "ciudad",
+      "direccion",
+    ];
+    if (roleInfo)
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+    if (!hasKeys) {
+      notifyError(
+        "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      );
+      validNavigate("/");
+    }
+  }, [roleInfo, validNavigate]);
+
+  useEffect(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      validNavigate("/");
+    } else {
+      fetchComercio();
+    }
+  }, [validNavigate, roleInfo, fetchComercio]);
+
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
     setShowModal(false);
