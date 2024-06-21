@@ -110,7 +110,7 @@ const AnalisisTransferenciaEfectivo = () => {
             setLoading(false);
             searchTrnasferencias();
             CloseModal();
-            return "Comprobante actualizado exitosamente";
+            return "Movimiento actualizado exitosamente";
           },
         },
         {
