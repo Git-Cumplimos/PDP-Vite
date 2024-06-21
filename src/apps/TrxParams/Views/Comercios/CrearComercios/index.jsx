@@ -86,6 +86,7 @@ const emptyCommerce = {
   fk_tipo_identificacion_rl: undefined,
   fk_numero_identificacion_rl: undefined,
   barrio_comercio: "",
+  fk_tipo_canal_crc: "",
 };
 
 const CrearComercios = () => {
@@ -768,6 +769,24 @@ const CrearComercios = () => {
             value={comercio?.pk_tbl_grupo_comercios}
             autoComplete="off"
           />
+          {/* Grupo comercio = CRC */}
+          {"27" === String(comercio?.pk_tbl_grupo_comercios ?? "") && (
+            <Select
+              className="place-self-stretch"
+              id="fk_tipo_canal_crc;"
+              name="fk_tipo_canal_crc"
+              label="Canal CRC Colpatria"
+              required={true}
+              options={[
+                { label: "", value: "" },
+                { label: "OLIMPIA", value: 1 },
+                { label: "PAYNET (INDRA)", value: 2 },
+              ]}
+              onChange={onChangeFormat}
+              value={comercio?.fk_tipo_canal_crc}
+              autoComplete="off"
+            />
+          )}
           <Input
             id="telefono_fijo_comercio"
             label="Teléfono fijo"
