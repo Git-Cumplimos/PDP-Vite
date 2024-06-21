@@ -776,7 +776,7 @@ const CrearComercios = () => {
               id="fk_tipo_canal_crc;"
               name="fk_tipo_canal_crc"
               label="Canal CRC Colpatria"
-              required={true}
+              required={false}
               options={[
                 { label: "", value: "" },
                 { label: "OLIMPIA", value: 1 },
