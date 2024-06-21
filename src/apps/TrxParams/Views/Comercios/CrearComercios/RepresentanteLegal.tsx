@@ -450,7 +450,7 @@ const RepresentanteLegal = ({
           id="telefono_fijo_rl"
           name="telefono_fijo_rl"
           type="tel"
-          minLength={1}
+          minLength={10}
           maxLength={10}
           value={propietarioRL.telefono_fijo_rl}
           onChange={(ev) => {
