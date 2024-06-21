@@ -91,27 +91,28 @@ const ConsultaBarras = () => {
 
   if (!hasData) {
     notifyError(
-      "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      "El usuario no cuenta con datos de comercio, no se permite la transacción"
     );
     return <Navigate to={"/"} replace />;
   }
 
   return (
     <Fragment>
-      <h1 className='text-3xl mt-6'>Consulta recaudo código de barras</h1>
+      <h1 className="text-3xl mt-6">Consulta recaudo código de barras</h1>
       <Form
         onSubmit={(ev) => {
           ev.preventDefault();
           const formData = new FormData(ev.target);
           searchCodigo(Object.fromEntries(formData));
         }}
-        formDir='col'
-        ref={formRef}>
+        formDir="col"
+        ref={formRef}
+      >
         <BarcodeReader
           onSearchCodigo={(codigo) => searchCodigo({ codigo_barras: codigo })}
         />
-        <ButtonBar className='lg:col-span-2'>
-          <Button type='reset' disabled={searchingData}>
+        <ButtonBar className="lg:col-span-2">
+          <Button type="reset" disabled={searchingData}>
             Volver a ingresar código de barras
           </Button>
         </ButtonBar>

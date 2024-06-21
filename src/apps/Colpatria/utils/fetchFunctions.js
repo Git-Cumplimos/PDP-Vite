@@ -19,17 +19,7 @@ export const makeDeposit = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Deposito Colpatria");
   } catch (err) {
     throw err;
   }
@@ -47,17 +37,7 @@ export const makePagoGiro = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Pago Giro Colpatria");
   } catch (err) {
     throw err;
   }
@@ -75,17 +55,7 @@ export const makePinDePago = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Pago Pin Colpatria");
   } catch (err) {
     throw err;
   }
@@ -103,17 +73,7 @@ export const makeSellPin = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Pago Venta Pines Colpatria");
   } catch (err) {
     throw err;
   }
@@ -131,17 +91,7 @@ export const makeInquiryPin = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Consulta Venta Pines Colpatria");
   } catch (err) {
     throw err;
   }
@@ -159,17 +109,7 @@ export const makeSellRecaudo = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Pago Recaudo Colpatria");
   } catch (err) {
     throw err;
   }
@@ -187,17 +127,7 @@ export const makeInquiryRecaudo = async (bodyDep) => {
       {},
       bodyDep
     );
-    if (!res?.status) {
-      if (res?.msg) {
-        throw new Error(
-          res?.obj?.error_user_msg ?? res?.msg ?? "",
-          { cause: "custom" }
-        );
-      }
-
-      throw new Error(res, { cause: "custom" });
-    }
-    return res;
+    return EvaluateResponse(res, "Consulta Recaudo Colpatria");
   } catch (err) {
     throw err;
   }
@@ -209,10 +139,9 @@ const buildGetFunction = (url) => {
       const res = await fetchData(url, "GET", args);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(
-            res?.obj?.error_user_msg ?? res?.msg ?? "",
-            { cause: "custom" }
-          );
+          throw new Error(res?.obj?.error_user_msg ?? res?.msg ?? "", {
+            cause: "custom",
+          });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -232,10 +161,9 @@ const buildPostFunction = (url) => {
       const res = await fetchData(url, "POST", {}, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(
-            res?.obj?.error_user_msg ?? res?.msg ?? "",
-            { cause: "custom" }
-          );
+          throw new Error(res?.obj?.error_user_msg ?? res?.msg ?? "", {
+            cause: "custom",
+          });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -257,10 +185,9 @@ const buildPutFunction = (url) => {
       const res = await fetchData(url, "PUT", args, body);
       if (!res?.status) {
         if (res?.msg) {
-          throw new Error(
-            res?.obj?.error_user_msg ?? res?.msg ?? "",
-            { cause: "custom" }
-          );
+          throw new Error(res?.obj?.error_user_msg ?? res?.msg ?? "", {
+            cause: "custom",
+          });
         }
 
         throw new Error(res, { cause: "custom" });
@@ -380,5 +307,58 @@ export const getConveniosRecaudoListMassive = async (args = {}) => {
     // return res;
   } catch (err) {
     throw err;
+  }
+};
+
+export const EvaluateResponse = (res, name_ = "") => {
+  const defaultError = `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`;
+  //Evaluar si la respuesta es json
+  try {
+    if (typeof res !== "object") {
+      throw new Error(
+        `Error respuesta Front-end PDP: Servicio no encontrado (${name_})`,
+        { cause: "custom" }
+      );
+    }
+  } catch (error) {
+    console.log("error", error);
+    throw error;
+  }
+  try {
+    if (!res?.hasOwnProperty("status")) {
+      //No es una respuesta directamente del servicio sino del api gateway
+      if (res?.hasOwnProperty("message")) {
+        if (res.message === "Endpoint request timed out") {
+          throw new Error(
+            `Error respuesta Front-end PDP: Timeout al consumir el servicio (${name_}) [0010002]`,
+            { cause: "custom" }
+          );
+        }
+      } else {
+        throw new Error(defaultError, { cause: "custom" });
+      }
+    }
+  } catch (error) {
+    console.log("error", error);
+    throw error;
+  }
+  // trx exitosa
+  try {
+    if (res?.status === true) {
+      return res;
+    }
+  } catch (error) {
+    throw new Error(defaultError, { cause: "custom" });
+  }
+  // trx no exitosa
+  //para los errores customizados del backend
+  try {
+    if (res?.status === false) {
+      throw new Error(res?.obj?.error_user_msg ?? res?.msg ?? defaultError, {
+        cause: "custom",
+      });
+    }
+  } catch (error) {
+    throw new Error(error.message ?? defaultError, { cause: "custom" });
   }
 };

@@ -498,7 +498,7 @@ export class ErrorCustomBackendPendingTrx extends ErrorCustomBackend {
   ) {
     super(
       "Su transacción quedó en estado pendiente, por favor consulte el estado de la transacción en aproximadamente 1 minuto en el modulo de transacciones",
-      "En este error no se puede definir el estado de la transaccion",
+      "En este error no se puede definir el estado de la transacción",
       error_msg_sequence,
       "notifyError",
       false,

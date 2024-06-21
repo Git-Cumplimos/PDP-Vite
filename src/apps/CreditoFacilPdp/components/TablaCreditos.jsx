@@ -59,24 +59,21 @@ const TablaCreditos = ({ dataCreditos, setDataCreditoUnique }) => {
           estado: Estado,
           valorCuota: formatMoney.format(Valorcuotaactual),
           saldo: formatMoney.format(Saldo),
-          desembolso: new Date(Fechadesembolso).toLocaleDateString("es-ES", {
+          desembolso: new Intl.DateTimeFormat("es-ES", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
-          }),
-          ultimoPago: new Date(Fechadeultimopago).toLocaleDateString("es-ES", {
+          }).format(new Date(Fechadesembolso)),
+          ultimoPago: new Intl.DateTimeFormat("es-ES", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
-          }),
-          proximoPago: new Date(Fechavencimientoproximo).toLocaleDateString(
-            "es-ES",
-            {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }
-          ),
+          }).format(new Date(Fechadeultimopago)),
+          proximoPago: new Intl.DateTimeFormat("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(new Date(Fechavencimientoproximo)),
         };
       }
     );

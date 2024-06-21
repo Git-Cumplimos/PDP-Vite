@@ -79,12 +79,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           notify(autoArr?.msg);
           let dateStatus = false;
           if (
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0 &&
             datosEnvio?.datosConvenio[0]?.val_fecha_lim_cnb === "1"
           ) {
             const dateVenc = new Date(
-              datosEnvio?.datosCodigoBarras?.fechaCaducidad[0]
+              datosEnvio?.datosCodigoBarras?.fecha_caducidad[0]
             );
             dateVenc.setHours(dateVenc.getHours() + 5);
             const dateActual = new Date();
@@ -103,8 +103,8 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           setDatosTransaccion((old) => {
             return {
               ...old,
-              ref1: autoArr?.obj.datosCodigoBarras.codigosReferencia[0] ?? "",
-              ref2: autoArr?.obj.datosCodigoBarras.codigosReferencia[1] ?? "",
+              ref1: autoArr?.obj.datosCodigoBarras.codigos_referencia[0] ?? "",
+              ref2: autoArr?.obj.datosCodigoBarras.codigos_referencia[1] ?? "",
               showValor: valorTrx ?? "",
               valor: valorTrx ?? "",
               valorSinModificar: valorTrx ?? "",
@@ -163,13 +163,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   };
   const onSubmitConfirm = (e) => {
     e.preventDefault();
-    if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
-      if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[0]) <= 0){
+    if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1") {
+      if (parseInt(datosEnvio?.datosCodigoBarras?.codigos_referencia[0]) <= 0) {
         return notifyError("La referencia no puede ser 0");
       }
     }
-    if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1"){
-      if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[1]) <= 0){
+    if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1") {
+      if (parseInt(datosEnvio?.datosCodigoBarras?.codigos_referencia[1]) <= 0) {
         return notifyError("La referencia no puede ser 0");
       }
     }
@@ -217,18 +217,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       dataConveniosPagar.includes(
         datosEnvio?.datosConvenio?.num_ind_consulta_cnb
       ) ||
-      peticion === 2
-      ||
+      peticion === 2 ||
       peticion === 3
     ) {
       let valorTransaccion = 0;
-      if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1"){
-        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[0]) <= 0){
+      if (datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1") {
+        if (
+          parseInt(datosEnvio?.datosCodigoBarras?.codigos_referencia[0]) <= 0
+        ) {
           return notifyError("La referencia no puede ser 0");
         }
       }
-      if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1"){
-        if (parseInt(datosEnvio?.datosCodigoBarras?.codigosReferencia[1]) <= 0){
+      if (datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1") {
+        if (
+          parseInt(datosEnvio?.datosCodigoBarras?.codigos_referencia[1]) <= 0
+        ) {
           return notifyError("La referencia no puede ser 0");
         }
       }
@@ -276,8 +279,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
           )}`
         );
       }
-      if (peticion === 3){
-        if (parseInt(datosTransaccion.valor) !== parseInt(datosTransaccion.valorSinModificar2)){
+      if (peticion === 3) {
+        if (
+          parseInt(datosTransaccion.valor) !==
+          parseInt(datosTransaccion.valorSinModificar2)
+        ) {
           let error = "El valor a pagar es diferente al valor ingresado";
           return notifyError(error);
         }
@@ -302,11 +308,13 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
 
         valCodigoIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
         valor: valorTransaccion,
-        valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-        valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
+        valReferencia1:
+          datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? "",
+        valReferencia2:
+          datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? "",
         nomConvenio: datosEnvio?.datosConvenio?.nom_convenio_cnb,
         fecCodigDeBarras:
-          datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
+          datosEnvio?.datosCodigoBarras?.fecha_caducidad[0] ?? "",
         valCodigoDeBarras: valorTransaccion,
         // valCodigoDeBarras: datosTrans.codBarras.slice(3).replace(/[\x1D]/g, ""),
 
@@ -338,7 +346,6 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                   const prom = await new Promise((resolve, reject) =>
                     setTimeout(() => {
                       postCheckReintentoRecaudoConveniosDavivienda({
-
                         idComercio: roleInfo?.id_comercio,
                         idUsuario: roleInfo?.id_usuario,
                         idTerminal: roleInfo?.id_dispositivo,
@@ -413,10 +420,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
       postConsultaConveniosDavivienda({
         tipoTransaccion: "1",
         numNumeroConvenioIAC: datosEnvio?.datosConvenio?.cod_iac_cnb,
-        valReferencia1: datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? "",
-        valReferencia2: datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? "",
+        valReferencia1:
+          datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? "",
+        valReferencia2:
+          datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? "",
         fecFechaCodigoBarras:
-          datosEnvio?.datosCodigoBarras?.fechaCaducidad[0] ?? "",
+          datosEnvio?.datosCodigoBarras?.fecha_caducidad[0] ?? "",
         numValorCodigoBarras: datosTransaccion.valor ?? 0,
         // numValorCodigoBarras: dataCodBarras,
         numValor: datosTransaccion.valor ?? 0,
@@ -471,21 +480,21 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
   return (
     <>
       <SimpleLoading show={isUploading} />
-      <h1 className='text-3xl text-center mb-10 mt-5'>
+      <h1 className="text-3xl text-center mb-10 mt-5">
         Recaudo servicios públicos y privados
       </h1>
       {!datosEnvio.estadoConsulta ? (
         <>
           <Form onSubmit={onSubmit}>
             <TextArea
-              id='codBarras'
-              label='Escanee el código de barras'
-              type='text'
-              name='codBarras'
+              id="codBarras"
+              label="Escanee el código de barras"
+              type="text"
+              name="codBarras"
               required
               value={datosTrans.codBarras}
               autoFocus
-              autoComplete='off'
+              autoComplete="off"
               onInput={onChangeFormat}
               onKeyDown={(ev) => {
                 if (ev.keyCode === 13 && ev.shiftKey === false) {
@@ -527,14 +536,16 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     data: "",
                   };
                 }
-              }}></TextArea>
+              }}
+            ></TextArea>
             {datosTrans.codBarras !== "" && (
               <ButtonBar>
                 <Button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     setDatosTrans({ codBarras: "" });
-                  }}>
+                  }}
+                >
                   Volver a ingresar código de barras
                 </Button>
               </ButtonBar>
@@ -543,95 +554,101 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
         </>
       ) : (
         <>
-          <h1 className='text-3xl text-center  mb-10'>{`Convenio: ${
+          <h1 className="text-3xl text-center  mb-10">{`Convenio: ${
             datosEnvio?.datosConvenio?.nom_convenio_cnb ?? ""
           }`}</h1>
           <Form grid onSubmit={onSubmitConfirm}>
             {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
               <>
                 <Input
-                  id='ref1'
+                  id="ref1"
                   label={datosEnvio?.datosConvenio?.nom_ref1_cnb}
-                  type='text'
-                  name='ref1'
-                  minLength='32'
-                  maxLength='32'
+                  type="text"
+                  name="ref1"
+                  minLength="32"
+                  maxLength="32"
                   disabled={true}
                   value={
-                    datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                    datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
                   }
                   onInput={(e) => {
                     // setDatosTransaccion((old) => {
                     //   return { ...old, ref1: e.target.value };
                     // });
-                  }}></Input>
+                  }}
+                ></Input>
               </>
             )}
             {datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1" && (
               <Input
-                id='ref2'
+                id="ref2"
                 label={datosEnvio?.datosConvenio?.nom_ref2_cnb}
-                type='text'
-                name='ref2'
-                minLength='32'
-                maxLength='32'
+                type="text"
+                name="ref2"
+                minLength="32"
+                maxLength="32"
                 disabled={true}
-                value={datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""}
+                value={datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? ""}
                 onInput={(e) => {
                   // setDatosTransaccion((old) => {
                   //   return { ...old, ref2: e.target.value };
                   // });
-                }}></Input>
+                }}
+              ></Input>
             )}
-            {datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length &&
-            datosEnvio?.datosCodigoBarras?.fechaCaducidad?.length > 0 ? (
+            {datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length &&
+            datosEnvio?.datosCodigoBarras?.fecha_caducidad?.length > 0 ? (
               <Input
-                id='ref2'
-                label='Fecha de caducidad'
-                type='text'
-                name='ref2'
-                minLength='32'
-                maxLength='32'
+                id="ref2"
+                label="Fecha de caducidad"
+                type="text"
+                name="ref2"
+                minLength="32"
+                maxLength="32"
                 disabled={true}
-                value={datosEnvio.datosCodigoBarras.fechaCaducidad[0] ?? ""}
+                value={datosEnvio.datosCodigoBarras.fecha_caducidad[0] ?? ""}
                 onInput={(e) => {
                   // setDatosTransaccion((old) => {
                   //   return { ...old, ref2: e.target.value };
                   // });
-                }}></Input>
+                }}
+              ></Input>
             ) : (
               <></>
             )}
-            {datosEnvio?.datosCodigoBarras.pago.length > 0 && dataConveniosPagar.includes(
-              datosEnvio?.datosConvenio?.num_ind_consulta_cnb) && (
-              <MoneyInputDec
-                id='valCashOut'
-                name='valCashOut'
-                label='Valor a pagar original'
-                type='text'
-                autoComplete='off'
-                maxLength={"15"}
-                disabled={true}
-                value={datosTransaccion.valorSinModificar ?? ""}
-                onInput={(e, valor) => {
-                  if (!isNaN(valor)) {
-                    const num = valor;
-                    // setDatosTransaccion((old) => {
-                    //   return { ...old, valor: num };
-                    // });
-                  }
-                }}
-                required></MoneyInputDec>
-            )}
+            {datosEnvio?.datosCodigoBarras.pago.length > 0 &&
+              dataConveniosPagar.includes(
+                datosEnvio?.datosConvenio?.num_ind_consulta_cnb
+              ) && (
+                <MoneyInputDec
+                  id="valCashOut"
+                  name="valCashOut"
+                  label="Valor a pagar original"
+                  type="text"
+                  autoComplete="off"
+                  maxLength={"15"}
+                  disabled={true}
+                  value={datosTransaccion.valorSinModificar ?? ""}
+                  onInput={(e, valor) => {
+                    if (!isNaN(valor)) {
+                      const num = valor;
+                      // setDatosTransaccion((old) => {
+                      //   return { ...old, valor: num };
+                      // });
+                    }
+                  }}
+                  required
+                ></MoneyInputDec>
+              )}
             {dataConveniosPagar.includes(
               datosEnvio?.datosConvenio?.num_ind_consulta_cnb
             ) && datosEnvio?.datosConvenio?.ind_valor_exacto_cnb === "0" ? (
               <MoneyInput
-                id='valor'
-                name='valor'
-                label='Valor a pagar'
-                autoComplete='off'
-                type='tel'
+                id="valor"
+                name="valor"
+                label="Valor a pagar"
+                autoComplete="off"
+                type="tel"
                 minLength={"5"}
                 maxLength={"12"}
                 value={datosTransaccion.showValor ?? ""}
@@ -651,9 +668,9 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             ) : (
               <></>
             )}
-            <ButtonBar className='lg:col-span-2'>
+            <ButtonBar className="lg:col-span-2">
               <Button
-                type='button'
+                type="button"
                 onClick={() => {
                   setDatosEnvio({
                     datosCodigoBarras: {},
@@ -670,11 +687,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     valorSinModificar: "",
                     data: "",
                   });
-                }}>
+                }}
+              >
                 Volver a ingresar código de barras
               </Button>
               {!datosEnvio.estadoFecha && (
-                <Button type='submit' disabled={showModal}>
+                <Button type="submit" disabled={showModal}>
                   {dataConveniosPagar.includes(
                     datosEnvio?.datosConvenio?.num_ind_consulta_cnb
                   )
@@ -685,11 +703,15 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
             </ButtonBar>
           </Form>
           <Modal show={showModal}>
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center text-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
               {peticion === 1 && (
                 <>
-                  <Form grid onSubmit={onSubmitPago} className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center">
-                    <h1 className='text-2xl font-semibold'>
+                  <Form
+                    grid
+                    onSubmit={onSubmitPago}
+                    className="grid grid-flow-row auto-rows-max gap-4 place-items-center text-center"
+                  >
+                    <h1 className="text-2xl font-semibold">
                       {dataConveniosPagar.includes(
                         datosEnvio?.datosConvenio?.num_ind_consulta_cnb
                       )
@@ -701,44 +723,47 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     }`}</h2>
                     {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
                       <h2>{`${datosEnvio?.datosConvenio?.nom_ref1_cnb}: ${
-                        datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                        datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
                       }`}</h2>
                     )}
                     {datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1" && (
                       <h2>{`${datosEnvio?.datosConvenio?.nom_ref2_cnb}: ${
-                        datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                        datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? ""
                       }`}</h2>
                     )}
                     <h2>{`Valor transacción: ${formatMoney.format(
                       datosTransaccion.valor
                     )}`}</h2>
-                      <ButtonBar>
-                        <Button onClick={hideModalReset}>Cancelar</Button>
-                        <Button type='submit' disabled={peticion !== 1 && showModal}>
-                          Aceptar
-                        </Button>
+                    <ButtonBar>
+                      <Button onClick={hideModalReset}>Cancelar</Button>
+                      <Button
+                        type="submit"
+                        disabled={peticion !== 1 && showModal}
+                      >
+                        Aceptar
+                      </Button>
                     </ButtonBar>
                   </Form>
                 </>
               )}
               {peticion === 2 && (
                 <>
-                  <h1 className='text-2xl text-center mb-5 font-semibold'>
+                  <h1 className="text-2xl text-center mb-5 font-semibold">
                     Resultado consulta
                   </h1>
                   <h2>{`Nombre convenio: ${datosEnvio?.datosConvenio?.nom_convenio_cnb}`}</h2>
                   <h2>{`Número convenio: ${datosEnvio?.datosConvenio?.cod_convenio_cnb}`}</h2>
                   {datosEnvio?.datosConvenio?.ctrol_ref1_cnb === "1" && (
                     <h2>{`${datosEnvio?.datosConvenio?.nom_ref1_cnb}: ${
-                      datosEnvio.datosCodigoBarras.codigosReferencia[0] ?? ""
+                      datosEnvio.datosCodigoBarras.codigos_referencia[0] ?? ""
                     }`}</h2>
                   )}
                   {datosEnvio?.datosConvenio?.ctrol_ref2_cnb === "1" && (
                     <h2>{`${datosEnvio?.datosConvenio?.nom_ref2_cnb}: ${
-                      datosEnvio.datosCodigoBarras.codigosReferencia[1] ?? ""
+                      datosEnvio.datosCodigoBarras.codigos_referencia[1] ?? ""
                     }`}</h2>
                   )}
-                  <h2 className='text-base font-semibold'>
+                  <h2 className="text-base font-semibold">
                     {`Valor consultado: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
@@ -749,11 +774,11 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     datosEnvio?.datosConvenio?.ind_mayor_vlr_cnb !== "0") ? (
                     <Form grid onSubmit={onSubmitPago}>
                       <MoneyInput
-                        id='valor'
-                        name='valor'
-                        label='Valor a pagar'
-                        autoComplete='off'
-                        type='tel'
+                        id="valor"
+                        name="valor"
+                        label="Valor a pagar"
+                        autoComplete="off"
+                        type="tel"
                         minLength={"5"}
                         maxLength={"12"}
                         value={datosTransaccion.valorSinModificar ?? ""}
@@ -773,52 +798,64 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                       />
                       <ButtonBar>
                         <Button onClick={hideModalReset}>Cancelar</Button>
-                        <Button type='submit' disabled={peticion !== 2 && showModal}>Realizar pago</Button>
+                        <Button
+                          type="submit"
+                          disabled={peticion !== 2 && showModal}
+                        >
+                          Realizar pago
+                        </Button>
                       </ButtonBar>
                     </Form>
                   ) : (
-                    <Form onSubmit={() => {
-                      setDatosTransaccion((old) => ({
-                        ...old,
-                        valor: 0,
-                        showValor: 0,
-                      }));
-                      setPeticion(3)}}>
+                    <Form
+                      onSubmit={() => {
+                        setDatosTransaccion((old) => ({
+                          ...old,
+                          valor: 0,
+                          showValor: 0,
+                        }));
+                        setPeticion(3);
+                      }}
+                    >
                       <ButtonBar>
-                      <Button onClick={hideModalReset}>Cancelar</Button>
-                      <Button type='submit' disabled={peticion !== 2 && showModal}>
-                        Realizar pago
-                      </Button>
-                    </ButtonBar>
+                        <Button onClick={hideModalReset}>Cancelar</Button>
+                        <Button
+                          type="submit"
+                          disabled={peticion !== 2 && showModal}
+                        >
+                          Realizar pago
+                        </Button>
+                      </ButtonBar>
                     </Form>
                   )}
                 </>
               )}
               {peticion === 3 && (
                 <>
-                  <h1 className='text-2xl text-center mb-2 font-semibold'>
+                  <h1 className="text-2xl text-center mb-2 font-semibold">
                     ¿Esta seguro de realizar el pago?
                   </h1>
-                  <h2 className='text-xl font-semibold'>
+                  <h2 className="text-xl font-semibold">
                     {`Valor a pagar: ${formatMoney.format(
                       datosTransaccion.valorSinModificar2
                     )} `}
                   </h2>
-                  <h2 className='text-base font-semibold'>
-                    Por favor ingresar el valor a pagar para confirmar la transacción
+                  <h2 className="text-base font-semibold">
+                    Por favor ingresar el valor a pagar para confirmar la
+                    transacción
                   </h2>
                   <Form grid onSubmit={onSubmitPago}>
                     <MoneyInput
-                      id='valor'
-                      name='valor'
-                      label='Validación valor'
-                      autoComplete='off'
-                      type='tel'
+                      id="valor"
+                      name="valor"
+                      label="Validación valor"
+                      autoComplete="off"
+                      type="tel"
                       minLength={"5"}
                       maxLength={"12"}
                       value={datosTransaccion.valor ?? ""}
                       onInput={(ev, val) => {
-                        if (!isNaN(val)){
+                        if (!isNaN(val)) {
                           const num = val;
                           setDatosTransaccion((old) => ({
                             ...old,
@@ -835,7 +872,12 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     />
                     <ButtonBar>
                       <Button onClick={hideModalReset}>Cancelar</Button>
-                      <Button type='submit' disabled={peticion !== 3 && showModal}>Realizar pago</Button>
+                      <Button
+                        type="submit"
+                        disabled={peticion !== 3 && showModal}
+                      >
+                        Realizar pago
+                      </Button>
                     </ButtonBar>
                   </Form>
                 </>
@@ -846,18 +888,20 @@ const RecaudoServiciosPublicosPrivadosLecturaCodigoBarras = () => {
                     <ButtonBar>
                       <Button onClick={handlePrint}>Imprimir</Button>
                       <Button
-                        type='submit'
+                        type="submit"
                         onClick={() => {
                           hideModalReset();
                           navigate(-1);
-                        }}>
+                        }}
+                      >
                         Aceptar
                       </Button>
                     </ButtonBar>
                   </h2>
                   <TicketsDavivienda
                     ticket={objTicketActual}
-                    refPrint={printDiv}></TicketsDavivienda>
+                    refPrint={printDiv}
+                  ></TicketsDavivienda>
                 </>
               )}
             </div>

@@ -298,7 +298,12 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             minLength={5}
             maxLength={10}
             autoComplete="off"
-            min={Math.ceil(dataCreditoUnique?.Valorcuotaactual)}
+            // min={
+            //   dataCreditoUnique?.Valorcuotaactual !== 0
+            //     ? Math.ceil(dataCreditoUnique?.Valorcuotaactual)
+            //     : 1
+            // }
+            min={1}
             max={Math.ceil(dataCreditoUnique?.Saldo)}
             value={dataInput?.valor ?? ""}
             onInput={onChangeFormatNum}
@@ -320,7 +325,7 @@ const FormPagoCreditoPdp = ({ dataCreditoUnique, closeModule }) => {
             value={dataInput?.observaciones ?? ""}
             onChange={onChangeFormat}
             disabled={loadingPeticionPagoCredito}
-            required
+            // required
           />
         </Fieldset>
         <ButtonBar className="lg:col-span-2">

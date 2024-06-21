@@ -59,6 +59,7 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
     );
     if (!res?.status) {
       console.error(res?.msg);
+      throw Error(res?.msg ?? "Error al hacer petición convenios");
     }
     return res?.obj;
   } catch (err) {

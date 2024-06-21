@@ -15,6 +15,7 @@ export const base_agenda = {
     { day: "Festivo", startTime: "06:00", endTime: "20:00" },
   ],
   attendance: 0,
+  fecha_inoperancia: [],
 };
 
 export const fetchGetDisponibilidadByIdComercio = async (
@@ -86,3 +87,4 @@ export const fetchPostCrearHorario = async (body) => {
     throw err;
   }
 };
+

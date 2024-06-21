@@ -10,6 +10,10 @@ import { notify, notifyError } from "../../../../../utils/notify";
 import { useAuth } from "../../../../../hooks/AuthHooks";
 import ButtonBar from "../../../../../components/Base/ButtonBar";
 import Modal from "../../../../../components/Base/Modal";
+import {
+  CalendarDate,
+  CalendarMonth,
+} from "../../../../../components/Base/Calendar/Calendar";
 
 const Agenda = () => {
   const { roleInfo } = useAuth();
@@ -24,7 +28,6 @@ const Agenda = () => {
       new Date(Date.now()).toISOString().split("T")[0],
       roleInfo.id_comercio
     );
-    // console.log(res);
     setScheduleData({
       date: "",
       hours: [
@@ -70,6 +73,7 @@ const Agenda = () => {
         },
       ],
       attendance: res.numero_ventanillas,
+      fecha_inoperancia: res.fecha_inoperancia,
     });
   }, [roleInfo]);
 
@@ -77,13 +81,32 @@ const Agenda = () => {
     getSchedule();
   }, [roleInfo, getSchedule]);
 
+  const handleDateChange = useCallback(
+    (date) => {
+      const isDuplicate = scheduleData.fecha_inoperancia?.some(
+        (inoperanceDate) => inoperanceDate === date.target.value
+      );
+      if (!isDuplicate) {
+        setScheduleData({
+          ...scheduleData,
+          fecha_inoperancia: [
+            ...scheduleData.fecha_inoperancia,
+            date.target.value,
+          ],
+        });
+      } else {
+        notifyError("La fecha ya ha sido seleccionada.");
+      }
+    },
+    [scheduleData]
+  );
+
   const updateHours = async () => {
-    // console.log(scheduleData);
     const body = {
       fecha_vigencia:
         new Date(Date.now()).toISOString().split("T")[0] + " 00:00:00",
       duracion_tiempo_cita: 60,
-      fecha_inoperancia: [],
+      fecha_inoperancia: scheduleData.fecha_inoperancia,
       horario_atencion: {
         lunes: {
           Apertura: scheduleData.hours[0].startTime,
@@ -121,26 +144,33 @@ const Agenda = () => {
       fk_id_comercio: roleInfo.id_comercio,
       numero_ventanillas: scheduleData.attendance,
     };
-    // console.log(body);
     const res = await fetchPostCrearHorario(body);
-    // console.log(res);
     if (!res.status) {
       notifyError(res.msg);
     } else {
       notify(res.msg);
       setResults(res.obj.resp_cancelaciones.obj);
       setShowModalResults(true);
-      // setScheduleData(base_agenda);
-      getSchedule();
+      if (!res.obj.resp_cancelaciones.obj.url_descargaS3) {
+        return;
+      } else {
+        notify("Descargando archivo de cancelaciones...");
+        // Descargar automaticamente el archivo Excel
+        const file = res.obj.resp_cancelaciones.obj.url_descargaS3;
+        const link = document.createElement("a");
+        link.href = file;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        link.remove();
+      }
+      await getSchedule();
     }
   };
 
   return (
     <>
       <div className="flex flex-col w-full my-2">
-        {/* <CalendarDate value={scheduleData.date} onChange={changeDate}>
-        <CalendarMonth />
-      </CalendarDate> */}
         <div className="grid grid-cols-2 gap-x-5">
           {scheduleData.hours.map((hour, index) => (
             <div
@@ -194,6 +224,50 @@ const Agenda = () => {
             }
           />
         </div>
+        <br></br>
+        <div className="p-2 mb-5 border rounded-xl border-primary-extra-light">
+          <h3 className="font-semibold text-center">
+            Agregar Fechas Inoperancia
+          </h3>
+          <br />
+          {/* <Button design="secondary" type="button" onClick={addInoperanceDate}>
+            Agregar Inoperancia
+          </Button> */}
+          <div className="grid grid-cols-2 gap-x-4">
+            <div className="flex justify-center w-auto">
+              <CalendarDate
+                value={scheduleData?.inoperancia}
+                onChange={handleDateChange}
+              >
+                <CalendarMonth />
+              </CalendarDate>
+            </div>
+            <div className="grid grid-cols-4 gap-x-5">
+              {scheduleData.fecha_inoperancia.map((date, index) => (
+                <div
+                  className="flex flex-col items-center justify-center p-2 border rounded-xl border-primary-extra-light max-h-16"
+                  key={index}
+                >
+                  {date && date}
+                  <button
+                    className="w-20 p-1 text-center text-white bg-red-500 rounded-md"
+                    onClick={() =>
+                      setScheduleData({
+                        ...scheduleData,
+                        fecha_inoperancia:
+                          scheduleData.fecha_inoperancia.filter(
+                            (_, i) => i !== index
+                          ),
+                      })
+                    }
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
         <ButtonBar>
           <Button
             design="secondary"
@@ -222,14 +296,13 @@ const Agenda = () => {
           value={results?.cantidad_citas_canceladas}
           disabled
         />
-        {results?.lista_citas_canceladas &&
-          results?.lista_citas_canceladas.length > 0 &&
-          results?.lista_citas_canceladas?.map((cita) => (
-            <p key={cita}>{cita}</p>
-          ))}
+        {results?.url_descargaS3 && (
+          <p>Se descargó un archivo con las citas canceladas.</p>
+        )}
       </Modal>
     </>
   );
 };
 
 export default Agenda;
+

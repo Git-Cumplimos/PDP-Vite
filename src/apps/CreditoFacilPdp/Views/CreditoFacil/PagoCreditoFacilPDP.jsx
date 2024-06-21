@@ -47,7 +47,7 @@ const DATA_CREDITO_UNIQUE_SIIAN_INI = {
 };
 
 const PagoCreditoFacilPDP = () => {
-  const navigate = useNavigate();
+  const validNavigate = useNavigate();
   const { roleInfo } = useAuth();
   const [dataCreditos, setDataCreditos] = useState([]);
   const [dataCreditoUnique, setDataCreditoUnique] = useState(
@@ -61,16 +61,16 @@ const PagoCreditoFacilPDP = () => {
     setDataCreditoUnique(DATA_CREDITO_UNIQUE_SIIAN_INI);
     setDataCreditos([]);
     notifyError("Pago cancelado por el usuario");
-    navigate(-1);
-  }, [navigate]);
+    validNavigate(-1);
+  }, [validNavigate]);
   useEffect(() => {
     if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
-      navigate("/");
+      validNavigate("/");
     } else {
-      fetchComercio();
+      consultaCredito();
     }
   }, []);
-  const fetchComercio = useCallback(() => {
+  const consultaCredito = useCallback(() => {
     let hasKeys = true;
     const keys = [
       "id_comercio",
@@ -88,12 +88,10 @@ const PagoCreditoFacilPDP = () => {
     }
     if (!hasKeys) {
       notifyError(
-        "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+        "El usuario no cuenta con datos de comercio, no se permite la transacción"
       );
-      navigate("/");
+      return validNavigate("/");
     }
-  }, [roleInfo, navigate]);
-  const consultaCredito = useCallback(() => {
     const data = {
       id_comercio: roleInfo?.id_comercio,
     };
@@ -117,16 +115,12 @@ const PagoCreditoFacilPDP = () => {
       },
       {
         render: ({ data: error }) => {
-          navigate(-1);
+          validNavigate("/");
           return error?.message ?? "Consulta fallida";
         },
       }
     );
-  }, [navigate, roleInfo.id_comercio]);
-  useEffect(() => {
-    consultaCredito();
-    return () => {};
-  }, []);
+  }, [validNavigate, roleInfo]);
 
   return (
     <>

@@ -144,7 +144,7 @@ const Deposito = () => {
       }
       if (!hasKeys) {
         notifyError(
-          "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+          "El usuario no cuenta con datos de comercio, no se permite la transacción"
         );
         navigate("/");
       }

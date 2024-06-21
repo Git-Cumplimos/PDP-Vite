@@ -364,6 +364,7 @@ const HistoricoPines = () => {
             { label: "Cancelado", value: "Cancelado" },
             { label: "Creado", value: "Creado" },
             { label: "Sin recaudo", value: "Sin recaudo" },
+            { label: "Vencido", value: "Vencido" },
           ]}
           onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
         />
@@ -488,12 +489,17 @@ const HistoricoPines = () => {
           <FileInput
             label="Certificado de cuenta"
             accept=".pdf"
-            onGetFile={(file) =>
+            onGetFile={(file) => {
+              // Validar que sea un archivo PDF
+              if (file[0].type !== "application/pdf") {
+                notifyError("El archivo debe ser un PDF");
+                return;
+              }
               setDevolucionData({
                 ...devolucionData,
                 certificado: file[0],
-              })
-            }
+              });
+            }}
           />
           {devolucionData.certificado && (
             <p className="text-center">

@@ -89,7 +89,11 @@ const fetchData = async (
     if (contentType && contentType.includes("charset=ISO-8859-1")) {
       const text = await response.arrayBuffer();
       return text;
-    } else {
+    }else if (contentType && contentType.includes("csv")) {
+      const csv = await response.blob();
+      return csv;
+    }
+    else {
       const text = await response.text();
       return text;
     }
