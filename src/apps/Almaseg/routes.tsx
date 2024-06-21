@@ -1,20 +1,18 @@
 import { lazy } from "react";
 
 import AppIcons from "../../components/Base/AppIcons/AppIcons";
-import HNavbar from "../../components/Base/HNavbar/HNavbar";
-import { TypingRoutes } from "../../utils/TypingUtils";
 import { enumPermisosAlmaseg } from "./utils/enumPermisosAlmaseg";
 
 const ConsultaGeneracionPin = lazy(
   () => import("./views/ConsultaPagoFacturasAlamaseg")
 );
+const MenuAlmaseg = lazy(() => import("./views/MenuAlmaseg"));
+
 const listPermissions = Object.values(enumPermisosAlmaseg);
 const routesAlmaseg = {
   link: "/almaseg",
   label: <AppIcons Logo={"ALMASEG"} name="Almaseg" />,
-  component: ({ subRoutes }: { subRoutes: TypingRoutes[] }) => (
-    <HNavbar links={subRoutes} />
-  ),
+  component: MenuAlmaseg,
   permission: [...listPermissions],
   subRoutes: [
     {
