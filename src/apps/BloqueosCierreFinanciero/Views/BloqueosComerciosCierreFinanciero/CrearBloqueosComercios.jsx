@@ -201,7 +201,7 @@ const CrearBloqueosComercios = () => {
           </>
           :
             <Button type={"submit"} onClick={() => onSubmit()} disabled={
-              loadingPeticionCrearBloqueo}>
+              loadingPeticionCrearBloqueo || (dataComercio.id_comercio === "")}>
                 Aceptar
             </Button>
           }
