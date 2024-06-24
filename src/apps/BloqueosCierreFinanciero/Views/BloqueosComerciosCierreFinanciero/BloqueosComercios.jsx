@@ -68,7 +68,7 @@ const BloqueoComerciosCierre = () => {
               setFilerror(res);
               setShowModalErrors(true);
               setShowModalReport(true);
-              notify("Usuarios Creados Exitosamente");
+              notify("Registros actualizados exitosamente");
               setIsUploading(false);
               setReloadComercios((prev) => !prev);
             }
@@ -83,7 +83,7 @@ const BloqueoComerciosCierre = () => {
                   setIsUploading(false);
                   setCreatedfile(false);
                   handleClose();
-                  notify("Usuarios Creados Exitosamente");
+                  notify("Registros actualizados exitosamente");
                   setReloadComercios((prev) => !prev);
                   break;
                 }
@@ -95,7 +95,7 @@ const BloqueoComerciosCierre = () => {
                 break;
               }
               await wait(7000);
-              notify("Procesando los usuarios...")
+              notify("Procesando los registros...")
             }
           }
         })
