@@ -154,7 +154,7 @@ const PagoTerceros = () => {
         }
       })
       .catch((error) => {
-        if (!error instanceof ErrorCustom) {
+        if (!(error instanceof ErrorCustom)) {
           notifyError("Pago de terceros no exitoso");
         }
         HandleCloseSecond();
@@ -243,7 +243,7 @@ const PagoTerceros = () => {
           value={inputData.valor_total_trx}
           onInput={onChangeInputSecond}
           required
-          type='text'
+          type="text"
           equalError={false}
           equalErrorMin={false}
         />

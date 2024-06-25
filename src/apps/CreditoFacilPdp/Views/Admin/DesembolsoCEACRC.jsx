@@ -208,7 +208,7 @@ const DesembolsoCEACRC = () => {
         {
           render: ({ data: res }) => {
             navigate("/creditos-pdp");
-            return "Crédito desembolsado al cupo del comercio satisfactoriamente";
+            return "Crédito desembolsado satisfactoriamente";
           },
         },
         {

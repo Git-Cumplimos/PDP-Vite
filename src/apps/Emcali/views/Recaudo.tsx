@@ -113,6 +113,39 @@ const Recaudo = () => {
     setPaso("LecturaEmcali");
   }, []);
 
+  const fetchComercio = useCallback(() => {
+    let hasKeys = true;
+    const keys = [
+      "id_comercio",
+      "id_usuario",
+      "tipo_comercio",
+      "id_dispositivo",
+      "ciudad",
+      "direccion",
+    ];
+    if (roleInfo)
+      for (const key of keys) {
+        if (!(key in roleInfo)) {
+          hasKeys = false;
+          break;
+        }
+      }
+    if (!hasKeys) {
+      notifyError(
+        "El usuario no cuenta con datos de comercio, no se permite la transaccion"
+      );
+      validNavigate("/");
+    }
+  }, [roleInfo, validNavigate]);
+
+  useEffect(() => {
+    if (!roleInfo || (roleInfo && Object.keys(roleInfo).length === 0)) {
+      validNavigate("/");
+    } else {
+      fetchComercio();
+    }
+  }, [validNavigate, roleInfo, fetchComercio]);
+
   //********************Funciones para cerrar el Modal**************************
   const HandleCloseTrx = useCallback((notify_error_: boolean) => {
     setShowModal(false);
@@ -197,23 +230,13 @@ const Recaudo = () => {
   const onSubmitConsult = useCallback(
     (e: MouseEvent<HTMLInputElement>) => {
       e.preventDefault();
-      // const data = {
-      //   comercio: {
-      //     id_comercio: roleInfo?.["id_comercio"] ?? "",
-      //     id_usuario: roleInfo?.["id_usuario"] ?? "",
-      //     id_terminal: roleInfo?.["id_dispositivo"] ?? "",
-      //     nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
-      //     nombre_usuario: pdpUser?.["uname"] ?? "",
-      //   },
-      //   numcupon: inputData.numcupon,
-      // };
       const data = {
         comercio: {
-          id_comercio: 10166,
-          id_usuario: 500,
-          id_terminal: 245,
-          nombre_comercio: "PDP SOPO",
-          nombre_usuario: "sopo",
+          id_comercio: roleInfo?.["id_comercio"] ?? "",
+          id_usuario: roleInfo?.["id_usuario"] ?? "",
+          id_terminal: roleInfo?.["id_dispositivo"] ?? "",
+          nombre_comercio: roleInfo?.["nombre comercio"] ?? "",
+          nombre_usuario: pdpUser?.["uname"] ?? "",
         },
         numcupon: inputData.numcupon,
       };

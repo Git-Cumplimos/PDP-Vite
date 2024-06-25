@@ -208,9 +208,17 @@ const PagoRecaudoServiciosCajaSocial = ({
             setDataRecaudo((old) => {
               return {
                 ...old,
-                valorTrx: res?.obj.valor_consultado,
-                valorTrxOriginal: old.valorTrxOriginalCodBarras !== 0 ? old.valorTrxOriginalCodBarras : res?.obj.valor_consultado,
-                valorTrxConsultado: res?.obj.valor_consultado
+                valorTrx:
+                  convenio.permite_modificar_valor === "1" &&
+                  tipoRecaudo === "codigoBarras" &&
+                  old.valorTrxOriginal !== 0
+                    ? old.valorTrxOriginal
+                    : res?.obj.valor_consultado,
+                valorTrxOriginal:
+                  old.valorTrxOriginalCodBarras !== 0
+                    ? old.valorTrxOriginalCodBarras
+                    : res?.obj.valor_consultado,
+                valorTrxConsultado: res?.obj.valor_consultado,
               };
             });
             setEstadoPeticion("response");
@@ -457,23 +465,24 @@ const PagoRecaudoServiciosCajaSocial = ({
           )}
           {tipoRecaudo === "codigoBarras" && (
             <>
-              {dataCodigoBarras.pago.length > 0 && convenio.tipo_recaudo === "01" && (
-                <MoneyInput
-                  id="valorTrxOriginal"
-                  name="valorTrxOriginal"
-                  label={"Valor a pagar original"}
-                  type="tel"
-                  maxLength={12}
-                  decimalDigits={2}
-                  autoComplete="off"
-                  defaultValue={dataCodigoBarras.pago[0] ?? 0}
-                  onInput={() => {}}
-                  disabled
-                  required
-                  equalError={false}
-                  equalErrorMin={false}
-                />
-              )}
+              {dataCodigoBarras.pago.length > 0 &&
+                convenio.tipo_recaudo === "01" && (
+                  <MoneyInput
+                    id="valorTrxOriginal"
+                    name="valorTrxOriginal"
+                    label={"Valor a pagar original"}
+                    type="tel"
+                    maxLength={12}
+                    decimalDigits={2}
+                    autoComplete="off"
+                    defaultValue={dataCodigoBarras.pago[0] ?? 0}
+                    onInput={() => {}}
+                    disabled
+                    required
+                    equalError={false}
+                    equalErrorMin={false}
+                  />
+                )}
               {convenio.permite_modificar_valor === "1" &&
                 convenio.tipo_recaudo === "01" && (
                   <MoneyInput
@@ -646,7 +655,10 @@ const PagoRecaudoServiciosCajaSocial = ({
                     ]
                   )
                 ),
-                ...(convenio?.solicita_otra_ref === "1" && {[`${convenio?.["nombre_otra_ref"]}.`]:dataRecaudo?.otraReferencia}),
+                ...(convenio?.solicita_otra_ref === "1" && {
+                  [`${convenio?.["nombre_otra_ref"]}.`]:
+                    dataRecaudo?.otraReferencia,
+                }),
                 "Valor a pagar": formatMoney.format(dataRecaudo?.valorTrx),
               }}
             >
@@ -687,12 +699,15 @@ const PagoRecaudoServiciosCajaSocial = ({
                     ]
                   )
                 ),
-                ...(convenio?.solicita_otra_ref === "1" && {[`${convenio?.["nombre_otra_ref"]}.`]:dataRecaudo?.otraReferencia}),
+                ...(convenio?.solicita_otra_ref === "1" && {
+                  [`${convenio?.["nombre_otra_ref"]}.`]:
+                    dataRecaudo?.otraReferencia,
+                }),
                 [`${
                   convenio.permite_modificar_valor === "1"
                     ? "Valor consultado"
                     : "Valor a pagar"
-                }`]: formatMoney.format(dataRecaudo.valorTrxConsultado)
+                }`]: formatMoney.format(dataRecaudo.valorTrxConsultado),
               }}
             >
               <Form onSubmit={pagoRecaudoServicios}>

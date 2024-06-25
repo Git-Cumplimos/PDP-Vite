@@ -1,7 +1,94 @@
-import { fetchDataTotpNoMsg } from "../../../utils/MFA";
-import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
+import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
+import { fetchDataTotpNoMsg } from "../../../utils/MFA";
+import { fetchSecure } from "../../../utils/functions";
+
+const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+// const URL_COMERCIOS = `http://127.0.0.1:5000`;
+
+export const bloquearComerciosCierreFinanciero = async (bodyObj) => {
+  if (!bodyObj) {
+    return new Promise((resolve, reject) => {
+      resolve("Sin datos body");
+    });
+  }
+  let parseObj = JSON.stringify(bodyObj);
+  let dataObj = {
+    data: cifrarAES(
+      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
+      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_ITAU}`,
+      parseObj
+    ),
+  };
+
+  try {
+    const res = await fetchData(
+      `${URL_COMERCIOS}/bloqueo_cierre_financiero/crear_bloqueo`,
+      "POST",
+      {},
+      dataObj,
+      {},
+      {},
+      40000
+    );
+    if (!res?.status) {
+      console.error(res?.msg);
+    }
+    if (res?.obj !== {}) {
+      const dataDecrypt = res?.obj?.data;
+      const obj = decryptAES(
+        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
+        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_ITAU}`,
+        dataDecrypt
+      );
+      res.obj = JSON.parse(obj);
+    }
+
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const buildPostFunctionMassive = (url) => {
+  return async (body) => {
+    try {
+      const response = await fetchSecure(url,
+        {
+          method: 'POST',
+          body,
+        });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
+};
+
+const buildPostFunction = (url) => {
+  return async (body) => {
+    if (!body) {
+      throw new Error("Sin datos en el body", { cause: "custom" });
+    }
+    try {
+      const res = await fetchData(url, "POST", {}, body);
+      if (!res?.status) {
+        if (res?.msg) {
+          throw new Error(res?.msg, { cause: "custom" });
+        }
+
+        throw new Error(res, { cause: "custom" });
+      }
+      return res;
+    } catch (err) {
+      throw err;
+    }
+  };
+};
+
+export const updateComercioMassive = buildPostFunctionMassive(`${URL_COMERCIOS}/bloqueo_cierre_financiero/masivo`);
+export const verifyFileComerceMassive = buildPostFunction(`${URL_COMERCIOS}/bloqueo_cierre_financiero/file-comerce-massive`);
 
 export const fetchCustom = (
   url_,
@@ -33,7 +120,7 @@ export const fetchCustom = (
     }
 
     //Petición
-    let Peticion;
+    let Peticion;  
     let parseObj = JSON.stringify(data_);
     let dataObj = {
       data: cifrarAES(
@@ -50,10 +137,20 @@ export const fetchCustom = (
         Peticion = await fetchFunc(urlCompleto, "PUT", {}, dataObj, {}, true);
       } else if (metodo_ === "POST") {
         Peticion = await fetchFunc(urlCompleto, "POST", {}, dataObj, {}, true);
+        const dataDecrypt = Peticion?.obj?.data ?? "";
+        const obj = decryptAES(
+          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          dataDecrypt
+        );
+        Peticion.obj = JSON.parse(obj);
       }
     } catch (error) {
-      if (error.message.includes("La OTP no es válida")) {
-        throw new ErrorCustomFetch(error.message, error.message);
+      if (error.message.includes("La OTP no es válida")){
+        throw new ErrorCustomFetch(
+          error.message,
+          error.message
+        );
       }
       throw new ErrorCustomFetch(
         `Error respuesta Front-end PDP: Fallo al consumir el servicio (${name_}) [0010002]`,
@@ -110,18 +207,7 @@ export const fetchCustom = (
         );
       }
     }
-    try {
-      const dataDecrypt = Peticion?.obj?.data ?? "";
-      const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        dataDecrypt
-      );
-      Peticion.obj = JSON.parse(obj);
-    } catch (error) {
-      console.error(`No se puede desencriptar`);
-      throw error;
-    }
+
     //evaluar la respuesta que llega del backend
     try {
       if (evaluate === true) {
@@ -151,13 +237,7 @@ export const EvaluateResponse = (res, name_ = "") => {
   //para los errores customizados del backend
   try {
     if (res?.status === false) {
-      let tempObject = {};
-      if (res.hasOwnProperty("obj")) {
-        if (res.obj.hasOwnProperty("ticket")) {
-          tempObject["ticket"] = res.obj.ticket;
-        }
-      }
-      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`, tempObject);
+      throw new ErrorCustomBackend(`${res?.msg}`, `${res?.msg}`);
     }
   } catch (error) {
     if (error instanceof ErrorCustomBackend) {
@@ -187,12 +267,11 @@ export const EvaluateResponse = (res, name_ = "") => {
 };
 
 export class ErrorCustom extends Error {
-  constructor(message, name, error_msg, notificacion, optionalObject) {
+  constructor(message, name, error_msg, notificacion) {
     super(message);
     this.name = name;
     this.error_msg = error_msg;
     this.notificacion = notificacion;
-    this.optionalObject = optionalObject;
     if (this.notificacion === "notifyError") {
       console.log(message);
     } else if (this.notificacion === "notify") {
@@ -209,48 +288,31 @@ export class ErrorCustom extends Error {
 }
 
 export class ErrorCustomFetch extends ErrorCustom {
-  constructor(message, error_msg, optionalObject = {}) {
-    super(
-      message,
-      "ErrorCustomFetch",
-      error_msg,
-      "notifyError",
-      optionalObject
-    );
+  constructor(message, error_msg) {
+    super(message, "ErrorCustomFetch", error_msg, "notifyError");
   }
 }
 
 export class ErrorCustomTimeout extends ErrorCustom {
-  constructor(
-    message,
-    error_msg,
-    notificacion = "notifyError",
-    optionalObject = {}
-  ) {
-    super(
-      message,
-      "ErrorCustomTimeout",
-      error_msg,
-      notificacion,
-      optionalObject
-    );
+  constructor(message, error_msg, notificacion = "notifyError") {
+    super(message, "ErrorCustomTimeout", error_msg, notificacion);
   }
 }
 
 export class ErrorCustomBackend extends ErrorCustom {
-  constructor(message, error_msg, optionalObject = {}) {
-    super(message, "ErrorCustomBackend", error_msg, null, optionalObject);
+  constructor(message, error_msg) {
+    super(message, "ErrorCustomBackend", error_msg, null);
   }
 }
 
 export class ErrorCustomBackendUser extends ErrorCustom {
-  constructor(message, error_msg, optionalObject = {}) {
-    super(message, "ErrorCustomBackendUser", error_msg, null, optionalObject);
+  constructor(message, error_msg) {
+    super(message, "ErrorCustomBackendUser", error_msg, null);
   }
 }
 
 export class msgCustomBackend extends ErrorCustom {
-  constructor(message, error_msg, optionalObject = {}) {
-    super(message, "msgCustomBackend", error_msg, null, optionalObject);
+  constructor(message, error_msg) {
+    super(message, "msgCustomBackend", error_msg, null);
   }
 }

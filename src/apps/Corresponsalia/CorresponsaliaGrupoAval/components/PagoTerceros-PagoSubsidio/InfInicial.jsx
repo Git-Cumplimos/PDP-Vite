@@ -21,10 +21,10 @@ const InfInicial = ({
         {!loadingPeticion ? (
           <>
             <ButtonBar>
+              <Button onClick={HandleClose}>Cancelar</Button>
               <Button type={"submit"} onClick={Peticion}>
                 Aceptar
               </Button>
-              <Button onClick={HandleClose}>Cancelar</Button>
             </ButtonBar>
           </>
         ) : (

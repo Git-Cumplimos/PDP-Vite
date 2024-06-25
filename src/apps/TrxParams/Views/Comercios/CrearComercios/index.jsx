@@ -86,6 +86,7 @@ const emptyCommerce = {
   fk_tipo_identificacion_rl: undefined,
   fk_numero_identificacion_rl: undefined,
   barrio_comercio: "",
+  fk_tipo_canal_crc: null,
 };
 
 const CrearComercios = () => {
@@ -475,6 +476,7 @@ const CrearComercios = () => {
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
       if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0)
         dataOrg.alert_cupo = "";
+      if (!dataOrg.fk_tipo_canal_crc) delete dataOrg["fk_tipo_canal_crc"];
       if (pk_comercio_handled) {
         delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(structuredClone(dataOrg))
@@ -768,12 +770,30 @@ const CrearComercios = () => {
             value={comercio?.pk_tbl_grupo_comercios}
             autoComplete="off"
           />
+          {/* Grupo comercio = CRC */}
+          {"27" === String(comercio?.pk_tbl_grupo_comercios ?? "") && (
+            <Select
+              className="place-self-stretch"
+              id="fk_tipo_canal_crc;"
+              name="fk_tipo_canal_crc"
+              label="Canal CRC Colpatria"
+              required={false}
+              options={[
+                { label: "", value: null },
+                { label: "OLIMPIA", value: 1 },
+                { label: "PAYNET (INDRA)", value: 2 },
+              ]}
+              onChange={onChangeFormat}
+              value={comercio?.fk_tipo_canal_crc}
+              autoComplete="off"
+            />
+          )}
           <Input
             id="telefono_fijo_comercio"
             label="Teléfono fijo"
             type="tel"
             name="telefono_fijo_comercio"
-            minLength="1"
+            minLength="10"
             maxLength="10"
             required
             value={comercio?.telefono_fijo_comercio}
@@ -1013,7 +1033,7 @@ const CrearComercios = () => {
             label="Teléfono"
             type="tel"
             name="tel_contacto1_comercio"
-            minLength="1"
+            minLength="10"
             maxLength="10"
             required
             value={comercio?.tel_contacto1_comercio}
@@ -1054,7 +1074,7 @@ const CrearComercios = () => {
             label="Teléfono"
             type="tel"
             name="tel_contacto2_comercio"
-            minLength="1"
+            minLength="10"
             maxLength="10"
             value={comercio?.tel_contacto2_comercio}
             onInput={(e) => {

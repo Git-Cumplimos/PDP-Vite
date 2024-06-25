@@ -4,14 +4,9 @@ import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Modal from "../../../../components/Base/Modal";
-import useQuery from "../../../../hooks/useQuery";
 import { useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import {
-  notify,
-  notifyError,
-  notifyPending,
-} from "../../../../utils/notify";
+import { notifyError, notifyPending } from "../../../../utils/notify";
 import Tickets from "../../components/TicketsPowwi";
 import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import MoneyInput, {
@@ -22,21 +17,21 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import Select from "../../../../components/Base/Select";
 import HideInput from "../../../../components/Base/HideInput";
 import { enumParametrosPowwi } from "../../utils/enumParametrosPowwi";
-import { cifrarAES } from "../../../../utils/cryptoUtils"
 import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
+import { useFetchPowwi } from "../../hooks/fetchPowwi";
 
-const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/consultaRetiroPowwi`;
-const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_POWWI}/corresponsal_powwi/retiroCorresponsalPowwi`;
+const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/consulta-retiro-powwi`;
+const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/retiro-powwi`;
+const URL_CONSULTAR_TRANSACCION_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}//corresponsalia-powwi/consulta-estado-retiro-powwi`;
 
 const Retiro = () => {
   const navigate = useNavigate();
   const { roleInfo, infoTicket } = useAuth();
   const [limitesMontos, setLimitesMontos] = useState({
-    max: enumParametrosPowwi.maxRetiroCuentas,
-    min: enumParametrosPowwi.minRetiroCuentas,
+    max: enumParametrosPowwi.MAX_RETIRO_SERVICIOS_POWWI,
+    min: enumParametrosPowwi.MIN_RETIRO_SERVICIOS_POWWI,
   });
-  const [, fetchTypes] = useFetch();
   const [showModal, setShowModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [datosConsulta, setDatosConsulta] = useState("");
@@ -44,7 +39,7 @@ const Retiro = () => {
     tipoDocumento: "1",
     userDoc: "",
     numeroTelefono: "",
-    otp: ""
+    otp: "",
   });
   const [isUploading, setIsUploading] = useState(false);
   const [valor, setValor] = useState("");
@@ -104,8 +99,11 @@ const Retiro = () => {
   const [loadingPeticionConsultaCosto, peticionConsultaCosto] = useFetch(
     fetchCustom(URL_CONSULTAR_COSTO, "POST", "Consultar costo")
   );
-  const [loadingPeticionRetiro, peticionRetiro] = useFetch(
-    fetchCustom(URL_RETIRO, "POST", "Retiro")
+
+  const [loadingPeticionRetiro, peticionRetiro] = useFetchPowwi(
+    URL_RETIRO,
+    URL_CONSULTAR_TRANSACCION_RETIRO,
+    "Realizar Retiro Powwi"
   );
 
   const onSubmitRetiro = useCallback(
@@ -122,8 +120,8 @@ const Retiro = () => {
           const userDoc = formData.get("docCliente");
           const numeroTelefono = formData.get("numeroTelefono");
           const valorFormat = formData.get("valor");
-          if (numeroTelefono.length !== 0){
-            if (numeroTelefono[0] !== "3"){
+          if (numeroTelefono.length !== 0) {
+            if (numeroTelefono[0] !== "3") {
               return notifyError("El número Powwi debe comenzar por 3");
             }
           }
@@ -138,10 +136,14 @@ const Retiro = () => {
             city: roleInfo?.ciudad,
             nombre_usuario: roleInfo?.["nombre comercio"],
             nombre_comercio: roleInfo?.["nombre comercio"],
-            oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+            oficina_propia:
+              roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+              roleInfo?.tipo_comercio === "KIOSCO"
+                ? true
+                : false,
             valor_total_trx: valor,
             Datos: {
-              numeroProducto: "(+57)"+numeroTelefono,
+              numeroProducto: "(+57)" + numeroTelefono,
             },
           };
           notifyPending(
@@ -153,15 +155,20 @@ const Retiro = () => {
               },
             },
             {
-              render: ({data: res }) =>{
+              render: ({ data: res }) => {
                 setIsUploading(false);
                 setDatosConsulta(res?.obj);
                 const summary = {
                   "Número Powwi": numeroTelefono,
-                  "Tipo documento cliente": datosTrx.tipoDocumento === "1" ? "Cédula de ciudadanía" : "NIT",
+                  "Tipo documento cliente":
+                    datosTrx.tipoDocumento === "1"
+                      ? "Cédula de ciudadanía"
+                      : "NIT",
                   "Número documento cliente": userDoc,
                   "Valor a retirar": valorFormat,
-                  "Costo de la transacción": formatMoney.format(res?.obj?.costoTotal),
+                  "Costo de la transacción": formatMoney.format(
+                    res?.obj?.costoTotal
+                  ),
                   "Valor Total": valorFormat,
                 };
                 setSummary(summary);
@@ -170,7 +177,7 @@ const Retiro = () => {
               },
             },
             {
-              render: ( { data: error}) => {
+              render: ({ data: error }) => {
                 setIsUploading(false);
                 setDatosTrx({
                   tipoDocumento: "1",
@@ -201,7 +208,7 @@ const Retiro = () => {
   const goToRecaudo = useCallback(() => {
     navigate(-1);
   }, [navigate]);
-  
+
   const onMakePayment = useCallback(() => {
     setIsUploading(true);
     const data = {
@@ -209,30 +216,33 @@ const Retiro = () => {
         id_comercio: roleInfo?.id_comercio,
         id_usuario: roleInfo?.id_usuario,
         id_terminal: roleInfo?.id_dispositivo,
+        id_uuid_trx: uuid,
       },
       address: roleInfo?.direccion,
       dane_code: roleInfo?.codigo_dane,
       city: roleInfo?.ciudad,
       nombre_usuario: roleInfo?.["nombre comercio"],
       nombre_comercio: roleInfo?.["nombre comercio"],
-      oficina_propia: roleInfo?.tipo_comercio === "OFICINAS PROPIAS" || roleInfo?.tipo_comercio === "KIOSCO" ? true : false,
+      oficina_propia:
+        roleInfo?.tipo_comercio === "OFICINAS PROPIAS" ||
+        roleInfo?.tipo_comercio === "KIOSCO"
+          ? true
+          : false,
       valor_total_trx: valor,
       id_trx: datosConsulta?.id_trx,
-      id_uuid_trx: uuid,
       costo_trx: datosConsulta?.costoTotal,
       Datos: {
         tipoIdentificacionCliente: datosTrx.tipoDocumento,
         identificacionCliente: datosTrx.userDoc,
-        numeroProducto: "(+57)"+datosTrx.numeroTelefono,
-        otp: cifrarAES(
-          `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-          `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
-          datosTrx.otp
-        ),
+        numeroProducto: "(+57)" + datosTrx.numeroTelefono,
+        otp: datosTrx.otp,
       },
     };
+    const dataAditional = {
+      id_uuid_trx: uuid,
+    };
     notifyPending(
-      peticionRetiro({}, data),
+      peticionRetiro(data, dataAditional),
       {
         render: () => {
           return "Procesando transacción";
@@ -242,7 +252,7 @@ const Retiro = () => {
         render: ({ data: res }) => {
           setIsUploading(false);
           setPaymentStatus(res?.obj?.ticket ?? {});
-          return "Transaccion satisfactoria";
+          return "Transacción satisfactoria";
         },
       },
       {
@@ -253,7 +263,7 @@ const Retiro = () => {
             return <p style={{ whiteSpace: "pre-wrap" }}>{err?.message}</p>;
           }
           console.error(err?.message);
-          return err?.message ?? "Consulta fallida";
+          return err?.message ?? "Transacción fallida";
         },
       }
     );
@@ -272,17 +282,17 @@ const Retiro = () => {
   return (
     <>
       <Fragment>
-        <h1 className='text-3xl mt-6'>Retiro Powwi</h1>
+        <h1 className="text-3xl mt-6">Retiro Powwi</h1>
         <Form onSubmit={onSubmitRetiro} grid>
           <Input
-            id='numeroTelefono'
-            label='Número Powwi'
-            type='text'
-            name='numeroTelefono'
-            minLength='10'
-            maxLength='10'
+            id="numeroTelefono"
+            label="Número Powwi"
+            type="text"
+            name="numeroTelefono"
+            minLength="10"
+            maxLength="10"
             required
-            autoComplete='off'
+            autoComplete="off"
             value={datosTrx.numeroTelefono}
             onInput={(e) => {
               let valor = e.target.value;
@@ -292,80 +302,82 @@ const Retiro = () => {
                 (String(e.target.value).slice(0, 1) !== "3")
               ) {
                 notifyError("El número de celular debe iniciar por 3");
-                setDatosTrx(prevState => ({
+                setDatosTrx((prevState) => ({
                   ...prevState,
-                  numeroTelefono: ""
-                }));;
-              } else{ 
+                  numeroTelefono: "",
+                }));
+              } else {
                 if (!isNaN(num)) {
                   if (datosTrx.numeroTelefono.length === 0 && num !== "3") {
                     return notifyError("El número debe comenzar por 3");
                   }
-                  setDatosTrx(prevState => ({
+                  setDatosTrx((prevState) => ({
                     ...prevState,
-                    numeroTelefono: num
+                    numeroTelefono: num,
                   }));
                 }
               }
-            }}/>
+            }}
+          />
           <Select
-            id='tipoDocumento'
-            label='Tipo Documento Cliente'
+            id="tipoDocumento"
+            label="Tipo Documento Cliente"
             options={optionsDocumento}
             value={datosTrx.tipoDocumento}
             onChange={(e) => {
-              setDatosTrx(prevState => ({
+              setDatosTrx((prevState) => ({
                 ...prevState,
-                tipoDocumento: e.target.value
+                tipoDocumento: e.target.value,
               }));
             }}
             required
           />
           <Input
-            id='docCliente'
-            name='docCliente'
-            label='Número Documento Cliente'
-            type='text'
-            autoComplete='off'
+            id="docCliente"
+            name="docCliente"
+            label="Número Documento Cliente"
+            type="text"
+            autoComplete="off"
             minLength={"5"}
             maxLength={"15"}
             value={datosTrx.userDoc}
             onInput={(e) => {
               const num = e.target.value.replace(/[\s\.\-+eE]/g, "");
               if (!isNaN(num)) {
-                setDatosTrx(prevState => ({
+                setDatosTrx((prevState) => ({
                   ...prevState,
-                  userDoc: num
+                  userDoc: num,
                 }));
               }
             }}
             required
           />
           <HideInput
-            id='otp'
-            label='Número OTP'
-            type='text'
-            name='otp'
+            id="otp"
+            label="Número OTP"
+            type="text"
+            name="otp"
             minLength={"6"}
             maxLength={"6"}
-            autoComplete='off'
+            autoComplete="off"
             required
             value={datosTrx.otp}
             onInput={(e, valor) => {
               let num = valor.replace(/[\s\.]/g, "");
               if (!isNaN(valor)) {
-                setDatosTrx(prevState => ({
+                setDatosTrx((prevState) => ({
                   ...prevState,
-                  otp: num
+                  otp: num,
                 }));
               }
-            }}></HideInput>
+            }}
+          ></HideInput>
           <MoneyInput
-            id='valor'
-            name='valor'
-            label='Valor a retirar'
-            autoComplete='off'
-            type='text'
+            id="valor"
+            name="valor"
+            label="Valor a retirar"
+            autoComplete="off"
+            type="text"
             minLength={"1"}
             maxLength={"11"}
             min={limitesMontos?.min}
@@ -374,9 +386,9 @@ const Retiro = () => {
             equalErrorMin={false}
             value={valor}
             onInput={(e, valor) => {
-              if (!isNaN(valor)){
+              if (!isNaN(valor)) {
                 const num = valor;
-                setValor(num)
+                setValor(num);
               }
             }}
             required
@@ -385,46 +397,48 @@ const Retiro = () => {
             <Button type={"submit"} disabled={loadingPeticionConsultaCosto}>
               Realizar consulta
             </Button>
-            <Button  
-              type='button'
-              onClick={() => 
-                {
-                  goToRecaudo();
-                  notifyError("Transacción cancelada por el usuario");
-                }}
+            <Button
+              type="button"
+              onClick={() => {
+                goToRecaudo();
+                notifyError("Transacción cancelada por el usuario");
+              }}
             >
               Cancelar
             </Button>
           </ButtonBar>
         </Form>
-        <Modal
-          show={showModal}
-          handleClose={paymentStatus || loadingPeticionRetiro ? () => {} : handleClose}>
+        <Modal show={showModal}>
           {paymentStatus ? (
-            <div className='grid grid-flow-row auto-rows-max gap-4 place-items-center'>
+            <div className="grid grid-flow-row auto-rows-max gap-4 place-items-center">
+              <Tickets refPrint={printDiv} ticket={paymentStatus} />
               <ButtonBar>
                 <Button onClick={handlePrint}>Imprimir</Button>
                 <Button onClick={goToRecaudo}>Cerrar</Button>
               </ButtonBar>
-              <Tickets refPrint={printDiv} ticket={paymentStatus} />
             </div>
           ) : (
-            <PaymentSummary summaryTrx={summary} title='Respuesta de consulta Powwi' subtitle = "Resumen de la transacción">
+            <PaymentSummary
+              summaryTrx={summary}
+              title="Respuesta de consulta Powwi"
+              subtitle="Resumen de la transacción"
+            >
               <ButtonBar>
                 <Button
-                  type='submit'
+                  type="submit"
                   onClick={onMakePayment}
-                  disabled={loadingPeticionRetiro}>
+                  disabled={loadingPeticionRetiro}
+                >
                   Aceptar
                 </Button>
                 <Button
-                  type='button'
-                  onClick={() => 
-                    {
-                      handleClose();
-                      notifyError("Transacción cancelada por el usuario");
-                    }}
-                  disabled={loadingPeticionRetiro}>
+                  type="button"
+                  onClick={() => {
+                    handleClose();
+                    notifyError("Transacción cancelada por el usuario");
+                  }}
+                  disabled={loadingPeticionRetiro}
+                >
                   Cancelar
                 </Button>
               </ButtonBar>

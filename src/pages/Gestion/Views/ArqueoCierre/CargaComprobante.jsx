@@ -98,7 +98,7 @@ const CargaComprobante = () => {
     () => ({
       "Id comercio": roleInfo?.id_comercio ?? 59,
       "Nombre comercio": roleInfo?.nombre_comercio,
-      "Id Usuario que transfiere": roleInfo?.id_usuario ?? 8202,
+      "Id usuario que transfiere": roleInfo?.id_usuario ?? 8202,
       "Nombre usuario que transfiere": pdpUser?.uname
     }),
     [roleInfo?.id_comercio, roleInfo?.id_usuario, pdpUser?.uname, roleInfo?.nombre_comercio]
@@ -789,7 +789,7 @@ const CargaComprobante = () => {
               <Input
                 id="id_usuario_recibido"
                 name="id_usuario_recibido"  
-                label={`Id Usuario que recibe`}
+                label={`Id usuario que recibe`}
                 autoComplete="off"
                 type="tel"
                 maxLength={"15"}

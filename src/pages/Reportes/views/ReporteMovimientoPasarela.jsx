@@ -37,7 +37,6 @@ const ReporteMovimientoPasarela = () => {
     {
       onPending: useCallback(() => "Enlistando archivos", []),
       onSuccess: useCallback((res) => {
-        console.log("res-->",res)
         const listOfFiles = (res?.obj?.result?.archivos || []).map(
           ({ archivo, tipo, fecha}) => ({
             archivo,
@@ -58,7 +57,7 @@ const ReporteMovimientoPasarela = () => {
         );
         setFileList(listOfFiles);
         setUrlList(listOfUrl);
-        setMaxPages(res?.obj?.maxpages || 1);
+        setMaxPages(res?.obj?.result?.maxpages || 1);
         handleClose();
         return "Listado de archivo de movimiento exitosa";
       }, [handleClose]),

@@ -68,7 +68,8 @@ const Peticiones = () => {
       ...Object.fromEntries(
         Object.entries(newSearchFilters).filter(([, val]) => val)
       ),
-      tipo_pin: "CRC"
+      tipo_pin: "CRC",
+      uuid: pdpUser.uuid
     }
     setTable([])
     setIsLoading(true)

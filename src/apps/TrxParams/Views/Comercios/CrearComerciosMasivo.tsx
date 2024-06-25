@@ -109,7 +109,7 @@ const CrearComerciosMasivo = ({
                         .split("=")?.[1] + ".csv";
                     const a = document.createElement("a");
                     a.href = urlFile;
-                    a.download = filename;
+                    a.download = filename.replace(/"/g, "");
                     document.body.appendChild(a);
                     a.click();
                     URL.revokeObjectURL(urlFile);

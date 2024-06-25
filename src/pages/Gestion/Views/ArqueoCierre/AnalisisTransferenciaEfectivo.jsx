@@ -110,7 +110,7 @@ const AnalisisTransferenciaEfectivo = () => {
             setLoading(false);
             searchTrnasferencias();
             CloseModal();
-            return "Comprobante actualizado exitosamente";
+            return "Movimiento actualizado exitosamente";
           },
         },
         {
@@ -332,8 +332,19 @@ const AnalisisTransferenciaEfectivo = () => {
             disabled={selected?.fk_estado_revision !== null || roleInfo.id_usuario === selected?.id_usuario}
             required={selected?.fk_estado_revision === null}
           />
+          {selected?.fk_estado_revision !== null?
+          <Input
+            id="updated"
+            label="Fecha de aprobación"
+            type="text"
+            value={
+              selected?.created
+                ? dateFormatter.format(new Date(selected?.updated))
+                : ""
+            }
+            disabled
+          />:null}
           <ButtonBar>
-
             {selected?.fk_estado_revision === null && (
               <Button type="submit" disabled={stateRev === null || loading}>
                 Aceptar
