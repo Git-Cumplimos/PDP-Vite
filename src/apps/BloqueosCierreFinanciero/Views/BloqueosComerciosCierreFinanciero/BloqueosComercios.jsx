@@ -28,7 +28,7 @@ const BloqueoComerciosCierre = () => {
   let fechaActual = new Date();
   let fechaIso = fechaActual.toISOString();
   let fechaHoraFormateada = fechaIso.replace(/[-:T.]/g, "").slice(0, 14);
-  const [createdfile, setCreatedfile] = useState(true);
+  const createdfile = true
   const [showModalReport, setShowModalReport] = useState(false);
   const [reloadComercios, setReloadComercios] = useState(false);
 
@@ -78,10 +78,10 @@ const BloqueoComerciosCierre = () => {
                 const verificationResponse = await verifyFileComerceMassive({
                   filename: nombreArchivo,
                 });
+                console.log(verificationResponse)
                 if (verificationResponse?.obj !== false) {
                   window.open(verificationResponse?.obj);
                   setIsUploading(false);
-                  setCreatedfile(false);
                   handleClose();
                   notify("Registros actualizados exitosamente");
                   setReloadComercios((prev) => !prev);
