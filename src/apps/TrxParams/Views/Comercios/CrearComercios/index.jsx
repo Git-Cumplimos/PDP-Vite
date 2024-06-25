@@ -86,7 +86,7 @@ const emptyCommerce = {
   fk_tipo_identificacion_rl: undefined,
   fk_numero_identificacion_rl: undefined,
   barrio_comercio: "",
-  fk_tipo_canal_crc: "",
+  fk_tipo_canal_crc: null,
 };
 
 const CrearComercios = () => {
@@ -476,6 +476,7 @@ const CrearComercios = () => {
       if (!dataOrg.pk_comercio) delete dataOrg["pk_comercio"];
       if (dataOrg.alert_cupo === "%" || dataOrg.alert_cupo === 0)
         dataOrg.alert_cupo = "";
+      if (!dataOrg.fk_tipo_canal_crc) delete dataOrg["fk_tipo_canal_crc"];
       if (pk_comercio_handled) {
         delete dataOrg["pk_tbl_grupo_comercios"];
         putModificarComercio(structuredClone(dataOrg))
@@ -778,7 +779,7 @@ const CrearComercios = () => {
               label="Canal CRC Colpatria"
               required={false}
               options={[
-                { label: "", value: "" },
+                { label: "", value: null },
                 { label: "OLIMPIA", value: 1 },
                 { label: "PAYNET (INDRA)", value: 2 },
               ]}
