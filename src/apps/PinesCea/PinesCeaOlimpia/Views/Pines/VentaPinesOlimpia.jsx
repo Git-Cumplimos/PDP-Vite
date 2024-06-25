@@ -266,7 +266,7 @@ const VentaPinesOlimpia = () => {
           setIdRunt("");
           setCodigoAprobacion("");
           setFechaTransaccion("");
-          notifyError("Error Respuesta Olimpia: "+res?.msg);
+          notifyError(res?.msg);
           setEstadoConsulta(false);
           setIsLoadingPago(false);
           setNumeroPin("");
