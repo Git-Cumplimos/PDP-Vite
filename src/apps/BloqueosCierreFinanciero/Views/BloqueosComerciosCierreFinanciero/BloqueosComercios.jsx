@@ -78,7 +78,6 @@ const BloqueoComerciosCierre = () => {
                 const verificationResponse = await verifyFileComerceMassive({
                   filename: nombreArchivo,
                 });
-                console.log(verificationResponse)
                 if (verificationResponse?.obj !== false) {
                   window.open(verificationResponse?.obj);
                   setIsUploading(false);
