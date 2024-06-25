@@ -123,6 +123,28 @@ const VentaPines = () => {
     setDireccion
   ]);  
 
+  useEffect(() => {
+    fetchData(
+      `${process.env.REACT_APP_URL_PinesVus}/consulta_canal`,
+      "GET",
+      { id_comercio: roleInfo?.id_comercio, }
+    )
+      .then((res) => {
+        setLoadingInquiry(false);
+        if (res?.status) {
+          setCanal(res?.obj?.canal || "1");
+        }
+        else {
+          notifyError(res?.msg);
+          return;
+        }
+      })
+      .catch((err) => {
+        notifyError("Error consultando canal para la transacción");
+        setLoadingInquiry(true);
+      });
+  }, []);
+  
   const summary = useMemo(
     () => ({
       "Número de convenio": datosConvenio.pk_codigo_convenio,
@@ -207,9 +229,6 @@ const VentaPines = () => {
             setLoadingInquiry(false);
             setInquiryStatus(res?.obj);
             setValVentaPines(res?.obj?.valor);
-            // if (canal==2){
-            // setValVentaPines(res?.obj?.valor);
-            // }
             return "Consulta satisfactoria";
           },
         },
@@ -695,12 +714,12 @@ setUserReferences((old) => ({
     return <Navigate to={"/"} replace />;
   }
 
-  const  optionsCanales = [
-    {"descripcion": "Olimpia",
-    "id":1},
-    {"descripcion": "Paynet(Indra)" ,
-    "id":2}
-  ]
+  // const  optionsCanales = [
+  //   {"descripcion": "Olimpia",
+  //   "id":1},
+  //   {"descripcion": "Paynet(Indra)" ,
+  //   "id":2}
+  // ]
 
   if (searchingConvData || !(searchingConvData || datosConvenio)) {
     return (
@@ -786,7 +805,7 @@ setUserReferences((old) => ({
         onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
         grid>
 
-        <Select
+        {/* <Select
           className="place-self-stretch"
           id="tramite"
           label="Canal"
@@ -803,7 +822,7 @@ setUserReferences((old) => ({
             setCanal(e.target.value);
           }}
 
-        />
+        /> */}
 
         {/* <Input
           label='Número de convenio pin'
@@ -959,7 +978,7 @@ setUserReferences((old) => ({
         onSubmit={inquiryStatus ? (ev) => ev.preventDefault() : onMakeInquiry}
         grid>
 
-        <Select
+        {/* <Select
           className="place-self-stretch"
           id="tramite"
           label="Canal"
@@ -976,7 +995,7 @@ setUserReferences((old) => ({
             setCanal(e.target.value);
           }}
 
-        />
+        /> */}
 
         {/* <Input
           label='Número de convenio pin'
