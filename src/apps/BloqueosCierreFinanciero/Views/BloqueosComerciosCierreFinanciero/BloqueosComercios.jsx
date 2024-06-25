@@ -28,7 +28,7 @@ const BloqueoComerciosCierre = () => {
   let fechaActual = new Date();
   let fechaIso = fechaActual.toISOString();
   let fechaHoraFormateada = fechaIso.replace(/[-:T.]/g, "").slice(0, 14);
-  const [createdfile, setCreatedfile] = useState(true);
+  const createdfile = true
   const [showModalReport, setShowModalReport] = useState(false);
   const [reloadComercios, setReloadComercios] = useState(false);
 
@@ -68,7 +68,7 @@ const BloqueoComerciosCierre = () => {
               setFilerror(res);
               setShowModalErrors(true);
               setShowModalReport(true);
-              notify("Usuarios Creados Exitosamente");
+              notify("Registros actualizados exitosamente");
               setIsUploading(false);
               setReloadComercios((prev) => !prev);
             }
@@ -81,9 +81,8 @@ const BloqueoComerciosCierre = () => {
                 if (verificationResponse?.obj !== false) {
                   window.open(verificationResponse?.obj);
                   setIsUploading(false);
-                  setCreatedfile(false);
                   handleClose();
-                  notify("Usuarios Creados Exitosamente");
+                  notify("Registros actualizados exitosamente");
                   setReloadComercios((prev) => !prev);
                   break;
                 }
@@ -95,7 +94,7 @@ const BloqueoComerciosCierre = () => {
                 break;
               }
               await wait(7000);
-              notify("Procesando los usuarios...")
+              notify("Procesando los registros...")
             }
           }
         })
