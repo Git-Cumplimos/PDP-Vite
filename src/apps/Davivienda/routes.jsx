@@ -12,14 +12,14 @@ export const listPermissionsDavivienda = listPermissions;
 
 const routesDavivienda = {
   link: "/GestionTransaccional/gestion-davivienda",
-  label: <AppIcons Logo={"MARKETPLACE"} name="Gestión Davivienda" />,
+  label: <AppIcons Logo={"DAVIVIENDA"} name="Gestión Davivienda" />,
   component: Davivienda,
   permission: [enumPermisosDavivienda.DAVIVIENDA_CONVENIOS],
   subRoutes: [
     {
       link: "/GestionTransaccional/gestion-davivienda/convenios",
       label: (
-        <AppIcons Logo={"MARKETPLACE"} name={"Convenios recaudo Davivienda"} />
+        <AppIcons Logo={"DAVIVIENDA_RECAUDO_MANUAL"} name={"Convenios recaudo Davivienda"} />
       ),
       component: Convenios,
       permission: [enumPermisosDavivienda.DAVIVIENDA_CONVENIOS],
