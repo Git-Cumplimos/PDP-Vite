@@ -156,7 +156,7 @@ const CrearBloqueosComercios = () => {
   return (
     <>
       <Fragment>
-        <h1 className="text-3xl mt-10 mb-8">Bloqueo manual de comercios</h1>
+        <h1 className="text-3xl mt-10 mb-8">{!params?.id ?"Bloqueo manual de comercios":"Desbloqueo manual de comercios"}</h1>
         <Fieldset legend={"Bloquear Comercio"} className={"lg:col-span-2"}>
           <Input
             id='id_comercio'
@@ -196,7 +196,7 @@ const CrearBloqueosComercios = () => {
             <Button type={"submit"} onClick={() => ShowAlert()} disabled={
               loadingPeticionConsultaComercios ||
               loadingPeticionEliminarComercios}>
-              Eliminar Comercio
+              Desbloquear Comercio
             </Button>
           </>
           :
