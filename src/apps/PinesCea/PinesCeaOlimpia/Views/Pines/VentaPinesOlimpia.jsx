@@ -225,7 +225,6 @@ const VentaPinesOlimpia = () => {
         setNumeroPin("");
         setNumeroDocumento("");
         setTipoDocumentoInput(1);
-        // console.error(err);
         notifyError("Error Respuesta Olimpia: Error consultando pin cea Olimpia");
       });
   };
@@ -334,7 +333,6 @@ const VentaPinesOlimpia = () => {
               setNumeroPin("");
               setNumeroDocumento("");
               setTipoDocumentoInput(1);
-              // console.error(err);
               notifyError("Error Respuesta Olimpia: Error confirmando recaudo del pin cea Olimpia");
             });
         }
@@ -346,7 +344,6 @@ const VentaPinesOlimpia = () => {
         setNumeroPin("");
         setNumeroDocumento("");
         setTipoDocumentoInput(1);
-        // console.error(err);
         notifyError("Error Respuesta Olimpia: Error recaudando el pin cea Olimpia");
       });
   };
