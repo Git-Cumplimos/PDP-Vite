@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlAval = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}`;
+const urlAval = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}`;
 
 export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   if (!bodyObj) {

@@ -1,7 +1,7 @@
 import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
 
-const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
+const urlDaviplata = `${import.meta.env.VITE_URL_CORRESPONSALIA_DAVIVIENDA}`;
 
 export const postConsultaPagoPorGiroDavivienda = async (bodyObj) => {
   if (!bodyObj) {
@@ -10,8 +10,8 @@ export const postConsultaPagoPorGiroDavivienda = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -30,8 +30,8 @@ export const postConsultaPagoPorGiroDavivienda = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -48,8 +48,8 @@ export const postPagoPorGiroDavivienda = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -68,8 +68,8 @@ export const postPagoPorGiroDavivienda = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -86,8 +86,8 @@ export const postModificarTicketPagoPorGiroDavivienda = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -106,8 +106,8 @@ export const postModificarTicketPagoPorGiroDavivienda = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);

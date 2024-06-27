@@ -136,7 +136,7 @@ const VentaPinesOlimpia = () => {
     e.preventDefault();
     setIsLoading(true)
     fetchData(
-      `${process.env.REACT_APP_URL_PinesVus}/consulta_pin_referenciado`,
+      `${import.meta.env.VITE_URL_PinesVus}/consulta_pin_referenciado`,
       "POST",
       {},
       {
@@ -187,7 +187,7 @@ const VentaPinesOlimpia = () => {
     e.preventDefault();
     setIsLoadingPago(true)
     fetchData(
-      `${process.env.REACT_APP_URL_PinesVus}/confirmar_recaudo`,
+      `${import.meta.env.VITE_URL_PinesVus}/confirmar_recaudo`,
       "POST",
       {},
       {

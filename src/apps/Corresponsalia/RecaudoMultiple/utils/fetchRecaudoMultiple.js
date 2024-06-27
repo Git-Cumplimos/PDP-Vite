@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlRecaudoMultiple = `${process.env.REACT_APP_RECAUDO_MULTIPLE}`;
+const urlRecaudoMultiple = `${import.meta.env.VITE_RECAUDO_MULTIPLE}`;
 
 export const postConsultaRecaudoMultiple = async (bodyObj) => {
   if (!bodyObj) {

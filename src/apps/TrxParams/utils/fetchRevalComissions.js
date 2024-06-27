@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlComissions = process.env.REACT_APP_URL_REVAL_COMISIONES;
+const urlComissions = import.meta.env.VITE_URL_REVAL_COMISIONES;
 
 export const postComission = async (bodyObj) => {
   if (!bodyObj) {

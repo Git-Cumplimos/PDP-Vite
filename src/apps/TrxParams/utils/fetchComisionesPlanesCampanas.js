@@ -1,9 +1,9 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
+const urlConvenios = import.meta.env.VITE_URL_REVAL_CONVENIOS;
 
 const urlComisiones =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 export const postComisionesPlanCampanas = async (bodyObj) => {
   if (!bodyObj) {

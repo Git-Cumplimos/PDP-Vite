@@ -9,7 +9,7 @@ import { notifyError, notifyPending } from "../../../../../utils/notify";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 import PagoRecaudoServiciosItau from "../../components/PagoRecaudoServiciosItau";
 
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
+const URL_CONSULTA_CONVENIO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
 
 const RecaudoManualServiciosItau = () => {
   const validNavigate = useNavigate();

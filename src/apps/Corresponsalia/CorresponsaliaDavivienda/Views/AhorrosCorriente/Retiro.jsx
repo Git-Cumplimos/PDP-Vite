@@ -221,7 +221,7 @@ const Retiro = () => {
       direccion: roleInfo?.direccion,
       cod_dane: roleInfo?.codigo_dane,
       mostrar_costo:
-        process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
+        import.meta.env.VITE_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
           ? true
           : false,
     };

@@ -11,7 +11,7 @@ import { notifyPending } from "../../../utils/notify";
 import { enumParametrosCreditosPDP } from "../utils/enumParametrosCreditosPdp";
 import Modal from "../../../components/Base/Modal";
 
-const URL_REALIZAR_SIMULACION_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
+const URL_REALIZAR_SIMULACION_CREDITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/simulacion-credito-siian`;
 
 const ModalSimulacionCredito = ({
   dataCredito,

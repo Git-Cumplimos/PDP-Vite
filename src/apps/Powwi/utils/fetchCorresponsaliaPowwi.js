@@ -37,8 +37,8 @@ export const fetchCustom = (
     let parseObj = JSON.stringify(data_);
     let dataObj = {
       data: cifrarAES(
-        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
         parseObj
       ),
     };
@@ -113,8 +113,8 @@ export const fetchCustom = (
     try {
       const dataDecrypt = Peticion?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       Peticion.obj = JSON.parse(obj);

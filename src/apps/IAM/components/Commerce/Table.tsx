@@ -28,7 +28,7 @@ type Props =
       ) => void;
     };
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 
 const CommerceTableIam = ({ type, onSelectComerce }: Props) => {
   const [comercios, setComercios] = useState<any[]>([]);

@@ -2,11 +2,11 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
 const urlParametrizacion =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
-const URL_CORRESPONSALIA_OTROS = process.env.REACT_APP_URL_CORRESPONSALIA_OTROS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const URL_CORRESPONSALIA_OTROS = import.meta.env.VITE_URL_CORRESPONSALIA_OTROS;
 
 // const urlReporte = `http://localhost:5000/tu-llave`;
-const urlReporte = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave`;
+const urlReporte = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/tu-llave`;
  
 export const buscarReporteTrxTuLlave = () => {return `${urlReporte}/reporte-trx`};
 

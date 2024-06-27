@@ -2,7 +2,7 @@ import { Auth } from "aws-amplify";
 import { Buffer } from "buffer";
 import { notifyError } from "./notify";
 
-const CryptoJS = require("crypto-js");
+import CryptoJS from "crypto-js";
 
 export const makeMoneyFormatter = (fractionDigits) => {
   return Intl.NumberFormat("es-CO", {

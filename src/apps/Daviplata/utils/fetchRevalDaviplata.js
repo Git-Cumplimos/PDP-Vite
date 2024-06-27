@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlDaviplata = `${process.env.REACT_APP_URL_REVAL_CONEXION}/daviplata-reval`;
+const urlDaviplata = `${import.meta.env.VITE_URL_REVAL_CONEXION}/daviplata-reval`;
 
 export const postConsultaCashIn = async (bodyObj) => {
   if (!bodyObj) {

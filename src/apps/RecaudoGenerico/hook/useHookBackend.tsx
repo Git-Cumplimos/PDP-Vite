@@ -7,7 +7,7 @@ import {
   fetchCustom,
 } from "../utils/fetchUtils";
 
-const url = `${process.env.REACT_APP_URL_RECAUDO_GENERICO}/backend/recaudo-generico/transaciciones`;
+const url = `${import.meta.env.VITE_URL_RECAUDO_GENERICO}/backend/recaudo-generico/transaciciones`;
 
 export type TypeConfiguracion = {
   modificar_valor: boolean;

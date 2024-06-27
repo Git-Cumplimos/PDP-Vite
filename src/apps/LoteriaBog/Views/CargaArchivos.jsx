@@ -13,7 +13,7 @@ import { useLoteria } from "../utils/LoteriaHooks";
 import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/cargueS3`;
+const url_cargueS3 = `${import.meta.env.VITE_URL_LOTERIAS}/cargueS3`;
 
 const CargaArchivos = ({ route }) => {
   const { codigos_lot, setCodigos_lot } = useLoteria();
@@ -63,8 +63,8 @@ const CargaArchivos = ({ route }) => {
   const [progress, setProgress] = useState(0);
 
   const nombreUsuario = pdpUser.uname.replace(/ /g,"_").replace(/-/g,"");
-  const S3_BUCKET = process.env.REACT_APP_BUCKET;
-  const REGION = process.env.REACT_APP_REGION;
+  const S3_BUCKET = import.meta.env.VITE_BUCKET;
+  const REGION = import.meta.env.VITE_REGION;
   const bucket = new AWS.S3({
     params: { Bucket: S3_BUCKET },
     region: REGION,

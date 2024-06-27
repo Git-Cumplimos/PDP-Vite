@@ -1,9 +1,9 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlConveniosPdp = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp`;
+const urlConveniosPdp = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp`;
 // const urlConveniosPdp = `http://localhost:5000/convenios-pdp`;
 
-const url_types = process.env.REACT_APP_URL_TRXS_TRX;
+const url_types = import.meta.env.VITE_URL_TRXS_TRX;
 
 const buildGetFunction = (url) => {
   return async (args = {}) => {

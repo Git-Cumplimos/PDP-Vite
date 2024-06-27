@@ -23,7 +23,7 @@ import Fieldset from "../../../../../components/Base/Fieldset/Fieldset";
 import Select from "../../../../../components/Base/Select/Select";
 import { useNavigate } from "react-router-dom";
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
+const url_cargueS3 = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_recaudo/subir_archivos_convenios`;
 
 const def_validacion_referencia = (referencias) => {
   const hashTable = {};

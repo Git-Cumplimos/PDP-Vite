@@ -9,7 +9,7 @@ import useFetchDebounce from "../../../../../hooks/useFetchDebounce";
 import TablaGruposConvenios from "./components/TablaGruposConvenios";
 
 const urlGruposConvenios =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 // const urlGruposConvenios = "http://localhost:5000";
 
 const GruposConvenios = () => {

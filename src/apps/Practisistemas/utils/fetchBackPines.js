@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlPines = `${process.env.REACT_APP_PRACTISISTEMAS}/pines`;
+const urlPines = `${import.meta.env.VITE_PRACTISISTEMAS}/pines`;
 
 export const postConsultaPines = async (bodyObj) => {
   if (!bodyObj) {

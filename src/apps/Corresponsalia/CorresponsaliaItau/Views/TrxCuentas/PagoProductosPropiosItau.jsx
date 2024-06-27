@@ -15,8 +15,8 @@ import { enumParametrosItau } from "../../utils/enumParametrosItau";
 import TicketsItau from "../../components/TicketsItau";
 import Select from "../../../../../components/Base/Select";
 
-const URL_REALIZAR_PAGO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/productos-propios-itau/pago-productos-propios`;
-const URL_CONSULTAR_TRANSACCION_PAGO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/productos-propios-itau/consulta-estado-pago-productos-propios`;
+const URL_REALIZAR_PAGO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/productos-propios-itau/pago-productos-propios`;
+const URL_CONSULTAR_TRANSACCION_PAGO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/productos-propios-itau/consulta-estado-pago-productos-propios`;
 
 const PagoProductosPropiosItau = () => {
   const navigate = useNavigate();

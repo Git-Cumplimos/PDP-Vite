@@ -5,7 +5,7 @@ import Input from "../../../../components/Base/Input";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { CommerceTableIam } from "../../components/Commerce";
 
-const urlIAM = process.env.REACT_APP_URL_IAM_PDP;
+const urlIAM = import.meta.env.VITE_URL_IAM_PDP;
 
 const mapGroups = (data) => data;
 // const mapCommerce = ({

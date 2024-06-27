@@ -2,7 +2,7 @@ import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
 
-const urlBackendValidar = `${process.env.REACT_APP_URL_PinesVus}/validar_archivos`;
+const urlBackendValidar = `${import.meta.env.VITE_URL_PinesVus}/validar_archivos`;
 
 export const Validar_archivo = async (nombre_archivo) => {
   let new_nombre_archivo = nombre_archivo.substring(

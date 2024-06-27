@@ -7,8 +7,8 @@ import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { makeDateFormatter } from "../../../../utils/functions";
 
-const urlBackend = `${process.env.REACT_APP_BASE_API}/cert/pinesVus`;
-const urlBackend2 = `${process.env.REACT_APP_BASE_API}/cert/pinesVus`;
+const urlBackend = `${import.meta.env.VITE_BASE_API}/cert/pinesVus`;
+const urlBackend2 = `${import.meta.env.VITE_BASE_API}/cert/pinesVus`;
 
 const initialSearchFilters = new Map([
   ["fecha_ini", ""],

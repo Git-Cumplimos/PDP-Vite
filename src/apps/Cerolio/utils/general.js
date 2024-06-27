@@ -1,5 +1,5 @@
 import fetchData from "../../../utils/fetchData";
-const urlCerolio = process.env.REACT_APP_URL_CEROLIO;
+const urlCerolio = import.meta.env.VITE_URL_CEROLIO;
 
 export const addHoursAndFormat = (time1, time2) => {
   // Crear objetos Date a partir de las cadenas de tiempo

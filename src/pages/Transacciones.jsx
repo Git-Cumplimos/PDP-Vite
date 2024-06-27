@@ -51,7 +51,7 @@ const initialSearchFilters = new Map([
   ["limit", 10],
 ]);
 
-const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transacciones-paginated`;
+const url = `${import.meta.env.VITE_URL_TRXS_TRX}/transacciones-paginated`;
 
 const Transacciones = () => {
   const { roleInfo, userPermissions, pdpUser, commerceInfo } = useAuth();
@@ -175,7 +175,7 @@ const Transacciones = () => {
   }, [pdpUser, setSearchFilters]);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center my-8">
+    <div className="flex flex-col items-center justify-center w-full my-8">
       <h1 className="text-3xl">Transacciones</h1>
       <DataTable
         title="Transacciones"
@@ -348,7 +348,7 @@ const Transacciones = () => {
       </DataTable>
       <Modal show={showModal} handleClose={closeModal}>
         {selected?.ticket && JSON.stringify(selected?.ticket) !== "{}" ? (
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col items-center justify-center">
             {selected?.ticket.autorizador === 14 ||
             selected?.id_autorizador === 14 ? (
               <TicketColpatria
@@ -510,13 +510,13 @@ const Transacciones = () => {
             </ButtonBar>
           </div>
         ) : (
-          <div className="flex flex-col justify-center items-center mx-auto container">
+          <div className="container flex flex-col items-center justify-center mx-auto">
             <PaymentSummary
               title="Resumen transacción"
               subtitle=""
               summaryTrx={summaryTrx}
             >
-              <h1 className="text-3xl mt-6 text-aling">
+              <h1 className="mt-6 text-3xl text-aling">
                 No hay ticket registrado
               </h1>
               <ButtonBar>

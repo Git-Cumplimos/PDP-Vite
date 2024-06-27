@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlConfiguracionComercios = process.env.REACT_APP_URL_COMISIONES;
+const urlConfiguracionComercios = import.meta.env.VITE_URL_COMISIONES;
 
 export const postConfiguracionComercios = async (bodyObj) => {
   if (!bodyObj) {

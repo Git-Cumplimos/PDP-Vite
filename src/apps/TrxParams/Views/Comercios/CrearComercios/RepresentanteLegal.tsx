@@ -62,7 +62,7 @@ const initialPropietarioRL: PropietarioRL = {
   dv_interno: 0,
 };
 
-const url_comercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const url_comercios = import.meta.env.VITE_URL_SERVICE_COMMERCE;
 // const url_comercios = `http://localhost:5000`;
 
 const RepresentanteLegal = ({

@@ -13,7 +13,7 @@ import {
 } from "../utils/typingPagoDaviplata";
 
 //FRAGMENT--------- Constantes ------------------
-const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
+const urlDaviplata = `${import.meta.env.VITE_URL_CORRESPONSALIA_DAVIVIENDA}`;
 
 //FRAGMENT ----------- hook ------------------
 export const useFetchPagoDaviplata = () => {

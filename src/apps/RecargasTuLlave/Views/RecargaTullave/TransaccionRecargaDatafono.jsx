@@ -20,9 +20,9 @@ import { useReactToPrint } from "react-to-print";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
 
-const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
-const URL_REALIZAR_RECARGA_DATAFONO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-datafono`;
-const URL_CONSULTAR_RECARGA_DATAFONO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-datafono`;
+const URL_CONSULTAR_DATAFONO = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
+const URL_REALIZAR_RECARGA_DATAFONO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-datafono`;
+const URL_CONSULTAR_RECARGA_DATAFONO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-datafono`;
 
 const TransaccionRecargaDatafono = () => {
   const navigate = useNavigate();

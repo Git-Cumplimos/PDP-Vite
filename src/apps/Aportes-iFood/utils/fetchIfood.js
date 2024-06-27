@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  subirArchivo: process.env.REACT_APP_APORTES_IFOOD,
+  subirArchivo: import.meta.env.VITE_APORTES_IFOOD,
 };
 
 export const cargaArchivosS3 = async (queryParam) => {

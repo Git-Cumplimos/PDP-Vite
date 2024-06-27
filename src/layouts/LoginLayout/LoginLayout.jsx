@@ -1,4 +1,4 @@
-import classes from "./LoginLayout.module.css";
+import styles from "./LoginLayout.module.css";
 import LogoPDP from "../../components/Base/LogoPDP";
 import RightArrow from "../../components/Base/RightArrow";
 import { useImgs } from "../../hooks/ImgsHooks";
@@ -9,7 +9,7 @@ import { Outlet } from "react-router-dom";
 import ContentBox from "../../components/Base/SkeletonLoading/ContentBox";
 
 const LoginLayout = ({ children }) => {
-  const { loginLayout, wave, headerPDP, usrData } = classes;
+  const { loginLayout, wave, headerPDP, usrData } = styles;
 
   const {
     imgs: { personas },
@@ -40,7 +40,7 @@ const LoginLayout = ({ children }) => {
           <LogoPDP large />
           <RightArrow large />
         </div>
-        <h1 className="text-3xl mb-6">¡Bienvenido!</h1>
+        <h1 className="mb-6 text-3xl">¡Bienvenido!</h1>
       </header>
       <main className="container">
         <Suspense fallback={<ContentBox />}>

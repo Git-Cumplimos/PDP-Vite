@@ -162,7 +162,7 @@ const Deposito = () => {
                 "Valor depósito": valorFormat,
               };
               if (
-                process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
+                import.meta.env.VITE_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
               ) {
                 summary["Valor cobro"] = formatMoney.format(
                   res?.obj?.Data?.numValorCobro
@@ -221,7 +221,7 @@ const Deposito = () => {
       nomMunicipio: roleInfo?.ciudad ? roleInfo?.ciudad : "No hay datos",
       tip_id_depositante: tipoDocumento,
       mostrar_costo:
-        process.env.REACT_APP_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
+        import.meta.env.VITE_SHOW_COSTO_DEPOSITO_DAVIVIENDA === "true"
           ? true
           : false,
     };

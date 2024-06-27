@@ -23,10 +23,10 @@ import { useFetchRunt } from "../../hooks/hookRunt";
 const { styleComponents } = classes;
 
 //Constantes
-const url_get_barcode = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
-const url_consult_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/consulta-runt`;
-const url_pagar_runt = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/pago-runt`;
-const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
+const url_get_barcode = `${import.meta.env.VITE_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/get-codigo-barras`;
+const url_consult_runt = `${import.meta.env.VITE_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/consulta-runt`;
+const url_pagar_runt = `${import.meta.env.VITE_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/pago-runt`;
+const urlreintentos = `${import.meta.env.VITE_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const option_manual = "Manual";
 const option_barcode = "Código de barras";
 const options_select = [

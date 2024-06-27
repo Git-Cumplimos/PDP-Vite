@@ -153,7 +153,7 @@ const DevolucionPinesOlimpia = () => {
     e.preventDefault();
     setIsLoading(true)
     fetchDataPinesCea(
-      `${process.env.REACT_APP_URL_PinesVus}/consulta_pin_cea`,
+      `${import.meta.env.VITE_URL_PinesVus}/consulta_pin_cea`,
       "POST",
       {},
       {
@@ -234,7 +234,7 @@ const DevolucionPinesOlimpia = () => {
     e.preventDefault();
     setIsLoadingPago(true)
     fetchDataPinesCea(
-      `${process.env.REACT_APP_URL_PinesVus}/confirmar_devolucion_cea`,
+      `${import.meta.env.VITE_URL_PinesVus}/confirmar_devolucion_cea`,
       "POST",
       {},
       {
@@ -281,11 +281,11 @@ const DevolucionPinesOlimpia = () => {
           const partesFecha = fecha.split("/");
           const fechaFormateada = `${partesFecha[0]}-${partesFecha[1]}-${partesFecha[2]}`;
           fetchDataPinesCea(
-            `${process.env.REACT_APP_URL_PinesVus}/AnularPin`,
+            `${import.meta.env.VITE_URL_PinesVus}/AnularPin`,
             "POST",
             {},
             {
-              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA_CEA,
+              IdCliente: import.meta.env.VITE_ID_CLIENTE_OLIMPIA_CEA,
               Pin: numeroPin,
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,

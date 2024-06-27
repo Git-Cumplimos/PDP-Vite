@@ -4,7 +4,7 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { notify } from "../../../utils/notify";
 import useFetchDebounce from "../../../hooks/useFetchDebounce";
 
-const url = process.env.REACT_APP_URL_PASARELAS;
+const url = import.meta.env.VITE_URL_PASARELAS;
 
 const ReporteMovimientoPasarela = () => {
   const [fecha, setFecha] = useState("");

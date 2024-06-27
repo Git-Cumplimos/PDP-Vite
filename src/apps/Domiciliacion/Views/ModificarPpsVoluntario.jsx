@@ -33,7 +33,7 @@ const ModificarPps = () => {
     useState(true);
   const [estadoUsuarioNoEncontrado, setEstadoUsuarioNoEncontrado] =
     useState(false);
-  const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  const url = `${import.meta.env.VITE_URL_COLPENSIONES}`;
   // const url = "http://127.0.0.1:2500/";
   // const url =  "http://127.0.0.1:7000";
   const [estado, setEstado] = useState(false);

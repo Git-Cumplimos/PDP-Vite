@@ -13,7 +13,7 @@ import Fieldset from "../../../../components/Base/Fieldset";
 
 type Props = {};
 
-const urlIam = `${process.env.REACT_APP_URL_IAM_PDP}`;
+const urlIam = `${import.meta.env.VITE_URL_IAM_PDP}`;
 // const urlIam = `http://localhost:5000`;
 
 const toastIdCarga = "carga-archivo-123";

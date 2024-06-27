@@ -14,7 +14,7 @@ import { onChangeNumber } from "../../../utils/functions";
 import { notify, notifyError } from "../../../utils/notify";
 import { fetchAutorizadores } from "../../TrxParams/utils/fetchRevalAutorizadores";
 
-const url_types = process.env.REACT_APP_URL_TRXS_TRX;
+const url_types = import.meta.env.VITE_URL_TRXS_TRX;
 
 const fetchTrxTypesPages = async (Nombre_operacion, page, limit) => {
   try {

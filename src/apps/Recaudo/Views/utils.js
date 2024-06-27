@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlBroker = `${process.env.REACT_APP_URL_BROKER_MAY}/api`;
+const urlBroker = `${import.meta.env.VITE_URL_BROKER_MAY}/api`;
 // const urlBroker = "http://localhost:8000/api";
 
 const buildPostFunction = (url) => {

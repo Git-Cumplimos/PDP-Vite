@@ -8,7 +8,7 @@ import fetchData from "../../../utils/fetchData";
 import EditPermissionForm from "../components/Permissions/EditPermissionForm";
 import PermissionForm from "../components/Permissions/PermissionForm";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const IAMPermissions = () => {
   const [permisosDB, setPermisosDB] = useState([]);

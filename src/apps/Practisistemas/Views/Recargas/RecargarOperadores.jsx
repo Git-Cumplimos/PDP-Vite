@@ -28,8 +28,8 @@ import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
 const minValor = enumLimiteApuestas.minRecagas;
 const maxValor = enumLimiteApuestas.maxRecargas;
 
-const URL_RECARGA = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/recarga`;
-const URL_CONSULTA_RECARGA = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/consulta-estado-trx`;
+const URL_RECARGA = `${import.meta.env.VITE_PRACTISISTEMAS}/recargasCelular/recarga`;
+const URL_CONSULTA_RECARGA = `${import.meta.env.VITE_PRACTISISTEMAS}/recargasCelular/consulta-estado-trx`;
 
 
 const RecargasOperadores = () => {

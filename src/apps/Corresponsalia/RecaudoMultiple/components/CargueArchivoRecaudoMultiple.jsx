@@ -7,7 +7,7 @@ import ButtonBar from "../../../../components/Base/ButtonBar/ButtonBar";
 import Button from "../../../../components/Base/Button/Button";
 import Fieldset from "../../../../components/Base/Fieldset/Fieldset";
 
-const url_cargueS3 = `${process.env.REACT_APP_RECAUDO_MULTIPLE}/cargue-archivo-recaudo-multiple`;
+const url_cargueS3 = `${import.meta.env.VITE_RECAUDO_MULTIPLE}/cargue-archivo-recaudo-multiple`;
 
 const CargueArchivoRecaudoMultiple = ({
   setIsUploading,

@@ -12,10 +12,10 @@ import { notify, notifyError } from "../../../utils/notify";
 import Input from "../../../components/Base/Input";
 import Form from "../../../components/Base/Form";
 
-const url_consultaBalance = `${process.env.REACT_APP_URL_APISMS}/consultaBalance`;
-const url_SMS = `${process.env.REACT_APP_URL_APISMS}/SMS_texto`;
-const url_buscarNum = `${process.env.REACT_APP_URL_APISMS}/buscar_celular`;
-const url_tipComercios = `${process.env.REACT_APP_URL_APISMS}/tip_comercio`;
+const url_consultaBalance = `${import.meta.env.VITE_URL_APISMS}/consultaBalance`;
+const url_SMS = `${import.meta.env.VITE_URL_APISMS}/SMS_texto`;
+const url_buscarNum = `${import.meta.env.VITE_URL_APISMS}/buscar_celular`;
+const url_tipComercios = `${import.meta.env.VITE_URL_APISMS}/tip_comercio`;
 
 const EnviarSMS = () => {
   const [SMS, setSMS] = useState("");

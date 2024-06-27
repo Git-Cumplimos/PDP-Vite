@@ -7,7 +7,7 @@ import { fetchCustom } from "../utils/fetchCreditoFacil";
 import { notifyError } from "../../../utils/notify";
 
 
-const URL_RECHAZAR_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/rechazar-creditos`;
+const URL_RECHAZAR_CREDITOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/rechazar-creditos`;
 
 const ModalRechazarCreditos = ({
   dataCredito,

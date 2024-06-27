@@ -18,7 +18,7 @@ type Props = {
   };
 };
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 // const url = `http://localhost:5000`;
 
 const ResetUserMFA = ({ userInfo }: Props) => {

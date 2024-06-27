@@ -89,7 +89,7 @@ export const pinBlock = (pinX, panX) => {
 
   const result = bytesToHex(resultBytes);
 
-  const key = process.env.REACT_APP_KEY_ENCRIP_AVAL;
+  const key = import.meta.env.VITE_KEY_ENCRIP_AVAL;
   const resultEncrip = encryptAES(result, key);
 
   return resultEncrip;

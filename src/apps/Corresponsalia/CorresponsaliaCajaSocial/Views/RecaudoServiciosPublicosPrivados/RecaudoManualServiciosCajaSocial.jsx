@@ -5,7 +5,7 @@ import { fetchCustom } from "../../utils/fetchCajaSocial";
 import { notifyPending } from "../../../../../utils/notify";
 import PagoRecaudoServiciosCajaSocial from "../../components/PagoRecaudoServiciosCajaSocial";
 
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
+const URL_CONSULTA_CONVENIO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
 
 const RecaudoManualServiciosCajaSocial = () => {
   const validNavigate = useNavigate();

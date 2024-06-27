@@ -21,7 +21,7 @@ type Props = {
   ) => void;
 };
 
-const urlDaneMunicipios = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
+const urlDaneMunicipios = `${import.meta.env.VITE_URL_DANE_MUNICIPIOS}`;
 
 const CitySearchTable = ({ onSelectCity }: Props) => {
   const [cities, setCities] = useState<DaneCity[]>([]);

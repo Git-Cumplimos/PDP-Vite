@@ -17,8 +17,8 @@ import {
   msgCustomBackend,
 } from "../utils/fetchPaquetesMovistar";
 
-const url_carga_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-carga-paquetes/cargar-archivo-paquetes`;
-const url_prescrita_archivo = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-carga-paquetes/url-post-archivo-paquetes`;
+const url_carga_paquetes = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-carga-paquetes/cargar-archivo-paquetes`;
+const url_prescrita_archivo = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-carga-paquetes/url-post-archivo-paquetes`;
 
 const CargaPaquetesMovistar = () => {
   const [showModal, setShowModal] = useState(false);

@@ -1,8 +1,8 @@
 import { fetchSecure } from "../../../utils/functions";
 import fetchData from "../../../utils/fetchData";
 
-const urlCupo = `${process.env.REACT_APP_URL_SERVICIOS_CUPO_COMERCIO}`;
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlCupo = `${import.meta.env.VITE_URL_SERVICIOS_CUPO_COMERCIO}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 // const urlCupo = `http://127.0.0.1:5000`;
 // const urlComercios = `http://127.0.0.1:5000`;
 

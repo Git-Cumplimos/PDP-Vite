@@ -1,4 +1,4 @@
-const urlAssets = process.env.REACT_APP_ASSETS_URL;
+const urlAssets = import.meta.env.VITE_ASSETS_URL;
 
 const images = {
   pdpHorizontal: `${urlAssets}/assets/img/LogofinalPDP.svg`,

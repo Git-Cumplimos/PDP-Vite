@@ -10,9 +10,9 @@ import fetchData from "../../../utils/fetchData";
 import { useAuth } from "../../../hooks/AuthHooks";
 import { useFetchCreditoFacil } from "../hooks/fetchCreditoFacil";
 
-const URL_CARGA_ARCHIVO_S3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/carga-archivo`;
-const URL_GUARDAR_CREDITOS_TBL_MOVIMIENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/creacion-credito`;
-const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
+const URL_CARGA_ARCHIVO_S3 = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/carga-archivo`;
+const URL_GUARDAR_CREDITOS_TBL_MOVIMIENTOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/creacion-credito`;
+const URL_CONSULTAR_ESTADO_SIMULACION = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
 
 const FormCargaMasivaCreditos = ({ setModalOpen, consultaCreditos }) => {
   const [file, setFile] = useState({});

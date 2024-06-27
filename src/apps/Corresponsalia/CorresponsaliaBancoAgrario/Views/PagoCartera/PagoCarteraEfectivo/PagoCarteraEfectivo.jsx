@@ -24,9 +24,9 @@ import SimpleLoading from "../../../../../../components/Base/SimpleLoading/Simpl
 import TableEnterprise from "../../../../../../components/Base/TableEnterprise/TableEnterprise";
 import { enumParametrosBancoAgrario } from "../../../utils/enumParametrosBancoAgrario";
 const { styleComponents } = classes;
-const url_consult_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/consulta_pago_cartera`;
-const url_pago_cartera = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera`;
-const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
+const url_consult_pago_cartera = `${import.meta.env.VITE_URL_BANCO_AGRARIO}/banco-agrario/consulta_pago_cartera`;
+const url_pago_cartera = `${import.meta.env.VITE_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera`;
+const urlreintentos = `${import.meta.env.VITE_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const numero_cedula = "Número de cédula ";
 const numero_obligacion = "Número de obligación";
 const PagoCarteraEfectivo = () => {

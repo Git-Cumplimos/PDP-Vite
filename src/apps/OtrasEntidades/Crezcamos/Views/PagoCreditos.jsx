@@ -17,9 +17,9 @@ import { v4 } from "uuid";
 import { fetchCustom } from "../utils/fetchCorresponsaliaCrezcamos";
 import { useFetchCrezcamos } from "../hooks/fetchCrezcamos";
 
-const URL_CONSULTAR_SALDOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/crezcamos/consultapagocredito`;
-const URL_PAGO_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/crezcamos/pagocredito`;
-const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/crezcamos/check_estado_pagocredito_crezcamos`;
+const URL_CONSULTAR_SALDOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/crezcamos/consultapagocredito`;
+const URL_PAGO_CREDITOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/crezcamos/pagocredito`;
+const URL_CONSULTAR_ESTADO_TRX = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/crezcamos/check_estado_pagocredito_crezcamos`;
 
 const PagoCredito = () => {
   const navigate = useNavigate();

@@ -15,7 +15,7 @@ import {
   fetchConveniosUnique,
 } from "../utils/fetchRevalConvenios";
 
-const urlAutorizadores = process.env.REACT_APP_URL_REVAL_AUTORIZADOR;
+const urlAutorizadores = import.meta.env.VITE_URL_REVAL_AUTORIZADOR;
 
 const ConvAuto = () => {
   const navigate = useNavigate();

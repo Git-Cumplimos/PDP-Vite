@@ -9,8 +9,8 @@ import { fetchCustom } from "../../utils/fetchPractisistemas";
 import { useFetch } from "../../../../hooks/useFetch";
 import useDelayedCallback from "../../../../hooks/useDelayedCallback";
 
-const URL_CONSULTAR_CASAS = `${process.env.REACT_APP_PRACTISISTEMAS}/apuestas-deportivas/tabla-casa-apuestas`;
-const URL_CONSULTAR_CASAS_PRACTISISTEMAS = `${process.env.REACT_APP_PRACTISISTEMAS}/apuestas-deportivas/consulta-casa-apuestas`;
+const URL_CONSULTAR_CASAS = `${import.meta.env.VITE_PRACTISISTEMAS}/apuestas-deportivas/tabla-casa-apuestas`;
+const URL_CONSULTAR_CASAS_PRACTISISTEMAS = `${import.meta.env.VITE_PRACTISISTEMAS}/apuestas-deportivas/consulta-casa-apuestas`;
 
 const ApuestasDeportivas = ({ subRoutes }) => {
   const navigate = useNavigate();

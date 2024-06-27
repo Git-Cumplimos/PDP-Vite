@@ -13,7 +13,7 @@ const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
 };
 
-const url = process.env.REACT_APP_URL_DANE_MUNICIPIOS;
+const url = import.meta.env.VITE_URL_DANE_MUNICIPIOS;
 
 const LocationFormPinesVus = ({
   place = "",

@@ -4,15 +4,15 @@ import { notify, notifyError } from "../../../utils/notify";
 import { cifrarAES, decryptAES } from "../../../utils/cryptoUtils";
 import fetchData from "../../../utils/fetchData";
 
-const URL_DESCARGAR_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
-const URL_TERMINOS_CONDICIONES = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
-const URL_ENVIAR_CODIGO_OTP = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/generar-codigo-otp`;
-const URL_CONSULTAR_CREDITOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/consulta-creditos`;
-const URL_CONSULTAR_CREDITOS_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/consulta-creditos`;
-const URL_CONSULTAR_VALIDACION_DOCUMENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consulta-creditos`;
-const URL_TERMINOS_CONDICIONES_CEA_CRC = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/terminos-condiciones-cea-crc`;
-const URL_CONSULTA_DOCUMENTOS_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consultar-documentos-bd`;
-const URL_DESCARGA_ARCHIVO_VALIDACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/descargar-documento`;
+const URL_DESCARGAR_SIMULACION = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/descarga-simulacion-credito`;
+const URL_TERMINOS_CONDICIONES = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/terminos-condiciones-comercios`;
+const URL_ENVIAR_CODIGO_OTP = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/generar-codigo-otp`;
+const URL_CONSULTAR_CREDITOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/consulta-creditos`;
+const URL_CONSULTAR_CREDITOS_BD = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/carga-masivo-creditos/consulta-creditos`;
+const URL_CONSULTAR_VALIDACION_DOCUMENTOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consulta-creditos`;
+const URL_TERMINOS_CONDICIONES_CEA_CRC = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/terminos-condiciones-cea-crc`;
+const URL_CONSULTA_DOCUMENTOS_BD = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/consultar-documentos-bd`;
+const URL_DESCARGA_ARCHIVO_VALIDACION = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/descargar-documento`;
 
 
 const sleep = (millisecons) => {
@@ -72,16 +72,16 @@ export const useFetchCreditoFacil = (
             let parseObjConsulta = JSON.stringify(data_consulta);
             let dataObjConsulta = {
               data: cifrarAES(
-                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
                 parseObjConsulta
               ),
             };
             PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
             const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
             const objConsulta = decryptAES(
-              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
               dataDecryptConsulta
             );
             PeticionConsulta.obj = JSON.parse(objConsulta);
@@ -162,8 +162,8 @@ export const postDescargarSimulacion = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -180,8 +180,8 @@ export const postDescargarSimulacion = async (bodyObj) => {
     if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -208,8 +208,8 @@ export const postEnviarCodigoOtp = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -226,8 +226,8 @@ export const postEnviarCodigoOtp = async (bodyObj) => {
     if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -254,8 +254,8 @@ export const postConsultaCreditosPendienteDesembolsar = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -272,8 +272,8 @@ export const postConsultaCreditosPendienteDesembolsar = async (bodyObj) => {
     if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -291,8 +291,8 @@ export const postValidacionDocumentosCreditos = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -309,8 +309,8 @@ export const postValidacionDocumentosCreditos = async (bodyObj) => {
     if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -337,8 +337,8 @@ export const postConsultaDocumentosBd = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -355,8 +355,8 @@ export const postConsultaDocumentosBd = async (bodyObj) => {
     if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -374,8 +374,8 @@ export const postDescargarDocumentoValidacion = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -392,8 +392,8 @@ export const postDescargarDocumentoValidacion = async (bodyObj) => {
     if (JSON.stringify(res?.obj) !== JSON.stringify({})) {
       const dataDecrypt = res?.obj?.data;
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);

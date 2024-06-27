@@ -16,7 +16,7 @@ const BuscarCedulaPpsADemanda = () => {
   const [showModal, setShowModal] = useState(true);
   const [estado, setEstado] = useState(false);
   const [estadoInput, setEstadoInput] = useState(false);
-  const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  const url = `${import.meta.env.VITE_URL_COLPENSIONES}`;
   // const url = "http://127.0.0.1:2500/";
 
   const hijoAPadre = () => {

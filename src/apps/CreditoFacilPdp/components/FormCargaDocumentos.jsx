@@ -9,8 +9,8 @@ import { notifyError, notifyPending } from "../../../utils/notify";
 import fetchData from "../../../utils/fetchData";
 import { fetchCustom } from "../utils/fetchCreditoFacil";
 
-const URL_CARGA_ARCHIVO_S3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-creditos`;
-const URL_GUARDAR_DOCUMENTOS_TBL_MOVIMIENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/actualizacion-documentos`;
+const URL_CARGA_ARCHIVO_S3 = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-creditos`;
+const URL_GUARDAR_DOCUMENTOS_TBL_MOVIMIENTOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/actualizacion-documentos`;
 
 const documentTypes = [
   { key: "pagareFirmado", label: "Pagaré Firmado" },

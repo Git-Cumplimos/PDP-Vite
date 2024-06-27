@@ -274,7 +274,7 @@ const VentaPines = () => {
 
   useEffect(() => {
     fetchData(
-      `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
+      `${import.meta.env.VITE_URL_TRXS_TRX}/tipos-operaciones`,
       "GET",
       { tipo_op: 73 }
     )

@@ -1,9 +1,9 @@
 import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
-const urlColpatriaTrx = `${process.env.REACT_APP_URL_COLPATRIA}/trx`;
-const urlColpatriaParams = `${process.env.REACT_APP_URL_COLPATRIA}/params`;
-const urlPinesVus = `${process.env.REACT_APP_URL_PinesVus}`
+const urlColpatriaTrx = `${import.meta.env.VITE_URL_COLPATRIA}/trx`;
+const urlColpatriaParams = `${import.meta.env.VITE_URL_COLPATRIA}/params`;
+const urlPinesVus = `${import.meta.env.VITE_URL_PinesVus}`
 
 
 export const makeDeposit = async (bodyDep) => {

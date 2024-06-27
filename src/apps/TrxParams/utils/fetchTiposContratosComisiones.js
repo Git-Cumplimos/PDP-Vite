@@ -1,10 +1,10 @@
 import fetchData from "../../../utils/fetchData";
 import { fetchAutorizadores } from "./fetchRevalAutorizadores";
 
-const urlConvenios = process.env.REACT_APP_URL_REVAL_CONVENIOS;
-const urlAutorizadores = process.env.REACT_APP_URL_REVAL_AUTORIZADOR;
+const urlConvenios = import.meta.env.VITE_URL_REVAL_CONVENIOS;
+const urlAutorizadores = import.meta.env.VITE_URL_REVAL_AUTORIZADOR;
 
-const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+const urlComisiones = import.meta.env.VITE_URL_COMISIONES;
 
 export const fetchTiposContratosComisiones = async (
   obj

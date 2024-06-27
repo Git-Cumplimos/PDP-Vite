@@ -30,11 +30,11 @@ import {
 const { styleComponents } = classes;
 
 //Constantes
-const url_get_barcode = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/codigo_barras`;
-const url_consult_moviliza = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/consultar`;
-const url_pagar_moviliza= `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/pagar_tramites`;
-const urlreintentos = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/reintento-moviliza`;
-const url_autenticar = `${process.env.REACT_APP_URL_MOVILIZA}/moviliza/autenticar`;
+const url_get_barcode = `${import.meta.env.VITE_URL_MOVILIZA}/moviliza/codigo_barras`;
+const url_consult_moviliza = `${import.meta.env.VITE_URL_MOVILIZA}/moviliza/consultar`;
+const url_pagar_moviliza= `${import.meta.env.VITE_URL_MOVILIZA}/moviliza/pagar_tramites`;
+const urlreintentos = `${import.meta.env.VITE_URL_MOVILIZA}/moviliza/reintento-moviliza`;
+const url_autenticar = `${import.meta.env.VITE_URL_MOVILIZA}/moviliza/autenticar`;
 const option_manual = "Manual";
 const option_barcode = "Código de barras";
 const options_select = [

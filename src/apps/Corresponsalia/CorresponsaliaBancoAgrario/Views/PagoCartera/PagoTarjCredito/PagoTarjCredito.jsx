@@ -17,8 +17,8 @@ import Input from "../../../../../../components/Base/Input/Input";
 import { makeMoneyFormatter } from "../../../../../../utils/functions";
 import MoneyInput from "../../../../../../components/Base/MoneyInput";
 import { enumParametrosBancoAgrario } from "../../../utils/enumParametrosBancoAgrario";
-const url_pago_cartera_tarjcredito = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
-const urlreintentos = `${process.env.REACT_APP_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
+const url_pago_cartera_tarjcredito = `${import.meta.env.VITE_URL_BANCO_AGRARIO}/banco-agrario/pago_cartera_tarjCredito`;
+const urlreintentos = `${import.meta.env.VITE_URL_CORRESPONSALIA_AGRARIO_RUNT}/banco-agrario/reintento-runt`;
 const PagoTarjCredito = () => {
   const uniqueId = v4();
   const [datosTarjCredito, setDatosTarjCredito] = useState({

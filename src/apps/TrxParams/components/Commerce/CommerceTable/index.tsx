@@ -23,7 +23,7 @@ type Props = {
   setSearchCommercesFn?: Dispatch<SetStateAction<() => void | Promise<void>>>;
 };
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 
 const CommerceTable = ({ onSelectComerce, setSearchCommercesFn }: Props) => {
   const [comercios, setComercios] = useState<any[]>([]);

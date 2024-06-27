@@ -18,8 +18,8 @@ import Select from "../../../components/Base/Select";
 import TextArea from "../../../components/Base/TextArea";
 import { enumParametrosCreditosPDP } from "../utils/enumParametrosCreditosPdp";
 
-const URL_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
-const URL_CONSULTA_PAGO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
+const URL_PAGO_CREDITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/pago-credito-pdp`;
+const URL_CONSULTA_PAGO_CREDITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/pago-credito-facil/consulta-estado-pago-credito-pdp`;
 const DATA_TIPO_DOCUMENTO = {
   "RECIBO DE CAJA": "R01",
   // "OTROS INGRESOS": "R02",

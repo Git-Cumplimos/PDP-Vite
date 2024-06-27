@@ -27,9 +27,9 @@ import { useFetchMovistar } from "../hook/useFetchMovistar";
 import usePermissionTrx from "../hook/usePermissionTrx";
 
 //----------constantes------------
-const url_get_paquetes = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/get-paquetes`;
-const url_trx_compra_paquete = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/trx-compra-paquete`;
-const url_consulta_compra_paquete = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/consulta-compra-paquete`;
+const url_get_paquetes = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-compra-paquetes/get-paquetes`;
+const url_trx_compra_paquete = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/trx-compra-paquete`;
+const url_consulta_compra_paquete = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-compra-paquetes/metodo1/consulta-compra-paquete`;
 const inputDataInitial = {
   celular: "",
 };

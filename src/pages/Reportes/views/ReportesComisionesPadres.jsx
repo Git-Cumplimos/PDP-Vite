@@ -5,7 +5,7 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import useFetchDebounce from "../../../hooks/useFetchDebounce";
 import DataTable from "../../../components/Base/DataTable";
 
-const url = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const url = import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const ReportesComisionesPadres = () => {
   const { pdpUser } = useAuth();

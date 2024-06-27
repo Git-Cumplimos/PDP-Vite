@@ -38,7 +38,7 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 
 const formatMoney = makeMoneyFormatter(0);
 
-// const url_user = process.env.REACT_APP_URL_IAM_PDP;
+// const url_user = import.meta.env.VITE_URL_IAM_PDP;
 
 const CargaComprobante = () => {
   const navigate = useNavigate();

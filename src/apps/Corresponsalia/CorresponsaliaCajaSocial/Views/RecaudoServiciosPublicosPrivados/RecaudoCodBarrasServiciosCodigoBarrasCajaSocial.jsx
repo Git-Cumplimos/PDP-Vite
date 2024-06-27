@@ -7,7 +7,7 @@ import BarcodeReader from "../../../../../components/Base/BarcodeReader";
 import { notifyPending } from "../../../../../utils/notify";
 import Form from "../../../../../components/Base/Form";
 import PagoRecaudoServiciosCajaSocial from "../../components/PagoRecaudoServiciosCajaSocial";
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-codigo-barras`;
+const URL_CONSULTA_CONVENIO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-codigo-barras`;
 const DATA_CONVENIOS_INIT = {
   data_codigo_barras: {
     codigo_ean: "",

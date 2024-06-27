@@ -136,7 +136,7 @@ const DevolucionPinesOlimpia = () => {
     e.preventDefault();
     setIsLoading(true)
     fetchData(
-      `${process.env.REACT_APP_URL_PinesVus}/consulta_devolucion_pendiente`,
+      `${import.meta.env.VITE_URL_PinesVus}/consulta_devolucion_pendiente`,
       "POST",
       {},
       {
@@ -187,7 +187,7 @@ const DevolucionPinesOlimpia = () => {
     e.preventDefault();
     setIsLoadingPago(true)
     fetchData(
-      `${process.env.REACT_APP_URL_PinesVus}/confirmar_devolucion`,
+      `${import.meta.env.VITE_URL_PinesVus}/confirmar_devolucion`,
       "POST",
       {},
       {

@@ -27,8 +27,8 @@ import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
 const minValor = enumLimiteApuestas.minApuestas;
 const maxValor = enumLimiteApuestas.maxApuestas;
 
-const URL_APUESTA = `${process.env.REACT_APP_PRACTISISTEMAS}/apuestas-deportivas/recarga`;
-const URL_CONSULTA_APUESTA = `${process.env.REACT_APP_PRACTISISTEMAS}/apuestas-deportivas/consulta-estado-trx`;
+const URL_APUESTA = `${import.meta.env.VITE_PRACTISISTEMAS}/apuestas-deportivas/recarga`;
+const URL_CONSULTA_APUESTA = `${import.meta.env.VITE_PRACTISISTEMAS}/apuestas-deportivas/consulta-estado-trx`;
 
 const RecargarApuestas = () => {
   //Variables

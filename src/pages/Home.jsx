@@ -11,7 +11,7 @@ import Modal from "../components/Base/Modal";
 import { useAuth } from "../hooks/AuthHooks";
 // import ReconoSERID from "../components/Compound/ReconoSERID/ReconoSERID";
 
-const urlAssets = process.env.REACT_APP_ASSETS_URL;
+const urlAssets = import.meta.env.VITE_ASSETS_URL;
 
 const Home = () => {
   const { showModalPublicidad, setShowModalPublicidad } = useAuth();

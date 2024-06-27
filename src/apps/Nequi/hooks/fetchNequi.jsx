@@ -39,16 +39,16 @@ export const useFetchNequi = (
         let parseObj = JSON.stringify(data_);
         let dataObj = {
           data: cifrarAES(
-            `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-            `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+            `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+            `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
             parseObj
           ),
         };
         PeticionTrx = await fetchTrx({}, dataObj);
         const dataDecrypt = PeticionTrx?.obj?.data ?? "";
         const obj = decryptAES(
-          `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-          `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+          `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
           dataDecrypt
         );
         PeticionTrx.obj = JSON.parse(obj);
@@ -75,16 +75,16 @@ export const useFetchNequi = (
             let parseObjConsulta = JSON.stringify(data_consulta);
             let dataObjConsulta = {
               data: cifrarAES(
-                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
                 parseObjConsulta
               ),
             };
             PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
             const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
             const objConsulta = decryptAES(
-              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
               dataDecryptConsulta
             );
             PeticionConsulta.obj = JSON.parse(objConsulta);
@@ -129,16 +129,16 @@ export const useFetchNequi = (
             let parseObjConsulta = JSON.stringify(data_consulta);
             let dataObjConsulta = {
               data: cifrarAES(
-                `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-                `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+                `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
                 parseObjConsulta
               ),
             };
             PeticionConsulta = await fetchConsulta({}, dataObjConsulta);
             const dataDecryptConsulta = PeticionConsulta?.obj?.data ?? "";
             const objConsulta = decryptAES(
-              `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-              `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+              `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
               dataDecryptConsulta
             );
             PeticionConsulta.obj = JSON.parse(objConsulta);

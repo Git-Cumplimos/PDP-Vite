@@ -76,7 +76,7 @@ const RetiroEfectivo = () => {
       cuenta: parseInt(dataInput.cuenta),
       OTP: pinBlock(
         dataInput.OTP,
-        process.env.REACT_APP_PAN_BANCO_AGRARIO ?? ""
+        import.meta.env.VITE_PAN_BANCO_AGRARIO ?? ""
       ),
 
       location: {

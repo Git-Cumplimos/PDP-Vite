@@ -9,8 +9,8 @@ import Modal from "../../../components/Base/Modal";
 import { useMFA } from "../../../components/Base/MFAScreen";
 import { useFetchCreditoFacil } from "../hooks/fetchCreditoFacil";
 
-const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
-const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
+const URL_CONSULTAR_ESTADO_SIMULACION = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/check-estado-credito-facil`;
+const URL_REALIZAR_DESEMBOLSO_CREDITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/desembolso-credito-facil`;
 
 const ModalDesembolso = ({ dataCredito }) => {
   const navigate = useNavigate();

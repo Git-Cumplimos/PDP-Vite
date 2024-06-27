@@ -1,7 +1,7 @@
 import fetchData from "../../../../utils/fetchData";
 import { notifyError } from "../../../../utils/notify";
 
-const url_retiro_efectivo = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/retiro-efectivo`;
+const url_retiro_efectivo = `${import.meta.env.VITE_URL_BANCO_AGRARIO}/banco-agrario/retiro-efectivo`;
 
 export class ValidationRetiroEfectivo extends Error {
   constructor(message) {

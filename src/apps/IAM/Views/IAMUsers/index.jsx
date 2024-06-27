@@ -19,7 +19,7 @@ import { useAuth } from "../../../../hooks/AuthHooks";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 import IAMRecoverQRMassive from "./IAMRecoverQRMassive";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const initialSearchFilters = new Map([
   ["uuid", ""],

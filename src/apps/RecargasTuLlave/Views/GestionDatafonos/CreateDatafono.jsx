@@ -14,11 +14,11 @@ import Form from "../../../../components/Base/Form/Form";
 import ConsultaComerciosDatafonos from "../../components/ConsultaComerciosDatafonos/ConsultaComerciosDatafonos";
 import { useAuth } from "../../../../hooks/AuthHooks";
 
-const URL_CONSULTAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
-const URL_EDITAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/actualizar`;
-const URL_CREAR_DATAFONO = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
-const URL_CONSULTA_INVENTARIO = `${process.env.REACT_APP_URL_INVENTARIO}/consultar_datafono_unique`;
-const URL_EDITAR_INVENTARIO = `${process.env.REACT_APP_URL_INVENTARIO}/editar_datafono`;
+const URL_CONSULTAR_DATAFONO = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/consultar`;
+const URL_EDITAR_DATAFONO = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/actualizar`;
+const URL_CREAR_DATAFONO = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/tullave-gestion-datafonos/crear`;
+const URL_CONSULTA_INVENTARIO = `${import.meta.env.VITE_URL_INVENTARIO}/consultar_datafono_unique`;
+const URL_EDITAR_INVENTARIO = `${import.meta.env.VITE_URL_INVENTARIO}/editar_datafono`;
 // const URL_CONSULTA_INVENTARIO = `http://127.0.0.1:8000/tullave-gestion-datafonos/consultar_datafono_unique`;
 // const URL_EDITAR_INVENTARIO = `http://127.0.0.1:8000/tullave-gestion-datafonos/editar_datafono`;
 

@@ -16,8 +16,8 @@ import { v4 } from "uuid";
 import { useFetchMovii } from "../hooks/fetchMovii";
 import { enumParametrosMovii } from "../utils/enumParametrosMovii";
 
-const URL_REALIZAR_RETIRO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/retiro-corresponsal-movii`;
-const URL_CONSULTAR_RETIRO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/check-estado-retiro-movii`;
+const URL_REALIZAR_RETIRO_MOVII = `${import.meta.env.VITE_URL_MOVII}/corresponsal-movii/retiro-corresponsal-movii`;
+const URL_CONSULTAR_RETIRO_MOVII = `${import.meta.env.VITE_URL_MOVII}/corresponsal-movii/check-estado-retiro-movii`;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",

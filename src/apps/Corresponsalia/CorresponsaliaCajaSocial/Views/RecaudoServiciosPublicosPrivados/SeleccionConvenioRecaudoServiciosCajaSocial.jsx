@@ -7,7 +7,7 @@ import Input from "../../../../../components/Base/Input";
 import useDelayedCallback from "../../../../../hooks/useDelayedCallback";
 import { notifyError } from "../../../../../utils/notify";
 
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
+const URL_CONSULTA_CONVENIO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-convenios`;
 
 const DATA_CONVENIOS_INIT = {
   convenios: [],

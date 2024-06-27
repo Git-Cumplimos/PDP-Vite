@@ -9,8 +9,8 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  consultaOrden: `${process.env.REACT_APP_URL_MARKETPLACE}consultorder`,
-  pagoOrden: `${process.env.REACT_APP_URL_MARKETPLACE}payorder`,
+  consultaOrden: `${import.meta.env.VITE_URL_MARKETPLACE}consultorder`,
+  pagoOrden: `${import.meta.env.VITE_URL_MARKETPLACE}payorder`,
 };
 
 export const MarketContext = createContext({

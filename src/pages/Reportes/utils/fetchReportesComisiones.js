@@ -1,8 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlComisiones = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlComisiones = import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 // const urlComisiones = "http://127.0.0.1:5000"
-const urlComercios = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const urlComercios = import.meta.env.VITE_URL_SERVICE_COMMERCE;
 
 export const descargarReporte = (url) => {
   return async (body) => {

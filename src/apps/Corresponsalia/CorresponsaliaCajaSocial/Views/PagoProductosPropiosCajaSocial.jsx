@@ -28,9 +28,9 @@ import TicketsCajaSocial from "../components/TicketsCajaSocial";
 import BarcodeReader from "../../../../components/Base/BarcodeReader";
 import Select from "../../../../components/Base/Select";
 
-const URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/consulta-pago-productos-propios`;
-const URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/pago-productos-propios`;
-const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/consulta-estado-pago-productos-propios`;
+const URL_CONSULTA_PAGO_PRODUCTOS_PROPIOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/consulta-pago-productos-propios`;
+const URL_PAGO_PRODUCTOS_PROPIOS_CAJA_SOCIAL = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/pago-productos-propios`;
+const URL_ESTADO_PAGO_PRODUCTOS_PROPIOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/productos-propios-caja-social/consulta-estado-pago-productos-propios`;
 
 const DATA_PAGO_INIT = {
   estadoLecturaPago: "codigoBarras",

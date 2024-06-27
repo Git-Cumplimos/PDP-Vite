@@ -22,8 +22,8 @@ const dateFormatter = Intl.DateTimeFormat("es-CO", {
 });
 
 const ConsultaCitas = () => {
-  const UrlConsultaOficinas = `${process.env.REACT_APP_URL_PinesVus}/consulta_oficinas`
-  const UrlParametrizacion = `${process.env.REACT_APP_URL_PinesVus}/parametrizar_horarios`
+  const UrlConsultaOficinas = `${import.meta.env.VITE_URL_PinesVus}/consulta_oficinas`
+  const UrlParametrizacion = `${import.meta.env.VITE_URL_PinesVus}/parametrizar_horarios`
 
   const navigate = useNavigate();
 

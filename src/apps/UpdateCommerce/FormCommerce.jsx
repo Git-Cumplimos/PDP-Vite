@@ -13,11 +13,11 @@ import { useAuth } from "../../hooks/AuthHooks";
 import fetchData from "../../utils/fetchData";
 import { notify, notifyError } from "../../utils/notify";
 
-const url = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
+const url = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}/actividad`;
 
-const url_send = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const url_send = import.meta.env.VITE_URL_SERVICE_COMMERCE;
 
-const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const url_types = import.meta.env.VITE_URL_SERVICE_COMMERCE;
 
 const FormCommerce = () => {
   const [commerceId, setCommerceId] = useState(123);

@@ -7,8 +7,8 @@ import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import useFetchDispatchDebounce from "../../../../hooks/useFetchDispatchDebounce";
 import { makeDateFormatter } from "../../../../utils/functions";
 
-const urlBackend = process.env.REACT_APP_URL_PinesVus;
-const urlBackend2 = process.env.REACT_APP_URL_PinesVus;
+const urlBackend = import.meta.env.VITE_URL_PinesVus;
+const urlBackend2 = import.meta.env.VITE_URL_PinesVus;
 
 const initialSearchFilters = new Map([
   ["fecha_ini", ""],

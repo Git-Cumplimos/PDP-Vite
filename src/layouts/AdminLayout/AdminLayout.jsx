@@ -1,7 +1,7 @@
 import { useUrls } from "../../hooks/UrlsHooks";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import classes from "./AdminLayout.module.css";
+import styles from "./AdminLayout.module.css";
 import LogoPDP from "../../components/Base/LogoPDP";
 import BarIcon from "../../components/Base/BarIcon";
 import UserInfo from "../../components/Compound/UserInfo";
@@ -43,11 +43,11 @@ const AdminLayout = () => {
     comision,
     diasSobregiro,
     valMinConsignar,
-  } = classes;
+  } = styles;
 
-  const montoMaximoCaja = process.env.REACT_APP_MAX_MONTO_CAJA;
-  const porcentajeAlerta1 = process.env.REACT_APP_PORCENTAJE_ALERTA_1;
-  const porcentajeAlerta2 = process.env.REACT_APP_PORCENTAJE_ALERTA_2;
+  const montoMaximoCaja = import.meta.env.VITE_MAX_MONTO_CAJA;
+  const porcentajeAlerta1 = import.meta.env.VITE_PORCENTAJE_ALERTA_1;
+  const porcentajeAlerta2 = import.meta.env.VITE_PORCENTAJE_ALERTA_2;
 
   const {
     quotaInfo,
@@ -356,7 +356,7 @@ const AdminLayout = () => {
               realice el movimiento a bóveda
               <ButtonBar>
                 <Button
-                  className="btn mx-auto d-block"
+                  className="mx-auto btn d-block"
                   type="submit"
                   onClick={() => handleCloseBoveda()}
                 >
@@ -374,7 +374,7 @@ const AdminLayout = () => {
                 realizar transacciones hasta que realice el cierre.
                 <ButtonBar>
                   <Button
-                    className="btn mx-auto d-block"
+                    className="mx-auto btn d-block"
                     type="submit"
                     onClick={() => closeCash()}
                   >

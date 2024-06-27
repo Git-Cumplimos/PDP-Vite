@@ -16,7 +16,7 @@ const FileInputX = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
-  const urlAssets = process.env.REACT_APP_ASSETS_URL;
+  const urlAssets = import.meta.env.VITE_ASSETS_URL;
   const {
     contendorPrincipalFormulario,
     contenedorForm,
@@ -42,7 +42,7 @@ const FileInputX = () => {
   const [disabledBtn, setDisabledBtn] = useState(false);
   const [procesandoValidacion, setProcesandoValidacion] = useState(false);
   const [type1, setType1] = useState([]);
-  const file_name = `${process.env.REACT_APP_CARPETA_BUCKET_PINES}`
+  const file_name = `${import.meta.env.VITE_CARPETA_BUCKET_PINES}`
   const { pdpUser } = useAuth();
 
   //------------------Guardar Archivos PDF---------------------//

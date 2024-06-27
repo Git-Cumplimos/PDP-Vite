@@ -19,7 +19,7 @@ type Props = {};
 
 const dateFormatter = makeDateFormatter(true);
 
-const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+const urlComisiones = import.meta.env.VITE_URL_COMISIONES;
 // const urlComisiones = "http://localhost:5000";
 
 const HistorialDispersionesUsuarioPadre = (props: Props) => {

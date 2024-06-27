@@ -43,7 +43,7 @@ const fetchDataPinesCea = async (
     method: method,
   };
 
-  const AuthorizationOlimpiaCodificado = btoa(`${process.env.REACT_APP_USUARIO_CEA_OLIMPIA}:${process.env.REACT_APP_CONTRASENNA_CEA_OLIMPIA}`);
+  const AuthorizationOlimpiaCodificado = btoa(`${import.meta.env.VITE_USUARIO_CEA_OLIMPIA}:${import.meta.env.VITE_CONTRASENNA_CEA_OLIMPIA}`);
 
   const _headers = {};
   if (authenticate) {

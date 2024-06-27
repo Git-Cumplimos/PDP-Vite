@@ -20,7 +20,7 @@ const FileInputX = ({ banco }) => {
 
   const banco_minuscula = banco.charAt(0).toLowerCase() + banco.slice(1);
   // console.log(banco_minuscula);
-  const urlAssets = process.env.REACT_APP_ASSETS_URL;
+  const urlAssets = import.meta.env.VITE_ASSETS_URL;
   const {
     contendorPrincipalFormulario,
     contenedorForm,

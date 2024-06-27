@@ -15,7 +15,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_cambioParams = `${process.env.REACT_APP_URL_LOTERIAS}/cambio_params`;
+const url_cambioParams = `${import.meta.env.VITE_URL_LOTERIAS}/cambio_params`;
 
 const ParamsForm = ({ closeModal, params, setParams }) => {
   const cambio_params = useCallback(async (uvt, max_pago) => {

@@ -10,9 +10,9 @@ import { notify, notifyError } from "../../../../utils/notify";
 import Form from "../../../../components/Base/Form";
 import Input from "../../../../components/Base/Input";
 
-const url_iam = process.env.REACT_APP_URL_IAM_PDP;
+const url_iam = import.meta.env.VITE_URL_IAM_PDP;
 
-const url_types = process.env.REACT_APP_URL_TRXS_TRX;
+const url_types = import.meta.env.VITE_URL_TRXS_TRX;
 
 const searchTypes = async (page = 1, limit = 5) => {
   const queries = {};

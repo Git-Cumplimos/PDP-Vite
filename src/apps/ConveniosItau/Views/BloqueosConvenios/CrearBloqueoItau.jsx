@@ -13,7 +13,7 @@ import {
 import { fetchCustom } from "../../utils/fetchConveniosItau";
 import Modal from "../../../../components/Base/Modal/Modal";
 
-const URL_CORRESPONSALIA_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_ITAU}`;
+const URL_CORRESPONSALIA_ITAU = `${import.meta.env.VITE_URL_CORRESPONSALIA_ITAU}`;
 // const URL_CORRESPONSALIA_ITAU = `http://127.0.0.1:5000`;
 
 const CrearBloqueoItau = () => {

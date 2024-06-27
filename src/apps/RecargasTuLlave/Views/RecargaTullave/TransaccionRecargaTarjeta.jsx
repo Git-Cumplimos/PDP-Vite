@@ -18,8 +18,8 @@ import Select from "../../../../components/Base/Select/Select";
 import Tickets from "../../../../components/Base/Tickets/Tickets";
 import { useFetchTuLlave } from "../../hooks/fetchTuLlave";
 
-const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
-const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
+const URL_REALIZAR_RECARGA_TARJETA = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/tu-llave/recarga-tarjeta`;
+const URL_CONSULTAR_RECARGA_TARJETA = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/tu-llave/consulta-recarga-tarjeta`;
 
 const TransaccionRecargaTarjeta = () => {
   const navigate = useNavigate();

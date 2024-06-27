@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
 
 export const postConsultaMensajesPublicitarios = async (bodyObj) => {
   if (!bodyObj) {

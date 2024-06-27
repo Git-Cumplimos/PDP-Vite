@@ -6,7 +6,7 @@ import ToggleInput from "../../../../components/Base/ToggleInput";
 import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 
-const url_iam = process.env.REACT_APP_URL_IAM_PDP;
+const url_iam = import.meta.env.VITE_URL_IAM_PDP;
 
 const EditUserForm = ({ selected, onCloseModal }) => {
   const onSubmit = (e) => {

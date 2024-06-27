@@ -16,7 +16,7 @@ import LogoPDP from "../../../../components/Base/LogoPDP";
 import Fieldset from "../../../../components/Base/Fieldset";
 import SimpleLoading from "../../../../components/Base/SimpleLoading";
 
-const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
+const urlLoto = `${import.meta.env.VITE_URL_LOTERIAS}/contiploteria`;
 const {
   contenedorPrincipal,
   BarcodeCompleto,

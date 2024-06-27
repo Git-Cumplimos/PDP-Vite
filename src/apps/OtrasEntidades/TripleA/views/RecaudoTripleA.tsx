@@ -56,17 +56,17 @@ type TypingConsultData = null | {
 const name_componente = "Recaudo";
 const infServiceBackend: TypeInf = {
   barcode: {
-    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/get-codigo-barras`,
+    url: `${import.meta.env.VITE_URL_TRIPLE_A}/backend_tripleA/transacciones/get-codigo-barras`,
     name: "tripleA - Lectura código de barras",
     method: "POST",
   },
   validation: {
-    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/validacion-facturas`,
+    url: `${import.meta.env.VITE_URL_TRIPLE_A}/backend_tripleA/transacciones/validacion-facturas`,
     name: "tripleA - validacion",
     method: "POST",
   },
   pay: {
-    url: `${process.env.REACT_APP_URL_TRIPLE_A}/backend_tripleA/transacciones/trx-pago-factura`,
+    url: `${import.meta.env.VITE_URL_TRIPLE_A}/backend_tripleA/transacciones/trx-pago-factura`,
     name: "tripleA - pago",
     method: "POST",
   },

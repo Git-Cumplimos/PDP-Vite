@@ -3,7 +3,7 @@ import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
 import { notify } from "../../../../utils/notify";
 
-const URL_CONSULTA_CONVENIO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
+const URL_CONSULTA_CONVENIO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-convenios`;
 
 export const fetchCustom = (
   url_,
@@ -39,8 +39,8 @@ export const fetchCustom = (
     let parseObj = JSON.stringify(data_);
     let dataObj = {
       data: cifrarAES(
-        `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
         parseObj
       ),
     };
@@ -115,8 +115,8 @@ export const fetchCustom = (
     try {
       const dataDecrypt = Peticion?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       Peticion.obj = JSON.parse(obj);
@@ -264,8 +264,8 @@ export const postConsultaConveniosItau = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_CORRESPONSALIA_OTROS}`,
       parseObj
     ),
   };
@@ -285,8 +285,8 @@ export const postConsultaConveniosItau = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_CORRESPONSALIA_OTROS}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);

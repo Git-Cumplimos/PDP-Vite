@@ -21,7 +21,7 @@ const dateFormatter = Intl.DateTimeFormat("fr-ca", {
 });
 
 const ConsultaCitas = () => {
-  const UrlConsultaCitas = `${process.env.REACT_APP_URL_PinesVus}/consulta_citas`
+  const UrlConsultaCitas = `${import.meta.env.VITE_URL_PinesVus}/consulta_citas`
   const navigate = useNavigate();
   const { consultaCupoQX, modificarCupoQX } =
     usePinesVus();

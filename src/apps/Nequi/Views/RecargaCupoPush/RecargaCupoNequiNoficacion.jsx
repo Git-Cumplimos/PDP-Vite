@@ -17,8 +17,8 @@ import Tickets from "../../../../components/Base/Tickets";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
 
-const URL_REALIZAR_PAGO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/recarga-notificacion-push`;
-const URL_CONSULTA_TRX_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/check-estado-recarga-credito-nequi`;
+const URL_REALIZAR_PAGO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/nequi/recarga-notificacion-push`;
+const URL_CONSULTA_TRX_BD = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/nequi/check-estado-recarga-credito-nequi`;
 const costoTrx = parseInt(
   enumParametrosNequi.COSTO_TRANSACCION_RECARGA_CUPO_NEQUI_NOTIFICACION
 );

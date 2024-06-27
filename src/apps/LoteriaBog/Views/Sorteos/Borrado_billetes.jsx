@@ -9,8 +9,8 @@ import Modal from "../../../../components/Base/Modal";
 import { notify, notifyError } from "../../../../utils/notify";
 import { useLoteria } from "../../utils/LoteriaHooks";
 
-const url_BorrarBilletes = `${process.env.REACT_APP_URL_LOTERIAS}/eliminar_asignacion`;
-const url_sorteos = `${process.env.REACT_APP_URL_LOTERIAS}/num_sorteo`;
+const url_BorrarBilletes = `${import.meta.env.VITE_URL_LOTERIAS}/eliminar_asignacion`;
+const url_sorteos = `${import.meta.env.VITE_URL_LOTERIAS}/num_sorteo`;
 
 const Borrado_billetes = ({ route }) => {
   const [cod_distribuidor, setCod_distribuidor] = useState("");

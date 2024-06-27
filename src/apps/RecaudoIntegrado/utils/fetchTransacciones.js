@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 
-const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
+const urlBackend = `${import.meta.env.VITE_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
 export const BuscarPorBanco = async (banco) => {
   /*   console.log("BODY", banco); */
   if (!banco) {

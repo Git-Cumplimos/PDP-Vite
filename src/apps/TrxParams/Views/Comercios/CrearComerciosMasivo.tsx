@@ -22,7 +22,7 @@ type Props = {
   searchCommercesFn: () => void | Promise<void>;
 };
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 // const urlComercios = `http://localhost:5000`;
 
 const toastIdCarga = "carga-archivo-123";

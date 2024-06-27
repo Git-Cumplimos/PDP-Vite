@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlCerolio = process.env.REACT_APP_URL_CEROLIO;
+const urlCerolio = import.meta.env.VITE_URL_CEROLIO;
 
 export const fetchTarifasByIdComercio = async (id_comercio) => {
   try {

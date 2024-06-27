@@ -17,7 +17,7 @@ const BuscarComercioEmail = () => {
   const [showModal, setShowModal] = useState(true);
   const [continuarDomiciliacion, setContinuarDomiciliacion] = useState(false);
   const [emailVerificado, setEmailVerificado] = useState(true);
-  const url = `${process.env.REACT_APP_URL_COLPENSIONES}`;
+  const url = `${import.meta.env.VITE_URL_COLPENSIONES}`;
   // const url = "http://127.0.0.1:2500/";
 
   //------------------Constantes para Dar Estilos---------------------//

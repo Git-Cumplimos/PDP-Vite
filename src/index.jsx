@@ -1,3 +1,4 @@
+import "./init";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
@@ -30,3 +31,4 @@ ReactDOM.render(
 // Learn more about service workers: https://cra.link/PWA
 // serviceWorkerRegistration.register({ onUpdate: onUpdateSW });
 serviceWorkerRegistration.unregister();
+

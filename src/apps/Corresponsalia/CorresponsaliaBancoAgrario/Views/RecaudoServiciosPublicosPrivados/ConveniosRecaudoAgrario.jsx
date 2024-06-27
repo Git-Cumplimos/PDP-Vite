@@ -21,7 +21,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import ToggleInput from "../../../../../components/Base/ToggleInput";
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_BANCO_AGRARIO}/banco-agrario/banco_agrario_cb_recaudo/subir_archivos_convenios`;
+const url_cargueS3 = `${import.meta.env.VITE_URL_BANCO_AGRARIO}/banco-agrario/banco_agrario_cb_recaudo/subir_archivos_convenios`;
 
 const ConveniosRecaudoAgrario = () => {
   const navigate = useNavigate();

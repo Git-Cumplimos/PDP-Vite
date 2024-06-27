@@ -20,9 +20,9 @@ import { useFetchItau } from "../hooks/fetchItau";
 import { enumParametrosItau } from "../utils/enumParametrosItau";
 import TicketsItau from "./TicketsItau/TicketsItau";
 
-const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-recaudo-servicios`;
-const URL_PAGO_RECAUDO_ITAU = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/recaudo-servicios`;
-const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-estado-recaudo-servicios`;
+const URL_CONSULTA_RECAUDO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-recaudo-servicios`;
+const URL_PAGO_RECAUDO_ITAU = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/recaudo-servicios`;
+const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/recaudo-servicios-itau/consulta-estado-recaudo-servicios`;
 
 const DATA_RECAUDO_INIT = {
   codigoConvenio: "",

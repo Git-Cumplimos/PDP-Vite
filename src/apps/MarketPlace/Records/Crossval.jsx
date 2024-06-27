@@ -24,7 +24,7 @@ const Crossval = () => {
 
   const transacciones = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end) => {
-      const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+      const url = `${import.meta.env.VITE_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio === -1 || Comercio === "")) {
         queries.id_comercio = Comercio;

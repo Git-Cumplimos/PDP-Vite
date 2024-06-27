@@ -1,5 +1,5 @@
 import fetchData from "../../../utils/fetchData";
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 // const urlComercios = `http://127.0.0.1:5000`;
 
 

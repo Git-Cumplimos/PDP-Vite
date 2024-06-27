@@ -1,6 +1,6 @@
 import fetchData from "../../../../utils/fetchData";
 
-const urlBancoAgrario = `${process.env.REACT_APP_URL_BANCO_AGRARIO}`;
+const urlBancoAgrario = `${import.meta.env.VITE_URL_BANCO_AGRARIO}`;
 
 export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   if (!bodyObj) {

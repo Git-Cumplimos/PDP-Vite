@@ -28,7 +28,7 @@ type Props = {
   setReloadFunction?: Dispatch<SetStateAction<() => void>>;
 };
 
-const urlGruposConvenios = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlGruposConvenios = import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const TablaGruposConvenios = ({ onSelect, setReloadFunction }: Props) => {
   const [gruposDeConvenios, setGruposDeConvenios] = useState<

@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
-// const urlRecargasCelular = `${process.env.REACT_APP_RECARGAS_CELULAR}`;
-const urlApuestasDeportivas = process.env.REACT_APP_PRACTISISTEMAS+'/apuestasDeportivas';
+// const urlRecargasCelular = `${import.meta.env.VITE_RECARGAS_CELULAR}`;
+const urlApuestasDeportivas = import.meta.env.VITE_PRACTISISTEMAS+'/apuestasDeportivas';
 
 export const postConsultaCasasApuestas = async (bodyObj) => {
   if (!bodyObj) {

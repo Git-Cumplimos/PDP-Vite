@@ -1,5 +1,5 @@
 import fetchData from "../../../utils/fetchData";
-const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+const urlComisiones = import.meta.env.VITE_URL_COMISIONES;
 
 export const postComisionesPagar = async (bodyObj) => {
   if (!bodyObj) {

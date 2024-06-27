@@ -19,7 +19,7 @@ const dateFormatter = Intl.DateTimeFormat("az", {
   day: "2-digit",
 });
 
-//const url_cargueS3 = `${process.env.REACT_APP_URL_PinesVus}/CargueS3`;
+//const url_cargueS3 = `${import.meta.env.VITE_URL_PinesVus}/CargueS3`;
 
 const Participacion = () => {
   const navigate = useNavigate();

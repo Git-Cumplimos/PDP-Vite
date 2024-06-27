@@ -37,9 +37,9 @@ type Props = {};
 const toastIdLoading = "progress-trx-123";
 const limite_maximo_dispersion = 10_000_000;
 
-const urlComisiones = process.env.REACT_APP_URL_COMISIONES;
+const urlComisiones = import.meta.env.VITE_URL_COMISIONES;
 // const urlComisiones = "http://localhost:5000";
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 
 const DispersionUsuarioPadre = (props: Props) => {
   const { pdpUser, quotaInfo } = useAuth();

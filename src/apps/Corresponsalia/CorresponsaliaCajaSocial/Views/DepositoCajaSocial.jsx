@@ -22,9 +22,9 @@ import { algoCheckCuentaCreditoBMCajaSocial } from "../utils/trxUtils";
 import TicketsCajaSocial from "../components/TicketsCajaSocial";
 import { useMFA } from "../../../../components/Base/MFAScreen";
 
-const URL_CONSULTA_TITULAR_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
-const URL_DEPOSITO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
-const URL_CONSULTA_DEPOSITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-deposito`;
+const URL_CONSULTA_TITULAR_DEPOSITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-titular`;
+const URL_DEPOSITO_CAJA_SOCIAL = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/deposito-corresponsal`;
+const URL_CONSULTA_DEPOSITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/deposito-caja-social/consulta-estado-deposito`;
 
 const DATA_DEPOSITO_INIT = {
   numeroCuenta: "",

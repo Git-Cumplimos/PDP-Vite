@@ -20,8 +20,8 @@ import TableEnterprise from "../../../../components/Base/TableEnterprise";
 import FormAceptarTerminosCEACRC from "../../components/FormAceptarTerminosCEACRC";
 import { postTerminosCondicionesCEACRC } from "../../hooks/fetchCreditoFacil";
 
-const URL_CONSULTAR_ESTADO_SIMULACION = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/check-estado-desembolso-credito-facil`;
-const URL_REALIZAR_DESEMBOLSO_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/desembolso`;
+const URL_CONSULTAR_ESTADO_SIMULACION = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/check-estado-desembolso-credito-facil`;
+const URL_REALIZAR_DESEMBOLSO_CREDITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil-cea-crc/desembolso`;
 
 const DesembolsoCEACRC = () => {
   const navigate = useNavigate();

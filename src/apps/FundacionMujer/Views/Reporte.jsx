@@ -57,8 +57,8 @@ const pageStyle = `
   }
 `;
 
-const url_Report = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
-const url_Download = `${process.env.REACT_APP_URL_FDLMWSDL}/report`;
+const url_Report = `${import.meta.env.VITE_URL_TRXS_TRX}/transaciones-view`;
+const url_Download = `${import.meta.env.VITE_URL_FDLMWSDL}/report`;
 
 const Reporte = () => {
   const formatMoney = new Intl.NumberFormat("es-CO", {

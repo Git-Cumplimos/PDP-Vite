@@ -8,7 +8,7 @@ import fetchData from "../../../utils/fetchData";
 import EditRoleForm from "../components/Roles/EditRoleForm";
 import RoleForm from "../components/Roles/RoleForm";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const IAMRoles = () => {
   const [rolesDB, setRolesDB] = useState([]);

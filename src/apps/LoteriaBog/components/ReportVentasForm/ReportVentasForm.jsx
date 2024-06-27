@@ -40,8 +40,8 @@ function createCard(
     fecha_venta,
   };
 }
-const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
-const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
+const url_reportVentas = `${import.meta.env.VITE_URL_LOTERIAS}/reportes_ventas`;
+const urlLoto = `${import.meta.env.VITE_URL_LOTERIAS}/contiploteria`;
 
 const ReportVentasForm = ({ closeModal, oficina }) => {
   const { codigos_lot, setCodigos_lot } = useLoteria();

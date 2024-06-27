@@ -24,9 +24,9 @@ type Props = {
 };
 
 const urlConvenios =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
-const URL_CARGUE_ARCHIVO_PARAM = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp/parametrizar-codigos-barras-convenios-masivo`;
-const URL_ESTADO_CARGUE_ARCHIVO_PARAM = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp/comprobar-cargue-archivo-param-cod-barras`;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const URL_CARGUE_ARCHIVO_PARAM = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp/parametrizar-codigos-barras-convenios-masivo`;
+const URL_ESTADO_CARGUE_ARCHIVO_PARAM = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}/convenios-pdp/comprobar-cargue-archivo-param-cod-barras`;
 // const urlConvenios = `http://localhost:5000`;
 
 const CrearParametrizacionCodBarrasConveniosMasivo = ({

@@ -22,8 +22,8 @@ import { onChangeNumber } from "../../../../utils/functions";
 import { CommerceTagsIam } from "../../components/Commerce";
 import ResetUserMFA from "./ResetUserMFA";
 
-const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url_types = import.meta.env.VITE_URL_SERVICE_COMMERCE;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const HandleUser = () => {
   const { uuid } = useParams();

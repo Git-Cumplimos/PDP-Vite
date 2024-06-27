@@ -20,9 +20,9 @@ import { useFetchCajaSocial } from "../hooks/fetchCajaSocial";
 import { enumParametrosCajaSocial } from "../utils/enumParametrosCajaSocial";
 import TicketsCajaSocial from "./TicketsCajaSocial";
 
-const URL_CONSULTA_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-recaudo-servicios`;
-const URL_PAGO_RECAUDO_CAJA_SOCIAL = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/recaudo-servicios`;
-const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${process.env.REACT_APP_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-estado-recaudo-servicios`;
+const URL_CONSULTA_RECAUDO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-recaudo-servicios`;
+const URL_PAGO_RECAUDO_CAJA_SOCIAL = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/recaudo-servicios`;
+const URL_CONSULTA_ESTADO_PAGO_RECAUDO = `${import.meta.env.VITE_URL_CORRESPONSALIA_CAJA_SOCIAL}/recaudo-servicios-caja-social/consulta-estado-recaudo-servicios`;
 
 const DATA_RECAUDO_INIT = {
   codigoConvenio: "",

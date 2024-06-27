@@ -22,8 +22,8 @@ import classes from "./Premios.module.css";
 
 const { btnBasura, contenedorArchivosBasura } = classes;
 
-const url_cargueS3 = `${process.env.REACT_APP_URL_LOTERIAS}/documentos_premios`;
-const urlAssets = process.env.REACT_APP_ASSETS_URL;
+const url_cargueS3 = `${import.meta.env.VITE_URL_LOTERIAS}/documentos_premios`;
+const urlAssets = import.meta.env.VITE_ASSETS_URL;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",

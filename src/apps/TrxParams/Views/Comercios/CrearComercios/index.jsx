@@ -30,11 +30,11 @@ import RepresentanteLegal from "./RepresentanteLegal";
 import AddressForm from "../../../../../components/Base/AddressForm";
 import NitInput from "../../ConveniosPDP/components/NitInput";
 
-const url_types = process.env.REACT_APP_URL_SERVICE_COMMERCE;
-const init_grupo_comercio = process.env.REACT_APP_URL_INIT_GRUPO_COMERCIO;
+const url_types = import.meta.env.VITE_URL_SERVICE_COMMERCE;
+const init_grupo_comercio = import.meta.env.VITE_URL_INIT_GRUPO_COMERCIO;
 
 const vectorCodigosInstitucionales = [
-  ...process.env.REACT_APP_CODIGOS_INSTITUCIONALES_COMERCIOS.split("/").map(
+  ...import.meta.env.VITE_CODIGOS_INSTITUCIONALES_COMERCIOS.split("/").map(
     (e, i) => {
       return {
         value: e,
@@ -44,11 +44,11 @@ const vectorCodigosInstitucionales = [
   ),
 ];
 
-const urlComercios = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const urlComercios = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 // const urlComercios = `http://127.0.0.1:5000`;
 const urlParametrizacion =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
-const urlActividades = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/actividad`;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlActividades = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}/actividad`;
 
 const emptyCommerce = {
   apellido_contacto1_comercio: "",
@@ -1317,7 +1317,7 @@ const CrearComercios = () => {
             disabled={alertMonto !== "" && alertMonto !== 0 ? true : false}
           />
         </Fieldset>
-        {process.env.REACT_APP_APPENV_NAME === "pdp" && (
+        {import.meta.env.VITE_APPENV_NAME === "pdp" && (
           <Fieldset legend="Dispersión de pagos" className="lg:col-span-2">
             <Select
               id="derechos_locales"

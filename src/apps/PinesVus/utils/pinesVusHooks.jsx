@@ -3,21 +3,21 @@ import { useAuth } from "../../../hooks/AuthHooks";
 import fetchData from "../../../utils/fetchData";
 
 const urls = {
-  cancelPinVus: `${process.env.REACT_APP_URL_PinesVus}/cancelarPines`,
-  PinVus: `${process.env.REACT_APP_URL_PinesVus}/pines`,
-  cons_estado_tipoPin: `${process.env.REACT_APP_URL_PinesVus}/TipoEstadoPin`,
-  consultaTramites: `${process.env.REACT_APP_URL_PinesVus}/consultaTramites`,
-  consultaClientes: `${process.env.REACT_APP_URL_PinesVus}/consultaClientes`,
-  consultaParticipacion: `${process.env.REACT_APP_URL_PinesVus}/consultaParticipacion`,
-  registroPagoParticipacion: `${process.env.REACT_APP_URL_PinesVus}/registroPagoParticipacion`,
-  consultaPagoParticipacion: `${process.env.REACT_APP_URL_PinesVus}/consultaPagoParticipacion`,
-  descargaArchivosS3: `${process.env.REACT_APP_URL_PinesVus}/descargaArchivosS3`,
-  cupoQX: `${process.env.REACT_APP_URL_PinesVus}/cupoQX`,
-  ingresarIdQX: `${process.env.REACT_APP_URL_PinesVus}/ingresarIdQX`,
-  consultaEpsArl: `${process.env.REACT_APP_URL_PinesVus}/consultaEpsArl`,
-  reenvioHash: `${process.env.REACT_APP_URL_PinesVus}/reenviarCodigoHash`,
-  cierreManual: `${process.env.REACT_APP_URL_PinesVus}/cierreManual`,
-  consultaEstadoCierre: `${process.env.REACT_APP_URL_PinesVus}/consultaCierreManual`,
+  cancelPinVus: `${import.meta.env.VITE_URL_PinesVus}/cancelarPines`,
+  PinVus: `${import.meta.env.VITE_URL_PinesVus}/pines`,
+  cons_estado_tipoPin: `${import.meta.env.VITE_URL_PinesVus}/TipoEstadoPin`,
+  consultaTramites: `${import.meta.env.VITE_URL_PinesVus}/consultaTramites`,
+  consultaClientes: `${import.meta.env.VITE_URL_PinesVus}/consultaClientes`,
+  consultaParticipacion: `${import.meta.env.VITE_URL_PinesVus}/consultaParticipacion`,
+  registroPagoParticipacion: `${import.meta.env.VITE_URL_PinesVus}/registroPagoParticipacion`,
+  consultaPagoParticipacion: `${import.meta.env.VITE_URL_PinesVus}/consultaPagoParticipacion`,
+  descargaArchivosS3: `${import.meta.env.VITE_URL_PinesVus}/descargaArchivosS3`,
+  cupoQX: `${import.meta.env.VITE_URL_PinesVus}/cupoQX`,
+  ingresarIdQX: `${import.meta.env.VITE_URL_PinesVus}/ingresarIdQX`,
+  consultaEpsArl: `${import.meta.env.VITE_URL_PinesVus}/consultaEpsArl`,
+  reenvioHash: `${import.meta.env.VITE_URL_PinesVus}/reenviarCodigoHash`,
+  cierreManual: `${import.meta.env.VITE_URL_PinesVus}/cierreManual`,
+  consultaEstadoCierre: `${import.meta.env.VITE_URL_PinesVus}/consultaCierreManual`,
 };
 
 export const pinesVusContext = createContext({

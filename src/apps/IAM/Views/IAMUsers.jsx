@@ -10,7 +10,7 @@ import UserForm from "../components/Users/UserForm";
 import EditUserGroupForm from "../components/Users/EditUserGroupForm";
 import PaginationAuth from "../../../components/Compound/PaginationAuth/PaginationAuth";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const IAMUsers = () => {
   const [usuariosDB, setUsuariosDB] = useState([]);

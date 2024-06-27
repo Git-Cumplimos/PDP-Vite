@@ -5,7 +5,7 @@ import { notifyError } from "../../../utils/notify";
 import { useLoteria } from "../utils/LoteriaHooks";
 import Select from "../../../components/Base/Select"
 
-const url = process.env.REACT_APP_URL_LOTERIAS;
+const url = import.meta.env.VITE_URL_LOTERIAS;
 
 const ArchivosPagoPremios = () => {
 

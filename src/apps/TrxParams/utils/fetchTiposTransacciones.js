@@ -1,8 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 
-const url_types = process.env.REACT_APP_URL_TRXS_TRX;
+const url_types = import.meta.env.VITE_URL_TRXS_TRX;
 const urlComisiones =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 export const fetchTrxTypesPages = async (Nombre_operacion, page) => {
   try {

@@ -19,8 +19,8 @@ import usePermissionTrx from "../hook/usePermissionTrx";
 
 const minValor = 1000;
 const maxValor = 100000;
-const url_trx_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-recargas/metodo1/trx-recarga`;
-const url_consulta_recarga = `${process.env.REACT_APP_URL_MOVISTAR}/servicio-recargas/metodo1/consulta-recarga`;
+const url_trx_recarga = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-recargas/metodo1/trx-recarga`;
+const url_consulta_recarga = `${import.meta.env.VITE_URL_MOVISTAR}/servicio-recargas/metodo1/consulta-recarga`;
 
 const RecargasMovistar = () => {
   //Variables

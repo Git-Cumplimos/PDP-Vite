@@ -125,7 +125,7 @@ const VentaPines = () => {
 
     useEffect(() => {
       fetchData(
-        `${process.env.REACT_APP_URL_PinesVus}/consulta_canal`,
+        `${import.meta.env.VITE_URL_PinesVus}/consulta_canal`,
         "GET",
         { id_comercio: roleInfo?.id_comercio, }
       )
@@ -457,7 +457,7 @@ const VentaPines = () => {
 
   useEffect(() => {
     fetchData(
-      `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`,
+      `${import.meta.env.VITE_URL_TRXS_TRX}/tipos-operaciones`,
       "GET",
       { tipo_op: 73 }
     )
@@ -641,12 +641,12 @@ const VentaPines = () => {
   const datosConveni = useMemo(() => {
     if (canal == "1") {
       return{
-    "codigo_pin":  `${process.env.REACT_APP_CODIGO_PIN_CEA_OLIMPIA}`,
-    "fk_id_convenio": `${process.env.REACT_APP_CANAL_VENTA_CEA_OLIMPIA}`, //2310,//2041, 
+    "codigo_pin":  `${import.meta.env.VITE_CODIGO_PIN_CEA_OLIMPIA}`,
+    "fk_id_convenio": `${import.meta.env.VITE_CANAL_VENTA_CEA_OLIMPIA}`, //2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CEA", 
     "permite_modificar": true, 
-    "pk_codigo_convenio": `${process.env.REACT_APP_CODIGO_CONVENIO_CEA_OLIMPIA}`,
+    "pk_codigo_convenio": `${import.meta.env.VITE_CODIGO_CONVENIO_CEA_OLIMPIA}`,
     "referencia_1": "Documento", 
     "referencia_2": "Celular", 
     "referencia_3": null, 
@@ -654,12 +654,12 @@ const VentaPines = () => {
     "referencia_5": null
   };}
   else{ return{
-    "codigo_pin": `${process.env.REACT_APP_CODIGO_PIN_CEA_PAYNET}`, 
-    "fk_id_convenio": `${process.env.REACT_APP_CANAL_VENTA_CEA_PAYNET}`,//2310,//2041, 
+    "codigo_pin": `${import.meta.env.VITE_CODIGO_PIN_CEA_PAYNET}`, 
+    "fk_id_convenio": `${import.meta.env.VITE_CANAL_VENTA_CEA_PAYNET}`,//2310,//2041, 
     "fk_tipo_valor": 1, 
     "nombre_convenio": "Venta pines CEA", 
     "permite_modificar": false, 
-    "pk_codigo_convenio": `${process.env.REACT_APP_CODIGO_CONVENIO_CEA_PAYNET}`,
+    "pk_codigo_convenio": `${import.meta.env.VITE_CODIGO_CONVENIO_CEA_PAYNET}`,
     "referencia_1": "Documento", 
     "referencia_2": "Celular", 
     "referencia_3": null, 

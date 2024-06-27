@@ -12,7 +12,7 @@ import { useFetch } from "../../../../hooks/useFetch";
 import { notifyError } from "../../../../utils/notify";
 import Input from "../../../../components/Base/Input";
 import TextArea from "../../../../components/Base/TextArea";
-const url = process.env.REACT_APP_URL_PinesVus;
+const url = import.meta.env.VITE_URL_PinesVus;
 
 const reportPermisions = {
   "sftp_user/prueba_Pines/": 41,

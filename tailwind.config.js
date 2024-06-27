@@ -1,8 +1,5 @@
-const colors = require("tailwindcss/colors");
-delete colors.lightBlue;
-
-module.exports = {
-  purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
@@ -18,12 +15,8 @@ module.exports = {
         secondary: "rgba(6, 140, 193, 0.25)",
         "secondary-light": "rgb(225, 225, 223)",
         "secondary-dark": "rgb(96, 96, 96)",
-        ...colors,
       },
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [require("@tailwindcss/aspect-ratio")],
 };

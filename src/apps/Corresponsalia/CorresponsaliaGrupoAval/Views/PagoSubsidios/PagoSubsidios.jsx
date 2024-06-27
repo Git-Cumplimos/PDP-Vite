@@ -28,8 +28,8 @@ const dataInputInitial = {
   valor_total_trx: "",
 };
 
-const url_consulta_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidios`;
-const url_pago_subsidio = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidios`;
+const url_consulta_subsidio = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/consulta-pago-subsidios`;
+const url_pago_subsidio = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}/grupo_aval_cb_pago_subsidios/pago-subsidios`;
 // ********************************************
 
 // >>>>>>>>>>>>>>>>>>> componente <<<<<<<<<<<<<<<<<<<<<
@@ -162,7 +162,7 @@ const PagoSubsidios = () => {
       documento: inputData.documento,
       otp: pinBlock(
         inputData.otp,
-        process.env.REACT_APP_PAN_AVAL_PAGO_TERCEROS
+        import.meta.env.VITE_PAN_AVAL_PAGO_TERCEROS
       ),
       location: {
         address: roleInfo.direccion,

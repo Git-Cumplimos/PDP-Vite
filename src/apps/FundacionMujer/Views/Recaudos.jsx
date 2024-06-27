@@ -19,11 +19,11 @@ import { useFetch } from "../../../hooks/useFetch";
 import  useMoney from "../../../hooks/useMoney";
 import { useFetchFDLM } from "../hooks/fetchFDLM";
 
-const url_params = `${process.env.REACT_APP_URL_TRXS_TRX}/tipos-operaciones`;
-const URL_MOSTRAR_CREDITO= `${process.env.REACT_APP_URL_FDLMWSDL}/mostrarcreditos`
-const URL_INGRESAR_RECIBO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresorecibo`
-const URL_CONSULTAR_ESTADO_TRX = `${process.env.REACT_APP_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
-const URL_VALOR_CUOTA = `${process.env.REACT_APP_URL_FDLMWSDL}/valorcuota`
+const url_params = `${import.meta.env.VITE_URL_TRXS_TRX}/tipos-operaciones`;
+const URL_MOSTRAR_CREDITO= `${import.meta.env.VITE_URL_FDLMWSDL}/mostrarcreditos`
+const URL_INGRESAR_RECIBO = `${import.meta.env.VITE_URL_FDLMWSDL}/ingresorecibo`
+const URL_CONSULTAR_ESTADO_TRX = `${import.meta.env.VITE_URL_FDLMWSDL}/check_estado_recaudo_fdlm`
+const URL_VALOR_CUOTA = `${import.meta.env.VITE_URL_FDLMWSDL}/valorcuota`
 
 const Recaudo = () => {
   const navigate = useNavigate();

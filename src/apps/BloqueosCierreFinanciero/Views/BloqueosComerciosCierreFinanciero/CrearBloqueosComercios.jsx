@@ -14,7 +14,7 @@ import { fetchCustom } from "../../utils/fetchComerciosCierreFinanciero";
 import Modal from "../../../../components/Base/Modal/Modal";
 import { useAuth } from "../../../../hooks/AuthHooks";
 
-const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}`;
+const URL_COMERCIOS = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}`;
 // const URL_COMERCIOS = `http://127.0.0.1:5000`;
 
 const CrearBloqueosComercios = () => {

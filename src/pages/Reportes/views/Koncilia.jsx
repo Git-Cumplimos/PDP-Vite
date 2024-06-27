@@ -11,7 +11,7 @@ import { useFetch } from "../../../hooks/useFetch";
 
 import { notifyError } from "../../../utils/notify";
 
-const url = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const url = import.meta.env.VITE_URL_SERVICE_COMMERCE;
 
 const reportPermisions = {
   "reporte-general-transacciones/": 41,

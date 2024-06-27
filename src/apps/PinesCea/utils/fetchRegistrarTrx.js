@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlRegistroTrx =  `${process.env.REACT_APP_URL_PinesVus}`;
+const urlRegistroTrx =  `${import.meta.env.VITE_URL_PinesVus}`;
 
 export const registroTrx = async (bodyTrx) => {
     if (!bodyTrx) {

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import fetchData from "../../../utils/fetchData";
 import { notifyError } from "../../../utils/notify";
 
-const url = process.env.REACT_APP_URL_RECAUDO_GENERICO;
+const url = import.meta.env.VITE_URL_RECAUDO_GENERICO;
 
 const RecaudoCodigo = () => {
   const navigate = useNavigate();

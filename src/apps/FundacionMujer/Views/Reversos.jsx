@@ -21,11 +21,11 @@ import { useFetch } from "../../../hooks/useFetch";
 import { onChangeNumber } from "../../../utils/functions";
 
 /* URLS para consultar información de oficinas de donde hay que hacer el reverso*/
-const url_USERS = process.env.REACT_APP_URL_IAM_PDP;
-const url_datosComercio = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
-const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
+const url_USERS = import.meta.env.VITE_URL_IAM_PDP;
+const url_datosComercio = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}/login`;
+const urlCiudad_dane = `${import.meta.env.VITE_URL_DANE_MUNICIPIOS}`;
 /**/
-const URL_INGRESAR_REVERSO = `${process.env.REACT_APP_URL_FDLMWSDL}/ingresoreversorecibo`
+const URL_INGRESAR_REVERSO = `${import.meta.env.VITE_URL_FDLMWSDL}/ingresoreversorecibo`
 
 const Reversos = () => {
   /*__________ Fechas para consulta de transacciones del día________________ */
@@ -151,7 +151,7 @@ const Reversos = () => {
 
   const reversosFDLM = useCallback(
     (page, Comercio, Tipo_operacion, date_ini, date_end, state, limit) => {
-      const url = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones-view`;
+      const url = `${import.meta.env.VITE_URL_TRXS_TRX}/transaciones-view`;
       const queries = {};
       if (!(Comercio?.id_comercio === -1 || Comercio?.id_comercio === "")) {
         queries.id_comercio = Comercio?.id_comercio;

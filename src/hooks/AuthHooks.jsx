@@ -15,15 +15,15 @@ import { notifyError } from "../utils/notify";
 import useFetchDebounce from "./useFetchDebounce";
 import controlgroup from "../layouts/AdminLayout/ControlGroup";
 
-const urlLog = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/login`;
-const urlQuota = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/cupo`;
-const urlCiudad_dane = `${process.env.REACT_APP_URL_DANE_MUNICIPIOS}`;
-const urlInfoTicket = `${process.env.REACT_APP_URL_TRXS_TRX}/transaciones`;
-const url_iam_pdp_users = process.env.REACT_APP_URL_IAM_PDP;
-const url_user = process.env.REACT_APP_URL_COGNITO;
-const url_device = process.env.REACT_APP_URL_COGNITO_DEVICE;
-const public_urls = process.env.REACT_APP_URL_SERVICE_PUBLIC;
-const url_pdp_commerce = process.env.REACT_APP_URL_SERVICE_COMMERCE;
+const urlLog = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}/login`;
+const urlQuota = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}/cupo`;
+const urlCiudad_dane = `${import.meta.env.VITE_URL_DANE_MUNICIPIOS}`;
+const urlInfoTicket = `${import.meta.env.VITE_URL_TRXS_TRX}/transaciones`;
+const url_iam_pdp_users = import.meta.env.VITE_URL_IAM_PDP;
+const url_user = import.meta.env.VITE_URL_COGNITO;
+const url_device = import.meta.env.VITE_URL_COGNITO_DEVICE;
+const public_urls = import.meta.env.VITE_URL_SERVICE_PUBLIC;
+const url_pdp_commerce = import.meta.env.VITE_URL_SERVICE_COMMERCE;
 
 const validateUser = async (email) => {
   const get = {

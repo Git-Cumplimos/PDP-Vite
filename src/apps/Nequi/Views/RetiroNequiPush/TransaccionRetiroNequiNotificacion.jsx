@@ -17,8 +17,8 @@ import Tickets from "../../../../components/Base/Tickets";
 import Modal from "../../../../components/Base/Modal";
 import Input from "../../../../components/Base/Input";
 
-const URL_REALIZAR_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/retiro-notificacion-push`;
-const URL_CONSULTA_TRX_BD = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/nequi/check-estado-retiro-nequi`;
+const URL_REALIZAR_RETIRO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/nequi/retiro-notificacion-push`;
+const URL_CONSULTA_TRX_BD = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/nequi/check-estado-retiro-nequi`;
 const costoTrx = parseInt(
   enumParametrosNequi.COSTO_TRANSACCION_RETIRO_NEQUI_NOTIFICACION
 );

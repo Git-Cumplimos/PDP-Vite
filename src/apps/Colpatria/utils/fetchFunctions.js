@@ -2,8 +2,8 @@ import { fetchDataTotp } from "../../../utils/MFA";
 import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
-const urlColpatriaTrx = `${process.env.REACT_APP_URL_COLPATRIA}/trx`;
-const urlColpatriaParams = `${process.env.REACT_APP_URL_COLPATRIA}/params`;
+const urlColpatriaTrx = `${import.meta.env.VITE_URL_COLPATRIA}/trx`;
+const urlColpatriaParams = `${import.meta.env.VITE_URL_COLPATRIA}/params`;
 // const urlColpatriaTrx = `http://localhost:5000/trx`;
 // const urlColpatriaParams = `http://localhost:5000/params`;
 

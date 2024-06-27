@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
-const urlIam = process.env.REACT_APP_URL_IAM_PDP;
+const urlIam = import.meta.env.VITE_URL_IAM_PDP;
 
 const buildPostFunction = (url) => {
   return async (body) => {

@@ -7,7 +7,7 @@ import { onChangeNumber } from "../../../utils/functions";
 import useDelayedCallback from "../../../hooks/useDelayedCallback";
 
 const urlConvenios =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const RecaudoManual = () => {
   const navigate = useNavigate();

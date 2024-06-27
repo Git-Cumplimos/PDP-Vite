@@ -5,7 +5,7 @@ import Input from "../../../../components/Base/Input/Input";
 import { useFetch } from "../../../../hooks/useFetch";
 
 
-const URL_COMERCIOS = `${process.env.REACT_APP_URL_SERVICE_COMMERCE}/bloqueo_cierre_financiero/consulta_bloqueos`;
+const URL_COMERCIOS = `${import.meta.env.VITE_URL_SERVICE_COMMERCE}/bloqueo_cierre_financiero/consulta_bloqueos`;
 // const URL_COMERCIOS = `http://127.0.0.1:5000/bloqueo_cierre_financiero/consulta_bloqueos`;
 
 const ConsultaComerciosBloqueados = ({

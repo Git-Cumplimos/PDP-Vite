@@ -16,7 +16,7 @@ import { notifyError } from "../../../utils/notify";
 import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { useAuth } from "../../../hooks/AuthHooks";
 
-const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
+const urlLoto = `${import.meta.env.VITE_URL_LOTERIAS}/contiploteria`;
 
 const Loteria = ({ route }) => {
   const { roleInfo } = useAuth();

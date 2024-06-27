@@ -2,7 +2,7 @@ import { fetchDataTotp } from "../../../utils/MFA";
 import fetchData from "../../../utils/fetchData";
 import { notify } from "../../../utils/notify";
 
-const url = process.env.REACT_APP_URL_MOVII;
+const url = import.meta.env.VITE_URL_MOVII;
 export const postRealizarCashout = async (bodyObj) => {
   if (!bodyObj) {
     return "Sin datos body";

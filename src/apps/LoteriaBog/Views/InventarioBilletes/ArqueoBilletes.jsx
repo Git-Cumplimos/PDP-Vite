@@ -21,9 +21,9 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 
-const url_reportVentas = `${process.env.REACT_APP_URL_LOTERIAS}/reportes_ventas`;
-const url_Arqueobilletes = `${process.env.REACT_APP_URL_LOTERIAS}/arqueobilletes`;
-const urlLoto = `${process.env.REACT_APP_URL_LOTERIAS}/contiploteria`;
+const url_reportVentas = `${import.meta.env.VITE_URL_LOTERIAS}/reportes_ventas`;
+const url_Arqueobilletes = `${import.meta.env.VITE_URL_LOTERIAS}/arqueobilletes`;
+const urlLoto = `${import.meta.env.VITE_URL_LOTERIAS}/contiploteria`;
 
 const ArqueoBilletes = ({ route }) => {
   /*__________ Fechas para consulta de transacciones del día________________ */

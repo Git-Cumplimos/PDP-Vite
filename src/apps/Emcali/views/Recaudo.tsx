@@ -63,18 +63,18 @@ const len_valor_total_trx_maximo = formatMoney.format(
 const name_componente = "Recaudo";
 const infServiceBackend: TypeInf = {
   barcode: {
-    url: `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/transacciones/get-codigo-barras`,
+    url: `${import.meta.env.VITE_URL_EMCALI}/backend_emcali/transacciones/get-codigo-barras`,
     name: "Emcali - Lectura código de barras",
     method: "POST",
   },
   consult: {
-    // url: `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/transacciones/consulta-por-referencia`,
+    // url: `${import.meta.env.VITE_URL_EMCALI}/backend_emcali/transacciones/consulta-por-referencia`,
     url: `http://127.0.0.1:5000/backend_emcali/transacciones/consulta-por-referencia`,
     name: "Emcali - consulta",
     method: "POST",
   },
   pay: {
-    url: `${process.env.REACT_APP_URL_EMCALI}/backend_emcali/transacciones/trx-pago-cupon`,
+    url: `${import.meta.env.VITE_URL_EMCALI}/backend_emcali/transacciones/trx-pago-cupon`,
     name: "Emcali - pago",
     method: "POST",
   },

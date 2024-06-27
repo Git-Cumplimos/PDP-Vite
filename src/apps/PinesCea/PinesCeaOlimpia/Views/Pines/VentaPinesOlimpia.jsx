@@ -152,7 +152,7 @@ const VentaPinesOlimpia = () => {
     e.preventDefault();
     setIsLoading(true)
     fetchDataPinesCea(
-      `${process.env.REACT_APP_URL_PinesVus}/consulta_pin_cea`,
+      `${import.meta.env.VITE_URL_PinesVus}/consulta_pin_cea`,
       "POST",
       {},
       {
@@ -233,7 +233,7 @@ const VentaPinesOlimpia = () => {
     e.preventDefault();
     setIsLoadingPago(true)
     fetchDataPinesCea(
-      `${process.env.REACT_APP_URL_PinesVus}/recaudar_pin`,
+      `${import.meta.env.VITE_URL_PinesVus}/recaudar_pin`,
       "POST",
       {},
       {
@@ -282,11 +282,11 @@ const VentaPinesOlimpia = () => {
           const partesFecha = fecha.split("/");
           const fechaFormateada = `${partesFecha[0]}-${partesFecha[1]}-${partesFecha[2]}`;
           fetchDataPinesCea(
-            `${process.env.REACT_APP_URL_PinesVus}/ConfirmarRecaudo`,
+            `${import.meta.env.VITE_URL_PinesVus}/ConfirmarRecaudo`,
             "POST",
             {},
             {
-              IdCliente: process.env.REACT_APP_ID_CLIENTE_OLIMPIA_CEA,
+              IdCliente: import.meta.env.VITE_ID_CLIENTE_OLIMPIA_CEA,
               Pin: numeroPin,
               TipoIdentificacion: tipoIdentificacion,
               NumeroIdentificacion: numeroIdentificacion,

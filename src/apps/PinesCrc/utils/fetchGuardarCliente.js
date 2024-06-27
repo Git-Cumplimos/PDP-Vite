@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlRegistroCliente =  `${process.env.REACT_APP_URL_PinesVus}`;
+const urlRegistroCliente =  `${import.meta.env.VITE_URL_PinesVus}`;
 
 export const guardarCliente = async (bodyCliente) => {
     if (!bodyCliente) {

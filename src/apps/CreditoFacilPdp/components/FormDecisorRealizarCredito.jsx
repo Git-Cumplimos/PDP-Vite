@@ -12,7 +12,7 @@ import Button from "../../../components/Base/Button";
 import { notifyError, notifyPending } from "../../../utils/notify";
 import { enumParametrosCreditosPDP } from "../utils/enumParametrosCreditosPdp";
 
-const URL_REALIZAR_CONSULTA_DECISOR = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
+const URL_REALIZAR_CONSULTA_DECISOR = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/credito-facil/consulta-preaprobado-decisor`;
 
 const FormDecisorRealizarCredito = ({ dataCredito, setDataCredito }) => {
   const navigate = useNavigate();

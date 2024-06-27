@@ -5,8 +5,8 @@ import Button from "../../Base/Button";
 import ButtonBar from "../../Base/ButtonBar";
 import Modal from "../../Base/Modal";
 
-const timeIdleTimeOut = `${process.env.REACT_APP_TIEMPO_INACTIVIDAD_ADVERTENCIA}`;
-const timeLogOutTimeOut = `${process.env.REACT_APP_TIEMPO_INACTIVIDAD_LOGOUT}`;
+const timeIdleTimeOut = `${import.meta.env.VITE_TIEMPO_INACTIVIDAD_ADVERTENCIA}`;
+const timeLogOutTimeOut = `${import.meta.env.VITE_TIEMPO_INACTIVIDAD_LOGOUT}`;
 
 const IdleTimeOut = () => {
   const [idleModal, setIdleModal] = useState(false);

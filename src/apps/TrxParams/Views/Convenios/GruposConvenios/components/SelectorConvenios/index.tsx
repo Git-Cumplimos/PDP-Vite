@@ -34,7 +34,7 @@ type Props = {
   setUpdateCurrentConvs?: Dispatch<SetStateAction<() => void>>;
 };
 
-const urlGruposConvenios = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlGruposConvenios = import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const titulos = {
   SEARCH_TABLE_DELETE: {

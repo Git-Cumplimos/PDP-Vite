@@ -19,9 +19,9 @@ import PaymentSummary from "../../../components/Compound/PaymentSummary";
 import { useFetch } from "../../../hooks/useFetch";
 import { fetchCustom } from "../utils/fetchTranscaribe";
 
-const URL_CONSULTA_SALDO_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/transcaribe/consulta-tarjeta`;
-const URL_REALIZAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/transcaribe/recarga-tarjeta`;
-const URL_CONSULTAR_RECARGA_TARJETA = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/transcaribe/consulta-recarga-tarjeta`;
+const URL_CONSULTA_SALDO_TARJETA = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/transcaribe/consulta-tarjeta`;
+const URL_REALIZAR_RECARGA_TARJETA = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/transcaribe/recarga-tarjeta`;
+const URL_CONSULTAR_RECARGA_TARJETA = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/transcaribe/consulta-recarga-tarjeta`;
 
 const TransaccionRecargaTarjeta = () => {
   const validNavigate = useNavigate();

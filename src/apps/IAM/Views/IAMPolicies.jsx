@@ -9,7 +9,7 @@ import { notifyError } from "../../../utils/notify";
 import EditPolicyForm from "../components/Policies/EditPolicyForm";
 import PolicyForm from "../components/Policies/PolicyForm";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const IAMPolicies = () => {
   const [policiesDB, setPoliciesDB] = useState([]);

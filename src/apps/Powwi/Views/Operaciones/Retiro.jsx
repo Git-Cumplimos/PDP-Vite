@@ -21,9 +21,9 @@ import { v4 } from "uuid";
 import { fetchCustom } from "../../utils/fetchCorresponsaliaPowwi";
 import { useFetchPowwi } from "../../hooks/fetchPowwi";
 
-const URL_CONSULTAR_COSTO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/consulta-retiro-powwi`;
-const URL_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/retiro-powwi`;
-const URL_CONSULTAR_TRANSACCION_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}//corresponsalia-powwi/consulta-estado-retiro-powwi`;
+const URL_CONSULTAR_COSTO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/consulta-retiro-powwi`;
+const URL_RETIRO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/corresponsalia-powwi/retiro-powwi`;
+const URL_CONSULTAR_TRANSACCION_RETIRO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}//corresponsalia-powwi/consulta-estado-retiro-powwi`;
 
 const Retiro = () => {
   const navigate = useNavigate();

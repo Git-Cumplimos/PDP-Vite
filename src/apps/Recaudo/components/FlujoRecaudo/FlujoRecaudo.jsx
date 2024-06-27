@@ -10,7 +10,7 @@ import fetchData from "../../../../utils/fetchData";
 import { notifyError } from "../../../../utils/notify";
 import RefsForm from "../RefsForm/RefsForm";
 
-const urlRecaudo = process.env.REACT_APP_URL_REVAL_RECAUDO;
+const urlRecaudo = import.meta.env.VITE_URL_REVAL_RECAUDO;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",

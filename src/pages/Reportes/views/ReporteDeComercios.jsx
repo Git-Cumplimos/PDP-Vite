@@ -5,7 +5,7 @@ import TableEnterprise from "../../../components/Base/TableEnterprise";
 import { useFetch } from "../../../hooks/useFetch";
 import { notifyError,notify } from "../../../utils/notify";
 
-const url = process.env.REACT_APP_URL_CAJA;
+const url = import.meta.env.VITE_URL_CAJA;
 
 
 const ReporteDeComercios = () => {

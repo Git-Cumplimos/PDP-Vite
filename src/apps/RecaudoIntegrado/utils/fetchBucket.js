@@ -1,8 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 import { notify, notifyError } from "../../../utils/notify";
 
-const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
-const urlBackendValidar = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-validar-archivos`;
+const urlBackend = `${import.meta.env.VITE_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
+const urlBackendValidar = `${import.meta.env.VITE_URL_RECAUDO_EMPRESARIAL}/servicio-validar-archivos`;
 export const Presigned = async (archivo, banco) => {
   console.log("BODY", archivo);
   if (!archivo) {

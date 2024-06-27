@@ -10,7 +10,7 @@ import { notifyError } from "../../../../../utils/notify";
 
 import SelectorConvenios from "./components/SelectorConvenios";
 
-const urlGruposConvenios = process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+const urlGruposConvenios = import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 const EditGruposConvenios = () => {
   const { id: id_grupo_convenio } = useParams();

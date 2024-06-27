@@ -125,8 +125,8 @@ const Retiro = () => {
       numCelular: datosTrans.numeroTelefono,
       municipio: roleInfo?.["ciudad"] ? roleInfo?.["ciudad"] : "No hay datos",
       otp: cifrarAES(
-        `${process.env.REACT_APP_LLAVE_AES_CASHOUT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_CASHOUT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_CASHOUT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_CASHOUT_DAV}`,
         datosTrans.otp
       ),
       oficinaPropia:

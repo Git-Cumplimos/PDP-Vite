@@ -35,9 +35,9 @@ const dataInputInitial = {
   numero_factura: "",
   numero_identificacion_retiro: "",
 };
-const url_consulta = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/consulta-generacion-pin`;
-const URL_REALIZAR_RETIRO_ALMASEG = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/retiro-almaseg`;
-const URL_CONSULTAR_RETIRO_ALMASEG = `${process.env.REACT_APP_URL_ALMASEG}/servicio_almaseg/check-estado-retiro-almaseg`;
+const url_consulta = `${import.meta.env.VITE_URL_ALMASEG}/servicio_almaseg/consulta-generacion-pin`;
+const URL_REALIZAR_RETIRO_ALMASEG = `${import.meta.env.VITE_URL_ALMASEG}/servicio_almaseg/retiro-almaseg`;
+const URL_CONSULTAR_RETIRO_ALMASEG = `${import.meta.env.VITE_URL_ALMASEG}/servicio_almaseg/check-estado-retiro-almaseg`;
 
 //--------- componente ------------------
 const ConsultaGeneracionPin = (): JSX.Element => {

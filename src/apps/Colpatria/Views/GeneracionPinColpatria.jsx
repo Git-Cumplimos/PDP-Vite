@@ -23,8 +23,8 @@ import { useFetchcolpatria } from "../hooks/fetchColpatria";
 import TicketColpatria from "../components/TicketColpatria";
 import { useReactToPrint } from "react-to-print";
 
-const URL_GENERACION_PIN = `${process.env.REACT_APP_URL_COLPATRIA}/soap/generacion-pin-pago`;
-const URL_CONSULTA_GENERACION_PIN = `${process.env.REACT_APP_URL_COLPATRIA}/soap/consulta-estado-generacion-pin-pago`;
+const URL_GENERACION_PIN = `${import.meta.env.VITE_URL_COLPATRIA}/soap/generacion-pin-pago`;
+const URL_CONSULTA_GENERACION_PIN = `${import.meta.env.VITE_URL_COLPATRIA}/soap/consulta-estado-generacion-pin-pago`;
 
 const DATA_INICIAL_PIN = {
   referencia_1: "",

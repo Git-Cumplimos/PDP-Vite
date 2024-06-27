@@ -1,8 +1,8 @@
 import fetchData from "../../../utils/fetchData";
 
-// const urlRecargasCelular = `${process.env.REACT_APP_RECARGAS_CELULAR}`;
+// const urlRecargasCelular = `${import.meta.env.VITE_RECARGAS_CELULAR}`;
 const urlRecargasCelular =
-  process.env.REACT_APP_PRACTISISTEMAS + "/recargasCelular";
+  import.meta.env.VITE_PRACTISISTEMAS + "/recargasCelular";
 
 export const postConsultaOperadores = async (bodyObj) => {
   if (!bodyObj) {

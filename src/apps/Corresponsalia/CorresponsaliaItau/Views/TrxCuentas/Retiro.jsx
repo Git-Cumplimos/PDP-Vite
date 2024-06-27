@@ -17,8 +17,8 @@ import { enumParametrosItau } from "../../utils/enumParametrosItau";
 import TicketsItau from "../../components/TicketsItau";
 import PaymentSummary from "../../../../../components/Compound/PaymentSummary";
 
-const URL_REALIZAR_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/retiro-servicios-itau/retiro-servicios`;
-const URL_CONSULTAR_TRANSACCION_RETIRO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/retiro-servicios-itau/consulta-estado-retiro-servicios`;
+const URL_REALIZAR_RETIRO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/retiro-servicios-itau/retiro-servicios`;
+const URL_CONSULTAR_TRANSACCION_RETIRO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/retiro-servicios-itau/consulta-estado-retiro-servicios`;
 
 const Retiro = () => {
   const navigate = useNavigate();

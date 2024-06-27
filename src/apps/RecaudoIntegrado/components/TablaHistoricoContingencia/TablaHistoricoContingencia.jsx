@@ -7,7 +7,7 @@ import useFetchDebounce from "../../../../hooks/useFetchDebounce";
 import useFetchDispatchDebounce,{ErrorPDPFetch} from "../../../../hooks/useFetchDispatchDebounce";
 import { makeDateFormatter } from "../../../../utils/functions";
 
-const urlBackend = `${process.env.REACT_APP_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
+const urlBackend = `${import.meta.env.VITE_URL_RECAUDO_EMPRESARIAL}/servicio-contingencia-empresarial-pdp`;
 // const urlBackend = `http://localhost:5000/servicio-contingencia-empresarial-pdp`;
 
 const initialSearchFilters = new Map([

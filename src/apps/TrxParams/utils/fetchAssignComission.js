@@ -1,6 +1,6 @@
 import fetchData from "../../../utils/fetchData";
 const urlComisiones =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 
 export const postAsignacionesComisiones = async (bodyObj) => {
   if (!bodyObj) {

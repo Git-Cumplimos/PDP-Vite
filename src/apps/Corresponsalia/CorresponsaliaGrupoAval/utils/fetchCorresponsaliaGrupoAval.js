@@ -1,8 +1,8 @@
 import { fetchDataTotp } from "../../../../utils/MFA";
 import fetchData from "../../../../utils/fetchData";
 
-const urlGrupoAval = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}`;
-const urlParametrizacion = `${process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
+const urlGrupoAval = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}`;
+const urlParametrizacion = `${import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS}`;
 
 export const consultaCostoGrupoAval = async (bodyObj) => {
   if (!bodyObj) {

@@ -73,7 +73,7 @@ const Retiro = () => {
   const [showBTNConsulta, setShowBTNConsulta] = useState(true);
 
   const otpEncrip = useMemo(() => {
-    let x = pinBlock(otp, process.env.REACT_APP_PAN_AVAL);
+    let x = pinBlock(otp, import.meta.env.VITE_PAN_AVAL);
     return x;
   }, [otp]);
 

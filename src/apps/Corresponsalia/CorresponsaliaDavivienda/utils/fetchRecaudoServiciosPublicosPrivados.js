@@ -2,7 +2,7 @@ import { cifrarAES, decryptAES } from "../../../../utils/cryptoUtils";
 import fetchData from "../../../../utils/fetchData";
 import { hash } from "../../../../utils/hash";
 
-const urlDaviplata = `${process.env.REACT_APP_URL_CORRESPONSALIA_DAVIVIENDA}`;
+const urlDaviplata = `${import.meta.env.VITE_URL_CORRESPONSALIA_DAVIVIENDA}`;
 
 export const postConsultaTablaConveniosPaginado = async (bodyObj) => {
   if (!bodyObj) {
@@ -32,8 +32,8 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -52,8 +52,8 @@ export const postConsultaTablaConveniosEspecifico = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -70,8 +70,8 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -90,8 +90,8 @@ export const postConsultaCodigoBarrasConveniosEspecifico = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -108,8 +108,8 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -129,8 +129,8 @@ export const postConsultaConveniosDavivienda = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);
@@ -200,8 +200,8 @@ export const postRecaudoConveniosDavivienda = async (bodyObj) => {
   let parseObj = JSON.stringify(bodyObj);
   let dataObj = {
     data: cifrarAES(
-      `${process.env.REACT_APP_LLAVE_AES_ENCRYPT_DAV}`,
-      `${process.env.REACT_APP_IV_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_LLAVE_AES_ENCRYPT_DAV}`,
+      `${import.meta.env.VITE_IV_AES_ENCRYPT_DAV}`,
       parseObj
     ),
   };
@@ -221,8 +221,8 @@ export const postRecaudoConveniosDavivienda = async (bodyObj) => {
     if (res?.obj !== {}) {
       const dataDecrypt = res?.obj?.data ?? "";
       const obj = decryptAES(
-        `${process.env.REACT_APP_LLAVE_AES_DECRYPT_DAV}`,
-        `${process.env.REACT_APP_IV_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_LLAVE_AES_DECRYPT_DAV}`,
+        `${import.meta.env.VITE_IV_AES_DECRYPT_DAV}`,
         dataDecrypt
       );
       res.obj = JSON.parse(obj);

@@ -31,7 +31,7 @@ const {
   btnBasura,
 } = classes;
 
-const urlAssets = process.env.REACT_APP_ASSETS_URL;
+const urlAssets = import.meta.env.VITE_ASSETS_URL;
 
 const CargarPaquetes = ({ operadorCurrent }: { operadorCurrent: any }) => {
   const { svgs }: any = useImgs();

@@ -26,7 +26,7 @@ const formatMoney = new Intl.NumberFormat("es-CO", {
   maximumFractionDigits: 0,
 });
 const { contenedorImagen, contenedorForm, contenedorFieldset } = classes;
-const url = process.env.REACT_APP_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
+const url = import.meta.env.VITE_URL_COLPENSIONES_OBLIGATORIO_DEMANDA;
 // const url = "http://127.0.0.1:5000";
 const PpsObligatorioDemanda = ({ ced, fun }) => {
   const { quotaInfo, roleInfo, infoTicket, pdpUser } = useAuth();

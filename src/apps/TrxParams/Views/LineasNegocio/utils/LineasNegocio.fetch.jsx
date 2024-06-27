@@ -1,7 +1,7 @@
 import { Auth } from "@aws-amplify/auth";
 import * as BusinessLineCons from "./LineasNegocio.cons";
 
-const API = `${process.env.REACT_APP_URL_BUSINESS_LINES}`;
+const API = `${import.meta.env.VITE_URL_BUSINESS_LINES}`;
 
 export const petitions = {
   get: async ({ uri }) => {

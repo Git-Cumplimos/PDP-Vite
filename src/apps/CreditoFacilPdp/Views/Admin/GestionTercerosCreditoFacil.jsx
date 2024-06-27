@@ -15,8 +15,8 @@ import {
   MUNICIPIOS_SIIAN,
 } from "../../enumDataLocalizacionCredito";
 
-const URL_CONSULTA_TERCEROS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/consulta-tercero`;
-const URL_CREACION_TERCEROS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/creacion-tercero`;
+const URL_CONSULTA_TERCEROS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/consulta-tercero`;
+const URL_CREACION_TERCEROS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/gestion-credito-facil/creacion-tercero`;
 
 const DATA_TIPO_ID = {
   NIT: 2,

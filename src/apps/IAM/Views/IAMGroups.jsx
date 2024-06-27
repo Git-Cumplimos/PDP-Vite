@@ -7,7 +7,7 @@ import PaginationAuth from "../../../components/Compound/PaginationAuth";
 import fetchData from "../../../utils/fetchData";
 import GroupForm from "../components/Groups/GroupForm";
 
-const url = process.env.REACT_APP_URL_IAM_PDP;
+const url = import.meta.env.VITE_URL_IAM_PDP;
 
 const IAMGroups = () => {
   const [gruposDB, setGruposDB] = useState([]);

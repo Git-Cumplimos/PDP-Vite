@@ -10,8 +10,8 @@ import fetchData from "../../../utils/fetchData";
 import { fetchCustom } from "../utils/fetchCreditoFacil";
 import Fieldset from "../../../components/Base/Fieldset";
 
-const URL_ACTUALIZAR_DOCUMENTO_TBL_MOVIMIENTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/actualizacion-documento-guardado`;
-const URL_MODIFICAR_ARCHIVO_S3 = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-modificar`;
+const URL_ACTUALIZAR_DOCUMENTO_TBL_MOVIMIENTOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/actualizacion-documento-guardado`;
+const URL_MODIFICAR_ARCHIVO_S3 = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/validacion-documentos/carga-documentos-modificar`;
 
 const documentTypes = [
   { key: "Pagare", label: "Pagaré Firmado" },

@@ -12,7 +12,7 @@ import fetchData from "../../../../utils/fetchData";
 import { notify, notifyError } from "../../../../utils/notify";
 import ParamsForm from "../../components/ParamsFomr/ParamsForm";
 
-const url_consultaParams = `${process.env.REACT_APP_URL_LOTERIAS}/con_params`;
+const url_consultaParams = `${import.meta.env.VITE_URL_LOTERIAS}/con_params`;
 
 const CrearSorteos = ({ route }) => {
   const { label } = route;

@@ -30,9 +30,9 @@ function createCard(
   };
 }
 
-const url_Report = `${process.env.REACT_APP_URL_APISMS}/report`;
-const url_actualizar = `${process.env.REACT_APP_URL_APISMS}/actualizar_pendientes`;
-const url_Download = `${process.env.REACT_APP_URL_APISMS}/reportDownload`;
+const url_Report = `${import.meta.env.VITE_URL_APISMS}/report`;
+const url_actualizar = `${import.meta.env.VITE_URL_APISMS}/actualizar_pendientes`;
+const url_Download = `${import.meta.env.VITE_URL_APISMS}/reportDownload`;
 
 const ReporteSMS = () => {
   const [trxs, setTrxs] = useState([]);

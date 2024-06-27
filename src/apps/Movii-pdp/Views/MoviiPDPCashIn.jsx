@@ -16,9 +16,9 @@ import { enumParametrosMovii } from "../utils/enumParametrosMovii";
 import { useFetchMovii } from "../hooks/fetchMovii";
 import { useFetch } from "../../../hooks/useFetch";
 import { useMFA } from "../../../components/Base/MFAScreen";
-const URL_CONSULTA_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/check-estado-deposito-movii`;
-const URL_CONSULTAR_USUARIO_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/consulta-deposito-movii`;
-const URL_REALIZAR_DEPOSITO_MOVII = `${process.env.REACT_APP_URL_MOVII}/corresponsal-movii/deposito-corresponsal-movii`;
+const URL_CONSULTA_DEPOSITO_MOVII = `${import.meta.env.VITE_URL_MOVII}/corresponsal-movii/check-estado-deposito-movii`;
+const URL_CONSULTAR_USUARIO_DEPOSITO_MOVII = `${import.meta.env.VITE_URL_MOVII}/corresponsal-movii/consulta-deposito-movii`;
+const URL_REALIZAR_DEPOSITO_MOVII = `${import.meta.env.VITE_URL_MOVII}/corresponsal-movii/deposito-corresponsal-movii`;
 
 const formatMoney = new Intl.NumberFormat("es-CO", {
   style: "currency",

@@ -8,7 +8,7 @@ import fetchData from "../../../../utils/fetchData";
 import { onChangeNumber } from "../../../../utils/functions";
 import { notify, notifyError } from "../../../../utils/notify";
 
-const url_iam = process.env.REACT_APP_URL_IAM_PDP;
+const url_iam = import.meta.env.VITE_URL_IAM_PDP;
 
 const PermissionForm = ({ onCloseModal }) => {
   const makeForm = useMemo(() => {

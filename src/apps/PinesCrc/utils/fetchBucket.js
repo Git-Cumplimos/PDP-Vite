@@ -1,7 +1,7 @@
 import fetchData from "../../../utils/fetchData";
 
-const urlBackend = `${process.env.REACT_APP_URL_PinesVus}`;
-//const urlBackend = `${process.env.REACT_APP_BASE_API}/cert/pinesVus`;
+const urlBackend = `${import.meta.env.VITE_URL_PinesVus}`;
+//const urlBackend = `${import.meta.env.VITE_BASE_API}/cert/pinesVus`;
 
 
 export const Presigned_validar = async (archivo, filename) => {

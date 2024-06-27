@@ -17,7 +17,7 @@ import TicketMoviliza from "../../components/TicketsMoviliza/TicketMoviliza";
 //Constantes Style
 const { styleComponents } = classes;
 //Constantes
-const url_consult_pago = `${process.env.REACT_APP_URL_PASARELA_GOU}/backend/pasarela-pagos/consultar-pago`;
+const url_consult_pago = `${import.meta.env.VITE_URL_PASARELA_GOU}/backend/pasarela-pagos/consultar-pago`;
 
 const ConsultarPago = () => {
   const [numLiquidacion, setNumLiquidacion] = useState("");

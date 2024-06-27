@@ -1,14 +1,14 @@
 import fetchData from "../../../utils/fetchData";
 import { fetchSecure } from "../../../utils/functions";
 
-const urlArqueo = `${process.env.REACT_APP_URL_CAJA}/arqueo`;
-const urlCaja = `${process.env.REACT_APP_URL_CAJA}/caja`;
-const urlComprobantes = `${process.env.REACT_APP_URL_CAJA}/comprobantes`;
-const urlCuentas = `${process.env.REACT_APP_URL_CAJA}/cuentas`;
-const urlNotas = `${process.env.REACT_APP_URL_CAJA}/notas`;
-const urlReportes = `${process.env.REACT_APP_URL_CAJA}/reportes`;
-const urlCierreCaja = `${process.env.REACT_APP_URL_CAJA}/transacciones`;
-const urltransacciones =`${process.env.REACT_APP_URL_CAJA}/transacciones`;
+const urlArqueo = `${import.meta.env.VITE_URL_CAJA}/arqueo`;
+const urlCaja = `${import.meta.env.VITE_URL_CAJA}/caja`;
+const urlComprobantes = `${import.meta.env.VITE_URL_CAJA}/comprobantes`;
+const urlCuentas = `${import.meta.env.VITE_URL_CAJA}/cuentas`;
+const urlNotas = `${import.meta.env.VITE_URL_CAJA}/notas`;
+const urlReportes = `${import.meta.env.VITE_URL_CAJA}/reportes`;
+const urlCierreCaja = `${import.meta.env.VITE_URL_CAJA}/transacciones`;
+const urltransacciones =`${import.meta.env.VITE_URL_CAJA}/transacciones`;
 
 // const urlCierreCaja = `http://localhost:5000/transacciones`;
 // const urlArqueo = `http://localhost:5000/arqueo`;

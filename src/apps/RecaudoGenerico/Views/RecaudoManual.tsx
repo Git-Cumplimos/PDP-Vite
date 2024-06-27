@@ -26,7 +26,7 @@ type TypeSearchFilters = {
 };
 
 //------ constantes generales --------
-const url = `${process.env.REACT_APP_URL_RECAUDO_GENERICO}/backend/recaudo-generico/convenios/consultar-convenios-manual`;
+const url = `${import.meta.env.VITE_URL_RECAUDO_GENERICO}/backend/recaudo-generico/convenios/consultar-convenios-manual`;
 const searchFiltersInitial: TypeSearchFilters = {
   id_relacion_convenio_autorizador: "",
   name_pdp_convenio: "",

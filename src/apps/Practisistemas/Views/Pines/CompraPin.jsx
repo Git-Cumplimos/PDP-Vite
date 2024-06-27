@@ -36,8 +36,8 @@ const maxValor = enumLimiteApuestas.maxPines;
 const minValorEPM = enumLimiteApuestas.minPinesEPM;
 const maxValorEPM = enumLimiteApuestas.maxPinesEPM;
 
-const URL_PINES = `${process.env.REACT_APP_PRACTISISTEMAS}/pines/transacciones`;
-const URL_CONSULTA_PINES = `${process.env.REACT_APP_PRACTISISTEMAS}/pines/consulta-estado-trx`;
+const URL_PINES = `${import.meta.env.VITE_PRACTISISTEMAS}/pines/transacciones`;
+const URL_CONSULTA_PINES = `${import.meta.env.VITE_PRACTISISTEMAS}/pines/consulta-estado-trx`;
 
 const CompraPin = () => {
   const { contenedorbtn, contenedorTitulos } = classes;

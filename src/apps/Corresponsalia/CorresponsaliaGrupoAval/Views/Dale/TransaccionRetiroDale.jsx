@@ -19,9 +19,9 @@ import { pinBlock } from "../../utils/pinBlock";
 import { enumParametrosGrupoAval } from "../../utils/enumParametrosGrupoAval";
 import TicketsDale from "../../components/TicketsDale/TicketsDale";
 
-const URL_REALIZAR_RETIRO_DALE = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/transacciones-dale/retiro-otp-dale`;
-const URL_CONSULTAR_COSTO_RETIRO_DALE = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/transacciones-dale/consulta-costo-retiro-dale`;
-const URL_CONSULTAR_TRANSACCION_RETIRO_DALE = `${process.env.REACT_APP_URL_CORRESPONSALIA_AVAL}/transacciones-dale/check-estado-retiro-dale`;
+const URL_REALIZAR_RETIRO_DALE = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}/transacciones-dale/retiro-otp-dale`;
+const URL_CONSULTAR_COSTO_RETIRO_DALE = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}/transacciones-dale/consulta-costo-retiro-dale`;
+const URL_CONSULTAR_TRANSACCION_RETIRO_DALE = `${import.meta.env.VITE_URL_CORRESPONSALIA_AVAL}/transacciones-dale/check-estado-retiro-dale`;
 
 const TransaccionRetiroDale = () => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const TransaccionRetiroDale = () => {
           documento: dataUsuario?.numeroDocumento,
           otp: pinBlock(
             dataUsuario?.otpDale,
-            process.env.REACT_APP_PAN_AVAL_RETIRO_OTP
+            import.meta.env.VITE_PAN_AVAL_RETIRO_OTP
           ),
           id_trx_original: resConsulta?.id_trx,
           numCelular: dataUsuario?.numCelular,
@@ -127,7 +127,7 @@ const TransaccionRetiroDale = () => {
           documento: dataUsuario?.numeroDocumento,
           otp: pinBlock(
             dataUsuario?.otpDale,
-            process.env.REACT_APP_PAN_AVAL_RETIRO_OTP
+            import.meta.env.VITE_PAN_AVAL_RETIRO_OTP
           ),
           numCelular: dataUsuario?.numCelular,
         },

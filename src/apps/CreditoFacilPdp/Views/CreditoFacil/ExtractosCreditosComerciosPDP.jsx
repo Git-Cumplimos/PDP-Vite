@@ -10,8 +10,8 @@ import PaymentSummary from "../../../../components/Compound/PaymentSummary";
 import ButtonBar from "../../../../components/Base/ButtonBar";
 import Button from "../../../../components/Base/Button";
 
-const URL_CONSULTA_CREDITO = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/consulta-creditos`;
-const URL_GENERAR_EXTRACTOS = `${process.env.REACT_APP_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/generacion-extracto`;
+const URL_CONSULTA_CREDITO = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/consulta-creditos`;
+const URL_GENERAR_EXTRACTOS = `${import.meta.env.VITE_URL_CORRESPONSALIA_OTROS}/extractos-credito-facil/generacion-extracto`;
 
 const DATA_CREDITO_UNIQUE_SIIAN_INI = {
   Agrupacion: "",

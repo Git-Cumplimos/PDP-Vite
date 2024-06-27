@@ -22,8 +22,8 @@ import { toPhoneNumber } from "../../../../utils/functions";
 import { v4 } from "uuid";
 import { useFetchPractisistemas } from "../../hooks/fetchPractisistemasHook";
 
-const URL_RECARGA = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/recarga`;
-const URL_CONSULTA_RECARGA = `${process.env.REACT_APP_PRACTISISTEMAS}/recargasCelular/consulta-estado-trx`;
+const URL_RECARGA = `${import.meta.env.VITE_PRACTISISTEMAS}/recargasCelular/recarga`;
+const URL_CONSULTA_RECARGA = `${import.meta.env.VITE_PRACTISISTEMAS}/recargasCelular/consulta-estado-trx`;
 
 
 const RecargarPaquetes = () => {

@@ -45,7 +45,7 @@ type Props = {
 };
 
 const urlConveniosPdp =
-  process.env.REACT_APP_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
+  import.meta.env.VITE_URL_SERVICIOS_PARAMETRIZACION_SERVICIOS;
 // const urlConveniosPdp = "http://localhost:5000";
 
 const TablaParametrizacionCodBarrasConvenios = ({

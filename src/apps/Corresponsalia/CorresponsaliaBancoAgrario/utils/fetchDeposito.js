@@ -1,5 +1,5 @@
 import { fetchDataTotp } from "../../../../utils/MFA";
-const url_banco_agrario = `${process.env.REACT_APP_URL_BANCO_AGRARIO}`;
+const url_banco_agrario = `${import.meta.env.VITE_URL_BANCO_AGRARIO}`;
 
 // export ValidationRetiroEfectivo
 
